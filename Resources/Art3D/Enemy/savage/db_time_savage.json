@@ -1,0 +1,11 @@
+[
+    { "animName" : "db_anm_savage_attack_chop", "timing" : [6, 3, 3], "directions" : 2 },
+    { "animName" : "db_anm_savage_attack_bowShoot", "timing" : [2, 3, 5, 5], "directions" : 2 },
+    { "animName" : "db_anm_savage_attack_thrust", "timing" : [6, 3, 2], "directions" : 2 },
+    { "animName" : "db_anm_savage_death", "timing" : [3, 2, 2, 2.996, 0.004, 2, 2, 10], "directions" : 1 },
+    { "animName" : "db_anm_savage_flex", "timing" : [3, 4, 2, 1], "directions" : 2 },
+    { "animName" : "db_anm_savage_idle", "timing" : [9, 6, 7, 4], "directions" : 2 },
+    { "animName" : "db_anm_savage_run", "timing" : [3, 3, 3, 3, 1], "directions" : 2 },
+    { "animName" : "db_anm_savage_suffer", "timing" : [2, 2, 2, 3, 2, 3], "directions" : 2 },
+    { "animName" : "db_anm_savage_tauntJeer", "timing" : [4, 4, 4, 4], "directions" : 2 }
+]

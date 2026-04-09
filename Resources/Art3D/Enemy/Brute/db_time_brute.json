@@ -1,0 +1,10 @@
+[
+    { "animName" : "db_anm_brute_attack_chop", "timing" : [3, 3, 2, 1, 4], "directions" : 3 },
+    { "animName" : "db_anm_brute_attack_fart", "timing" : [3, 3, 4, 3, 8], "directions" : 3 },
+    { "animName" : "db_anm_brute_death", "timing" : [3, 2, 1, 3, 3, 3, 44], "directions" : 1 },
+    { "animName" : "db_anm_brute_flex", "timing" : [6, 4, 4, 4, 4], "directions" : 3 },
+    { "animName" : "db_anm_brute_idle", "timing" : [9, 6, 9, 2], "directions" : 3 },
+    { "animName" : "db_anm_brute_run", "timing" : [2, 2, 3, 2, 2, 2, 1], "directions" : 3 },
+    { "animName" : "db_anm_brute_suffer", "timing" : [2, 4, 3, 5], "directions" : 3 },
+    { "animName" : "db_anm_brute_tauntJeer", "timing" : [7, 9, 6, 1], "directions" : 3 }
+]

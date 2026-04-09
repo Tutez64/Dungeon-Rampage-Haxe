@@ -1,0 +1,19 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Execute" type="HaxeApplicationRunConfiguration" factoryName="Haxe Application" show_console_on_std_err="false" show_console_on_std_out="false">
+    <module name="DungeonRampageHaxe" />
+    <option name="allowRunningInParallel" value="false" />
+    <option name="customDebugPort" value="6972" />
+    <option name="customExecutable" value="false" />
+    <option name="customExecutablePath" value="" />
+    <option name="customFileToLaunch" value="false" />
+    <option name="customFileToLaunchPath" value="" />
+    <option name="customRemoteDebugging" value="false" />
+    <option name="projectPathOnTarget" />
+    <option name="selectedOptions">
+      <list />
+    </option>
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>

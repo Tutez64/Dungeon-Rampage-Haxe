@@ -1,0 +1,11 @@
+[
+    { "animName" : "db_anm_knightInBoxer_idle", "timing" : [4, 5, 6, 3, 4, 5, 2], "directions" : 3 },
+    { "animName" : "db_anm_knightInBoxer_attack_thrust", "timing" : [6, 1, 2, 2], "directions" : 3 },
+    { "animName" : "db_anm_knightInBoxer_attack_singleCrossbowShoot", "timing" : [3, 2, 6], "directions" : 3 },
+    { "animName" : "db_anm_knightInBoxer_run", "timing" : [1, 2, 2, 2, 2, 2, 2, 1], "directions" : 3 },
+    { "animName" : "db_anm_knightInBoxer_suffer", "timing" : [2, 4, 2, 3, 2], "directions" : 3 },
+    { "animName" : "db_anm_knightInBoxer_throw", "timing" : [3, 2, 4, 1, 2, 2], "directions" : 3 },
+    { "animName" : "db_anm_knightInBoxer_death", "timing" : [1, 1, 4, 1, 2, 2, 8], "directions" : 1 },
+    { "animName" : "db_anm_knightInBoxer_attack_chop", "timing" : [6, 3, 3], "directions" : 3 },
+    { "animName" : "db_anm_knightInBoxer_attack_swingLeft", "timing" : [9, 3, 6], "directions" : 3 }
+]

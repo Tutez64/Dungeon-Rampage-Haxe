@@ -1,0 +1,2 @@
+# Specific to this folder we want to upload these json blobs as git lfs content
+*.json filter=lfs diff=lfs merge=lfs -text

@@ -1,0 +1,9 @@
+[
+    { "animName" : "db_anm_raptor_attack_bite", "timing" : [2, 3, 3, 3], "directions" : 3 },
+    { "animName" : "db_anm_raptor_attack_tackle", "timing" : [3, 2, 2, 3, 1], "directions" : 3 },
+    { "animName" : "db_anm_raptor_death", "timing" : [3, 3, 3, 3, 7], "directions" : 1 },
+    { "animName" : "db_anm_raptor_idle", "timing" : [7, 9, 7], "directions" : 3 },
+    { "animName" : "db_anm_raptor_roar", "timing" : [3, 4, 5, 5, 2], "directions" : 3 },
+    { "animName" : "db_anm_raptor_run", "timing" : [2, 2, 2, 2, 2, 2, 1], "directions" : 3 },
+    { "animName" : "db_anm_raptor_suffer", "timing" : [3, 2, 4], "directions" : 3 }
+]

@@ -1,0 +1,17 @@
+{
+    "FullAggro": false,
+    "tileLibrary": "Resources/Levels/castle/arena/db_tiles_TUTORIAL_LEVEL.json",
+    "tiles": [
+        {"type": "LEFloorTile", "tileId": "2.1312222262445", "y": 3600, "id": "1.1318154692105", "x": 2700},
+        {"type": "LEFloorTile", "tileId": "9.1318154724467", "y": 3600, "id": "160.1318156125107", "x": 3600},
+        {"type": "LEFloorTile", "tileId": "2.1312222262445", "y": 4500, "id": "2.1318154692950", "x": 2700},
+        {"type": "LEFloorTile", "tileId": "2.1312222262445", "y": 4500, "id": "3.1318154695748", "x": 3600},
+        {"type": "LEFloorTile", "tileId": "2.1312222262445", "y": 4500, "id": "4.1318154696580", "x": 4500},
+        {"type": "LEFloorTile", "tileId": "2.1312222262445", "y": 2700, "id": "5.1318154699444", "x": 2700},
+        {"type": "LEFloorTile", "tileId": "2.1312222262445", "y": 2700, "id": "6.1318154702565", "x": 3600},
+        {"type": "LEFloorTile", "tileId": "2.1312222262445", "y": 2700, "id": "7.1318154703445", "x": 4500},
+        {"type": "LEFloorTile", "tileId": "2.1312222262445", "y": 3600, "id": "8.1318154704661", "x": 4500}
+    ],
+    "version": "Version 2.9.0",
+    "fileType": "floor"
+}

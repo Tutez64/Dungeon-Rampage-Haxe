@@ -1,0 +1,11 @@
+[
+    { "animName" : "db_anm_yeti_attack_clawSwipe", "timing" : [3, 3, 2, 6], "directions" : 3 },
+    { "animName" : "db_anm_yeti_attack_groundPound", "timing" : [5, 5, 4, 12], "directions" : 3 },
+    { "animName" : "db_anm_yeti_death", "timing" : [5, 4, 5, 12], "directions" : 1 },
+    { "animName" : "db_anm_yeti_flex", "timing" : [5, 4, 4, 6], "directions" : 3 },
+    { "animName" : "db_anm_yeti_idle", "timing" : [4, 5, 6, 7, 4], "directions" : 3 },
+    { "animName" : "db_anm_yeti_run", "timing" : [4, 4, 4, 4, 4, 4, 3], "directions" : 3 },
+    { "animName" : "db_anm_yeti_suffer", "timing" : [3, 3, 3], "directions" : 3 },
+    { "animName" : "db_anm_yeti_throw", "timing" : [7, 3, 3, 11], "directions" : 3 },
+    { "animName" : "db_anm_yeti_tauntJeer", "timing" : [3, 2, 2, 3, 3], "directions" : 3 }
+]

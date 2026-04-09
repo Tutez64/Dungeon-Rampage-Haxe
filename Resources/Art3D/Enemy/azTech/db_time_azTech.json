@@ -1,0 +1,8 @@
+[
+    { "animName" : "db_anm_azTech_sleeping", "timing" : [2], "directions" : 3 },
+    { "animName" : "db_anm_azTech_idle", "timing" : [9, 10, 10, 10, 1], "directions" : 3 },
+    { "animName" : "db_anm_azTech_suffer", "timing" : [2, 3, 3, 5], "directions" : 3 },
+    { "animName" : "db_anm_azTech_death", "timing" : [3, 2, 2, 2, 2, 20], "directions" : 1 },
+    { "animName" : "db_anm_azTech_run", "timing" : [3, 3, 8, 4, 4, 7], "directions" : 3 },
+    { "animName" : "db_anm_azTech_tauntJeer", "timing" : [5, 4, 5, 4], "directions" : 3 }
+]

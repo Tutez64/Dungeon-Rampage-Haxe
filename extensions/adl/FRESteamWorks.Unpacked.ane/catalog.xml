@@ -1,0 +1,208 @@
+<?xml version="1.0" ?>
+<swc xmlns="http://www.adobe.com/flash/swccatalog/9">
+    <versions>
+        <swc version="1.2"/>
+        <compiler name="ActionScript Compiler" version="2.0.0" build="354209"/>
+    </versions>
+    <features>
+        <feature-script-deps/>
+    </features>
+    <libraries>
+        <library path="library.swf">
+            <script name="com/amanitadesign/steam/DownloadUGCResult" mod="1733235133851">
+                <def id="com.amanitadesign.steam:DownloadUGCResult"/>
+                <dep id="Object" type="i"/>
+                <dep id="String" type="s"/>
+                <dep id="int" type="s"/>
+                <dep id="uint" type="s"/>
+            </script>
+            <script name="com/amanitadesign/steam/FRESteamWorks" mod="1737749285364">
+                <def id="com.amanitadesign.steam:FRESteamWorks"/>
+                <dep id="Array" type="e"/>
+                <dep id="Boolean" type="s"/>
+                <dep id="Function" type="s"/>
+                <dep id="Number" type="e"/>
+                <dep id="String" type="e"/>
+                <dep id="com.amanitadesign.steam:DownloadUGCResult" type="e"/>
+                <dep id="com.amanitadesign.steam:FileDetailsResult" type="e"/>
+                <dep id="com.amanitadesign.steam:FilesByUserActionResult" type="e"/>
+                <dep id="com.amanitadesign.steam:InputAnalogActionData" type="e"/>
+                <dep id="com.amanitadesign.steam:InputDigitalActionData" type="e"/>
+                <dep id="com.amanitadesign.steam:ItemVoteDetailsResult" type="e"/>
+                <dep id="com.amanitadesign.steam:MicroTxnAuthorizationResponse" type="e"/>
+                <dep id="com.amanitadesign.steam:SteamConstants" type="e"/>
+                <dep id="com.amanitadesign.steam:SteamEvent" type="e"/>
+                <dep id="com.amanitadesign.steam:SteamResults" type="e"/>
+                <dep id="com.amanitadesign.steam:SubscribedFilesResult" type="e"/>
+                <dep id="com.amanitadesign.steam:UploadLeaderboardScoreResult" type="e"/>
+                <dep id="com.amanitadesign.steam:UserFilesResult" type="e"/>
+                <dep id="com.amanitadesign.steam:UserStatsConstants" type="e"/>
+                <dep id="com.amanitadesign.steam:UserVoteDetails" type="e"/>
+                <dep id="com.amanitadesign.steam:WorkshopFilesResult" type="e"/>
+                <dep id="flash.display:BitmapData" type="e"/>
+                <dep id="flash.display:DisplayObjectContainer" type="s"/>
+                <dep id="flash.display:Sprite" type="s"/>
+                <dep id="flash.events:Event" type="e"/>
+                <dep id="flash.events:EventDispatcher" type="i"/>
+                <dep id="flash.events:IEventDispatcher" type="s"/>
+                <dep id="flash.events:StatusEvent" type="s"/>
+                <dep id="flash.external:ExtensionContext" type="s"/>
+                <dep id="flash.utils:ByteArray" type="s"/>
+                <dep id="flash.utils:clearInterval" type="e"/>
+                <dep id="flash.utils:setInterval" type="e"/>
+                <dep id="flash.utils:setTimeout" type="e"/>
+                <dep id="int" type="s"/>
+                <dep id="uint" type="s"/>
+            </script>
+            <script name="com/amanitadesign/steam/FileDetailsResult" mod="1733235133851">
+                <def id="com.amanitadesign.steam:FileDetailsResult"/>
+                <dep id="Boolean" type="s"/>
+                <dep id="Object" type="i"/>
+                <dep id="String" type="s"/>
+                <dep id="int" type="s"/>
+                <dep id="uint" type="s"/>
+            </script>
+            <script name="com/amanitadesign/steam/FilesByUserActionResult" mod="1733235133851">
+                <def id="com.amanitadesign.steam:FilesByUserActionResult"/>
+                <dep id="Array" type="s"/>
+                <dep id="Object" type="i"/>
+                <dep id="int" type="s"/>
+            </script>
+            <script name="com/amanitadesign/steam/FriendConstants" mod="1733235133851">
+                <def id="com.amanitadesign.steam:FriendConstants"/>
+                <dep id="Object" type="i"/>
+                <dep id="int" type="s"/>
+            </script>
+            <script name="com/amanitadesign/steam/ISteamWorks" mod="1737749285364">
+                <def id="com.amanitadesign.steam:ISteamWorks"/>
+                <dep id="Array" type="s"/>
+                <dep id="Boolean" type="s"/>
+                <dep id="Number" type="s"/>
+                <dep id="String" type="s"/>
+                <dep id="com.amanitadesign.steam:DownloadUGCResult" type="s"/>
+                <dep id="com.amanitadesign.steam:FileDetailsResult" type="s"/>
+                <dep id="com.amanitadesign.steam:FilesByUserActionResult" type="s"/>
+                <dep id="com.amanitadesign.steam:ItemVoteDetailsResult" type="s"/>
+                <dep id="com.amanitadesign.steam:MicroTxnAuthorizationResponse" type="s"/>
+                <dep id="com.amanitadesign.steam:SubscribedFilesResult" type="s"/>
+                <dep id="com.amanitadesign.steam:UploadLeaderboardScoreResult" type="s"/>
+                <dep id="com.amanitadesign.steam:UserFilesResult" type="s"/>
+                <dep id="com.amanitadesign.steam:UserStatsConstants" type="e"/>
+                <dep id="com.amanitadesign.steam:UserVoteDetails" type="s"/>
+                <dep id="com.amanitadesign.steam:WorkshopFilesResult" type="s"/>
+                <dep id="flash.display:BitmapData" type="s"/>
+                <dep id="flash.display:DisplayObjectContainer" type="s"/>
+                <dep id="flash.events:IEventDispatcher" type="i"/>
+                <dep id="flash.utils:ByteArray" type="s"/>
+                <dep id="int" type="s"/>
+                <dep id="uint" type="s"/>
+            </script>
+            <script name="com/amanitadesign/steam/InputAnalogActionData" mod="1733235133852">
+                <def id="com.amanitadesign.steam:InputAnalogActionData"/>
+                <dep id="Boolean" type="s"/>
+                <dep id="Number" type="s"/>
+                <dep id="Object" type="i"/>
+                <dep id="int" type="s"/>
+            </script>
+            <script name="com/amanitadesign/steam/InputDigitalActionData" mod="1733235133852">
+                <def id="com.amanitadesign.steam:InputDigitalActionData"/>
+                <dep id="Boolean" type="s"/>
+                <dep id="Object" type="i"/>
+            </script>
+            <script name="com/amanitadesign/steam/ItemVoteDetailsResult" mod="1733235133852">
+                <def id="com.amanitadesign.steam:ItemVoteDetailsResult"/>
+                <dep id="Number" type="s"/>
+                <dep id="Object" type="i"/>
+                <dep id="String" type="s"/>
+                <dep id="int" type="s"/>
+            </script>
+            <script name="com/amanitadesign/steam/LeaderboardEntry" mod="1733235133852">
+                <def id="com.amanitadesign.steam:LeaderboardEntry"/>
+                <dep id="Array" type="s"/>
+                <dep id="Object" type="i"/>
+                <dep id="String" type="s"/>
+                <dep id="int" type="s"/>
+            </script>
+            <script name="com/amanitadesign/steam/MicroTxnAuthorizationResponse" mod="1733235133852">
+                <def id="com.amanitadesign.steam:MicroTxnAuthorizationResponse"/>
+                <dep id="Boolean" type="s"/>
+                <dep id="Object" type="i"/>
+                <dep id="String" type="s"/>
+                <dep id="uint" type="s"/>
+            </script>
+            <script name="com/amanitadesign/steam/SteamConstants" mod="1737749285364">
+                <def id="com.amanitadesign.steam:SteamConstants"/>
+                <dep id="Object" type="i"/>
+                <dep id="int" type="s"/>
+            </script>
+            <script name="com/amanitadesign/steam/SteamEvent" mod="1733235133852">
+                <def id="com.amanitadesign.steam:SteamEvent"/>
+                <dep id="Boolean" type="s"/>
+                <dep id="String" type="s"/>
+                <dep id="flash.events:Event" type="i"/>
+                <dep id="int" type="s"/>
+            </script>
+            <script name="com/amanitadesign/steam/SteamResults" mod="1733235133852">
+                <def id="com.amanitadesign.steam:SteamResults"/>
+                <dep id="Object" type="i"/>
+                <dep id="int" type="s"/>
+            </script>
+            <script name="com/amanitadesign/steam/SubscribedFilesResult" mod="1733235133852">
+                <def id="com.amanitadesign.steam:SubscribedFilesResult"/>
+                <dep id="Array" type="s"/>
+                <dep id="Object" type="i"/>
+                <dep id="int" type="s"/>
+            </script>
+            <script name="com/amanitadesign/steam/UploadLeaderboardScoreResult" mod="1733235133853">
+                <def id="com.amanitadesign.steam:UploadLeaderboardScoreResult"/>
+                <dep id="Boolean" type="s"/>
+                <dep id="Object" type="i"/>
+                <dep id="String" type="s"/>
+                <dep id="int" type="s"/>
+            </script>
+            <script name="com/amanitadesign/steam/UserConstants" mod="1733235133853">
+                <def id="com.amanitadesign.steam:UserConstants"/>
+                <dep id="Object" type="i"/>
+                <dep id="int" type="s"/>
+                <dep id="uint" type="s"/>
+            </script>
+            <script name="com/amanitadesign/steam/UserFilesResult" mod="1733235133853">
+                <def id="com.amanitadesign.steam:UserFilesResult"/>
+                <dep id="Array" type="s"/>
+                <dep id="Object" type="i"/>
+                <dep id="int" type="s"/>
+            </script>
+            <script name="com/amanitadesign/steam/UserStatsConstants" mod="1733235133853">
+                <def id="com.amanitadesign.steam:UserStatsConstants"/>
+                <dep id="Object" type="i"/>
+                <dep id="int" type="s"/>
+            </script>
+            <script name="com/amanitadesign/steam/UserVoteDetails" mod="1733235133853">
+                <def id="com.amanitadesign.steam:UserVoteDetails"/>
+                <dep id="Object" type="i"/>
+                <dep id="String" type="s"/>
+                <dep id="int" type="s"/>
+            </script>
+            <script name="com/amanitadesign/steam/UtilsConstants" mod="1733235133853">
+                <def id="com.amanitadesign.steam:UtilsConstants"/>
+                <dep id="Object" type="i"/>
+                <dep id="uint" type="s"/>
+            </script>
+            <script name="com/amanitadesign/steam/WorkshopConstants" mod="1733235133853">
+                <def id="com.amanitadesign.steam:WorkshopConstants"/>
+                <dep id="Object" type="i"/>
+                <dep id="String" type="s"/>
+                <dep id="int" type="s"/>
+            </script>
+            <script name="com/amanitadesign/steam/WorkshopFilesResult" mod="1733235133853">
+                <def id="com.amanitadesign.steam:WorkshopFilesResult"/>
+                <dep id="Array" type="s"/>
+                <dep id="Object" type="i"/>
+                <dep id="int" type="s"/>
+            </script>
+            <digests>
+                <digest type="SHA-256" signed="false" value="934424d352811df4f6d420a087115cd0c145a35b937caf50bee0df3337bca92d"/>
+            </digests>
+        </library>
+    </libraries>
+</swc>

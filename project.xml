@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project>
+	<meta title="Dungeon Rampage Haxe" package="com.dungeonrampage.haxe" version="1.0.0" company="Tutez" />
+	<app main="DungeonBustersProject" file="DungeonBustersProject" swf-version="32" />
+	<window width="1920" height="1080" fps="120" background="#000000" hardware="true" allow-shaders="true" require-shaders="true"/>
+
+	<haxelib name="SteamWrap" path="../SteamWrap" if="cpp" />
+	<haxelib name="lime" path="../lime" if="cpp" />
+	<haxelib name="swf" path="../swf" if="cpp" />
+	<haxelib name="openfl" path="../openfl" />
+	<haxelib name="format" if="cpp" />
+
+	<setenv name="STEAM_APP_ID" value="3053950" if="cpp" />
+	<dependency name="com.amanitadesign.steam.FRESteamWorks" path="extensions/FRESteamWorks.ane" if="air" />
+
+	<source path="src" />
+	<source path="compat" />
+
+	<assets path="Resources" rename="Resources" embed="false" />
+	<assets path="DbConfiguration" rename="DbConfiguration" embed="false" />
+
+	<include path="generated_swf_libraries.xml" if="cpp" />
+	<library path="src/_assets/assets.swf" preload="true" if="cpp" />
+	<haxeflag name="-swf-lib" value="src/_assets/assets.swf" if="air" />
+</project>

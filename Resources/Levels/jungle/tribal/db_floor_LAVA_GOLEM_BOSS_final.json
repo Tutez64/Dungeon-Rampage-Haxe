@@ -1,0 +1,17 @@
+{
+    "FullAggro": true,
+    "tileLibrary": "Resources/Levels/jungle/tribal/db_tiles_LAVA_GOLEM_BOSS.json",
+    "tiles": [
+        {"type": "LEFloorTile", "tileId": "117.1337883859372", "y": 3600, "id": "25.1337967869689", "x": 2700},
+        {"type": "LEFloorTile", "tileId": "117.1337883859372", "y": 2700, "id": "26.1337967871155", "x": 2700},
+        {"type": "LEFloorTile", "tileId": "117.1337883859372", "y": 2700, "id": "28.1337967873569", "x": 3600},
+        {"type": "LEFloorTile", "tileId": "117.1337883859372", "y": 2700, "id": "29.1337967875110", "x": 4500},
+        {"type": "LEFloorTile", "tileId": "117.1337883859372", "y": 3600, "id": "30.1337967876800", "x": 4500},
+        {"type": "LEFloorTile", "tileId": "117.1337883859372", "y": 4500, "id": "31.1337967878521", "x": 2700},
+        {"type": "LEFloorTile", "tileId": "117.1337883859372", "y": 4500, "id": "32.1337967879929", "x": 3600},
+        {"type": "LEFloorTile", "tileId": "117.1337883859372", "y": 4500, "id": "33.1337967881277", "x": 4500},
+        {"type": "LEFloorTile", "tileId": "318.1337205073618", "y": 3600, "id": "356.1337205303356", "x": 3600}
+    ],
+    "version": "Version 2.9.0",
+    "fileType": "floor"
+}

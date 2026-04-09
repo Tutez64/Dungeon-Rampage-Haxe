@@ -1,0 +1,3 @@
+# SWF libraries that need generated linkage classes on cpp.
+Resources/Art2D/Doobers/db_items_doobers.swf
+Resources/Art2D/Environments/*

@@ -1,0 +1,9 @@
+[
+    { "animName" : "db_anm_lion_attack_clawSwipe", "timing" : [3, 3, 2, 3], "directions" : 3 },
+    { "animName" : "db_anm_lion_attack_tackle", "timing" : [3, 2, 2, 2, 2], "directions" : 3 },
+    { "animName" : "db_anm_lion_death", "timing" : [3, 3, 4, 4], "directions" : 1 },
+    { "animName" : "db_anm_lion_roar", "timing" : [3, 3, 4, 9, 3], "directions" : 3 },
+    { "animName" : "db_anm_lion_idle", "timing" : [8, 8, 7, 6], "directions" : 3 },
+    { "animName" : "db_anm_lion_run", "timing" : [3, 2, 2, 2, 2], "directions" : 3 },
+    { "animName" : "db_anm_lion_suffer", "timing" : [3, 5, 1], "directions" : 3 }
+]

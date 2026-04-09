@@ -1,0 +1,14 @@
+[
+    { "animName" : "db_anm_ghostSamurai_idle", "timing" : [4, 5, 5, 4, 4, 5, 2], "directions" : 5 },
+    { "animName" : "db_anm_ghostSamurai_attack_db", "timing" : [3, 4, 3, 4, 6, 6, 7, 1], "directions" : 1 },
+    { "animName" : "db_anm_ghostSamurai_run", "timing" : [2, 2, 2, 2, 2, 2, 1, 1], "directions" : 5 },
+    { "animName" : "db_anm_ghostSamurai_suffer", "timing" : [2, 4, 5], "directions" : 5 },
+    { "animName" : "db_anm_ghostSamurai_attack_thrust", "timing" : [2, 2, 5, 2], "directions" : 5 },
+    { "animName" : "db_anm_ghostSamurai_death", "timing" : [2, 2, 2, 2, 5], "directions" : 1 },
+    { "animName" : "db_anm_ghostSamurai_getUp", "timing" : [4, 4, 2, 3, 6], "directions" : 1 },
+    { "animName" : "db_anm_ghostSamurai_attack_chop", "timing" : [3, 2, 2, 5], "directions" : 5 },
+    { "animName" : "db_anm_ghostSamurai_throw", "timing" : [2, 2, 3, 3], "directions" : 5 },
+    { "animName" : "db_anm_ghostSamurai_cast", "timing" : [7, 3, 4, 12], "directions" : 5 },
+    { "animName" : "db_anm_ghostSamurai_attack_swingLeft", "timing" : [2, 2, 2, 1, 1, 3], "directions" : 5 },
+    { "animName" : "db_anm_ghostSamurai_attack_swingRight", "timing" : [3, 1, 2, 1, 5], "directions" : 5 }
+]

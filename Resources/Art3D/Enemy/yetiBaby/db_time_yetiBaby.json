@@ -1,0 +1,12 @@
+[
+    { "animName" : "db_anm_yetiBaby_attack_bite", "timing" : [2, 2, 3], "directions" : 3 },
+    { "animName" : "db_anm_yetiBaby_attack_scratch", "timing" : [2, 1, 2, 1], "directions" : 3 },
+    { "animName" : "db_anm_yetiBaby_death", "timing" : [2, 2, 1, 2, 3, 2, 2, 5], "directions" : 1 },
+    { "animName" : "db_anm_yetiBaby_flex", "timing" : [2, 2, 2, 3, 1], "directions" : 3 },
+    { "animName" : "db_anm_yetiBaby_hibernate", "timing" : [2, 2, 1, 2, 1, 2, 2, 7], "directions" : 1 },
+    { "animName" : "db_anm_yetiBaby_idle", "timing" : [4, 3, 3, 4, 3, 2], "directions" : 3 },
+    { "animName" : "db_anm_yetiBaby_run", "timing" : [3, 3, 3, 2], "directions" : 3 },
+    { "animName" : "db_anm_yetiBaby_shake", "timing" : [2, 2, 2, 2, 3, 2, 3, 1], "directions" : 3 },
+    { "animName" : "db_anm_yetiBaby_suffer", "timing" : [2, 2, 1], "directions" : 3 },
+    { "animName" : "db_anm_yetiBaby_tauntJeer", "timing" : [3, 3, 3, 2], "directions" : 3 }
+]

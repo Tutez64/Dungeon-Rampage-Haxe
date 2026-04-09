@@ -1,0 +1,11 @@
+{
+    "FullAggro": false,
+    "tileLibrary": "Resources/Levels/castle/catacombs/db_tiles_CATACOMBS_GHOST_SAMURAI_RIVAL_BATTLE.json",
+    "tiles": [
+        {"type": "LEFloorTile", "tileId": "36.1334879196293", "y": 5400, "id": "925.1334882117355", "x": 3600},
+        {"type": "LEFloorTile", "tileId": "304.1334879985143", "y": 4500, "id": "927.1334882123729", "x": 3600},
+        {"type": "LEFloorTile", "tileId": "533.1334880482770", "y": 3600, "id": "936.1334882157281", "x": 3600}
+    ],
+    "version": "Version 2.9.0",
+    "fileType": "floor"
+}

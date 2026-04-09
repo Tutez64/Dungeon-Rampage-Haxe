@@ -1,0 +1,40 @@
+[
+	{
+		"enemyType":"DEFAULT",
+		"strength":50,
+		"intelligence":50,
+		"agility":50,
+		"armor":50,
+		"warding":50,
+		"dodge":50,
+		"maxHealth":50,
+		"maxEnergy":50,
+		"healthRegen":50,
+		"energyRegen":50,
+		"movementSpeed":50,
+		"attackSpeed":50,
+		"castingSpeed":50,
+		"shootingSpeed":50,
+		"luck":50
+	},
+	
+	{
+		"enemyType":"BUG",
+		"baseEnemyType":"DEFAULT",
+		"movementSpeed":10
+	},
+	
+	{
+		"enemyType":"ROCKBUG",
+		"baseEnemyType":"BUG",
+		"maxHealth":80,
+		"armor":75
+	},
+	
+	{
+		"enemyType":"BARREL",
+		"baseEnemyType":"DEFAULT",
+		"maxHealth":1,
+		"movementSpeed":0
+	}
+]

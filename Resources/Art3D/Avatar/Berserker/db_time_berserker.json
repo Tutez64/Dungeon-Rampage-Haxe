@@ -1,0 +1,15 @@
+[
+    { "animName" : "db_anm_berserker_idle", "timing" : [6, 4, 4, 3], "directions" : 5 },
+    { "animName" : "db_anm_berserker_run", "timing" : [2, 2, 2, 2, 2, 3, 1], "directions" : 5 },
+    { "animName" : "db_anm_berserker_suffer", "timing" : [4, 4, 3], "directions" : 5 },
+    { "animName" : "db_anm_berserker_throw", "timing" : [3, 1, 2, 3, 2], "directions" : 5 },
+    { "animName" : "db_anm_berserker_throwRock", "timing" : [7, 2, 4, 2, 4], "directions" : 5 },
+    { "animName" : "db_anm_berserker_death", "timing" : [2, 2, 3, 2, 3, 2, 5], "directions" : 1 },
+    { "animName" : "db_anm_berserker_dance_snf", "timing" : [4, 4, 4, 3], "directions" : 5 },
+    { "animName" : "db_anm_berserker_dance_snfPoint", "timing" : [7, 6, 4, 3], "directions" : 5 },
+    { "animName" : "db_anm_berserker_getUp", "timing" : [9, 8, 7], "directions" : 1 },
+    { "animName" : "db_anm_berserker_attack_chop", "timing" : [4, 1, 2, 2, 2, 1], "directions" : 5 },
+    { "animName" : "db_anm_berserker_attack_db", "timing" : [52, 3, 4, 4, 11, 5], "directions" : 1 },
+    { "animName" : "db_anm_berserker_attack_swingLeft", "timing" : [2, 2, 2, 1, 1, 3], "directions" : 5 },
+    { "animName" : "db_anm_berserker_attack_swingRight", "timing" : [3, 1, 2, 1, 5], "directions" : 5 }
+]

@@ -1,0 +1,7 @@
+# Optional SWF preload rules for generated_swf_libraries.ps1
+# One rule per line. Empty lines and lines starting with "#" are ignored.
+# Rules are PowerShell -like patterns matched against the relative SWF path.
+#
+# Examples:
+# Resources/Art2D/UI/db_UI_HUD.swf
+# Resources/Art2D/UI/db_UI_*.swf

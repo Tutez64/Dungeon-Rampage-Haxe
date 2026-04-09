@@ -1,0 +1,11 @@
+{
+    "FullAggro": false,
+    "tileLibrary": "Resources/Levels/nordic/temple/db_tiles_TEMPLE_FROST_TROLL_BOSS.json",
+    "tiles": [
+        {"type": "LEFloorTile", "tileId": "255.1333708249044", "y": 4500, "id": "219.1334967350579", "x": 3600},
+        {"type": "LEFloorTile", "tileId": "297.1333710494316", "y": 3600, "id": "221.1334967356248", "x": 3600},
+        {"type": "LEFloorTile", "tileId": "271.1333708475942", "y": 2700, "id": "222.1334967359999", "x": 3600}
+    ],
+    "version": "Version 2.9.0",
+    "fileType": "floor"
+}

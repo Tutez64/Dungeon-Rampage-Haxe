@@ -1,0 +1,5 @@
+[
+    { "animName" : "db_anm_bombMon_idle", "timing" : [4, 5, 6, 5, 5, 3], "directions" : 2 },
+    { "animName" : "db_anm_bombMon_run", "timing" : [2, 3, 3, 2], "directions" : 2 },
+    { "animName" : "db_anm_bombMon_suffer", "timing" : [2, 2, 2, 3], "directions" : 2 }
+]

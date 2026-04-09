@@ -1,0 +1,15 @@
+{
+    "FullAggro": false,
+    "tileLibrary": "Resources/Levels/castle/arena/db_tiles_ARENA_GAUNTLET_2.json",
+    "tiles": [
+        {"type": "LEFloorTile", "tileId": "4.1337202205458", "y": 1800, "id": "155.1337202705817", "x": 2700},
+        {"type": "LEFloorTile", "tileId": "2.1337645062987", "y": 900, "id": "209.1337645694618", "x": 2700},
+        {"type": "LEFloorTile", "tileId": "2.1337040487068", "y": 6300, "id": "428.1337102474989", "x": 2700},
+        {"type": "LEFloorTile", "tileId": "234.1337041636701", "y": 2700, "id": "434.1337102500779", "x": 2700},
+        {"type": "LEFloorTile", "tileId": "9.1337129363262", "y": 5400, "id": "502.1337189455644", "x": 2700},
+        {"type": "LEFloorTile", "tileId": "361.1337043610343", "y": 4500, "id": "599.1337105165060", "x": 2700},
+        {"type": "LEFloorTile", "tileId": "624.1337107444645", "y": 3600, "id": "847.1337108176140", "x": 2700}
+    ],
+    "version": "Version 2.9.0",
+    "fileType": "floor"
+}

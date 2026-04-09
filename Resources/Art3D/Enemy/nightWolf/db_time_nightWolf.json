@@ -1,0 +1,9 @@
+[
+    { "animName" : "db_anm_nightWolf_attack_bite", "timing" : [2, 3, 3], "directions" : 5 },
+    { "animName" : "db_anm_nightWolf_attack_tackle", "timing" : [3, 3, 4, 3], "directions" : 5 },
+    { "animName" : "db_anm_nightWolf_death", "timing" : [3, 3, 4, 4], "directions" : 1 },
+    { "animName" : "db_anm_nightWolf_growl", "timing" : [8, 8, 7, 6], "directions" : 5 },
+    { "animName" : "db_anm_nightWolf_idle", "timing" : [8, 8, 7, 6], "directions" : 5 },
+    { "animName" : "db_anm_nightWolf_run", "timing" : [3, 2, 2, 2, 2], "directions" : 5 },
+    { "animName" : "db_anm_nightWolf_suffer", "timing" : [3, 2, 3, 1], "directions" : 5 }
+]

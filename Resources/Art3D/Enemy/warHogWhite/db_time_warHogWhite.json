@@ -1,0 +1,8 @@
+[
+    { "animName" : "db_anm_warHogWhite_charge", "timing" : [2, 2, 2, 2], "directions" : 5 },
+    { "animName" : "db_anm_warHogWhite_headButt", "timing" : [3, 2, 2, 1], "directions" : 5 },
+    { "animName" : "db_anm_warHogWhite_death", "timing" : [3, 3, 3, 3, 6], "directions" : 1 },
+    { "animName" : "db_anm_warHogWhite_idle", "timing" : [6, 6, 6, 5], "directions" : 5 },
+    { "animName" : "db_anm_warHogWhite_run", "timing" : [3, 3, 3, 3, 3, 2], "directions" : 5 },
+    { "animName" : "db_anm_warHogWhite_suffer", "timing" : [1, 1, 5, 1], "directions" : 5 }
+]

@@ -1,0 +1,8 @@
+[
+    { "animName" : "db_anm_dragon_attack_bite", "timing" : [1, 5, 2], "directions" : 5 },
+    { "animName" : "db_anm_dragon_attack_fireBall", "timing" : [4, 4, 6], "directions" : 5 },
+    { "animName" : "db_anm_dragon_death", "timing" : [4, 3, 4, 8], "directions" : 1 },
+    { "animName" : "db_anm_dragon_idle", "timing" : [2, 2, 2, 2, 1], "directions" : 5 },
+    { "animName" : "db_anm_dragon_run", "timing" : [2, 2, 2, 2, 1], "directions" : 5 },
+    { "animName" : "db_anm_dragon_suffer", "timing" : [2, 2, 5], "directions" : 5 }
+]

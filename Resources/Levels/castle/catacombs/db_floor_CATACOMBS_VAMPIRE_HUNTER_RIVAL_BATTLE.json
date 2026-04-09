@@ -1,0 +1,15 @@
+{
+    "FullAggro": false,
+    "tileLibrary": "Resources/Levels/castle/catacombs/db_tiles_CATACOMBS_VAMPIRE_HUNTER_RIVAL_BATTLE.json",
+    "tiles": [
+        {"type": "LEFloorTile", "tileId": "958.1335313310469", "y": 3600, "id": "1246.1335313690960", "x": 4500},
+        {"type": "LEFloorTile", "tileId": "286.1335377410190", "y": 2700, "id": "1543.1335378121994", "x": 2700},
+        {"type": "LEFloorTile", "tileId": "1261.1335317128607", "y": 3600, "id": "16.1335375066160", "x": 2700},
+        {"type": "LEFloorTile", "tileId": "288.1335306556557", "y": 5400, "id": "423.1335307918790", "x": 3600},
+        {"type": "LEFloorTile", "tileId": "71.1335302530704", "y": 3600, "id": "424.1335307921480", "x": 3600},
+        {"type": "LEFloorTile", "tileId": "331.1335306912919", "y": 4500, "id": "425.1335307923850", "x": 4500},
+        {"type": "LEFloorTile", "tileId": "777.1335312465209", "y": 4500, "id": "957.1335313295872", "x": 3600}
+    ],
+    "version": "Version 2.9.0",
+    "fileType": "floor"
+}

@@ -1,0 +1,16 @@
+[
+    { "animName" : "db_anm_dragon_attack_breath", "timing" : [7, 3, 4, 5], "directions" : 5 },
+    { "animName" : "db_anm_dragon_attack_clawSwipe", "timing" : [3, 5, 4, 9], "directions" : 5 },
+    { "animName" : "db_anm_dragon_attack_lunge", "timing" : [2, 2, 3, 8], "directions" : 5 },
+    { "animName" : "db_anm_dragon_attack_tail", "timing" : [6, 4, 3, 3, 7], "directions" : 5 },
+    { "animName" : "db_anm_dragon_attack_pound", "timing" : [5, 5, 4, 5], "directions" : 5 },
+    { "animName" : "db_anm_dragon_death", "timing" : [5, 2, 5, 7], "directions" : 1 },
+    { "animName" : "db_anm_dragon_idle", "timing" : [9, 10, 15, 4], "directions" : 5 },
+    { "animName" : "db_anm_dragon_tauntJeer", "timing" : [5, 4, 3, 5, 4, 3], "directions" : 5 },
+    { "animName" : "db_anm_dragon_flex", "timing" : [10, 4, 4], "directions" : 5 },
+    { "animName" : "db_anm_dragon_run", "timing" : [3, 7, 4, 4, 7, 3], "directions" : 5 },
+    { "animName" : "db_anm_dragon_attack_wing", "timing" : [4, 4, 7, 8, 5], "directions" : 5 },
+    { "animName" : "db_anm_dragon_sleep", "timing" : [9, 9, 10, 11], "directions" : 5 },
+    { "animName" : "db_anm_dragon_wakeUp", "timing" : [6, 4, 3, 6], "directions" : 1 },
+    { "animName" : "db_anm_dragon_suffer", "timing" : [3, 2, 3, 2], "directions" : 5 }
+]

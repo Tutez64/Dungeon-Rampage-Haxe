@@ -1,0 +1,12 @@
+[
+    { "animName" : "db_anm_frostTroll_attack_charge", "timing" : [4, 4, 4, 2, 3, 4], "directions" : 3 },
+    { "animName" : "db_anm_frostTroll_attack_chop", "timing" : [8, 5, 4, 7], "directions" : 3 },
+    { "animName" : "db_anm_frostTroll_attack_drill", "timing" : [3, 3, 7, 6, 5], "directions" : 3 },
+    { "animName" : "db_anm_frostTroll_freezingBreath", "timing" : [3, 3, 5, 6, 12, 10], "directions" : 3 },
+    { "animName" : "db_anm_frostTroll_death", "timing" : [2, 2, 2, 3, 20], "directions" : 1 },
+    { "animName" : "db_anm_frostTroll_flex", "timing" : [8, 9, 8, 9], "directions" : 3 },
+    { "animName" : "db_anm_frostTroll_idle", "timing" : [4, 5, 6, 7, 4], "directions" : 3 },
+    { "animName" : "db_anm_frostTroll_run", "timing" : [4, 4, 4, 4, 4, 4, 3], "directions" : 3 },
+    { "animName" : "db_anm_frostTroll_suffer", "timing" : [3, 3, 3], "directions" : 3 },
+    { "animName" : "db_anm_frostTroll_tauntJeer", "timing" : [6, 6, 7], "directions" : 3 }
+]

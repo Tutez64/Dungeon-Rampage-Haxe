@@ -1,0 +1,3 @@
+# Specific to this folder we do not want these files to be LFS tracked
+*.json !filter !diff !merge -text
+

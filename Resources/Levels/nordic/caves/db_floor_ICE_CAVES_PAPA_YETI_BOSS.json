@@ -1,0 +1,13 @@
+{
+    "FullAggro": false,
+    "tileLibrary": "Resources/Levels/nordic/caves/tiles.json",
+    "tiles": [
+        {"type": "LEFloorTile", "tileId": "422.1327533253544", "y": 5400, "id": "906.1334886842255", "x": 4500},
+        {"type": "LEFloorTile", "tileId": "109.1334885027752", "y": 4500, "id": "907.1334886852733", "x": 4500},
+        {"type": "LEFloorTile", "tileId": "210.1327718420158", "y": 4500, "id": "908.1334886857679", "x": 5400},
+        {"type": "LEFloorTile", "tileId": "51.1334884262327", "y": 4500, "id": "909.1334886868253", "x": 3600},
+        {"type": "LEFloorTile", "tileId": "435.1327521552662", "y": 3600, "id": "910.1334886870845", "x": 4500}
+    ],
+    "version": "Version 2.9.0",
+    "fileType": "floor"
+}

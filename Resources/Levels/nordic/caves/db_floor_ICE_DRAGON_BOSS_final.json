@@ -1,0 +1,17 @@
+{
+    "FullAggro": true,
+    "tileLibrary": "Resources/Levels/nordic/caves/db_tiles_ICE_DRAGON_BOSS.json",
+    "tiles": [
+        {"type": "LEFloorTile", "tileId": "223.1337796999726", "y": 4500, "id": "1879.1337798814619", "x": 3600},
+        {"type": "LEFloorTile", "tileId": "256.1337797099165", "y": 3600, "id": "1880.1337798822787", "x": 3600},
+        {"type": "LEFloorTile", "tileId": "258.1337797099733", "y": 5400, "id": "1881.1337798824619", "x": 3600},
+        {"type": "LEFloorTile", "tileId": "228.1337797065703", "y": 3600, "id": "1882.1337798828372", "x": 2700},
+        {"type": "LEFloorTile", "tileId": "230.1337797066331", "y": 3600, "id": "1883.1337798829993", "x": 4500},
+        {"type": "LEFloorTile", "tileId": "250.1337797097713", "y": 4500, "id": "1884.1337798833216", "x": 4500},
+        {"type": "LEFloorTile", "tileId": "248.1337797097159", "y": 4500, "id": "1885.1337798835213", "x": 2700},
+        {"type": "LEFloorTile", "tileId": "252.1337797098238", "y": 5400, "id": "1886.1337798841757", "x": 2700},
+        {"type": "LEFloorTile", "tileId": "254.1337797098721", "y": 5400, "id": "1887.1337798843557", "x": 4500}
+    ],
+    "version": "Version 2.9.0",
+    "fileType": "floor"
+}

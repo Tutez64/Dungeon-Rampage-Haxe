@@ -1,0 +1,10 @@
+[
+    { "animName" : "db_anm_wizard_attack_shoot", "timing" : [4, 3, 3, 2], "directions" : 5 },
+    { "animName" : "db_anm_wizard_attack_db", "timing" : [3, 6, 3, 3, 3, 6], "directions" : 1 },
+    { "animName" : "db_anm_wizard_cast", "timing" : [3, 4, 3, 4, 4, 8], "directions" : 5 },
+    { "animName" : "db_anm_wizard_death", "timing" : [3, 4, 2, 2, 3], "directions" : 1 },
+    { "animName" : "db_anm_wizard_getUp", "timing" : [5, 4, 3, 5, 7], "directions" : 1 },
+    { "animName" : "db_anm_wizard_idle", "timing" : [6, 4, 4, 7, 7], "directions" : 5 },
+    { "animName" : "db_anm_wizard_run", "timing" : [2, 2, 2, 2, 2, 2, 1, 1], "directions" : 5 },
+    { "animName" : "db_anm_wizard_suffer", "timing" : [2, 2, 3, 1], "directions" : 5 }
+]

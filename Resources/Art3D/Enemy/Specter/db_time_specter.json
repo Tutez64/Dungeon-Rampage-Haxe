@@ -1,0 +1,9 @@
+[
+    { "animName" : "db_anm_specter_attack_cast", "timing" : [5, 6, 3], "directions" : 2 },
+    { "animName" : "db_anm_specter_attack_charge", "timing" : [8, 6, 9, 6], "directions" : 2 },
+    { "animName" : "db_anm_specter_death", "timing" : [3, 4, 9], "directions" : 1 },
+    { "animName" : "db_anm_specter_flex", "timing" : [6, 5], "directions" : 2 },
+    { "animName" : "db_anm_specter_idle", "timing" : [4, 4, 3, 5, 1], "directions" : 2 },
+    { "animName" : "db_anm_specter_suffer", "timing" : [2, 2, 4], "directions" : 2 },
+    { "animName" : "db_anm_specter_tauntJeer", "timing" : [4, 2, 3, 2], "directions" : 2 }
+]

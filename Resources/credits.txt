@@ -1,0 +1,307 @@
+Dungeon Rampage's Revivalist
+Angelos Mako
+Gamebreaking Studios
+Dru Erridge
+Sean Saleh
+Taylor Hellam
+Mulan Blum
+Wesley Elmer
+Eric Kilkenny
+David Lesnefsky
+Raymond Kim
+Camilo Zambrano Votto
+Robin Haphey
+Cai Glencross
+Truitt Savell
+Benjamin Teng
+Tim Stair
+Robert Kavert
+Jay Spang
+Thomas Scott
+David Boileau
+Nick Klose
+Kyrsten Grima
+Guillermo Garduno
+Reina Duplin
+Darius Yao
+Klaus Seer
+Marco Salcedo
+Original Developers
+Jason Yeung
+Olivia Fel
+Justin Huthmacher
+Paul Ferguson
+Mohammad Asaduzzaman
+Daniel Gonzalez
+Srinavin Nair
+John Loehrlein
+Sreekrishna Jayadevan
+Joshua Corb
+Sam Yip
+Yong Park
+Jiwon Kang
+Jonathan Kuo
+Mojgon Vatanchi
+Tamara Gray Smith
+Ajay Karat
+Mike Goslin
+Daniel Aasheim
+Joe Shochet
+Roger Hughston
+Chad Ludwig
+Minh Tran
+Timothy Panec
+Meghan Jenks
+Leon Lu
+Kristin Rozum
+Alex Jarvis
+Cathy Niu
+Special Thanks
+Scott Rogers
+Thomas Bidaux
+Laetitia Mostura
+Florence Di Ruocco
+Sandra Diana Cantú
+Tyler Wright
+Victoria Cribier
+Caroline Imbert
+Diogo Macedo
+Yomafil
+Additional Thanks
+SlikeyTre
+Elliott Heder
+Pablo Carrera Calero
+Brandon Hagerman
+Kelvin Yap (c0zmic)
+InmortalPx
+fallen
+Miasm
+obez
+JordiENP
+Selau
+Ricardo Afonso (Lioness) 
+Hans6ix 
+DestroyerCAB
+Zerbib Valentin (DRAKEUR)
+AyYildiz
+LoukasK
+CryptShot
+Sasa
+Nevim
+Fertiz
+Raspef
+Deejuice
+Rares
+Dantuga
+CarlinGebyte
+Reworust
+Steevveee
+Kakaoobab98
+xiu6565
+brian_angel
+SrPandaYT
+Loreww
+brian_angel
+kirtelo
+Borking
+Kxx21
+Pawlix38
+MasterAlexS
+danny1337
+JordyENP
+desertilo
+slavo33
+Oldes (Amanita Design)
+Ventero
+Brad Jackson (waveofthought)
+Ross Przybylski (RossD20Studios)
+Fancy2209
+Kickstarters Backers!
+Myster_Owocek - Kacper.J, DRAKEUR, Emir, Kiriakos Dimitropoulos
+RELIGION_OF_RAGE, Extuhh, Teniwar, Religion Of Rage, Gerton999, GTKstan
+Karlo Boršić, BlueFantm, The Fluffy Terminator, Junkynioy, Gerardo Sanchez 
+Mr.Marvinchy , shimon glisko, ZenJakey, iDax, JaxDoga, Beniboy, Staggy4
+Lioness, FishpogURSS, Arho, Persant, Wendell, EatenCrayon
+Filipe Jansen discher, Rog, konst17, No_abe, 24hr Jesus, Builderb0b, Yes
+STIWAR, Duygusuz, NGFeng, JustWasHere, Nathen Scott, WitteMonster
+Deathangel, Malditonso, Renas, BlankReaper, Mathis Vadeboncoeur, NinjaCreed
+RManny16, STARSET DEMONS, Jan Pešta, Ivan Koprolčec, Dynax, Joan65, lukagaja
+Krem, Delmaprime, MayB, DOOM31, Seapune, Daniel Wan, XDeydara, TheBobby
+Saiyan (Waahey), Antonio Lorente Plou, Grisfu, Dohwer, Colcol896, Phx_Foxx
+Cesar Morales , Jose Cauich castillo, Johnattan Mizuno, MitsuriUwU, gilou
+T., Falam Boy, Oliver7cf, Luci!, Andy Yang, Aralyn, LamaPasContent
+CaptainNami, Rodrigolg, lemrys, CrazyLeo, Meter, plsnogunviolence, solvi2
+Klarion, 123456789 (AlexX), Nthang22, Joaquin Roman Mico, KoalaBear
+Mileanox, skidadeedada, Gulli Helgi, Kevin \lil Djinn\ Rock, Thesmites, 8192
+Mordex, Bruno Vasel, calvocaiou, Valor, Tomás Di Marco
+Gustavo Leyendecker França de Siqueira, RemusTheKing, Oorejuk, xMaCx
+Yassine, Chocaio, Paulo Teixeira, Sebastian Dongo, Alexander Ivan  Gonzalez
+STEW, Arkent, Aurora_Lights, MحMD, Petrakus, Anyoubis, nanae
+Stiven Gutierrez, OmegaTheVee, HicelaCreyo, zK, AceSkyHeart, The UruzRune
+MaxStrategy, Kingrel, Vincent Chen, silvaril, Lord of Leipa, isitAdam..?
+Alessandro D'Amore, BenTB, MidnightPhoenix_, Enzo Thomas-Muller, MeIsShiro
+Nosei01, Two89089, Tomás Afonso, Mike54, GrabShock
+Kara Roncin & James Wheeler, nivelso, Ricky Tiomantara, Amerikonas, XxLPJxX
+Mr. Madness, Guitakamy, NA, Alan Huerta Magdaleno, Alex Goode, Saku Minamoto
+Netwick, mehow270, Sargon, didireiXD, Jiben, calvin ONEearKID, blobfish
+ApoxGreey, JohnVoukou, Xfu, Juan Montenegro, Frd_ale, Zaptomark
+Angelo Lanche Pellerin Lim, MadSkilly, Tudasai, Caleb Turner(Cable)
+Christopher R. Usrey, Cristian Dobos, Albert Aron Hilmarsson
+Zachariah Foote, Joji, Akalnm, borbs, Edgier91, Sean Deadostrich, Grom
+Joshua FuSxd, Aylo, JOENHEL, ThatChampionGuy, Eddy + Kat
+Brian Daniel Salazar Cadena, Brendan "Dramavian" Harris, Viran21
+Tudor Sandu, Yusufkaan NONAME, Zachary Morningstar, AegisKain, ARTIX, Kyzes
+Palaryel, TyranCZ, Caleb "Ceeb" Bradley, SkipTH, Ludwig - L-M, Luxferre
+Lucus Torrey, Alita, naibu, Icey Creamy, Gonza López Batista, DylDeKrokodil
+Patrueree, CarlosClove, LYAI, Geboo, Swagi, DaemonKail
+Loay almonayer (Astro-Axiom), ZHAO YUN-QING, popcube, Oliver P.
+Dandelion453, Bummerbuster, LuckyOnO, Foki, The_Tank_TVS, GiantCrush, Amau
+soto luis, Gfih100, Alihan Kömürcüoğlu, Jason Yeung, Alejo Gutiérrez, Blazro
+Milan Vuković Njaka, xenoszyy, SKOUPIDIOS, OhadR, SCG_NAZZA, Alkine
+Daniele Fiorini, Yuri Rocha Del Poço De Camargo Melo, Freus, NarrowPath20
+Maboroshi, Aldair Morgado, NawDav, Claxon Tournaments, DIMDDD, Vik
+Sweatpantz, ofspades, Shimon Rudenko, GeniusCow, Rin, Alaa,2a2, Nitram301
+iCurseDreamz, Alix Takada and Chewy, pong, cyhnx, ibie, Revelations
+JGustavo CTt, Lord Zsolt / Brian Y, Tartaros, Martfoil, Epicgunshine
+MoDCMomo, makku, Benkazi, Typ0Z, Ben D, Jhors Jimenez, Vektor007
+Patrick Alob, RaeLight, Vadbon, DinoSticksOG, Rynnux, Mr.Insolvent
+Yaheyl.H.Y, Murasiome, Sure, Justin H, Dountrax, RullingBrain, HumbleGoat316
+Lucasltnl, Tem, Señor Zwiggely, Oxsan, Sebastian Molina, mShadowv, Cloud
+Dragathorr, wislo, gilsaws, KicsiHuszár, Jean C. Perin, Sangte, Darkprince03
+Sadox13, blueskyegamer, Infralyxe - Federico Rosas, Loogi, Noobpower
+DjXAZBOaQieaYEa5, BuChuDin, JohnnyMex, BinKaki, YGaru-, IshimaruRitsu
+Miguelsooon, Lim Gao Hong, SANTY4KHDPRO, [Aberration], Andre, Moreno, Oxem
+Sopterean Cristian Florin, Arq.Rodrigo Carballo, Rondoletti, Pandy
+JusticeIL, Symekow_, Jo L'anneau, Ragnar Viking
+Anthony Ezequiel Reyes cisneros, Axelcba, Alexis416, Settie Setagawa
+Geomelocked, LuisAlfredo92, The Jimmay, BABA, El MenToSKa, Frank S
+Victor_Force, DEOXOGY, Slade Henry, Wolfers, Eli Boitlung, Bane, Bighershey
+PlKzbk4, EfkaTrifecta, MoVoStI, KHELTWZ, ArdynLC, Bowls, Catalinutzz
+Oršušar, Kalopsia, D3V1L9, TiYosh, FrogPL, Damien Broadley
+Simon Alexander Berens, Theap, TACOS $5 pesos, Leonardo Cidral, KainPT
+Shnaider, CzGabor, Mat Plins, poh1hop1, Andrei Dandoci, jhheight, ZbenG
+ELMONCHYY, Adhesivebee, Daado, Simpur, Benjamin "Krusty" Zheng, AllanVPM
+Xelikx, DienteDeHombre, Jeisus, J.Levanas, Savyell Navarro, LionDande
+Soricle, Pãolatinus, Kevin Haché, Yzocks, DubMFT, ErenJaeger, belaliyam
+RealPlay4377, Pedro Gil Pinheiro Silva, lonerswrld, Asa, Midnight_R3aper
+Michel Enciso, Diego PS, Lord Daniel, O Conquistador do Caos, MrElectro
+fadesbyzoli, Kylan Coats, Smitethenugget, Melik Kahraman, ️PadleBan
+BananaIcedZambie, Samu03_DxD, Hank, RealSteadfast, Cocoaboaro, Zoli the Envy
+Luisertix11, Edwin Delgado, Ronny Baylor, omaryjeremyestuvieronaqui
+Randomfysh, Shyvon, AshLore, Tesnk, Jemeni Colon, WideArthur, Catalyst
+Chen Obstler, Pamadem_, Ezra R Schultz, Remii (Lithium), Nawzs, Joni
+Mano_VKM, jelle bloemen, AguilarXD, PyroDrake - ARSM, Rodrigo5d, Min T. Htet
+Wish, Sean Murphy, HettyButterfly, t3mp3r4, Malreath, Siemenser, Junnohh
+Leonardo ayala, DJumper, Lord Nightmare, eu.alecreeper, DACR, Adripro
+Angeles4657, Mihajlo, ThurCad, FISHPOGURSS, Jigah_02, Akarui, Lucién Cerante
+L3E, KroxsetH, Dutchy5, Lexiolus, Manuel J. AimLion, Ynohtna, Kokokoov
+Sen7877, Elias, Iorga Mihai Jairr, Lucas, Jannyno Dokter, Kxx21, MD
+Nicodin Andrei Marian, UsSasuke, KEVISSON, Sayf, KingKizzy, Uneedmilk
+Selwyn (PigsmakeBacon), Deyner Zavala H, Deus Dogan, opo3000, Noronhaaaw
+Olaru, donda, Rowain, Chitiman, feiii.tkn, TimsahArda, Elsozfox, Azgalon
+Luis E. Rosello Yanarico, ShafieqEnvil, DelonOfficial!!!
+Fabio Roberto de Paula, Juan Arango, Firewolf, Bobiszon
+Robson Vinicius Lopes Macedo, Ondre, Javier Alejandro herbert hernandez
+nnfy, MrLisard, Julien L., Giao, PedroRoak, SuperBreadBoy, thiagolima7_
+Wendz, Fabio Henrique Dos Santos - Sowe, Rubya40, ghastyy, Jonathan Yang
+Geothewolf, xiiko, CarbunL, masanfe, DevSharks, Patryk Breza (Brezikps)
+EternalY, PineappleMayham, K4z0r, WerinBolt, Jesus Calambas, YisusHD23
+SchizoSanti, Cookie_Founder, JpVolpe, zenon, Marcos G., Luis Suarez Gonzalez
+AnDErs, Xame, Ziedine, Zach Hooper, Laskoś, God Jihyo, Marcianito, PaX
+Messiah, LeviLacerda, Jason le tavernier, tauparticle, Hugo A. Mladosich
+Franckix, Miguel Maia Amaral, 5hadow, Chris (Mortr0n) Morton, KonopiaGG
+Khelifzer, Burke, Lord_Zeltran, Nikki C, Nixo, Ronnie Shires, Cactus0192
+*Horbas*, Neekop, MasterZiemniak, NadeN, MasterAlexS, Gokai
+Mateus Lucas Gregório da Silva, EXRRO, Dominykas Jonkus, Jovex22
+SillyLilly99, \Harbinger of Death\, Glenn Helleman, Jyn43, Topce
+MatheusHK404, Miyagi17_PE, Proose, MarKoUwU, Palle-Nalle, owkk, jaimiebrans
+Inception42a, Tatu Reinikka, Preez, LeMoorian, Tiago Antunes, Rasmus Käige
+SupMe_CarryU, Legoless, Cameron N. Reid, Phants, Hicksz, Sappd, FoggyLight
+bibu, Merdi, Kevin Gibbs, Austin Scripp, Tok Zi Jun, Kyle Adams, Doug
+Daniel 'Drax' Jackson, Kubs_off, TheChairGuy2001, LetMeCook, ReinaMTF
+mixxpositions, Luke Parry, Arcari, GojiOnline, Clone, Matthew Roch
+Nadia Estrada Umanzor, Tronu, THOMAS DEKACHIN WONG, weberrap, RaresGX
+Chasmi, Fristi420, Fredo UwU, AurasALD, AlaskanBeard, Reflexbull, Koulas
+Memmedagge, Ghostboy, MLGBernardBLT, Sirkarel123456, Artiphyss, Patrik Sivec
+Grzegorz Molak, Yes, Mathias Reed Quilleré, Ljubascha, Sukkyra
+BudgetPrincess, eltumy444, Ciu, ByPwAsS, Slimane Rayen, MReach117
+Barret Smith, Eye4I-P, Avaracia, DarkAngelCY, Funtastic, Joel560S
+dos SANTOS SANTIAGO, Apples, tonpan, Zyrex con Z, Alexander Søe, Elearona
+LuigiXLR, cadlhq, brakdemonio, Biinh, LHSpartan007, GeoRyan, K Kapone
+MrKacho, MatheusFJ, TradexAlin, Babxmxre, Silva1131, Eldebil, MisaelSoog
+kamikos, Surdu Eduard, TheHoneydew, Tycho Demeyere, Smeettan, Waller
+Adler Reátegui, :D, Kirin Sim, HeenieWut, wolfflex, Simon-Pierre Hébert
+NobelPL, BubblyGaming, PocoGG, LeXtremzy, SWORD119, Gilexarr, Mauricio Arce
+Brian Duarte V., Monir, Emil Hougaard, Ali Bhayani, paper planes, AnxXiety
+DeathWish212, Maldia, G1byva, NemeCisf117, TheUnnamedRiddimGod, Everest
+P3RSSE0, Djajko, davi do livieiro, Yahusha, JakobSK, Skymap Games, Zanardi
+Xduwu, MrGhostxD, Edward1337, goni, Knockout, DicraSly44, Jeremy Jay Sinko
+GhostSlap, TheHand1359, Pedory, Silva, Billy Wang, Lukovsky
+xTheCrazy (Nathaniel), Fire Lord Iroh, Thierry Maheu, MangoWizard9999999
+ManuBG97, Zumorukito, NONAME, DavidLL, Haste_Sky, Anderson Gieseler
+JazCyrax, Ramazotti Mateo Rama, 7Yara, darkphoenix, Witor Santana, KG
+Alchimikaruz, Kewra, Shaked Levi, mal22k, ivak7, zSkyGrey, Eucharit, J_cob
+Karasz Róbert, luketa, Giacomo Parlatoni, Itsakis, L3venteHUN, Dranara
+Ilthaen, Gabriel Schneider, Ninjabalance, Indominus, MrRedPT, Maki, Adolfo
+HysteriaXO, ILuminx, JARROD YEOH, @vgarcab, Yohi (Yahel Yedoav), c0mpl3x
+markesiano, Optimomo533, Maicon Felipe Reolon, MARKY, Ismael Ime, Ditii
+Deriox, Zahard-Barquero, jer.ry, Mirato, Fyar, Gamer408, Scaryghost, Toshiro
+Ori Aharoni, Matikkii, Omer Barzilay, TheDon, Mcsilvers, Marçola, xXnikitoXx
+Tuxon, Kirai, Attach, Kandela, hystob, Sinley, Ken del rosario
+Ximellotheonecross, SandCS, Redicta, Fabien Letourneur, Karcus, Terinol
+Elton Toh, laurinkus, barry esteba sasari, YanusheQ, Alpha, Bruno Godfryx
+PuFFy, Xrcher, MakeItNhasty, Agentus, -FallenAngel-, XentreX
+Hristo Gornishki, HypersMovie, Nelios, Rafael Mazon, Nagy Máté, LegendsGuy
+J4O, Waiyo, ~Cristiano_DV~, VASCX, DaniiiGM, Raigeki, Itipi M.
+Matías Brascar or MatiEB, old Taxi, Vinicius Oliveira, Jaider Cuartas G.
+Matuno, Noah Toye, jihmmyquan, SpartanElRico, NeroFD, Bryan Bui
+Kieffer Rondon, bloopin, IsaacBautista, CloudNine, adir190
+Nicholas Fernandes, Ehtycs, Fiy, JIMI, Korkut, DOUG35, 3nigma, Patrik_Haru
+tiguan, Rene M, DELKEA, Cr1sFF, Altray, MortoInVita, Robert Olteanu
+𝒜𝓁𝓉𝓇𝒶𝓎, Liad Hayoun, speakl, nimatic, Shmenda, alex21433eq
+iiFerocious, ReakZez, KiseRyouta7VS, AlexSanta045, YouDonkey, Stroves1
+Arisu, Marllown_25, Xofza, Hyomie, Dorking, Matthew & destini henson, abod
+vas646, Farveblind, Riemma, Joseph Winters, Daabid, ray, Rennn, JSK, Oritony
+Mourente, MC, Wout Jacobs (FarmerKenku), Feyzoxy, Zwko, AfonsoSK, Tado
+ReSsuL, 7ow, Wythe89, TheSevet, Lofino, Schäller, Rohit Kumar Vadlamudi
+MagorovecCZ, trolul, Fatecasual, Leonardo Herkenhoff, Kanallu, Leo
+Philipi Guedes, buatmaluje, Kaice, Silvestre Stallone, Regal_tk, frvnco04
+Shimwick, Víctor Gálvez, Tem4ika, Jesse Joe Gomez, Steven Liu, Ringusik
+Xydy, PaweK, Tuffy, VHdSS, Roni kayt, Chems ed Amine, Mubin & Karim Abid
+TiWine, Naotsku, IMUNITY, Brando Armas, Xertix, Аргир Николов, John Pascual
+snayder bltzr, Kakune, Lasagna, Zellyk, Indiezera, KeczupThorn, LaCueva
+FeralcoJam, Hyper, Tomas Forero, Joaquin Banegas, Break Dancer, NickMCloud
+x7avox, BrianUA07, Wackumi, M8vagyok, Lil Dexa, Mike_IB_2005, matyasmandi29
+Campanero, Zegas, Matheus J C Rauch, Moicoloico, CrudeSamuel, Matheus Filip
+Benceba, BenjaminT, Nivirium, Nicolás Sutti, Gracjan Jeżyk, Diego Menegon
+Njake, Zafkiel, Red_Dragon, Teteusback, Cp00nek, XzCataXz, vevv, Sealo
+Hendrix C, MzDys, Jeff Mastey, Maicol Villabon, Danny Salisbury, Piper Kirby
+Rafael Borges, byd0314, IvanAnemi4niq, Saska, N u l l [ 0 ], Mishko019
+Jonathan Castillo, Jequeo, Ernestas Š., tugy, Chihaialex, mal2lam, juliaaa
+Erykoman, André Moraes, Rysaber, Marcelo Véliz, Franlqf, Martn43, AdrianDj
+Edyx, Rod Bradley, Kayn, Sergio Velasquez, Astral09a, Drandox, Alpha34
+bunns5, Mongbat25, MultiGames, ClubbedMan, INTEL MASTER o alexitohdz
+Miguel Calello, Rethovnik, EL GROMP, Cellsuu, Kledi MP, Alex Mccutcheon
+Ferney Ramos, Ishay, Unai, SEBASMG, Jory Bernstein, Eilifir
+Matías Ariel Aguirre, Corey Boll, Josh (Indieformer), PsychoSpyroo
+Greg Spacek, ba3sa, Christoforos, RaXRxSawX, ZeContente, Yoshisada Suzuki
+KanzimEH, LuanHA, Murphy2K, Nafets4, Julian ibarra, BPad, GhassanZ, Greveee
+Bret Jackson, JorgeLP, KUROZAKANA UwU, Rick Alonzo, Tenaki, Thz1n_0, Gouda
+Zaff the Wanderer, Jacobo Ruiz, Juanx_10, Babranz, Valentino236oficial
+Panagiotiszax, Ducky, Shakeitlink, ZaDeZ, PILES, Rei dos Ratos, Infecto
+Faqs, Abhilash JP, Azor55, Aiedail, ExpiredCobra, weser, Jojo le beau gosse
+Gyo, Stero77, Briam1412, Elsuper20, Dykrir, Judasz, Dungeon Rampage Fan
+Wesclei, TheLastAlive, the55, Sorvetecrem, pxd, denitricity, Altair, Diego S
+IEatDirt, Jahter, Alchr Dev, Arimochin, Valdexs, HydroAsuri, Warlike
+Paul Anthony Maddaloni, Joanna Tova Price, Mark030a, cadarn07, Andrew Styles
+Damian Paradis, Ced_TheRock, troubled boys, Reeback666, Nathan Montgomery
+Zafir, Frejny, Carborundum, XCrow19X, David S. Pietka, Lucas Sullivan, Csiti
+damqn369, Suspect, Bruno Bossao, El Stig, Stas_Was_Here, Mirkuzz
+RedBullMan2, Taolan, Carlos Parra, L_lucena, Sasicek, MagdiwangTayo, Ellione
+God4player6, Enzo Furiatti, TheArlod.N, Stefan Kaefel, El Ingeniero Juancho
+Fernando, Baldoino, Colin Simmons, Protonic, CotoZZ, Manuelfc0612, Zars
+AddictedToYu, Konstantinos Egkarchos, L.Nifty
+Giuliano Gentili "The apothecary", Louis Shumpert, arren1234, Yarin, fallen
+Will "BippaGod" Dulevitz, Whito, Tin L., cleanurpants, xPlictisitux
+Anderson, mountainmeiu28, colaesp(portugal), Aleexaander, LEXORHZ
+Franco Arteta, Timaka, Rexo G, Nikola Misic, Shotsinfin , SONESCO

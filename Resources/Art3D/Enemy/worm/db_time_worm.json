@@ -1,0 +1,7 @@
+[
+    { "animName" : "db_anm_worm_attack_bite", "timing" : [3, 2, 2, 2, 2, 3], "directions" : 5 },
+    { "animName" : "db_anm_worm_death", "timing" : [2, 4, 4, 9], "directions" : 1 },
+    { "animName" : "db_anm_worm_idle", "timing" : [3, 3, 2, 3, 2, 3, 2, 1], "directions" : 5 },
+    { "animName" : "db_anm_worm_run", "timing" : [3, 3, 2, 2, 2, 1], "directions" : 5 },
+    { "animName" : "db_anm_worm_suffer", "timing" : [2, 1, 2, 4], "directions" : 5 }
+]

@@ -1,0 +1,12 @@
+{
+    "FullAggro": false,
+    "tileLibrary": "Resources/Levels/jungle/dino/db_tiles_DINO_BOSS.json",
+    "tiles": [
+        {"type": "LEFloorTile", "tileId": "32.1335403947238", "y": 4500, "id": "750.1335406007601", "x": 3600},
+        {"type": "LEFloorTile", "tileId": "377.1335404611244", "y": 3600, "id": "753.1335406015382", "x": 4500},
+        {"type": "LEFloorTile", "tileId": "36.1335403960392", "y": 3600, "id": "754.1335406018446", "x": 5400},
+        {"type": "LEFloorTile", "tileId": "755.1335406023705", "y": 3600, "id": "932.1335406310762", "x": 3600}
+    ],
+    "version": "Version 2.9.0",
+    "fileType": "floor"
+}

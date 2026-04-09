@@ -1,0 +1,7 @@
+[
+    { "animName" : "db_anm_barrelMon_attack_bite", "timing" : [3, 2, 1, 2, 1], "directions" : 2 },
+    { "animName" : "db_anm_barrelMon_death", "timing" : [2, 4, 3, 1, 2, 2, 5], "directions" : 1 },
+    { "animName" : "db_anm_barrelMon_idle", "timing" : [2], "directions" : 1 },
+    { "animName" : "db_anm_barrelMon_run", "timing" : [3, 3, 3, 1], "directions" : 2 },
+    { "animName" : "db_anm_barrelMon_suffer", "timing" : [2, 1, 2, 2, 2], "directions" : 2 }
+]

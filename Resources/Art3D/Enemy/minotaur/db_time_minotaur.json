@@ -1,0 +1,10 @@
+[
+    { "animName" : "db_anm_minotaur_attack_chargeWithHorns", "timing" : [4, 3, 2, 2, 4], "directions" : 3 },
+    { "animName" : "db_anm_minotaur_attack_chop", "timing" : [6, 6, 6, 4], "directions" : 3 },
+    { "animName" : "db_anm_minotaur_attack_swingLeft", "timing" : [4, 4, 4, 4, 3], "directions" : 3 },
+    { "animName" : "db_anm_minotaur_death", "timing" : [2, 2, 2, 2, 5], "directions" : 1 },
+    { "animName" : "db_anm_minotaur_idle", "timing" : [4, 5, 6, 3, 4, 4], "directions" : 3 },
+    { "animName" : "db_anm_minotaur_roar", "timing" : [5, 4, 5, 5, 8], "directions" : 3 },
+    { "animName" : "db_anm_minotaur_run", "timing" : [3, 2, 3, 2, 3, 3, 2, 3, 1], "directions" : 3 },
+    { "animName" : "db_anm_minotaur_suffer", "timing" : [2, 2, 2, 2, 4, 2], "directions" : 3 }
+]

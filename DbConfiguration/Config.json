@@ -1,0 +1,13 @@
+{
+  "gameMasterPath":"Resources/Levels/DB_GameMaster.json",
+  "GameSocketPort":80,
+  "GameSocketAddress":"ws.green.prod.dr.g17s.net",
+  "EnvironmentPrefix": "gr",
+  "API_root":"https://api.green.prod.dr.g17s.net/api/",
+  "RPC_root":"https://api.green.prod.dr.g17s.net/rpc/",
+  "STEAM_API_root":"https://api.green.prod.dr.g17s.net/steam/",
+  "AccountId":1000000005,
+  "API_ValidationToken":"2045627941:FakeTokenThisShouldUseSteamAndPopulateFromTheServerInstead",
+  "Currency":"USD",
+  "NetworkId":3
+}

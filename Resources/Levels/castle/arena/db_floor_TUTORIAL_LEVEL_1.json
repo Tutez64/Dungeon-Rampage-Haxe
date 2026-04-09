@@ -1,0 +1,19 @@
+{
+    "FullAggro": false,
+    "tileLibrary": "Resources/Levels/castle/arena/db_tiles_TUTORIAL_LEVEL.json",
+    "tiles": [
+        {"type": "LEFloorTile", "tileId": "1.1314209546518", "y": 5400, "id": "1.1318443490440", "x": 1800},
+        {"type": "LEFloorTile", "tileId": "135.1308291666085", "y": 3600, "id": "11.1313731687678", "x": 2700},
+        {"type": "LEFloorTile", "tileId": "LETile.0.1304617672210", "y": 6300, "id": "3.1318443863243", "x": 1800},
+        {"type": "LEFloorTile", "tileId": "46.1308273570846", "y": 3600, "id": "33.1313732435478", "x": 4500},
+        {"type": "LEFloorTile", "tileId": "96.1311102245907", "y": 3600, "id": "34.1313732512979", "x": 3600},
+        {"type": "LEFloorTile", "tileId": "LETile.186.1304630379845", "y": 3600, "id": "6.1313731537053", "x": 5400},
+        {"type": "LEFloorTile", "tileId": "24.1308290813849", "y": 2700, "id": "6.1314243417091", "x": 5400},
+        {"type": "LEFloorTile", "tileId": "LETile.215.1304630568253", "y": 4500, "id": "6.1318444036643", "x": 2700},
+        {"type": "LEFloorTile", "tileId": "52.1313739964297", "y": 7200, "id": "69.1313740091611", "x": 1800},
+        {"type": "LEFloorTile", "tileId": "112.1314210610208", "y": 5400, "id": "7.1318444135751", "x": 2700},
+        {"type": "LEFloorTile", "tileId": "52.1313739964297", "y": 1800, "id": "70.1313740093562", "x": 5400}
+    ],
+    "version": "Version 2.9.0",
+    "fileType": "floor"
+}

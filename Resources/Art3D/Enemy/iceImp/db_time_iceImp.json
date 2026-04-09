@@ -1,0 +1,10 @@
+[
+    { "animName" : "db_anm_iceImp_cast", "timing" : [3, 2, 3, 6], "directions" : 3 },
+    { "animName" : "db_anm_iceImp_throwIceSpear", "timing" : [2, 2, 2, 2], "directions" : 3 },
+    { "animName" : "db_anm_iceImp_death", "timing" : [2, 2, 2, 5], "directions" : 1 },
+    { "animName" : "db_anm_iceImp_flex", "timing" : [3, 2, 2, 7], "directions" : 3 },
+    { "animName" : "db_anm_iceImp_Idle", "timing" : [4, 4, 4, 3], "directions" : 3 },
+    { "animName" : "db_anm_iceImp_run", "timing" : [2, 2, 2, 2, 1], "directions" : 3 },
+    { "animName" : "db_anm_iceImp_suffer", "timing" : [2, 3, 4], "directions" : 3 },
+    { "animName" : "db_anm_iceImp_tauntJeer", "timing" : [5, 4, 5, 3], "directions" : 3 }
+]

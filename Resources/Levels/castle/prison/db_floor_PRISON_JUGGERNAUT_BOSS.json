@@ -1,0 +1,14 @@
+{
+    "FullAggro": false,
+    "tileLibrary": "Resources/Levels/castle/prison/db_tiles_PRISON_JUGGERNAUT_BOSS.json",
+    "tiles": [
+        {"type": "LEFloorTile", "tileId": "846.1334958560950", "y": 2700, "id": "1000.1334959294387", "x": 3600},
+        {"type": "LEFloorTile", "tileId": "1001.1334959323175", "y": 2700, "id": "1245.1334960167450", "x": 5400},
+        {"type": "LEFloorTile", "tileId": "454.1334956026168", "y": 1800, "id": "1259.1334960277765", "x": 5400},
+        {"type": "LEFloorTile", "tileId": "425.1334955137207", "y": 4500, "id": "440.1334955204661", "x": 3600},
+        {"type": "LEFloorTile", "tileId": "2.1335553388031", "y": 2700, "id": "736.1335559156231", "x": 4500},
+        {"type": "LEFloorTile", "tileId": "469.1334956482895", "y": 3600, "id": "840.1334958501737", "x": 3600}
+    ],
+    "version": "Version 2.9.0",
+    "fileType": "floor"
+}

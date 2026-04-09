@@ -1,0 +1,10 @@
+[
+    { "animName" : "db_anm_MOskeleton_attack_chop", "timing" : [6, 3, 3], "directions" : 3 },
+    { "animName" : "db_anm_MOskeleton_attack_bowShoot", "timing" : [2, 8, 2, 3], "directions" : 3 },
+    { "animName" : "db_anm_MOskeleton_death", "timing" : [4, 2, 2, 2, 9], "directions" : 1 },
+    { "animName" : "db_anm_MOskeleton_flex", "timing" : [4, 3, 2, 2, 1], "directions" : 3 },
+    { "animName" : "db_anm_MOskeleton_idle", "timing" : [4, 5, 6, 4, 3, 4], "directions" : 3 },
+    { "animName" : "db_anm_MOskeleton_run", "timing" : [2, 2, 2, 2, 2, 2, 1, 1], "directions" : 3 },
+    { "animName" : "db_anm_MOskeleton_suffer", "timing" : [2, 3, 3, 6], "directions" : 3 },
+    { "animName" : "db_anm_MOskeleton_tauntJeer", "timing" : [5, 1, 1, 2, 4, 4, 4, 4, 6, 1], "directions" : 3 }
+]
