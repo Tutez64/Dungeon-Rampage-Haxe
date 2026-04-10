@@ -11,6 +11,7 @@ import flash.external.ExtensionContext;
 #if (cpp && !air)
 import steamwrap.api.Steam;
 #if sys
+import haxe.io.Path;
 import sys.FileSystem;
 import sys.io.File;
 #end
@@ -206,11 +207,19 @@ class FRESteamWorks extends EventDispatcher {
 			}
 		}
 
-		if (FileSystem.exists("steam_appid.txt")) {
-			var content = File.getContent("steam_appid.txt");
-			var parsedFile = Std.parseInt(StringTools.trim(content));
-			if (parsedFile != null && parsedFile > 0) {
-				return parsedFile;
+		var candidates = ["steam_appid.txt"];
+		var programDir = Path.directory(Sys.programPath());
+		if (programDir != null && programDir.length > 0) {
+			candidates.push(Path.normalize(Path.join([programDir, "steam_appid.txt"])));
+		}
+
+		for (candidate in candidates) {
+			if (FileSystem.exists(candidate)) {
+				var content = File.getContent(candidate);
+				var parsedFile = Std.parseInt(StringTools.trim(content));
+				if (parsedFile != null && parsedFile > 0) {
+					return parsedFile;
+				}
 			}
 		}
 

@@ -448,11 +448,26 @@ class SwfAsset extends Asset
     static function getPreprocessedBundlePath(param1:String) : String
     {
         var _loc1_= Path.directory(Sys.programPath());
+        var _loc2_:Array<String> = null;
+        var _loc3_:String = null;
+        var _loc4_:String = null;
         if(_loc1_ == null || _loc1_.length == 0)
         {
             return null;
         }
-        return Path.normalize(Path.join([_loc1_,"lib",param1 + ".zip"]));
+        _loc2_ = [
+            Path.normalize(Path.join([_loc1_,"lib",param1 + ".zip"])),
+            Path.normalize(Path.join([_loc1_,"..","Resources","lib",param1 + ".zip"]))
+        ];
+        for(_loc3_ in _loc2_)
+        {
+            if(_loc4_ != _loc3_ && FileSystem.exists(_loc3_))
+            {
+                return _loc3_;
+            }
+            _loc4_ = _loc3_;
+        }
+        return _loc2_[0];
     }
 
     #end

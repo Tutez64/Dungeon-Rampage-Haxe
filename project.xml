@@ -4,6 +4,8 @@
 	<app main="DungeonBustersProject" file="DungeonBustersProject" swf-version="32" />
 	<window width="1920" height="1080" fps="120" background="#000000" hardware="true" allow-shaders="true" require-shaders="true"/>
 
+	<set name="APP_FILE" value="DungeonBustersProject" />
+
 	<haxelib name="SteamWrap" path="../SteamWrap" if="cpp" />
 	<haxelib name="lime" path="../lime" if="cpp" />
 	<haxelib name="swf" path="../swf" if="cpp" />
