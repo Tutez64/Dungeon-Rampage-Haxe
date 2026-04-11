@@ -1,10 +1,10 @@
-# Dungeon-Rampage-Haxe
-DRH is a port of [Dungeon Rampage](https://store.steampowered.com/app/3053950/Dungeon_Rampage/) from AS3/AIR to Haxe, targeting native Linux and Windows.
+# Dungeon Rampage Haxe
+DRH is a port of [Dungeon Rampage](https://store.steampowered.com/app/3053950/Dungeon_Rampage/) from AS3/AIR to Haxe, targeting native Linux, macOS and Windows.
 
 It relies on OpenFL, a graphical library re-implementing the Flash/AIR APIs with various added benefits.
 
 # Installation instructions
-Download it [here](https://github.com/Tutez64/Dungeon-Rampage-Haxe/releases) and launch DungeonBustersProject.
+Download it [here](https://github.com/Tutez64/Dungeon-Rampage-Haxe/releases), unzip it then launch DungeonBustersProject.
 
 You need to have Steam open with the official game bought. Otherwise, it won't be able to connect to the official servers.
 
