@@ -20,9 +20,9 @@ Examples:
 Notes:
   - The output bundle is copied from the arm64 app, then Mach-O files present in both bundles
     are merged with lipo.
-  - By default the script re-signs the merged app with an ad-hoc signature (`codesign -`),
-    which is appropriate for local testing and unsigned distribution after lipo invalidates
-    the old signature.
+  - By default the script removes inherited signatures, then ad-hoc signs the merged `.app`
+    bundle and verifies it. This is suitable for local testing only.
+  - Use `--no-sign` if you want the merged app left unsigned.
 EOF
 }
 
@@ -37,8 +37,10 @@ warn() {
   echo "Warning: $*" >&2
 }
 
-bundle_executable_path() {
-  /usr/libexec/PlistBuddy -c "Print :CFBundleExecutable" "$1/Contents/Info.plist" 2>/dev/null
+strip_inherited_signatures() {
+  local app_path="$1"
+
+  find "$app_path" -name _CodeSignature -type d -prune -exec rm -rf {} +
 }
 
 is_macho() {
@@ -113,6 +115,7 @@ fi
 echo "Creating output bundle: $OUTPUT_APP"
 rm -rf "$OUTPUT_APP"
 ditto "$ARM_APP" "$OUTPUT_APP"
+strip_inherited_signatures "$OUTPUT_APP"
 
 while IFS= read -r relative_path; do
   x86_file="$X86_APP/$relative_path"
@@ -144,59 +147,9 @@ while IFS= read -r relative_path; do
 done < <(cd "$X86_APP" && find Contents -type f | sort)
 
 if [[ $DO_SIGN -eq 1 ]]; then
-  echo "Re-signing merged app with ad-hoc identity"
-
-  MAIN_EXECUTABLE_NAME="$(bundle_executable_path "$OUTPUT_APP" || true)"
-  MAIN_EXECUTABLE_PATH=""
-  STEAM_APPID_PATH="Contents/MacOS/steam_appid.txt"
-  STEAM_APPID_TEMP_PATH="Contents/Resources/steam_appid.txt.codesign-temp"
-  ENTITLEMENTS_PATH="Contents/Entitlements.plist"
-  ENTITLEMENTS_TEMP_PATH="Contents/Resources/Entitlements.plist.codesign-temp"
-
-  if [[ -n "$MAIN_EXECUTABLE_NAME" ]]; then
-    MAIN_EXECUTABLE_PATH="Contents/MacOS/$MAIN_EXECUTABLE_NAME"
-  fi
-
-  while IFS= read -r relative_path; do
-    target="$OUTPUT_APP/$relative_path"
-    if [[ "$relative_path" == "$MAIN_EXECUTABLE_PATH" ]]; then
-      continue
-    fi
-
-    if is_macho "$target"; then
-      if ! codesign --force --sign - "$target"; then
-        warn "Could not sign $relative_path"
-      fi
-    fi
-  done < <(cd "$OUTPUT_APP" && find Contents -type f | sort)
-
-  if [[ -n "$MAIN_EXECUTABLE_PATH" && -f "$OUTPUT_APP/$MAIN_EXECUTABLE_PATH" ]]; then
-    if [[ -f "$OUTPUT_APP/$STEAM_APPID_PATH" ]]; then
-      mv "$OUTPUT_APP/$STEAM_APPID_PATH" "$OUTPUT_APP/$STEAM_APPID_TEMP_PATH"
-    fi
-
-    if [[ -f "$OUTPUT_APP/$ENTITLEMENTS_PATH" ]]; then
-      mv "$OUTPUT_APP/$ENTITLEMENTS_PATH" "$OUTPUT_APP/$ENTITLEMENTS_TEMP_PATH"
-    fi
-
-    if ! codesign --force --sign - "$OUTPUT_APP/$MAIN_EXECUTABLE_PATH"; then
-      warn "Could not sign main executable $MAIN_EXECUTABLE_PATH"
-    fi
-
-    if [[ -f "$OUTPUT_APP/$STEAM_APPID_TEMP_PATH" ]]; then
-      mv "$OUTPUT_APP/$STEAM_APPID_TEMP_PATH" "$OUTPUT_APP/$STEAM_APPID_PATH"
-    fi
-
-    if [[ -f "$OUTPUT_APP/$ENTITLEMENTS_TEMP_PATH" ]]; then
-      mv "$OUTPUT_APP/$ENTITLEMENTS_TEMP_PATH" "$OUTPUT_APP/$ENTITLEMENTS_PATH"
-    fi
-  fi
-
-  if ! codesign --force --sign - "$OUTPUT_APP"; then
-    warn "Could not sign bundle $OUTPUT_APP"
-  elif ! codesign --verify --deep --strict --verbose=2 "$OUTPUT_APP"; then
-    warn "Bundle verification failed for $OUTPUT_APP; continuing anyway"
-  fi
+  echo "Ad-hoc signing bundle"
+  codesign --force --deep --sign - "$OUTPUT_APP"
+  codesign --verify --deep --strict --verbose=2 "$OUTPUT_APP"
 fi
 
 echo

@@ -17,6 +17,10 @@ Pipeline:
   2. Build arm64 app
   3. Merge both into one universal app
   4. Package the universal app into a ZIP
+
+Notes:
+  - By default the merged `.app` is ad-hoc signed and verified.
+  - Use `--no-sign` if you want the merged app left unsigned.
 EOF
 }
 
@@ -25,10 +29,10 @@ PROJECT_FILE="project.xml"
 OPENFL_BIN="${OPENFL_BIN:-openfl}"
 TARGET_NAME="macos"
 OUTPUT_APP="bin/macos/bin/DungeonBustersProject.app"
-OUTPUT_ZIP="bin/macos/bin/DungeonBustersProject-macos-universal.zip"
+OUTPUT_ZIP="bin/macos/bin/Dungeon Rampage Haxe macOS.zip"
 X86_APP=""
 ARM_APP=""
-NO_SIGN=0
+DO_SIGN=1
 EXTRA_ARGS=()
 
 while [[ $# -gt 0 ]]; do
@@ -62,7 +66,7 @@ while [[ $# -gt 0 ]]; do
       shift 2
       ;;
     --no-sign)
-      NO_SIGN=1
+      DO_SIGN=0
       shift
       ;;
     --)
@@ -121,7 +125,7 @@ UNIVERSAL_ARGS=(
   "$OUTPUT_APP"
 )
 
-if [[ $NO_SIGN -eq 1 ]]; then
+if [[ $DO_SIGN -eq 0 ]]; then
   "$SCRIPT_DIR/make_universal_macos_app.sh" --no-sign "${UNIVERSAL_ARGS[@]}"
 else
   "$SCRIPT_DIR/make_universal_macos_app.sh" "${UNIVERSAL_ARGS[@]}"
