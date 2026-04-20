@@ -54,8 +54,8 @@ package com.junkbyte.console.core
       public function unwatch(param1:String) 
       {
          var _loc2_:ASObject = null;
-         final __ax4_iter_79 = this._objectsList;
-         if (checkNullIteratee(__ax4_iter_79)) for(_tmp_ in __ax4_iter_79.keys())
+         final __ax4_iter_106 = this._objectsList;
+         if (checkNullIteratee(__ax4_iter_106)) for(_tmp_ in __ax4_iter_106.keys())
          {
             _loc2_  = _tmp_;
             if(this._objectsList[_loc2_] == param1)
@@ -80,14 +80,14 @@ package com.junkbyte.console.core
          }
          var _loc1_= new Array<ASAny>();
          var _loc2_:ASObject = new ASObject();
-         final __ax4_iter_80 = this._objectsList;
-         if (checkNullIteratee(__ax4_iter_80)) for(_tmp_ in __ax4_iter_80.keys())
+         final __ax4_iter_107 = this._objectsList;
+         if (checkNullIteratee(__ax4_iter_107)) for(_tmp_ in __ax4_iter_107.keys())
          {
             _loc3_  = _tmp_;
             _loc2_[this._objectsList[_loc3_]] = true;
          }
-         final __ax4_iter_81:ASObject = this._namesList;
-         if (checkNullIteratee(__ax4_iter_81)) for(_tmp_ in __ax4_iter_81.___keys())
+         final __ax4_iter_108:ASObject = this._namesList;
+         if (checkNullIteratee(__ax4_iter_108)) for(_tmp_ in __ax4_iter_108.___keys())
          {
             _loc4_  = _tmp_;
             if(!ASCompat.toBool(_loc2_[_loc4_]))

@@ -5,7 +5,6 @@ package actor.player
    import brain.logger.Logger;
    import brain.sound.SoundAsset;
    import brain.sound.SoundHandle;
-   import brain.workLoop.LogicalWorkComponent;
    import brain.workLoop.Task;
    import distributedObjects.HeroGameObject;
    import dungeon.Tile;
@@ -29,8 +28,6 @@ package actor.player
       public static var ACTIVATE_HEARTBEAT_AT_HEALTH_LEVEL:Float = 0.25;
       
       public var wantMouseEnabled:Bool = false;
-      
-      var mWorkComponent:LogicalWorkComponent;
       
       var mVisibilityTask:Task;
       
@@ -89,8 +86,7 @@ package actor.player
          var hitSprite:Sprite;
          super.init();
          this.nametag.hpBarVisible = false;
-         mWorkComponent = new LogicalWorkComponent(mDBFacade);
-         mVisibilityTask = mWorkComponent.doEveryFrame(fadeOccludingObjects);
+         mVisibilityTask = mLogicalWorkComponent.doEveryFrame(fadeOccludingObjects);
          if(!wantMouseEnabled)
          {
             root.mouseEnabled = false;
@@ -114,7 +110,7 @@ package actor.player
             if(_loc2_ != null)
             {
                mFootRing = ASCompat.dynamicAs(ASCompat.createInstance(_loc2_, []), flash.display.MovieClip);
-               mFootRing.scaleX = mFootRing.scaleY = 0.75;
+               mFootRing.scaleX = mFootRing.scaleY = 0.75 * (1 / mParentActorObject.actorData.scale3DModel);
                mBody.addChildAt(mFootRing,0);
             }
          });

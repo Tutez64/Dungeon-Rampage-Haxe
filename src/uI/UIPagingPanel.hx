@@ -143,8 +143,8 @@ function  get_currentPage() : UInt
          var offset:Float;
          mPageLeftButton.enabled = mCurrentPage != 0;
          mPageRightButton.enabled = mCurrentPage < mNumPages - 1;
-         final __ax4_iter_121 = mPageButtons;
-         if (checkNullIteratee(__ax4_iter_121)) for (_tmp_ in __ax4_iter_121)
+         final __ax4_iter_134 = mPageButtons;
+         if (checkNullIteratee(__ax4_iter_134)) for (_tmp_ in __ax4_iter_134)
          {
             pageButton  = _tmp_;
             pageButton.detach();

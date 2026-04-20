@@ -81,7 +81,7 @@ package combat.attack
          
          mDBFacade = param4;
          mDistributedDungeonFloor = param5;
-         mLogicalWorkComponent = new LogicalWorkComponent(mDBFacade);
+         mLogicalWorkComponent = new LogicalWorkComponent(mDBFacade,"ScriptTimeline");
          mTimelineActions = new Map();
          mActorView = param2;
          mActorGameObject = param1;
@@ -211,7 +211,7 @@ function  get_playSpeed() : Float
                
             case "scale":
                _loc2_ = ScaleAttackTimelineAction.buildFromJson(mActorGameObject,mActorView,mDBFacade,param1);
-               
+			   
             case "zoom"
                | "timeScale"
                | "circleCollider"

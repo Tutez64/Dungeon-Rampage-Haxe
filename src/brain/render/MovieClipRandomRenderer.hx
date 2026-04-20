@@ -15,9 +15,9 @@ package brain.render
       
       var mCurrentRandomLabel:RandomLabelObject;
       
-      public function new(param1:Facade, param2:MovieClip, param3:ASFunction = null)
+      public function new(param1:Facade, param2:MovieClip, param3:ASFunction = null, param4:String = null)
       {
-         super(param1,param2,param3);
+         super(param1,param2,param3,param4);
       }
       
       override public function destroy() 

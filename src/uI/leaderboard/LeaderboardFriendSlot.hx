@@ -10,7 +10,7 @@ package uI.leaderboard
    import dBGlobals.DBGlobal;
    import facade.DBFacade;
    import facade.Locale;
-   import uI.DBUIOneButtonPopup;
+   import uI.popup.DBUIOneButtonPopup;
    import com.greensock.TweenMax;
    import flash.display.MovieClip;
    import flash.geom.Point;
@@ -85,7 +85,7 @@ package uI.leaderboard
          mLeaderboard = param3;
          mThisSlotIndex = (param4 : UInt);
          mAssetLoadingComponent = new AssetLoadingComponent(param1);
-         mLogicalWorkComponent = new LogicalWorkComponent(param1);
+         mLogicalWorkComponent = new LogicalWorkComponent(param1,"LeaderboardFriendSlot");
          mFriendSlotPosition = mFriendSlot.localToGlobal(new Point(0,0));
          loadVariables();
          populateSlot(null);

@@ -172,6 +172,10 @@ public function  get_townHeader() : TownHeader
          mTownHeader.jumpToMapState = param1;
          mInventoryState.setRevlealedState(param3,param4,param5);
          this.transitionToState(mInventoryState);
+         if(mDBFacade.steamAchievementsManager != null)
+         {
+            mDBFacade.steamAchievementsManager.checkStorageAchievements();
+         }
       }
       
       public function enterTavernState(param1:Bool = false) 

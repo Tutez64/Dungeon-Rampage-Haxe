@@ -133,7 +133,7 @@ function  get_base() : ASObject
       
       public function getHintsFor(param1:String, param2:UInt) : Array<ASAny>
       {
-         var __ax4_iter_83:WeakObject;
+         var __ax4_iter_110:WeakObject;
          var hints:Array<ASAny>;
          var X:String = null;
          var canadate:Array<ASAny> = null;
@@ -142,8 +142,8 @@ function  get_base() : ASObject
          var str= param1;
          var max= param2;
          var all= new Array<ASAny>();
-         final __ax4_iter_82:ASObject = this._slashCmds;
-         if (checkNullIteratee(__ax4_iter_82)) for(_tmp_ in __ax4_iter_82.___keys())
+         final __ax4_iter_109:ASObject = this._slashCmds;
+         if (checkNullIteratee(__ax4_iter_109)) for(_tmp_ in __ax4_iter_109.___keys())
          {
             X  = _tmp_;
             cmd = this._slashCmds[X];
@@ -154,8 +154,8 @@ function  get_base() : ASObject
          }
          if(config.commandLineAllowed)
          {
-            __ax4_iter_83 = this._saved;
-            if (checkNullIteratee(__ax4_iter_83)) for(_tmp_ in (__ax4_iter_83 : ASAny).___keys())
+            __ax4_iter_110 = this._saved;
+            if (checkNullIteratee(__ax4_iter_110)) for(_tmp_ in (__ax4_iter_110 : ASAny).___keys())
             {
                Y  = _tmp_;
                all.push(["$" + Y,LogReferences.ShortClassName(this._saved.get(Y))]);
@@ -241,7 +241,7 @@ public function  get_scopeString() : String
       
       public function run(param1:String, param2:ASObject = null) : ASAny
       {
-         var __ax4_iter_84:WeakObject;
+         var __ax4_iter_111:WeakObject;
          var v:ASAny;
          var bytes:ByteArray = null;
          var exe:Executer = null;
@@ -290,8 +290,8 @@ public function  get_scopeString() : String
                exe.addEventListener(Event.COMPLETE,this.onExecLineComplete,false,0,true);
                if(ASCompat.toBool(saves))
                {
-                  __ax4_iter_84 = this._saved;
-                  if (checkNullIteratee(__ax4_iter_84)) for(_tmp_ in (__ax4_iter_84 : ASAny).___keys())
+                  __ax4_iter_111 = this._saved;
+                  if (checkNullIteratee(__ax4_iter_111)) for(_tmp_ in (__ax4_iter_111 : ASAny).___keys())
                   {
                      X  = _tmp_;
                      if(!ASCompat.toBool(saves[X]))
@@ -482,8 +482,8 @@ public function  get_scopeString() : String
          report("Saved vars: ",-1);
          var _loc2_= (0 : UInt);
          var _loc3_= (0 : UInt);
-         final __ax4_iter_85 = this._saved;
-         if (checkNullIteratee(__ax4_iter_85)) for(_tmp_ in (__ax4_iter_85 : ASAny).___keys())
+         final __ax4_iter_112 = this._saved;
+         if (checkNullIteratee(__ax4_iter_112)) for(_tmp_ in (__ax4_iter_112 : ASAny).___keys())
          {
             _loc4_  = _tmp_;
             _loc5_ = this._saved.getWeakRef(_loc4_);
@@ -509,8 +509,8 @@ public function  get_scopeString() : String
          var _loc4_:SlashCommand = null;
          var _loc2_:Array<ASAny> = [];
          var _loc3_:Array<ASAny> = [];
-         final __ax4_iter_86:ASObject = this._slashCmds;
-         if (checkNullIteratee(__ax4_iter_86)) for (_tmp_ in iterateDynamicValues(__ax4_iter_86))
+         final __ax4_iter_113:ASObject = this._slashCmds;
+         if (checkNullIteratee(__ax4_iter_113)) for (_tmp_ in iterateDynamicValues(__ax4_iter_113))
          {
             _loc4_  = ASCompat.dynamicAs(_tmp_, SlashCommand);
             if(config.commandLineAllowed || _loc4_.allow)

@@ -10,6 +10,7 @@ package actor.pets
    import distributedObjects.NPCGameObject;
    import events.GameObjectEvent;
    import facade.DBFacade;
+   import facade.GameMasterLocale;
    import facade.Locale;
    import flash.display.MovieClip;
    
@@ -55,7 +56,7 @@ package actor.pets
                ASCompat.setProperty((mNoPetUI.tooltip : ASAny).description_label, "text", Locale.getString("NO_PET_EQUIPPED_TOOLTIP_DESCRIPTION"));
             }
          }
-         mLogicalWorkComponent = new LogicalWorkComponent(mDBFacade);
+         mLogicalWorkComponent = new LogicalWorkComponent(mDBFacade,"PetPortraitUI");
          mEventComponent = new EventComponent(mDBFacade);
          mPetNPCGameObject = param4;
          mRoot.visible = false;
@@ -78,8 +79,8 @@ public function  get_petNPCGameObject() : NPCGameObject
          }
          if(mPetNPCGameObject != null)
          {
-            ASCompat.setProperty((mRoot : ASAny).tooltip.description_label, "text", mPetNPCGameObject.gmNpc.Description);
-            ASCompat.setProperty((mRoot : ASAny).tooltip.title_label, "text", mPetNPCGameObject.gmNpc.Name.toUpperCase());
+            ASCompat.setProperty((mRoot : ASAny).tooltip.description_label, "text", GameMasterLocale.getGameMasterSubString("PET_DESCRIPTION",mPetNPCGameObject.gmNpc.Constant));
+            ASCompat.setProperty((mRoot : ASAny).tooltip.title_label, "text", GameMasterLocale.getGameMasterSubString("PET_NAME",mPetNPCGameObject.gmNpc.Constant).toUpperCase());
             mEventComponent.addListener(GameObjectEvent.uniqueEvent("HpEvent_HP_UPDATE",mPetNPCGameObject.id),function(param1:events.HpEvent)
             {
                setHp(param1.hp,param1.maxHp);
@@ -115,23 +116,26 @@ public function  get_petNPCGameObject() : NPCGameObject
       
       public function petDeath() 
       {
+         var _loc1_= Math.NaN;
          mIsDead = true;
-         var _loc1_= mPetNPCGameObject.gmNpc.RespawnT;
-         if(_loc1_ > 0)
+         if(mPetNPCGameObject != null)
          {
-            handleRespawningPetDeath(_loc1_);
+            mEventComponent.removeListener(GameObjectEvent.uniqueEvent("HpEvent_HP_UPDATE",mPetNPCGameObject.id));
+            _loc1_ = mPetNPCGameObject.gmNpc.RespawnT;
+            if(_loc1_ > 0)
+            {
+               handleRespawningPetDeath(_loc1_);
+            }
          }
          mPetNPCGameObject = null;
       }
       
       function handleRespawningPetDeath(param1:Float) 
       {
-         var scopingSolution:PetPortraitUI;
          var respawnTimer= param1;
          ItemInfo.loadItemIcon(mPetNPCGameObject.actorData.gMActor.IconSwfFilepath,mPetNPCGameObject.actorData.gMActor.IconName,ASCompat.dynamicAs((root : ASAny).graphic, flash.display.DisplayObjectContainer),mDBFacade,(80 : UInt),(68 : UInt));
          ASCompat.setProperty((mRoot : ASAny).hp_death, "visible", true);
-         scopingSolution = this;
-         ASCompat.setProperty((root : ASAny).tooltip.title_label, "text", mPetNPCGameObject.gmNpc.Name.toUpperCase());
+         ASCompat.setProperty((root : ASAny).tooltip.title_label, "text", GameMasterLocale.getGameMasterSubString("PET_NAME",mPetNPCGameObject.gmNpc.Constant).toUpperCase());
          ASCompat.setProperty((root : ASAny).tooltip.description_label, "text", Locale.getString("PET_RESPAWNS_IN") + ": " + Std.string(respawnTimer));
          mCoolDownRenderer.playRate = mCoolDownClipLength / respawnTimer;
          mCoolDownRenderer.clip.visible = true;

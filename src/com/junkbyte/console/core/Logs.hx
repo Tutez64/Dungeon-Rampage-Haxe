@@ -174,8 +174,8 @@ package com.junkbyte.console.core
          this.addIfexist(LogReferences.INSPECTING_CHANNEL,_loc1_);
          this.addIfexist(Console.CONSOLE_CHANNEL,_loc1_);
          var _loc2_= new Array<ASAny>();
-         final __ax4_iter_88:ASObject = this._channels;
-         if (checkNullIteratee(__ax4_iter_88)) for(_tmp_ in __ax4_iter_88.___keys())
+         final __ax4_iter_115:ASObject = this._channels;
+         if (checkNullIteratee(__ax4_iter_115)) for(_tmp_ in __ax4_iter_115.___keys())
          {
             _loc3_  = _tmp_;
             if(_loc1_.indexOf(_loc3_) < 0)

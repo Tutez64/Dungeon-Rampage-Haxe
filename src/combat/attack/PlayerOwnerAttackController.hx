@@ -62,7 +62,7 @@ package combat.attack
          mDistributedPlayerOwner = param1;
          mDBFacade = param3;
          mPotentialWeaponInputQueue = [];
-         mLogicalWorkComponent = new LogicalWorkComponent(param3);
+         mLogicalWorkComponent = new LogicalWorkComponent(param3,"PlayerOwnerAttackController");
          mEventComponent = new EventComponent(mDBFacade);
          mEventComponent.addListener(GameObjectEvent.uniqueEvent(BuffHandler.BERSERK_MODE_START,mDistributedPlayerOwner.id),berserkModeStart);
          mEventComponent.addListener(GameObjectEvent.uniqueEvent(BuffHandler.BERSERK_MODE_DONE,mDistributedPlayerOwner.id),berserkModeEnd);

@@ -389,8 +389,8 @@ package com.greensock
          }
          this.cachedPT1 = null;
          this.propTweenLookup = {};
-         final __ax4_iter_135:ASObject = this.vars;
-         if (checkNullIteratee(__ax4_iter_135)) for(_tmp_ in __ax4_iter_135.___keys())
+         final __ax4_iter_151:ASObject = this.vars;
+         if (checkNullIteratee(__ax4_iter_151)) for(_tmp_ in __ax4_iter_151.___keys())
          {
             _loc1_  = _tmp_;
             if(!(_reservedProps.hasOwnProperty(_loc1_ ) && !(_loc1_ == "timeScale" && Std.isOfType(this.target , TweenCore))))

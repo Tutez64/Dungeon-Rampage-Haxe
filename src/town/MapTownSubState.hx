@@ -41,7 +41,7 @@ package town
       override function setupState() 
       {
          super.setupState();
-         mWorkComponent = new LogicalWorkComponent(mDBFacade);
+         mWorkComponent = new LogicalWorkComponent(mDBFacade,"MapTownSubState");
          mEventComponent = new EventComponent(mDBFacade);
          mWorldMap = new UIMapWorldMap(mDBFacade,mRootMovieClip,mTownStateMachine.townSwf,mTownStateMachine);
          var _loc8_= mTownStateMachine.townSwf.getClass("cursor_pointer");
@@ -111,15 +111,19 @@ package town
          });
          if(mWorkComponent == null)
          {
-            mWorkComponent = new LogicalWorkComponent(mDBFacade);
+            mWorkComponent = new LogicalWorkComponent(mDBFacade,"MapTownSubState");
          }
          initMap();
+         super.resetHeaderLinks();
+         super.setupHeaderLinks();
+         mDBFacade.menuNavigationController.pushNewLayer("MAP_MENU",mTownStateMachine.townHeader.determineCallback,mWorldMap.getCurrentNodeButton(),mWorldMap.getCurrentNodeButton());
       }
       
       override public function exitState() 
       {
          super.exitState();
          mWorldMap.deinit();
+         mDBFacade.menuNavigationController.popLayer("MAP_MENU");
          if(mWorkComponent != null)
          {
             mWorkComponent.destroy();
@@ -130,7 +134,25 @@ package town
             mClipRenderController.destroy();
             mClipRenderController = null;
          }
-         mEventComponent.removeAllListeners();
+         if(mEventComponent != null)
+         {
+            mEventComponent.removeAllListeners();
+         }
+      }
+      
+      override public function destroy() 
+      {
+         if(mEventComponent != null)
+         {
+            mEventComponent.destroy();
+            mEventComponent = null;
+         }
+         if(mAssetLoadingComponent != null)
+         {
+            mAssetLoadingComponent.destroy();
+            mAssetLoadingComponent = null;
+         }
+         super.destroy();
       }
    }
 

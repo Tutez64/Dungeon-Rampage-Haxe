@@ -93,7 +93,7 @@ package uI.options
       {
          
          mDBFacade = param1;
-         mSceneGraphComponent = new SceneGraphComponent(mDBFacade);
+         mSceneGraphComponent = new SceneGraphComponent(mDBFacade,"OptionsPanel");
          mAssetLoadingComponent = new AssetLoadingComponent(mDBFacade);
          mEventComponent = new EventComponent(mDBFacade);
          mDBSoundManager = ASCompat.reinterpretAs(mDBFacade.soundManager , DBSoundManager);
@@ -223,7 +223,12 @@ package uI.options
       
       function musicSliderCallback(param1:Float) 
       {
-         ASCompat.setProperty((mRoot : ASAny).music_slider_value, "text", Std.int(mMusicSlider.value * 10));
+         var _loc2_= Std.int(mMusicSlider.value * 10);
+         ASCompat.setProperty((mRoot : ASAny).music_slider_value, "text", _loc2_);
+         if(_loc2_ == 11 && mDBFacade.steamAchievementsManager != null)
+         {
+            mDBFacade.steamAchievementsManager.setAchievement("MUSIC_VOLUME_SET_TO_11");
+         }
          setMusicVolume(param1);
       }
       

@@ -7,7 +7,7 @@ package stateMachine.mainStateMachine
    import events.DBAccountLoadedEvent;
    import facade.DBFacade;
    import facade.Locale;
-   import uI.DBUIPopup;
+   import uI.popup.DBUIPopup;
    
     class ReloadTownState extends State
    {

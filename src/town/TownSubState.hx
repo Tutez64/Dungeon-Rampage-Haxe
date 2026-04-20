@@ -56,6 +56,16 @@ return param1;
       {
       }
       
+      function setupHeaderLinks() 
+      {
+         mTownStateMachine.townHeader.setupButtonLinks();
+      }
+      
+      function resetHeaderLinks() 
+      {
+         mTownStateMachine.townHeader.resetButtonLinks();
+      }
+      
       override public function enterState() 
       {
          super.enterState();
@@ -63,7 +73,7 @@ return param1;
          mDBFacade.mouseCursorManager.pushMouseCursor("auto");
          mTimeEnter = mDBFacade.gameClock.realTime;
          mDBFacade.metrics.log("AreaEnter",{"areaType":this.name});
-         mSceneGraphComponent = new SceneGraphComponent(mDBFacade);
+         mSceneGraphComponent = new SceneGraphComponent(mDBFacade,"TownSubState");
          mSceneGraphComponent.addChild(mRoot,(50 : UInt));
          if(mTownStateMachine.leaderboard != null)
          {

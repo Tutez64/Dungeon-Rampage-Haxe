@@ -160,6 +160,12 @@ public function  get_needsRenderer() : Bool
       {
          return mGMInventoryBase != null || mGMChestInfo != null;
       }
+      
+      @:isVar public var weaponAestheticConstant(get,never):String;
+public function  get_weaponAestheticConstant() : String
+      {
+         return "";
+      }
    }
 
 

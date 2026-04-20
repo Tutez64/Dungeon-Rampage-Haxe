@@ -57,7 +57,7 @@ package uI.gifting
          mStoreCallback = param4;
          mGiftsVector = new Vector<UIGiftMessage>();
          mAssetLoadingComponent = new AssetLoadingComponent(mDBFacade);
-         mSceneGraphComponent = new SceneGraphComponent(mDBFacade);
+         mSceneGraphComponent = new SceneGraphComponent(mDBFacade,"UIGift");
          mAssetLoadingComponent.getSwfAsset(DBFacade.buildFullDownloadPath("Resources/Art2D/UI/db_UI_town.swf"),giftPopupLoaded);
          mDBFacade.stageRef.addEventListener("keyDown",handleKeyDown);
       }
@@ -270,6 +270,11 @@ return param1;
             mAssetLoadingComponent.destroy();
          }
          mAssetLoadingComponent = null;
+         if(mSceneGraphComponent != null)
+         {
+            mSceneGraphComponent.destroy();
+            mSceneGraphComponent = null;
+         }
          if(mCloseCallback != null)
          {
             mCloseCallback();

@@ -115,20 +115,20 @@ public function  get_propFactory() : PropFactory
          param2(_loc7_);
          param3(_loc7_);
          buildBackground(_loc6_.LEBackground,_loc7_,param4);
-         final __ax4_iter_128:Array<ASAny> = _loc6_.LEObjects;
-         if (checkNullIteratee(__ax4_iter_128)) for (_tmp_ in __ax4_iter_128)
+         final __ax4_iter_148:Array<ASAny> = _loc6_.LEObjects;
+         if (checkNullIteratee(__ax4_iter_148)) for (_tmp_ in __ax4_iter_148)
          {
             _loc5_  = _tmp_;
             buildingProp(_loc5_,_loc7_,param4);
          }
-         final __ax4_iter_129:Array<ASAny> = _loc6_.LETriggers;
-         if (checkNullIteratee(__ax4_iter_129)) for (_tmp_ in __ax4_iter_129)
+         final __ax4_iter_149:Array<ASAny> = _loc6_.LETriggers;
+         if (checkNullIteratee(__ax4_iter_149)) for (_tmp_ in __ax4_iter_149)
          {
             _loc5_  = _tmp_;
             buildingProp(_loc5_,_loc7_,param4);
          }
-         final __ax4_iter_130 = mLocalProximityTriggers;
-         if (checkNullIteratee(__ax4_iter_130)) for (_tmp_ in __ax4_iter_130)
+         final __ax4_iter_150 = mLocalProximityTriggers;
+         if (checkNullIteratee(__ax4_iter_150)) for (_tmp_ in __ax4_iter_150)
          {
             _loc5_  = _tmp_;
             analyzeLocalProximityTrigger(_loc5_,_loc7_,param4);

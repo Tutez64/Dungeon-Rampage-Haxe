@@ -7,10 +7,11 @@ package uI.inventory.chests
    import brain.sceneGraph.SceneGraphComponent;
    import brain.uI.UIButton;
    import facade.DBFacade;
+   import facade.GameMasterLocale;
    import facade.Locale;
    import gameMasterDictionary.GMChest;
    import gameMasterDictionary.GMRarity;
-   import uI.UIHud;
+   import uI.hud.UIHud;
    import flash.display.MovieClip;
    import flash.geom.Rectangle;
    
@@ -72,7 +73,7 @@ package uI.inventory.chests
          bounds = mRoot.getBounds(mDBFacade.stageRef);
          mRoot.x = mDBFacade.stageRef.stageWidth / 2 - bounds.width / 2 - bounds.x;
          mRoot.y = mDBFacade.stageRef.stageHeight / 2 - bounds.height / 2 - bounds.y;
-         ASCompat.setProperty((mRoot : ASAny).title_label, "text", isFromSummary ? Locale.getString("TREASURE_FOUND") : Locale.getString(selectedGMChest.Name));
+         ASCompat.setProperty((mRoot : ASAny).title_label, "text", isFromSummary ? Locale.getString("TREASURE_FOUND") : GameMasterLocale.getGameMasterSubString("CHEST_NAME",selectedGMChest.Rarity));
          if(ASCompat.toBool((mRoot : ASAny).description_label))
          {
             ASCompat.setProperty((mRoot : ASAny).description_label, "text", Locale.getString("BUY_KEY_TO_OPEN") + selectedGMChest.Rarity + Locale.getString("CHEST_!"));
@@ -132,6 +133,9 @@ package uI.inventory.chests
             refreshHeroInfoCallback(mRoot);
          }
          mSceneGraphComponent.addChild(mRoot,(105 : UInt));
+         mDBFacade.menuNavigationController.pushNewLayer("POPUP_KEYLESS",closeKeylessChestPopup,mCloseButton,mBuyCoinButton);
+         mCloseButton.isAbove(mBuyCoinButton);
+         mBuyCoinButton.isToTheLeftOf(mBuyGemButton);
       }
       
       function createKeySlots(param1:GMChest) 
@@ -166,6 +170,7 @@ public function  get_root() : MovieClip
       {
          var _loc1_= 0;
          mSceneGraphComponent.removeChild(mRoot);
+         mDBFacade.menuNavigationController.popLayer("POPUP_KEYLESS");
          mDBFacade = null;
          mAssetLoadingComponent = null;
          mBuyCoinButton.destroy();

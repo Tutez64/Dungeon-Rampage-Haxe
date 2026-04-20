@@ -23,7 +23,7 @@ package brain.gameObject
       
       var mMovieClipRenderer:MovieClipRenderController;
       
-      var mWorkComponent__Brain_GameObject_View/*redefined private*/:LogicalWorkComponent;
+      var mWorkComponent:LogicalWorkComponent;
       
       var mFadeResetTask:Task;
       
@@ -33,11 +33,12 @@ package brain.gameObject
       {
          
          mFacade = param1;
-         mSceneGraphComponent = new SceneGraphComponent(mFacade);
-         mWorkComponent__Brain_GameObject_View = new LogicalWorkComponent(mFacade);
+         var _loc2_= "View";
+         mSceneGraphComponent = new SceneGraphComponent(mFacade,_loc2_);
+         mWorkComponent = new LogicalWorkComponent(mFacade,_loc2_);
          mRoot = new Sprite();
          mFading = false;
-         MemoryTracker.track(this,"View - created in View()","brain");
+         MemoryTracker.track(this,_loc2_ + " - created in View()","brain");
       }
       
       static function recursiveFindChildrenOfClass(param1:Array<ASAny>, param2:DisplayObject, param3:Array<ASAny>) 
@@ -107,7 +108,7 @@ package brain.gameObject
          mFading = true;
          if(mFadeResetTask == null)
          {
-            mFadeResetTask = mWorkComponent__Brain_GameObject_View.doEveryFrame(updateFade);
+            mFadeResetTask = mWorkComponent.doEveryFrame(updateFade);
          }
       }
       
@@ -158,10 +159,10 @@ public function  get_root() : Sprite
             mFadeResetTask.destroy();
             mFadeResetTask = null;
          }
-         if(mWorkComponent__Brain_GameObject_View != null)
+         if(mWorkComponent != null)
          {
-            mWorkComponent__Brain_GameObject_View.destroy();
-            mWorkComponent__Brain_GameObject_View = null;
+            mWorkComponent.destroy();
+            mWorkComponent = null;
          }
          if(mRoot.parent != null)
          {

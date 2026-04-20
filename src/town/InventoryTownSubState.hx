@@ -61,10 +61,14 @@ package town
          });
          mUIInventory.refresh(true);
          mUIInventory.animateEntry();
+         super.resetHeaderLinks();
+         super.setupHeaderLinks();
+         mDBFacade.menuNavigationController.pushNewLayer("INVENTORY_MENU",mTownStateMachine.townHeader.determineCallback,mTownStateMachine.townHeader.closeButton,mTownStateMachine.townHeader.closeButton);
       }
       
       override public function exitState() 
       {
+         mDBFacade.menuNavigationController.popLayer("INVENTORY_MENU");
          mRoot.removeChild(mUIInventory.root);
          mUIInventory.exitState();
          mEventComponent.removeListener("DB_ACCOUNT_INFO_RESPONSE");

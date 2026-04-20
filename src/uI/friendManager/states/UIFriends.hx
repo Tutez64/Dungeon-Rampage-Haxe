@@ -9,10 +9,10 @@ package uI.friendManager.states
    import facade.DBFacade;
    import facade.Locale;
    import town.TownStateMachine;
-   import uI.DBUIOneButtonPopup;
-   import uI.DBUITwoButtonPopup;
    import uI.friendManager.FriendPopulater;
    import uI.friendManager.UIFriendManager;
+   import uI.popup.DBUIOneButtonPopup;
+   import uI.popup.DBUITwoButtonPopup;
    
     class UIFriends extends UIFMState
    {
@@ -168,8 +168,8 @@ package uI.friendManager.states
          mSelectedDRFriends.splice(0,(mSelectedDRFriends.length : UInt));
          mSelectedFBFriends.splice(0,(mSelectedFBFriends.length : UInt));
          mSelectedKGFriends.splice(0,(mSelectedKGFriends.length : UInt));
-         final __ax4_iter_178 = mFriendPopulater.getSelectedToggles();
-         if (checkNullIteratee(__ax4_iter_178)) for (_tmp_ in __ax4_iter_178)
+         final __ax4_iter_194 = mFriendPopulater.getSelectedToggles();
+         if (checkNullIteratee(__ax4_iter_194)) for (_tmp_ in __ax4_iter_194)
          {
             idx  = (ASCompat.toInt(_tmp_) : UInt);
             if(mListOfFriends[(idx : Int)].isDRFriend)
@@ -227,8 +227,8 @@ package uI.friendManager.states
             return;
          }
          newFriendsFound = false;
-         final __ax4_iter_179 = mFriendPopulater.getSelectedToggles();
-         if (checkNullIteratee(__ax4_iter_179)) for (_tmp_ in __ax4_iter_179)
+         final __ax4_iter_195 = mFriendPopulater.getSelectedToggles();
+         if (checkNullIteratee(__ax4_iter_195)) for (_tmp_ in __ax4_iter_195)
          {
             idx  = (ASCompat.toInt(_tmp_) : UInt);
             if(mDBFacade.dbAccountInfo.giftExcludeIds.indexOf(mListOfFriends[(idx : Int)].excludeId) < 0)
@@ -282,8 +282,8 @@ package uI.friendManager.states
          var _loc3_:Array<ASAny> = [];
          var _loc4_:Array<ASAny> = [];
          var _loc5_:ASAny;
-         final __ax4_iter_180 = mFriendPopulater.getSelectedToggles();
-         if (checkNullIteratee(__ax4_iter_180)) for (_tmp_ in __ax4_iter_180)
+         final __ax4_iter_196 = mFriendPopulater.getSelectedToggles();
+         if (checkNullIteratee(__ax4_iter_196)) for (_tmp_ in __ax4_iter_196)
          {
             _loc5_ = _tmp_;
             if(mDBFacade.dbAccountInfo.giftExcludeIds.indexOf(mListOfFriends[ASCompat.toInt(_loc5_)].excludeId) >= 0)
@@ -317,8 +317,8 @@ package uI.friendManager.states
       {
          var _loc3_:Array<ASAny> = [];
          var _loc4_:ASAny;
-         final __ax4_iter_181 = mFriendPopulater.getSelectedToggles();
-         if (checkNullIteratee(__ax4_iter_181)) for (_tmp_ in __ax4_iter_181)
+         final __ax4_iter_197 = mFriendPopulater.getSelectedToggles();
+         if (checkNullIteratee(__ax4_iter_197)) for (_tmp_ in __ax4_iter_197)
          {
             _loc4_ = _tmp_;
             if(mDBFacade.dbAccountInfo.giftExcludeIds.indexOf(mListOfFriends[ASCompat.toInt(_loc4_)].excludeId) < 0)
@@ -337,8 +337,8 @@ package uI.friendManager.states
          var _loc4_:Array<ASAny> = [];
          var _loc3_:Array<ASAny> = [];
          var _loc5_:ASAny;
-         final __ax4_iter_182 = mFriendPopulater.getSelectedToggles();
-         if (checkNullIteratee(__ax4_iter_182)) for (_tmp_ in __ax4_iter_182)
+         final __ax4_iter_198 = mFriendPopulater.getSelectedToggles();
+         if (checkNullIteratee(__ax4_iter_198)) for (_tmp_ in __ax4_iter_198)
          {
             _loc5_ = _tmp_;
             if(mDBFacade.dbAccountInfo.giftExcludeIds.indexOf(mListOfFriends[ASCompat.toInt(_loc5_)].excludeId) < 0)

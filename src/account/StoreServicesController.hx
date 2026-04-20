@@ -8,16 +8,16 @@ package account
    import gameMasterDictionary.GMOfferDetail;
    import gameMasterDictionary.GMStackable;
    import gameMasterDictionary.GMWeaponItem;
-   import uI.DBUIOneButtonPopup;
-   import uI.DBUIPopup;
-   import uI.DBUITwoButtonPopup;
    import uI.inventory.UIPurchaseOfferPopup;
    import uI.inventory.UISellItemPopup;
-   import uI.UICashPage;
-   import uI.UICoinPage;
-   import uI.UIGiftPage;
-   import uI.UIOfferPopup;
-   import uI.UIStorageFullPopup;
+   import uI.popup.DBUIOneButtonPopup;
+   import uI.popup.DBUIPopup;
+   import uI.popup.DBUITwoButtonPopup;
+   import uI.popup.UICashPage;
+   import uI.popup.UICoinPage;
+   import uI.popup.UIGiftPage;
+   import uI.popup.UIOfferPopup;
+   import uI.popup.UIStorageFullPopup;
    import org.as3commons.collections.Map;
    
     class StoreServicesController
@@ -462,23 +462,39 @@ package account
       public static function buyOffer(param1:DBFacade, param2:GMOffer, param3:ASFunction, param4:UInt = (0 : UInt)) 
       {
          var popup:DBUIPopup;
+         var previousBucketsWeapon:Int;
          var dbFacade= param1;
          var gmOffer= param2;
          var buySuccessCallback= param3;
          var forHeroId= param4;
          dbFacade.metrics.log("ShopPurchase",getOfferMetrics(dbFacade,gmOffer));
          popup = StoreServicesController.waitForPurchaseServicePopup(dbFacade);
+         previousBucketsWeapon = dbFacade.dbAccountInfo.inventoryInfo.storageLimitWeapon;
          StoreServices.purchaseOffer(dbFacade,gmOffer.Id,function(param1:ASAny)
          {
+            var _loc2_= 0;
             popup.destroy();
-            if(gmOffer.CurrencyType == "PREMIUM" && dbFacade.facebookController != null)
+            if(dbFacade.steamAchievementsManager != null)
             {
-               dbFacade.facebookController.updateGuestAchievement((5 : UInt));
+               if(gmOffer.CurrencyType == "BASIC")
+               {
+                  dbFacade.steamAchievementsManager.addToStatInt("SPEND_COINS_INT",Std.int(gmOffer.Price));
+               }
+               if(gmOffer.Tab == "WEAPON")
+               {
+                  dbFacade.steamAchievementsManager.setAchievement("PURCHASE_WEAPON_FIRST_TIME");
+               }
             }
             StoreServices.getLimitedOfferUsage(dbFacade,param1,null,null);
             if(buySuccessCallback != null)
             {
                buySuccessCallback(param1);
+               _loc2_ = dbFacade.dbAccountInfo.inventoryInfo.storageLimitWeapon;
+               if(previousBucketsWeapon < _loc2_ && dbFacade.steamAchievementsManager != null)
+               {
+                  dbFacade.steamAchievementsManager.setAchievement("STORAGE_EXPAND_FIRST_TIME");
+                  dbFacade.steamAchievementsManager.setMaxStorageStat(previousBucketsWeapon,_loc2_);
+               }
             }
          },function(param1:Error)
          {

@@ -38,7 +38,7 @@ package effects
       {
          super(param1,param2,param3,1);
          mReady = false;
-         mLogicalWorkComponent = new LogicalWorkComponent(param1);
+         mLogicalWorkComponent = new LogicalWorkComponent(param1,"ChargeEffectGameObject");
          mAssetLoadingComponent = new AssetLoadingComponent(param1);
          mActorView = param4;
          view.root.visible = false;

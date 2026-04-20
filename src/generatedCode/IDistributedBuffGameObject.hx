@@ -16,6 +16,8 @@ package generatedCode
       @:isVar var type(never,set):UInt;
       
       @:isVar var effectedActor(never,set):UInt;
+      
+      @:isVar var attackerActor(never,set):UInt;
    }
 
 

@@ -10,7 +10,6 @@ package distributedObjects
    import brain.logger.Logger;
    import brain.render.Layer;
    import brain.utils.MemoryTracker;
-   import brain.workLoop.PreRenderWorkComponent;
    import brain.workLoop.Task;
    import camera.FollowTargetCameraStrategy;
    import combat.attack.PlayerOwnerAttackController;
@@ -53,6 +52,8 @@ package distributedObjects
       public static var HERO_OWNER_READY:String = "HERO_OWNER_READY";
       
       public static var currentHeroOwnerId:UInt = (0 : UInt);
+      
+      static inline final FOLLOW_NEXT_ALLY_KEYCODE= 32;
       
       var mBroadcastTask:Task;
       
@@ -206,7 +207,6 @@ public function  get_weaponControllers() : Vector<WeaponController>
       override public function init() 
       {
          super.init();
-         mPreRenderWorkComponent = new PreRenderWorkComponent(mDBFacade);
          mDBFacade.camera.targetObject = mDBFacade.sceneGraphManager.worldTransformNode;
          mDBFacade.sceneGraphManager.worldTransformNode.parent.x = mDBFacade.viewWidth * 0.5;
          mDBFacade.sceneGraphManager.worldTransformNode.parent.y = mDBFacade.viewHeight * 0.5;
@@ -271,7 +271,7 @@ public function  get_visibleTiles() : Vector<Tile>
       
       function doVisibility(param1:GameClock) 
       {
-         var __ax4_iter_193:Vector<Tile>;
+         var __ax4_iter_209:Vector<Tile>;
          var _loc3_:Rectangle = null;
          var _loc2_:Vector<Tile> = /*undefined*/null;
          var _loc4_:Tile = null;
@@ -279,8 +279,8 @@ public function  get_visibleTiles() : Vector<Tile>
          {
             _loc3_ = mFacade.camera.visibleRectangle;
             _loc2_ = mDistributedDungeonFloor.tileGrid.getVisibleTiles(_loc3_);
-            __ax4_iter_193 = mVisibleTiles;
-            if (checkNullIteratee(__ax4_iter_193)) for (_tmp_ in __ax4_iter_193)
+            __ax4_iter_209 = mVisibleTiles;
+            if (checkNullIteratee(__ax4_iter_209)) for (_tmp_ in __ax4_iter_209)
             {
                _loc4_  = _tmp_;
                if(ASCompat.toNumber(_loc2_.indexOf(_loc4_)) < 0)
@@ -421,8 +421,8 @@ return param1;
       public function doAttackOnHit(param1:String, param2:WeaponGameObject) 
       {
          var _loc3_:WeaponController;
-         final __ax4_iter_194 = weaponControllers;
-         if (checkNullIteratee(__ax4_iter_194)) for (_tmp_ in __ax4_iter_194)
+         final __ax4_iter_210 = weaponControllers;
+         if (checkNullIteratee(__ax4_iter_210)) for (_tmp_ in __ax4_iter_210)
          {
             _loc3_ = _tmp_;
             if(_loc3_ != null && _loc3_.weapon == param2)

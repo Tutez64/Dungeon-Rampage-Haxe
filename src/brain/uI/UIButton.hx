@@ -372,8 +372,8 @@ return param1;
          popRollOverMouseCursor();
          mStates = null;
          var _loc1_:ASAny;
-         final __ax4_iter_146 = mRenderers;
-         if (checkNullIteratee(__ax4_iter_146)) for (_tmp_ in __ax4_iter_146)
+         final __ax4_iter_162 = mRenderers;
+         if (checkNullIteratee(__ax4_iter_162)) for (_tmp_ in __ax4_iter_162)
          {
             _loc1_ = _tmp_;
             if(ASCompat.toBool(_loc1_))
@@ -401,8 +401,8 @@ return param1;
       function showState(param1:UInt) 
       {
          var _loc3_:ASAny;
-         final __ax4_iter_147 = mStates;
-         if (checkNullIteratee(__ax4_iter_147)) for (_tmp_ in __ax4_iter_147)
+         final __ax4_iter_163 = mStates;
+         if (checkNullIteratee(__ax4_iter_163)) for (_tmp_ in __ax4_iter_163)
          {
             _loc3_ = _tmp_;
             if(ASCompat.toBool(_loc3_))
@@ -411,8 +411,8 @@ return param1;
             }
          }
          var _loc2_:ASAny;
-         final __ax4_iter_148 = mRenderers;
-         if (checkNullIteratee(__ax4_iter_148)) for (_tmp_ in __ax4_iter_148)
+         final __ax4_iter_164 = mRenderers;
+         if (checkNullIteratee(__ax4_iter_164)) for (_tmp_ in __ax4_iter_164)
          {
             _loc2_ = _tmp_;
             if(ASCompat.toBool(_loc2_))
@@ -440,6 +440,18 @@ return param1;
                mEnterCallback();
             }
          }
+      }
+      
+      override function onFocused() 
+      {
+         super.onFocused();
+         showState(overState);
+      }
+      
+      override function onUnfocused() 
+      {
+         super.onUnfocused();
+         showState(upState);
       }
       
       function onPress(param1:MouseEvent) 
@@ -702,6 +714,14 @@ function  get_overState() : UInt
          mFacade.stageRef.removeEventListener("mouseUp",onMouseUp);
          mFacade.stageRef.removeEventListener("mouseLeave",onStageMouseLeave);
          showState(upState);
+      }
+      
+      override public function onSelected() 
+      {
+         if(ASCompat.toBool(mReleaseCallback))
+         {
+            mReleaseCallback();
+         }
       }
    }
 

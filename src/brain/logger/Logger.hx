@@ -87,8 +87,8 @@ package brain.logger
       public static function listSlashCommands() 
       {
          var _loc1_:ASAny;
-         final __ax4_iter_94 = mListSlashCommands;
-         if (checkNullIteratee(__ax4_iter_94)) for (_tmp_ in __ax4_iter_94)
+         final __ax4_iter_119 = mListSlashCommands;
+         if (checkNullIteratee(__ax4_iter_119)) for (_tmp_ in __ax4_iter_119)
          {
             _loc1_ = _tmp_;
             log(_loc1_);

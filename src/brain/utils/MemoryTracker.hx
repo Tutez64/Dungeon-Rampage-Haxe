@@ -7,6 +7,8 @@ package brain.utils
     class MemoryTracker
    {
       
+      public static inline final CATEGORY_POOL= "pool";
+      
       static var m_count:Int = 0;
       
       static var m_stage:Stage = null;
@@ -133,8 +135,8 @@ static public function  get_trackedCount() : Int
       {
          var _loc1_= 0;
          var _loc2_:ASAny;
-         final __ax4_iter_57 = m_tracking;
-         if (checkNullIteratee(__ax4_iter_57)) for(_tmp_ in __ax4_iter_57.keys())
+         final __ax4_iter_59 = m_tracking;
+         if (checkNullIteratee(__ax4_iter_59)) for(_tmp_ in __ax4_iter_59.keys())
          {
             _loc2_ = _tmp_;
             _loc1_++;
@@ -148,8 +150,8 @@ static public function  get_trackedCountSinceCheckpoint() : Int
          var _loc3_:ASObject = null;
          var _loc1_= 0;
          var _loc2_:ASAny;
-         final __ax4_iter_58 = m_tracking;
-         if (checkNullIteratee(__ax4_iter_58)) for(_tmp_ in __ax4_iter_58.keys())
+         final __ax4_iter_60 = m_tracking;
+         if (checkNullIteratee(__ax4_iter_60)) for(_tmp_ in __ax4_iter_60.keys())
          {
             _loc2_ = _tmp_;
             _loc3_ = m_tracking[_loc2_];
@@ -159,6 +161,37 @@ static public function  get_trackedCountSinceCheckpoint() : Int
             }
          }
          return _loc1_;
+      }
+      
+      static function _forEachTracked(param1:ASFunction) 
+      {
+         var _loc2_:ASAny;
+         final __ax4_iter_61 = m_tracking;
+         if (checkNullIteratee(__ax4_iter_61)) for(_tmp_ in __ax4_iter_61.keys())
+         {
+            _loc2_ = _tmp_;
+            param1(_loc2_,m_tracking[_loc2_]);
+         }
+      }
+      
+      public static function getAllTracked() : Array<ASAny>
+      {
+         return [];
+      }
+      
+      public static function getGrowingLeaks() : Array<ASAny>
+      {
+         return [];
+      }
+      
+      public static function getPoolLeakCandidates() : Array<ASAny>
+      {
+         return [];
+      }
+      
+      public static function findTrackedByLabel(param1:String) : Array<ASAny>
+      {
+         return [];
       }
       
       static function _gc(param1:Event) 

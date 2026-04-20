@@ -33,6 +33,8 @@ package gameMasterDictionary
       
       public var SwfFilepath:String;
       
+      public var HDSwfFilepath:String;
+      
       public var PortraitName:String;
       
       public var IconSwfFilepath:String;
@@ -58,6 +60,8 @@ package gameMasterDictionary
       public var Saturation:Float = Math.NaN;
       
       public var Brightness:Float = Math.NaN;
+      
+      public var Scale3DModel:Float = Math.NaN;
       
       public var Ability:UInt = 0;
       
@@ -132,6 +136,7 @@ package gameMasterDictionary
          IconSwfFilepath = param1.IconSwfFilepath;
          mIconName = param1.IconName;
          SwfFilepath = param1.SwfFilepath;
+         HDSwfFilepath = param1.HDSwfFilepath;
          Description = param1.Description;
          AssetType = param1.AssetType;
          SpriteWidth = ASCompat.toNumberField(param1, "SpriteWidth");
@@ -145,6 +150,14 @@ package gameMasterDictionary
          Hue = ASCompat.toNumberField(param1, "Hue");
          Saturation = ASCompat.toNumberField(param1, "Saturation") > 0 ? ASCompat.toNumber(100 + param1.Saturation) / 100 * 2 : 0;
          Brightness = ASCompat.toNumberField(param1, "Brightness");
+         if(param1.Scale3DModel == null)
+         {
+            Scale3DModel = 1;
+         }
+         else
+         {
+            Scale3DModel = ASCompat.toNumberField(param1, "Scale3DModel");
+         }
          BaseMove = ASCompat.toNumberField(param1, "BaseMove");
          HitSound = param1.HitSound;
          HitVolume = ASCompat.toNumberField(param1, "HitVol");

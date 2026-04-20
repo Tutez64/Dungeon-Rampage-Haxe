@@ -100,14 +100,14 @@ public function  get_size() : UInt
       {
          var _loc2_:ASAny = /*undefined*/null;
          var _loc1_= new Array<ASAny>();
-         final __ax4_iter_158:ASObject = this._stringItems;
-         if (checkNullIteratee(__ax4_iter_158)) for (_tmp_ in iterateDynamicValues(__ax4_iter_158))
+         final __ax4_iter_174:ASObject = this._stringItems;
+         if (checkNullIteratee(__ax4_iter_174)) for (_tmp_ in iterateDynamicValues(__ax4_iter_174))
          {
             _loc2_  = _tmp_;
             _loc1_.push(_loc2_);
          }
-         final __ax4_iter_159 = this._items;
-         if (checkNullIteratee(__ax4_iter_159)) for (_tmp_ in __ax4_iter_159)
+         final __ax4_iter_175 = this._items;
+         if (checkNullIteratee(__ax4_iter_175)) for (_tmp_ in __ax4_iter_175)
          {
             _loc2_  = _tmp_;
             _loc1_.push(_loc2_);

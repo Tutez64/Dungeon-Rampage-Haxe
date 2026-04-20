@@ -5,9 +5,9 @@ package brain.workLoop
     class PreRenderWorkComponent extends WorkComponent
    {
       
-      public function new(param1:Facade)
+      public function new(param1:Facade, param2:String = null)
       {
-         super(param1,param1.preRenderWorkManager);
+         super(param1,param1.preRenderWorkManager,param2);
       }
    }
 

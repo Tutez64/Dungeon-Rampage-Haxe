@@ -17,10 +17,11 @@ package town
    import events.BoostersParsedEvent;
    import events.TrophiesUpdatedAccountEvent;
    import facade.DBFacade;
+   import facade.GameMasterLocale;
    import facade.Locale;
    import uI.CountdownTextTimer;
-   import uI.UIExitPopup;
-   import uI.UIShop;
+   import uI.popup.UIExitPopup;
+   import uI.shop.UIShop;
    import uI.UITownTweens;
    import flash.display.MovieClip;
    import flash.filters.DropShadowFilter;
@@ -118,8 +119,8 @@ package town
          mEventComponent = new EventComponent(mDBFacade);
          mEventComponent.addListener("CurrencyUpdatedAccountEvent",this.currencyUpdated);
          mEventComponent.addListener("TrophiesUpdatedAccountEvent",this.trophiesUpdated);
-         mLogicalWorkComponent = new LogicalWorkComponent(mDBFacade);
-         mSceneGraphComponent = new SceneGraphComponent(mDBFacade);
+         mLogicalWorkComponent = new LogicalWorkComponent(mDBFacade,"TownHeader");
+         mSceneGraphComponent = new SceneGraphComponent(mDBFacade,"TownHeader");
          mAssetLoadingComponent = new AssetLoadingComponent(mDBFacade);
          mAssetLoadingComponent.getSwfAsset(DBFacade.buildFullDownloadPath("Resources/Art2D/UI/db_UI_town.swf"),swfLoaded);
       }
@@ -190,6 +191,8 @@ public function  get_rootMovieClip() : MovieClip
          mTeamBonusUI = new UIObject(mDBFacade,ASCompat.dynamicAs((mRoot : ASAny).currency.crewbonus, flash.display.MovieClip));
          ASCompat.setProperty((mTeamBonusUI.tooltip : ASAny).title_label, "text", Locale.getString("TEAM_BONUS_TOOLTIP_TITLE"));
          ASCompat.setProperty((mTeamBonusUI.tooltip : ASAny).description_label, "text", Locale.getString("TEAM_BONUS_TOOLTIP_DESCRIPTION"));
+         ASCompat.setProperty((mTeamBonusUI.root : ASAny).header_crew_bonus_txt1, "text", Locale.getString("TEAM_BONUS_TITLE_CREW"));
+         ASCompat.setProperty((mTeamBonusUI.root : ASAny).header_crew_bonus_txt2, "text", Locale.getString("TEAM_BONUS_TITLE_BONUS"));
          ASCompat.setProperty((mTeamBonusUI.root : ASAny).header_crew_bonus_number, "text", mDBFacade.dbAccountInfo.inventoryInfo.getTotalHeroesOwned() - 1);
          (mTeamBonusUI.root : ASAny).header_crew_bonus_anim.stop();
          mCoinBoosterUI = new UIObject(mDBFacade,ASCompat.dynamicAs((mRoot : ASAny).currency.boosterCoin, flash.display.MovieClip));
@@ -342,7 +345,7 @@ public function  set_inHomeState(param1:Bool) :Bool      {
          MemoryTracker.track(_loc1_,"UIExitPopup - created in TownHeader.showExitPopup()");
       }
       
-      function determineCallback() 
+      public function determineCallback() 
       {
          if(mInHomeState)
          {
@@ -422,7 +425,7 @@ public function  set_inHomeState(param1:Bool) :Bool      {
          if(mBoosterGold != null)
          {
             ASCompat.setProperty((mRoot : ASAny).currency.boosterCoin.label, "text", mBoosterGold.BuffInfo.Gold + "X");
-            ASCompat.setProperty((mCoinBoosterUI.tooltip : ASAny).title_label, "text", mBoosterGold.StackInfo.Name);
+            ASCompat.setProperty((mCoinBoosterUI.tooltip : ASAny).title_label, "text", GameMasterLocale.getGameMasterSubString("STACKABLE_NAME",mBoosterGold.StackInfo.Constant));
             mCoinBoosterUI.visible = true;
             mCountDownTextGold = new CountdownTextTimer(ASCompat.dynamicAs((mCoinBoosterUI.tooltip : ASAny).time_label, flash.text.TextField),mBoosterGold.getEndDate(),GameClock.getWebServerDate,setBoosters,Locale.getString("BOOSTER_REMAINING"),"",Locale.getString("EXPIRED"));
             mCountDownTextGold.start();
@@ -443,6 +446,49 @@ public function  set_title(param1:String) :String      {
             ASCompat.setProperty((mRoot : ASAny).page_title, "mouseEnabled", false);
          }
 return param1;
+      }
+      
+      @:isVar public var addCoinButton(get,never):UIButton;
+public function  get_addCoinButton() : UIButton
+      {
+         return mAddCoinButton;
+      }
+      
+      @:isVar public var addGemButton(get,never):UIButton;
+public function  get_addGemButton() : UIButton
+      {
+         return mAddCashButton;
+      }
+      
+      @:isVar public var closeButton(get,never):UIButton;
+public function  get_closeButton() : UIButton
+      {
+         return mCloseButton;
+      }
+      
+      public function setupButtonLinks() 
+      {
+         mAddCoinButton.downNavigation = null;
+         mAddCashButton.downNavigation = null;
+         mAddCoinButton.isToTheLeftOf(mAddCashButton);
+         if(mShowCloseButton)
+         {
+            mAddCashButton.isToTheLeftOf(mCloseButton);
+         }
+         else
+         {
+            mAddCashButton.rightNavigation = null;
+         }
+      }
+      
+      public function resetButtonLinks() 
+      {
+         mAddCoinButton.clearNavigationAndInteractions();
+         mAddCashButton.clearNavigationAndInteractions();
+         mCloseButton.clearNavigationAndInteractions();
+         mAddCoinButton.setFocused(false);
+         mAddCashButton.setFocused(false);
+         mCloseButton.setFocused(false);
       }
    }
 

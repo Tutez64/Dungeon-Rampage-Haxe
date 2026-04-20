@@ -25,6 +25,10 @@ package brain.utils
       
       public static inline final WANT_REFRESH_HUD_ON_FLOOR_TRANSITION= "want-hud-refresh-on-floor-transition";
       
+      public static inline final EXPERIMENTAL_USE_STEAM_INPUT= "experimental-use-steam-input";
+      
+      public static inline final WANT_STEAM_ACHIEVEMENTS= "want-steam-achievements";
+      
       var mFeatureFlags:ASDictionary<ASAny,ASAny>;
       
       public function new()
@@ -41,7 +45,9 @@ package brain.utils
          addFeatureFlag("want-mana-bars",false);
          addFeatureFlag("quality-control-button",true);
          addFeatureFlag("want-numbered-hud",false);
-         addFeatureFlag("want-hud-refresh-on-floor-transition",false);
+         addFeatureFlag("want-hud-refresh-on-floor-transition",true);
+         addFeatureFlag("experimental-use-steam-input",false);
+         addFeatureFlag("want-steam-achievements",false);
       }
       
       function addFeatureFlag(param1:String, param2:Bool, param3:String = null, param4:String = null) 
@@ -67,7 +73,7 @@ package brain.utils
       public function loadFeatureFlagValuesFromCli(param1:Array<ASAny>) 
       {
          var _loc2_:ASAny;
-         var __ax4_iter_54:ASDictionary<ASAny,ASAny>;
+         var __ax4_iter_56:ASDictionary<ASAny,ASAny>;
          var _loc6_= 0;
          var _loc5_:String = null;
          var _loc8_:ASAny = null;
@@ -81,8 +87,8 @@ package brain.utils
             if(_loc5_.indexOf("--") == 0)
             {
                _loc8_ = null;
-               __ax4_iter_54 = mFeatureFlags;
-               if (checkNullIteratee(__ax4_iter_54)) for (_tmp_ in __ax4_iter_54)
+               __ax4_iter_56 = mFeatureFlags;
+               if (checkNullIteratee(__ax4_iter_56)) for (_tmp_ in __ax4_iter_56)
                {
                   _loc2_ = _tmp_;
                   if(_loc2_.commandLineFlag == _loc5_)
@@ -116,8 +122,8 @@ package brain.utils
          var _loc4_:ASObject = null;
          var _loc3_= false;
          var _loc2_:ASAny;
-         final __ax4_iter_55 = mFeatureFlags;
-         if (checkNullIteratee(__ax4_iter_55)) for (_tmp_ in __ax4_iter_55)
+         final __ax4_iter_57 = mFeatureFlags;
+         if (checkNullIteratee(__ax4_iter_57)) for (_tmp_ in __ax4_iter_57)
          {
             _loc2_ = _tmp_;
             _loc4_ = param1.getConfigObject(_loc2_.configFileAttributeName,null);
@@ -132,8 +138,8 @@ package brain.utils
       public function logFeatureFlagNamesAndValues() 
       {
          var _loc1_:ASAny;
-         final __ax4_iter_56 = mFeatureFlags;
-         if (checkNullIteratee(__ax4_iter_56)) for (_tmp_ in __ax4_iter_56)
+         final __ax4_iter_58 = mFeatureFlags;
+         if (checkNullIteratee(__ax4_iter_58)) for (_tmp_ in __ax4_iter_58)
          {
             _loc1_ = _tmp_;
             Logger.log("Flag Name: " + Std.string(_loc1_.name) + " Flag Value:" + getFlagValue(_loc1_.name));

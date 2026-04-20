@@ -60,7 +60,7 @@ package actor
          mAnims = new Map();
          mLoadingAnims = new Map();
          mAssetLoadingComponent = new AssetLoadingComponent(mDBFacade);
-         mPreRenderWorkComponent = new PreRenderWorkComponent(mDBFacade);
+         mPreRenderWorkComponent = new PreRenderWorkComponent(mDBFacade,"ActorRenderer");
          mPreloadSprites = mDBFacade.dbConfigManager.getConfigBoolean("preload_sprites",false);
       }
       
@@ -262,7 +262,7 @@ public function  get_currentAnimName() : String
                   switch(this.assetType)
          {
             case "SPRITE_SHEET":
-               this.y = ActorView.BODY_Y_OFFSET;
+               this.y = ActorView.BODY_Y_OFFSET * (1 / mActorGameObject.actorData.scale3DModel);
                if(mPreloadSprites)
                {
                   loadSpriteSheetAssets();

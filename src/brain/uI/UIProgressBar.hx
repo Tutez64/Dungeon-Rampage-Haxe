@@ -51,7 +51,7 @@ package brain.uI
             mDeltaBar = ASCompat.dynamicAs(ASCompat.toBool((param3 : ASAny).bar) ? ASCompat.dynamicAs((param3 : ASAny).bar, flash.display.MovieClip) : param3, flash.display.MovieClip);
             mDeltaBar.alpha = 0.3;
          }
-         mWorkComponent = new LogicalWorkComponent(param1);
+         mWorkComponent = new LogicalWorkComponent(param1,"UIProgressBar");
          MemoryTracker.track(mWorkComponent,"LogicalWorkComponent - created in UIProgressBar()","brain");
          update();
       }
@@ -166,6 +166,16 @@ return param1;
 function  get_value() : Float
       {
          return mValue;
+      }
+      
+      override public function destroy() 
+      {
+         if(mWorkComponent != null)
+         {
+            mWorkComponent.destroy();
+            mWorkComponent = null;
+         }
+         super.destroy();
       }
       
       public function displayErrorMessage(param1:String) 

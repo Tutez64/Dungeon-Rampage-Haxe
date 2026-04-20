@@ -103,8 +103,8 @@ package com.junkbyte.console.core
          var _loc3_:String = null;
          report("Key binds:",-2);
          var _loc2_= (0 : UInt);
-         final __ax4_iter_87:ASObject = this._binds;
-         if (checkNullIteratee(__ax4_iter_87)) for(_tmp_ in __ax4_iter_87.___keys())
+         final __ax4_iter_114:ASObject = this._binds;
+         if (checkNullIteratee(__ax4_iter_114)) for(_tmp_ in __ax4_iter_114.___keys())
          {
             _loc3_  = _tmp_;
             _loc2_++;

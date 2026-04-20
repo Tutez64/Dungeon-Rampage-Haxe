@@ -42,7 +42,7 @@ package generatedCode
       
       public static inline final CLID_MatchMaker= (42 : UInt);
       
-      public static inline final DcHash= (1346577049 : UInt);
+      public static inline final DcHash= (1351928210 : UInt);
       
       public function new(param1:DBFacade, param2:String, param3:Int, param4:String, param5:String, param6:UInt)
       {
@@ -51,7 +51,7 @@ package generatedCode
       
       override public function getDcHash() : UInt
       {
-         return (1346577049 : UInt);
+         return (1351928210 : UInt);
       }
       
       public function ObjectFactoryOwner(param1:UInt, param2:UInt, param3:DcNetworkPacket) 

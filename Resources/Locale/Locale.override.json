@@ -1,0 +1,14 @@
+{
+  "Instructions":
+  {
+    "INSTRUCTION_01": "When Modifying the file, check the Locale Console Channel for any potential mistakes.",
+    "INSTRUCTION_02": "When you start localizing change the next object 'RENAME_ME_TO_strings', to strings",
+    "INSTRUCTION_03": "If you don't change it from the current to be just strings, it won't work"
+  },
+  "RENAME_ME_TO_strings":
+  {
+  },
+  "errors":
+  {
+  }
+}

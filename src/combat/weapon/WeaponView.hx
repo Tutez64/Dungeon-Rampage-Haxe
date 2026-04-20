@@ -30,7 +30,7 @@ package combat.weapon
          super(param1);
          mWeaponGameObject = param2;
          mAssetLoadingComponent = new AssetLoadingComponent(mFacade);
-         mPreRenderWorkComponent = new PreRenderWorkComponent(mFacade);
+         mPreRenderWorkComponent = new PreRenderWorkComponent(mFacade,"WeaponView");
          if(ASCompat.stringAsBool(mWeaponGameObject.weaponAesthetic.ModelName))
          {
             mWeaponRenderer = new WeaponRenderer(mDBFacade,mWeaponGameObject,true);

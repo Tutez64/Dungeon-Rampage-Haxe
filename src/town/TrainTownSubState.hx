@@ -23,6 +23,9 @@ package town
       
       override public function enterState() 
       {
+         super.resetHeaderLinks();
+         super.setupHeaderLinks();
+         mDBFacade.menuNavigationController.pushNewLayer("TRAINING_MENU",mTownStateMachine.townHeader.determineCallback,mTownStateMachine.townHeader.closeButton,mTownStateMachine.townHeader.closeButton);
          super.enterState();
          if(mUIHeroTraining != null)
          {
@@ -44,6 +47,7 @@ package town
       
       override public function exitState() 
       {
+         mDBFacade.menuNavigationController.popLayer("TRAINING_MENU");
          if(mUIHeroTraining != null)
          {
             mUIHeroTraining.processChosenAvatar();

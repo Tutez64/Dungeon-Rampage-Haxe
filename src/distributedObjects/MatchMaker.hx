@@ -52,8 +52,8 @@ package distributedObjects
       {
          var _loc1_:InfiniteMapNodeDetail = null;
          mInfiniteDungeonDetails = new Map();
-         final __ax4_iter_198 = mInfiniteMapNodeDetails;
-         if (checkNullIteratee(__ax4_iter_198)) for (_tmp_ in __ax4_iter_198)
+         final __ax4_iter_214 = mInfiniteMapNodeDetails;
+         if (checkNullIteratee(__ax4_iter_214)) for (_tmp_ in __ax4_iter_214)
          {
             _loc1_  = _tmp_;
             if(_loc1_ != null)

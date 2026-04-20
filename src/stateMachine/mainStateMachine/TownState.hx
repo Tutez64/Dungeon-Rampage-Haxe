@@ -74,7 +74,7 @@ public function  get_townStateMachine() : TownStateMachine
          mDBFacade.dbAccountInfo.setPresenceTask("TOWN");
          mTownStateMachine = new TownStateMachine(mDBFacade);
          mAssetLoadingComponent = new AssetLoadingComponent(mDBFacade);
-         mSceneGraphComponent = new SceneGraphComponent(mDBFacade);
+         mSceneGraphComponent = new SceneGraphComponent(mDBFacade,"TownState");
          loadNecessarySwfs();
          mDBFacade.camera.centerCameraOnPoint(new Vector3D());
          mSceneGraphComponent.fadeIn(0.5);

@@ -4,7 +4,7 @@ package stateMachine.mainStateMachine
    import brain.utils.MemoryTracker;
    import facade.DBFacade;
    import facade.Locale;
-   import uI.DBUIOneButtonPopup;
+   import uI.popup.DBUIOneButtonPopup;
    import flash.desktop.NativeApplication;
    
     class SocketErrorState extends State

@@ -1,6 +1,7 @@
 package uI.training
 ;
    import facade.DBFacade;
+   import facade.GameMasterLocale;
    import gameMasterDictionary.GMStat;
    import gameMasterDictionary.GMSuperStat;
    import flash.display.MovieClip;
@@ -41,16 +42,16 @@ package uI.training
       @:isVar public var statItem(never,set):GMStat;
 public function  set_statItem(param1:GMStat) :GMStat      {
          mGMStatItem = param1;
-         mTitleLabel.text = mGMStatItem.Name.toUpperCase();
-         mDescription.text = mGMStatItem.Description;
+         mTitleLabel.text = GameMasterLocale.getGameMasterSubString("STATS_NAME",mGMStatItem.Constant).toUpperCase();
+         mDescription.text = GameMasterLocale.getGameMasterSubString("STATS_DESCRIPTION",mGMStatItem.Constant);
 return param1;
       }
       
       @:isVar public var superStatItem(never,set):GMSuperStat;
 public function  set_superStatItem(param1:GMSuperStat) :GMSuperStat      {
          mGMSuperStatItem = param1;
-         mTitleLabel.text = mGMSuperStatItem.Name.toUpperCase();
-         mDescription.text = mGMSuperStatItem.Description;
+         mTitleLabel.text = GameMasterLocale.getGameMasterSubString("STATS_NAME",mGMSuperStatItem.Constant).toUpperCase();
+         mDescription.text = GameMasterLocale.getGameMasterSubString("STATS_DESCRIPTION",mGMSuperStatItem.Constant);
 return param1;
       }
    }

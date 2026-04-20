@@ -28,13 +28,13 @@ package actor.buffs
       
       public var className:String ;
       
-      public var deltaValues:StatVector ;
+      public var deltaValues:StatVector;
       
-      public var mSortLayer:String ;
+      public var mSortLayer:String;
       
       public var mCameraTweenMax:TimelineMax;
       
-      public function new(param1:DBFacade, param2:ActorGameObject, param3:ActorView, param4:UInt, param5:UInt = (0 : UInt))
+      public function new(param1:DBFacade, param2:ActorGameObject, param3:ActorView, param4:UInt, param5:UInt = (0 : UInt), param6:UInt = (0 : UInt))
       {
          mActorGameObject = param2;
          mParentView = param3;
@@ -42,8 +42,12 @@ package actor.buffs
          mData = ASCompat.dynamicAs(param1.gameMaster.buffById.itemFor(buffId), gameMasterDictionary.GMBuff);
          swfPath = DBFacade.buildFullDownloadPath(mData.VFXFilepath);
          className = mData.VFX;
-         deltaValues = mData.DeltaValues;
-         mSortLayer = mData.SortLayer;
+         if(ASCompat.stringAsBool(this.className))
+         {
+            this.className = param1.customSkinVisualsOverrideHandler.customSkinVFXVisualsOverrider(mData.VFX,param6);
+         }
+         this.deltaValues = mData.DeltaValues;
+         this.mSortLayer = mData.SortLayer;
          super(param1,param5);
          position = mActorGameObject.position;
       }

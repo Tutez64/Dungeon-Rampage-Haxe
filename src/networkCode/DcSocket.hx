@@ -73,7 +73,7 @@ package networkCode
          input_double_buffer = new DcNetworkPacket();
          mDBFacade = param1;
          Doid_NetInterfaces = {};
-         mLogicalWorkComponent = new LogicalWorkComponent(mDBFacade);
+         mLogicalWorkComponent = new LogicalWorkComponent(mDBFacade,"DcSocket");
          configureListeners();
          Logger.debug("Starting Conection ");
          mDBFacade.metrics.log("DcSocketCreate");
@@ -484,8 +484,8 @@ public function  get_facade() : DBFacade
          }
          var _loc4_= new Vector<DcNetworkClass>();
          var _loc3_:String;
-         final __ax4_iter_142:ASObject = Doid_NetInterfaces;
-         if (checkNullIteratee(__ax4_iter_142)) for(_tmp_ in __ax4_iter_142.___keys())
+         final __ax4_iter_158:ASObject = Doid_NetInterfaces;
+         if (checkNullIteratee(__ax4_iter_158)) for(_tmp_ in __ax4_iter_158.___keys())
          {
             _loc3_ = _tmp_;
             _loc1_ = Doid_NetInterfaces[_loc3_];

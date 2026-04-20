@@ -35,18 +35,19 @@ public function  get_gameClock() : GameClock
          return mCurrentGameClock;
       }
       
-      public function doEveryFrame(param1:ASFunction) : Task
+      public function doEveryFrame(param1:ASFunction, param2:String = null) : Task
       {
-         var _loc2_= new Task();
-         _loc2_.callback = param1;
-         mTasks.add(_loc2_);
-         MemoryTracker.track(_loc2_,"Task - every frame task in WorkLoopManager.doEveryFrame()","brain");
-         return _loc2_;
+         var _loc3_= new Task();
+         _loc3_.callback = param1;
+         mTasks.add(_loc3_);
+         var _loc4_= ASCompat.stringAsBool(param2) ? "Task - " + param2 + " every frame" : "Task - every frame task in WorkLoopManager.doEveryFrame()";
+         MemoryTracker.track(_loc3_,_loc4_,"brain");
+         return _loc3_;
       }
       
-      public function doEverySeconds(param1:Float, param2:ASFunction, param3:Bool = true) : DoLater
+      public function doEverySeconds(param1:Float, param2:ASFunction, param3:Bool = true, param4:String = null) : DoLater
       {
-         return doLater(param1,param2,param3);
+         return doLater(param1,param2,param3,param4);
       }
       
       public function CalculateCallbackTime(param1:Float) : UInt
@@ -54,15 +55,16 @@ public function  get_gameClock() : GameClock
          return (Std.int(mCurrentGameClock.gameTime + param1 * 1000) : UInt);
       }
       
-      public function doLater(param1:Float, param2:ASFunction, param3:Bool = true) : DoLater
+      public function doLater(param1:Float, param2:ASFunction, param3:Bool = true, param4:String = null) : DoLater
       {
-         var _loc4_= new DoLater(param3);
-         _loc4_.delay = param1;
-         _loc4_.dueTime = (Std.int(mCurrentGameClock.gameTime + _loc4_.delay * 1000) : UInt);
-         _loc4_.callback = param2;
-         doLaterQueue.enqueue(_loc4_);
-         MemoryTracker.track(_loc4_,"DoLater - delay=" + param1 + "s repeat=" + param3 + " in WorkLoopManager.doLater()","brain");
-         return _loc4_;
+         var _loc6_= new DoLater(param3);
+         _loc6_.delay = param1;
+         _loc6_.dueTime = (Std.int(mCurrentGameClock.gameTime + _loc6_.delay * 1000) : UInt);
+         _loc6_.callback = param2;
+         doLaterQueue.enqueue(_loc6_);
+         var _loc5_= ASCompat.stringAsBool(param4) ? "DoLater - " + param4 + " delay=" + param1 + "s repeat=" + param3 : "DoLater - delay=" + param1 + "s repeat=" + param3 + " in WorkLoopManager.doLater()";
+         MemoryTracker.track(_loc6_,_loc5_,"brain");
+         return _loc6_;
       }
       
       function removeDoLater(param1:DoLater) : Bool

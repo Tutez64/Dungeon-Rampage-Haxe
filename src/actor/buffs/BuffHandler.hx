@@ -64,6 +64,11 @@ package actor.buffs
       
       public function destroy() 
       {
+         if(mEventComponent != null)
+         {
+            mEventComponent.destroy();
+            mEventComponent = null;
+         }
          if(mSwappableBuffDisplayTask != null)
          {
             mSwappableBuffDisplayTask.destroy();
@@ -102,7 +107,7 @@ package actor.buffs
          var _loc2_= ASCompat.dynamicAs(mBuffs.itemFor(param1.type), actor.buffs.BuffGameObject);
          if(_loc2_ == null)
          {
-            _loc9_ = new BuffGameObject(mFacade,mActorGameObject,mActorGameObject.actorView,param1.type);
+            _loc9_ = new BuffGameObject(mFacade,mActorGameObject,mActorGameObject.actorView,param1.type,(0 : UInt),param1.attackerActor);
             MemoryTracker.track(_loc9_,"BuffGameObject - created in BuffHandler.activateBuff()");
             mBuffs.add(param1.type,_loc9_);
             recalcBuffMultiplier();
@@ -114,7 +119,7 @@ package actor.buffs
                if(mSwappableBuffDisplayTask == null && mSwappableBuffs.length > 1)
                {
                   processSwappableBuffDisplays();
-                  mSwappableBuffDisplayTask = mFacade.logicalWorkManager.doEverySeconds(1,processSwappableBuffDisplays);
+                  mSwappableBuffDisplayTask = mFacade.logicalWorkManager.doEverySeconds(1,processSwappableBuffDisplays,true,"BuffHandler");
                }
             }
          }

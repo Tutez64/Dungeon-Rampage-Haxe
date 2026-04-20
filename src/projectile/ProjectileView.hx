@@ -35,7 +35,7 @@ package projectile
          super(param1,param2);
          mProjectileGameObject = param2;
          mAssetLoadingComponent = new AssetLoadingComponent(mFacade);
-         mLogicalWorkComponent = new LogicalWorkComponent(mFacade);
+         mLogicalWorkComponent = new LogicalWorkComponent(mFacade,"ProjectileView");
          if(mProjectileGameObject.effectTimeOffset > 0)
          {
             mLogicalWorkComponent.doLater(mProjectileGameObject.effectTimeOffset,createEffect);
@@ -78,13 +78,15 @@ package projectile
       
       function setupArt(param1:SwfAsset) 
       {
-         mProjectileRenderer = ASCompat.reinterpretAs(mDBFacade.movieClipPool.checkout(mDBFacade,param1,mProjectileGameObject.gmProjectile.ProjModel) , MovieClipRenderController);
+         var _loc3_= mProjectileGameObject.gmProjectile.ProjModel;
+         _loc3_ = mDBFacade.customSkinVisualsOverrideHandler.customSkinProjectileVisualOverrider(_loc3_,mProjectileGameObject.parentActorSkinId);
+         mProjectileRenderer = ASCompat.reinterpretAs(mDBFacade.movieClipPool.checkout(mDBFacade,param1,_loc3_) , MovieClipRenderController);
          mBody = mProjectileRenderer.clip;
          mProjectileRenderer.play((0 : UInt),true);
          mRoot.addChild(mBody);
-         var _loc3_= mProjectileGameObject.gmProjectile.Tint;
+         var _loc4_= mProjectileGameObject.gmProjectile.Tint;
          var _loc2_= mProjectileGameObject.gmProjectile.Saturation;
-         applyColor(_loc3_,_loc2_,mBody);
+         applyColor(_loc4_,_loc2_,mBody);
          if(mProjectileGameObject.rotationSpeed == 0)
          {
             if(mProjectileGameObject.shouldRotate)

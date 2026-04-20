@@ -54,8 +54,8 @@ import box2D.common.B2Color;
       {
          super(param2,param3,param4,param5,param6);
          mDBFacade = param1;
-         mSceneGraphComponent = new SceneGraphComponent(mDBFacade);
-         mPreRenderWorkComponent = new PreRenderWorkComponent(mDBFacade);
+         mSceneGraphComponent = new SceneGraphComponent(mDBFacade,"DBBox2DVisualizer");
+         mPreRenderWorkComponent = new PreRenderWorkComponent(mDBFacade,"DBBox2DVisualizer");
          mSceneGraphComponent.addChild(rootSprite,(30 : UInt));
          mPreRenderWorkComponent.doEveryFrame(update);
          mDebugDraw.SetDrawScale(50);

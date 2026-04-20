@@ -1009,56 +1009,6 @@ public function  get_pets() : Map
          return _loc4_;
       }
       
-      public function equipItemOnAccount(param1:UInt, param2:UInt, param3:ASFunction = null, param4:ASFunction = null) 
-      {
-         var itemInstanceId= param1;
-         var equipSlot= param2;
-         var responseFinishedCallback= param3;
-         var errorCallback= param4;
-         var rpcFunc= JSONRPCService.getFunction("equipItemOnAccount",mDBFacade.rpcRoot + "account");
-         rpcFunc(mDBFacade.dbAccountInfo.id,itemInstanceId,equipSlot,mDBFacade.validationToken,function(param1:ASAny)
-         {
-            mResponseCallback(param1);
-            if(responseFinishedCallback != null)
-            {
-               responseFinishedCallback();
-            }
-         },function(param1:Error)
-         {
-            mParseErrorCallback(param1);
-            errorCallback();
-         });
-      }
-      
-      public function unequipItemOffAccount(param1:StackableInfo, param2:ASFunction = null, param3:ASFunction = null) 
-      {
-         var rpcFunc:ASFunction;
-         var itemInfo= param1;
-         var responseFinishedCallback= param2;
-         var errorCallback= param3;
-         if(!itemInfo.isEquipped)
-         {
-            Logger.error("Trying to unequip an item that is not currently equipped.");
-            if(errorCallback != null)
-            {
-               errorCallback(new Error("Trying to unequip an item that is not currently equipped.",-1));
-            }
-         }
-         rpcFunc = JSONRPCService.getFunction("unequipItemOffAccount",mDBFacade.rpcRoot + "account");
-         rpcFunc(mDBFacade.dbAccountInfo.id,itemInfo.databaseId,mDBFacade.validationToken,function(param1:ASAny)
-         {
-            mResponseCallback(param1);
-            if(responseFinishedCallback != null)
-            {
-               responseFinishedCallback();
-            }
-         },function(param1:Error)
-         {
-            mParseErrorCallback(param1);
-            errorCallback();
-         });
-      }
-      
       public function equipPetOnAvatar(param1:UInt, param2:UInt, param3:ASFunction = null, param4:ASFunction = null) 
       {
          var avatarInstanceId= param1;
@@ -1117,6 +1067,12 @@ public function  get_pets() : Map
       public function isThereEmptySpaceInWeaponStorage() : Bool
       {
          return unequippedWeaponCount < mStorageLimitWeapon;
+      }
+      
+      @:isVar public var storageLimitWeapon(get,never):UInt;
+public function  get_storageLimitWeapon() : UInt
+      {
+         return mStorageLimitWeapon;
       }
       
       public function isEquippableByAnyOwnedAvatar(param1:ItemInfo) : Bool

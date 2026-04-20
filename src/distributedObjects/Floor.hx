@@ -78,7 +78,7 @@ package distributedObjects
          mActiveDungeonModifiers = new Vector<DungeonModifierHelper>();
          mDBFacade = dbFacade;
          pastInitialLoad = false;
-         mLogicalWorkComponent = new LogicalWorkComponent(mDBFacade);
+         mLogicalWorkComponent = new LogicalWorkComponent(mDBFacade,"Floor");
          mB2World = new B2World(NavCollider.convertToB2Vec2(new Vector3D(0,0)),true);
          mContactListener = new ContactListener(mDBFacade);
          mB2World.SetContactListener(mContactListener);
@@ -89,7 +89,7 @@ package distributedObjects
          mFloorBody = mB2World.CreateBody(floorBodyDef);
          mFloorBody.SetUserData(this.id);
          buildWalls();
-         mPhysicsUpdateTask = mDBFacade.physicsWorkManager.doEveryFrame(update);
+         mPhysicsUpdateTask = mDBFacade.physicsWorkManager.doEveryFrame(update,"Floor");
          wantAllCollisions = mDBFacade.showCollisions || mDBFacade.dbConfigManager.getConfigBoolean("show_all_colliders",false);
          showCombatCollisions = mDBFacade.showCollisions || mDBFacade.dbConfigManager.getConfigBoolean("show_combat_colliders",false);
          showNavCollisions = mDBFacade.showCollisions || mDBFacade.dbConfigManager.getConfigBoolean("show_navigation_colliders",false);
@@ -98,7 +98,7 @@ package distributedObjects
          {
             mBox2DVisualizer = new DBBox2DVisualizer(mDBFacade,mB2World,wantAllCollisions,showCombatCollisions,showNavCollisions,showAStarVisuals);
          }
-         mSceneGraphComponent = new SceneGraphComponent(mDBFacade);
+         mSceneGraphComponent = new SceneGraphComponent(mDBFacade,"Floor");
          mEventComponent = new EventComponent(mDBFacade);
          mEventComponent.addListener(HeroGameObjectOwner.HERO_OWNER_READY,function(param1:Event)
          {

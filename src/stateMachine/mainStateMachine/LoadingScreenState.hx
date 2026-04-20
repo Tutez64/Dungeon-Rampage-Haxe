@@ -21,7 +21,7 @@ package stateMachine.mainStateMachine
    import facade.Locale;
    import facade.TrickleCacheLoader;
    import gameMasterDictionary.GMMapNode;
-   import uI.DBUIOneButtonPopup;
+   import uI.popup.DBUIOneButtonPopup;
    import uI.UIHints;
    import com.greensock.TweenMax;
    import flash.display.MovieClip;
@@ -129,9 +129,9 @@ import flash.net.NetStream;
       {
          super("LoadingScreenState",param2);
          mDBFacade = param1;
-         mWorkComponent = new LogicalWorkComponent(mDBFacade);
+         mWorkComponent = new LogicalWorkComponent(mDBFacade,"LoadingScreenState");
          mAssetLoadingComponent = new AssetLoadingComponent(mDBFacade);
-         mSceneGraphComponent = new SceneGraphComponent(mDBFacade);
+         mSceneGraphComponent = new SceneGraphComponent(mDBFacade,"LoadingScreenState");
          mEventComponent = new EventComponent(mDBFacade);
          mScreenLoaded = false;
          mHeroOwnerReady = false;
@@ -392,6 +392,7 @@ import flash.net.NetStream;
          if(mTask != null)
          {
             mTask.destroy();
+            mTask = null;
          }
          super.exitState();
       }

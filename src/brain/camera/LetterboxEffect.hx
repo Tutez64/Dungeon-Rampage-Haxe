@@ -39,7 +39,7 @@ package brain.camera
          
          mFramesElapsed = (0 : UInt);
          mFacade = param1;
-         mWorkComponent = new LogicalWorkComponent(param1);
+         mWorkComponent = new LogicalWorkComponent(param1,"LetterboxEffect");
          MemoryTracker.track(mWorkComponent,"LogicalWorkComponent - created in LetterboxEffect()","brain");
       }
       
@@ -128,6 +128,20 @@ package brain.camera
          if(mFadeTask != null && mRectSprite != null)
          {
             ResetFade();
+         }
+      }
+      
+      public function destroy() 
+      {
+         if(mFadeTask != null)
+         {
+            mFadeTask.destroy();
+            mFadeTask = null;
+         }
+         if(mWorkComponent != null)
+         {
+            mWorkComponent.destroy();
+            mWorkComponent = null;
          }
       }
    }

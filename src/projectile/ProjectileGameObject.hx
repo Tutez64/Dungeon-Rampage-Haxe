@@ -145,7 +145,7 @@ package projectile
             _loc22_ = param5.power;
             _loc23_ = param5.weaponType;
          }
-         mLogicalWorkComponent = new LogicalWorkComponent(mDBFacade);
+         mLogicalWorkComponent = new LogicalWorkComponent(mDBFacade,"ProjectileGameObject");
          mAssetLoadingComponent = new AssetLoadingComponent(mDBFacade);
          mParentActorId = param2;
          mParentActorTeam = param3;
@@ -520,6 +520,17 @@ return param1;
             mCollisionComponent = null;
          }
          super.destroy();
+      }
+      
+      @:isVar public var parentActorSkinId(get,never):UInt;
+public function  get_parentActorSkinId() : UInt
+      {
+         var _loc1_= mDistributedDungeonFloor.getActor(mParentActorId);
+         if(_loc1_ != null && _loc1_.gmSkin != null)
+         {
+            return _loc1_.gmSkin.Id;
+         }
+         return (0 : UInt);
       }
    }
 

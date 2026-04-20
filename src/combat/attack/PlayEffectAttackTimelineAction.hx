@@ -103,6 +103,7 @@ package combat.attack
             _loc9_ = 180;
          }
          var _loc8_= (0 : UInt);
+         _loc10_ = mDBFacade.customSkinVisualsOverrideHandler.customSkinBusterVisualOverrider(_loc10_,mActorGameObject);
          _loc8_ = mActorGameObject.distributedDungeonFloor.effectManager.playEffect(DBFacade.buildFullDownloadPath(mEffectPath),_loc10_,_loc4_,_loc3_,mBehindAvatar,mScale,0,0,_loc9_,_loc2_,mLoop,mLayer,mManaged,mPlayRate,ASCompat.asFunction(mDoIconInsert ? assetLoadedCallback(this) : null));
          if(mManaged)
          {

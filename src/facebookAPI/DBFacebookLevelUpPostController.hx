@@ -2,14 +2,11 @@ package facebookAPI
 ;
    import brain.assetRepository.AssetLoadingComponent;
    import brain.event.EventComponent;
-   import brain.render.MovieClipRenderController;
    import brain.sceneGraph.SceneGraphComponent;
-   import brain.uI.UIButton;
    import events.FacebookLevelUpPostEvent;
    import facade.DBFacade;
-   import facade.Locale;
    import gameMasterDictionary.GMFeedPosts;
-   import flash.display.MovieClip;
+   import uI.popup.UIDungeonSummaryLevelUpPopup;
    import flash.display.Sprite;
    import flash.events.Event;
    import org.as3commons.collections.Map;
@@ -43,7 +40,7 @@ package facebookAPI
          mDBFacade = param1;
          mAssetLoadingComponent = new AssetLoadingComponent(mDBFacade);
          mEventComponent = new EventComponent(mDBFacade);
-         mSceneGraphComponent = new SceneGraphComponent(mDBFacade);
+         mSceneGraphComponent = new SceneGraphComponent(mDBFacade,"DBFacebookLevelUpPostController");
          mFeedPostCallbackFunction = param2;
          mLevelUpFeedPostsMap = new Map();
          mEventComponent.addListener("FacebookLevelUpPostEvent",setlevelUpPost);
@@ -84,8 +81,8 @@ package facebookAPI
       function loadMap() 
       {
          var _loc1_:GMFeedPosts;
-         final __ax4_iter_177 = mDBFacade.gameMaster.FeedPosts;
-         if (checkNullIteratee(__ax4_iter_177)) for (_tmp_ in __ax4_iter_177)
+         final __ax4_iter_193 = mDBFacade.gameMaster.FeedPosts;
+         if (checkNullIteratee(__ax4_iter_193)) for (_tmp_ in __ax4_iter_193)
          {
             _loc1_ = _tmp_;
             if(_loc1_.Category == "LEVELUP")
@@ -102,73 +99,11 @@ package facebookAPI
       {
          var levelUpPost= param1;
          var gmSkin= mDBFacade.gameMaster.getSkinByType(mDBFacade.dbAccountInfo.activeAvatarInfo.skinId);
-         var avatarPicScale:Float = 0.45;
-         mAssetLoadingComponent.getSwfAsset(DBFacade.buildFullDownloadPath("Resources/Art2D/UI/db_UI_town.swf"),function(param1:brain.assetRepository.SwfAsset)
+         mAssetLoadingComponent.getSwfAsset(DBFacade.buildFullDownloadPath(gmSkin.PortraitName),function(param1:brain.assetRepository.SwfAsset)
          {
-            var outerSwfAsset= param1;
-            var levelupPopupClass= outerSwfAsset.getClass("UI_prompt_levelup");
-            var levelupPopup= ASCompat.dynamicAs(ASCompat.createInstance(levelupPopupClass, []), flash.display.MovieClip);
-            levelupPopup.x += 40;
-            levelupPopup.scaleX = levelupPopup.scaleY = 1.8;
-            mAssetLoadingComponent.getSwfAsset(DBFacade.buildFullDownloadPath(gmSkin.PortraitName),function(param1:brain.assetRepository.SwfAsset)
-            {
-               var child:Int;
-               var levelUpButton:UIButton;
-               var closeButton:UIButton;
-               var swfAsset= param1;
-               var picClass= swfAsset.getClass(gmSkin.IconName);
-               var avatarPic= ASCompat.dynamicAs(ASCompat.createInstance(picClass, []), flash.display.MovieClip);
-               var movieClipRenderer= new MovieClipRenderController(mDBFacade,avatarPic);
-               movieClipRenderer.play();
-               avatarPic.scaleX = avatarPic.scaleY = avatarPicScale;
-               if(ASCompat.toNumberField((levelupPopup : ASAny).avatar, "numChildren") > 0)
-               {
-                  child = ASCompat.toInt(ASCompat.toNumberField((levelupPopup : ASAny).avatar, "numChildren") - 1);
-                  while(child >= 0)
-                  {
-                     (levelupPopup : ASAny).avatar.removeChildAt(child);
-                     child = child - 1;
-                  }
-               }
-               (levelupPopup : ASAny).avatar.addChildAt(avatarPic,0);
-               ASCompat.setProperty((levelupPopup : ASAny).level_text, "text", levelUpPost.LevelTrigger);
-               ASCompat.setProperty((levelupPopup : ASAny).congrats_label, "text", Locale.getString("LEVEL_UP_SHARE_TITLE"));
-               ASCompat.setProperty((levelupPopup : ASAny).label, "text", Locale.getString("LEVEL_UP_SHARE_TEXT") + levelUpPost.LevelTrigger);
-               levelUpButton = new UIButton(mDBFacade,ASCompat.dynamicAs((levelupPopup : ASAny).share, flash.display.MovieClip));
-               if(mDBFacade.isDRPlayer)
-               {
-                  levelUpButton.label.text = Locale.getString("SWEET");
-               }
-               else
-               {
-                  levelUpButton.label.text = Locale.getString("LEVEL_UP_SHARE_BUTTON_TEXT");
-               }
-               closeButton = new UIButton(mDBFacade,ASCompat.dynamicAs((levelupPopup : ASAny).close, flash.display.MovieClip));
-               levelUpButton.releaseCallback = function()
-               {
-                  closePopup(levelupPopup);
-                  if(mDBFacade.isFacebookPlayer)
-                  {
-                     mFeedPostCallbackFunction(levelUpPost,"",gmSkin.FeedPostPicture);
-                  }
-               };
-               closeButton.releaseCallback = function()
-               {
-                  closePopup(levelupPopup);
-               };
-               mCurtain = makeCurtain(mDBFacade,mSceneGraphComponent);
-               mSceneGraphComponent.addChild(levelupPopup,(105 : UInt));
-               levelupPopup.x = mDBFacade.viewWidth / 2;
-               levelupPopup.y = mDBFacade.viewHeight / 2;
-            });
+            var _loc3_= param1.getClass(gmSkin.IconName);
+            var _loc2_= new UIDungeonSummaryLevelUpPopup(mDBFacade,null,gmSkin,levelUpPost,_loc3_);
          });
-      }
-      
-      function closePopup(param1:MovieClip) 
-      {
-         removeCurtain(mCurtain,mSceneGraphComponent);
-         mSceneGraphComponent.removeChild(param1);
-         param1 = null;
       }
       
       function checkIfMapIsLoaded() 
@@ -201,9 +136,22 @@ package facebookAPI
       
       public function destroy() 
       {
+         if(mEventComponent != null)
+         {
+            mEventComponent.destroy();
+            mEventComponent = null;
+         }
+         if(mAssetLoadingComponent != null)
+         {
+            mAssetLoadingComponent.destroy();
+            mAssetLoadingComponent = null;
+         }
+         if(mSceneGraphComponent != null)
+         {
+            mSceneGraphComponent.destroy();
+            mSceneGraphComponent = null;
+         }
          mDBFacade = null;
-         mAssetLoadingComponent = null;
-         mEventComponent = null;
          mSelectedLevelUpPost = null;
          mLevelUpFeedPostsMap.clear();
          mFeedPostCallbackFunction = null;

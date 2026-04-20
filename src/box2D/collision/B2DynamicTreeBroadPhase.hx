@@ -78,8 +78,8 @@ package box2D.collision
          var pair:B2DynamicTreePair = null;
          var callback= param1;
          this.m_pairCount = 0;
-         final __ax4_iter_78 = this.m_moveBuffer;
-         if (checkNullIteratee(__ax4_iter_78)) for (_tmp_ in __ax4_iter_78)
+         final __ax4_iter_87 = this.m_moveBuffer;
+         if (checkNullIteratee(__ax4_iter_87)) for (_tmp_ in __ax4_iter_87)
          {
             queryProxy  = _tmp_;
             QueryCallback = function(param1:B2DynamicTreeNode):Bool

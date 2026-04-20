@@ -10,8 +10,8 @@ package uI.inventory
    import dBGlobals.DBGlobal;
    import facade.DBFacade;
    import facade.Locale;
-   import uI.DBUIOneButtonPopup;
-   import uI.DBUIPopup;
+   import uI.popup.DBUIOneButtonPopup;
+   import uI.popup.DBUIPopup;
    import flash.display.MovieClip;
    import flash.text.TextField;
    
@@ -55,7 +55,7 @@ package uI.inventory
       public function new(param1:DBFacade, param2:Int, param3:ASFunction, param4:InventoryBaseInfo, param5:ASFunction = null, param6:Bool = false)
       {
          mDBFacade = param1;
-         mSceneGraphComponent = new SceneGraphComponent(mDBFacade);
+         mSceneGraphComponent = new SceneGraphComponent(mDBFacade,"EquipItemToSlotPopup");
          mAvatarInstanceId = param2;
          mClosePopupCallback = param3;
          mNotAllowedCallback = param5;
@@ -283,11 +283,6 @@ package uI.inventory
          {
             showNotAllowedPopup();
          }
-      }
-      
-      function equipToAccountSlot(param1:UInt) 
-      {
-         mDBFacade.dbAccountInfo.inventoryInfo.equipItemOnAccount(mItemInfoToEquip.databaseId,param1 + 1,mClosePopupCallback);
       }
       
       override public function destroy() 

@@ -28,14 +28,14 @@ package uI.inventory
    import gameMasterDictionary.GMStackable;
    import gameMasterDictionary.GMWeaponItem;
    import town.TownHeader;
-   import uI.DBUIOneButtonPopup;
-   import uI.DBUITwoButtonPopup;
    import uI.equipPicker.HeroWithEquipPicker;
    import uI.equipPicker.PetsWithEquipPicker;
    import uI.equipPicker.StacksWithEquipPicker;
    import uI.equipPicker.StuffWithEquipPicker;
+   import uI.hud.UIHud;
    import uI.inventory.chests.ChestInfoCard;
-   import uI.UIHud;
+   import uI.popup.DBUIOneButtonPopup;
+   import uI.popup.DBUITwoButtonPopup;
    import uI.UIPagingPanel;
    import uI.UITownTweens;
    import flash.display.MovieClip;
@@ -159,9 +159,9 @@ package uI.inventory
             mWantPets = true;
          }
          mTabButtons = new Map();
-         mLogicalWorkComponent = new LogicalWorkComponent(mDBFacade);
+         mLogicalWorkComponent = new LogicalWorkComponent(mDBFacade,"UIInventory");
          mAssetLoadingComponent = new AssetLoadingComponent(mDBFacade);
-         mSceneGraphComponent = new SceneGraphComponent(mDBFacade);
+         mSceneGraphComponent = new SceneGraphComponent(mDBFacade,"UIInventory");
          mInventoryGridElements = new Vector<MovieClip>();
          mItems = new Vector<UIInventoryItem>();
          mNewItemIds = [];
@@ -341,6 +341,11 @@ public function  get_root() : Sprite
                      {
                         mNewPetIds.splice(_loc1_,(1 : UInt));
                      }
+                  }
+                  if(mDBFacade.steamAchievementsManager != null)
+                  {
+                     mDBFacade.steamAchievementsManager.setAchievement("SELL_AN_ITEM");
+                     mDBFacade.steamAchievementsManager.addToStatInt("SELL_ITEM_STAT",1);
                   }
                   refresh();
                });
@@ -1535,6 +1540,10 @@ public function  set_currentTab(param1:String) :String      {
             mLogicalWorkComponent.destroy();
          }
          mLogicalWorkComponent = null;
+         if(mAssetLoadingComponent != null)
+         {
+            mAssetLoadingComponent.destroy();
+         }
          mAssetLoadingComponent = null;
          mRoot = null;
          mInventoryRoot = null;
@@ -1624,6 +1633,10 @@ public function  set_currentTab(param1:String) :String      {
          }
          mStuffWithEquipPicker = null;
          mSelectedItemInfo = null;
+         if(mSceneGraphComponent != null)
+         {
+            mSceneGraphComponent.destroy();
+         }
          mSceneGraphComponent = null;
          if(mChestCard != null)
          {
@@ -1643,6 +1656,7 @@ public function  set_currentTab(param1:String) :String      {
          if(mEventComponent != null)
          {
             mEventComponent.removeListener("DB_ACCOUNT_INFO_RESPONSE");
+            mEventComponent.destroy();
          }
          mEventComponent = null;
          if(mConsumableChestCard != null)

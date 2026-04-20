@@ -9,7 +9,7 @@ package uI.infiniteIsland
    import gameMasterDictionary.GMChest;
    import gameMasterDictionary.GMDoober;
    import generatedCode.InfiniteRewardData;
-   import uI.DBUITwoButtonPopup;
+   import uI.popup.DBUITwoButtonPopup;
    import flash.display.DisplayObject;
    import flash.display.MovieClip;
    import flash.filters.ColorMatrixFilter;
@@ -188,6 +188,11 @@ package uI.infiniteIsland
       
       override public function destroy() 
       {
+         if(mEventComponent != null)
+         {
+            mEventComponent.destroy();
+            mEventComponent = null;
+         }
          super.destroy();
       }
    }

@@ -85,7 +85,7 @@ return param1;
          {
             if(mDooberData.DooberType == "TREASURE")
             {
-               mLogicalWorkComponent = new LogicalWorkComponent(mDBFacade);
+               mLogicalWorkComponent = new LogicalWorkComponent(mDBFacade,"DooberGameObject");
                mLogicalWorkComponent.doEveryFrame(checkForTutorialPopUp);
             }
          }

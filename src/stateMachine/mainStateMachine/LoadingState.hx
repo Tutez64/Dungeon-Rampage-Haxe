@@ -9,13 +9,15 @@ package stateMachine.mainStateMachine
    import brain.event.EventComponent;
    import brain.logger.Logger;
    import brain.stateMachine.State;
-   import config.ConfigFileLoadedEvent;
    import config.DBConfigManager;
+   import config.ServiceDiscoveryReadyEvent;
    import events.DBAccountLoadedEvent;
    import events.ManagersLoadedEvent;
    import events.MatchMakerLoadedEvent;
    import facade.DBFacade;
    import facade.TrickleCacheLoader;
+   import steamAchievements.SteamAchievementsManager;
+   import uI.map.PlayerActivityCount;
    
     class LoadingState extends State
    {
@@ -62,7 +64,7 @@ package stateMachine.mainStateMachine
          mEventComponent = new EventComponent(mDBFacade);
          mAssetLoader = new AssetLoadingComponent(mDBFacade);
          AssetLoader.startTrackingLoads(finishedLoadingCache);
-         mEventComponent.addListener("ConfigFileLoadedEvent",configLoaded);
+         mEventComponent.addListener("ServiceDiscoveryReadyEvent",configReady);
          mEventComponent.addListener("ManagersLoadedEvent",managersLoaded);
          mEventComponent.addListener("DB_ACCOUNT_INFO_LOADED",accountLoaded);
          mEventComponent.addListener("MATCH_MAKER_LOADED",matchMakerReady);
@@ -90,13 +92,21 @@ package stateMachine.mainStateMachine
          Logger.debug("MAIN STATE MACHINE TRANSITION -- EXIT LOADING STATE");
       }
       
-      function configLoaded(param1:ConfigFileLoadedEvent) 
+      function configReady(param1:ServiceDiscoveryReadyEvent) 
       {
-         Logger.info("LoadingState configLoaded");
+         Logger.info("LoadingState configReady");
          mDBFacade.loadingBarTick();
+         if(param1.serviceDiscoveryResult == null)
+         {
+            mDBFacade.mainStateMachine.enterSocketErrorState((param1.serviceDiscoveryErrorCode : UInt),param1.serviceDiscoveryErrorText);
+            return;
+         }
+         mDBFacade.applyServiceDiscoveryResult(param1.serviceDiscoveryResult);
          mConfigLoaded = true;
          mDBFacade.featureFlags.loadFeatureFlagValuesFromConfigs(mDBFacade.dbConfigManager);
          SteamAccountInfo.getOrCreateAccount(mDBFacade,steamInfoLoaded);
+         mDBFacade.steamAchievementsManager = new SteamAchievementsManager(mDBFacade);
+         Logger.infoch("SteamAchievements","creating SteamAchievementsManager");
          TownState.preLoadAssets(mDBFacade);
          TrickleCacheLoader.swfAsset(DBFacade.buildFullDownloadPath("Resources/Art2D/UI/db_UI_loading_screen.swf"),mDBFacade);
          TrickleCacheLoader.swfAsset(DBFacade.buildFullDownloadPath("Resources/Art2D/FX/db_fx_library.swf"),mDBFacade);
@@ -107,6 +117,7 @@ package stateMachine.mainStateMachine
          mDBFacade.preLoadJson();
          GameClock.startSetWebServerTime();
          StoreServicesController.getWebServerTimestamp(mDBFacade,timeLoaded);
+         mDBFacade.playerActivityCount = new PlayerActivityCount(mDBFacade);
       }
       
       function steamInfoLoaded() 

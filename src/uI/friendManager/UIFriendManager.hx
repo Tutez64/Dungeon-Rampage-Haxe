@@ -71,9 +71,9 @@ package uI.friendManager
          mDBFacade = param1;
          mSwfAsset = param2.townSwf;
          mTownHeader = param2.townHeader;
-         mSceneGraphComponent = new SceneGraphComponent(mDBFacade);
+         mSceneGraphComponent = new SceneGraphComponent(mDBFacade,"UIFriendManager");
          mAssetLoadingComponent = new AssetLoadingComponent(mDBFacade);
-         mLogicalWorkComponent = new LogicalWorkComponent(mDBFacade);
+         mLogicalWorkComponent = new LogicalWorkComponent(mDBFacade,"UIFriendManager");
          states = new Map();
          states.add(1,new UIFriends(this,mDBFacade,param2));
          states.add(4,new UIInvite(this,mDBFacade,param2));

@@ -32,7 +32,7 @@ package distributedObjects
       {
          Logger.debug("New  DistributedDungionArea******************************");
          super(param1,param2);
-         mSceneGraphComponent = new SceneGraphComponent(mDBFacade);
+         mSceneGraphComponent = new SceneGraphComponent(mDBFacade,"DistributedDungionArea");
          mCacheNpc = new Vector<UInt>();
          mCacheSfc = new Vector<String>();
          mEventComponent = new EventComponent(param1);

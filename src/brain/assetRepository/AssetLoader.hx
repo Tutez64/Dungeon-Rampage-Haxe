@@ -114,8 +114,8 @@ static public function  get_pendingBytesTotal() : UInt
          mBytesLoaded = (0 : UInt);
          mBytesTotal = (0 : UInt);
          var _loc1_:Loader;
-         final __ax4_iter_62 = mloadersets;
-         if (checkNullIteratee(__ax4_iter_62)) for (_tmp_ in __ax4_iter_62)
+         final __ax4_iter_65 = mloadersets;
+         if (checkNullIteratee(__ax4_iter_65)) for (_tmp_ in __ax4_iter_65)
          {
             _loc1_ = _tmp_;
             mBytesLoaded += (ASCompat.toInt(_loc1_.contentLoaderInfo.bytesLoaded) : UInt);
@@ -281,7 +281,7 @@ static public function  get_pendingBytesTotal() : UInt
                mErrorCallback(mAssetLoaderInfo);
             }
             Logger.error("Loader.handleIOError from path: " + AssetString);
-         },false);
+         },false,"AssetLoader.handleIOError");
       }
       
       function handleIOErrorUrl(param1:Event) 
@@ -305,7 +305,7 @@ static public function  get_pendingBytesTotal() : UInt
                      mErrorCallback(mAssetLoaderInfo);
                   }
                }
-            },false);
+            },false,"AssetLoader.handleIOErrorUrl");
          }
          else
          {

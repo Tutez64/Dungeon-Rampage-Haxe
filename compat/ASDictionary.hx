@@ -107,6 +107,10 @@ abstract ASDictionary<K,V>(Dictionary<K,V>) from Dictionary<K,V> to Dictionary<K
 		#end
 	}
 
+	public inline function hasOwnProperty(key:K):Bool {
+		return exists(key);
+	}
+
 	public inline function remove(key:K):Bool {
 		#if flash
 		return untyped __delete__(this, key);

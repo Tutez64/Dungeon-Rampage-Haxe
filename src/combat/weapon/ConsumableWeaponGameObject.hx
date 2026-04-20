@@ -48,6 +48,15 @@ package combat.weapon
          mConsumableAttack = ASCompat.dynamicAs(mDBFacade.gameMaster.attackByConstant.itemFor(mGMStackable.UsageAttack), gameMasterDictionary.GMAttack);
       }
       
+      override public function destroy() 
+      {
+         mConsumableDetails = null;
+         mDefaultWeaponDetails = null;
+         mGMStackable = null;
+         mConsumableAttack = null;
+         super.destroy();
+      }
+      
       public function getConsumableAttack() : GMAttack
       {
          return mConsumableAttack;
@@ -62,6 +71,10 @@ package combat.weapon
       {
          mConsumableDetails.count--;
          mDBFacade.hud.decrementConsumableCount((slot : UInt));
+         if(mDBFacade.steamAchievementsManager != null)
+         {
+            mDBFacade.steamAchievementsManager.setAchievement("USE_CONSUMABLE_FIRST_TIME");
+         }
          if(mConsumableDetails.count == 0)
          {
             mDBFacade.hud.totalConsumableCountReached((slot : UInt));

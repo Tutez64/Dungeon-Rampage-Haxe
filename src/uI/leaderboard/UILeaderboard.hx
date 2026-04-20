@@ -14,8 +14,8 @@ package uI.leaderboard
    import facade.DBFacade;
    import facade.Locale;
    import town.TownStateMachine;
-   import uI.DBUIOneButtonPopup;
-   import uI.DBUITwoButtonPopup;
+   import uI.popup.DBUIOneButtonPopup;
+   import uI.popup.DBUITwoButtonPopup;
    import flash.display.MovieClip;
    import flash.events.Event;
    import flash.events.MouseEvent;
@@ -118,8 +118,8 @@ package uI.leaderboard
          mOnlineFriends = new Vector<FriendInfo>();
          mOfflineFriends = new Vector<FriendInfo>();
          mAssetLoadingComponent = new AssetLoadingComponent(param1);
-         mSceneGraphComponent = new SceneGraphComponent(param1);
-         mLogicalWorkComponent = new LogicalWorkComponent(param1);
+         mSceneGraphComponent = new SceneGraphComponent(param1,"UILeaderboard");
+         mLogicalWorkComponent = new LogicalWorkComponent(param1,"UILeaderboard");
          mEventComponent = new EventComponent(mDBFacade);
          mTownStateMachine = param5;
          mAssetLoadingComponent.getSwfAsset(DBFacade.buildFullDownloadPath("Resources/Art2D/UI/db_UI_leaderboard.swf"),leaderboardLoaded);
@@ -257,6 +257,7 @@ package uI.leaderboard
          mFriendSlots.push(new LeaderboardFriendSlot(mDBFacade,ASCompat.dynamicAs((mLeaderboard : ASAny).slot_9, flash.display.MovieClip),this,9));
          mFriendSlots.push(new LeaderboardFriendSlot(mDBFacade,ASCompat.dynamicAs((mLeaderboard : ASAny).slot_10, flash.display.MovieClip),this,10));
          mInviteFriendButton = new UIButton(mDBFacade,ASCompat.dynamicAs((mLeaderboard : ASAny).invite_friend, flash.display.MovieClip));
+         mInviteFriendButton.label.text = Locale.getString("INVITE_POPUP_BUTTON");
          if(mDBFacade.isFacebookPlayer)
          {
             mInviteFriendButton.releaseCallback = inviteFriendFB;
@@ -287,6 +288,7 @@ package uI.leaderboard
          };
          mDBFacade.dbAccountInfo.getIgnoredFriendData();
          mFriendManagementButton = new UIButton(mDBFacade,ASCompat.dynamicAs((mLeaderboard : ASAny).block_button, flash.display.MovieClip));
+         mFriendManagementButton.label.text = Locale.getString("FRIEND_MANAGEMENT_HEADING_FRIENDS");
          mFriendManagementButton.releaseCallback = function()
          {
             mTownStateMachine.enterFriendManagementState();
@@ -314,6 +316,11 @@ package uI.leaderboard
          }
          mDBFacade.metrics.log("InviteLeaderboardClickedFB");
          mDBFacade.facebookController.genericFriendRequests();
+      }
+      
+      public function setupNavigationlinks() 
+      {
+         mFriendManagementButton.isToTheLeftOf(mInviteFriendButton);
       }
       
       public function showDRInvitePopup() 
@@ -628,8 +635,8 @@ public function  get_mustRefreshLeaderboard() : Bool
          initialized = false;
          mDBFacade = null;
          var _loc2_:ASAny;
-         final __ax4_iter_139 = mFriendSlots;
-         if (checkNullIteratee(__ax4_iter_139)) for (_tmp_ in __ax4_iter_139)
+         final __ax4_iter_155 = mFriendSlots;
+         if (checkNullIteratee(__ax4_iter_155)) for (_tmp_ in __ax4_iter_155)
          {
             _loc2_ = _tmp_;
             _loc2_.destroy();
@@ -651,15 +658,15 @@ public function  get_mustRefreshLeaderboard() : Bool
          }
          mAlertRenderer = null;
          var _loc3_:ASAny;
-         final __ax4_iter_140 = mOnlineFriends;
-         if (checkNullIteratee(__ax4_iter_140)) for (_tmp_ in __ax4_iter_140)
+         final __ax4_iter_156 = mOnlineFriends;
+         if (checkNullIteratee(__ax4_iter_156)) for (_tmp_ in __ax4_iter_156)
          {
             _loc3_ = _tmp_;
             _loc3_ = null;
          }
          var _loc1_:ASAny;
-         final __ax4_iter_141 = mOfflineFriends;
-         if (checkNullIteratee(__ax4_iter_141)) for (_tmp_ in __ax4_iter_141)
+         final __ax4_iter_157 = mOfflineFriends;
+         if (checkNullIteratee(__ax4_iter_157)) for (_tmp_ in __ax4_iter_157)
          {
             _loc1_ = _tmp_;
             _loc1_ = null;
@@ -758,6 +765,18 @@ public function  get_offlineFriends() : Vector<FriendInfo>
 public function  get_townStateMachine() : TownStateMachine
       {
          return mTownStateMachine;
+      }
+      
+      @:isVar public var getManageFriendsButton(get,never):UIButton;
+public function  get_getManageFriendsButton() : UIButton
+      {
+         return mFriendManagementButton;
+      }
+      
+      @:isVar public var getInviteFriendsButton(get,never):UIButton;
+public function  get_getInviteFriendsButton() : UIButton
+      {
+         return mInviteFriendButton;
       }
       
       public function enableMessageFriendButton() 

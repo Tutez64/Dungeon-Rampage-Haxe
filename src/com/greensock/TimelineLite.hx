@@ -404,7 +404,7 @@ public function  get_useFrames() : Bool
       
       public function shiftChildren(param1:Float, param2:Bool = false, param3:Float = 0) 
       {
-         var __ax4_iter_137:ASObject;
+         var __ax4_iter_153:ASObject;
          var _loc5_:String = null;
          var _loc4_= ASCompat.dynamicAs(this.gc ? ASCompat.dynamicAs(_endCaps[0], com.greensock.core.TweenCore) : _firstChild, com.greensock.core.TweenCore);
          while(_loc4_ != null)
@@ -417,8 +417,8 @@ public function  get_useFrames() : Bool
          }
          if(param2)
          {
-            __ax4_iter_137 = _labels;
-            if (checkNullIteratee(__ax4_iter_137)) for(_tmp_ in __ax4_iter_137.___keys())
+            __ax4_iter_153 = _labels;
+            if (checkNullIteratee(__ax4_iter_153)) for(_tmp_ in __ax4_iter_153.___keys())
             {
                _loc5_  = _tmp_;
                if(ASCompat.toNumber(_labels[_loc5_]) >= param3)

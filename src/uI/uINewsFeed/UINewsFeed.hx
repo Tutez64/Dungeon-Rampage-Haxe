@@ -69,8 +69,8 @@ package uI.uINewsFeed
          mDBFacade = param1;
          mRoot = param2;
          mFinishedCallback = param3;
-         mLogicalWorkComponent = new LogicalWorkComponent(mDBFacade);
-         mSceneGraphComponent = new SceneGraphComponent(mDBFacade);
+         mLogicalWorkComponent = new LogicalWorkComponent(mDBFacade,"UINewsFeed");
+         mSceneGraphComponent = new SceneGraphComponent(mDBFacade,"UINewsFeed");
          mAssetLoadingComponent = new AssetLoadingComponent(mDBFacade);
          mSceneGraphComponent.addChild(mRoot,(50 : UInt));
          setupUI();

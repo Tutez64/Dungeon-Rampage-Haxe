@@ -261,8 +261,8 @@ return param1;
                }
             }
          }
-         final __ax4_iter_97:ASObject = this._infoMap;
-         if (checkNullIteratee(__ax4_iter_97)) for(_tmp_ in __ax4_iter_97.___keys())
+         final __ax4_iter_123:ASObject = this._infoMap;
+         if (checkNullIteratee(__ax4_iter_123)) for(_tmp_ in __ax4_iter_123.___keys())
          {
             _loc12_  = _tmp_;
             if (checkNullIteratee(_loc4_)) for (_tmp_ in _loc4_)
@@ -287,7 +287,7 @@ return param1;
       
       public function updateKeyText() 
       {
-         var __ax4_iter_98:ASObject;
+         var __ax4_iter_124:ASObject;
          var _loc2_:String = null;
          var _loc1_= "<r><low>";
          if(ASCompat.stringAsBool(this._type))
@@ -307,8 +307,8 @@ return param1;
          }
          else
          {
-            __ax4_iter_98 = this._infoMap;
-            if (checkNullIteratee(__ax4_iter_98)) for(_tmp_ in __ax4_iter_98.___keys())
+            __ax4_iter_124 = this._infoMap;
+            if (checkNullIteratee(__ax4_iter_124)) for(_tmp_ in __ax4_iter_124.___keys())
             {
                _loc2_  = _tmp_;
                _loc1_ += " <font color=\'#" + Std.string(ASCompat.dynGetIndex(this._infoMap[_loc2_], 0)) + "\'>" + _loc2_ + "</font>";

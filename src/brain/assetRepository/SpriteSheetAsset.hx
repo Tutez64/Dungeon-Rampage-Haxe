@@ -123,8 +123,8 @@ package brain.assetRepository
       {
          mFacade = null;
          var _loc1_:BitmapData;
-         final __ax4_iter_63 = mFrames;
-         if (checkNullIteratee(__ax4_iter_63)) for (_tmp_ in __ax4_iter_63)
+         final __ax4_iter_66 = mFrames;
+         if (checkNullIteratee(__ax4_iter_66)) for (_tmp_ in __ax4_iter_66)
          {
             _loc1_ = _tmp_;
             _loc1_.dispose();

@@ -39,10 +39,14 @@ package actor.player.input
          
          mDBFacade = param1;
          mHeroOwner = param2;
+         mMovementVelocity = new Vector3D();
+         mInputHeading = new Vector3D();
          mCombatKeys = new Vector<Int>();
+         mPressedCombatKeysThisFrame = new Vector<Int>();
+         mConsumableKeys = new Vector<Int>();
+         mReleasedConsumableKeysThisFrame = new Vector<Int>();
          ASCompat.ASArray.pushMultiple(mCombatKeys, 90,88,67,66,74,75,76,89);
          mCombatDisabled = false;
-         mConsumableKeys = new Vector<Int>();
          ASCompat.ASArray.pushMultiple(mConsumableKeys, 49,50);
       }
       
@@ -124,9 +128,10 @@ public function  set_combatDisabled(param1:Bool) :Bool      {
       
       public function determineMotion() 
       {
-         mMovementVelocity = mInputVector.clone();
-         mMovementVelocity.scaleBy(mHeroOwner.movementSpeed);
-         mInputHeading = mInputVector.clone();
+         mMovementVelocity.copyFrom(mInputVector);
+         var _loc1_= mHeroOwner.movementSpeed;
+         mMovementVelocity.scaleBy(_loc1_);
+         mInputHeading.copyFrom(mInputVector);
       }
       
       @:isVar public var inputVelocity(get,never):Vector3D;

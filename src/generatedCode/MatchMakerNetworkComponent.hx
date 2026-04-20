@@ -10,47 +10,47 @@ package generatedCode
       
       var the_instance:MatchMaker;
       
-      public static inline final FLID_InfiniteDetails= (294 : UInt);
+      public static inline final FLID_InfiniteDetails= (295 : UInt);
       
-      public static inline final FLID_ClientRequestEntry= (295 : UInt);
+      public static inline final FLID_ClientRequestEntry= (296 : UInt);
       
-      public static inline final FLID_ClientRequestEntryResponce= (296 : UInt);
+      public static inline final FLID_ClientRequestEntryResponce= (297 : UInt);
       
-      public static inline final FLID_RequestExit= (297 : UInt);
+      public static inline final FLID_RequestExit= (298 : UInt);
       
-      public static inline final FLID_ClientExitComplete= (298 : UInt);
+      public static inline final FLID_ClientExitComplete= (299 : UInt);
       
-      public static inline final FLID_ClientDataFlushExit= (299 : UInt);
+      public static inline final FLID_ClientDataFlushExit= (300 : UInt);
       
-      public static inline final FLID_ClientRequestPartyMemberInvite= (300 : UInt);
+      public static inline final FLID_ClientRequestPartyMemberInvite= (301 : UInt);
       
-      public static inline final FLID_RequestPartyMemberInvite= (301 : UInt);
+      public static inline final FLID_RequestPartyMemberInvite= (302 : UInt);
       
-      public static inline final FLID_ClientRequestLeaveParty= (302 : UInt);
+      public static inline final FLID_ClientRequestLeaveParty= (303 : UInt);
       
-      public static inline final FLID_ClientInformPartyComposition= (303 : UInt);
+      public static inline final FLID_ClientInformPartyComposition= (304 : UInt);
       
-      public static inline final FLID_Proxy_ClientRequestEntryResponce= (304 : UInt);
+      public static inline final FLID_Proxy_ClientRequestEntryResponce= (305 : UInt);
       
-      public static inline final FLID_RequestEntry= (305 : UInt);
+      public static inline final FLID_RequestEntry= (306 : UInt);
       
-      public static inline final FLID_AreaManagerStatus= (306 : UInt);
+      public static inline final FLID_AreaManagerStatus= (307 : UInt);
       
-      public static inline final FLID_AreaStatus= (307 : UInt);
+      public static inline final FLID_AreaStatus= (308 : UInt);
       
-      public static inline final FLID_MatchMaker_Newgame= (308 : UInt);
+      public static inline final FLID_MatchMaker_Newgame= (309 : UInt);
       
-      public static inline final FLID_RequestExitProxy= (309 : UInt);
+      public static inline final FLID_RequestExitProxy= (310 : UInt);
       
-      public static inline final FLID_AreaExit= (310 : UInt);
+      public static inline final FLID_AreaExit= (311 : UInt);
       
-      public static inline final FLID_ForceAreaExit= (311 : UInt);
+      public static inline final FLID_ForceAreaExit= (312 : UInt);
       
-      public static inline final FLID_PlayerExit= (312 : UInt);
+      public static inline final FLID_PlayerExit= (313 : UInt);
       
-      public static inline final FLID_ReportAreaOutcome= (313 : UInt);
+      public static inline final FLID_ReportAreaOutcome= (314 : UInt);
       
-      public static inline final FLID_TimingProbResp= (314 : UInt);
+      public static inline final FLID_TimingProbResp= (315 : UInt);
       
       public function new(param1:MatchMaker, param2:GeneratedDcSocket, param3:UInt)
       {
@@ -70,7 +70,7 @@ package generatedCode
       
       override public function recvById(param1:DcNetworkPacket, param2:UInt) 
       {
-         switch(param2 - 294)
+         switch(param2 - 295)
          {
             case 0:
                recv_InfiniteDetails(param1);
@@ -122,7 +122,7 @@ package generatedCode
       public function send_ClientRequestEntry(param1:String, param2:UInt, param3:UInt, param4:UInt, param5:UInt, param6:UInt, param7:String) 
       {
          var _loc8_= new DcNetworkPacket();
-         Prepare_FieldUpdate(_loc8_,(295 : UInt));
+         Prepare_FieldUpdate(_loc8_,(296 : UInt));
          _loc8_.writeUTF(param1);
          _loc8_.writeUnsignedInt(param2);
          _loc8_.writeUnsignedInt(param3);
@@ -143,7 +143,7 @@ package generatedCode
       public function send_RequestExit(param1:UInt) 
       {
          var _loc2_= new DcNetworkPacket();
-         Prepare_FieldUpdate(_loc2_,(297 : UInt));
+         Prepare_FieldUpdate(_loc2_,(298 : UInt));
          _loc2_.writeUnsignedInt(param1);
          Send_packet(_loc2_);
       }
@@ -157,7 +157,7 @@ package generatedCode
       public function send_ClientRequestPartyMemberInvite(param1:String, param2:UInt) 
       {
          var _loc3_= new DcNetworkPacket();
-         Prepare_FieldUpdate(_loc3_,(300 : UInt));
+         Prepare_FieldUpdate(_loc3_,(301 : UInt));
          _loc3_.writeUTF(param1);
          _loc3_.writeUnsignedInt(param2);
          Send_packet(_loc3_);

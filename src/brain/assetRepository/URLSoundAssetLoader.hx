@@ -71,7 +71,7 @@ package brain.assetRepository
                      mErrorCallback(mAssetLoaderInfo);
                   }
                }
-            },false);
+            },false,"URLSoundAssetLoader.handleIOError");
          }
          else
          {

@@ -1104,6 +1104,16 @@ public function  get_securityChecksum() : Int
       {
          return ASCompat.dynamicAs(mapNodeById.itemFor(param1), gameMasterDictionary.GMMapNode);
       }
+      
+      public function getStackableByConstant(param1:String) : GMSkin
+      {
+         var _loc2_= ASCompat.dynamicAs(mSkinsByConstant.itemFor(param1), gameMasterDictionary.GMSkin);
+         if(_loc2_ == null)
+         {
+            Logger.error("Unable to find GMSkin for skinConstant: " + param1);
+         }
+         return _loc2_;
+      }
    }
 
 

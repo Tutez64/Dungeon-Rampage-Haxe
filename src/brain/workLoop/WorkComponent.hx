@@ -12,11 +12,17 @@ package brain.workLoop
       
       var mTasks:ASDictionary<ASAny,ASAny>;
       
-      public function new(param1:Facade, param2:WorkLoopManager)
+      var mOwnerName:String;
+      
+      var mTasksLabel:String;
+      
+      public function new(param1:Facade, param2:WorkLoopManager, param3:String = null)
       {
          super(param1);
+         mOwnerName = param3;
+         mTasksLabel = "Dictionary - tasks in " + (if (ASCompat.stringAsBool(param3)) param3 else "WorkComponent") + "()";
          mTasks = new ASDictionary<ASAny,ASAny>(true);
-         MemoryTracker.track(mTasks,"Dictionary - tasks in WorkComponent()","brain");
+         MemoryTracker.track(mTasks,mTasksLabel,"brain");
          mWorkLoopManager = param2;
       }
       
@@ -28,21 +34,21 @@ public function  get_gameClock() : GameClock
       
       public function doEveryFrame(param1:ASFunction) : Task
       {
-         var _loc2_= mWorkLoopManager.doEveryFrame(param1);
+         var _loc2_= mWorkLoopManager.doEveryFrame(param1,mOwnerName);
          mTasks[_loc2_] = 1;
          return _loc2_;
       }
       
       public function doLater(param1:Float, param2:ASFunction) : Task
       {
-         var _loc3_:Task = mWorkLoopManager.doLater(param1,param2,false);
+         var _loc3_:Task = mWorkLoopManager.doLater(param1,param2,false,mOwnerName);
          mTasks[_loc3_] = 1;
          return _loc3_;
       }
       
       public function doEverySeconds(param1:Float, param2:ASFunction) : Task
       {
-         var _loc3_:Task = mWorkLoopManager.doEverySeconds(param1,param2,true);
+         var _loc3_:Task = mWorkLoopManager.doEverySeconds(param1,param2,true,mOwnerName);
          mTasks[_loc3_] = 1;
          return _loc3_;
       }
@@ -50,20 +56,21 @@ public function  get_gameClock() : GameClock
       public function clear() 
       {
          var _loc1_:ASAny;
-         final __ax4_iter_206 = mTasks;
-         if (checkNullIteratee(__ax4_iter_206)) for(_tmp_ in __ax4_iter_206.keys())
+         final __ax4_iter_228 = mTasks;
+         if (checkNullIteratee(__ax4_iter_228)) for(_tmp_ in __ax4_iter_228.keys())
          {
             _loc1_ = _tmp_;
             cast(_loc1_, Task).destroy();
          }
          mTasks = new ASDictionary<ASAny,ASAny>(true);
+         MemoryTracker.track(mTasks,mTasksLabel,"brain");
       }
       
       override public function destroy() 
       {
          var _loc1_:ASAny;
-         final __ax4_iter_207 = mTasks;
-         if (checkNullIteratee(__ax4_iter_207)) for(_tmp_ in __ax4_iter_207.keys())
+         final __ax4_iter_229 = mTasks;
+         if (checkNullIteratee(__ax4_iter_229)) for(_tmp_ in __ax4_iter_229.keys())
          {
             _loc1_ = _tmp_;
             cast(_loc1_, Task).destroy();

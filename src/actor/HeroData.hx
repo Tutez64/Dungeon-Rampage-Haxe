@@ -20,6 +20,10 @@ package actor
       
       override public function getSwfFilePath() : String
       {
+         if(ASCompat.stringAsBool(mGMSkin.HDSwfFilepath))
+         {
+            return DBFacade.buildFullDownloadPath(mGMSkin.HDSwfFilepath);
+         }
          return DBFacade.buildFullDownloadPath(mGMSkin.SwfFilepath);
       }
       
@@ -86,6 +90,11 @@ package actor
       override public function  get_deathVolume() : Float
       {
          return mGMSkin.DeathVol;
+      }
+      
+      override public function  get_scale3DModel() : Float
+      {
+         return mGMSkin.Scale3DModel;
       }
    }
 

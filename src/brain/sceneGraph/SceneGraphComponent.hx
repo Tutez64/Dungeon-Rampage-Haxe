@@ -21,11 +21,11 @@ package brain.sceneGraph
       
       var mCurtainActive:Bool = false;
       
-      public function new(param1:Facade)
+      public function new(param1:Facade, param2:String = null)
       {
          super(param1);
          mDisplayObjects = new Set();
-         MemoryTracker.track(this,"SceneGraphComponent - created in SceneGraphComponent()","brain");
+         MemoryTracker.track(this,"SceneGraphComponent - " + (if (ASCompat.stringAsBool(param2)) param2 else "unknown"),"brain");
       }
       
       public static function bringToFront(param1:DisplayObject) 

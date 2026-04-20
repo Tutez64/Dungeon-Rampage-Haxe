@@ -84,8 +84,8 @@ package actor
          mBodyFilters = [];
          mVelocity = new Vector3D(0,0,0);
          mEventComponent = new EventComponent(mFacade);
-         mPreRenderWorkComponent = new PreRenderWorkComponent(mFacade);
-         mLogicalWorkComponent = new LogicalWorkComponent(mFacade);
+         mPreRenderWorkComponent = new PreRenderWorkComponent(mFacade,"ActorView");
+         mLogicalWorkComponent = new LogicalWorkComponent(mFacade,"ActorView");
          mSoundComponent = new DBSoundComponent(param1);
          mRoot.name = "ActorView.mRoot_" + param2.id;
          mAssetLoadingComponent = new AssetLoadingComponent(mFacade);
@@ -255,6 +255,10 @@ public function  get_body() : Sprite
          super.init();
          mBodyAnimRenderer = new ActorRenderer(mDBFacade,mParentActorObject,true);
          mBodyAnimRenderer.loadAssets();
+         if(mParentActorObject.actorData.assetType == "SPRITE_SHEET")
+         {
+            mBody.scaleX = mBody.scaleY = mParentActorObject.actorData.scale3DModel;
+         }
          mBody.addChild(mBodyAnimRenderer);
          applyColor(mBodyAnimRenderer);
          buildNametag();

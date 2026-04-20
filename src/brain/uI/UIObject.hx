@@ -17,6 +17,18 @@ package brain.uI
       
       static inline final DEFAULT_TOOLTIP_LAYER= 107;
       
+      static inline final NAVIGATION_UP= "UP";
+      
+      static inline final NAVIGATION_DOWN= "DOWN";
+      
+      static inline final NAVIGATION_LEFT= "LEFT";
+      
+      static inline final NAVIGATION_RIGHT= "RIGHT";
+      
+      static inline final NAVIGATION_SELECTED= "SELECTED";
+      
+      static inline final NAVIGATION_SET_TO_UNSELECTED= "SET_TO_UNSELECTED";
+      
       var mEnabled:Bool = true;
       
       var mFacade:Facade;
@@ -38,6 +50,12 @@ package brain.uI
       var mDontKillMyChildren:Bool = false;
       
       var mIsParentedToStage:Bool = false;
+      
+      var mNavigationDictionary:ASDictionary<ASAny,ASAny> = new ASDictionary(true);
+      
+      var mNavigationAdditionalInteraction:ASDictionary<ASAny,ASAny> = new ASDictionary(true);
+      
+      var mIsFocused:Bool = false;
       
       public function new(param1:Facade, param2:MovieClip, param3:Int = 0, param4:Bool = false)
       {
@@ -113,6 +131,36 @@ return param1;
          mRoot.addEventListener("rollOut",onRollOut);
       }
       
+      public function setFocused(param1:Bool) 
+      {
+         if(mIsFocused != param1)
+         {
+            mIsFocused = param1;
+            if(mIsFocused)
+            {
+               onFocused();
+            }
+            else
+            {
+               onUnfocused();
+            }
+         }
+      }
+      
+      function onFocused() 
+      {
+         onRollOver(null);
+      }
+      
+      function onUnfocused() 
+      {
+         onRollOut(null);
+      }
+      
+      public function onSelected() 
+      {
+      }
+      
       function removeListeners() 
       {
          mRoot.removeEventListener("rollOver",onRollOver);
@@ -130,7 +178,7 @@ return param1;
             }
             else
             {
-               mTooltipTask = mFacade.preRenderWorkManager.doLater(mTooltipDelay,showTooltip);
+               mTooltipTask = mFacade.preRenderWorkManager.doLater(mTooltipDelay,showTooltip,false,"UIObject.tooltip");
             }
          }
       }
@@ -304,14 +352,241 @@ public function  set_dontKillMyChildren(param1:Bool) :Bool      {
                   mRoot.removeChildAt(0);
                }
             }
+            mNavigationDictionary = null;
             mRoot = null;
             mFacade = null;
          }
       }
       
+      public function canBeFocused() : Bool
+      {
+         return enabled && visible;
+      }
+      
+      public function isFocused() : Bool
+      {
+         return mIsFocused;
+      }
+      
       public function setRootMovieClipAsBitMap() 
       {
          mRoot.cacheAsBitmap = true;
+      }
+      
+      public function isToTheLeftOf(param1:UIObject) 
+      {
+         this.rightNavigation = param1;
+         param1.leftNavigation = this;
+      }
+      
+      public function isAbove(param1:UIObject) 
+      {
+         this.downNavigation = param1;
+         param1.upNavigation = this;
+      }
+      
+            
+      @:isVar public var leftNavigation(get,set):UIObject;
+public function  get_leftNavigation() : UIObject
+      {
+         return ASCompat.dynamicAs(mNavigationDictionary["LEFT"], UIObject);
+      }
+      
+            
+      @:isVar public var rightNavigation(get,set):UIObject;
+public function  get_rightNavigation() : UIObject
+      {
+         return ASCompat.dynamicAs(mNavigationDictionary["RIGHT"], UIObject);
+      }
+      
+            
+      @:isVar public var upNavigation(get,set):UIObject;
+public function  get_upNavigation() : UIObject
+      {
+         return ASCompat.dynamicAs(mNavigationDictionary["UP"], UIObject);
+      }
+      
+            
+      @:isVar public var downNavigation(get,set):UIObject;
+public function  get_downNavigation() : UIObject
+      {
+         return ASCompat.dynamicAs(mNavigationDictionary["DOWN"], UIObject);
+      }
+function  set_leftNavigation(param1:UIObject) :UIObject      {
+         if(mNavigationDictionary["LEFT"] == param1)
+         {
+            Logger.warnch("UI","Navigation left already set to same target on: " + this.mRoot.name);
+            return param1;
+         }
+         if(ASCompat.dictionaryLookupNeNull(mNavigationDictionary, "LEFT"))
+         {
+            throw new Error("This UIObject (" + this.mRoot.name + ") can already navigate left towards: " + Std.string(mNavigationDictionary["LEFT"].mRoot.name));
+         }
+         mNavigationDictionary["LEFT"] = param1;
+return param1;
+      }
+function  set_rightNavigation(param1:UIObject) :UIObject      {
+         if(mNavigationDictionary["RIGHT"] == param1)
+         {
+            Logger.warnch("UI","Navigation right already set to same target on: " + this.mRoot.name);
+            return param1;
+         }
+         if(ASCompat.dictionaryLookupNeNull(mNavigationDictionary, "RIGHT"))
+         {
+            throw new Error("This UIObject (" + this.mRoot.name + ") can already navigate right towards: " + Std.string(mNavigationDictionary["RIGHT"].mRoot.name));
+         }
+         mNavigationDictionary["RIGHT"] = param1;
+return param1;
+      }
+function  set_upNavigation(param1:UIObject) :UIObject      {
+         if(mNavigationDictionary["UP"] == param1)
+         {
+            Logger.warnch("UI","Navigation up already set to same target on: " + this.mRoot.name);
+            return param1;
+         }
+         if(ASCompat.dictionaryLookupNeNull(mNavigationDictionary, "UP"))
+         {
+            throw new Error("This UIObject (" + this.mRoot.name + ") can already navigate up towards: " + Std.string(mNavigationDictionary["UP"].mRoot.name));
+         }
+         mNavigationDictionary["UP"] = param1;
+return param1;
+      }
+function  set_downNavigation(param1:UIObject) :UIObject      {
+         if(mNavigationDictionary["DOWN"] == param1)
+         {
+            Logger.warnch("UI","Navigation down already set to same target on: " + this.mRoot.name);
+            return param1;
+         }
+         if(ASCompat.dictionaryLookupNeNull(mNavigationDictionary, "DOWN"))
+         {
+            throw new Error("This UIObject (" + this.mRoot.name + ") can already navigate down towards: " + Std.string(mNavigationDictionary["DOWN"].mRoot.name));
+         }
+         mNavigationDictionary["DOWN"] = param1;
+return param1;
+      }
+      
+      public function clearLeftNavigation() 
+      {
+         mNavigationDictionary["LEFT"] = null;
+      }
+      
+      public function clearRightNavigation() 
+      {
+         mNavigationDictionary["RIGHT"] = null;
+      }
+      
+      public function clearUpNavigation() 
+      {
+         mNavigationDictionary["UP"] = null;
+      }
+      
+      public function clearDownNavigation() 
+      {
+         mNavigationDictionary["DOWN"] = null;
+      }
+      
+      public function clearNavigationAndInteractions() 
+      {
+         mNavigationDictionary["LEFT"] = null;
+         mNavigationDictionary["RIGHT"] = null;
+         mNavigationDictionary["UP"] = null;
+         mNavigationDictionary["DOWN"] = null;
+         mNavigationAdditionalInteraction["LEFT"] = null;
+         mNavigationAdditionalInteraction["RIGHT"] = null;
+         mNavigationAdditionalInteraction["UP"] = null;
+         mNavigationAdditionalInteraction["DOWN"] = null;
+         mNavigationAdditionalInteraction["SELECTED"] = null;
+         mNavigationAdditionalInteraction["SET_TO_UNSELECTED"] = null;
+      }
+      
+            
+      @:isVar public var leftNavigationAdditionalInteraction(get,set):ASFunction;
+public function  get_leftNavigationAdditionalInteraction() : ASFunction
+      {
+         return ASCompat.asFunction(mNavigationAdditionalInteraction["LEFT"]);
+      }
+      
+            
+      @:isVar public var rightNavigationAdditionalInteraction(get,set):ASFunction;
+public function  get_rightNavigationAdditionalInteraction() : ASFunction
+      {
+         return ASCompat.asFunction(mNavigationAdditionalInteraction["RIGHT"]);
+      }
+      
+            
+      @:isVar public var upNavigationAdditionalInteraction(get,set):ASFunction;
+public function  get_upNavigationAdditionalInteraction() : ASFunction
+      {
+         return ASCompat.asFunction(mNavigationAdditionalInteraction["UP"]);
+      }
+      
+            
+      @:isVar public var downNavigationAdditionalInteraction(get,set):ASFunction;
+public function  get_downNavigationAdditionalInteraction() : ASFunction
+      {
+         return ASCompat.asFunction(mNavigationAdditionalInteraction["DOWN"]);
+      }
+      
+            
+      @:isVar public var navigationSelectedInteraction(get,set):ASFunction;
+public function  get_navigationSelectedInteraction() : ASFunction
+      {
+         return ASCompat.asFunction(mNavigationAdditionalInteraction["SELECTED"]);
+      }
+      
+            
+      @:isVar public var navigationSetToUnselectedInteraction(get,set):ASFunction;
+public function  get_navigationSetToUnselectedInteraction() : ASFunction
+      {
+         return ASCompat.asFunction(mNavigationAdditionalInteraction["SET_TO_UNSELECTED"]);
+      }
+function  set_leftNavigationAdditionalInteraction(param1:ASFunction) :ASFunction      {
+         if(ASCompat.dictionaryLookupNeNull(mNavigationAdditionalInteraction, "LEFT"))
+         {
+            throw new Error("This UIObject (" + this.mRoot.name + ") already has an additional interaction:  " + Std.string(mNavigationAdditionalInteraction["LEFT"].mRoot.name));
+         }
+         mNavigationAdditionalInteraction["LEFT"] = param1;
+return param1;
+      }
+function  set_rightNavigationAdditionalInteraction(param1:ASFunction) :ASFunction      {
+         if(ASCompat.dictionaryLookupNeNull(mNavigationAdditionalInteraction, "RIGHT"))
+         {
+            throw new Error("This UIObject (" + this.mRoot.name + ") already has an additional interaction:  " + Std.string(mNavigationAdditionalInteraction["RIGHT"].mRoot.name));
+         }
+         mNavigationAdditionalInteraction["RIGHT"] = param1;
+return param1;
+      }
+function  set_upNavigationAdditionalInteraction(param1:ASFunction) :ASFunction      {
+         if(ASCompat.dictionaryLookupNeNull(mNavigationAdditionalInteraction, "UP"))
+         {
+            throw new Error("This UIObject (" + this.mRoot.name + ") already has an additional interaction:  " + Std.string(mNavigationAdditionalInteraction["UP"].mRoot.name));
+         }
+         mNavigationAdditionalInteraction["UP"] = param1;
+return param1;
+      }
+function  set_downNavigationAdditionalInteraction(param1:ASFunction) :ASFunction      {
+         if(ASCompat.dictionaryLookupNeNull(mNavigationAdditionalInteraction, "DOWN"))
+         {
+            throw new Error("This UIObject (" + this.mRoot.name + ") already has an additional interaction: " + Std.string(mNavigationAdditionalInteraction["DOWN"].mRoot.name));
+         }
+         mNavigationAdditionalInteraction["DOWN"] = param1;
+return param1;
+      }
+function  set_navigationSelectedInteraction(param1:ASFunction) :ASFunction      {
+         if(ASCompat.dictionaryLookupNeNull(mNavigationAdditionalInteraction, "SELECTED"))
+         {
+            throw new Error("This UIObject (" + this.mRoot.name + ") already has a selected interaction: " + Std.string(mNavigationAdditionalInteraction["SELECTED"].mRoot.name));
+         }
+         mNavigationAdditionalInteraction["SELECTED"] = param1;
+return param1;
+      }
+function  set_navigationSetToUnselectedInteraction(param1:ASFunction) :ASFunction      {
+         if(ASCompat.dictionaryLookupNeNull(mNavigationAdditionalInteraction, "SET_TO_UNSELECTED"))
+         {
+            throw new Error("This UIObject (" + this.mRoot.name + ") already has an unselected interaction: " + Std.string(mNavigationAdditionalInteraction["SET_TO_UNSELECTED"].mRoot.name));
+         }
+         mNavigationAdditionalInteraction["SET_TO_UNSELECTED"] = param1;
+return param1;
       }
    }
 

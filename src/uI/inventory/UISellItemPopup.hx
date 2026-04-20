@@ -5,7 +5,8 @@ package uI.inventory
    import brain.assetRepository.SwfAsset;
    import brain.logger.Logger;
    import facade.DBFacade;
-   import uI.DBUITwoButtonPopup;
+   import facade.Locale;
+   import uI.popup.DBUITwoButtonPopup;
    import flash.display.MovieClip;
    
     class UISellItemPopup extends DBUITwoButtonPopup
@@ -46,6 +47,7 @@ package uI.inventory
          ASCompat.setProperty((mPopup : ASAny).power, "visible", itemInfo != null);
          if(itemInfo != null)
          {
+            ASCompat.setProperty((mPopup : ASAny).power.attack_label, "text", Locale.getString("POWER"));
             ASCompat.setProperty((mPopup : ASAny).power.label, "text", Std.string(itemInfo.power));
          }
          swfPath = mInfo.uiSwfFilepath;

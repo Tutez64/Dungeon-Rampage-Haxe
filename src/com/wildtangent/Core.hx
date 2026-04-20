@@ -63,8 +63,8 @@ package com.wildtangent
       public function launchMethods() 
       {
          var _loc1_:String = null;
-         final __ax4_iter_77 = methodStorage;
-         if (checkNullIteratee(__ax4_iter_77)) for(_tmp_ in 0...__ax4_iter_77.length)
+         final __ax4_iter_80 = methodStorage;
+         if (checkNullIteratee(__ax4_iter_80)) for(_tmp_ in 0...__ax4_iter_80.length)
          {
             _loc1_  = Std.string(_tmp_);
             if((methodStorage : ASAny)[ASCompat.toInt(_loc1_)].obj != null)

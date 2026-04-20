@@ -48,7 +48,7 @@ package combat.weapon
          mDBFacade = param1;
          mWeapon = param2;
          mHero = param3;
-         mLogicalWorkComponent = new LogicalWorkComponent(mDBFacade);
+         mLogicalWorkComponent = new LogicalWorkComponent(mDBFacade,"WeaponController");
          mQueueAttack = null;
          buildAttackArray();
       }
@@ -384,6 +384,11 @@ public function  get_weaponRange() : UInt
       public function destroy() 
       {
          mIsInCooldown = false;
+         if(mLogicalWorkComponent != null)
+         {
+            mLogicalWorkComponent.destroy();
+            mLogicalWorkComponent = null;
+         }
       }
    }
 

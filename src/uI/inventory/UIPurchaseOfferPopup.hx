@@ -3,6 +3,7 @@ package uI.inventory
    import brain.assetRepository.SwfAsset;
    import brain.logger.Logger;
    import facade.DBFacade;
+   import facade.GameMasterLocale;
    import facade.Locale;
    import gameMasterDictionary.GMHero;
    import gameMasterDictionary.GMNpc;
@@ -11,7 +12,7 @@ package uI.inventory
    import gameMasterDictionary.GMSkin;
    import gameMasterDictionary.GMWeaponAesthetic;
    import gameMasterDictionary.GMWeaponItem;
-   import uI.DBUITwoButtonPopup;
+   import uI.popup.DBUITwoButtonPopup;
    import flash.display.MovieClip;
    
     class UIPurchaseOfferPopup extends DBUITwoButtonPopup
@@ -71,11 +72,12 @@ package uI.inventory
             {
                weaponItem = ASCompat.dynamicAs(mDBFacade.gameMaster.weaponItemById.itemFor(offerDetail.WeaponId), gameMasterDictionary.GMWeaponItem);
                weaponAesthetic = weaponItem.getWeaponAesthetic(offerDetail.Level);
-               offerName = weaponAesthetic.Name;
+               offerName = GameMasterLocale.getGameMasterSubString("WEAPON_AESTHETIC_NAME",weaponAesthetic.Constant);
                swfPath = weaponAesthetic.IconSwf;
                iconName = weaponAesthetic.IconName;
                ASCompat.setProperty((mPopup : ASAny).power, "visible", true);
                ASCompat.setProperty((mPopup : ASAny).power.label, "text", offerDetail.WeaponPower);
+               ASCompat.setProperty((mPopup : ASAny).power.attack_label, "text", Locale.getString("POWER"));
             }
             else if(offerDetail.HeroId != 0)
             {
@@ -83,7 +85,7 @@ package uI.inventory
                defaultSkin = mDBFacade.gameMaster.getSkinByConstant(hero.DefaultSkin);
                if(defaultSkin != null)
                {
-                  offerName = hero.Name;
+                  offerName = GameMasterLocale.getGameMasterSubString("SKIN_NAME",defaultSkin.Constant);
                   swfPath = defaultSkin.UISwfFilepath;
                   iconName = defaultSkin.IconName;
                }
@@ -91,14 +93,14 @@ package uI.inventory
             else if(offerDetail.PetId != 0)
             {
                pet = ASCompat.dynamicAs(mDBFacade.gameMaster.npcById.itemFor(offerDetail.PetId), gameMasterDictionary.GMNpc);
-               offerName = pet.Name;
+               offerName = GameMasterLocale.getGameMasterSubString("PET_NAME",pet.Constant);
                swfPath = pet.IconSwfFilepath;
                iconName = pet.IconName;
             }
             else if(offerDetail.SkinId != 0)
             {
                skin = mDBFacade.gameMaster.getSkinByType(offerDetail.SkinId);
-               offerName = skin.Name;
+               offerName = GameMasterLocale.getGameMasterSubString("SKIN_NAME",skin.Constant);
                swfPath = skin.UISwfFilepath;
                iconName = skin.IconName;
             }

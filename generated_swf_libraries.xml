@@ -1,5 +1,6 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <project>
+	<library path="Resources/Art2D/cutscene/db_cutscene_intro_minotaur.swf" id="ax4_swf_resources_art2d_cutscene_db_cutscene_intro_minotaur_swf" preload="false" generate="false" />
 	<library path="Resources/Art2D/Doobers/db_items_doobers.swf" id="ax4_swf_resources_art2d_doobers_db_items_doobers_swf" preload="false" generate="true" />
 	<library path="Resources/Art2D/Environments/boss/db_prop_boss_dragon.swf" id="ax4_swf_resources_art2d_environments_boss_db_prop_boss_dragon_swf" preload="false" generate="true" />
 	<library path="Resources/Art2D/Environments/boss/db_prop_boss_golem.swf" id="ax4_swf_resources_art2d_environments_boss_db_prop_boss_golem_swf" preload="false" generate="true" />
@@ -35,6 +36,7 @@
 	<library path="Resources/Art2D/FX/death/db_anm_knight_death_fx.swf" id="ax4_swf_resources_art2d_fx_death_db_anm_knight_death_fx_swf" preload="false" generate="false" />
 	<library path="Resources/Art2D/Icons/Avatars/db_body_berserker.swf" id="ax4_swf_resources_art2d_icons_avatars_db_body_berserker_swf" preload="false" generate="false" />
 	<library path="Resources/Art2D/Icons/Avatars/db_body_chef.swf" id="ax4_swf_resources_art2d_icons_avatars_db_body_chef_swf" preload="false" generate="false" />
+	<library path="Resources/Art2D/Icons/Avatars/db_body_ghostsamurai.swf" id="ax4_swf_resources_art2d_icons_avatars_db_body_ghostsamurai_swf" preload="false" generate="false" />
 	<library path="Resources/Art2D/Icons/Avatars/db_body_ranger.swf" id="ax4_swf_resources_art2d_icons_avatars_db_body_ranger_swf" preload="false" generate="false" />
 	<library path="Resources/Art2D/Icons/Avatars/db_body_sorcerer.swf" id="ax4_swf_resources_art2d_icons_avatars_db_body_sorcerer_swf" preload="false" generate="false" />
 	<library path="Resources/Art2D/Icons/Avatars/db_body_vampirehunter.swf" id="ax4_swf_resources_art2d_icons_avatars_db_body_vampirehunter_swf" preload="false" generate="false" />
@@ -48,23 +50,25 @@
 	<library path="Resources/Art2D/Icons/Princess/db_icons_princess.swf" id="ax4_swf_resources_art2d_icons_princess_db_icons_princess_swf" preload="false" generate="false" />
 	<library path="Resources/Art2D/Icons/Stats/db_icon_stats.swf" id="ax4_swf_resources_art2d_icons_stats_db_icon_stats_swf" preload="false" generate="false" />
 	<library path="Resources/Art2D/Icons/Treasure/db_icons_treasure.swf" id="ax4_swf_resources_art2d_icons_treasure_db_icons_treasure_swf" preload="false" generate="false" />
+	<library path="Resources/Art2D/Icons/weapon_ability/db_icons_weapon_ability.swf" id="ax4_swf_resources_art2d_icons_weapon_ability_db_icons_weapon_ability_swf" preload="false" generate="false" />
 	<library path="Resources/Art2D/Icons/Weapons/db_icons_weapon_axes.swf" id="ax4_swf_resources_art2d_icons_weapons_db_icons_weapon_axes_swf" preload="false" generate="false" />
 	<library path="Resources/Art2D/Icons/Weapons/db_icons_weapon_bows.swf" id="ax4_swf_resources_art2d_icons_weapons_db_icons_weapon_bows_swf" preload="false" generate="false" />
 	<library path="Resources/Art2D/Icons/Weapons/db_icons_weapon_cookingpot.swf" id="ax4_swf_resources_art2d_icons_weapons_db_icons_weapon_cookingpot_swf" preload="false" generate="false" />
 	<library path="Resources/Art2D/Icons/Weapons/db_icons_weapon_crossbows.swf" id="ax4_swf_resources_art2d_icons_weapons_db_icons_weapon_crossbows_swf" preload="false" generate="false" />
 	<library path="Resources/Art2D/Icons/Weapons/db_icons_weapon_gloves.swf" id="ax4_swf_resources_art2d_icons_weapons_db_icons_weapon_gloves_swf" preload="false" generate="false" />
 	<library path="Resources/Art2D/Icons/Weapons/db_icons_weapon_hammers.swf" id="ax4_swf_resources_art2d_icons_weapons_db_icons_weapon_hammers_swf" preload="false" generate="false" />
+	<library path="Resources/Art2D/Icons/Weapons/db_icons_weapon_katanas.swf" id="ax4_swf_resources_art2d_icons_weapons_db_icons_weapon_katanas_swf" preload="false" generate="false" />
 	<library path="Resources/Art2D/Icons/Weapons/db_icons_weapon_lightningstaves.swf" id="ax4_swf_resources_art2d_icons_weapons_db_icons_weapon_lightningstaves_swf" preload="false" generate="false" />
 	<library path="Resources/Art2D/Icons/Weapons/db_icons_weapon_magic.swf" id="ax4_swf_resources_art2d_icons_weapons_db_icons_weapon_magic_swf" preload="false" generate="false" />
 	<library path="Resources/Art2D/Icons/Weapons/db_icons_weapon_meatcleaver.swf" id="ax4_swf_resources_art2d_icons_weapons_db_icons_weapon_meatcleaver_swf" preload="false" generate="false" />
 	<library path="Resources/Art2D/Icons/Weapons/db_icons_weapon_swords.swf" id="ax4_swf_resources_art2d_icons_weapons_db_icons_weapon_swords_swf" preload="false" generate="false" />
 	<library path="Resources/Art2D/Icons/Weapons/db_icons_weapon_throwingweapons.swf" id="ax4_swf_resources_art2d_icons_weapons_db_icons_weapon_throwingweapons_swf" preload="false" generate="false" />
 	<library path="Resources/Art2D/Icons/Weapons/db_icons_weapon_traps.swf" id="ax4_swf_resources_art2d_icons_weapons_db_icons_weapon_traps_swf" preload="false" generate="false" />
-	<library path="Resources/Art2D/Icons/weapon_ability/db_icons_weapon_ability.swf" id="ax4_swf_resources_art2d_icons_weapon_ability_db_icons_weapon_ability_swf" preload="false" generate="false" />
+	<library path="Resources/Art2D/projectiles/db_projectiles_library.swf" id="ax4_swf_resources_art2d_projectiles_db_projectiles_library_swf" preload="false" generate="false" />
 	<library path="Resources/Art2D/UI/db_DRfriends_UI_score_report.swf" id="ax4_swf_resources_art2d_ui_db_drfriends_ui_score_report_swf" preload="false" generate="false" />
-	<library path="Resources/Art2D/UI/db_UI_HUD.swf" id="ax4_swf_resources_art2d_ui_db_ui_hud_swf" preload="false" generate="false" />
 	<library path="Resources/Art2D/UI/db_UI_chest_reveal.swf" id="ax4_swf_resources_art2d_ui_db_ui_chest_reveal_swf" preload="false" generate="false" />
 	<library path="Resources/Art2D/UI/db_UI_daily_reward.swf" id="ax4_swf_resources_art2d_ui_db_ui_daily_reward_swf" preload="false" generate="false" />
+	<library path="Resources/Art2D/UI/db_UI_HUD.swf" id="ax4_swf_resources_art2d_ui_db_ui_hud_swf" preload="false" generate="false" />
 	<library path="Resources/Art2D/UI/db_UI_leaderboard.swf" id="ax4_swf_resources_art2d_ui_db_ui_leaderboard_swf" preload="false" generate="false" />
 	<library path="Resources/Art2D/UI/db_UI_loading_screen.swf" id="ax4_swf_resources_art2d_ui_db_ui_loading_screen_swf" preload="false" generate="false" />
 	<library path="Resources/Art2D/UI/db_UI_map.swf" id="ax4_swf_resources_art2d_ui_db_ui_map_swf" preload="false" generate="false" />
@@ -73,9 +77,8 @@
 	<library path="Resources/Art2D/UI/db_UI_screens.swf" id="ax4_swf_resources_art2d_ui_db_ui_screens_swf" preload="false" generate="false" />
 	<library path="Resources/Art2D/UI/db_UI_skip_button.swf" id="ax4_swf_resources_art2d_ui_db_ui_skip_button_swf" preload="false" generate="false" />
 	<library path="Resources/Art2D/UI/db_UI_town.swf" id="ax4_swf_resources_art2d_ui_db_ui_town_swf" preload="false" generate="false" />
+	<library path="Resources/Art2D/UI/loading_screen - Copie.swf" id="ax4_swf_resources_art2d_ui_loading_screen_copie_swf" preload="false" generate="false" />
 	<library path="Resources/Art2D/UI/loading_screen.swf" id="ax4_swf_resources_art2d_ui_loading_screen_swf" preload="false" generate="false" />
-	<library path="Resources/Art2D/cutscene/db_cutscene_intro_minotaur.swf" id="ax4_swf_resources_art2d_cutscene_db_cutscene_intro_minotaur_swf" preload="false" generate="false" />
-	<library path="Resources/Art2D/projectiles/db_projectiles_library.swf" id="ax4_swf_resources_art2d_projectiles_db_projectiles_library_swf" preload="false" generate="false" />
 	<library path="Resources/Art3D/Avatar/Berserker/db_char_berserker.swf" id="ax4_swf_resources_art3d_avatar_berserker_db_char_berserker_swf" preload="false" generate="false" />
 	<library path="Resources/Art3D/Avatar/Berserker/db_char_berserker_axe01A.swf" id="ax4_swf_resources_art3d_avatar_berserker_db_char_berserker_axe01a_swf" preload="false" generate="false" />
 	<library path="Resources/Art3D/Avatar/Berserker/db_char_berserker_axe01B.swf" id="ax4_swf_resources_art3d_avatar_berserker_db_char_berserker_axe01b_swf" preload="false" generate="false" />
@@ -182,7 +185,29 @@
 	<library path="Resources/Art3D/Avatar/chefColorBiker/db_char_chefColorBiker_meatCleaver02B.swf" id="ax4_swf_resources_art3d_avatar_chefcolorbiker_db_char_chefcolorbiker_meatcleaver02b_swf" preload="false" generate="false" />
 	<library path="Resources/Art3D/Avatar/chefColorBiker/db_char_chefColorBiker_meatCleaver03B.swf" id="ax4_swf_resources_art3d_avatar_chefcolorbiker_db_char_chefcolorbiker_meatcleaver03b_swf" preload="false" generate="false" />
 	<library path="Resources/Art3D/Avatar/ghostSamurai/db_char_ghostSamurai.swf" id="ax4_swf_resources_art3d_avatar_ghostsamurai_db_char_ghostsamurai_swf" preload="false" generate="false" />
+	<library path="Resources/Art3D/Avatar/ghostSamurai/db_char_ghostSamurai_glowSword.swf" id="ax4_swf_resources_art3d_avatar_ghostsamurai_db_char_ghostsamurai_glowsword_swf" preload="false" generate="false" />
+	<library path="Resources/Art3D/Avatar/ghostSamurai/db_char_ghostSamurai_katana01B.swf" id="ax4_swf_resources_art3d_avatar_ghostsamurai_db_char_ghostsamurai_katana01b_swf" preload="false" generate="false" />
+	<library path="Resources/Art3D/Avatar/ghostSamurai/db_char_ghostSamurai_katana02A.swf" id="ax4_swf_resources_art3d_avatar_ghostsamurai_db_char_ghostsamurai_katana02a_swf" preload="false" generate="false" />
+	<library path="Resources/Art3D/Avatar/ghostSamurai/db_char_ghostSamurai_katana02B.swf" id="ax4_swf_resources_art3d_avatar_ghostsamurai_db_char_ghostsamurai_katana02b_swf" preload="false" generate="false" />
+	<library path="Resources/Art3D/Avatar/ghostSamurai/db_char_ghostSamurai_katana03A.swf" id="ax4_swf_resources_art3d_avatar_ghostsamurai_db_char_ghostsamurai_katana03a_swf" preload="false" generate="false" />
+	<library path="Resources/Art3D/Avatar/ghostSamurai/db_char_ghostSamurai_katana03B.swf" id="ax4_swf_resources_art3d_avatar_ghostsamurai_db_char_ghostsamurai_katana03b_swf" preload="false" generate="false" />
+	<library path="Resources/Art3D/Avatar/ghostSamurai/db_char_ghostSamurai_katana03C.swf" id="ax4_swf_resources_art3d_avatar_ghostsamurai_db_char_ghostsamurai_katana03c_swf" preload="false" generate="false" />
+	<library path="Resources/Art3D/Avatar/ghostSamurai/db_char_ghostSamurai_knightSword.swf" id="ax4_swf_resources_art3d_avatar_ghostsamurai_db_char_ghostsamurai_knightsword_swf" preload="false" generate="false" />
+	<library path="Resources/Art3D/Avatar/ghostSamurai/db_char_ghostSamurai_lgnKatana01.swf" id="ax4_swf_resources_art3d_avatar_ghostsamurai_db_char_ghostsamurai_lgnkatana01_swf" preload="false" generate="false" />
+	<library path="Resources/Art3D/Avatar/ghostSamurai/db_char_ghostSamurai_lgnKatana02.swf" id="ax4_swf_resources_art3d_avatar_ghostsamurai_db_char_ghostsamurai_lgnkatana02_swf" preload="false" generate="false" />
+	<library path="Resources/Art3D/Avatar/ghostSamurai/db_char_ghostSamurai_lgnKatana03.swf" id="ax4_swf_resources_art3d_avatar_ghostsamurai_db_char_ghostsamurai_lgnkatana03_swf" preload="false" generate="false" />
+	<library path="Resources/Art3D/Avatar/ghostSamurai/db_char_ghostSamurai_lgnSword01.swf" id="ax4_swf_resources_art3d_avatar_ghostsamurai_db_char_ghostsamurai_lgnsword01_swf" preload="false" generate="false" />
+	<library path="Resources/Art3D/Avatar/ghostSamurai/db_char_ghostSamurai_lgnSword02.swf" id="ax4_swf_resources_art3d_avatar_ghostsamurai_db_char_ghostsamurai_lgnsword02_swf" preload="false" generate="false" />
+	<library path="Resources/Art3D/Avatar/ghostSamurai/db_char_ghostSamurai_lgnSword03.swf" id="ax4_swf_resources_art3d_avatar_ghostsamurai_db_char_ghostsamurai_lgnsword03_swf" preload="false" generate="false" />
+	<library path="Resources/Art3D/Avatar/ghostSamurai/db_char_ghostSamurai_lightThrowing02.swf" id="ax4_swf_resources_art3d_avatar_ghostsamurai_db_char_ghostsamurai_lightthrowing02_swf" preload="false" generate="false" />
+	<library path="Resources/Art3D/Avatar/ghostSamurai/db_char_ghostSamurai_rangerSword.swf" id="ax4_swf_resources_art3d_avatar_ghostsamurai_db_char_ghostsamurai_rangersword_swf" preload="false" generate="false" />
 	<library path="Resources/Art3D/Avatar/ghostSamurai/db_char_ghostSamurai_samuraiSword.swf" id="ax4_swf_resources_art3d_avatar_ghostsamurai_db_char_ghostsamurai_samuraisword_swf" preload="false" generate="false" />
+	<library path="Resources/Art3D/Avatar/ghostSamurai/db_char_ghostSamurai_sword01A.swf" id="ax4_swf_resources_art3d_avatar_ghostsamurai_db_char_ghostsamurai_sword01a_swf" preload="false" generate="false" />
+	<library path="Resources/Art3D/Avatar/ghostSamurai/db_char_ghostSamurai_sword01B.swf" id="ax4_swf_resources_art3d_avatar_ghostsamurai_db_char_ghostsamurai_sword01b_swf" preload="false" generate="false" />
+	<library path="Resources/Art3D/Avatar/ghostSamurai/db_char_ghostSamurai_sword02A.swf" id="ax4_swf_resources_art3d_avatar_ghostsamurai_db_char_ghostsamurai_sword02a_swf" preload="false" generate="false" />
+	<library path="Resources/Art3D/Avatar/ghostSamurai/db_char_ghostSamurai_sword02B.swf" id="ax4_swf_resources_art3d_avatar_ghostsamurai_db_char_ghostsamurai_sword02b_swf" preload="false" generate="false" />
+	<library path="Resources/Art3D/Avatar/ghostSamurai/db_char_ghostSamurai_sword03A.swf" id="ax4_swf_resources_art3d_avatar_ghostsamurai_db_char_ghostsamurai_sword03a_swf" preload="false" generate="false" />
+	<library path="Resources/Art3D/Avatar/ghostSamurai/db_char_ghostSamurai_sword03B.swf" id="ax4_swf_resources_art3d_avatar_ghostsamurai_db_char_ghostsamurai_sword03b_swf" preload="false" generate="false" />
 	<library path="Resources/Art3D/Avatar/ranger/db_char_ranger.swf" id="ax4_swf_resources_art3d_avatar_ranger_db_char_ranger_swf" preload="false" generate="false" />
 	<library path="Resources/Art3D/Avatar/ranger/db_char_ranger_bow01B.swf" id="ax4_swf_resources_art3d_avatar_ranger_db_char_ranger_bow01b_swf" preload="false" generate="false" />
 	<library path="Resources/Art3D/Avatar/ranger/db_char_ranger_bow02B.swf" id="ax4_swf_resources_art3d_avatar_ranger_db_char_ranger_bow02b_swf" preload="false" generate="false" />
@@ -253,12 +278,12 @@
 	<library path="Resources/Art3D/Avatar/rangerColorSanta/db_char_rangerColorSanta_sword03A.swf" id="ax4_swf_resources_art3d_avatar_rangercolorsanta_db_char_rangercolorsanta_sword03a_swf" preload="false" generate="false" />
 	<library path="Resources/Art3D/Avatar/rangerColorSanta/db_char_rangerColorSanta_sword03B.swf" id="ax4_swf_resources_art3d_avatar_rangercolorsanta_db_char_rangercolorsanta_sword03b_swf" preload="false" generate="false" />
 	<library path="Resources/Art3D/Avatar/vampireHunter/db_char_vampireHunter.swf" id="ax4_swf_resources_art3d_avatar_vampirehunter_db_char_vampirehunter_swf" preload="false" generate="false" />
-	<library path="Resources/Art3D/Avatar/vampireHunter/db_char_vampireHunter_crossBow03B.swf" id="ax4_swf_resources_art3d_avatar_vampirehunter_db_char_vampirehunter_crossbow03b_swf" preload="false" generate="false" />
 	<library path="Resources/Art3D/Avatar/vampireHunter/db_char_vampireHunter_crossbow01A.swf" id="ax4_swf_resources_art3d_avatar_vampirehunter_db_char_vampirehunter_crossbow01a_swf" preload="false" generate="false" />
 	<library path="Resources/Art3D/Avatar/vampireHunter/db_char_vampireHunter_crossbow01B.swf" id="ax4_swf_resources_art3d_avatar_vampirehunter_db_char_vampirehunter_crossbow01b_swf" preload="false" generate="false" />
 	<library path="Resources/Art3D/Avatar/vampireHunter/db_char_vampireHunter_crossbow02A.swf" id="ax4_swf_resources_art3d_avatar_vampirehunter_db_char_vampirehunter_crossbow02a_swf" preload="false" generate="false" />
 	<library path="Resources/Art3D/Avatar/vampireHunter/db_char_vampireHunter_crossbow02B.swf" id="ax4_swf_resources_art3d_avatar_vampirehunter_db_char_vampirehunter_crossbow02b_swf" preload="false" generate="false" />
 	<library path="Resources/Art3D/Avatar/vampireHunter/db_char_vampireHunter_crossbow03A.swf" id="ax4_swf_resources_art3d_avatar_vampirehunter_db_char_vampirehunter_crossbow03a_swf" preload="false" generate="false" />
+	<library path="Resources/Art3D/Avatar/vampireHunter/db_char_vampireHunter_crossBow03B.swf" id="ax4_swf_resources_art3d_avatar_vampirehunter_db_char_vampirehunter_crossbow03b_swf" preload="false" generate="false" />
 	<library path="Resources/Art3D/Avatar/vampireHunter/db_char_vampireHunter_glowSword.swf" id="ax4_swf_resources_art3d_avatar_vampirehunter_db_char_vampirehunter_glowsword_swf" preload="false" generate="false" />
 	<library path="Resources/Art3D/Avatar/vampireHunter/db_char_vampireHunter_knightSword.swf" id="ax4_swf_resources_art3d_avatar_vampirehunter_db_char_vampirehunter_knightsword_swf" preload="false" generate="false" />
 	<library path="Resources/Art3D/Avatar/vampireHunter/db_char_vampireHunter_lgnCrossbow01.swf" id="ax4_swf_resources_art3d_avatar_vampirehunter_db_char_vampirehunter_lgncrossbow01_swf" preload="false" generate="false" />
@@ -286,25 +311,32 @@
 	<library path="Resources/Art3D/Avatar/wizard/db_char_wizard_lgnBoltStaff02.swf" id="ax4_swf_resources_art3d_avatar_wizard_db_char_wizard_lgnboltstaff02_swf" preload="false" generate="false" />
 	<library path="Resources/Art3D/Avatar/wizard/db_char_wizard_lgnBoltStaff03.swf" id="ax4_swf_resources_art3d_avatar_wizard_db_char_wizard_lgnboltstaff03_swf" preload="false" generate="false" />
 	<library path="Resources/Art3D/Avatar/wizard/db_char_wizard_wizardStaff.swf" id="ax4_swf_resources_art3d_avatar_wizard_db_char_wizard_wizardstaff_swf" preload="false" generate="false" />
-	<library path="Resources/Art3D/Enemy/Brute/db_emy_brute.swf" id="ax4_swf_resources_art3d_enemy_brute_db_emy_brute_swf" preload="false" generate="false" />
-	<library path="Resources/Art3D/Enemy/Brute/db_emy_brute_stoneClub.swf" id="ax4_swf_resources_art3d_enemy_brute_db_emy_brute_stoneclub_swf" preload="false" generate="false" />
-	<library path="Resources/Art3D/Enemy/Knight/db_emy_knight.swf" id="ax4_swf_resources_art3d_enemy_knight_db_emy_knight_swf" preload="false" generate="false" />
-	<library path="Resources/Art3D/Enemy/Knight/db_emy_knight_corssbowSolo.swf" id="ax4_swf_resources_art3d_enemy_knight_db_emy_knight_corssbowsolo_swf" preload="false" generate="false" />
-	<library path="Resources/Art3D/Enemy/Knight/db_emy_knight_knightSpear.swf" id="ax4_swf_resources_art3d_enemy_knight_db_emy_knight_knightspear_swf" preload="false" generate="false" />
-	<library path="Resources/Art3D/Enemy/Knight/db_emy_knight_knightSword.swf" id="ax4_swf_resources_art3d_enemy_knight_db_emy_knight_knightsword_swf" preload="false" generate="false" />
-	<library path="Resources/Art3D/Enemy/MOskeleton/db_emy_MOskeleton.swf" id="ax4_swf_resources_art3d_enemy_moskeleton_db_emy_moskeleton_swf" preload="false" generate="false" />
-	<library path="Resources/Art3D/Enemy/MOskeleton/db_emy_MOskeleton_skeletonBow.swf" id="ax4_swf_resources_art3d_enemy_moskeleton_db_emy_moskeleton_skeletonbow_swf" preload="false" generate="false" />
-	<library path="Resources/Art3D/Enemy/MOskeleton/db_emy_MOskeleton_skeletonSword.swf" id="ax4_swf_resources_art3d_enemy_moskeleton_db_emy_moskeleton_skeletonsword_swf" preload="false" generate="false" />
-	<library path="Resources/Art3D/Enemy/Specter/db_emy_specter.swf" id="ax4_swf_resources_art3d_enemy_specter_db_emy_specter_swf" preload="false" generate="false" />
+	<library path="Resources/Art3D/Avatar/wizardColorDark/db_char_wizardColorDark.swf" id="ax4_swf_resources_art3d_avatar_wizardcolordark_db_char_wizardcolordark_swf" preload="false" generate="false" />
+	<library path="Resources/Art3D/Avatar/wizardColorDark/db_char_wizardColorDark_boltStaff01A.swf" id="ax4_swf_resources_art3d_avatar_wizardcolordark_db_char_wizardcolordark_boltstaff01a_swf" preload="false" generate="false" />
+	<library path="Resources/Art3D/Avatar/wizardColorDark/db_char_wizardColorDark_boltStaff01B.swf" id="ax4_swf_resources_art3d_avatar_wizardcolordark_db_char_wizardcolordark_boltstaff01b_swf" preload="false" generate="false" />
+	<library path="Resources/Art3D/Avatar/wizardColorDark/db_char_wizardColorDark_boltStaff02A.swf" id="ax4_swf_resources_art3d_avatar_wizardcolordark_db_char_wizardcolordark_boltstaff02a_swf" preload="false" generate="false" />
+	<library path="Resources/Art3D/Avatar/wizardColorDark/db_char_wizardColorDark_boltStaff02B.swf" id="ax4_swf_resources_art3d_avatar_wizardcolordark_db_char_wizardcolordark_boltstaff02b_swf" preload="false" generate="false" />
+	<library path="Resources/Art3D/Avatar/wizardColorDark/db_char_wizardColorDark_boltStaff03A.swf" id="ax4_swf_resources_art3d_avatar_wizardcolordark_db_char_wizardcolordark_boltstaff03a_swf" preload="false" generate="false" />
+	<library path="Resources/Art3D/Avatar/wizardColorDark/db_char_wizardColorDark_boltStaff03B.swf" id="ax4_swf_resources_art3d_avatar_wizardcolordark_db_char_wizardcolordark_boltstaff03b_swf" preload="false" generate="false" />
+	<library path="Resources/Art3D/Avatar/wizardColorDark/db_char_wizardColorDark_lgnBoltStaff01.swf" id="ax4_swf_resources_art3d_avatar_wizardcolordark_db_char_wizardcolordark_lgnboltstaff01_swf" preload="false" generate="false" />
+	<library path="Resources/Art3D/Avatar/wizardColorDark/db_char_wizardColorDark_lgnBoltStaff02.swf" id="ax4_swf_resources_art3d_avatar_wizardcolordark_db_char_wizardcolordark_lgnboltstaff02_swf" preload="false" generate="false" />
+	<library path="Resources/Art3D/Avatar/wizardColorDark/db_char_wizardColorDark_lgnBoltStaff03.swf" id="ax4_swf_resources_art3d_avatar_wizardcolordark_db_char_wizardcolordark_lgnboltstaff03_swf" preload="false" generate="false" />
+	<library path="Resources/Art3D/Avatar/wizardColorDark/db_char_wizardColorDark_wizardStaff.swf" id="ax4_swf_resources_art3d_avatar_wizardcolordark_db_char_wizardcolordark_wizardstaff_swf" preload="false" generate="false" />
 	<library path="Resources/Art3D/Enemy/azTech/db_emy_azTech.swf" id="ax4_swf_resources_art3d_enemy_aztech_db_emy_aztech_swf" preload="false" generate="false" />
 	<library path="Resources/Art3D/Enemy/barrelMon/db_emy_barrelMon.swf" id="ax4_swf_resources_art3d_enemy_barrelmon_db_emy_barrelmon_swf" preload="false" generate="false" />
 	<library path="Resources/Art3D/Enemy/bombMon/db_emy_bombMon.swf" id="ax4_swf_resources_art3d_enemy_bombmon_db_emy_bombmon_swf" preload="false" generate="false" />
+	<library path="Resources/Art3D/Enemy/Brute/db_emy_brute.swf" id="ax4_swf_resources_art3d_enemy_brute_db_emy_brute_swf" preload="false" generate="false" />
+	<library path="Resources/Art3D/Enemy/Brute/db_emy_brute_stoneClub.swf" id="ax4_swf_resources_art3d_enemy_brute_db_emy_brute_stoneclub_swf" preload="false" generate="false" />
 	<library path="Resources/Art3D/Enemy/dragon/db_emy_dragon.swf" id="ax4_swf_resources_art3d_enemy_dragon_db_emy_dragon_swf" preload="false" generate="false" />
 	<library path="Resources/Art3D/Enemy/frostTroll/db_emy_frostTroll.swf" id="ax4_swf_resources_art3d_enemy_frosttroll_db_emy_frosttroll_swf" preload="false" generate="false" />
 	<library path="Resources/Art3D/Enemy/iceImp/db_emy_iceImp.swf" id="ax4_swf_resources_art3d_enemy_iceimp_db_emy_iceimp_swf" preload="false" generate="false" />
 	<library path="Resources/Art3D/Enemy/iceImp/db_emy_iceImp_iceSpear.swf" id="ax4_swf_resources_art3d_enemy_iceimp_db_emy_iceimp_icespear_swf" preload="false" generate="false" />
 	<library path="Resources/Art3D/Enemy/jug/db_emy_jug.swf" id="ax4_swf_resources_art3d_enemy_jug_db_emy_jug_swf" preload="false" generate="false" />
 	<library path="Resources/Art3D/Enemy/jug/db_emy_jug_jugMace.swf" id="ax4_swf_resources_art3d_enemy_jug_db_emy_jug_jugmace_swf" preload="false" generate="false" />
+	<library path="Resources/Art3D/Enemy/Knight/db_emy_knight.swf" id="ax4_swf_resources_art3d_enemy_knight_db_emy_knight_swf" preload="false" generate="false" />
+	<library path="Resources/Art3D/Enemy/Knight/db_emy_knight_corssbowSolo.swf" id="ax4_swf_resources_art3d_enemy_knight_db_emy_knight_corssbowsolo_swf" preload="false" generate="false" />
+	<library path="Resources/Art3D/Enemy/Knight/db_emy_knight_knightSpear.swf" id="ax4_swf_resources_art3d_enemy_knight_db_emy_knight_knightspear_swf" preload="false" generate="false" />
+	<library path="Resources/Art3D/Enemy/Knight/db_emy_knight_knightSword.swf" id="ax4_swf_resources_art3d_enemy_knight_db_emy_knight_knightsword_swf" preload="false" generate="false" />
 	<library path="Resources/Art3D/Enemy/knightInBoxer/db_emy_knightInBoxer.swf" id="ax4_swf_resources_art3d_enemy_knightinboxer_db_emy_knightinboxer_swf" preload="false" generate="false" />
 	<library path="Resources/Art3D/Enemy/knightInBoxer/db_emy_knightInBoxer_crossbowSolo.swf" id="ax4_swf_resources_art3d_enemy_knightinboxer_db_emy_knightinboxer_crossbowsolo_swf" preload="false" generate="false" />
 	<library path="Resources/Art3D/Enemy/knightInBoxer/db_emy_knightInBoxer_knightSpear.swf" id="ax4_swf_resources_art3d_enemy_knightinboxer_db_emy_knightinboxer_knightspear_swf" preload="false" generate="false" />
@@ -312,6 +344,9 @@
 	<library path="Resources/Art3D/Enemy/lion/db_emy_lion.swf" id="ax4_swf_resources_art3d_enemy_lion_db_emy_lion_swf" preload="false" generate="false" />
 	<library path="Resources/Art3D/Enemy/minotaur/db_emy_minotaur.swf" id="ax4_swf_resources_art3d_enemy_minotaur_db_emy_minotaur_swf" preload="false" generate="false" />
 	<library path="Resources/Art3D/Enemy/minotaur/db_emy_minotaur_minotaurHammer.swf" id="ax4_swf_resources_art3d_enemy_minotaur_db_emy_minotaur_minotaurhammer_swf" preload="false" generate="false" />
+	<library path="Resources/Art3D/Enemy/MOskeleton/db_emy_MOskeleton.swf" id="ax4_swf_resources_art3d_enemy_moskeleton_db_emy_moskeleton_swf" preload="false" generate="false" />
+	<library path="Resources/Art3D/Enemy/MOskeleton/db_emy_MOskeleton_skeletonBow.swf" id="ax4_swf_resources_art3d_enemy_moskeleton_db_emy_moskeleton_skeletonbow_swf" preload="false" generate="false" />
+	<library path="Resources/Art3D/Enemy/MOskeleton/db_emy_MOskeleton_skeletonSword.swf" id="ax4_swf_resources_art3d_enemy_moskeleton_db_emy_moskeleton_skeletonsword_swf" preload="false" generate="false" />
 	<library path="Resources/Art3D/Enemy/nightWolf/db_emy_nightWolf.swf" id="ax4_swf_resources_art3d_enemy_nightwolf_db_emy_nightwolf_swf" preload="false" generate="false" />
 	<library path="Resources/Art3D/Enemy/raptor/db_emy_raptor.swf" id="ax4_swf_resources_art3d_enemy_raptor_db_emy_raptor_swf" preload="false" generate="false" />
 	<library path="Resources/Art3D/Enemy/savage/db_emy_savage.swf" id="ax4_swf_resources_art3d_enemy_savage_db_emy_savage_swf" preload="false" generate="false" />
@@ -325,6 +360,7 @@
 	<library path="Resources/Art3D/Enemy/skeletonNordicB/db_emy_skeletonNordicB.swf" id="ax4_swf_resources_art3d_enemy_skeletonnordicb_db_emy_skeletonnordicb_swf" preload="false" generate="false" />
 	<library path="Resources/Art3D/Enemy/skeletonNordicB/db_emy_skeletonNordicB_axeThin1.swf" id="ax4_swf_resources_art3d_enemy_skeletonnordicb_db_emy_skeletonnordicb_axethin1_swf" preload="false" generate="false" />
 	<library path="Resources/Art3D/Enemy/skeletonNordicB/db_emy_skeletonNordicB_mace.swf" id="ax4_swf_resources_art3d_enemy_skeletonnordicb_db_emy_skeletonnordicb_mace_swf" preload="false" generate="false" />
+	<library path="Resources/Art3D/Enemy/Specter/db_emy_specter.swf" id="ax4_swf_resources_art3d_enemy_specter_db_emy_specter_swf" preload="false" generate="false" />
 	<library path="Resources/Art3D/Enemy/tigerSiberian/db_emy_tigerSiberian.swf" id="ax4_swf_resources_art3d_enemy_tigersiberian_db_emy_tigersiberian_swf" preload="false" generate="false" />
 	<library path="Resources/Art3D/Enemy/warHogBrown/db_emy_warHogBrown.swf" id="ax4_swf_resources_art3d_enemy_warhogbrown_db_emy_warhogbrown_swf" preload="false" generate="false" />
 	<library path="Resources/Art3D/Enemy/warHogWhite/db_emy_warHogWhite.swf" id="ax4_swf_resources_art3d_enemy_warhogwhite_db_emy_warhogwhite_swf" preload="false" generate="false" />

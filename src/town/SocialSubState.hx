@@ -43,6 +43,9 @@ package town
          mTownStateMachine.townHeader.title = Locale.getString("FM_HEADER");
          mTownStateMachine.townHeader.showCloseButton(true);
          checkForFriendMessages();
+         super.resetHeaderLinks();
+         super.setupHeaderLinks();
+         mDBFacade.menuNavigationController.pushNewLayer("FRIENDS_MENU",mTownStateMachine.townHeader.determineCallback,mTownStateMachine.townHeader.closeButton,mTownStateMachine.townHeader.closeButton);
       }
       
       public function setTabCategory(param1:UInt) 
@@ -52,6 +55,7 @@ package town
       
       override public function exitState() 
       {
+         mDBFacade.menuNavigationController.popLayer("FRIENDS_MENU");
          super.exitState();
          if(mUIFriendManager != null)
          {

@@ -2,6 +2,8 @@ package uI.inventory
 ;
    import account.AvatarInfo;
    import facade.DBFacade;
+   import facade.GameMasterLocale;
+   import facade.Locale;
    import gameMasterDictionary.GMHero;
    import flash.display.MovieClip;
    import flash.text.TextField;
@@ -42,7 +44,7 @@ package uI.inventory
       
       @:isVar public var ownedHero(never,set):AvatarInfo;
 public function  set_ownedHero(param1:AvatarInfo) :AvatarInfo      {
-         mLabel.text = param1.gmHero.Name.toUpperCase();
+         mLabel.text = GameMasterLocale.getGameMasterSubString("SKIN_NAME",param1.gmHero.Constant).toUpperCase();
          mLevelLabel.text = Std.string(param1.level);
          mLevelLabel.visible = true;
          mStar.visible = true;
@@ -52,10 +54,10 @@ return param1;
       
       @:isVar public var unownedHero(never,set):GMHero;
 public function  set_unownedHero(param1:GMHero) :GMHero      {
-         mLabel.text = param1.Name.toUpperCase();
+         mLabel.text = GameMasterLocale.getGameMasterSubString("SKIN_NAME",param1.Constant).toUpperCase();
          mLevelLabel.visible = false;
          mStar.visible = false;
-         mDescriptionLabel.text = "Not Unlocked";
+         mDescriptionLabel.text = Locale.getString("HERO_NOT_UNLOCKED_TOOLTIP");
          mDescriptionLabel.visible = true;
 return param1;
       }

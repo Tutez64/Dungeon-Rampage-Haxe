@@ -24,7 +24,7 @@ package actor.stateMachine
       public function new(param1:DBFacade, param2:ActorGameObject, param3:ActorView)
       {
          super(param1,param2,param3,"ActorDeadState");
-         mWorkComponent = new LogicalWorkComponent(mDBFacade);
+         mWorkComponent = new LogicalWorkComponent(mDBFacade,"ActorDeadState");
       }
       
       override public function destroy() 

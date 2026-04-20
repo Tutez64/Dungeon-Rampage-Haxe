@@ -177,6 +177,12 @@ public function  get_deathVolume() : Float
       {
          return mData.DeathVolume;
       }
+      
+      @:isVar public var scale3DModel(get,never):Float;
+public function  get_scale3DModel() : Float
+      {
+         return mData.Scale3DModel;
+      }
    }
 
 

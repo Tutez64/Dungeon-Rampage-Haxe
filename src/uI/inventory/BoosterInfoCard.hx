@@ -13,6 +13,7 @@ package uI.inventory
    import brain.uI.UIObject;
    import events.BoostersParsedEvent;
    import facade.DBFacade;
+   import facade.GameMasterLocale;
    import facade.Locale;
    import gameMasterDictionary.GMBuff;
    import uI.CountdownTextTimer;
@@ -65,6 +66,16 @@ package uI.inventory
             mCountdownTextTimer.destroy();
             mCountdownTextTimer = null;
          }
+         if(mEventComponent != null)
+         {
+            mEventComponent.destroy();
+            mEventComponent = null;
+         }
+         if(mAssetLoadingComponent != null)
+         {
+            mAssetLoadingComponent.destroy();
+            mAssetLoadingComponent = null;
+         }
          super.destroy();
       }
       
@@ -102,8 +113,8 @@ public function  set_info(param1:StackableInfo) :StackableInfo      {
                mAssetLoadingComponent = new AssetLoadingComponent(mDBFacade);
             }
             setupBoosterInfoUI(mInfo);
-            ASCompat.setProperty((mRoot : ASAny).label, "text", mInfo.Name);
-            ASCompat.setProperty((mRoot : ASAny).description, "text", mInfo.Description);
+            ASCompat.setProperty((mRoot : ASAny).label, "text", GameMasterLocale.getGameMasterSubString("STACKABLE_NAME",mInfo.gmStackable.Constant));
+            ASCompat.setProperty((mRoot : ASAny).description, "text", GameMasterLocale.getGameMasterSubString("STACKABLE_DESCRIPTION",mInfo.gmStackable.Constant));
             ASCompat.setProperty((mRoot : ASAny).button_activate.label, "text", Locale.getString("BOOSTER_CARD_ACTIVATE"));
             ASCompat.setProperty((mRoot : ASAny).booster_activated, "visible", false);
             ASCompat.setProperty((mRoot : ASAny).booster_activated.label_time, "text", "00:00:00");

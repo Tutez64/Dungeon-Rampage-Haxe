@@ -8,7 +8,6 @@ package distributedObjects
    import brain.event.EventComponent;
    import brain.logger.Logger;
    import brain.utils.MemoryTracker;
-   import brain.workLoop.LogicalWorkComponent;
    import combat.attack.AttackTimeline;
    import combat.weapon.ConsumableWeaponGameObject;
    import events.BusterPointsEvent;
@@ -90,7 +89,6 @@ package distributedObjects
       {
          super(param1,param2);
          mWantNavCollisions = true;
-         mLogicalWorkComponent = new LogicalWorkComponent(mFacade);
          mChatEventComponent = new EventComponent(param1);
          mCanInitiateAnAttack = true;
       }
@@ -160,6 +158,17 @@ function  set_canInitiateAnAttack(param1:Bool) :Bool      {
          mChatEventComponent.destroy();
          mHeroStateMachine.destroy();
          mHeroStateMachine = null;
+         var _loc1_:ConsumableWeaponGameObject;
+         final __ax4_iter_219 = mConsumableWeapons;
+         if (checkNullIteratee(__ax4_iter_219)) for (_tmp_ in __ax4_iter_219)
+         {
+            _loc1_ = _tmp_;
+            if(_loc1_ != null)
+            {
+               _loc1_.destroy();
+            }
+         }
+         mConsumableWeapons = null;
          mHeroView = null;
          super.destroy();
       }
@@ -242,6 +251,7 @@ public function  set_experiencePoints(param1:UInt) :UInt      {
          if(mLevel != _loc2_)
          {
             mHeroView.playHeroLevelUpEffects();
+            mDBFacade.steamAchievementsManager.setHeroLevelStat(mLevel,this.gMHero);
             if(Std.isOfType(this , HeroGameObjectOwner))
             {
                mFacade.eventManager.dispatchEvent(new FacebookLevelUpPostEvent("FacebookLevelUpPostEvent",mLevel));
@@ -362,8 +372,8 @@ public function  set_partyBombsUsed(param1:UInt) :UInt      {
          mAptitudeModMultiplier = 0;
          mAccelerationModMultiplier = 0;
          var _loc1_:WeaponDetails;
-         final __ax4_iter_203 = mWeaponDetails;
-         if (checkNullIteratee(__ax4_iter_203)) for (_tmp_ in __ax4_iter_203)
+         final __ax4_iter_220 = mWeaponDetails;
+         if (checkNullIteratee(__ax4_iter_220)) for (_tmp_ in __ax4_iter_220)
          {
             _loc1_ = _tmp_;
             switch(ASCompat.toInt(_loc1_.legendarymodifier) - 1)
@@ -518,8 +528,8 @@ return param1;
       {
          var _loc4_:ConsumableWeaponGameObject = null;
          var _loc2_:ConsumableWeaponGameObject;
-         final __ax4_iter_204 = mConsumableWeapons;
-         if (checkNullIteratee(__ax4_iter_204)) for (_tmp_ in __ax4_iter_204)
+         final __ax4_iter_221 = mConsumableWeapons;
+         if (checkNullIteratee(__ax4_iter_221)) for (_tmp_ in __ax4_iter_221)
          {
             _loc2_ = _tmp_;
             if(_loc2_ != null)
@@ -530,8 +540,8 @@ return param1;
          var _loc1_= (0 : UInt);
          mConsumableWeapons = new Vector<ConsumableWeaponGameObject>();
          var _loc3_:ConsumableDetails;
-         final __ax4_iter_205 = mConsumableDetails;
-         if (checkNullIteratee(__ax4_iter_205)) for (_tmp_ in __ax4_iter_205)
+         final __ax4_iter_222 = mConsumableDetails;
+         if (checkNullIteratee(__ax4_iter_222)) for (_tmp_ in __ax4_iter_222)
          {
             _loc3_ = _tmp_;
             if(ASCompat.toNumberField(_loc3_, "type") != 0)

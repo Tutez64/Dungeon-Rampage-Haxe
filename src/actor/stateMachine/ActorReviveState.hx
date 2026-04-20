@@ -29,7 +29,7 @@ package actor.stateMachine
    import generatedCode.InfiniteRewardData;
    import stateMachine.mainStateMachine.DungeonTutorial;
    import uI.infiniteIsland.II_UIExitDungeonPopUp;
-   import uI.UILootLossPopup;
+   import uI.popup.UILootLossPopup;
    import com.greensock.TweenMax;
    import flash.display.DisplayObject;
    import flash.display.MovieClip;
@@ -55,6 +55,8 @@ package actor.stateMachine
       public static inline final DEAD_PLAYER_EFFECT_Y_OFFSET:Float = -100;
       
       public static inline final TRIGGER_RANGE:Float = 100;
+      
+      static inline final REVIVE_KEYCODE= 32;
       
       var mAssetLoadingComponent:AssetLoadingComponent;
       
@@ -115,8 +117,8 @@ package actor.stateMachine
          super(dbFacade,heroGameObject,actorView,"ActorReviveState",finishedCallback);
          mHeroGameObject = heroGameObject;
          mAssetLoadingComponent = new AssetLoadingComponent(mDBFacade);
-         mLogicalWorkComponent = new LogicalWorkComponent(mDBFacade);
-         mSceneGraphComponent = new SceneGraphComponent(mDBFacade);
+         mLogicalWorkComponent = new LogicalWorkComponent(mDBFacade,"ActorReviveState");
+         mSceneGraphComponent = new SceneGraphComponent(mDBFacade,"ActorReviveState");
          mDungeonReviveTutorial = new DungeonTutorial(mDBFacade);
          mEventComponent = new EventComponent(mDBFacade);
          mEventComponent.addListener("CLEAR_REVIVE_EVENT",function(param1:Event)
@@ -327,7 +329,7 @@ package actor.stateMachine
       {
          if(param2 != null && param2.heroStateMachine != null && mHeroGameObject != null)
          {
-            if(param1.keyCode == 32 && mDBFacade.inputManager.pressed(32) && param2.heroStateMachine.currentSubState.name == "ActorNavigationState")
+            if(param1.keyCode == 32 && didPressReviveAction() && param2.heroStateMachine.currentSubState.name == "ActorNavigationState")
             {
                if(mSpaceBarTask != null)
                {
@@ -345,6 +347,11 @@ package actor.stateMachine
                }
             }
          }
+      }
+      
+      function didPressReviveAction() : Bool
+      {
+         return mDBFacade.inputManager.pressed(32) || mDBFacade.steamInputManager.pressedAction("revive_ally");
       }
       
       function initRevive() 

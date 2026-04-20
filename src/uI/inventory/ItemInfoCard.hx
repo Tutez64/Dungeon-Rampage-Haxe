@@ -17,6 +17,7 @@ package uI.inventory
    import dBGlobals.DBGlobal;
    import distributedObjects.DistributedDungeonSummary;
    import facade.DBFacade;
+   import facade.GameMasterLocale;
    import facade.Locale;
    import gameMasterDictionary.GMModifier;
    import gameMasterDictionary.GMWeaponItem;
@@ -165,6 +166,7 @@ package uI.inventory
          mTitleY = mLabel.y;
          mPowerIcon = ASCompat.dynamicAs((mRoot : ASAny).power, flash.display.MovieClip);
          mPowerLabel = ASCompat.dynamicAs((mRoot : ASAny).power.label, flash.text.TextField);
+         ASCompat.setProperty((mRoot : ASAny).power.attack_label, "text", Locale.getString("POWER"));
          mLevelRequirement = ASCompat.dynamicAs((mRoot : ASAny).level_requirement, flash.text.TextField);
          mLevelRequirementNotMet = ASCompat.dynamicAs((mRoot : ASAny).level_requirement_not_met, flash.text.TextField);
          mModifierTitle = ASCompat.dynamicAs((mRoot : ASAny).ability.label_modifier, flash.text.TextField);
@@ -289,16 +291,29 @@ return param1;
          }
       }
       
-      function setupInventoryBaseUI() 
+      function setupInventoryBaseUI(param1:String) 
       {
-         var _loc1_= (mInfo.sellCoins : UInt);
+         var _loc2_= (mInfo.sellCoins : UInt);
          mSellButton.enabled = true;
          mSellButton.visible = true;
-         mSellPriceLabel.text = Std.string(_loc1_);
+         mSellPriceLabel.text = Std.string(_loc2_);
          mSellPriceLabel.visible = true;
          ASCompat.setProperty((mRoot : ASAny).pet_stats, "visible", false);
-         mLabel.text = mInfo.Name.toUpperCase();
-         mDescription.text = mInfo.Description;
+         if(param1 == "weapon")
+         {
+            mLabel.text = GameMasterLocale.getGameMasterSubString("WEAPON_AESTHETIC_NAME",mInfo.weaponAestheticConstant).toUpperCase();
+            mDescription.text = GameMasterLocale.getGameMasterSubString("WEAPON_AESTHETIC_NAME",mInfo.weaponAestheticConstant);
+         }
+         else if(param1 == "stackable")
+         {
+            mLabel.text = GameMasterLocale.getGameMasterSubString("STACKABLE_NAME",mInfo.gmInventoryBase.Constant).toUpperCase();
+            mDescription.text = GameMasterLocale.getGameMasterSubString("STACKABLE_DESCRIPTION",mInfo.gmInventoryBase.Constant);
+         }
+         else
+         {
+            mLabel.text = mInfo.Name.toUpperCase();
+            mDescription.text = mInfo.Description;
+         }
          mModifierTitle.visible = false;
          clearModifiers();
          loadIcon();
@@ -312,7 +327,7 @@ return param1;
          ASCompat.setProperty((mRoot : ASAny).ability, "visible", false);
          mDescription.visible = true;
          mWeaponDescTooltip.visible = false;
-         this.setupInventoryBaseUI();
+         this.setupInventoryBaseUI("stackable");
          ASCompat.setProperty((mRoot : ASAny).icon_slot, "x", mOriginalXValueForIcon + 55);
          mItemParent.root.x = mOriginalXValueForIcon + 55;
          var _loc2_= ASCompat.reinterpretAs(mInfo , StackableInfo);
@@ -365,6 +380,9 @@ return param1;
          {
             return;
          }
+         ASCompat.setProperty((mRoot : ASAny).pet_stats.pet_stats_power.label, "text", Locale.getString("TAVERN_ATTACK_LABEL"));
+         ASCompat.setProperty((mRoot : ASAny).pet_stats.pet_stats_speed.label, "text", Locale.getString("TAVERN_SPEED_LABEL"));
+         ASCompat.setProperty((mRoot : ASAny).pet_stats.pet_stats_defense.label, "text", Locale.getString("TAVERN_DEFENSE_LABEL"));
          ASCompat.setProperty((mRoot : ASAny).pet_stats.petname_label, "visible", false);
          ASCompat.setProperty((mRoot : ASAny).pet_stats, "visible", true);
          ASCompat.setProperty((mRoot : ASAny).pet_stats.pet_stats_power.star1, "visible", true);
@@ -446,8 +464,8 @@ return param1;
          mSellButton.enabled = true;
          sellBackPrice = (petInfo.gmNpc.SellCoins : UInt);
          mSellPriceLabel.text = Std.string(sellBackPrice);
-         mLabel.text = petInfo.gmNpc.Name.toUpperCase();
-         mDescription.text = petInfo.gmNpc.Description;
+         mLabel.text = GameMasterLocale.getGameMasterSubString("PET_NAME",petInfo.gmNpc.Constant).toUpperCase();
+         mDescription.text = GameMasterLocale.getGameMasterSubString("PET_DESCRIPTION",petInfo.gmNpc.Constant);
          loadIcon();
          if(petInfo.EquippedHero == 0)
          {
@@ -505,13 +523,13 @@ return param1;
          var sizeMult:Float;
          var itemInfo= param1;
          var equipped= param2;
-         this.setupInventoryBaseUI();
+         this.setupInventoryBaseUI("weapon");
          ASCompat.setProperty((mRoot : ASAny).ability, "visible", true);
          mDescription.visible = false;
          ASCompat.setProperty((mRoot : ASAny).icon_slot, "x", mOriginalXValueForIcon);
          mItemParent.root.x = mOriginalXValueForIcon;
          weaponName = "";
-         weaponName = itemInfo.Name.toUpperCase();
+         weaponName = GameMasterLocale.getGameMasterSubString("WEAPON_AESTHETIC_NAME",itemInfo.gmWeaponAesthetic.Constant).toUpperCase();
          gmWeaponItem = itemInfo.gmWeaponItem;
          power = itemInfo.power;
          sellBackPrice = (gmWeaponItem.SellCoins : UInt);
@@ -539,7 +557,7 @@ return param1;
                      _loc2_ = ASCompat.dynamicAs(ASCompat.createInstance(_loc3_, []), flash.display.MovieClip);
                      _loc2_.scaleX = _loc2_.scaleY = 0.5;
                      mTapIcon.root.addChild(_loc2_);
-                     mTapTooltip.setValues(gmWeaponItem.TapTitle,gmWeaponItem.TapDescription);
+                     mTapTooltip.setValues(GameMasterLocale.getGameMasterSubString("WEAPON_ITEM_TAP_TITLE",gmWeaponItem.Constant),GameMasterLocale.getGameMasterSubString("WEAPON_ITEM_TAP_DESCRIPTION",gmWeaponItem.Constant));
                      mTapTooltip.visible = true;
                      stagePos = new Point();
                      stagePos.y += mHoldIcon.root.height * 0.5;
@@ -570,8 +588,8 @@ return param1;
                      _loc2_ = ASCompat.dynamicAs(ASCompat.createInstance(_loc3_, []), flash.display.MovieClip);
                      _loc2_.scaleX = _loc2_.scaleY = 0.5;
                      mHoldIcon.root.addChild(_loc2_);
-                     _loc4_ = gmWeaponItem.WeaponController != null ? Locale.getString(gmWeaponItem.WeaponController) : gmWeaponItem.HoldTitle;
-                     mHoldTooltip.setValues(_loc4_,gmWeaponItem.HoldDescription);
+                     _loc4_ = gmWeaponItem.WeaponController != null ? GameMasterLocale.getGameMasterSubString("WEAPON_ITEM_CONTROLLER",gmWeaponItem.WeaponController) : gmWeaponItem.HoldTitle;
+                     mHoldTooltip.setValues(_loc4_,GameMasterLocale.getGameMasterSubString("WEAPON_ITEM_HOLD_DESCRIPTION",gmWeaponItem.Constant));
                      mHoldTooltip.visible = true;
                      stagePos = new Point();
                      stagePos.y += mHoldIcon.root.height * 0.5;
@@ -643,14 +661,14 @@ return param1;
          while(i < modifierList.length)
          {
             mModifiersList.push(new UIModifier(mDBFacade,ASCompat.dynamicAs(cast((mRoot : ASAny).ability, flash.display.DisplayObjectContainer).getChildByName("modifier_icon_" + Std.string((i + 1))) , MovieClip),modifierList[i].Constant));
-            preNameModifiers += modifierList[i].Name.toUpperCase() + " ";
+            preNameModifiers += GameMasterLocale.getGameMasterSubString("MODIFIER_NAME",modifierList[i].Constant).toUpperCase() + " ";
             i = i + 1;
          }
          weaponName = preNameModifiers + mLabel.text;
          if(itemInfo.legendaryModifier > 0)
          {
             mModifiersList.push(new UIModifier(mDBFacade,ASCompat.dynamicAs(cast((mRoot : ASAny).ability, flash.display.DisplayObjectContainer).getChildByName("modifier_icon_3") , MovieClip),"",(0 : UInt),true,itemInfo.legendaryModifier));
-            weaponName = gmWeaponItem.getWeaponAesthetic((0 : UInt),true).Name;
+            weaponName = GameMasterLocale.getGameMasterSubString("WEAPON_AESTHETIC_NAME",gmWeaponItem.getWeaponAesthetic((0 : UInt),true).Constant);
          }
          format = new TextFormat();
          sizeMult = 0.1;
@@ -850,8 +868,8 @@ return param1;
             {
                mWeaponTypeLabel.visible = true;
                mWeaponTypeUnequippableLabel.visible = true;
-               mWeaponTypeLabel.text = param1.Name.toUpperCase();
-               mWeaponTypeUnequippableLabel.text = param1.Name.toUpperCase();
+               mWeaponTypeLabel.text = GameMasterLocale.getGameMasterSubString("WEAPON_ITEM_NAME",param1.Constant).toUpperCase();
+               mWeaponTypeUnequippableLabel.text = GameMasterLocale.getGameMasterSubString("WEAPON_ITEM_NAME",param1.Constant).toUpperCase();
             }
             else
             {

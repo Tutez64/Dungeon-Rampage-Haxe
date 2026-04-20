@@ -13,6 +13,8 @@ package actor.buffs
       
       var mEffectedActor:UInt = 0;
       
+      var mAttackerActor:UInt = 0;
+      
       public var buffHandler:BuffHandler;
       
       public function new(param1:Facade, param2:UInt = (0 : UInt))
@@ -54,6 +56,16 @@ public function  get_type() : UInt
       @:isVar public var effectedActor(never,set):UInt;
 public function  set_effectedActor(param1:UInt) :UInt      {
          return mEffectedActor = param1;
+      }
+      
+            
+      @:isVar public var attackerActor(get,set):UInt;
+public function  set_attackerActor(param1:UInt) :UInt      {
+         return mAttackerActor = param1;
+      }
+function  get_attackerActor() : UInt
+      {
+         return mAttackerActor;
       }
 function  set_type(param1:UInt) :UInt      {
          return mType = param1;

@@ -1,6 +1,7 @@
 package uI.inventory
 ;
    import facade.DBFacade;
+   import facade.GameMasterLocale;
    import gameMasterDictionary.GMWeaponItem;
    import flash.display.MovieClip;
    import flash.text.TextField;
@@ -38,7 +39,7 @@ package uI.inventory
       
       public function setWeaponItem(param1:GMWeaponItem, param2:UInt, param3:Bool = false) 
       {
-         mDescription.text = param1.getWeaponAesthetic(param2,param3).Description;
+         mDescription.text = GameMasterLocale.getGameMasterSubString("WEAPON_AESTHETIC_DESCRIPTION",param1.getWeaponAesthetic(param2,param3).WeaponItemConstant);
       }
    }
 

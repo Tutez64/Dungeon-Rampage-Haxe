@@ -136,7 +136,7 @@ package uI.infiniteIsland
          var _loc6_= ASCompat.dynamicAs(mDBFacade.gameMaster.rarityById.itemFor(param1.rarity), gameMasterDictionary.GMRarity);
          var _loc5_= _loc4_.getWeaponAesthetic((ASCompat.toInt(param1.requiredLevel) : UInt),ASCompat.toNumberField(param1, "rarity") == 4);
          ItemInfo.loadItemIcon(_loc5_.IconSwf,_loc5_.IconName,param3.root,mDBFacade,(Std.int(param3.root.width * 2) : UInt),(0 : UInt),mAssetLoadingComponent);
-         param2.setWeaponItemFromData(_loc5_.Name,(ASCompat.toInt(param1.power) : UInt),_loc4_.TapIcon,_loc4_.HoldIcon,(ASCompat.toInt(param1.modifier1) : UInt),(ASCompat.toInt(param1.modifier2) : UInt),(ASCompat.toInt(param1.legendaryModifier) : UInt),(ASCompat.toInt(param1.rarity) : UInt),(ASCompat.toInt(param1.requiredLevel) : UInt));
+         param2.setWeaponItemFromData(_loc5_.Name,(ASCompat.toInt(param1.power) : UInt),_loc4_.TapIcon,_loc4_.HoldIcon,(ASCompat.toInt(param1.modifier1) : UInt),(ASCompat.toInt(param1.modifier2) : UInt),(ASCompat.toInt(param1.legendaryModifier) : UInt),(ASCompat.toInt(param1.rarity) : UInt),(ASCompat.toInt(param1.requiredLevel) : UInt),_loc5_);
          param3.tooltip = param2;
          param3.tooltipPos = new Point(0,0);
       }

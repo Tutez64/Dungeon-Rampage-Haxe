@@ -902,7 +902,7 @@ return param1;
       
       function _updateMenu() 
       {
-         var __ax4_iter_95:ASObject;
+         var __ax4_iter_122:ASObject;
          var _loc2_= false;
          var _loc3_:String = null;
          var _loc1_= "<r><high>";
@@ -917,8 +917,8 @@ return param1;
                _loc1_ += this.getChannelsLink(true);
             }
             _loc1_ += "<menu> <b>";
-            __ax4_iter_95 = this._extraMenus;
-            if (checkNullIteratee(__ax4_iter_95)) for(_tmp_ in __ax4_iter_95.___keys())
+            __ax4_iter_122 = this._extraMenus;
+            if (checkNullIteratee(__ax4_iter_122)) for(_tmp_ in __ax4_iter_122.___keys())
             {
                _loc3_  = _tmp_;
                _loc1_ += "<a href=\"event:external_" + _loc3_ + "\">" + _loc3_ + "</a> ";

@@ -3,6 +3,7 @@
    import brain.GameEntry;
    import brain.logger.Logger;
    import brain.mouseScrollPlugin.*;
+   import dBGlobals.DBGlobal;
    import facade.DBFacade;
    import com.amanitadesign.steam.SteamEvent;
    import flash.desktop.NativeApplication;
@@ -105,10 +106,7 @@
       function onExit(param1:Event) 
       {
          Logger.info("Exiting application, cleaning up Steam");
-         if(mDBFacade.mSteamworks != null)
-         {
-            mDBFacade.mSteamworks.dispose();
-         }
+         mDBFacade.mSteamworks.dispose();
       }
       
       function processArguments(param1:Array<ASAny>) 
@@ -121,7 +119,7 @@
          while(_loc3_ < param1.length)
          {
             _loc2_ = param1[_loc3_];
-            if(endsWith(_loc2_,".json"))
+            if(DBGlobal.endsWith(_loc2_,".json"))
             {
                if(++_loc4_ > 2)
                {
@@ -135,10 +133,6 @@
             _loc3_++;
          }
       }
-      
-      public function endsWith(param1:String, param2:String) : Bool
-      {
-         return param2 == param1.substring(param1.length - param2.length);
-      }
    }
+
 

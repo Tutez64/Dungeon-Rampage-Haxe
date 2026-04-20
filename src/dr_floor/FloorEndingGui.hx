@@ -13,6 +13,7 @@ package dr_floor
    import distributedObjects.Floor;
    import events.II_FloorCompleteEvent;
    import facade.DBFacade;
+   import facade.GameMasterLocale;
    import facade.Locale;
    import gameMasterDictionary.GMDungeonModifier;
    import gameMasterDictionary.GMMapNode;
@@ -100,8 +101,8 @@ package dr_floor
          mFloorGUIStarted = false;
          mDBFacade = dbFacade;
          mRoot = new Sprite();
-         mSceneGraphComponent = new SceneGraphComponent(mDBFacade);
-         mLogicalWorkComponent = new LogicalWorkComponent(mDBFacade);
+         mSceneGraphComponent = new SceneGraphComponent(mDBFacade,"FloorEndingGui");
+         mLogicalWorkComponent = new LogicalWorkComponent(mDBFacade,"FloorEndingGui");
          mAssetLoadingComponent = new AssetLoadingComponent(mDBFacade);
          mEventComponent = new EventComponent(mDBFacade);
          mNodeType = nodeType;
@@ -322,7 +323,7 @@ package dr_floor
             }
             _loc3_ = becauseFlashSucksAtScopingVariables(param1,param2 + 1);
             mKillswitchRenderer.play((0 : UInt),false,_loc3_);
-            ASCompat.setProperty((mKillswitchRenderer.clip : ASAny).banner_modifier.label_modifier, "text", param1[(param2 : Int)].Name);
+            ASCompat.setProperty((mKillswitchRenderer.clip : ASAny).banner_modifier.label_modifier, "text", GameMasterLocale.getGameMasterSubString("DUNGEON_MODIFIER_NAME",param1[(param2 : Int)].Constant));
             mKillswitchRenderer.clip.visible = true;
             return;
          }

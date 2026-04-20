@@ -2,7 +2,6 @@ package uI.popup
 ;
    import facade.DBFacade;
    import facade.Locale;
-   import uI.DBUIPopup;
    
     class DBUIUltimateRampagePopup extends DBUIPopup
    {

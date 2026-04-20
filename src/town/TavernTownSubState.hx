@@ -1,16 +1,13 @@
 package town
 ;
    import brain.event.EventComponent;
-   import brain.uI.UIButton;
    import facade.DBFacade;
-   import uI.UITavern;
+   import uI.tavern.UITavern;
    
     class TavernTownSubState extends TownSubState
    {
       
       static inline final NAME= "TavernTownSubState";
-      
-      var mBackButton:UIButton;
       
       var mTavernUI:UITavern;
       
@@ -46,15 +43,25 @@ package town
          {
             mTavernUI.refresh();
          });
+         super.resetHeaderLinks();
+         super.setupHeaderLinks();
+         mDBFacade.menuNavigationController.pushNewLayer("TAVERN_MENU",mTownStateMachine.townHeader.determineCallback,mTavernUI.getDefaultMenuNavigationObject());
          mTavernUI.refresh();
          mTownStateMachine.townHeader.showCloseButton(true);
          mTavernUI.animateEntry();
+      }
+      
+      override function setupHeaderLinks() 
+      {
+         super.setupHeaderLinks();
       }
       
       override public function exitState() 
       {
          mTavernUI.processChosenAvatar();
          mEventComponent.removeListener("DB_ACCOUNT_INFO_RESPONSE");
+         mDBFacade.menuNavigationController.popLayer("TAVERN_MENU");
+         mTavernUI.resetHeaderLinks();
          super.exitState();
       }
    }

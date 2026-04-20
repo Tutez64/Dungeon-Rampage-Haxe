@@ -15,6 +15,7 @@ import openfl.utils.Assets;
 import openfl.utils.AssetType;
 import swf.exporters.animate.AnimateLibrary;
 import sys.FileSystem;
+import brain.logger.Logger;
 #end
 
 class SwfAsset extends Asset

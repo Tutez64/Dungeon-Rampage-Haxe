@@ -51,7 +51,7 @@ package actor
          mDBFacade = param3;
          mView = param2;
          mActorGameObject = param1;
-         mPreRenderWorkComponent = new PreRenderWorkComponent(param3);
+         mPreRenderWorkComponent = new PreRenderWorkComponent(param3,"MovementController");
          mWantSmoothTelemetry = mDBFacade.dbConfigManager.getConfigBoolean("smooth_telemetry",true);
          mSmoothFactor = mDBFacade.dbConfigManager.getConfigNumber("smooth_telemetry_factor",0.8);
       }

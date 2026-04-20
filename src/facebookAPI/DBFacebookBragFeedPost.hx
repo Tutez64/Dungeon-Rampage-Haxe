@@ -13,7 +13,7 @@ package facebookAPI
    import gameMasterDictionary.GMNpc;
    import gameMasterDictionary.GMSkin;
    import town.TownHeader;
-   import uI.DBUIOneButtonPopup;
+   import uI.popup.DBUIOneButtonPopup;
    import com.greensock.TweenMax;
    import flash.display.Bitmap;
    import flash.display.MovieClip;
@@ -38,6 +38,10 @@ package facebookAPI
          var avatarPicScale:Float = 0.4;
          if(facade.isDRPlayer)
          {
+            if(facade.steamAchievementsManager != null)
+            {
+               facade.steamAchievementsManager.setAchievement(facade.steamAchievementsManager.findUnlockHeroAchievementAPIName(gmHero));
+            }
             popupCenterButtonText = Locale.getString("SWEET");
          }
          else

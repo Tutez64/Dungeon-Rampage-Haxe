@@ -1,6 +1,5 @@
 package uI.dailyRewards
 ;
-   import brain.assetRepository.AssetLoadingComponent;
    import brain.assetRepository.SwfAsset;
    import brain.clock.GameClock;
    import brain.logger.Logger;
@@ -12,8 +11,8 @@ package uI.dailyRewards
    import facade.Locale;
    import gameMasterDictionary.GMOffer;
    import sound.DBSoundComponent;
-   import uI.DBUIPopup;
-   import uI.UICashPage;
+   import uI.popup.DBUIPopup;
+   import uI.popup.UICashPage;
    import flash.display.DisplayObject;
    import flash.display.MovieClip;
    import flash.events.Event;
@@ -186,11 +185,10 @@ package uI.dailyRewards
             {
                closeCallback();
             }
-         },false);
+         },false,ASCompat.stringAsBool("DAILY_LOGIN_POPUP"));
          mDBFacade = dbFacade;
          mCloseCallback = closeCallback;
          mPopup.visible = false;
-         mAssetLoadingComponent = new AssetLoadingComponent(mDBFacade);
          mSoundComponent = new DBSoundComponent(mDBFacade);
          mAssetLoadingComponent.getSoundAsset(DBFacade.buildFullDownloadPath("Resources/Audio/soundEffects.swf"),"ExpCollectSound",function(param1:SoundAsset)
          {
@@ -461,6 +459,9 @@ package uI.dailyRewards
             exitButtonPushed();
          };
          mCrewButton = new UIButton(mDBFacade,ASCompat.dynamicAs((mDailyRewardGoldPopup : ASAny).crewBonus_anim.crewBonus, flash.display.MovieClip));
+         mReplayButton.isToTheLeftOf(mAcceptButton);
+         mReplayButton.upNavigation = mExitButton;
+         mAcceptButton.upNavigation = mExitButton;
          mSlotMovieController = new MovieClipRenderController(mDBFacade,mSlotMovie);
          mAcceptButton.visible = false;
          mReplayButton.visible = false;
@@ -532,7 +533,7 @@ package uI.dailyRewards
          mBoxButton2.enabled = false;
          mAcceptButton.releaseCallback = function()
          {
-            destroy();
+            exitButtonPushed();
          };
          mReplayButton.releaseCallback = function()
          {
@@ -552,6 +553,11 @@ package uI.dailyRewards
          {
             mDBFacade.metrics.log("DailyRewardsHitReplay");
             resetMysteryBox(true);
+            if(mDBFacade.steamAchievementsManager != null)
+            {
+               mDBFacade.steamAchievementsManager.addToStatInt("REROLL_DAILY_REWARD_STAT",1);
+               mDBFacade.steamAchievementsManager.setAchievement("REROLL_DAILY_REWARD");
+            }
          }
       }
       
@@ -613,10 +619,12 @@ package uI.dailyRewards
          mRewardIcon0 = null;
          mRewardIcon1 = null;
          mRewardIcon2 = null;
+         mDBFacade.menuNavigationController.setFocusedUiObject(mBoxButton0);
       }
       
       function exitButtonPushed() 
       {
+         mDBFacade.menuNavigationController.popLayer("DAILY_LOGIN_POPUP");
          mDBFacade.metrics.log("DailyRewardCancel");
          if(mCountdownTimer == null)
          {
@@ -679,6 +687,11 @@ package uI.dailyRewards
             mCloseCallback();
          }
          mCloseCallback = null;
+         if(mSoundComponent != null)
+         {
+            mSoundComponent.destroy();
+            mSoundComponent = null;
+         }
          mDBFacade.mInDailyReward = false;
          super.destroy();
          mDBFacade = null;
@@ -763,6 +776,15 @@ package uI.dailyRewards
          mBoxButton0.enabled = true;
          mBoxButton1.enabled = true;
          mBoxButton2.enabled = true;
+         mDBFacade.menuNavigationController.pushNewLayer("DAILY_LOGIN_POPUP",exitButtonPushed,mExitButton,mExitButton);
+         mBoxButton0.isToTheLeftOf(mBoxButton1);
+         mBoxButton1.isToTheLeftOf(mBoxButton2);
+         mBoxButton0.downNavigation = mReplayButton;
+         mBoxButton0.upNavigation = mExitButton;
+         mBoxButton1.upNavigation = mExitButton;
+         mBoxButton2.upNavigation = mExitButton;
+         mExitButton.downNavigation = mBoxButton0;
+         mDBFacade.menuNavigationController.setFocusedUiObject(mBoxButton0);
          ASCompat.setProperty((mDailyRewardMysteryBoxPopup : ASAny).inv_empty_slot_storage_box01.storage_box, "visible", false);
          ASCompat.setProperty((mDailyRewardMysteryBoxPopup : ASAny).inv_empty_slot_storage_box02.storage_box, "visible", false);
          ASCompat.setProperty((mDailyRewardMysteryBoxPopup : ASAny).inv_empty_slot_storage_box03.storage_box, "visible", false);
@@ -1043,6 +1065,10 @@ package uI.dailyRewards
             mRewardArray = [mRewardIcon0,mRewardIcon1,mRewardIcon2];
          }
          ASCompat.setProperty((mDailyRewardMysteryBoxPopup : ASAny).label_message2, "text", Locale.getString("DAILY_REWARDS_YOU_GOT"));
+         if(mDBFacade.steamAchievementsManager != null)
+         {
+            mDBFacade.steamAchievementsManager.setAchievement("COLLECT_DAILY_REWARD");
+         }
       }
       
       public function desaturate(param1:DisplayObject) 

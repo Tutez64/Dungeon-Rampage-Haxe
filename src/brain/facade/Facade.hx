@@ -246,7 +246,7 @@ public function  get_popupCurtainBlockMouse() : Bool
             mLogicalWorkManager.update(mGameClock);
             mPhysicsWorkManager.update(mGameClock);
             mPreRenderWorkManager.update(mGameClock);
-            mInputManager.flush();
+            flushInputs();
             mElapsedTime -= mTickLength;
             mGameClock.gameTime += Std.int(mTickLength * 1000);
             _loc3_++;
@@ -256,6 +256,11 @@ public function  get_popupCurtainBlockMouse() : Bool
          {
             mElapsedTime = 0;
          }
+      }
+      
+      function flushInputs() 
+      {
+         mInputManager.flush();
       }
       
       public function iamaCheater(param1:String) 

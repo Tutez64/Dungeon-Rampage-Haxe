@@ -192,6 +192,11 @@ package brain.utils
       
       public function destroy() 
       {
+         if(mAssetLoadingComponent != null)
+         {
+            mAssetLoadingComponent.destroy();
+            mAssetLoadingComponent = null;
+         }
       }
    }
 

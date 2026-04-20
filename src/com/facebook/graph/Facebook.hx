@@ -383,7 +383,7 @@ static public function  set_locale(param1:String) :String      {
       
       function handleJSEvent(param1:String, param2:String = null) 
       {
-         var __ax4_iter_138:ASAny;
+         var __ax4_iter_154:ASAny;
          var _loc3_:ASObject = null;
          var _loc4_:ASObject = null;
          if(this.jsCallbacks[param1] != null)
@@ -395,8 +395,8 @@ static public function  set_locale(param1:String) :String      {
             catch(e:com.adobe.serialization.json.JSONParseError)
             {
             }
-            __ax4_iter_138 = this.jsCallbacks[param1];
-            if (checkNullIteratee(__ax4_iter_138)) for(_tmp_ in __ax4_iter_138.___keys())
+            __ax4_iter_154 = this.jsCallbacks[param1];
+            if (checkNullIteratee(__ax4_iter_154)) for(_tmp_ in __ax4_iter_154.___keys())
             {
                _loc4_  = _tmp_;
                ASCompat.asFunction(_loc4_ )(_loc3_);

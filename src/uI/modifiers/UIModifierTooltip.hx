@@ -26,7 +26,7 @@ package uI.modifiers
          var _loc7_= param2.localToGlobal(new Point());
          mRoot.x = _loc7_.x;
          mRoot.y = _loc7_.y + 20;
-         mSceneGraphComponent = new SceneGraphComponent(param1);
+         mSceneGraphComponent = new SceneGraphComponent(param1,"UIModifierTooltip");
          mSceneGraphComponent.addChild(mRoot,(107 : UInt));
       }
       

@@ -9,6 +9,7 @@ package uI.infiniteIsland
    import brain.uI.UISlider;
    import brain.jsonRPC.JSONRPCService;
    import facade.DBFacade;
+   import facade.GameMasterLocale;
    import facade.Locale;
    import gameMasterDictionary.GMChest;
    import gameMasterDictionary.GMDoober;
@@ -345,7 +346,7 @@ package uI.infiniteIsland
          {
             var _loc2_:MovieClip = null;
             var __tmpAssignObj0:ASAny = (mFloorModifierLabels[(index : Int)].root : ASAny).label_floor_modifier;
-            ASCompat.setProperty(__tmpAssignObj0, "text", Std.string(__tmpAssignObj0.text) + "\n" + gmDungeonModifer.Name);
+            ASCompat.setProperty(__tmpAssignObj0, "text", Std.string(__tmpAssignObj0.text) + "\n" + GameMasterLocale.getGameMasterSubString("DUNGEON_MODIFIER_NAME",gmDungeonModifer.Constant));
             var _loc3_= param1.getClass(gmDungeonModifer.IconName);
             if(_loc3_ != null)
             {
@@ -357,8 +358,8 @@ package uI.infiniteIsland
                }
                (mFloorModifierLabels[(index : Int)].root : ASAny).floor_modifier_icon.addChild(_loc2_);
             }
-            ASCompat.setProperty((mFloorModifierLabels[(index : Int)].tooltip : ASAny).title_label, "text", gmDungeonModifer.Name);
-            ASCompat.setProperty((mFloorModifierLabels[(index : Int)].tooltip : ASAny).description_label, "text", gmDungeonModifer.Description);
+            ASCompat.setProperty((mFloorModifierLabels[(index : Int)].tooltip : ASAny).title_label, "text", GameMasterLocale.getGameMasterSubString("DUNGEON_MODIFIER_NAME",gmDungeonModifer.Constant));
+            ASCompat.setProperty((mFloorModifierLabels[(index : Int)].tooltip : ASAny).description_label, "text", GameMasterLocale.getGameMasterSubString("DUNGEON_MODIFIER_DESCRIPTION",gmDungeonModifer.Constant));
          };
       }
       

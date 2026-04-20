@@ -15,6 +15,7 @@ package uI.inventory.chests
    import brain.uI.UIObject;
    import brain.workLoop.LogicalWorkComponent;
    import facade.DBFacade;
+   import facade.GameMasterLocale;
    import facade.Locale;
    import facebookAPI.DBFacebookBragFeedPost;
    import gameMasterDictionary.GMAttack;
@@ -29,10 +30,10 @@ package uI.inventory.chests
    import gameMasterDictionary.GMWeaponItem;
    import gameMasterDictionary.GMWeaponMastertype;
    import sound.DBSoundComponent;
-   import uI.DBUIPopup;
+   import uI.hud.UIHud;
    import uI.inventory.UITapHoldTooltip;
    import uI.modifiers.UIModifier;
-   import uI.UIHud;
+   import uI.popup.DBUIPopup;
    import flash.display.MovieClip;
    import flash.geom.Point;
    import flash.geom.Rectangle;
@@ -160,8 +161,8 @@ package uI.inventory.chests
          mCloseCallback = param3;
          mGoToStorageCallback = param4;
          mSoundComponent = new DBSoundComponent(mDBFacade);
-         mSceneGraphComponent = new SceneGraphComponent(mDBFacade);
-         mLogicalWorkComponent = new LogicalWorkComponent(mDBFacade);
+         mSceneGraphComponent = new SceneGraphComponent(mDBFacade,"ChestRevealPopUp");
+         mLogicalWorkComponent = new LogicalWorkComponent(mDBFacade,"ChestRevealPopUp");
          mItemOfferId = (0 : UInt);
          mUpdateToInventoryDone = false;
          mNewWeaponDBID = 0;
@@ -205,6 +206,7 @@ package uI.inventory.chests
          var swfAsset= param1;
          var backgroundSwfClass= swfAsset.getClass("reveal_chest_popup");
          mPopUpMC = ASCompat.dynamicAs(ASCompat.createInstance(backgroundSwfClass, []) , MovieClip);
+         ASCompat.setProperty((mPopUpMC : ASAny).title_label, "text", GameMasterLocale.getGameMasterSubString("CHEST_NAME",mChestGM.Rarity));
          mPopUpMC.scaleX = mPopUpMC.scaleY = 1.8;
          bounds = mPopUpMC.getBounds(mDBFacade.stageRef);
          mPopUpMC.x = mDBFacade.stageRef.stageWidth / 2 - bounds.width / 2 - bounds.x;
@@ -288,7 +290,7 @@ package uI.inventory.chests
       
       public function updateRevealLoot(param1:ASAny) 
       {
-         var __ax4_iter_92:Vector<GMOfferDetail>;
+         var __ax4_iter_120:Vector<GMOfferDetail>;
          var offerId:UInt = 0;
          var weaponId:UInt = 0;
          var swfPath:String = null;
@@ -363,14 +365,14 @@ package uI.inventory.chests
             {
                swfPath = mRevealedGMOffer.BundleSwfFilepath;
                iconClass = mRevealedGMOffer.BundleIcon;
-               name = mRevealedGMOffer.BundleName;
+               name = GameMasterLocale.getGameMasterSubString("BUNDLE_OFFER_NAME",Std.string(mRevealedGMOffer.Id));
                mItemType = (2 : UInt);
                mRevealedItemId = offerId;
             }
             else if(mRevealedGMOffer.Details != null && mRevealedGMOffer.Details.length > 0)
             {
-               __ax4_iter_92 = mRevealedGMOffer.Details;
-               if (checkNullIteratee(__ax4_iter_92)) for (_tmp_ in __ax4_iter_92)
+               __ax4_iter_120 = mRevealedGMOffer.Details;
+               if (checkNullIteratee(__ax4_iter_120)) for (_tmp_ in __ax4_iter_120)
                {
                   offerDetail  = _tmp_;
                   if(offerDetail.StackableId != 0)
@@ -378,7 +380,7 @@ package uI.inventory.chests
                      gmStackable = ASCompat.dynamicAs(mDBFacade.gameMaster.stackableById.itemFor(offerDetail.StackableId), gameMasterDictionary.GMStackable);
                      swfPath = gmStackable.UISwfFilepath;
                      iconClass = gmStackable.IconName;
-                     name = gmStackable.Name;
+                     name = GameMasterLocale.getGameMasterSubString("STACKABLE_NAME",gmStackable.Constant);
                      mItemType = (2 : UInt);
                      mRevealedItemId = offerDetail.StackableId;
                   }
@@ -387,7 +389,7 @@ package uI.inventory.chests
                      gmPet = ASCompat.dynamicAs(mDBFacade.gameMaster.npcById.itemFor(offerDetail.PetId), gameMasterDictionary.GMNpc);
                      swfPath = gmPet.IconSwfFilepath;
                      iconClass = gmPet.IconName;
-                     name = gmPet.Name;
+                     name = GameMasterLocale.getGameMasterSubString("PET_NAME",gmPet.Constant);
                      mItemType = (3 : UInt);
                      mRevealedItemId = offerDetail.PetId;
                   }
@@ -401,7 +403,7 @@ package uI.inventory.chests
             aesthetic = mRevealedGMWeapon.getWeaponAesthetic(mRevealedItemLevel,mRevealedItemInfo.legendaryModifier > 0);
             swfPath = aesthetic.IconSwf;
             iconClass = aesthetic.IconName;
-            name = aesthetic.Name;
+            name = GameMasterLocale.getGameMasterSubString("WEAPON_AESTHETIC_NAME",aesthetic.Constant);
             mItemType = (1 : UInt);
          }
          mItemName = name;
@@ -508,16 +510,16 @@ package uI.inventory.chests
             ASCompat.setProperty((mItemInfoCardMC : ASAny).pet_stats, "visible", false);
             mRevealedItemIcon.scaleX = mRevealedItemIcon.scaleY = 0.5;
             gmWeaponItem = ASCompat.dynamicAs(mDBFacade.gameMaster.weaponItemById.itemFor(mRevealedItemId), gameMasterDictionary.GMWeaponItem);
-            mItemDesc = gmWeaponItem.getWeaponAesthetic(mRevealedItemLevel,mRevealedItemInfo.legendaryModifier > 0).Description;
+            mItemDesc = GameMasterLocale.getGameMasterSubString("WEAPON_AESTHETIC_DESCRIPTION",gmWeaponItem.getWeaponAesthetic(mRevealedItemLevel,mRevealedItemInfo.legendaryModifier > 0).WeaponItemConstant);
             isWeapon = isSellable = true;
-            mItemName = mRevealedItemInfo.Name;
+            mItemName = GameMasterLocale.getGameMasterSubString("WEAPON_AESTHETIC_NAME",gmWeaponItem.getWeaponAesthetic(mRevealedItemLevel,mRevealedItemInfo.legendaryModifier > 0).Constant);
             gmMasterTypeVector = mDBFacade.gameMaster.WeaponMastertypes;
             vi = 0;
             while(vi < gmMasterTypeVector.length)
             {
                if(gmMasterTypeVector[vi].Constant == gmWeaponItem.MasterType)
                {
-                  weaponType = gmMasterTypeVector[vi].Name.toUpperCase();
+                  weaponType = GameMasterLocale.getGameMasterSubString("WEAPON_MASTERTYPE",gmMasterTypeVector[vi].Constant).toUpperCase();
                }
                vi = vi + 1;
             }
@@ -529,7 +531,7 @@ package uI.inventory.chests
                chargeAttack = ASCompat.dynamicAs(mDBFacade.gameMaster.attackByConstant.itemFor(gmWeaponItem.ChargeAttack), gameMasterDictionary.GMAttack);
                if(chargeAttack != null)
                {
-                  chargeAttackName = chargeAttack.Name.toUpperCase();
+                  chargeAttackName = "MAKO" + chargeAttack.Name.toUpperCase();
                }
             }
             if(currentlySelectedAvatarInfo != null && currentlySelectedAvatarInfo.level >= weaponRequiredLevel)
@@ -587,7 +589,7 @@ package uI.inventory.chests
             if(gmStackable == null)
             {
                gmOffer = ASCompat.dynamicAs(mDBFacade.gameMaster.offerById.itemFor(mRevealedItemId), gameMasterDictionary.GMOffer);
-               mItemDesc = gmOffer.BundleDescription;
+               mItemDesc = GameMasterLocale.getGameMasterSubString("BUNDLE_OFFER_DESCRIPTION",Std.string(gmOffer.Id));
                if(gmOffer.Details.length > 0)
                {
                   if(gmOffer.Details[0].StackableId != 0)
@@ -601,7 +603,7 @@ package uI.inventory.chests
             }
             else
             {
-               mItemDesc = gmStackable.Description;
+               mItemDesc = GameMasterLocale.getGameMasterSubString("STACKABLE_DESCRIPTION",gmStackable.Constant);
             }
          }
          else if(mItemType == 3)
@@ -610,7 +612,7 @@ package uI.inventory.chests
             ASCompat.setProperty((mItemInfoCardMC : ASAny).pet_stats, "visible", true);
             mRevealedItemIcon.scaleX = mRevealedItemIcon.scaleY = 1;
             gmPet = ASCompat.dynamicAs(mDBFacade.gameMaster.npcById.itemFor(mRevealedItemId), gameMasterDictionary.GMNpc);
-            mItemDesc = gmPet.Description;
+            mItemDesc = GameMasterLocale.getGameMasterSubString("PET_DESCRIPTION",gmPet.Constant);
             j = (1 : UInt);
             while(j <= 5)
             {
@@ -672,7 +674,7 @@ package uI.inventory.chests
                         _loc2_ = ASCompat.dynamicAs(ASCompat.createInstance(_loc3_, []), flash.display.MovieClip);
                         _loc2_.scaleX = _loc2_.scaleY = 0.5;
                         mTapIcon.root.addChild(_loc2_);
-                        mTapTooltip.setValues(gmWeaponItem.TapTitle,gmWeaponItem.TapDescription);
+                        mTapTooltip.setValues(GameMasterLocale.getGameMasterSubString("WEAPON_ITEM_TAP_TITLE",gmWeaponItem.Constant),GameMasterLocale.getGameMasterSubString("WEAPON_ITEM_TAP_DESCRIPTION",gmWeaponItem.Constant));
                         mTapTooltip.visible = true;
                         stagePos = new Point();
                         stagePos.y += mTapIcon.root.height * 0.5;
@@ -698,8 +700,8 @@ package uI.inventory.chests
                         _loc2_ = ASCompat.dynamicAs(ASCompat.createInstance(_loc3_, []), flash.display.MovieClip);
                         _loc2_.scaleX = _loc2_.scaleY = 0.5;
                         mHoldIcon.root.addChild(_loc2_);
-                        _loc4_ = gmWeaponItem.WeaponController != null ? Locale.getString(gmWeaponItem.WeaponController) : gmWeaponItem.HoldTitle;
-                        mHoldTooltip.setValues(_loc4_,gmWeaponItem.HoldDescription);
+                        _loc4_ = gmWeaponItem.WeaponController != null ? GameMasterLocale.getGameMasterSubString("WEAPON_ITEM_CONTROLLER",gmWeaponItem.WeaponController) : gmWeaponItem.HoldTitle;
+                        mHoldTooltip.setValues(_loc4_,GameMasterLocale.getGameMasterSubString("WEAPON_ITEM_HOLD_DESCRIPTION",gmWeaponItem.Constant));
                         mHoldTooltip.visible = true;
                         stagePos = new Point();
                         stagePos.y += mHoldIcon.root.height * 0.5;
@@ -755,14 +757,14 @@ package uI.inventory.chests
             while(i < modifierList.length)
             {
                mModifiersList.push(new UIModifier(mDBFacade,ASCompat.dynamicAs(cast((mItemInfoCardMC : ASAny).ability, flash.display.DisplayObjectContainer).getChildByName("modifier_icon_" + Std.string((i + 1))) , MovieClip),modifierList[i].Constant));
-               preNameModifiers += modifierList[i].Name + " ";
+               preNameModifiers += GameMasterLocale.getGameMasterSubString("MODIFIER_NAME",modifierList[i].Constant) + " ";
                i = i + 1;
             }
             mItemName = preNameModifiers + mItemName;
             if(mRevealedItemInfo.legendaryModifier > 0)
             {
                mModifiersList.push(new UIModifier(mDBFacade,ASCompat.dynamicAs(cast((mItemInfoCardMC : ASAny).ability, flash.display.DisplayObjectContainer).getChildByName("modifier_icon_3") , MovieClip),"",(0 : UInt),true,mRevealedItemInfo.legendaryModifier));
-               mItemName = mRevealedItemInfo.gmWeaponItem.getWeaponAesthetic((0 : UInt),true).Name;
+               mItemName = GameMasterLocale.getGameMasterSubString("WEAPON_AESTHETIC_NAME",mRevealedItemInfo.gmWeaponItem.getWeaponAesthetic((0 : UInt),true).Constant);
             }
          }
          format = new TextFormat();
@@ -776,6 +778,12 @@ package uI.inventory.chests
          }
          ASCompat.setProperty((mPopUpMC : ASAny).title_label, "defaultTextFormat", format);
          ASCompat.setProperty((mPopUpMC : ASAny).title_label, "text", mItemName.toUpperCase());
+         mDBFacade.menuNavigationController.pushNewLayer("POPUP_WEAPON_CHEST_REVEALER",destroy,mItemInfoCardStoreButton,mItemInfoCardEquipButton);
+         mItemInfoCardSellButton.isToTheLeftOf(mItemInfoCardStoreButton);
+         mItemInfoCardStoreButton.isToTheLeftOf(mItemInfoCardEquipButton);
+         mCloseButton.isAbove(mItemInfoCardEquipButton);
+         mItemInfoCardSellButton.upNavigation = mCloseButton;
+         mItemInfoCardStoreButton.upNavigation = mCloseButton;
       }
       
       function sellRevealedItem() 
@@ -883,7 +891,7 @@ package uI.inventory.chests
       public function destroy() 
       {
          var _loc1_:UIModifier;
-         var __ax4_iter_93:Vector<UIModifier>;
+         var __ax4_iter_121:Vector<UIModifier>;
          if(mHoldTooltip != null)
          {
             mHoldTooltip.destroy();
@@ -892,12 +900,13 @@ package uI.inventory.chests
          {
             mHoldIcon.destroy();
          }
+         mDBFacade.menuNavigationController.popLayer("POPUP_WEAPON_CHEST_REVEALER");
          mHoldTooltip = null;
          mHoldIcon = null;
          if(mModifiersList.length > 0)
          {
-            __ax4_iter_93 = mModifiersList;
-            if (checkNullIteratee(__ax4_iter_93)) for (_tmp_ in __ax4_iter_93)
+            __ax4_iter_121 = mModifiersList;
+            if (checkNullIteratee(__ax4_iter_121)) for (_tmp_ in __ax4_iter_121)
             {
                _loc1_ = _tmp_;
                _loc1_.destroy();
@@ -905,7 +914,6 @@ package uI.inventory.chests
          }
          mModifiersList = null;
          mDBFacade = null;
-         mAssetLoadingComponent = null;
          mChestGM = null;
          if(mChestRenderer != null)
          {
@@ -941,6 +949,10 @@ package uI.inventory.chests
          }
          mAnimationMC = null;
          mSlotMachineAnimationMC = null;
+         if(mSceneGraphComponent != null)
+         {
+            mSceneGraphComponent.destroy();
+         }
          mSceneGraphComponent = null;
          mPopUpMC = null;
          mSoundComponent.destroy();

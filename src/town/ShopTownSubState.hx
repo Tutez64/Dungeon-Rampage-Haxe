@@ -1,8 +1,7 @@
 package town
 ;
    import facade.DBFacade;
-   import metrics.PixelTracker;
-   import uI.UIShop;
+   import uI.shop.UIShop;
    
     class ShopTownSubState extends TownSubState
    {
@@ -27,11 +26,18 @@ package town
             mUIShop.animateEntry();
          }
          mTownStateMachine.townHeader.showCloseButton(true);
-         PixelTracker.visitedStore(mDBFacade);
+         super.resetHeaderLinks();
+         super.setupHeaderLinks();
+         mDBFacade.menuNavigationController.pushNewLayer("SHOP_MENU",mTownStateMachine.townHeader.determineCallback,mTownStateMachine.townHeader.closeButton,mTownStateMachine.townHeader.closeButton);
+      }
+      
+      override function setupHeaderLinks() 
+      {
       }
       
       override public function exitState() 
       {
+         mDBFacade.menuNavigationController.popLayer("SHOP_MENU");
          mUIShop.processChosenAvatar();
          super.exitState();
       }

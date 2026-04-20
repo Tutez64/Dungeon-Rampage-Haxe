@@ -1,6 +1,7 @@
 package brain.input
 ;
    import brain.facade.Facade;
+   import brain.logger.Logger;
    import brain.mouseScrollPlugin.CustomMouseWheelEvent;
    import brain.utils.MemoryTracker;
    import flash.events.Event;
@@ -9,10 +10,6 @@ package brain.input
    
     class InputManager
    {
-      
-      public static inline final STAGE_KEY_DOWN= "STAGE_KEY_DOWN";
-      
-      public static inline final STAGE_KEY_UP= "STAGE_KEY_UP";
       
       var mEnabled:Bool = false;
       
@@ -46,6 +43,8 @@ package brain.input
       
       public var disableInputs:Bool = false;
       
+      var menuNavigationCallback:ASFunction;
+      
       public function new(param1:Facade)
       {
          
@@ -54,6 +53,21 @@ package brain.input
          MemoryTracker.track(mKeysPressed,"Vector.<int> - keys pressed in InputManager()","brain");
          MemoryTracker.track(mKeysReleased,"Vector.<int> - keys released in InputManager()","brain");
          enable();
+      }
+      
+      public function registerMenuNavigationCallback(param1:ASFunction) 
+      {
+         menuNavigationCallback = param1;
+      }
+      
+      public function unregisterKeyPressedCallback(param1:ASAny) 
+      {
+         if(ASCompat.toBool(menuNavigationCallback))
+         {
+            menuNavigationCallback = null;
+            return;
+         }
+         Logger.warn("Unregistering MenuNavigation shouldn\'t have an empty callback");
       }
       
       @:isVar public var mouseWheelDelta(get,never):Int;
@@ -155,6 +169,10 @@ public function  get_mouseFlashY() : Int
                mKeysDown[_loc2_] = true;
                mNumberOfKeysDown = mNumberOfKeysDown + 1;
                mKeysPressed[mNumberOfKeysPressed++] = _loc2_;
+            }
+            if(ASCompat.toBool(menuNavigationCallback))
+            {
+               menuNavigationCallback(_loc2_);
             }
          }
       }

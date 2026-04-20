@@ -120,8 +120,8 @@ return param1;
          var _loc2_:FriendInfo = null;
          pendingFriendRequests = mPendingFriendRequests;
          var _loc1_:ASAny;
-         final __ax4_iter_183 = mPendingFriendRequests;
-         if (checkNullIteratee(__ax4_iter_183)) for (_tmp_ in __ax4_iter_183)
+         final __ax4_iter_199 = mPendingFriendRequests;
+         if (checkNullIteratee(__ax4_iter_199)) for (_tmp_ in __ax4_iter_199)
          {
             _loc1_ = _tmp_;
             _loc2_ = new FriendInfo(mDBFacade,_loc1_);
@@ -138,8 +138,8 @@ return param1;
          var idx:UInt;
          mSelectedFriendToIds.splice(0,(mSelectedFriendToIds.length : UInt));
          mSelectedFriendRequestIds.splice(0,(mSelectedFriendRequestIds.length : UInt));
-         final __ax4_iter_184 = mFriendRequestPopulater.getSelectedToggles();
-         if (checkNullIteratee(__ax4_iter_184)) for (_tmp_ in __ax4_iter_184)
+         final __ax4_iter_200 = mFriendRequestPopulater.getSelectedToggles();
+         if (checkNullIteratee(__ax4_iter_200)) for (_tmp_ in __ax4_iter_200)
          {
             idx  = (ASCompat.toInt(_tmp_) : UInt);
             mSelectedFriendToIds.push(mPendingFriendRequests[(idx : Int)].account_id);
@@ -170,8 +170,8 @@ return param1;
          mSelectedFriendToIds.splice(0,(mSelectedFriendToIds.length : UInt));
          mSelectedFriendRequestIds.splice(0,(mSelectedFriendRequestIds.length : UInt));
          fullAcceptList = "[";
-         final __ax4_iter_185 = mFriendRequestPopulater.getSelectedToggles();
-         if (checkNullIteratee(__ax4_iter_185)) for (_tmp_ in __ax4_iter_185)
+         final __ax4_iter_201 = mFriendRequestPopulater.getSelectedToggles();
+         if (checkNullIteratee(__ax4_iter_201)) for (_tmp_ in __ax4_iter_201)
          {
             idx  = (ASCompat.toInt(_tmp_) : UInt);
             mSelectedFriendToIds.push(mPendingFriendRequests[(idx : Int)].account_id);

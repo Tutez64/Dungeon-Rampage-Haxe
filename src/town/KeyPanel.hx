@@ -47,7 +47,7 @@ package town
          mCloseCallBack = param4;
          mStateCreated = param5;
          mChestKeySlots = new Vector<ChestKeySlot>();
-         mSceneGraphComponent = new SceneGraphComponent(mDBFacade);
+         mSceneGraphComponent = new SceneGraphComponent(mDBFacade,"KeyPanel");
          mAssetLoadingComponent.getSwfAsset(DBFacade.buildFullDownloadPath("Resources/Art2D/UI/db_UI_town.swf"),swfLoaded);
          var _loc6_:ASObject = {};
          ASCompat.setProperty(_loc6_, "mainGameState", mStateCreated);

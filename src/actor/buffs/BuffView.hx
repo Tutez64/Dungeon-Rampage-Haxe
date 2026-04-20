@@ -58,7 +58,7 @@ package actor.buffs
          mScaleUpStartDelayTime = param7;
          mScaleUpIncrementTime = param8;
          mScaleUpIncrementScale = param9;
-         mLogicalWorkComponent = new LogicalWorkComponent(param1);
+         mLogicalWorkComponent = new LogicalWorkComponent(param1,"BuffView");
          super(param1,param2);
          if(ASCompat.stringAsBool(param2.className))
          {
@@ -191,6 +191,11 @@ package actor.buffs
             mShowTween.complete();
             mShowTween.kill();
             mShowTween = null;
+         }
+         if(mLogicalWorkComponent != null)
+         {
+            mLogicalWorkComponent.destroy();
+            mLogicalWorkComponent = null;
          }
          if(mParentView != null)
          {

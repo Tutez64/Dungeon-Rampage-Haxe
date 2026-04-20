@@ -136,8 +136,8 @@ public function  get_answerPath() : Vector<UInt>
       {
          var _loc2_= new Vector<UInt>();
          var _loc1_:UInt;
-         final __ax4_iter_74 = mAnswerPath;
-         if (checkNullIteratee(__ax4_iter_74)) for (_tmp_ in __ax4_iter_74)
+         final __ax4_iter_77 = mAnswerPath;
+         if (checkNullIteratee(__ax4_iter_77)) for (_tmp_ in __ax4_iter_77)
          {
             _loc1_ = _tmp_;
             _loc2_.push(_loc1_);
@@ -235,7 +235,7 @@ public function  get_answerPath() : Vector<UInt>
       public function Search(param1:Vector3D, param2:Vector3D) 
       {
          var _loc9_:UInt;
-         var __ax4_iter_75:Vector<UInt>;
+         var __ax4_iter_78:Vector<UInt>;
          var _loc7_:B2Transform = null;
          mClosestGrid = null;
          mAnswerPath.splice(0,(mAnswerPath.length : UInt));
@@ -266,8 +266,8 @@ public function  get_answerPath() : Vector<UInt>
             _loc7_ = new B2Transform();
             _loc7_.position = NavCollider.convertToB2Vec2(_loc3_);
             mDistributedDungeonFloor.debugVisualizer.makeAGridCircle(_loc7_,new B2Color(1,0,0));
-            __ax4_iter_75 = mAnswerPath;
-            if (checkNullIteratee(__ax4_iter_75)) for (_tmp_ in __ax4_iter_75)
+            __ax4_iter_78 = mAnswerPath;
+            if (checkNullIteratee(__ax4_iter_78)) for (_tmp_ in __ax4_iter_78)
             {
                _loc9_ = _tmp_;
                if(!(_loc9_ == _loc8_ || _loc9_ == _loc5_))
@@ -283,7 +283,7 @@ public function  get_answerPath() : Vector<UInt>
       public function AstarWorker(param1:UInt, param2:UInt) : Bool
       {
          var _loc8_:ASAny;
-         var __ax4_iter_76:Array<ASAny>;
+         var __ax4_iter_79:Array<ASAny>;
          var _loc9_:AstarGridNode = null;
          var _loc3_:AstarGridNode = null;
          var _loc5_= false;
@@ -317,8 +317,8 @@ public function  get_answerPath() : Vector<UInt>
             }
             mOpenList.pop();
             _loc9_.visited = (mUniquePassKey : Int);
-            __ax4_iter_76 = _loc9_.Neighbors;
-            if (checkNullIteratee(__ax4_iter_76)) for (_tmp_ in __ax4_iter_76)
+            __ax4_iter_79 = _loc9_.Neighbors;
+            if (checkNullIteratee(__ax4_iter_79)) for (_tmp_ in __ax4_iter_79)
             {
                _loc8_ = _tmp_;
                _loc3_ = Nodes[ASCompat.toInt(_loc8_)];

@@ -127,8 +127,8 @@ package actor
          mAFK = false;
          mMovementController = new MovementController(this,mActorView,mDBFacade);
          mMouseEventHandler = new MouseEventHandler(this,mDBFacade);
-         mPreRenderWorkComponent = new PreRenderWorkComponent(mDBFacade);
-         mLogicalWorkComponent = new LogicalWorkComponent(mDBFacade);
+         mPreRenderWorkComponent = new PreRenderWorkComponent(mDBFacade,"ActorGameObject");
+         mLogicalWorkComponent = new LogicalWorkComponent(mDBFacade,"ActorGameObject");
          buildStateMachine();
          mLevel = (0 : UInt);
          this.layer = 20;

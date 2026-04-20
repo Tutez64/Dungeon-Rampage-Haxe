@@ -45,7 +45,7 @@ package uI.uINewsFeed
       {
          
          mDBFacade = param1;
-         mLogicalWorkComponent = new LogicalWorkComponent(mDBFacade);
+         mLogicalWorkComponent = new LogicalWorkComponent(mDBFacade,"UINewsFeedController");
          mAssetLoadingComponent = new AssetLoadingComponent(mDBFacade);
          mEventComponent = new EventComponent(mDBFacade);
          mVisibleFeeds = new Vector<UINewsFeed>();
@@ -158,8 +158,8 @@ package uI.uINewsFeed
       function lerpAllfeedsUp() 
       {
          var _loc1_:UINewsFeed;
-         final __ax4_iter_64 = mVisibleFeeds;
-         if (checkNullIteratee(__ax4_iter_64)) for (_tmp_ in __ax4_iter_64)
+         final __ax4_iter_67 = mVisibleFeeds;
+         if (checkNullIteratee(__ax4_iter_67)) for (_tmp_ in __ax4_iter_67)
          {
             _loc1_ = _tmp_;
             if(_loc1_ != null)
@@ -172,8 +172,8 @@ package uI.uINewsFeed
       function flushFeeds() 
       {
          var _loc1_:ASAny;
-         final __ax4_iter_65 = mQueuedFeeds;
-         if (checkNullIteratee(__ax4_iter_65)) for (_tmp_ in __ax4_iter_65)
+         final __ax4_iter_68 = mQueuedFeeds;
+         if (checkNullIteratee(__ax4_iter_68)) for (_tmp_ in __ax4_iter_68)
          {
             _loc1_ = _tmp_;
             if(_loc1_ != null)
@@ -183,8 +183,8 @@ package uI.uINewsFeed
             _loc1_ = null;
          }
          mQueuedFeeds.splice(0,(mQueuedFeeds.length : UInt));
-         final __ax4_iter_66 = mVisibleFeeds;
-         if (checkNullIteratee(__ax4_iter_66)) for (_tmp_ in __ax4_iter_66)
+         final __ax4_iter_69 = mVisibleFeeds;
+         if (checkNullIteratee(__ax4_iter_69)) for (_tmp_ in __ax4_iter_69)
          {
             _loc1_  = _tmp_;
             if(ASCompat.toBool(_loc1_))

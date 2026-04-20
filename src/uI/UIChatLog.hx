@@ -89,6 +89,8 @@ package uI
       
       var mHeroOwner:HeroGameObjectOwner;
       
+      var mEnabledChatEnterEvent:Bool = false;
+      
       var mPreviousHeight:Float = 1;
       
       public function new(param1:DBFacade, param2:MovieClip, param3:MovieClip, param4:MovieClip, param5:MovieClip)
@@ -101,7 +103,7 @@ package uI
          }
          mPlayerSetSlider = false;
          mAssetLoadingComponent = new AssetLoadingComponent(mDBFacade);
-         mSceneGraphComponent = new SceneGraphComponent(mDBFacade);
+         mSceneGraphComponent = new SceneGraphComponent(mDBFacade,"UIChatLog");
          mEventComponent = new EventComponent(mDBFacade);
          setupButtons(param3,param4,param5);
          setupLog(param2);
@@ -213,7 +215,7 @@ public function  set_heroOwner(param1:HeroGameObjectOwner) :HeroGameObjectOwner 
       {
          if(!Logger.isConsoleVisible())
          {
-            if(param1.keyCode == 13)
+            if(param1.keyCode == 13 && mEnabledChatEnterEvent)
             {
                mDBFacade.stageRef.focus = mChatInputText.textField;
             }
@@ -277,7 +279,7 @@ default:
       function addChatLog(param1:String, param2:UInt, param3:String = "") 
       {
          var _loc4_:ChatTextFieldHelper;
-         var __ax4_iter_114:Vector<ChatTextFieldHelper>;
+         var __ax4_iter_135:Vector<ChatTextFieldHelper>;
          var __tmpAssignObj7:ChatTextFieldHelper;
          var __tmpAssignObj8:ChatTextFieldHelper;
          var _loc8_:ChatTextFieldHelper = null;
@@ -299,8 +301,8 @@ default:
          {
             _loc8_ = mChats.shift();
             _loc6_ = _loc8_.colorEndIndex - _loc8_.colorStartIndex;
-            __ax4_iter_114 = mChats;
-            if (checkNullIteratee(__ax4_iter_114)) for (_tmp_ in __ax4_iter_114)
+            __ax4_iter_135 = mChats;
+            if (checkNullIteratee(__ax4_iter_135)) for (_tmp_ in __ax4_iter_135)
             {
                _loc4_ = _tmp_;
                __tmpAssignObj7 = _loc4_;
@@ -318,14 +320,14 @@ default:
          var _loc2_:ASAny = 0;
          mChatLog.text = "";
          var _loc3_:ChatTextFieldHelper;
-         final __ax4_iter_115 = mChats;
-         if (checkNullIteratee(__ax4_iter_115)) for (_tmp_ in __ax4_iter_115)
+         final __ax4_iter_136 = mChats;
+         if (checkNullIteratee(__ax4_iter_136)) for (_tmp_ in __ax4_iter_136)
          {
             _loc3_ = _tmp_;
             mChatLog.text = mChatLog.text + Std.string(_loc3_.chatText);
          }
-         final __ax4_iter_116 = mChats;
-         if (checkNullIteratee(__ax4_iter_116)) for (_tmp_ in __ax4_iter_116)
+         final __ax4_iter_137 = mChats;
+         if (checkNullIteratee(__ax4_iter_137)) for (_tmp_ in __ax4_iter_137)
          {
             _loc3_  = _tmp_;
             _loc2_ = _loc3_.colorStartIndex;
@@ -462,6 +464,16 @@ default:
          mDBFacade = null;
          mChatLog = null;
          mChatLogContainer = null;
+      }
+      
+            
+      @:isVar public var enabledChatEnterEvent(get,set):Bool;
+public function  set_enabledChatEnterEvent(param1:Bool) :Bool      {
+         return mEnabledChatEnterEvent = param1;
+      }
+function  get_enabledChatEnterEvent() : Bool
+      {
+         return mEnabledChatEnterEvent;
       }
    }
 

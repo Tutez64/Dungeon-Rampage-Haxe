@@ -40,7 +40,7 @@ package brain.uI
       public function new(param1:Facade, param2:MovieClip, param3:Float, param4:UInt, param5:Float, param6:Float = 1, param7:Float = 180)
       {
          super(param1,param2);
-         mLogicalWorkComponent = new LogicalWorkComponent(param1);
+         mLogicalWorkComponent = new LogicalWorkComponent(param1,"UICircularProgressBar");
          MemoryTracker.track(mLogicalWorkComponent,"LogicalWorkComponent - created in UICircularProgressBar()","brain");
          mEmptyClip = new MovieClip();
          MemoryTracker.track(mEmptyClip,"MovieClip - drawing clip created in UICircularProgressBar()","brain");
@@ -117,8 +117,13 @@ public function  set_updateTask(param1:Task) :Task      {
          if(mDrawTask != null)
          {
             mDrawTask.destroy();
+            mDrawTask = null;
          }
-         mDrawTask = null;
+         if(mLogicalWorkComponent != null)
+         {
+            mLogicalWorkComponent.destroy();
+            mLogicalWorkComponent = null;
+         }
          super.destroy();
       }
    }

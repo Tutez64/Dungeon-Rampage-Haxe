@@ -1,6 +1,7 @@
 package uI
 ;
    import facade.DBFacade;
+   import facade.GameMasterLocale;
    import facade.Locale;
    import gameMasterDictionary.GMHints;
    import flash.display.MovieClip;
@@ -33,8 +34,8 @@ package uI
          var _loc2_= new Vector<GMHints>();
          var _loc5_= mDBFacade.dbAccountInfo.activeAvatarInfo.level;
          var _loc4_:GMHints;
-         final __ax4_iter_120 = mDBFacade.gameMaster.Hints;
-         if (checkNullIteratee(__ax4_iter_120)) for (_tmp_ in __ax4_iter_120)
+         final __ax4_iter_133 = mDBFacade.gameMaster.Hints;
+         if (checkNullIteratee(__ax4_iter_133)) for (_tmp_ in __ax4_iter_133)
          {
             _loc4_ = _tmp_;
             if(ASCompat.toNumberField(_loc4_, "MinLevel") <= _loc5_ && ASCompat.toNumberField(_loc4_, "MaxLevel") >= _loc5_)
@@ -52,7 +53,7 @@ package uI
          {
             return;
          }
-         mHintText.text = _loc3_.HintText;
+         mHintText.text = GameMasterLocale.getGameMasterSubString("HINTS",_loc3_.Constant);
       }
       
       public function destroy() 

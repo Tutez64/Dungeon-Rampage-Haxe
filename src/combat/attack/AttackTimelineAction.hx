@@ -34,7 +34,7 @@ package combat.attack
          mActorGameObject = param1;
          mActorView = param2;
          mDBFacade = param3;
-         mWorkComponent = new LogicalWorkComponent(mDBFacade);
+         mWorkComponent = new LogicalWorkComponent(mDBFacade,"AttackTimelineAction");
       }
       
       @:isVar public var attackType(never,set):UInt;

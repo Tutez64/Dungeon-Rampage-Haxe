@@ -2,6 +2,7 @@ package combat.weapon
 ;
    import actor.ActorRenderer;
    import brain.render.IRenderer;
+   import dBGlobals.DBGlobal;
    import facade.DBFacade;
    
     class WeaponRenderer extends ActorRenderer
@@ -43,6 +44,10 @@ package combat.weapon
       
       override function  get_swfFilePath() : String
       {
+         if(DBGlobal.endsWith(super.swfFilePath,".HD.swf"))
+         {
+            return super.swfFilePath.substring(0,super.swfFilePath.length - 7) + "_" + mWeaponGameObject.weaponAesthetic.ModelName + ".HD.swf";
+         }
          return super.swfFilePath.substring(0,super.swfFilePath.length - 4) + "_" + mWeaponGameObject.weaponAesthetic.ModelName + ".swf";
       }
    }

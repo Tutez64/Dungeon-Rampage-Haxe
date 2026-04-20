@@ -16,11 +16,12 @@ package uI.inventory.chests
    import brain.uI.UIObject;
    import brain.utils.MemoryTracker;
    import facade.DBFacade;
+   import facade.GameMasterLocale;
    import facade.Locale;
    import gameMasterDictionary.GMHero;
    import gameMasterDictionary.GMSkin;
-   import uI.DBUIPopup;
-   import uI.UIHud;
+   import uI.hud.UIHud;
+   import uI.popup.DBUIPopup;
    import flash.display.MovieClip;
    
     class ChestInfoCard extends UIObject
@@ -100,7 +101,7 @@ package uI.inventory.chests
          mDBFacade = param1;
          mSceneGraphComponent = param2;
          mAssetLoadingComponent = new AssetLoadingComponent(mDBFacade);
-         mSceneGraphComponent = new SceneGraphComponent(mDBFacade);
+         mSceneGraphComponent = new SceneGraphComponent(mDBFacade,"ChestInfoCard");
          mOpenChestCallback = param5;
          mAbandonChestCallback = param4;
          mOpenChestCallbackDS = param7;
@@ -198,7 +199,7 @@ return param1;
       public function refreshChestInfoUI() 
       {
          loadIcon();
-         ASCompat.setProperty((mChestCardMC : ASAny).label, "text", mChestInfo.gmChestInfo.Name);
+         ASCompat.setProperty((mChestCardMC : ASAny).label, "text", GameMasterLocale.getGameMasterSubString("CHEST_NAME",mChestInfo.gmChestInfo.Rarity));
          if(mChestInfo.isFromDungeonSummary())
          {
             ASCompat.setProperty((mChestCardMC : ASAny).selection_01, "visible", false);
@@ -522,6 +523,10 @@ return param1;
          mKeyThatCanOpenChest = null;
          mOpenChestCallback = null;
          mAbandonChestCallback = null;
+         if(mSceneGraphComponent != null)
+         {
+            mSceneGraphComponent.destroy();
+         }
          mSceneGraphComponent = null;
          if(mChestRenderer != null)
          {

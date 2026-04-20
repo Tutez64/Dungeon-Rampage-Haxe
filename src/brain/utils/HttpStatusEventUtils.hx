@@ -18,8 +18,8 @@ package brain.utils
             return null;
          }
          var _loc2_:URLRequestHeader;
-         final __ax4_iter_59 = param1.responseHeaders;
-         if (checkNullIteratee(__ax4_iter_59)) for (_tmp_ in __ax4_iter_59)
+         final __ax4_iter_62 = param1.responseHeaders;
+         if (checkNullIteratee(__ax4_iter_62)) for (_tmp_ in __ax4_iter_62)
          {
             _loc2_ = _tmp_;
             if(_loc2_.name.toLowerCase() == "x-trace-id")

@@ -3,7 +3,6 @@ package brain.render
    import brain.clock.GameClock;
    import brain.facade.Facade;
    import brain.logger.Logger;
-   import brain.utils.MemoryTracker;
    import brain.workLoop.LogicalWorkComponent;
    import brain.workLoop.Task;
    import flash.display.DisplayObject;
@@ -41,14 +40,14 @@ package brain.render
       
       var mLogicalWorkComponent:LogicalWorkComponent;
       
-      public function new(param1:Facade, param2:MovieClip, param3:ASFunction = null)
+      public function new(param1:Facade, param2:MovieClip, param3:ASFunction = null, param4:String = null)
       {
          
          this.clip = param2;
          mFinishedCallback = param3;
          if(mMaxFrames > 1)
          {
-            mLogicalWorkComponent = new LogicalWorkComponent(param1);
+            mLogicalWorkComponent = new LogicalWorkComponent(param1,"MovieClipRenderer");
             if(mClip.stage != null)
             {
                onAdd();
@@ -56,7 +55,6 @@ package brain.render
             mClip.addEventListener("addedToStage",onAdd);
             mClip.addEventListener("removedFromStage",onRemove);
          }
-         MemoryTracker.track(this,"MovieClipRenderer frames=" + mMaxFrames,"pool");
       }
       
       public function setFrame(param1:UInt) 
@@ -360,8 +358,8 @@ public function  get_isPlaying() : Bool
       {
          var _loc2_= -1;
          var _loc3_:FrameLabel;
-         final __ax4_iter_131 = param1.currentLabels;
-         if (checkNullIteratee(__ax4_iter_131)) for (_tmp_ in __ax4_iter_131)
+         final __ax4_iter_140 = param1.currentLabels;
+         if (checkNullIteratee(__ax4_iter_140)) for (_tmp_ in __ax4_iter_140)
          {
             _loc3_ = _tmp_;
             if(_loc3_.name == "loop")

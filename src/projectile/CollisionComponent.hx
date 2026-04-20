@@ -62,7 +62,7 @@ package projectile
       {
          
          mDBFacade = param1;
-         mLogicalWorkComponent = new LogicalWorkComponent(mDBFacade);
+         mLogicalWorkComponent = new LogicalWorkComponent(mDBFacade,"CollisionComponent");
          mDungeonFloor = param4;
          mNumCollisions = (0 : UInt);
          mDontTrackGenerations = param2.gmProjectile.NoGenerations;
@@ -115,6 +115,11 @@ public function  get_updatedVelocity() : Bool
          mRecurringHitDelayTasks = null;
          mActorCollisions.clear();
          mActorCollisions = null;
+         if(mLogicalWorkComponent != null)
+         {
+            mLogicalWorkComponent.destroy();
+            mLogicalWorkComponent = null;
+         }
       }
       
       public function hitWall() 

@@ -66,7 +66,7 @@ package combat.weapon
       
       public function buildControllerAttacks() 
       {
-         mScalingLogicalWorkComponent = new LogicalWorkComponent(mDBFacade);
+         mScalingLogicalWorkComponent = new LogicalWorkComponent(mDBFacade,"ScalingWeaponController");
          mHoldingAttack = ASCompat.dynamicAs(mDBFacade.gameMaster.attackByConstant.itemFor(mWeapon.weaponData.HoldingAttack), gameMasterDictionary.GMAttack);
          if(mHoldingAttack != null)
          {

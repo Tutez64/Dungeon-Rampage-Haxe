@@ -23,6 +23,8 @@ package gameMasterDictionary
       
       public var SwfFilepath:String;
       
+      public var HDSwfFilepath:String;
+      
       public var UISwfFilepath:String;
       
       public var FeedPostPicture:String;
@@ -40,6 +42,8 @@ package gameMasterDictionary
       public var Saturation:Float = Math.NaN;
       
       public var Brightness:Float = Math.NaN;
+      
+      public var Scale3DModel:Float = Math.NaN;
       
       public var HitVol:Float = Math.NaN;
       
@@ -82,6 +86,7 @@ package gameMasterDictionary
          IconName = ASCompat.asString(param1.IconName );
          CardName = ASCompat.asString(param1.CardName );
          SwfFilepath = ASCompat.asString(param1.SwfFilepath );
+         HDSwfFilepath = param1.HDSwfFilepath;
          UISwfFilepath = ASCompat.asString(param1.UISwfFilepath );
          FeedPostPicture = param1.FeedPostPicture;
          Scale = ASCompat.asNumber(param1.Scale );
@@ -91,6 +96,14 @@ package gameMasterDictionary
          Hue = ASCompat.toNumberField(param1, "Hue");
          Saturation = ASCompat.toBool(param1.Saturation) ? ASCompat.toNumber(100 + param1.Saturation) / 100 * 2 : 0;
          Brightness = ASCompat.toNumberField(param1, "Brightness");
+         if(param1.Scale3DModel == null)
+         {
+            Scale3DModel = 1;
+         }
+         else
+         {
+            Scale3DModel = ASCompat.toNumberField(param1, "Scale3DModel");
+         }
          HitVol = ASCompat.asNumber(param1.HitVol );
          HitSound = ASCompat.asString(param1.HitSound );
          DeathVol = ASCompat.asNumber(param1.DeathVol );

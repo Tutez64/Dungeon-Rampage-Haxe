@@ -9,8 +9,8 @@ package stateMachine.mainStateMachine
    import events.GameObjectEvent;
    import events.LEClientEvent;
    import facade.DBFacade;
+   import uI.hud.UITutorialController;
    import uI.uINewsFeed.UINewsFeedController;
-   import uI.UITutorialController;
    import flash.events.Event;
    
     class RunState extends State
@@ -46,7 +46,7 @@ package stateMachine.mainStateMachine
          mDBFacade = param1;
          mGoToSplashScreenCallback = param2;
          mEventComponent = new EventComponent(mDBFacade);
-         mLogicalWorkComponent = new LogicalWorkComponent(mDBFacade);
+         mLogicalWorkComponent = new LogicalWorkComponent(mDBFacade,"RunState");
          mTutorialController = new UITutorialController(mDBFacade);
       }
       

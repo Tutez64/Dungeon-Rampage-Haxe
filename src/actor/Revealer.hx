@@ -38,7 +38,7 @@ package actor
          mStartFrame = param2.gameClock.frame;
          mTargetScale = param1.scaleX;
          mRevealType = param5;
-         mWorkComponent = new LogicalWorkComponent(mDBFacade);
+         mWorkComponent = new LogicalWorkComponent(mDBFacade,"Revealer");
          mWorkComponent.doEveryFrame(update);
       }
       

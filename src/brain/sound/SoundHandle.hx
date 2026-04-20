@@ -50,7 +50,7 @@ package brain.sound
       {
          
          mSoundManager = param1;
-         mWorkComponent = new LogicalWorkComponent(param2);
+         mWorkComponent = new LogicalWorkComponent(param2,"SoundHandle");
          MemoryTracker.track(mWorkComponent,"LogicalWorkComponent - created in SoundHandle, category: " + param4,"brain");
          mSound = param3;
          mVolume = param7;
@@ -239,6 +239,11 @@ public function  get_category() : String
          }
          mCategory = null;
          mSoundTransform = null;
+         if(mWorkComponent != null)
+         {
+            mWorkComponent.destroy();
+            mWorkComponent = null;
+         }
          if(mEventComponent != null)
          {
             mEventComponent.destroy();

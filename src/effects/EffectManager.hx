@@ -39,9 +39,9 @@ package effects
          mDBFacade = param1;
          mManagedEffects = new Map();
          mAssetLoadingComponent = new AssetLoadingComponent(mDBFacade);
-         mSceneGraphComponent = new SceneGraphComponent(mDBFacade);
+         mSceneGraphComponent = new SceneGraphComponent(mDBFacade,"EffectManager");
          mSoundComponent = new DBSoundComponent(mDBFacade);
-         mLogicalWorkComponent = new LogicalWorkComponent(mDBFacade);
+         mLogicalWorkComponent = new LogicalWorkComponent(mDBFacade,"EffectManager");
       }
       
       public function playLerpedEffect(param1:String, param2:String, param3:Vector3D, param4:FloorObject = null, param5:ActorGameObject = null, param6:Float = 1, param7:UInt = (13369344 : UInt), param8:Bool = false, param9:Float = 1, param10:Float = 0, param11:Float = 0, param12:Float = 0, param13:Float = 0, param14:Bool = false, param15:String = "sorted", param16:Bool = false, param17:Float = 1, param18:ASFunction = null) 

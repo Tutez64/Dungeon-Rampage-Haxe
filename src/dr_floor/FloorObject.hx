@@ -125,8 +125,8 @@ public function  get_worldCenterAsb2Vec2() : B2Vec2
       public function removeNavColliders() 
       {
          var _loc1_:NavCollider;
-         final __ax4_iter_190 = mNavCollisions;
-         if (checkNullIteratee(__ax4_iter_190)) for (_tmp_ in __ax4_iter_190)
+         final __ax4_iter_225 = mNavCollisions;
+         if (checkNullIteratee(__ax4_iter_225)) for (_tmp_ in __ax4_iter_225)
          {
             _loc1_ = _tmp_;
             _loc1_.destroy();
@@ -137,8 +137,8 @@ public function  get_worldCenterAsb2Vec2() : B2Vec2
       @:isVar public var navCollidersActive(never,set):Bool;
 public function  set_navCollidersActive(param1:Bool) :Bool      {
          var _loc2_:NavCollider;
-         final __ax4_iter_191 = mNavCollisions;
-         if (checkNullIteratee(__ax4_iter_191)) for (_tmp_ in __ax4_iter_191)
+         final __ax4_iter_226 = mNavCollisions;
+         if (checkNullIteratee(__ax4_iter_226)) for (_tmp_ in __ax4_iter_226)
          {
             _loc2_ = _tmp_;
             ASCompat.setProperty(_loc2_, "active", param1);
@@ -273,8 +273,8 @@ function  get_view() : FloorView
          mTile = null;
          mDistributedDungeonFloor = null;
          var _loc1_:NavCollider;
-         final __ax4_iter_192 = mNavCollisions;
-         if (checkNullIteratee(__ax4_iter_192)) for (_tmp_ in __ax4_iter_192)
+         final __ax4_iter_227 = mNavCollisions;
+         if (checkNullIteratee(__ax4_iter_227)) for (_tmp_ in __ax4_iter_227)
          {
             _loc1_ = _tmp_;
             _loc1_.destroy();

@@ -14,6 +14,8 @@ package generatedCode
       
       public static inline final FLID_effectedActor= (293 : UInt);
       
+      public static inline final FLID_attackerActor= (294 : UInt);
+      
       public function new(param1:DistributedBuffGameObject, param2:GeneratedDcSocket, param3:UInt)
       {
          super(param1,param2,param3);
@@ -40,6 +42,9 @@ package generatedCode
             case 1:
                recv_effectedActor(param1);
                
+            case 2:
+               recv_attackerActor(param1);
+               
             default:
                super.recvById(param1,param2);
          }
@@ -49,6 +54,7 @@ package generatedCode
       {
          recv_type(param1);
          recv_effectedActor(param1);
+         recv_attackerActor(param1);
          recvByIdLoop(param1);
       }
       
@@ -67,6 +73,12 @@ package generatedCode
       {
          var _loc2_= param1.readUnsignedInt();
          the_instance.effectedActor = _loc2_;
+      }
+      
+      public function recv_attackerActor(param1:DcNetworkPacket) 
+      {
+         var _loc2_= param1.readUnsignedInt();
+         the_instance.attackerActor = _loc2_;
       }
    }
 

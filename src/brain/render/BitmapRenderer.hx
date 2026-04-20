@@ -19,7 +19,7 @@ package brain.render
       
       var mBitmap:Bitmap = new Bitmap();
       
-      var mSmoothing:Bool = false;
+      var mSmoothing:Bool = true;
       
       var mCenter:Point = new Point(0.5,0.5);
       

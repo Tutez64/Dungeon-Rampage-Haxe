@@ -48,8 +48,8 @@ package dungeon
       {
          var _loc1_= new Vector<Vector3D>();
          var _loc2_:Tile;
-         final __ax4_iter_126 = mTiles;
-         if (checkNullIteratee(__ax4_iter_126)) for (_tmp_ in __ax4_iter_126)
+         final __ax4_iter_146 = mTiles;
+         if (checkNullIteratee(__ax4_iter_146)) for (_tmp_ in __ax4_iter_146)
          {
             _loc2_ = _tmp_;
             if(_loc2_ != null && !ASCompat.toBool(_loc2_.isFiller()))
@@ -181,8 +181,8 @@ package dungeon
       public function removeAllFromWorld() 
       {
          var _loc1_:Tile;
-         final __ax4_iter_127 = mTiles;
-         if (checkNullIteratee(__ax4_iter_127)) for (_tmp_ in __ax4_iter_127)
+         final __ax4_iter_147 = mTiles;
+         if (checkNullIteratee(__ax4_iter_147)) for (_tmp_ in __ax4_iter_147)
          {
             _loc1_ = _tmp_;
             if(_loc1_ != null)

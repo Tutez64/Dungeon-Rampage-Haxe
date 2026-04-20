@@ -159,6 +159,12 @@ package dBGlobals
       
       public static inline final UI_16_TO_9_PORT_OBJECT_SCALE:Float = 1.8;
       
+      public static inline final FILTER_QUALITY_LOW= (0 : UInt);
+      
+      public static inline final FILTER_QUALITY_MEDIUM= (1 : UInt);
+      
+      public static inline final FILTER_QUALITY_HIGH= (2 : UInt);
+      
       public static var StatNames:Vector<String> = Vector.ofArray(["HP_BOOST","MP_BOOST","MELEE_ATK","SHOOT_ATK","MAGIC_ATK","SHOOT_DEF","MELEE_DEF","MAGIC_DEF","MELEE_SPD","SHOOT_SPD","MAGIC_SPD","HP_REGEN","MP_REGEN","MOVEMENT","LUCK"]);
       
       public static final UI_ROLLOVER_FILTER:GlowFilter = new GlowFilter((16633879 : UInt),1,8,8,5);
@@ -295,6 +301,56 @@ package dBGlobals
             _loc2_ = ASCompat.toInt(_loc2_) + 1;
          }
          trace("\t+ --------------------------------------------------------------------------------------");
+      }
+      
+      public static function highlightButton(param1:ASAny, param2:UInt = (1 : UInt)) 
+      {
+         var _loc3_= UI_ROLLOVER_FILTER;
+         if(param2 == 0)
+         {
+            _loc3_.quality = 1;
+         }
+         else if(param2 == 1)
+         {
+            _loc3_.quality = 2;
+         }
+         else if(param2 == 2)
+         {
+            _loc3_.quality = 3;
+         }
+         else
+         {
+            Logger.warn("No such quality exists..");
+         }
+         if(Std.isOfType(param1 , MovieClip))
+         {
+            ASCompat.setProperty(param1, "filters", [_loc3_]);
+         }
+         else
+         {
+            ASCompat.setProperty(param1.root, "filters", [_loc3_]);
+         }
+      }
+      
+      public static function unHighlightButton(param1:ASAny) 
+      {
+         if(param1 == null)
+         {
+            Logger.warn("Cannot unhilight null button/movieclip");
+         }
+         if(Std.isOfType(param1 , MovieClip))
+         {
+            ASCompat.setProperty(param1, "filters", []);
+         }
+         else
+         {
+            ASCompat.setProperty(param1.root, "filters", null);
+         }
+      }
+      
+      public static function endsWith(param1:String, param2:String) : Bool
+      {
+         return param2 == param1.substring(param1.length - param2.length);
       }
    }
 

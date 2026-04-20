@@ -29,8 +29,8 @@ package org.as3commons.collections
          var _loc3_:String = null;
          var _loc4_:ASAny = /*undefined*/null;
          var _loc2_= (0 : UInt);
-         final __ax4_iter_160:ASObject = this._stringMap;
-         if (checkNullIteratee(__ax4_iter_160)) for(_tmp_ in __ax4_iter_160.___keys())
+         final __ax4_iter_176:ASObject = this._stringMap;
+         if (checkNullIteratee(__ax4_iter_176)) for(_tmp_ in __ax4_iter_176.___keys())
          {
             _loc3_  = _tmp_;
             if(this._stringMap[_loc3_] == param1)
@@ -41,8 +41,8 @@ package org.as3commons.collections
                _loc2_++;
             }
          }
-         final __ax4_iter_161 = this._items;
-         if (checkNullIteratee(__ax4_iter_161)) for(_tmp_ in __ax4_iter_161.keys())
+         final __ax4_iter_177 = this._items;
+         if (checkNullIteratee(__ax4_iter_177)) for(_tmp_ in __ax4_iter_177.keys())
          {
             _loc4_  = _tmp_;
             if(this._items[_loc4_] == param1)
@@ -68,14 +68,14 @@ public function  get_size() : UInt
          var _loc2_:String = null;
          var _loc3_:ASAny = /*undefined*/null;
          var _loc1_= new Array<ASAny>();
-         final __ax4_iter_162:ASObject = this._stringMap;
-         if (checkNullIteratee(__ax4_iter_162)) for(_tmp_ in __ax4_iter_162.___keys())
+         final __ax4_iter_178:ASObject = this._stringMap;
+         if (checkNullIteratee(__ax4_iter_178)) for(_tmp_ in __ax4_iter_178.___keys())
          {
             _loc2_  = _tmp_;
             _loc1_.push(_loc2_);
          }
-         final __ax4_iter_163 = this._keys;
-         if (checkNullIteratee(__ax4_iter_163)) for (_tmp_ in __ax4_iter_163)
+         final __ax4_iter_179 = this._keys;
+         if (checkNullIteratee(__ax4_iter_179)) for (_tmp_ in __ax4_iter_179)
          {
             _loc3_  = _tmp_;
             _loc1_.push(_loc3_);
@@ -100,8 +100,8 @@ public function  get_size() : UInt
       {
          var _loc3_:ASAny = /*undefined*/null;
          var _loc2_= (0 : UInt);
-         final __ax4_iter_164:ASObject = this._stringMap;
-         if (checkNullIteratee(__ax4_iter_164)) for (_tmp_ in iterateDynamicValues(__ax4_iter_164))
+         final __ax4_iter_180:ASObject = this._stringMap;
+         if (checkNullIteratee(__ax4_iter_180)) for (_tmp_ in iterateDynamicValues(__ax4_iter_180))
          {
             _loc3_  = _tmp_;
             if(_loc3_ == param1)
@@ -109,8 +109,8 @@ public function  get_size() : UInt
                _loc2_++;
             }
          }
-         final __ax4_iter_165 = this._items;
-         if (checkNullIteratee(__ax4_iter_165)) for (_tmp_ in __ax4_iter_165)
+         final __ax4_iter_181 = this._items;
+         if (checkNullIteratee(__ax4_iter_181)) for (_tmp_ in __ax4_iter_181)
          {
             _loc3_  = _tmp_;
             if(_loc3_ == param1)
@@ -124,8 +124,8 @@ public function  get_size() : UInt
       public function has(param1:ASAny) : Bool
       {
          var _loc2_:ASAny = /*undefined*/null;
-         final __ax4_iter_166:ASObject = this._stringMap;
-         if (checkNullIteratee(__ax4_iter_166)) for (_tmp_ in iterateDynamicValues(__ax4_iter_166))
+         final __ax4_iter_182:ASObject = this._stringMap;
+         if (checkNullIteratee(__ax4_iter_182)) for (_tmp_ in iterateDynamicValues(__ax4_iter_182))
          {
             _loc2_  = _tmp_;
             if(_loc2_ == param1)
@@ -133,8 +133,8 @@ public function  get_size() : UInt
                return true;
             }
          }
-         final __ax4_iter_167 = this._items;
-         if (checkNullIteratee(__ax4_iter_167)) for (_tmp_ in __ax4_iter_167)
+         final __ax4_iter_183 = this._items;
+         if (checkNullIteratee(__ax4_iter_183)) for (_tmp_ in __ax4_iter_183)
          {
             _loc2_  = _tmp_;
             if(_loc2_ == param1)
@@ -149,8 +149,8 @@ public function  get_size() : UInt
       {
          var _loc2_:String = null;
          var _loc3_:ASAny = /*undefined*/null;
-         final __ax4_iter_168:ASObject = this._stringMap;
-         if (checkNullIteratee(__ax4_iter_168)) for(_tmp_ in __ax4_iter_168.___keys())
+         final __ax4_iter_184:ASObject = this._stringMap;
+         if (checkNullIteratee(__ax4_iter_184)) for(_tmp_ in __ax4_iter_184.___keys())
          {
             _loc2_  = _tmp_;
             if(this._stringMap[_loc2_] == param1)
@@ -161,8 +161,8 @@ public function  get_size() : UInt
                return true;
             }
          }
-         final __ax4_iter_169 = this._items;
-         if (checkNullIteratee(__ax4_iter_169)) for(_tmp_ in __ax4_iter_169.keys())
+         final __ax4_iter_185 = this._items;
+         if (checkNullIteratee(__ax4_iter_185)) for(_tmp_ in __ax4_iter_185.keys())
          {
             _loc3_  = _tmp_;
             if(this._items[_loc3_] == param1)
@@ -181,14 +181,14 @@ public function  get_size() : UInt
       {
          var _loc2_:ASAny = /*undefined*/null;
          var _loc1_= new Array<ASAny>();
-         final __ax4_iter_170:ASObject = this._stringMap;
-         if (checkNullIteratee(__ax4_iter_170)) for (_tmp_ in iterateDynamicValues(__ax4_iter_170))
+         final __ax4_iter_186:ASObject = this._stringMap;
+         if (checkNullIteratee(__ax4_iter_186)) for (_tmp_ in iterateDynamicValues(__ax4_iter_186))
          {
             _loc2_  = _tmp_;
             _loc1_.push(_loc2_);
          }
-         final __ax4_iter_171 = this._items;
-         if (checkNullIteratee(__ax4_iter_171)) for (_tmp_ in __ax4_iter_171)
+         final __ax4_iter_187 = this._items;
+         if (checkNullIteratee(__ax4_iter_187)) for (_tmp_ in __ax4_iter_187)
          {
             _loc2_  = _tmp_;
             _loc1_.push(_loc2_);

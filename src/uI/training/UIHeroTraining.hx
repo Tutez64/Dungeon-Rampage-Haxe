@@ -12,15 +12,17 @@ package uI.training
    import brain.uI.UIButton;
    import brain.utils.MemoryTracker;
    import brain.workLoop.LogicalWorkComponent;
+   import dBGlobals.DBGlobal;
    import events.DBAccountResponseEvent;
    import facade.DBFacade;
+   import facade.GameMasterLocale;
    import facade.Locale;
    import gameMasterDictionary.GMHero;
    import gameMasterDictionary.GMOffer;
    import gameMasterDictionary.GMSkin;
    import town.TownHeader;
    import uI.equipPicker.HeroWithEquipPicker;
-   import uI.UIRetrainPopup;
+   import uI.popup.UIRetrainPopup;
    import uI.UITownTweens;
    import flash.display.DisplayObject;
    import flash.display.MovieClip;
@@ -87,9 +89,9 @@ package uI.training
       {
          
          mDBFacade = param1;
-         mSceneGraphComponent = new SceneGraphComponent(mDBFacade);
+         mSceneGraphComponent = new SceneGraphComponent(mDBFacade,"UIHeroTraining");
          mAssetLoadingComponent = new AssetLoadingComponent(mDBFacade);
-         mLogicalWorkComponent = new LogicalWorkComponent(mDBFacade);
+         mLogicalWorkComponent = new LogicalWorkComponent(mDBFacade,"UIHeroTraining");
          mEventComponent = new EventComponent(mDBFacade);
          mTownHeader = param4;
          var _loc6_= param2.getClass("DR_weapon_tooltip");
@@ -132,6 +134,7 @@ package uI.training
          }
          mSpendButton = new UIButton(mDBFacade,ASCompat.dynamicAs((mUIRoot : ASAny).spend_button, flash.display.MovieClip));
          mSpendButton.enabled = false;
+         ASCompat.setProperty((mSpendButton.root : ASAny).button_text, "text", Locale.getString("TRAINING_POINTS"));
          mResetButton = new UIButton(mDBFacade,ASCompat.dynamicAs((mUIRoot : ASAny).reset_button, flash.display.MovieClip));
          mResetButton.label.text = Locale.getString("RETRAIN");
          mResetButton.releaseCallback = function()
@@ -162,6 +165,8 @@ package uI.training
                UITownTweens.footerTweenSequence(mHeroWithEquipPicker.root,mDBFacade);
             });
          }
+         setupMenuNavigation();
+         setButtonNavigationFilters();
       }
       
       public function setupIcons(param1:SwfAsset) 
@@ -212,6 +217,7 @@ package uI.training
          mUIRoot.visible = false;
          mHeroPortrait.visible = false;
          mHeroWithEquipPicker.setAvatarAlert(false);
+         resetMenuNavigation();
       }
       
       function greyHero(param1:Bool) 
@@ -337,7 +343,7 @@ function  get_spendAmountClient() : Int
       public function readSelectedHeroInfo() 
       {
          var _loc2_= 0;
-         mHeroPortraitText.text = mSelectedHero.Name.toUpperCase();
+         mHeroPortraitText.text = GameMasterLocale.getGameMasterSubString("SKIN_NAME",mSelectedHero.Constant).toUpperCase();
          var _loc1_:Array<ASAny> = [mSelectedHero.StatUpgrade1,mSelectedHero.StatUpgrade2,mSelectedHero.StatUpgrade3,mSelectedHero.StatUpgrade4];
          _loc2_ = 0;
          while(_loc2_ < 4)
@@ -346,8 +352,9 @@ function  get_spendAmountClient() : Int
             mStatHelpers[_loc2_].refresh(mIconSwfAsset);
             _loc2_++;
          }
-         ASCompat.setProperty((mUIRoot : ASAny).training_db_name, "text", Std.string(mDBFacade.gameMaster.attackByConstant.itemFor(mSelectedHero.DBuster1).Name).toUpperCase());
-         ASCompat.setProperty((mUIRoot : ASAny).training_db_description, "text", mDBFacade.gameMaster.attackByConstant.itemFor(mSelectedHero.DBuster1).Description);
+         ASCompat.setProperty((mUIRoot : ASAny).training_db_label, "text", Locale.getString("DUNGEON_BUSTER"));
+         ASCompat.setProperty((mUIRoot : ASAny).training_db_name, "text", GameMasterLocale.getGameMasterSubString("ATTACK_BUSTER_NAME",mDBFacade.gameMaster.attackByConstant.itemFor(mSelectedHero.DBuster1).Constant).toUpperCase());
+         ASCompat.setProperty((mUIRoot : ASAny).training_db_description, "text", GameMasterLocale.getGameMasterSubString("ATTACK_BUSTER_DESCRIPTION",mDBFacade.gameMaster.attackByConstant.itemFor(mSelectedHero.DBuster1).Constant));
          ASCompat.setProperty((mUIRoot : ASAny).xp_label.level_label, "text", mHeroLevel);
       }
       
@@ -479,6 +486,11 @@ function  get_spendAmountClient() : Int
                      mStatHelpers[_loc2_].statAmount = (0 : UInt);
                      _loc2_++;
                   }
+                  if(mDBFacade.steamAchievementsManager != null)
+                  {
+                     mDBFacade.steamAchievementsManager.addToStatInt("RETRAIN_STAT",1);
+                     mDBFacade.steamAchievementsManager.setAchievement("RETRAIN_CHARACTER");
+                  }
                   updateUIClient();
                });
             },(Std.int(mGMOffer.Price) : UInt));
@@ -501,6 +513,67 @@ function  get_spendAmountClient() : Int
          {
             mDBFacade.dbAccountInfo.changeActiveAvatarRPC(_loc1_);
          }
+      }
+      
+      function setupMenuNavigation() 
+      {
+         mTownHeader.closeButton.isAbove(mStatLevelPlusButtons[0]);
+         mStatLevelPlusButtons[0].isAbove(mStatLevelPlusButtons[1]);
+         mStatLevelPlusButtons[1].isAbove(mStatLevelPlusButtons[2]);
+         mStatLevelPlusButtons[2].isAbove(mStatLevelPlusButtons[3]);
+         mStatLevelPlusButtons[3].isAbove(mResetButton);
+         mResetButton.downNavigation = mHeroWithEquipPicker.getFirstHeroSlotUIObject();
+         mHeroWithEquipPicker.setupHeroWithEquipPickerMenuNavigation(mResetButton);
+      }
+      
+      function resetMenuNavigation() 
+      {
+         mStatLevelPlusButtons[0].clearNavigationAndInteractions();
+         mStatLevelPlusButtons[1].clearNavigationAndInteractions();
+         mStatLevelPlusButtons[2].clearNavigationAndInteractions();
+         mStatLevelPlusButtons[3].clearNavigationAndInteractions();
+         mStatLevelPlusButtons[0].setFocused(false);
+         mStatLevelPlusButtons[1].setFocused(false);
+         mStatLevelPlusButtons[2].setFocused(false);
+         mStatLevelPlusButtons[3].setFocused(false);
+         mResetButton.clearNavigationAndInteractions();
+         mHeroWithEquipPicker.resetHeroWithEquipPickerMenuNavigation();
+      }
+      
+      function setButtonNavigationFilters() 
+      {
+         mStatLevelPlusButtons[0].navigationSelectedInteraction = function()
+         {
+            DBGlobal.highlightButton(mStatLevelPlusButtons[0]);
+         };
+         mStatLevelPlusButtons[1].navigationSelectedInteraction = function()
+         {
+            DBGlobal.highlightButton(mStatLevelPlusButtons[1]);
+         };
+         mStatLevelPlusButtons[2].navigationSelectedInteraction = function()
+         {
+            DBGlobal.highlightButton(mStatLevelPlusButtons[2]);
+         };
+         mStatLevelPlusButtons[3].navigationSelectedInteraction = function()
+         {
+            DBGlobal.highlightButton(mStatLevelPlusButtons[3]);
+         };
+         mStatLevelPlusButtons[0].navigationSetToUnselectedInteraction = function()
+         {
+            DBGlobal.unHighlightButton(mStatLevelPlusButtons[0]);
+         };
+         mStatLevelPlusButtons[1].navigationSetToUnselectedInteraction = function()
+         {
+            DBGlobal.unHighlightButton(mStatLevelPlusButtons[1]);
+         };
+         mStatLevelPlusButtons[2].navigationSetToUnselectedInteraction = function()
+         {
+            DBGlobal.unHighlightButton(mStatLevelPlusButtons[2]);
+         };
+         mStatLevelPlusButtons[3].navigationSetToUnselectedInteraction = function()
+         {
+            DBGlobal.unHighlightButton(mStatLevelPlusButtons[3]);
+         };
       }
    }
 

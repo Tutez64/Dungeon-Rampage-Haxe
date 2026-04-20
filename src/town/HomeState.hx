@@ -19,20 +19,20 @@ package town
    import facebookAPI.DBFacebookLevelUpPostController;
    import gameMasterDictionary.GMOffer;
    import gameMasterDictionary.GMSkin;
-   import uI.DBUIMoviePopup;
-   import uI.DBUIOneButtonPopup;
-   import uI.DBUIPopup;
    import uI.dailyRewards.UIDailyRewards;
    import uI.gifting.UIGift;
    import uI.leaderboard.UILeaderboard;
    import uI.options.OptionsPanel;
-   import uI.UIDragonKnightUpsellPopup;
-   import uI.UIFBInvitePopup;
-   import uI.UIFlaggedPopup;
-   import uI.UIHeroUpsellPopup;
-   import uI.UILevelUpShopPopup;
+   import uI.popup.DBUIMoviePopup;
+   import uI.popup.DBUIOneButtonPopup;
+   import uI.popup.DBUIPopup;
+   import uI.popup.UIDragonKnightUpsellPopup;
+   import uI.popup.UIFBInvitePopup;
+   import uI.popup.UIFlaggedPopup;
+   import uI.popup.UIHeroUpsellPopup;
+   import uI.popup.UILevelUpShopPopup;
+   import uI.popup.UIWhatsNewPopup;
    import uI.UIPagingPanel;
-   import uI.UIWhatsNewPopup;
    import flash.display.DisplayObject;
    import flash.display.MovieClip;
    import flash.display.Sprite;
@@ -57,6 +57,8 @@ package town
       static inline final MAX_HERO_UPSELL_POPUPS= (8 : UInt);
       
       static inline final POPUP_DELAY_TIME:Float = 0.5;
+      
+      static inline final DELAY_AMOUNT_FOR_FRIEND_LEADERBOARD_NAVIGATION_LOAD= (2 : UInt);
       
       public static var mHasPonderedMOD:Bool = false;
       
@@ -132,6 +134,8 @@ package town
       
       var mUILeaderboard:UILeaderboard;
       
+      var mFriendLeaderboardDelayMenuNavigationLinkageTask:Task;
+      
       var mHeroTypesLazilyLoaded:Set;
       
       var mNewsStories:Vector<MessageOfTheDay>;
@@ -148,7 +152,7 @@ package town
       {
          super(param1,param2,"HomeState");
          mEventComponent = new EventComponent(mDBFacade);
-         mLogicalWorkComponent = new LogicalWorkComponent(mDBFacade);
+         mLogicalWorkComponent = new LogicalWorkComponent(mDBFacade,"HomeState");
          mAssetLoadingComponent = new AssetLoadingComponent(mDBFacade);
          mOptionsPanel = new OptionsPanel(mDBFacade);
          MemoryTracker.track(mOptionsPanel,"OptionsPanel - created in HomeState.HomeState()");
@@ -193,6 +197,7 @@ package town
          mAssetLoadingComponent = null;
          mOptionsPanel.destroy();
          mOptionsPanel = null;
+         mDBFacade.menuNavigationController.popLayer("TOWN_MENU");
          super.destroy();
       }
       
@@ -274,6 +279,45 @@ package town
          loadActiveAvatarIcon(new Event("ACTIVE_AVATAR_CHANGED_EVENT"));
          mEventComponent.addListener("ACTIVE_AVATAR_CHANGED_EVENT",loadActiveAvatarIcon);
          this.refreshAlerts();
+         mTavernButton.isToTheLeftOf(mBattleButton);
+         mTavernButton.isAbove(mGiftButton);
+         mBattleButton.isToTheLeftOf(mInventoryButton);
+         mBattleButton.isAbove(mShopButton);
+         mInventoryButton.isAbove(mCreditsButton);
+         mGiftButton.isToTheLeftOf(mTrainButton);
+         mTrainButton.isToTheLeftOf(mShopButton);
+         mShopButton.isToTheLeftOf(mCreditsButton);
+         setupHeaderLinks();
+         mDBFacade.menuNavigationController.pushNewLayer("TOWN_MENU",mTownStateMachine.townHeader.determineCallback,mBattleButton,mBattleButton);
+         if(mFriendLeaderboardDelayMenuNavigationLinkageTask != null)
+         {
+            mFriendLeaderboardDelayMenuNavigationLinkageTask.destroy();
+         }
+         mFriendLeaderboardDelayMenuNavigationLinkageTask = mLogicalWorkComponent.doLater(2,setupFriendLinks);
+      }
+      
+      public function setupFriendLinks(param1:GameClock = null) 
+      {
+         mTrainButton.isAbove(mUILeaderboard.getManageFriendsButton);
+         mShopButton.isAbove(mUILeaderboard.getInviteFriendsButton);
+      }
+      
+      override function setupHeaderLinks() 
+      {
+         super.resetHeaderLinks();
+         super.setupHeaderLinks();
+         mTownStateMachine.townHeader.addCoinButton.isAbove(mTavernButton);
+         mTownStateMachine.townHeader.addGemButton.isAbove(mBattleButton);
+         mTownStateMachine.townHeader.closeButton.isAbove(mInventoryButton);
+      }
+      
+      function refreshHeaderNavigationLinks() 
+      {
+         super.resetHeaderLinks();
+         super.setupHeaderLinks();
+         mTownStateMachine.townHeader.addCoinButton.downNavigation = mTavernButton;
+         mTownStateMachine.townHeader.addGemButton.downNavigation = mBattleButton;
+         mTownStateMachine.townHeader.closeButton.downNavigation = mInventoryButton;
       }
       
       function openDaily(param1:KeyboardEvent) 
@@ -287,9 +331,9 @@ package town
       
       public function animateEntry() 
       {
-         if(mDBFacade.featureFlags.getFlagValue("want-town-animations"))
+         if(mTownStateMachine.townHeader.rootMovieClip != null)
          {
-            if(mTownStateMachine.townHeader.rootMovieClip != null)
+            if(mDBFacade.featureFlags.getFlagValue("want-town-animations"))
             {
                mTownStateMachine.townHeader.rootMovieClip.visible = false;
                mLogicalWorkComponent.doLater(0.20833333333333334,function(param1:GameClock)
@@ -387,8 +431,8 @@ package town
          }
          var _loc3_= new Vector<GMOffer>();
          var _loc5_:UInt;
-         final __ax4_iter_122 = StoreServicesController.HERO_OFFERS;
-         if (checkNullIteratee(__ax4_iter_122)) for (_tmp_ in __ax4_iter_122)
+         final __ax4_iter_138 = StoreServicesController.HERO_OFFERS;
+         if (checkNullIteratee(__ax4_iter_138)) for (_tmp_ in __ax4_iter_138)
          {
             _loc5_ = _tmp_;
             _loc6_ = ASCompat.dynamicAs(mDBFacade.gameMaster.offerById.itemFor(_loc5_), gameMasterDictionary.GMOffer);
@@ -826,6 +870,7 @@ package town
             mPopupDelayTask.destroy();
          }
          mPopupDelayTask = mLogicalWorkComponent.doLater(0.5,showPopups);
+         refreshHeaderNavigationLinks();
       }
       
       function showPopups(param1:GameClock = null) 
@@ -922,6 +967,11 @@ package town
          {
             mPopupDelayTask.destroy();
             mPopupDelayTask = null;
+         }
+         if(mFriendLeaderboardDelayMenuNavigationLinkageTask != null)
+         {
+            mFriendLeaderboardDelayMenuNavigationLinkageTask.destroy();
+            mFriendLeaderboardDelayMenuNavigationLinkageTask = null;
          }
          mRenderer.stop();
          mEventComponent.removeListener("DB_ACCOUNT_INFO_RESPONSE");

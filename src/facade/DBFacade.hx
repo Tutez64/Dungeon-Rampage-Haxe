@@ -18,21 +18,28 @@ package facade
    import combat.attack.TimelineFactory;
    import config.ConfigFileLoadedEvent;
    import config.DBConfigManager;
+   import config.ServiceDiscoveryLoader;
+   import config.ServiceDiscoveryReadyEvent;
    import distributedObjects.DistributedObjectManager;
+   import effects.CustomSkinVisualsOverrideHandler;
    import effects.EffectPool;
    import events.ManagersLoadedEvent;
    import facebookAPI.DBFacebookAPIController;
    import gameMasterDictionary.GameMaster;
    import generatedCode.InfiniteMapNodeDetail;
+   import input.MenuNavigationController;
    import magicWords.MagicWordManager;
    import metrics.MetricsLogger;
    import metrics.PixelTracker;
    import sound.DBSoundManager;
    import stateMachine.mainStateMachine.LoadingFinishedEvent;
    import stateMachine.mainStateMachine.MainStateMachine;
+   import steamAchievements.SteamAchievementsManager;
+   import steamInput.SteamInputManager;
    import town.AdManager;
-   import uI.DBUIOneButtonPopup;
-   import uI.UIHud;
+   import uI.hud.UIHud;
+   import uI.map.PlayerActivityCount;
+   import uI.popup.DBUIOneButtonPopup;
    import com.amanitadesign.steam.FRESteamWorks;
    import com.maccherone.json.JSON;
    import flash.display.DisplayObject;
@@ -112,17 +119,33 @@ package facade
       
       var mAccountBonus:AccountBonus;
       
+      var mMenuNavigationController:MenuNavigationController;
+      
+      var mCustomSkinVisualsOverrideHandler:CustomSkinVisualsOverrideHandler;
+      
       public var gameMaster:GameMaster;
       
       var mAssetLoader:AssetLoadingComponent;
       
       var mMagicWordManager:MagicWordManager;
       
+      public var steamAchievementsManager:SteamAchievementsManager;
+      
+      var mWebServicesUrl:String;
+      
+      var mGameSocketAddress:String;
+      
+      var mGameSocketPort:Int = 0;
+      
       var mWebAPIRoot:String;
+      
+      var mPendingServiceDiscoveryEvent:ServiceDiscoveryReadyEvent;
       
       var mRPCRoot:String;
       
       var mSteamAPIRoot:String;
+      
+      var mPlayerActivityCount:PlayerActivityCount;
       
       var mAccountId:UInt = 0;
       
@@ -189,6 +212,8 @@ package facade
       public var mSteamIsFlaggedDueToFamilySharingOwnerIsFlagged:Bool = false;
       
       public var mSteamIsFlaggedDueToFamilySharingOwnerName:String;
+      
+      var mSteamInputManager:SteamInputManager;
       
       public var mAdditionalConfigFilesToLoad:Array<ASAny> = [];
       
@@ -331,23 +356,8 @@ return param1;
       
       function loadLocale() 
       {
-         var _loc4_:String = null;
-         var _loc1_= "en_US";
-         var _loc5_= Capabilities.language;
-         if("en" != _loc5_)
-         {
-            Logger.warn("Locale (" + Capabilities.language + ") not yet supported. Using default: " + _loc1_);
-            _loc4_ = _loc1_;
-         }
-         else
-         {
-            _loc4_ = "en_US";
-         }
-         Logger.debug("System language: " + Capabilities.language);
-         var _loc3_= mDBConfigManager.getConfigString("locale","");
-         var _loc2_:String = ASCompat.stringAsBool(_loc3_) ? _loc3_ : _loc4_;
-         Logger.debug("Locale selected: " + _loc4_ + " config: " + _loc3_ + " final: " + _loc2_);
-         Locale.loadStrings(this,_loc2_,localeAvailable);
+         Locale.loadStrings(this,localeAvailable);
+         GameMasterLocale.loadGameMasterStrings(this,localeAvailable);
          mMagicWordManager = new MagicWordManager(this);
       }
       
@@ -389,6 +399,7 @@ return param1;
          Logger.info("building engines 2");
          computeServerTimeOffset();
          super.buildEngines();
+         mSteamInputManager = new SteamInputManager(this,mSteamworks,mStageRef,featureFlags.getFlagValue("experimental-use-steam-input"));
          Logger.info("building engines 3");
          mSoundManager = new DBSoundManager(this);
          var _loc1_= mDBConfigManager.getConfigBoolean("show_colliders",false);
@@ -431,6 +442,8 @@ return param1;
          logSystemMetrics();
          NODE_RULES = (ASCompat.toInt(getSplitTestBoolean("NODE_UNLOCK_GLOBAL",false)) : UInt);
          environmentPrefix = dbConfigManager.getConfigString("EnvironmentPrefix","u");
+         mMenuNavigationController = new MenuNavigationController(this);
+         mCustomSkinVisualsOverrideHandler = new CustomSkinVisualsOverrideHandler(this);
       }
       
       function kongregateInit() 
@@ -484,7 +497,26 @@ public function  get_kongregateAPI() : ASAny
       
       function localeAvailable() 
       {
+         var _loc1_:ServiceDiscoveryReadyEvent = null;
          Logger.debug("locale available");
+         if(mPendingServiceDiscoveryEvent != null && Locale.isDefaultLoaded)
+         {
+            _loc1_ = mPendingServiceDiscoveryEvent;
+            mPendingServiceDiscoveryEvent = null;
+            mEventComponent.dispatchEvent(_loc1_);
+         }
+      }
+      
+      override public function mainLoop(param1:Event) 
+      {
+         mSteamInputManager.runFrame();
+         super.mainLoop(param1);
+      }
+      
+      override function flushInputs() 
+      {
+         super.flushInputs();
+         mSteamInputManager.flushInputs();
       }
       
       function requestNewValidationToken(param1:GameClock) 
@@ -523,7 +555,7 @@ public function  get_kongregateAPI() : ASAny
       public function createTokenRegenTask() 
       {
          removeTokenRegenTask();
-         mTokenRegenTask = mRealClockWorkManager.doEverySeconds(3600,this.requestNewValidationToken,true);
+         mTokenRegenTask = mRealClockWorkManager.doEverySeconds(3600,this.requestNewValidationToken,true,"DBFacade.tokenRegen");
       }
       
       public function removeTokenRegenTask() 
@@ -624,21 +656,12 @@ public function  get_kongregateAPI() : ASAny
          Logger.setInfoMessages(dbConfigManager.getConfigBoolean("want_info_logging",true));
          mEventComponent.removeListener("ConfigFileLoadedEvent");
          Logger.CustomLoggerString = dbConfigManager.getConfigString("customLoggerString",null);
-         mWebAPIRoot = dbConfigManager.getConfigString("API_root","");
-         if(mWebAPIRoot == "")
+         var _loc2_= dbConfigManager.getConfigString("ServiceDiscoveryUrl","");
+         if(_loc2_ == "")
          {
-            Logger.fatal("Webservice API root is empty.  Unable to continue.");
+            Logger.fatal("ServiceDiscoveryUrl is empty. Unable to continue.");
          }
-         mRPCRoot = dbConfigManager.getConfigString("RPC_root","");
-         if(mRPCRoot == "")
-         {
-            Logger.fatal("RPC root is empty.  Unable to continue.");
-         }
-         mSteamAPIRoot = dbConfigManager.getConfigString("STEAM_API_root","");
-         if(mSteamAPIRoot == "")
-         {
-            Logger.fatal("Steam API root is empty.  Unable to continue.");
-         }
+         new ServiceDiscoveryLoader(_loc2_,onServiceDiscoveryComplete);
          mUseSteamLogin = dbConfigManager.getConfigBoolean("UseSteamLogin",true);
          if(this.getUserAgent() == "Internet Explorer" && !mDBConfigManager.getConfigBoolean("turn_off_ie_input_hack",false))
          {
@@ -647,6 +670,29 @@ public function  get_kongregateAPI() : ASAny
          mDownloadRoot = dbConfigManager.getConfigString("download_root","./");
          cacheVersion = mDBConfigManager.getConfigString("CacheVersion","development");
          buildEngines();
+      }
+      
+      function onServiceDiscoveryComplete(param1:ASObject, param2:Int, param3:String) 
+      {
+         var _loc4_= new ServiceDiscoveryReadyEvent(param1,param2,param3);
+         if(Locale.isDefaultLoaded)
+         {
+            mEventComponent.dispatchEvent(_loc4_);
+         }
+         else
+         {
+            mPendingServiceDiscoveryEvent = _loc4_;
+         }
+      }
+      
+      public function applyServiceDiscoveryResult(param1:ASObject) 
+      {
+         mWebServicesUrl = ASCompat.asString(param1.webServicesUrl );
+         mGameSocketAddress = ASCompat.asString(param1.gameSocketAddress );
+         mGameSocketPort = ASCompat.asInt(param1.gameSocketPort );
+         mWebAPIRoot = mWebServicesUrl + "/api/";
+         mRPCRoot = mWebServicesUrl + "/rpc/";
+         mSteamAPIRoot = mWebServicesUrl + "/steam/";
       }
       
       function initMetricsLogger() 
@@ -687,8 +733,8 @@ public function  get_kongregateAPI() : ASAny
          var _loc2_:JsonAsset = null;
          mTileLibraryMap.clear();
          var _loc1_:ASAny;
-         final __ax4_iter_67 = mJsonAssets;
-         if (checkNullIteratee(__ax4_iter_67)) for (_tmp_ in __ax4_iter_67)
+         final __ax4_iter_70 = mJsonAssets;
+         if (checkNullIteratee(__ax4_iter_70)) for (_tmp_ in __ax4_iter_70)
          {
             _loc1_ = _tmp_;
             _loc2_ = ASCompat.dynamicAs(_loc1_ , JsonAsset);
@@ -730,7 +776,7 @@ public function  get_libraryJson() : Array<ASAny>
       function libraryFinishedLoading(param1:JsonAsset) 
       {
          var _loc2_:ASAny;
-         var __ax4_iter_69:Array<ASAny>;
+         var __ax4_iter_72:Array<ASAny>;
          Logger.info("libraryFinishedLoading");
          this.loadingBarTick();
          mLibraryJsonLoaded = true;
@@ -738,13 +784,13 @@ public function  get_libraryJson() : Array<ASAny>
          var _loc4_= 0;
          mLibraryJson = ASCompat.dynamicAs(param1.json , Array);
          var _loc3_:ASAny;
-         final __ax4_iter_68:ASObject = param1.json;
-         if (checkNullIteratee(__ax4_iter_68)) for (_tmp_ in iterateDynamicValues(__ax4_iter_68))
+         final __ax4_iter_71:ASObject = param1.json;
+         if (checkNullIteratee(__ax4_iter_71)) for (_tmp_ in iterateDynamicValues(__ax4_iter_71))
          {
             _loc3_ = _tmp_;
             _loc4_ = 0;
-            __ax4_iter_69 = _loc3_.navCollisions;
-            if (checkNullIteratee(__ax4_iter_69)) for (_tmp_ in __ax4_iter_69)
+            __ax4_iter_72 = _loc3_.navCollisions;
+            if (checkNullIteratee(__ax4_iter_72)) for (_tmp_ in __ax4_iter_72)
             {
                _loc2_ = _tmp_;
                _loc4_ += GetSecurityValue(_loc2_);
@@ -796,8 +842,8 @@ public function  get_timelineFactory() : TimelineFactory
          mGameMasterJsonLoaded = true;
          var _loc3_= false;
          var _loc2_:ASAny;
-         final __ax4_iter_70:Array<ASAny> = mGameMasterJson.Hero;
-         if (checkNullIteratee(__ax4_iter_70)) for (_tmp_ in __ax4_iter_70)
+         final __ax4_iter_73:Array<ASAny> = mGameMasterJson.Hero;
+         if (checkNullIteratee(__ax4_iter_73)) for (_tmp_ in __ax4_iter_73)
          {
             _loc2_ = _tmp_;
             if(ASCompat.toNumberField(_loc2_, "BaseMove") > 250)
@@ -860,28 +906,24 @@ public function  get_sCode() : Int
       
       public function powerUpDistributedObjectManager() 
       {
-         var _loc1_:String = null;
-         var _loc2_:Float = 0;
          Logger.info("*****************Starting powerUpDistributedObjectManager");
          this.loadingBarTick();
          if(mDistributedObjectManager == null)
          {
-            _loc1_ = dbConfigManager.getConfigString("GameSocketAddress","");
-            if(_loc1_ == "")
+            if(mGameSocketAddress == null || mGameSocketAddress == "")
             {
                Logger.fatal("GameSocketAddress is empty.  Unable to continue.");
                return;
             }
-            _loc2_ = dbConfigManager.getConfigNumber("GameSocketPort",0);
-            if(_loc2_ == 0)
+            if(mGameSocketPort == 0)
             {
                Logger.fatal("GameSocketPort is empty.  Unable to continue.");
                return;
             }
-            Security.loadPolicyFile("xmlsocket://" + _loc1_.toString() + ":843");
+            Security.loadPolicyFile("xmlsocket://" + mGameSocketAddress + ":843");
             mDistributedObjectManager = new DistributedObjectManager(this);
             MemoryTracker.track(mDistributedObjectManager,"DistributedObjectManager - created in DBFacade.startGame()");
-            mDistributedObjectManager.Initialize(_loc1_,Std.int(_loc2_),validationToken,demographicsJson,accountId,(Std.int(dbConfigManager.networkId) : UInt),NODE_RULES);
+            mDistributedObjectManager.Initialize(mGameSocketAddress,mGameSocketPort,validationToken,demographicsJson,accountId,(Std.int(dbConfigManager.networkId) : UInt),NODE_RULES);
          }
       }
       
@@ -891,10 +933,10 @@ public function  get_sCode() : Int
          MemoryTracker.track(_loc3_,"DBUIOneButtonPopup - created in DBFacade.warningPopup()");
       }
       
-      public function errorPopup(param1:String, param2:String) 
+      public function errorPopup(param1:String, param2:String, param3:String = "") 
       {
-         var _loc3_= new DBUIOneButtonPopup(this,param1,param2,Locale.getString("OK"),null);
-         MemoryTracker.track(_loc3_,"DBUIOneButtonPopup - created in DBFacade.errorPopup()");
+         var _loc4_= new DBUIOneButtonPopup(this,param1,param2,Locale.getString("OK"),null,true,null,null,null,ASCompat.stringAsBool(param3));
+         MemoryTracker.track(_loc4_,"DBUIOneButtonPopup - created in DBFacade.errorPopup()");
       }
       
       function getUserAgent() : String
@@ -1072,6 +1114,22 @@ public function  get_webServiceAPIRoot() : String
          return mWebAPIRoot;
       }
       
+      @:isVar public var webServicesUrl(get,never):String;
+public function  get_webServicesUrl() : String
+      {
+         return mWebServicesUrl;
+      }
+      
+            
+      @:isVar public var playerActivityCount(get,set):PlayerActivityCount;
+public function  get_playerActivityCount() : PlayerActivityCount
+      {
+         return mPlayerActivityCount;
+      }
+function  set_playerActivityCount(param1:PlayerActivityCount) :PlayerActivityCount      {
+         return mPlayerActivityCount = param1;
+      }
+      
       @:isVar public var rpcRoot(get,never):String;
 public function  get_rpcRoot() : String
       {
@@ -1159,6 +1217,12 @@ public function  get_demographicsJson() : String
          return com.maccherone.json.JSON.encode(mDemographics);
       }
       
+      @:isVar public var steamInputManager(get,never):SteamInputManager;
+public function  get_steamInputManager() : SteamInputManager
+      {
+         return mSteamInputManager;
+      }
+      
       function _textFocus(param1:FocusEvent) 
       {
          if(mStageRef.focus != null)
@@ -1208,7 +1272,7 @@ public function  get_demographicsJson() : String
             mDelayErrors.push(_loc2_);
             if(mLogicalWorkComponent == null)
             {
-               mLogicalWorkComponent = new LogicalWorkComponent(this);
+               mLogicalWorkComponent = new LogicalWorkComponent(this,"DBFacade");
             }
             if(mErrorTask == null)
             {
@@ -1243,8 +1307,8 @@ public function  get_splitTests() : ASObject
       public function getSplitTestNumber(param1:String, param2:Float) : Float
       {
          var _loc3_:ASAny;
-         final __ax4_iter_71:ASObject = this.splitTests;
-         if (checkNullIteratee(__ax4_iter_71)) for (_tmp_ in iterateDynamicValues(__ax4_iter_71))
+         final __ax4_iter_74:ASObject = this.splitTests;
+         if (checkNullIteratee(__ax4_iter_74)) for (_tmp_ in iterateDynamicValues(__ax4_iter_74))
          {
             _loc3_ = _tmp_;
             if(_loc3_.name == param1)
@@ -1259,8 +1323,8 @@ public function  get_splitTests() : ASObject
       public function getSplitTestBoolean(param1:String, param2:Bool) : Bool
       {
          var _loc3_:ASAny;
-         final __ax4_iter_72:ASObject = this.splitTests;
-         if (checkNullIteratee(__ax4_iter_72)) for (_tmp_ in iterateDynamicValues(__ax4_iter_72))
+         final __ax4_iter_75:ASObject = this.splitTests;
+         if (checkNullIteratee(__ax4_iter_75)) for (_tmp_ in iterateDynamicValues(__ax4_iter_75))
          {
             _loc3_ = _tmp_;
             if(_loc3_.name == param1)
@@ -1276,8 +1340,8 @@ public function  get_splitTests() : ASObject
       public function getSplitTestString(param1:String, param2:String) : String
       {
          var _loc3_:ASAny;
-         final __ax4_iter_73:ASObject = this.splitTests;
-         if (checkNullIteratee(__ax4_iter_73)) for (_tmp_ in iterateDynamicValues(__ax4_iter_73))
+         final __ax4_iter_76:ASObject = this.splitTests;
+         if (checkNullIteratee(__ax4_iter_76)) for (_tmp_ in iterateDynamicValues(__ax4_iter_76))
          {
             _loc3_ = _tmp_;
             if(_loc3_.name == param1)
@@ -1308,40 +1372,39 @@ function  set_adManager(param1:AdManager) :AdManager      {
          return mAdManager = param1;
       }
       
-      public function openSteamPage() 
+      public function overlaySteamwithURL(param1:String) 
       {
-         var _loc2_:URLRequest = null;
-         var _loc1_= mSteamworks.isOverlayEnabled();
-         var _loc3_= stageRef.displayState == "fullScreenInteractive";
-         if(_loc1_ && _loc3_)
+         var _loc3_:URLRequest = null;
+         var _loc2_= mSteamworks.isOverlayEnabled();
+         var _loc4_= stageRef.displayState == "fullScreenInteractive";
+         if(_loc2_ && _loc4_)
          {
             Logger.debug("Using activateGameOverlayToStore to open steam page");
-            mSteamworks.activateGameOverlayToStore((3053950 : UInt),(0 : UInt));
+            mSteamworks.activateGameOverlayToWebPage(param1);
          }
          else
          {
-            Logger.debug("Using navigateToURL to open steam page because isOverlayEnabled:" + _loc1_ + " isFullscreen:" + _loc3_);
-            _loc2_ = new URLRequest("steam://store/3053950");
-            flash.Lib.getURL(_loc2_,"_blank");
+            Logger.debug("Using navigateToURL to open steam page because isOverlayEnabled:" + _loc2_ + " isFullscreen:" + _loc4_);
+            _loc3_ = new URLRequest(param1);
+            flash.Lib.getURL(_loc3_,"_blank");
          }
       }
       
-      public function joinDiscordServer() 
+      public function overlaySteamBasedOnAppId(param1:UInt) 
       {
-         var _loc2_:URLRequest = null;
-         var _loc1_= mSteamworks.isOverlayEnabled();
-         var _loc3_= stageRef.displayState == "fullScreenInteractive";
-         if(_loc1_ && _loc3_)
-         {
-            Logger.debug("Using activateGameOverlayToStore to open steam page");
-            mSteamworks.activateGameOverlayToWebPage("https://discord.com/invite/dungeonrampage");
-         }
-         else
-         {
-            Logger.debug("Using navigateToURL to open steam page because isOverlayEnabled:" + _loc1_ + " isFullscreen:" + _loc3_);
-            _loc2_ = new URLRequest("https://discord.com/invite/dungeonrampage");
-            flash.Lib.getURL(_loc2_,"_blank");
-         }
+         overlaySteamwithURL("https://store.steampowered.com/app/" + param1 + "/");
+      }
+      
+      @:isVar public var menuNavigationController(get,never):MenuNavigationController;
+public function  get_menuNavigationController() : MenuNavigationController
+      {
+         return mMenuNavigationController;
+      }
+      
+      @:isVar public var customSkinVisualsOverrideHandler(get,never):CustomSkinVisualsOverrideHandler;
+public function  get_customSkinVisualsOverrideHandler() : CustomSkinVisualsOverrideHandler
+      {
+         return mCustomSkinVisualsOverrideHandler;
       }
    }
 

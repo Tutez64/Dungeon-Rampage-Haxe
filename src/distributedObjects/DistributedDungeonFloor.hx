@@ -6,6 +6,7 @@ package distributedObjects
    import brain.logger.Logger;
    import brain.sound.SoundHandle;
    import brain.utils.MemoryTracker;
+   import doobers.DooberGameObject;
    import dungeon.DungeonFloorFactory;
    import dungeon.RectangleNavCollider;
    import dungeon.Tile;
@@ -32,6 +33,7 @@ package distributedObjects
    import flash.net.URLRequest;
    import org.as3commons.collections.Map;
    import org.as3commons.collections.Set;
+   import org.as3commons.collections.framework.IMapIterator;
    import org.as3commons.collections.framework.ISetIterator;
    
     class DistributedDungeonFloor extends Floor implements IDistributedDungeonFloor
@@ -54,6 +56,8 @@ package distributedObjects
       var mRemoteHeroes:Map;
       
       var mRemoteActors:Map;
+      
+      var mDoobers:ASDictionary<ASAny,ASAny>;
       
       var mBuildPropReady:Bool = false;
       
@@ -83,6 +87,8 @@ package distributedObjects
       
       var mMusicTestSoundHandle:SoundHandle;
       
+      var mBgMusic:Sound;
+      
       public function new(param1:DBFacade, param2:UInt)
       {
          Logger.debug("New  DistributedDungeonFloor******************************");
@@ -90,6 +96,7 @@ package distributedObjects
          super(param1,param2);
          mRemoteHeroes = new Map();
          mRemoteActors = new Map();
+         mDoobers = new ASDictionary<ASAny,ASAny>(true);
          mFloorObjectsAwaitingDungeonFloor = new Set();
          mEffectManager = new EffectManager(mDBFacade);
          MemoryTracker.track(mEffectManager,"EffectManager - created in DistributedDungeonFloor.constructor()");
@@ -213,11 +220,20 @@ public function  get_dungeonFloorFactory() : DungeonFloorFactory
       {
          logDungeonCompletion();
          super.victory();
+         if(mDBFacade.steamAchievementsManager != null)
+         {
+            mDBFacade.steamAchievementsManager.unlockFloorCompleted(mMapNode.Constant);
+         }
       }
       
       override public function defeat() 
       {
          logDungeonCompletion();
+         var _loc1_= getCurrentFloorNum();
+         if(mDBFacade.steamAchievementsManager != null)
+         {
+            mDBFacade.steamAchievementsManager.setHighestFloorAchieved(mMapNode,_loc1_);
+         }
          super.defeat();
       }
       
@@ -287,30 +303,33 @@ public function  get_dungeonFloorFactory() : DungeonFloorFactory
       
       function playMusic() 
       {
-         var bgMusic:Sound;
-         var req:URLRequest;
-         var context:SoundLoaderContext;
-         var gmTier= ASCompat.dynamicAs(mDBFacade.gameMaster.coliseumTierByConstant.itemFor(mColiseumTierConstant), gameMasterDictionary.GMColiseumTier);
-         if(gmTier != null && ASCompat.stringAsBool(gmTier.MusicFilepath))
+         var _loc3_:URLRequest = null;
+         var _loc2_:SoundLoaderContext = null;
+         var _loc1_= ASCompat.dynamicAs(mDBFacade.gameMaster.coliseumTierByConstant.itemFor(mColiseumTierConstant), gameMasterDictionary.GMColiseumTier);
+         if(_loc1_ != null && ASCompat.stringAsBool(_loc1_.MusicFilepath))
          {
-            bgMusic = new Sound();
-            req = new URLRequest(DBFacade.buildFullDownloadPath(gmTier.MusicFilepath));
-            context = new SoundLoaderContext(1000,true);
-            context.checkPolicyFile = true;
-            bgMusic.load(req,context);
-            bgMusic.addEventListener("complete",function(param1:Event)
-            {
-               mDBSoundComponent.playStreamingMusic(bgMusic);
-            });
-            bgMusic.addEventListener("ioError",function(param1:flash.events.IOErrorEvent)
-            {
-               Logger.error("IOErrorEvent: " + param1.toString() + " Data:" + Std.string(req.data) + " URL:" + gmTier.MusicFilepath.toString());
-            });
-            bgMusic.addEventListener("securityError",function(param1:flash.events.SecurityErrorEvent)
-            {
-               Logger.error("SecurityErrorEvent: " + param1.toString() + " Data:" + Std.string(req.data) + " URL:" + gmTier.MusicFilepath.toString());
-            });
+            mBgMusic = new Sound();
+            _loc3_ = new URLRequest(DBFacade.buildFullDownloadPath(_loc1_.MusicFilepath));
+            _loc2_ = new SoundLoaderContext(1000,true);
+            _loc2_.checkPolicyFile = true;
+            mBgMusic.load(_loc3_,_loc2_);
+            mBgMusic.addEventListener("complete",onBgMusicLoaded);
+            mBgMusic.addEventListener("ioError",onBgMusicError);
+            mBgMusic.addEventListener("securityError",onBgMusicError);
          }
+      }
+      
+      function onBgMusicLoaded(param1:Event) 
+      {
+         if(mDBSoundComponent != null)
+         {
+            mDBSoundComponent.playStreamingMusic(mBgMusic);
+         }
+      }
+      
+      function onBgMusicError(param1:Event) 
+      {
+         Logger.error("BgMusic load error: " + param1.toString());
       }
       
       @:isVar public var coliseumTier(get,never):GMColiseumTier;
@@ -520,9 +539,24 @@ function  set_currentFloorNum(param1:UInt) :UInt      {
       
       override public function destroy() 
       {
+         var _loc2_:DooberGameObject = null;
          Logger.debug("destroy DistributedDungeonFloor " + Std.string(id));
          mEventComponent.dispatchEvent(new Event("DUNGEON_FLOOR_DESTROY"));
          mActiveOwnerAvatar = null;
+         if(mBgMusic != null)
+         {
+            mBgMusic.removeEventListener("complete",onBgMusicLoaded);
+            mBgMusic.removeEventListener("ioError",onBgMusicError);
+            mBgMusic.removeEventListener("securityError",onBgMusicError);
+            try
+            {
+               mBgMusic.close();
+            }
+            catch(e:Dynamic)
+            {
+            }
+            mBgMusic = null;
+         }
          if(mDBSoundComponent != null)
          {
             mDBSoundComponent.destroy();
@@ -535,10 +569,52 @@ function  set_currentFloorNum(param1:UInt) :UInt      {
          }
          mDungeonFloorFactory.destroy();
          mDungeonFloorFactory = null;
+         var _loc6_:Array<ASAny> = [];
+         var _loc3_= ASCompat.reinterpretAs(mRemoteHeroes.iterator() , IMapIterator);
+         while(_loc3_.hasNext())
+         {
+            _loc6_.push(_loc3_.next());
+         }
+         var _loc7_:ASAny;
+         if (checkNullIteratee(_loc6_)) for (_tmp_ in _loc6_)
+         {
+            _loc7_ = _tmp_;
+            if(ASCompat.toBool(_loc7_))
+            {
+               _loc7_.destroy();
+            }
+         }
          mRemoteHeroes.clear();
          mRemoteHeroes = null;
+         var _loc5_:Array<ASAny> = [];
+         var _loc4_= ASCompat.reinterpretAs(mRemoteActors.iterator() , IMapIterator);
+         while(_loc4_.hasNext())
+         {
+            _loc5_.push(_loc4_.next());
+         }
+         var _loc1_:ASAny;
+         if (checkNullIteratee(_loc5_)) for (_tmp_ in _loc5_)
+         {
+            _loc1_ = _tmp_;
+            if(ASCompat.toBool(_loc1_))
+            {
+               _loc1_.destroy();
+            }
+         }
          mRemoteActors.clear();
          mRemoteActors = null;
+         var _loc8_:ASAny;
+         final __ax4_iter_223 = mDoobers;
+         if (checkNullIteratee(__ax4_iter_223)) for(_tmp_ in __ax4_iter_223.keys())
+         {
+            _loc8_ = _tmp_;
+            _loc2_ = ASCompat.dynamicAs(_loc8_ , DooberGameObject);
+            if(_loc2_ != null && !_loc2_.isDestroyed)
+            {
+               _loc2_.destroy();
+            }
+         }
+         mDoobers = null;
          mFloorObjectsAwaitingDungeonFloor.clear();
          mFloorObjectsAwaitingDungeonFloor = null;
          mTileGrid.destroy();
@@ -574,6 +650,10 @@ function  set_currentFloorNum(param1:UInt) :UInt      {
          {
             remoteActors.add(param1.id,ASCompat.reinterpretAs(param1 , ActorGameObject));
             mEventComponent.dispatchEvent(new ActorLifetimeEvent("ACTOR_CREATED",param1.id));
+         }
+         else if(Std.isOfType(param1 , DooberGameObject))
+         {
+            mDoobers[param1] = true;
          }
          if(Std.isOfType(param1 , FloorObject))
          {

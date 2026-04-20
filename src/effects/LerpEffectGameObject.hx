@@ -95,7 +95,12 @@ package effects
       
       override public function destroy() 
       {
-         mEventComponent.removeListener("enterFrame");
+         if(mEventComponent != null)
+         {
+            mEventComponent.removeListener("enterFrame");
+            mEventComponent.destroy();
+            mEventComponent = null;
+         }
          super.destroy();
       }
    }

@@ -17,7 +17,7 @@ package account
    import events.TrophiesUpdatedAccountEvent;
    import facade.DBFacade;
    import facade.Locale;
-   import uI.DBUIPopup;
+   import uI.popup.DBUIPopup;
    import flash.events.Event;
    import flash.events.IOErrorEvent;
    import flash.events.SecurityErrorEvent;
@@ -117,7 +117,7 @@ package account
          SocketPingMilsecs = -1;
          mDBFacade = param1;
          mAssetLoadingComponent = new AssetLoadingComponent(mDBFacade);
-         mLogicalWorkComponent = new LogicalWorkComponent(mDBFacade);
+         mLogicalWorkComponent = new LogicalWorkComponent(mDBFacade,"DBAccountInfo");
          mAttributes = new Map();
          mFriendsInfo = new Map();
          mGiftsInfo = new Map();
@@ -453,6 +453,10 @@ function  set_hudStyle(param1:UInt) :UInt      {
             {
                successCallback();
             }
+            if(mDBFacade.steamAchievementsManager != null)
+            {
+               mDBFacade.steamAchievementsManager.setAchievement("SEND_A_GIFT");
+            }
          };
          rpcFunc(mDBFacade.dbAccountInfo.id,offerId,mDBFacade.dbConfigManager.networkId,requestIds,toIds,mDBFacade.validationToken,rpcSuccessCallback,parseError);
       }
@@ -745,7 +749,7 @@ function  set_hudStyle(param1:UInt) :UInt      {
          mLastFPSFrame = mDBFacade.gameClock.frame;
          mFPSLocation = param1;
          setOnlinePresence(mDBFacade.gameClock);
-         mOnlinePresenceTask = mDBFacade.realClockWorkManager.doEverySeconds(60,setOnlinePresence);
+         mOnlinePresenceTask = mDBFacade.realClockWorkManager.doEverySeconds(60,setOnlinePresence,true,"DBAccountInfo.onlinePresence");
       }
       
       function setOnlinePresence(param1:GameClock) 

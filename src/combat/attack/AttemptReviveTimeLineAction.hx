@@ -11,6 +11,8 @@ package combat.attack
       
       public static inline final TYPE= "attemptRevive";
       
+      static inline final REVIVE_KEYCODE= 32;
+      
       var mKeyboardCheckTask:Task;
       
       var mDeltaPerFrame:Float = Math.NaN;
@@ -27,10 +29,16 @@ package combat.attack
       
       function keyboardCheck(param1:GameClock) 
       {
-         if(!mDBFacade.inputManager.check(32) || !this.mTimeline.targetActor.isInReviveState())
+         var _loc2_= isReviveActionDown();
+         if(!_loc2_ || !this.mTimeline.targetActor.isInReviveState())
          {
             mTimeline.stop();
          }
+      }
+      
+      function isReviveActionDown() : Bool
+      {
+         return mDBFacade.inputManager.check(32) || mDBFacade.steamInputManager.heldAction("revive_ally");
       }
       
       override public function execute(param1:ScriptTimeline) 

@@ -17,8 +17,8 @@ package uI.friendManager.states
    import facade.Locale;
    import gameMasterDictionary.GMSkin;
    import town.TownStateMachine;
-   import uI.DBUIOneButtonPopup;
    import uI.friendManager.UIFriendManager;
+   import uI.popup.DBUIOneButtonPopup;
    import flash.display.MovieClip;
    import flash.external.ExternalInterface;
    
@@ -50,7 +50,7 @@ package uI.friendManager.states
          super(param2,param1,param3);
          mAssetLoadingComponent = new AssetLoadingComponent(mDBFacade);
          mEventComponent = new EventComponent(mDBFacade);
-         mLogicalWorkComponent = new LogicalWorkComponent(mDBFacade);
+         mLogicalWorkComponent = new LogicalWorkComponent(mDBFacade,"UIInvite");
       }
       
       override public function enter() 

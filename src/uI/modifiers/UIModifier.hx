@@ -3,6 +3,7 @@ package uI.modifiers
    import brain.assetRepository.AssetLoadingComponent;
    import brain.logger.Logger;
    import facade.DBFacade;
+   import facade.GameMasterLocale;
    import gameMasterDictionary.GMLegendaryModifier;
    import gameMasterDictionary.GMModifier;
    import flash.display.MovieClip;
@@ -117,7 +118,7 @@ public function  get_gmModifier() : GMModifier
                   _loc6_++;
                }
             }
-            mToolTip = new UIModifierTooltip(mDBFacade,mRoot,param1,mGMLegendaryModifier != null ? mGMLegendaryModifier.Name : mGMModifier.Name,mGMLegendaryModifier != null ? mGMLegendaryModifier.Description : mGMModifier.Description);
+            mToolTip = new UIModifierTooltip(mDBFacade,mRoot,param1,mGMLegendaryModifier != null ? GameMasterLocale.getGameMasterSubString("LEGENDARY_MODIFIER_NAME",mGMLegendaryModifier.Constant) : GameMasterLocale.getGameMasterSubString("MODIFIER_NAME",mGMModifier.Constant),mGMLegendaryModifier != null ? GameMasterLocale.getGameMasterSubString("LEGENDARY_MODIFIER_DESCRIPTION",mGMLegendaryModifier.Constant) : GameMasterLocale.getGameMasterSubString("MODIFIER_DESCRIPTION",mGMModifier.Constant));
             mToolTip.hide();
             mRoot.addEventListener("rollOver",onMouseOver);
             mRoot.addEventListener("rollOut",onMouseOut);

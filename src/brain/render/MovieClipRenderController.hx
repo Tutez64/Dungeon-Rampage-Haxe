@@ -22,14 +22,14 @@ package brain.render
       
       public var className:String = "";
       
-      public function new(param1:Facade, param2:MovieClip, param3:ASFunction = null)
+      public function new(param1:Facade, param2:MovieClip, param3:ASFunction = null, param4:String = null)
       {
          
          mFacade = param1;
          mClip = param2;
          mStartScaleX = mClip.scaleX;
          mStartScaleY = mClip.scaleY;
-         determineRenderer(param3);
+         determineRenderer(param3,param4);
       }
       
       public function postCheckout(param1:Bool) 
@@ -55,25 +55,25 @@ package brain.render
          return swfPath + ":" + className;
       }
       
-      function determineRenderer(param1:ASFunction) 
+      function determineRenderer(param1:ASFunction, param2:String = null) 
       {
-         var _loc2_:FrameLabel;
-         final __ax4_iter_134 = mClip.currentLabels;
-         if (checkNullIteratee(__ax4_iter_134)) for (_tmp_ in __ax4_iter_134)
+         var _loc3_:FrameLabel;
+         final __ax4_iter_143 = mClip.currentLabels;
+         if (checkNullIteratee(__ax4_iter_143)) for (_tmp_ in __ax4_iter_143)
          {
-            _loc2_ = _tmp_;
-            if(ASCompat.toNumber(_loc2_.name.indexOf("random")) >= 0)
+            _loc3_ = _tmp_;
+            if(ASCompat.toNumber(_loc3_.name.indexOf("random")) >= 0)
             {
-               mRenderer = new MovieClipRandomRenderer(mFacade,mClip,param1);
+               mRenderer = new MovieClipRandomRenderer(mFacade,mClip,param1,param2);
                return;
             }
-            if(_loc2_.name == "pause")
+            if(_loc3_.name == "pause")
             {
-               mRenderer = new MovieClipCutsceneRenderer(mFacade,mClip,param1);
+               mRenderer = new MovieClipCutsceneRenderer(mFacade,mClip,param1,param2);
                return;
             }
          }
-         mRenderer = new MovieClipRenderer(mFacade,mClip,param1);
+         mRenderer = new MovieClipRenderer(mFacade,mClip,param1,param2);
       }
       
       public function destroy() 

@@ -52,7 +52,7 @@ package dungeon
          super(param1);
          mIsFiller = param3;
          mBounds = new Rectangle(0,0,900,900);
-         mSceneGraphComponent = new SceneGraphComponent(param1);
+         mSceneGraphComponent = new SceneGraphComponent(param1,"Tile");
          mNumberOfProps = param2 + 1;
          mLocalHeroProximitySensors = new Vector<LocalHeroProximitySensor>();
          checkIfFinished();

@@ -13,8 +13,8 @@ package uI.equipPicker
    import facade.DBFacade;
    import facade.Locale;
    import gameMasterDictionary.GMStackable;
-   import uI.DBUIOneButtonPopup;
    import uI.inventory.UIInventoryItem;
+   import uI.popup.DBUIOneButtonPopup;
    import flash.display.MovieClip;
    
     class StacksWithEquipPicker extends UIObject

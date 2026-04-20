@@ -309,8 +309,8 @@ return param1;
          var _loc11_= (0 : UInt);
          var _loc12_:ByteArray = null;
          var _loc13_= (0 : UInt);
-         final __ax4_iter_90 = this._groups;
-         if (checkNullIteratee(__ax4_iter_90)) for (_tmp_ in __ax4_iter_90)
+         final __ax4_iter_117 = this._groups;
+         if (checkNullIteratee(__ax4_iter_117)) for (_tmp_ in __ax4_iter_117)
          {
             _loc4_  = ASCompat.dynamicAs(_tmp_, com.junkbyte.console.vos.GraphGroup);
             _loc5_ = true;
@@ -378,8 +378,8 @@ return param1;
          var i:GraphInterest = null;
          var v= Math.NaN;
          var group= param1;
-         final __ax4_iter_91 = group.interests;
-         if (checkNullIteratee(__ax4_iter_91)) for (_tmp_ in __ax4_iter_91)
+         final __ax4_iter_118 = group.interests;
+         if (checkNullIteratee(__ax4_iter_118)) for (_tmp_ in __ax4_iter_118)
          {
             i  = ASCompat.dynamicAs(_tmp_, com.junkbyte.console.vos.GraphInterest);
             try

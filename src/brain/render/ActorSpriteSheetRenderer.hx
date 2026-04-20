@@ -40,8 +40,8 @@ package brain.render
          }
          mDuration = 0;
          var _loc4_:Float;
-         final __ax4_iter_132 = mFrameTimes;
-         if (checkNullIteratee(__ax4_iter_132)) for (_tmp_ in __ax4_iter_132)
+         final __ax4_iter_141 = mFrameTimes;
+         if (checkNullIteratee(__ax4_iter_141)) for (_tmp_ in __ax4_iter_141)
          {
             _loc4_ = _tmp_;
             mDuration += _loc4_ / 1000;
@@ -98,8 +98,8 @@ public function  get_frameRate() : UInt
          var _loc3_= (0 : UInt);
          var _loc4_:Float = 0;
          var _loc2_:Float;
-         final __ax4_iter_133 = mFrameTimes;
-         if (checkNullIteratee(__ax4_iter_133)) for (_tmp_ in __ax4_iter_133)
+         final __ax4_iter_142 = mFrameTimes;
+         if (checkNullIteratee(__ax4_iter_142)) for (_tmp_ in __ax4_iter_142)
          {
             _loc2_ = _tmp_;
             _loc4_ += _loc2_ / 1000 / mPlayRate;

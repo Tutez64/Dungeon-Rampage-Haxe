@@ -130,8 +130,8 @@ package stateMachine.mainStateMachine
          
          mDBFacade = param1;
          mAssetLoadingComponent = new AssetLoadingComponent(mDBFacade);
-         mSceneGraphComponent = new SceneGraphComponent(mDBFacade);
-         mLogicalWorkComponent = new LogicalWorkComponent(mDBFacade);
+         mSceneGraphComponent = new SceneGraphComponent(mDBFacade,"DungeonTutorial");
+         mLogicalWorkComponent = new LogicalWorkComponent(mDBFacade,"DungeonTutorial");
          mEventComponent = new EventComponent(mDBFacade);
          mDBFacade.stageRef.addEventListener("keyDown",handleKeyDown);
          mDBFacade.stageRef.addEventListener("mouseDown",handleMouseDown);

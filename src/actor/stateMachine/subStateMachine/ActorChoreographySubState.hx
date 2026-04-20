@@ -86,6 +86,12 @@ package actor.stateMachine.subStateMachine
       override public function destroy() 
       {
          exitState();
+         if(mEventComponent != null)
+         {
+            mEventComponent.destroy();
+            mEventComponent = null;
+         }
+         super.destroy();
       }
    }
 

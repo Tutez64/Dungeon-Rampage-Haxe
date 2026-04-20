@@ -3,7 +3,7 @@ package account
    import brain.logger.Logger;
    import brain.utils.MemoryTracker;
    import facade.DBFacade;
-   import uI.DBUIOneButtonPopup;
+   import uI.popup.DBUIOneButtonPopup;
    import com.adobe.serialization.json.JSON;
    import flash.display.DisplayObject;
    import flash.display.Loader;

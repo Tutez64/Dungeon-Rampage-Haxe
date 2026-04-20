@@ -34,6 +34,7 @@ package distributedObjects
    import events.GameObjectEvent;
    import events.PlayerExitEvent;
    import facade.DBFacade;
+   import facade.GameMasterLocale;
    import facade.Locale;
    import facebookAPI.DBFacebookBragFeedPost;
    import gameMasterDictionary.GMChest;
@@ -52,18 +53,18 @@ package distributedObjects
    import sound.DBSoundComponent;
    import town.TownHeader;
    import uI.CountdownTextTimer;
-   import uI.DBUIPopup;
-   import uI.DBUITwoButtonPopup;
    import uI.friendManager.UIFriendManager;
+   import uI.hud.UIHud;
    import uI.inventory.chests.ChestBuyKeysPopUp;
    import uI.inventory.chests.ChestKeySlot;
    import uI.inventory.chests.ChestRevealPopUp;
    import uI.inventory.UIInventory;
    import uI.inventory.UIWeaponTooltip;
+   import uI.popup.DBUIPopup;
+   import uI.popup.DBUITwoButtonPopup;
+   import uI.popup.UIReportPopup;
+   import uI.popup.UIVictoryBoosterPopup;
    import uI.UIChatLog;
-   import uI.UIHud;
-   import uI.UIReportPopup;
-   import uI.UIVictoryBoosterPopup;
    import com.greensock.TweenMax;
    import com.maccherone.json.JSONParseError;
    import flash.display.DisplayObject;
@@ -356,7 +357,7 @@ import flash.display.MovieClip;
             mRarityMap.add("LEGENDARY",6);
             mRarityMap.add("CONSUMABLE_SMALL",2);
             mRarityMap.add("CONSUMABLE_ROYAL",3);
-            mLogicalWorkComponent = new LogicalWorkComponent(mDBFacade);
+            mLogicalWorkComponent = new LogicalWorkComponent(mDBFacade,"DistributedDungeonSummary");
             mRevealedItemType = (0 : UInt);
             mRevealedItemOfferId = (0 : UInt);
             mAddFriendButtons = [];
@@ -374,9 +375,9 @@ import flash.display.MovieClip;
                mDBFacade.facebookController.updateGuestAchievement((1 : UInt));
             }
             mAssetLoadingComponent = new AssetLoadingComponent(mDBFacade);
-            mSceneGraphComponent = new SceneGraphComponent(mDBFacade);
+            mSceneGraphComponent = new SceneGraphComponent(mDBFacade,"DistributedDungeonSummary");
             mSoundComponent = new DBSoundComponent(mDBFacade);
-            mWorkComponent = new LogicalWorkComponent(mDBFacade);
+            mWorkComponent = new LogicalWorkComponent(mDBFacade,"DistributedDungeonSummary");
             mEventComponent = new EventComponent(mDBFacade);
             mChatBalloon = new Vector<ChatBalloon>((4 : UInt));
             mChatCloseTask = new Vector<Task>((4 : UInt));
@@ -448,7 +449,7 @@ import flash.display.MovieClip;
             PixelTracker.nodeCompleted(mDBFacade);
          }
          PixelTracker.nodeIndexCompleted(mDBFacade,mCurrentMapNode.BitIndex);
-         mDungeonName = mCurrentMapNode.Name.toUpperCase();
+         mDungeonName = GameMasterLocale.getGameMasterSubString("DUNGEON_NAME",mCurrentMapNode.Constant).toUpperCase();
          if(this.dungeonSuccess != 0)
          {
             mAssetLoadingComponent.getSwfAsset(DBFacade.buildFullDownloadPath("Resources/Art2D/UI/db_UI_score_report.swf"),successScoreReportSwfLoaded);
@@ -470,8 +471,8 @@ import flash.display.MovieClip;
       {
          var _loc3_= 0;
          var _loc2_:ASAny;
-         final __ax4_iter_199 = mUILootSlotsTwoTreasures;
-         if (checkNullIteratee(__ax4_iter_199)) for (_tmp_ in __ax4_iter_199)
+         final __ax4_iter_215 = mUILootSlotsTwoTreasures;
+         if (checkNullIteratee(__ax4_iter_215)) for (_tmp_ in __ax4_iter_215)
          {
             _loc2_ = _tmp_;
             _loc3_ = 0;
@@ -487,8 +488,8 @@ import flash.display.MovieClip;
       {
          var _loc3_= 0;
          var _loc2_:ASAny;
-         final __ax4_iter_200 = mUILootSlotsFourTreasures;
-         if (checkNullIteratee(__ax4_iter_200)) for (_tmp_ in __ax4_iter_200)
+         final __ax4_iter_216 = mUILootSlotsFourTreasures;
+         if (checkNullIteratee(__ax4_iter_216)) for (_tmp_ in __ax4_iter_216)
          {
             _loc2_ = _tmp_;
             _loc3_ = 0;
@@ -975,7 +976,6 @@ __tmpIncObj3[__tmpIncIdx4]= (__tmpIncObj3[__tmpIncIdx4] + 1 : UInt);
                
             case 12:
                fadeAwayTitle();
-               mEventComponent.dispatchEvent(new Event("TIME_TO_SHARE_LEVEL_UP_EVENT"));
                mTownHeader = new TownHeader(mDBFacade,closeHeader);
                mTownHeader.animateHeader();
                if(mCurrentMapNode.InfiniteDungeon != null)
@@ -988,6 +988,10 @@ __tmpIncObj3[__tmpIncIdx4]= (__tmpIncObj3[__tmpIncIdx4] + 1 : UInt);
                }
                mTownHeader.title = headerTitle;
                mTownHeader.showCloseButton(true);
+               mUIChatLog.enabledChatEnterEvent = false;
+               mDBFacade.menuNavigationController.pushNewLayer("DISTRIBUTED_DUNGEON_SUMMARY",closeHeader,mTownHeader.closeButton);
+               mTownHeader.setupButtonLinks();
+               mEventComponent.dispatchEvent(new Event("TIME_TO_SHARE_LEVEL_UP_EVENT"));
                go = mFacade.gameObjectManager.getReferenceFromId(mDungeonReport[0].id);
                player = ASCompat.reinterpretAs(go , PlayerGameObject);
                mEventComponent.dispatchEvent(new CurrencyUpdatedAccountEvent(player.basicCurrency,mDBFacade.dbAccountInfo.premiumCurrency));
@@ -1483,8 +1487,8 @@ __tmpIncObj3[__tmpIncIdx4]= (__tmpIncObj3[__tmpIncIdx4] + 1 : UInt);
          var mcr:MovieClipRenderer;
          var loot:Array<ASAny>;
          var yScale:Float;
-         final __ax4_iter_201 = mChestRenderers;
-         if (checkNullIteratee(__ax4_iter_201)) for (_tmp_ in __ax4_iter_201)
+         final __ax4_iter_217 = mChestRenderers;
+         if (checkNullIteratee(__ax4_iter_217)) for (_tmp_ in __ax4_iter_217)
          {
             mcr  = _tmp_;
             mcr.destroy();
@@ -1630,7 +1634,6 @@ __tmpIncObj3[__tmpIncIdx4]= (__tmpIncObj3[__tmpIncIdx4] + 1 : UInt);
             {
                if(mDungeonReport[_loc2_].valid == ASCompat.toNumber(true))
                {
-                  mWeapons.push([]);
                   mWeaponTooltips.push([]);
                   _loc3_ = 0;
                   while(_loc3_ < 3)
@@ -1725,13 +1728,13 @@ __tmpIncObj3[__tmpIncIdx4]= (__tmpIncObj3[__tmpIncIdx4] + 1 : UInt);
             switch(weaponSlotNum)
             {
                case 0:
-                  weaponTooltip.setWeaponItemFromData(gmWeaponAesthetic.Name,mDungeonReport[(statNum : Int)].weapon_power_1,gmWeaponItem.TapIcon,gmWeaponItem.HoldIcon,mDungeonReport[(statNum : Int)].modifier_type_1a,mDungeonReport[(statNum : Int)].modifier_type_1b,mDungeonReport[(statNum : Int)].legendary_modifier_type_1,mDungeonReport[(statNum : Int)].weapon_rarity_1,mDungeonReport[(statNum : Int)].weapon_level_1);
+                  weaponTooltip.setWeaponItemFromData(gmWeaponAesthetic.Name,mDungeonReport[(statNum : Int)].weapon_power_1,gmWeaponItem.TapIcon,gmWeaponItem.HoldIcon,mDungeonReport[(statNum : Int)].modifier_type_1a,mDungeonReport[(statNum : Int)].modifier_type_1b,mDungeonReport[(statNum : Int)].legendary_modifier_type_1,mDungeonReport[(statNum : Int)].weapon_rarity_1,mDungeonReport[(statNum : Int)].weapon_level_1,gmWeaponAesthetic);
                   
                case 1:
-                  weaponTooltip.setWeaponItemFromData(gmWeaponAesthetic.Name,mDungeonReport[(statNum : Int)].weapon_power_2,gmWeaponItem.TapIcon,gmWeaponItem.HoldIcon,mDungeonReport[(statNum : Int)].modifier_type_2a,mDungeonReport[(statNum : Int)].modifier_type_2b,mDungeonReport[(statNum : Int)].legendary_modifier_type_2,mDungeonReport[(statNum : Int)].weapon_rarity_2,mDungeonReport[(statNum : Int)].weapon_level_2);
+                  weaponTooltip.setWeaponItemFromData(gmWeaponAesthetic.Name,mDungeonReport[(statNum : Int)].weapon_power_2,gmWeaponItem.TapIcon,gmWeaponItem.HoldIcon,mDungeonReport[(statNum : Int)].modifier_type_2a,mDungeonReport[(statNum : Int)].modifier_type_2b,mDungeonReport[(statNum : Int)].legendary_modifier_type_2,mDungeonReport[(statNum : Int)].weapon_rarity_2,mDungeonReport[(statNum : Int)].weapon_level_2,gmWeaponAesthetic);
                   
                case 2:
-                  weaponTooltip.setWeaponItemFromData(gmWeaponAesthetic.Name,mDungeonReport[(statNum : Int)].weapon_power_3,gmWeaponItem.TapIcon,gmWeaponItem.HoldIcon,mDungeonReport[(statNum : Int)].modifier_type_3a,mDungeonReport[(statNum : Int)].modifier_type_3b,mDungeonReport[(statNum : Int)].legendary_modifier_type_3,mDungeonReport[(statNum : Int)].weapon_rarity_3,mDungeonReport[(statNum : Int)].weapon_level_3);
+                  weaponTooltip.setWeaponItemFromData(gmWeaponAesthetic.Name,mDungeonReport[(statNum : Int)].weapon_power_3,gmWeaponItem.TapIcon,gmWeaponItem.HoldIcon,mDungeonReport[(statNum : Int)].modifier_type_3a,mDungeonReport[(statNum : Int)].modifier_type_3b,mDungeonReport[(statNum : Int)].legendary_modifier_type_3,mDungeonReport[(statNum : Int)].weapon_rarity_3,mDungeonReport[(statNum : Int)].weapon_level_3,gmWeaponAesthetic);
             }
          });
       }
@@ -1882,6 +1885,10 @@ function  get_dungeonSuccess() : UInt
             refreshHeroInfoUI(mOpenKeyChestMC);
          }
          mSceneGraphComponent.addChild(mOpenKeyChestMC,(105 : UInt));
+         mDBFacade.menuNavigationController.pushNewLayer("POPUP_CHEST_LAYER",closeKeyChestPopup,mOpenButton);
+         mOpenButton.isAbove(mKeepButton);
+         mAbandonButton.isToTheLeftOf(mKeepButton);
+         mAbandonButton.upNavigation = mOpenButton;
       }
       
       public function refreshHeroInfoUI(param1:MovieClip) 
@@ -2055,10 +2062,10 @@ function  get_dungeonSuccess() : UInt
                "category":category
             });
             removeItemFromSlot(mSelectedItemSlot);
+            closeAbandonChestPopUp();
             closeKeyChestPopup();
             loadNextChestPopUp();
-            closeAbandonChestPopUp();
-         },false,null);
+         },false,null,true,true,"ABANDON_CHESTS");
          MemoryTracker.track(mAbandonChestPopUp,"DBUITwoButtonPopup - created in DistributedDungeonSummary.abandonChestCallback()");
          mAbandonChestPopUp.root.y += 180;
       }
@@ -2309,6 +2316,7 @@ function  get_dungeonSuccess() : UInt
             mSceneGraphComponent.removeChild(mOpenKeyChestMC);
             mOpenKeyChestMC = null;
             mSceneGraphComponent.removePopupCurtain();
+            mDBFacade.menuNavigationController.popLayer("POPUP_CHEST_LAYER");
          }
       }
       
@@ -2782,6 +2790,8 @@ function  get_dungeonSuccess() : UInt
             }
             mTeamBonusUI.add(i,new UIObject(mDBFacade,ASCompat.dynamicAs(stats_panels[(i : Int)].stats.crewbonus, flash.display.MovieClip)));
             teamBonusUI = ASCompat.dynamicAs(mTeamBonusUI.itemFor(i), brain.uI.UIObject);
+            ASCompat.setProperty((teamBonusUI.root : ASAny).header_crew_bonus_txt1, "text", Locale.getString("TEAM_BONUS_TITLE_CREW"));
+            ASCompat.setProperty((teamBonusUI.root : ASAny).header_crew_bonus_txt2, "text", Locale.getString("TEAM_BONUS_TITLE_BONUS"));
             ASCompat.setProperty((teamBonusUI.tooltip : ASAny).title_label, "text", Locale.getString("TEAM_BONUS_TOOLTIP_TITLE"));
             ASCompat.setProperty((teamBonusUI.tooltip : ASAny).description_label, "text", Locale.getString("TEAM_BONUS_TOOLTIP_DESCRIPTION"));
             ASCompat.setProperty((teamBonusUI.root : ASAny).header_crew_bonus_number, "text", mDungeonReport[(i : Int)].totalAvatarsOwned - 1);
@@ -3059,8 +3069,8 @@ function  get_dungeonSuccess() : UInt
             mCountDownTextGold.destroy();
          }
          var _loc3_:ASAny;
-         final __ax4_iter_202 = mTeamBonusUI;
-         if (checkNullIteratee(__ax4_iter_202)) for (_tmp_ in __ax4_iter_202.iterator())
+         final __ax4_iter_218 = mTeamBonusUI;
+         if (checkNullIteratee(__ax4_iter_218)) for (_tmp_ in __ax4_iter_218.iterator())
          {
             _loc3_ = _tmp_;
             _loc3_.destroy();
@@ -3348,7 +3358,7 @@ function  get_report() : Vector<DungeonReport>
          var _loc1_:DBUITwoButtonPopup = null;
          if(mItemCount > 0)
          {
-            _loc1_ = new DBUITwoButtonPopup(mDBFacade,Locale.getString("ABANDON_ITEMS_TITLE"),Locale.getString("ABANDON_ITEMS_MESSAGE"),Locale.getString("ABANDON_YES"),trySurveyLink,Locale.getString("CANCEL"),null);
+            _loc1_ = new DBUITwoButtonPopup(mDBFacade,Locale.getString("ABANDON_ITEMS_TITLE"),Locale.getString("ABANDON_ITEMS_MESSAGE"),Locale.getString("ABANDON_YES"),trySurveyLink,Locale.getString("CANCEL"),null,true,null,true,true,"ARE_YOU_SURE_YOU_WANT_TO_ABANDON_CHESTS");
             MemoryTracker.track(_loc1_,"DBUITwoButtonPopup - created in DistributedDungeonSummary.tryReturnToSplashScreen()");
          }
          else
@@ -3423,7 +3433,12 @@ function  get_report() : Vector<DungeonReport>
       
       function returnToSplashScreen() 
       {
+         mDBFacade.menuNavigationController.popLayer("DISTRIBUTED_DUNGEON_SUMMARY");
          mDBFacade.mDistributedObjectManager.mMatchMaker.RequestExit();
+      }
+      
+      function setupMenuNavigation() 
+      {
       }
    }
 

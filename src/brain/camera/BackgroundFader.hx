@@ -47,7 +47,7 @@ package brain.camera
          
          mFramesElapsed = (0 : UInt);
          mFacade = param1;
-         mWorkComponent = new LogicalWorkComponent(param1);
+         mWorkComponent = new LogicalWorkComponent(param1,"BackgroundFader");
          MemoryTracker.track(mWorkComponent,"LogicalWorkComponent - created in BackgroundFader()","brain");
       }
       
@@ -93,8 +93,8 @@ package brain.camera
          mRectSprite.alpha = 0;
          mFacade.sceneGraphManager.addChild(mRectSprite,42);
          var _loc1_:ASAny;
-         final __ax4_iter_187 = mExcludes;
-         if (checkNullIteratee(__ax4_iter_187)) for (_tmp_ in __ax4_iter_187)
+         final __ax4_iter_203 = mExcludes;
+         if (checkNullIteratee(__ax4_iter_203)) for (_tmp_ in __ax4_iter_203)
          {
             _loc1_ = _tmp_;
             mFacade.sceneGraphManager.addChild(ASCompat.dynamicAs(_loc1_, flash.display.DisplayObject),46);
@@ -134,8 +134,8 @@ package brain.camera
          mFramesElapsed = (0 : UInt);
          mFacade.sceneGraphManager.removeChild(mRectSprite);
          var _loc1_:ASAny;
-         final __ax4_iter_188 = mExcludes;
-         if (checkNullIteratee(__ax4_iter_188)) for (_tmp_ in __ax4_iter_188)
+         final __ax4_iter_204 = mExcludes;
+         if (checkNullIteratee(__ax4_iter_204)) for (_tmp_ in __ax4_iter_204)
          {
             _loc1_ = _tmp_;
             mFacade.sceneGraphManager.addChild(ASCompat.dynamicAs(_loc1_, flash.display.DisplayObject),20);
@@ -151,6 +151,20 @@ package brain.camera
          if(mFadeTask != null && mRectSprite != null)
          {
             ResetFade();
+         }
+      }
+      
+      public function destroy() 
+      {
+         if(mFadeTask != null)
+         {
+            mFadeTask.destroy();
+            mFadeTask = null;
+         }
+         if(mWorkComponent != null)
+         {
+            mWorkComponent.destroy();
+            mWorkComponent = null;
          }
       }
    }

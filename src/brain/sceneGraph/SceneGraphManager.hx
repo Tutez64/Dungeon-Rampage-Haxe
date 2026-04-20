@@ -174,7 +174,7 @@ package brain.sceneGraph
          mCollisionLayer = this.createLayer((40 : UInt),mWorldLayerGroup,"CollisionLayer");
          mGameFadeLayer = this.createLayer((42 : UInt),mWorldLayerGroup,"GameFadeLayer");
          mOverFadeLayer = this.createLayer((46 : UInt),mWorldLayerGroup,"OverFadeLayer");
-         mFacade.layerRenderWorkManager.doEveryFrame(mWorldLayerGroup.onFrame);
+         mFacade.layerRenderWorkManager.doEveryFrame(mWorldLayerGroup.onFrame,"SceneGraphManager.WorldLayerGroup");
          mUILayerGroup = new LayerGroup();
          mUILayerGroup.name = "SceneGraphManager.UILayerGroup";
          mFacade.addRootDisplayObject(mUILayerGroup);
@@ -205,7 +205,7 @@ package brain.sceneGraph
          mUI7T = this.createLayer((162 : UInt),mUILayerGroupT,"UI7T");
          mUI9T = this.createLayer((163 : UInt),mUILayerGroupT,"UI9T");
          mCursorLayer = this.createLayer((200 : UInt),mUILayerGroup,"CursorLayer");
-         mFacade.layerRenderWorkManager.doEveryFrame(mUILayerGroup.onFrame);
+         mFacade.layerRenderWorkManager.doEveryFrame(mUILayerGroup.onFrame,"SceneGraphManager.UILayerGroup");
          mPopupCurtain = new Sprite();
          mPopupCurtain.alpha = 0.5;
          mPopupCurtain.x = 0;

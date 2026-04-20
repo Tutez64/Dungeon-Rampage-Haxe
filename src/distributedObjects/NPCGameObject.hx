@@ -126,8 +126,8 @@ public function  get_gmNpc() : GMNpc
          mActorStateMachine.destroy();
          mActorStateMachine = null;
          var _loc1_:NavCollider;
-         final __ax4_iter_195 = mOffNavCollisions;
-         if (checkNullIteratee(__ax4_iter_195)) for (_tmp_ in __ax4_iter_195)
+         final __ax4_iter_211 = mOffNavCollisions;
+         if (checkNullIteratee(__ax4_iter_211)) for (_tmp_ in __ax4_iter_211)
          {
             _loc1_ = _tmp_;
             _loc1_.destroy();
@@ -179,8 +179,8 @@ public function  get_gmNpc() : GMNpc
       public function removeOffNavColliders() 
       {
          var _loc1_:NavCollider;
-         final __ax4_iter_196 = mOffNavCollisions;
-         if (checkNullIteratee(__ax4_iter_196)) for (_tmp_ in __ax4_iter_196)
+         final __ax4_iter_212 = mOffNavCollisions;
+         if (checkNullIteratee(__ax4_iter_212)) for (_tmp_ in __ax4_iter_212)
          {
             _loc1_ = _tmp_;
             _loc1_.destroy();
@@ -198,8 +198,8 @@ public function  get_triggerState() : Bool
       @:isVar public var offNavCollidersActive(never,set):Bool;
 public function  set_offNavCollidersActive(param1:Bool) :Bool      {
          var _loc2_:NavCollider;
-         final __ax4_iter_197 = mOffNavCollisions;
-         if (checkNullIteratee(__ax4_iter_197)) for (_tmp_ in __ax4_iter_197)
+         final __ax4_iter_213 = mOffNavCollisions;
+         if (checkNullIteratee(__ax4_iter_213)) for (_tmp_ in __ax4_iter_213)
          {
             _loc2_ = _tmp_;
             ASCompat.setProperty(_loc2_, "active", param1);

@@ -92,6 +92,9 @@ package town
          mRoot.addEventListener("mouseUp",resumeAutoScroll);
          mRoot.addEventListener("mouseWheel",onScrollWheel);
          mRoot.addEventListener("mouseDown",stopAutoScroll);
+         super.resetHeaderLinks();
+         super.setupHeaderLinks();
+         mDBFacade.menuNavigationController.pushNewLayer("CREDITS_MENU",mTownStateMachine.townHeader.determineCallback,mTownStateMachine.townHeader.closeButton,mTownStateMachine.townHeader.closeButton);
       }
       
       function textFieldToBitmap(param1:TextField) : Bitmap
@@ -108,7 +111,7 @@ package town
       function applyHeaderFormatting() 
       {
          var _loc6_:String;
-         var __ax4_iter_123:Vector<String>;
+         var __ax4_iter_139:Vector<String>;
          var _loc5_= 0;
          var _loc3_:String = null;
          var _loc8_= 0;
@@ -128,8 +131,8 @@ package town
             {
                _loc4_ = _loc5_;
             }
-            __ax4_iter_123 = Headers;
-            if (checkNullIteratee(__ax4_iter_123)) for (_tmp_ in __ax4_iter_123)
+            __ax4_iter_139 = Headers;
+            if (checkNullIteratee(__ax4_iter_139)) for (_tmp_ in __ax4_iter_139)
             {
                _loc6_ = _tmp_;
                if(_loc3_.indexOf(_loc6_) != -1)
@@ -182,6 +185,7 @@ package town
       
       override public function exitState() 
       {
+         mDBFacade.menuNavigationController.popLayer("CREDITS_MENU");
          super.exitState();
          mRoot.removeEventListener("mouseDown",stopAutoScroll);
          mRoot.removeEventListener("mouseUp",resumeAutoScroll);

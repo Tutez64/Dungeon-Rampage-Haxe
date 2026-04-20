@@ -33,11 +33,11 @@ package brain.render
       
       var mFacade:Facade;
       
-      public function new(param1:Facade, param2:MovieClip, param3:ASFunction = null)
+      public function new(param1:Facade, param2:MovieClip, param3:ASFunction = null, param4:String = null)
       {
          mAssetLoadingComponent = new AssetLoadingComponent(param1);
          mSoundComponent = new SoundComponent(param1);
-         super(param1,param2,param3);
+         super(param1,param2,param3,param4);
          mFacade = param1;
          mFacade.camera.doLetterboxEffect((10000 : UInt),120,new Vector3D(0,0,0),1);
          createButtons();
@@ -66,6 +66,16 @@ package brain.render
       
       override public function destroy() 
       {
+         if(mAssetLoadingComponent != null)
+         {
+            mAssetLoadingComponent.destroy();
+            mAssetLoadingComponent = null;
+         }
+         if(mSoundComponent != null)
+         {
+            mSoundComponent.destroy();
+            mSoundComponent = null;
+         }
          super.destroy();
          if(mNextButton != null)
          {

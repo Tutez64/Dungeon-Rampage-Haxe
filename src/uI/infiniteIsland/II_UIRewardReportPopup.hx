@@ -7,7 +7,7 @@ package uI.infiniteIsland
    import gameMasterDictionary.GMChest;
    import gameMasterDictionary.GMDoober;
    import generatedCode.InfiniteRewardData;
-   import uI.DBUIPopup;
+   import uI.popup.DBUIPopup;
    import flash.display.DisplayObject;
    import flash.display.MovieClip;
    import flash.events.TimerEvent;

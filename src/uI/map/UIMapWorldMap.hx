@@ -21,14 +21,15 @@ package uI.map
    import dBGlobals.DBGlobal;
    import distributedObjects.MatchMaker;
    import facade.DBFacade;
+   import facade.GameMasterLocale;
    import facade.Locale;
    import gameMasterDictionary.GMColiseumTier;
    import gameMasterDictionary.GMHero;
    import gameMasterDictionary.GMInfiniteDungeon;
    import gameMasterDictionary.GMMapNode;
    import town.TownStateMachine;
-   import uI.DBUIOneButtonPopup;
    import uI.infiniteIsland.II_UIMapBattlePopup;
+   import uI.popup.DBUIOneButtonPopup;
    import uI.popup.DBUIUltimateRampagePopup;
    import flash.display.DisplayObject;
    import flash.display.MovieClip;
@@ -218,7 +219,7 @@ import gameMasterDictionary.GMMapNode;
          mDBFacade = param1;
          mTownStateMachine = param4;
          mAssetLoadingComponent = new AssetLoadingComponent(param1);
-         mSceneGraphComponent = new SceneGraphComponent(mDBFacade);
+         mSceneGraphComponent = new SceneGraphComponent(mDBFacade,"UIMapWorldMap");
          mEventComponent = new EventComponent(mDBFacade);
          mWantCinematics = mDBFacade.dbConfigManager.getConfigBoolean("want_story",true);
          mRootMovieClip = param2;
@@ -229,18 +230,22 @@ import gameMasterDictionary.GMMapNode;
       
       public function initialize(param1:ASFunction, param2:ASFunction, param3:ASFunction, param4:ASFunction) 
       {
+         var finalLeagueBounds:Rectangle;
+         var globalBottomRight:Point;
+         var setReturnNode:ASFunction;
          var tavernCallback= param1;
          var inventoryCallback= param2;
          var shopCallback= param3;
          var townCallback= param4;
-         mWorkComponent = new LogicalWorkComponent(mDBFacade);
-         var finalLeagueBounds= ASCompat.dynamicAs((mRootMovieClip : ASAny).worldmap.infinite_island_league.getRect((mRootMovieClip : ASAny).worldmap.infinite_island_league), flash.geom.Rectangle);
-         var globalBottomRight= ASCompat.dynamicAs((mRootMovieClip : ASAny).worldmap.infinite_island_league.localToGlobal(finalLeagueBounds.bottomRight), flash.geom.Point);
+         mWorkComponent = new LogicalWorkComponent(mDBFacade,"UIMapWorldMap");
+         mWorkComponent.doEverySeconds(59,mDBFacade.playerActivityCount.fetchPublicDungeonActivityLevel);
+         finalLeagueBounds = ASCompat.dynamicAs((mRootMovieClip : ASAny).worldmap.infinite_island_league.getRect((mRootMovieClip : ASAny).worldmap.infinite_island_league), flash.geom.Rectangle);
+         globalBottomRight = ASCompat.dynamicAs((mRootMovieClip : ASAny).worldmap.infinite_island_league.localToGlobal(finalLeagueBounds.bottomRight), flash.geom.Point);
          mMapWidth = ASCompat.toNumber(globalBottomRight.x - ASCompat.toNumberField((mRootMovieClip : ASAny).worldmap, "x") + 390);
          mMapHeight = ASCompat.toNumberField((mRootMovieClip : ASAny).worldmap, "height");
          mCurrentNode = null;
          mReturnToTownCallback = townCallback;
-         var setReturnNode:ASFunction = function(param1:ASFunction):ASFunction
+         setReturnNode = function(param1:ASFunction):ASFunction
          {
             var callback= param1;
             return function()
@@ -301,6 +306,7 @@ import gameMasterDictionary.GMMapNode;
          clearMouseEnabledOnWorldmap();
          hideAllMapNodes();
          setupMapNodeButtons();
+         setupMapNodeLinks();
          if(mChooseDungeonMessage == null)
          {
             mWorkComponent.doLater(1,showChooseDungeonMessage);
@@ -355,6 +361,398 @@ import gameMasterDictionary.GMMapNode;
          mWorkComponent.doEveryFrame(keyboardCheck);
       }
       
+      function setupMapNodeLinks() 
+      {
+         var _loc8_= 0;
+         var _loc9_= 0;
+         var _loc4_:GMMapNode = null;
+         var _loc7_:UIButton = null;
+         var _loc5_= 0;
+         var _loc6_:UIButton = null;
+         var _loc2_= 0;
+         var _loc3_:UIButton = null;
+         var _loc1_= mOpenNodeButtons.keysToArray();
+         ASCompat.ASArray.sortWithOptions(_loc1_, 16);
+         setupMapNodeNavigationUltimateRampage();
+         _loc8_ = 0;
+         while(_loc8_ < _loc1_.length)
+         {
+            _loc9_ = ASCompat.toInt(_loc1_[_loc8_]);
+            if(mDBFacade.dbAccountInfo.inventoryInfo.mapnodes1.hasKey(_loc9_))
+            {
+               _loc4_ = ASCompat.dynamicAs(mDBFacade.gameMaster.mapNodeById.itemFor(_loc9_), gameMasterDictionary.GMMapNode);
+               if(_loc4_.IsInfiniteDungeon)
+               {
+                  break;
+               }
+               _loc7_ = ASCompat.dynamicAs(mOpenNodeButtons.itemFor(_loc9_), brain.uI.UIButton);
+               _loc5_ = ASCompat.toInt(_loc8_ > 0 ? _loc1_[_loc8_ - 1] : 0);
+               if(_loc5_ > 0)
+               {
+                  _loc6_ = ASCompat.dynamicAs(mOpenNodeButtons.itemFor(_loc5_), brain.uI.UIButton);
+                  if(_loc6_ != null && mDBFacade.dbAccountInfo.inventoryInfo.mapnodes1.hasKey(_loc5_))
+                  {
+                     _loc7_.leftNavigation = _loc6_;
+                  }
+               }
+               _loc2_ = ASCompat.toInt(_loc8_ < _loc1_.length - 1 ? _loc1_[_loc8_ + 1] : 0);
+               if(_loc2_ > 0)
+               {
+                  _loc3_ = ASCompat.dynamicAs(mOpenNodeButtons.itemFor(_loc2_), brain.uI.UIButton);
+                  if(_loc3_ != null && mDBFacade.dbAccountInfo.inventoryInfo.mapnodes1.hasKey(_loc2_) && _loc2_ != 50150)
+                  {
+                     _loc7_.rightNavigation = _loc3_;
+                  }
+               }
+            }
+            _loc8_++;
+         }
+         setupMapNodeMenuNavigationLeagueChangeTriggers();
+         setupMapNodeNavigationGladiatorLeaguePrisonPath();
+         setupMapNodeNavigationGladiatorLeagueCretaceousPath();
+         setupMapNodeNavigationGladiatorLeagueFrostguardPath();
+         setupMapNodeNavigationChampionLeagueKnightFortressPath();
+      }
+      
+      function setupMapNodeMenuNavigationLeagueChangeTriggers() 
+      {
+         ASCompat.setProperty(mOpenNodeButtons.itemFor(50020), "rightNavigationAdditionalInteraction", function()
+         {
+            setCurrentLeague((1 : UInt));
+         });
+         ASCompat.setProperty(mOpenNodeButtons.itemFor(50021), "leftNavigationAdditionalInteraction", function()
+         {
+            setCurrentLeague((0 : UInt));
+         });
+         ASCompat.setProperty(mOpenNodeButtons.itemFor(50051), "rightNavigationAdditionalInteraction", function()
+         {
+            setCurrentLeague((2 : UInt));
+         });
+         ASCompat.setProperty(mOpenNodeButtons.itemFor(50052), "leftNavigationAdditionalInteraction", function()
+         {
+            setCurrentLeague((1 : UInt));
+         });
+         ASCompat.setProperty(mOpenNodeButtons.itemFor(50083), "rightNavigationAdditionalInteraction", function()
+         {
+            setCurrentLeague((3 : UInt));
+         });
+         ASCompat.setProperty(mOpenNodeButtons.itemFor(50084), "leftNavigationAdditionalInteraction", function()
+         {
+            setCurrentLeague((2 : UInt));
+         });
+         ASCompat.setProperty(mOpenNodeButtons.itemFor(50099), "rightNavigationAdditionalInteraction", function()
+         {
+            setCurrentLeague((4 : UInt));
+         });
+         ASCompat.setProperty(mOpenNodeButtons.itemFor(50156), "leftNavigationAdditionalInteraction", function()
+         {
+            setCurrentLeague((3 : UInt));
+         });
+      }
+      
+      function setupMapNodeNavigationGladiatorLeaguePrisonPath() 
+      {
+         var _loc8_= ASCompat.dynamicAs(mOpenNodeButtons.itemFor(50026), brain.uI.UIButton);
+         var _loc6_= ASCompat.dynamicAs(mOpenNodeButtons.itemFor(50027), brain.uI.UIButton);
+         var _loc7_= ASCompat.dynamicAs(mOpenNodeButtons.itemFor(50028), brain.uI.UIButton);
+         var _loc4_= ASCompat.dynamicAs(mOpenNodeButtons.itemFor(50029), brain.uI.UIButton);
+         var _loc5_= ASCompat.dynamicAs(mOpenNodeButtons.itemFor(50030), brain.uI.UIButton);
+         var _loc2_= ASCompat.dynamicAs(mOpenNodeButtons.itemFor(50031), brain.uI.UIButton);
+         var _loc3_= ASCompat.dynamicAs(mOpenNodeButtons.itemFor(50032), brain.uI.UIButton);
+         var _loc1_= ASCompat.dynamicAs(mOpenNodeButtons.itemFor(50033), brain.uI.UIButton);
+         _loc8_.clearNavigationAndInteractions();
+         _loc6_.clearNavigationAndInteractions();
+         _loc7_.clearNavigationAndInteractions();
+         _loc4_.clearNavigationAndInteractions();
+         _loc5_.clearNavigationAndInteractions();
+         _loc2_.clearNavigationAndInteractions();
+         _loc3_.clearNavigationAndInteractions();
+         _loc1_.clearLeftNavigation();
+         _loc8_.leftNavigation = ASCompat.dynamicAs(mOpenNodeButtons.itemFor(50025), brain.uI.UIObject);
+         _loc5_.isAbove(_loc8_);
+         _loc5_.leftNavigation = _loc8_;
+         _loc3_.isToTheLeftOf(_loc1_);
+         _loc3_.isAbove(_loc2_);
+         _loc2_.isToTheLeftOf(_loc3_);
+         _loc2_.isAbove(_loc5_);
+         _loc5_.isToTheLeftOf(_loc2_);
+         _loc8_.isToTheLeftOf(_loc6_);
+         _loc6_.isToTheLeftOf(_loc7_);
+         _loc7_.isToTheLeftOf(_loc4_);
+         _loc4_.rightNavigation = _loc1_;
+         _loc1_.isAbove(_loc4_);
+      }
+      
+      function setupMapNodeNavigationGladiatorLeagueCretaceousPath() 
+      {
+         var _loc8_= ASCompat.dynamicAs(mOpenNodeButtons.itemFor(50036), brain.uI.UIButton);
+         var _loc4_= ASCompat.dynamicAs(mOpenNodeButtons.itemFor(50037), brain.uI.UIButton);
+         var _loc3_= ASCompat.dynamicAs(mOpenNodeButtons.itemFor(50038), brain.uI.UIButton);
+         var _loc6_= ASCompat.dynamicAs(mOpenNodeButtons.itemFor(50039), brain.uI.UIButton);
+         var _loc5_= ASCompat.dynamicAs(mOpenNodeButtons.itemFor(50040), brain.uI.UIButton);
+         var _loc2_= ASCompat.dynamicAs(mOpenNodeButtons.itemFor(50041), brain.uI.UIButton);
+         var _loc1_= ASCompat.dynamicAs(mOpenNodeButtons.itemFor(50042), brain.uI.UIButton);
+         var _loc7_= ASCompat.dynamicAs(mOpenNodeButtons.itemFor(50043), brain.uI.UIButton);
+         _loc4_.clearNavigationAndInteractions();
+         _loc6_.clearNavigationAndInteractions();
+         _loc3_.clearNavigationAndInteractions();
+         _loc2_.clearNavigationAndInteractions();
+         _loc1_.clearNavigationAndInteractions();
+         _loc7_.clearNavigationAndInteractions();
+         _loc5_.clearNavigationAndInteractions();
+         _loc4_.leftNavigation = _loc8_;
+         _loc8_.downNavigation = _loc4_;
+         _loc6_.isAbove(_loc4_);
+         _loc6_.isToTheLeftOf(_loc5_);
+         _loc5_.isAbove(_loc6_);
+         _loc4_.isAbove(_loc3_);
+         _loc3_.leftNavigation = _loc4_;
+         _loc3_.isAbove(_loc2_);
+         _loc3_.isToTheLeftOf(_loc2_);
+         _loc2_.isAbove(_loc1_);
+         _loc2_.isToTheLeftOf(_loc1_);
+         _loc1_.isAbove(_loc7_);
+         _loc1_.isToTheLeftOf(_loc7_);
+      }
+      
+      function setupMapNodeNavigationGladiatorLeagueFrostguardPath() 
+      {
+         var _loc9_= ASCompat.dynamicAs(mOpenNodeButtons.itemFor(50044), brain.uI.UIButton);
+         var _loc10_= ASCompat.dynamicAs(mOpenNodeButtons.itemFor(50045), brain.uI.UIButton);
+         var _loc1_= ASCompat.dynamicAs(mOpenNodeButtons.itemFor(50046), brain.uI.UIButton);
+         var _loc2_= ASCompat.dynamicAs(mOpenNodeButtons.itemFor(50047), brain.uI.UIButton);
+         var _loc3_= ASCompat.dynamicAs(mOpenNodeButtons.itemFor(50048), brain.uI.UIButton);
+         var _loc4_= ASCompat.dynamicAs(mOpenNodeButtons.itemFor(50049), brain.uI.UIButton);
+         var _loc5_= ASCompat.dynamicAs(mOpenNodeButtons.itemFor(50050), brain.uI.UIButton);
+         var _loc6_= ASCompat.dynamicAs(mOpenNodeButtons.itemFor(50051), brain.uI.UIButton);
+         _loc9_.clearNavigationAndInteractions();
+         _loc10_.clearNavigationAndInteractions();
+         _loc1_.clearNavigationAndInteractions();
+         _loc2_.clearNavigationAndInteractions();
+         _loc3_.clearNavigationAndInteractions();
+         _loc4_.clearNavigationAndInteractions();
+         _loc5_.clearNavigationAndInteractions();
+         _loc6_.clearLeftNavigation();
+         var _loc7_= ASCompat.dynamicAs(mOpenNodeButtons.itemFor(50040), brain.uI.UIButton);
+         var _loc8_= ASCompat.dynamicAs(mOpenNodeButtons.itemFor(50043), brain.uI.UIButton);
+         _loc8_.isToTheLeftOf(_loc9_);
+         _loc7_.isToTheLeftOf(_loc3_);
+         _loc9_.isToTheLeftOf(_loc10_);
+         _loc10_.isAbove(_loc9_);
+         _loc10_.isToTheLeftOf(_loc1_);
+         _loc1_.isAbove(_loc10_);
+         _loc1_.isToTheLeftOf(_loc2_);
+         _loc2_.isAbove(_loc1_);
+         _loc3_.isToTheLeftOf(_loc4_);
+         _loc3_.isAbove(_loc4_);
+         _loc4_.isToTheLeftOf(_loc5_);
+         _loc4_.isAbove(_loc5_);
+         _loc5_.isAbove(_loc2_);
+         _loc5_.rightNavigation = _loc2_;
+         _loc2_.isToTheLeftOf(_loc6_);
+      }
+      
+      function setupMapNodeNavigationChampionLeagueKnightFortressPath() 
+      {
+         var _loc19_= ASCompat.dynamicAs(mOpenNodeButtons.itemFor(50064), brain.uI.UIButton);
+         var _loc20_= ASCompat.dynamicAs(mOpenNodeButtons.itemFor(50065), brain.uI.UIButton);
+         var _loc22_= ASCompat.dynamicAs(mOpenNodeButtons.itemFor(50066), brain.uI.UIButton);
+         var _loc16_= ASCompat.dynamicAs(mOpenNodeButtons.itemFor(50067), brain.uI.UIButton);
+         var _loc17_= ASCompat.dynamicAs(mOpenNodeButtons.itemFor(50068), brain.uI.UIButton);
+         var _loc24_= ASCompat.dynamicAs(mOpenNodeButtons.itemFor(50069), brain.uI.UIButton);
+         var _loc5_= ASCompat.dynamicAs(mOpenNodeButtons.itemFor(50070), brain.uI.UIButton);
+         var _loc2_= ASCompat.dynamicAs(mOpenNodeButtons.itemFor(50071), brain.uI.UIButton);
+         var _loc3_= ASCompat.dynamicAs(mOpenNodeButtons.itemFor(50072), brain.uI.UIButton);
+         var _loc1_= ASCompat.dynamicAs(mOpenNodeButtons.itemFor(50073), brain.uI.UIButton);
+         _loc19_.clearNavigationAndInteractions();
+         _loc20_.clearNavigationAndInteractions();
+         _loc22_.clearNavigationAndInteractions();
+         _loc16_.clearNavigationAndInteractions();
+         _loc17_.clearNavigationAndInteractions();
+         _loc24_.clearNavigationAndInteractions();
+         _loc5_.clearNavigationAndInteractions();
+         _loc2_.clearNavigationAndInteractions();
+         _loc3_.clearNavigationAndInteractions();
+         _loc1_.clearNavigationAndInteractions();
+         _loc19_.isToTheLeftOf(_loc20_);
+         _loc20_.isToTheLeftOf(_loc22_);
+         _loc22_.isToTheLeftOf(_loc16_);
+         _loc16_.isToTheLeftOf(_loc17_);
+         _loc17_.isToTheLeftOf(_loc24_);
+         _loc24_.isToTheLeftOf(_loc5_);
+         _loc5_.isToTheLeftOf(_loc2_);
+         _loc2_.isToTheLeftOf(_loc3_);
+         _loc3_.isToTheLeftOf(_loc1_);
+         var _loc10_= ASCompat.dynamicAs(mOpenNodeButtons.itemFor(50057), brain.uI.UIButton);
+         var _loc11_= ASCompat.dynamicAs(mOpenNodeButtons.itemFor(50058), brain.uI.UIButton);
+         var _loc7_= ASCompat.dynamicAs(mOpenNodeButtons.itemFor(50059), brain.uI.UIButton);
+         var _loc9_= ASCompat.dynamicAs(mOpenNodeButtons.itemFor(50060), brain.uI.UIButton);
+         var _loc4_= ASCompat.dynamicAs(mOpenNodeButtons.itemFor(50061), brain.uI.UIButton);
+         var _loc6_= ASCompat.dynamicAs(mOpenNodeButtons.itemFor(50062), brain.uI.UIButton);
+         var _loc28_= ASCompat.dynamicAs(mOpenNodeButtons.itemFor(50063), brain.uI.UIButton);
+         var _loc27_= ASCompat.dynamicAs(mOpenNodeButtons.itemFor(50074), brain.uI.UIButton);
+         var _loc26_= ASCompat.dynamicAs(mOpenNodeButtons.itemFor(50075), brain.uI.UIButton);
+         var _loc25_= ASCompat.dynamicAs(mOpenNodeButtons.itemFor(50076), brain.uI.UIButton);
+         _loc10_.clearNavigationAndInteractions();
+         _loc11_.clearNavigationAndInteractions();
+         _loc7_.clearNavigationAndInteractions();
+         _loc9_.clearNavigationAndInteractions();
+         _loc4_.clearNavigationAndInteractions();
+         _loc6_.clearNavigationAndInteractions();
+         _loc28_.clearNavigationAndInteractions();
+         _loc27_.clearNavigationAndInteractions();
+         _loc26_.clearNavigationAndInteractions();
+         _loc25_.clearNavigationAndInteractions();
+         _loc10_.isToTheLeftOf(_loc11_);
+         _loc11_.isToTheLeftOf(_loc7_);
+         _loc7_.isToTheLeftOf(_loc9_);
+         _loc9_.isToTheLeftOf(_loc4_);
+         _loc4_.isToTheLeftOf(_loc6_);
+         _loc6_.isToTheLeftOf(_loc28_);
+         _loc28_.isToTheLeftOf(_loc27_);
+         _loc27_.isToTheLeftOf(_loc26_);
+         _loc26_.isToTheLeftOf(_loc25_);
+         var _loc8_= ASCompat.dynamicAs(mOpenNodeButtons.itemFor(50077), brain.uI.UIButton);
+         var _loc15_= ASCompat.dynamicAs(mOpenNodeButtons.itemFor(50078), brain.uI.UIButton);
+         var _loc14_= ASCompat.dynamicAs(mOpenNodeButtons.itemFor(50079), brain.uI.UIButton);
+         var _loc13_= ASCompat.dynamicAs(mOpenNodeButtons.itemFor(50080), brain.uI.UIButton);
+         var _loc12_= ASCompat.dynamicAs(mOpenNodeButtons.itemFor(50081), brain.uI.UIButton);
+         var _loc18_= ASCompat.dynamicAs(mOpenNodeButtons.itemFor(50082), brain.uI.UIButton);
+         var _loc21_= ASCompat.dynamicAs(mOpenNodeButtons.itemFor(50083), brain.uI.UIButton);
+         _loc8_.clearNavigationAndInteractions();
+         _loc15_.clearNavigationAndInteractions();
+         _loc14_.clearNavigationAndInteractions();
+         _loc13_.clearNavigationAndInteractions();
+         _loc12_.clearNavigationAndInteractions();
+         _loc18_.clearNavigationAndInteractions();
+         _loc21_.clearLeftNavigation();
+         _loc1_.isAbove(_loc8_);
+         _loc8_.isAbove(_loc15_);
+         _loc8_.isToTheLeftOf(_loc15_);
+         _loc15_.isAbove(_loc12_);
+         _loc15_.rightNavigation = _loc12_;
+         _loc25_.isToTheLeftOf(_loc14_);
+         _loc14_.isToTheLeftOf(_loc13_);
+         _loc13_.isToTheLeftOf(_loc12_);
+         _loc12_.isToTheLeftOf(_loc18_);
+         _loc18_.isToTheLeftOf(_loc21_);
+         _loc1_.isToTheLeftOf(_loc8_);
+         var _loc23_= ASCompat.dynamicAs(mOpenNodeButtons.itemFor(50056), brain.uI.UIButton);
+         _loc23_.clearRightNavigation();
+         _loc19_.isAbove(_loc23_);
+         _loc23_.isToTheLeftOf(_loc10_);
+         _loc23_.isAbove(ASCompat.dynamicAs(mOpenNodeButtons.itemFor(50055), brain.uI.UIObject));
+      }
+      
+      function setupMapNodeNavigationUltimateRampage() 
+      {
+         var _loc6_= ASCompat.dynamicAs(mOpenNodeButtons.itemFor(50150), brain.uI.UIButton);
+         var _loc8_= ASCompat.dynamicAs(mOpenNodeButtons.itemFor(50151), brain.uI.UIButton);
+         var _loc9_= ASCompat.dynamicAs(mOpenNodeButtons.itemFor(50153), brain.uI.UIButton);
+         var _loc4_= ASCompat.dynamicAs(mOpenNodeButtons.itemFor(50155), brain.uI.UIButton);
+         var _loc2_= ASCompat.dynamicAs(mOpenNodeButtons.itemFor(50156), brain.uI.UIButton);
+         var _loc5_= ASCompat.dynamicAs(mOpenNodeButtons.itemFor(50158), brain.uI.UIButton);
+         var _loc10_= ASCompat.dynamicAs(mOpenNodeButtons.itemFor(50159), brain.uI.UIButton);
+         var _loc7_= ASCompat.dynamicAs(mOpenNodeButtons.itemFor(50161), brain.uI.UIButton);
+         var _loc3_= ASCompat.dynamicAs(mOpenNodeButtons.itemFor(50162), brain.uI.UIButton);
+         var _loc1_= ASCompat.dynamicAs(mOpenNodeButtons.itemFor(50099), brain.uI.UIButton);
+         _loc3_.isAbove(_loc2_);
+         _loc3_.isToTheLeftOf(_loc8_);
+         _loc8_.isToTheLeftOf(_loc4_);
+         _loc4_.isAbove(_loc6_);
+         _loc6_.isAbove(_loc7_);
+         _loc5_.isToTheLeftOf(_loc6_);
+         _loc10_.isToTheLeftOf(_loc7_);
+         _loc9_.isToTheLeftOf(_loc10_);
+         _loc2_.isAbove(_loc9_);
+         _loc1_.isToTheLeftOf(_loc2_);
+      }
+      
+      public function getCurrentNodeButton() : UIButton
+      {
+         return ASCompat.dynamicAs(mOpenNodeButtons.itemFor(mCurrentNode.Id), brain.uI.UIButton);
+      }
+      
+      public function getCurrentNodeLeagueValue() : UInt
+      {
+         return getNodeLeagueValue(mCurrentNode);
+      }
+      
+      public function getButtonLeagueView(param1:UIObject) : UInt
+      {
+         var _loc5_= 0;
+         var _loc6_= 0;
+         var _loc2_:UIButton = null;
+         var _loc3_:GMMapNode = null;
+         var _loc4_= mOpenNodeButtons.keysToArray();
+         _loc5_ = 0;
+         while(_loc5_ < _loc4_.length)
+         {
+            _loc6_ = ASCompat.toInt(_loc4_[_loc5_]);
+            _loc2_ = ASCompat.dynamicAs(mOpenNodeButtons.itemFor(_loc6_), brain.uI.UIButton);
+            if(_loc2_ == param1)
+            {
+               _loc3_ = ASCompat.dynamicAs(mDBFacade.gameMaster.mapNodeById.itemFor(_loc6_), gameMasterDictionary.GMMapNode);
+               return getNodeLeagueValue(_loc3_);
+            }
+            _loc5_++;
+         }
+         return (0 : UInt);
+      }
+      
+      function getNodeLeagueValue(param1:GMMapNode) : UInt
+      {
+         var _loc3_= 0;
+         var _loc4_:MovieClip = null;
+         var _loc2_:MovieClip = null;
+         _loc3_ = 0;
+         while(_loc3_ <= 4)
+         {
+            _loc4_ = getLeagueClip((_loc3_ : UInt));
+            _loc2_ = ASCompat.reinterpretAs(_loc4_.getChildByName(param1.Constant) , MovieClip);
+            if(_loc2_ != null)
+            {
+               return (_loc3_ : UInt);
+            }
+            _loc3_++;
+         }
+         return (0 : UInt);
+      }
+      
+      function getLeagueClip(param1:UInt) : MovieClip
+      {
+         switch(param1)
+         {
+            case 0:
+               return ASCompat.dynamicAs((mRootMovieClip : ASAny).worldmap.rookie_league, flash.display.MovieClip);
+            case 1:
+               return ASCompat.dynamicAs((mRootMovieClip : ASAny).worldmap.gladiator_league, flash.display.MovieClip);
+            case 2:
+               return ASCompat.dynamicAs((mRootMovieClip : ASAny).worldmap.heroic_league, flash.display.MovieClip);
+            case 3:
+               return ASCompat.dynamicAs((mRootMovieClip : ASAny).worldmap.grinder_league, flash.display.MovieClip);
+            case 4:
+               return ASCompat.dynamicAs((mRootMovieClip : ASAny).worldmap.infinite_island_league, flash.display.MovieClip);
+            default:
+               return null;
+         }
+return null;
+      }
+      
+      public function getCurrentLeagueView() : UInt
+      {
+         return mCurrentLeague;
+      }
+      
+      public function setCurrentLeague(param1:UInt, param2:Bool = true) 
+      {
+         if(param1 != mCurrentLeague)
+         {
+            mCurrentLeague = param1;
+            updateCurrentLeague(param2);
+         }
+      }
+      
       function epochRollOverHandler(param1:Event) 
       {
          if(mBattlePopup == mIIBattlePopup)
@@ -372,27 +770,6 @@ import gameMasterDictionary.GMMapNode;
       
       function keyboardCheck(param1:GameClock) 
       {
-         var _loc2_= 0;
-         if(mDBFacade.inputManager.check(37) && mLastKeyboardUpdateFrame < param1.frame - KEYBOARD_FRAME_DELAY_UPDATE)
-         {
-            mLastKeyboardUpdateFrame = param1.frame;
-            _loc2_ = (mCurrentLeague : Int);
-            mCurrentLeague = (ASCompat.toInt(mCurrentLeague > 0 ? mCurrentLeague - 1 : (0 : UInt)) : UInt);
-            if((_loc2_ : UInt) != mCurrentLeague)
-            {
-               updateCurrentLeague();
-            }
-         }
-         if(mDBFacade.inputManager.check(39) && mLastKeyboardUpdateFrame < param1.frame - KEYBOARD_FRAME_DELAY_UPDATE)
-         {
-            mLastKeyboardUpdateFrame = param1.frame;
-            _loc2_ = (mCurrentLeague : Int);
-            mCurrentLeague = determineNextLeague();
-            if((_loc2_ : UInt) != mCurrentLeague)
-            {
-               updateCurrentLeague();
-            }
-         }
       }
       
       function popLeagueName(param1:MovieClip) 
@@ -567,7 +944,7 @@ import gameMasterDictionary.GMMapNode;
       public function deinit() 
       {
          var _loc1_:ASAny;
-         var __ax4_iter_149:Array<ASAny>;
+         var __ax4_iter_165:Array<ASAny>;
          mTownStateMachine = null;
          mDidDrag = false;
          mShowedDragMessage = false;
@@ -653,8 +1030,8 @@ import gameMasterDictionary.GMMapNode;
          }
          if(mOpenNodeButtons != null)
          {
-            __ax4_iter_149 = mOpenNodeButtons.toArray();
-            if (checkNullIteratee(__ax4_iter_149)) for (_tmp_ in __ax4_iter_149)
+            __ax4_iter_165 = mOpenNodeButtons.toArray();
+            if (checkNullIteratee(__ax4_iter_165)) for (_tmp_ in __ax4_iter_165)
             {
                _loc1_ = _tmp_;
                ASCompat.setProperty(_loc1_, "enabled", false);
@@ -673,7 +1050,10 @@ import gameMasterDictionary.GMMapNode;
             mWorkComponent.destroy();
             mWorkComponent = null;
          }
-         mEventComponent.removeAllListeners();
+         if(mEventComponent != null)
+         {
+            mEventComponent.removeAllListeners();
+         }
          if(mDBFacade.dbConfigManager.getConfigBoolean("ALLOW_HACKS_TO_PLAY_MAP_NODE",false))
          {
             tearDownHacksToPlayNode();
@@ -719,7 +1099,7 @@ import gameMasterDictionary.GMMapNode;
             if(mDBFacade.dbAccountInfo.inventoryInfo.getEquipedItemsOnAvatar(mDBFacade.dbAccountInfo.activeAvatarInfo.id).length == 0)
             {
                mDBFacade.metrics.log("NoWeaponsEquippedWarning");
-               mDBFacade.errorPopup("Warning","Cannot enter dungeon with no weapons equipped.");
+               mDBFacade.errorPopup("Warning","Cannot enter dungeon with no weapons equipped.","NO_WEAPONS_DUNGEON_ERROR_POPUP");
             }
             else
             {
@@ -734,13 +1114,13 @@ import gameMasterDictionary.GMMapNode;
       function clearAvatarList() 
       {
          var _loc2_:ASAny;
-         var __ax4_iter_150:Array<ASAny>;
+         var __ax4_iter_166:Array<ASAny>;
          var _loc1_:ASAny;
-         var __ax4_iter_151:Array<ASAny>;
+         var __ax4_iter_167:Array<ASAny>;
          if(mAvatarList != null)
          {
-            __ax4_iter_150 = mAvatarList;
-            if (checkNullIteratee(__ax4_iter_150)) for (_tmp_ in __ax4_iter_150)
+            __ax4_iter_166 = mAvatarList;
+            if (checkNullIteratee(__ax4_iter_166)) for (_tmp_ in __ax4_iter_166)
             {
                _loc2_ = _tmp_;
                (mRootMovieClip : ASAny).worldmap.removeChild(_loc2_);
@@ -748,8 +1128,8 @@ import gameMasterDictionary.GMMapNode;
          }
          if(mAvatarDropShadowList != null)
          {
-            __ax4_iter_151 = mAvatarDropShadowList;
-            if (checkNullIteratee(__ax4_iter_151)) for (_tmp_ in __ax4_iter_151)
+            __ax4_iter_167 = mAvatarDropShadowList;
+            if (checkNullIteratee(__ax4_iter_167)) for (_tmp_ in __ax4_iter_167)
             {
                _loc1_ = _tmp_;
                (mRootMovieClip : ASAny).worldmap.removeChild(_loc1_);
@@ -1147,8 +1527,8 @@ import gameMasterDictionary.GMMapNode;
       function hasLockedNextNode(param1:GMMapNode) : Bool
       {
          var _loc2_:ASAny;
-         final __ax4_iter_152 = param1.ChildNodes;
-         if (checkNullIteratee(__ax4_iter_152)) for (_tmp_ in __ax4_iter_152)
+         final __ax4_iter_168 = param1.ChildNodes;
+         if (checkNullIteratee(__ax4_iter_168)) for (_tmp_ in __ax4_iter_168)
          {
             _loc2_ = _tmp_;
             if(ASCompat.toBool(_loc2_))
@@ -1166,8 +1546,8 @@ import gameMasterDictionary.GMMapNode;
       {
          var _loc2_:GMMapNode = null;
          var _loc3_:ASAny;
-         final __ax4_iter_153 = param1.RevealNodes;
-         if (checkNullIteratee(__ax4_iter_153)) for (_tmp_ in __ax4_iter_153)
+         final __ax4_iter_169 = param1.RevealNodes;
+         if (checkNullIteratee(__ax4_iter_169)) for (_tmp_ in __ax4_iter_169)
          {
             _loc3_ = _tmp_;
             if(ASCompat.toBool(_loc3_))
@@ -1185,8 +1565,8 @@ import gameMasterDictionary.GMMapNode;
       function isChildNode(param1:GMMapNode, param2:String) : Bool
       {
          var _loc3_:ASAny;
-         final __ax4_iter_154 = param1.ChildNodes;
-         if (checkNullIteratee(__ax4_iter_154)) for (_tmp_ in __ax4_iter_154)
+         final __ax4_iter_170 = param1.ChildNodes;
+         if (checkNullIteratee(__ax4_iter_170)) for (_tmp_ in __ax4_iter_170)
          {
             _loc3_ = _tmp_;
             if(ASCompat.toBool(_loc3_) && _loc3_.Constant == param2)
@@ -1237,8 +1617,8 @@ import gameMasterDictionary.GMMapNode;
          var _loc7_:Float = 0.15;
          var _loc4_= hasUnlockedChild(param1);
          var _loc8_:ASAny;
-         final __ax4_iter_155 = param1.RevealNodes;
-         if (checkNullIteratee(__ax4_iter_155)) for (_tmp_ in __ax4_iter_155)
+         final __ax4_iter_171 = param1.RevealNodes;
+         if (checkNullIteratee(__ax4_iter_171)) for (_tmp_ in __ax4_iter_171)
          {
             _loc8_ = _tmp_;
             if(ASCompat.toBool(_loc8_))
@@ -1296,7 +1676,7 @@ import gameMasterDictionary.GMMapNode;
                if(ASCompat.toBool((_loc3_ : ASAny).text_popup) && ASCompat.toBool((_loc3_ : ASAny).text_popup.title_label))
                {
                   ASCompat.setProperty((_loc3_ : ASAny).text_popup, "visible", false);
-                  ASCompat.setProperty((_loc3_ : ASAny).text_popup.title_label, "text", "LOCKED");
+                  ASCompat.setProperty((_loc3_ : ASAny).text_popup.title_label, "text", Locale.getString("DUNGEON_LOCKED_TITLE"));
                }
                if(ASCompat.toBool((_loc3_ : ASAny).label))
                {
@@ -1349,8 +1729,10 @@ import gameMasterDictionary.GMMapNode;
          var _loc1_:Array<ASAny> = null;
          var _loc7_= 0;
          var _loc4_= getUnlockedNodes();
+         _loc4_.sort(Reflect.compare);
          var _loc6_= (0 : UInt);
          mCurrentLeague = (0 : UInt);
+         ASCompat.ASArray.sortOn(_loc4_, "nodeId",16);
          _loc6_ = (0 : UInt);
          while(_loc6_ < (_loc4_.length : UInt))
          {
@@ -1383,12 +1765,13 @@ import gameMasterDictionary.GMMapNode;
                      }
                   }
                }
+               mCurrentNode = _loc5_;
                if(_loc2_ != null)
                {
                   if(ASCompat.toBool((_loc2_ : ASAny).text_popup) && ASCompat.toBool((_loc2_ : ASAny).text_popup.title_label) && ASCompat.toBool((_loc2_ : ASAny).text_popup.description_label))
                   {
                      ASCompat.setProperty((_loc2_ : ASAny).text_popup, "visible", true);
-                     ASCompat.setProperty((_loc2_ : ASAny).text_popup.title_label, "text", _loc5_.Name.toUpperCase());
+                     ASCompat.setProperty((_loc2_ : ASAny).text_popup.title_label, "text", GameMasterLocale.getGameMasterSubString("DUNGEON_NAME",_loc5_.Constant).toUpperCase());
                      _loc11_ = ASCompat.dynamicAs(mDBFacade.gameMaster.coliseumTierByConstant.itemFor(_loc5_.TierRank), gameMasterDictionary.GMColiseumTier);
                      if(_loc11_.TotalFloors > 0 && _loc5_.NodeType != "BOSS")
                      {
@@ -1404,7 +1787,7 @@ import gameMasterDictionary.GMMapNode;
                      }
                      else
                      {
-                        ASCompat.setProperty((_loc2_ : ASAny).text_popup.description_label, "text", _loc5_.DifficultyName);
+                        ASCompat.setProperty((_loc2_ : ASAny).text_popup.description_label, "text", GameMasterLocale.getGameMasterSubString("DUNGEON_DIFFICULTY_NAME",_loc5_.Constant));
                      }
                   }
                   _loc2_.visible = true;
@@ -1456,7 +1839,7 @@ import gameMasterDictionary.GMMapNode;
                   }
                   if(ASCompat.toBool((_loc2_ : ASAny).label) && mCurrentLeague != 3)
                   {
-                     ASCompat.setProperty((_loc2_ : ASAny).label, "text", _loc5_.Name.toUpperCase());
+                     ASCompat.setProperty((_loc2_ : ASAny).label, "text", GameMasterLocale.getGameMasterSubString("DUNGEON_NAME",_loc5_.Constant).toUpperCase());
                   }
                   else if(ASCompat.toBool((_loc2_ : ASAny).label) && mCurrentLeague == 3)
                   {
@@ -1625,7 +2008,7 @@ import gameMasterDictionary.GMMapNode;
                      {
                         if(!_loc11_)
                         {
-                           ASCompat.setProperty((_loc10_ : ASAny).text_popup.description_label, "text", "Previous dungeon must be defeated first.");
+                           ASCompat.setProperty((_loc10_ : ASAny).text_popup.description_label, "text", Locale.getString("DUNGEON_LOCKED_DESCRIPTION"));
                         }
                         ASCompat.setProperty((_loc10_ : ASAny).text_popup, "x", 0);
                         ASCompat.setProperty((_loc10_ : ASAny).text_popup, "y", 0);
@@ -1651,25 +2034,16 @@ import gameMasterDictionary.GMMapNode;
       
       function setupMapNodeButtons() 
       {
-         var _loc1_:ASAny = null;
          mOpenNodeButtons = new Map();
          mLockedNodeButtons = new Map();
          initializeAllMapNodes();
          initializeOpenMapNodes();
-         var _loc4_= (0 : UInt);
-         var _loc3_= DBGlobal.TUTORIAL_MAP_NODE_ID;
-         var _loc2_= ASCompat.dynamicAs(mDBFacade.gameMaster.mapNodeById.itemFor(_loc3_), gameMasterDictionary.GMMapNode);
-         if(_loc2_ == null || !mapNodeOpen(_loc2_) || _loc3_ == 50001)
-         {
-            _loc3_ = DBGlobal.TUTORIAL_MAP_NODE_ID;
-            _loc2_ = ASCompat.dynamicAs(mDBFacade.gameMaster.mapNodeById.itemFor(_loc3_), gameMasterDictionary.GMMapNode);
-         }
          createNodeButtonsForLeague(ASCompat.dynamicAs((mRootMovieClip : ASAny).worldmap.rookie_league, flash.display.MovieClip));
          createNodeButtonsForLeague(ASCompat.dynamicAs((mRootMovieClip : ASAny).worldmap.gladiator_league, flash.display.MovieClip));
          createNodeButtonsForLeague(ASCompat.dynamicAs((mRootMovieClip : ASAny).worldmap.grinder_league, flash.display.MovieClip));
          createNodeButtonsForLeague(ASCompat.dynamicAs((mRootMovieClip : ASAny).worldmap.heroic_league, flash.display.MovieClip));
          mInfiniteIslandUnlocked = createNodeButtonsForLeague(ASCompat.dynamicAs((mRootMovieClip : ASAny).worldmap.infinite_island_league, flash.display.MovieClip));
-         setCurrentNode(_loc2_);
+         setCurrentNode(mCurrentNode);
       }
       
       function startFriendFader() 
@@ -1683,15 +2057,15 @@ import gameMasterDictionary.GMMapNode;
       function stopFriendFader() 
       {
          var _loc1_:ASAny;
-         var __ax4_iter_156:Array<ASAny>;
+         var __ax4_iter_172:Array<ASAny>;
          if(mFriendFadeTask != null)
          {
             mFriendFadeTask.destroy();
             mFriendFadeTask = null;
             if(mAvatarList != null)
             {
-               __ax4_iter_156 = mAvatarList;
-               if (checkNullIteratee(__ax4_iter_156)) for (_tmp_ in __ax4_iter_156)
+               __ax4_iter_172 = mAvatarList;
+               if (checkNullIteratee(__ax4_iter_172)) for (_tmp_ in __ax4_iter_172)
                {
                   _loc1_ = _tmp_;
                   ASCompat.setProperty(_loc1_, "alpha", 1);
@@ -1704,13 +2078,13 @@ import gameMasterDictionary.GMMapNode;
       function hideFriendsOnHover(param1:GameClock) 
       {
          var _loc4_:ASAny;
-         var __ax4_iter_157:Array<ASAny>;
+         var __ax4_iter_173:Array<ASAny>;
          var _loc2_= Math.NaN;
          var _loc3_= Math.NaN;
          if(mAvatarList != null)
          {
-            __ax4_iter_157 = mAvatarList;
-            if (checkNullIteratee(__ax4_iter_157)) for (_tmp_ in __ax4_iter_157)
+            __ax4_iter_173 = mAvatarList;
+            if (checkNullIteratee(__ax4_iter_173)) for (_tmp_ in __ax4_iter_173)
             {
                _loc4_ = _tmp_;
                _loc2_ = Math.abs(ASCompat.toNumber(ASCompat.toNumberField(_loc4_, "x") - ASCompat.toNumberField((mRootMovieClip : ASAny).worldmap, "mouseX")));

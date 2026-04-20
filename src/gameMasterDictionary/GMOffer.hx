@@ -9,6 +9,8 @@ package gameMasterDictionary
       
       public static inline final PREMIUM_CURRENCY= "PREMIUM";
       
+      public static inline final DLC_CURRENCY= "DLC";
+      
       static inline final SPECIAL_NEW= "NEW";
       
       static inline final SPECIAL_FEATURED= "FEATURED";
@@ -73,6 +75,8 @@ package gameMasterDictionary
       
       public var Details:Vector<GMOfferDetail>;
       
+      public var SteamAppId:UInt = 0;
+      
       public function new(param1:ASObject, param2:ASObject)
       {
          
@@ -121,6 +125,7 @@ package gameMasterDictionary
          mSpecial = param1.Special;
          Gift = ASCompat.toBool(param1.Gift);
          Details = new Vector<GMOfferDetail>();
+         SteamAppId = (ASCompat.toInt(param1.SteamAppId) : UInt);
       }
       
       @:isVar public var percentOff(get,never):UInt;
@@ -359,6 +364,59 @@ public function  get_isOnSaleNow() : GMOffer
             }
          }
          return _loc8_;
+      }
+      
+      public function getOfferItemConstant(param1:GameMaster, param2:String = "", param3:Bool = false) : String
+      {
+         var _loc10_:GMOfferDetail = null;
+         var _loc7_:GMHero = null;
+         var _loc4_:GMWeaponItem = null;
+         var _loc5_:GMWeaponAesthetic = null;
+         var _loc8_:GMNpc = null;
+         var _loc9_:GMSkin = null;
+         var _loc6_= param2;
+         if(this.IsBundle)
+         {
+            _loc6_ = this.BundleName.toUpperCase();
+         }
+         else
+         {
+            _loc10_ = this.Details[0];
+            if(_loc10_.HeroId != 0)
+            {
+               _loc7_ = ASCompat.dynamicAs(param1.heroById.itemFor(_loc10_.HeroId), gameMasterDictionary.GMHero);
+               if(_loc7_ != null)
+               {
+                  _loc6_ = _loc7_.Constant;
+               }
+            }
+            else if(_loc10_.WeaponId != 0)
+            {
+               _loc4_ = ASCompat.dynamicAs(param1.weaponItemById.itemFor(_loc10_.WeaponId), gameMasterDictionary.GMWeaponItem);
+               _loc5_ = _loc4_.getWeaponAesthetic(_loc10_.Level,param3);
+               _loc6_ = _loc5_.Constant;
+            }
+            else if(_loc10_.PetId != 0)
+            {
+               _loc8_ = ASCompat.dynamicAs(param1.npcById.itemFor(_loc10_.PetId), gameMasterDictionary.GMNpc);
+               if(_loc8_ != null)
+               {
+                  _loc6_ = _loc8_.Constant;
+               }
+            }
+            else if(_loc10_.SkinId != 0)
+            {
+               _loc9_ = param1.getSkinByType(_loc10_.SkinId);
+               if(_loc9_ != null)
+               {
+                  _loc6_ = _loc9_.Constant;
+               }
+            }
+            else if(_loc10_.StackableId == 0)
+            {
+            }
+         }
+         return _loc6_;
       }
       
       @:isVar public var Price(get,never):Float;

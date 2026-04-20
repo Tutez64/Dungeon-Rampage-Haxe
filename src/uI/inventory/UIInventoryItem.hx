@@ -72,7 +72,7 @@ package uI.inventory
          this.tooltip = mWeaponTooltip;
          this.tooltipPos = new Point(0,this.root.height * -0.4);
          mWeaponTooltip.visible = false;
-         mLogicalWorkComponent = new LogicalWorkComponent(mDBFacade);
+         mLogicalWorkComponent = new LogicalWorkComponent(mDBFacade,"UIInventoryItem");
          mPressCallback = function()
          {
             mClickedCallback(mInfo);

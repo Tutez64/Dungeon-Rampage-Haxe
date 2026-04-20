@@ -4,6 +4,7 @@ package uI.training
    import brain.render.MovieClipRenderController;
    import brain.uI.UIObject;
    import facade.DBFacade;
+   import facade.GameMasterLocale;
    import flash.display.MovieClip;
    import flash.geom.Point;
    import flash.text.TextField;
@@ -112,13 +113,13 @@ public function  set_statName(param1:String) :String      {
          var _loc2_:Dynamic = null;
          if(ASCompat.mapItemForNeNull(mDBFacade.gameMaster.statByConstant, mStatName))
          {
-            mStatNameText.text = Std.string(mDBFacade.gameMaster.statByConstant.itemFor(mStatName).Name).toUpperCase();
+            mStatNameText.text = GameMasterLocale.getGameMasterSubString("STATS_NAME",mDBFacade.gameMaster.statByConstant.itemFor(mStatName).Constant).toUpperCase();
             mStatIconName = mDBFacade.gameMaster.statByConstant.itemFor(mStatName).IconName;
             mStatIconTooltip.statItem = ASCompat.dynamicAs(mDBFacade.gameMaster.statByConstant.itemFor(mStatName), gameMasterDictionary.GMStat);
          }
          else
          {
-            mStatNameText.text = Std.string(mDBFacade.gameMaster.superStatByConstant.itemFor(mStatName).Name).toUpperCase();
+            mStatNameText.text = GameMasterLocale.getGameMasterSubString("STATS_NAME",mDBFacade.gameMaster.superStatByConstant.itemFor(mStatName).Constant).toUpperCase();
             mStatIconName = mDBFacade.gameMaster.superStatByConstant.itemFor(mStatName).IconName;
             mStatIconTooltip.superStatItem = ASCompat.dynamicAs(mDBFacade.gameMaster.superStatByConstant.itemFor(mStatName), gameMasterDictionary.GMSuperStat);
          }

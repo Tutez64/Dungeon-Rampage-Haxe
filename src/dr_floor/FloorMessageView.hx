@@ -34,8 +34,8 @@ package dr_floor
          mMessageKey = param2;
          mMessageString = param3;
          mAssetLoadingComponent = new AssetLoadingComponent(mDBFacade);
-         mSceneGraphComponent = new SceneGraphComponent(mDBFacade);
-         mLogicalWorkComponent = new LogicalWorkComponent(mDBFacade);
+         mSceneGraphComponent = new SceneGraphComponent(mDBFacade,"FloorMessageView");
+         mLogicalWorkComponent = new LogicalWorkComponent(mDBFacade,"FloorMessageView");
          mAssetLoadingComponent.getSwfAsset(DBFacade.buildFullDownloadPath("Resources/Art2D/UI/db_UI_screens.swf"),assetLoaded);
       }
       

@@ -77,20 +77,20 @@ package facebookAPI
          var _loc2_= 0;
          dbFacebook_script_js = /*<script>
 				<![CDATA[
-					function() 
-					{
-						DBFacebook = 
-						{
-							debugResults : function(debugData)
-							{
-								console.log(debugData);
-							},			
-							getAppURL : function()
-							{
-								return window.location.href;
-							}
-						};
-					}
+                function()
+                {
+                    DBFacebook =
+                    {
+                        debugResults : function(debugData)
+                        {
+                            console.log(debugData);
+                        },
+                        getAppURL : function()
+                        {
+                            return window.location.href;
+                        }
+                    };
+                }
 				]]>
 			</script>*/ null;
          super(param1,param1.facebookId);
@@ -134,8 +134,8 @@ package facebookAPI
       {
          var _loc5_= new Vector<GMFeedPosts>();
          var _loc4_:GMFeedPosts;
-         final __ax4_iter_172 = param1.gameMaster.FeedPosts;
-         if (checkNullIteratee(__ax4_iter_172)) for (_tmp_ in __ax4_iter_172)
+         final __ax4_iter_188 = param1.gameMaster.FeedPosts;
+         if (checkNullIteratee(__ax4_iter_188)) for (_tmp_ in __ax4_iter_188)
          {
             _loc4_ = _tmp_;
             if(_loc4_.Category == param3 && ASCompat.toNumberField(_loc4_, "IdTrigger") == param2)
@@ -349,8 +349,8 @@ package facebookAPI
       {
          var _loc3_:ASObject = com.adobe.serialization.json.JSON.decode(ASCompat.asString(param1.target.data ));
          var _loc4_:ASAny;
-         final __ax4_iter_173:Array<ASAny> = _loc3_.friend_ids;
-         if (checkNullIteratee(__ax4_iter_173)) for (_tmp_ in __ax4_iter_173)
+         final __ax4_iter_189:Array<ASAny> = _loc3_.friend_ids;
+         if (checkNullIteratee(__ax4_iter_189)) for (_tmp_ in __ax4_iter_189)
          {
             _loc4_ = _tmp_;
             param2.push(Std.string(_loc4_));
@@ -480,7 +480,7 @@ package facebookAPI
       
       public function genericFriendRequests(param1:Bool = false) 
       {
-         var __ax4_iter_174:Vector<GMFeedPosts>;
+         var __ax4_iter_190:Vector<GMFeedPosts>;
          var loginCallback:ASFunction;
          var filters:Array<ASAny>;
          var feedPostData:GMFeedPosts;
@@ -509,8 +509,8 @@ package facebookAPI
          filters = ["app_non_users"];
          if(mFriendInvitePosts.length == 0)
          {
-            __ax4_iter_174 = mDBFacade.gameMaster.FeedPosts;
-            if (checkNullIteratee(__ax4_iter_174)) for (_tmp_ in __ax4_iter_174)
+            __ax4_iter_190 = mDBFacade.gameMaster.FeedPosts;
+            if (checkNullIteratee(__ax4_iter_190)) for (_tmp_ in __ax4_iter_190)
             {
                feedPostData  = _tmp_;
                if(feedPostData.Category == "INVITE_REQUEST")
@@ -688,12 +688,12 @@ package facebookAPI
       public function leaderboardFeedPostToASingleUser(param1:String) 
       {
          var _loc2_:GMFeedPosts;
-         var __ax4_iter_175:Vector<GMFeedPosts>;
+         var __ax4_iter_191:Vector<GMFeedPosts>;
          var _loc3_:Float = 0;
          if(mLeaderBoardFeedPosts.length == 0)
          {
-            __ax4_iter_175 = mDBFacade.gameMaster.FeedPosts;
-            if (checkNullIteratee(__ax4_iter_175)) for (_tmp_ in __ax4_iter_175)
+            __ax4_iter_191 = mDBFacade.gameMaster.FeedPosts;
+            if (checkNullIteratee(__ax4_iter_191)) for (_tmp_ in __ax4_iter_191)
             {
                _loc2_ = _tmp_;
                if(_loc2_.Category == "MESSAGE")
@@ -711,7 +711,7 @@ package facebookAPI
       
       public function sendGiftRequests(param1:String, param2:UInt, param3:String = "") 
       {
-         var __ax4_iter_176:Vector<GMFeedPosts>;
+         var __ax4_iter_192:Vector<GMFeedPosts>;
          var filters:Array<ASAny>;
          var feedCaption:String;
          var excludeIds:Array<ASAny>;
@@ -732,8 +732,8 @@ package facebookAPI
          data = {"offerID":giftOfferID};
          if(mGiftFriendPosts.length == 0)
          {
-            __ax4_iter_176 = mDBFacade.gameMaster.FeedPosts;
-            if (checkNullIteratee(__ax4_iter_176)) for (_tmp_ in __ax4_iter_176)
+            __ax4_iter_192 = mDBFacade.gameMaster.FeedPosts;
+            if (checkNullIteratee(__ax4_iter_192)) for (_tmp_ in __ax4_iter_192)
             {
                feedPostData  = _tmp_;
                if(feedPostData.Category == "SEND_GIFT_REQUEST")

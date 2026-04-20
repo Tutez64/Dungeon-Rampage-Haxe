@@ -62,6 +62,7 @@ package uI.equipPicker
          mEquipResponseCallback = equipResponseFinishedCallback;
          mSetSelectedHeroCallback = setSelectedHeroIndexCallback;
          mGetSelectedHeroCallback = getSelectedHeroIndexCallback;
+         ASCompat.setProperty((mRoot : ASAny).label, "text", Locale.getString("PET_PICKER_LABEL"));
          mEquipElements = new Vector<AvatarEquipElement>();
          mEquipElements.push(new AvatarEquipElement(mDBFacade,"",ASCompat.dynamicAs((mRoot : ASAny).UI_pet.equip_slot_1, flash.display.MovieClip),weaponTooltipClass,unequipPet,handleItemDrop,(0 : UInt),equippedPetClicked,equipResponseFinishedCallback,allowEquipmentSwapping));
          ASCompat.setProperty((mRoot : ASAny).UI_pet.equip_slot_0, "visible", false);
@@ -340,6 +341,10 @@ return param1;
                equippingModal = UIPopup.show(mDBFacade,Locale.getString("EQUIPPING_MODAL"));
                var avatarId= avatarInfo.id;
                mDBFacade.dbAccountInfo.inventoryInfo.equipPetOnAvatar(avatarId,info.databaseId,equipServiceResponse,errorCallback);
+               if(mDBFacade.steamAchievementsManager != null)
+               {
+                  mDBFacade.steamAchievementsManager.setAchievement("EQUIP_PET");
+               }
             };
             equippedItems = mDBFacade.dbAccountInfo.inventoryInfo.getEquipedPetsOnAvatar(avatarInfo.id);
             if(equippedItems.length > 0)

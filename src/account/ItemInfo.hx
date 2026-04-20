@@ -3,6 +3,7 @@ package account
    import brain.assetRepository.AssetLoadingComponent;
    import brain.logger.Logger;
    import facade.DBFacade;
+   import facade.GameMasterLocale;
    import gameMasterDictionary.GMInventoryBase;
    import gameMasterDictionary.GMLegendaryModifier;
    import gameMasterDictionary.GMModifier;
@@ -147,7 +148,7 @@ package account
       override public function  get_Description() : String
       {
          var _loc1_= this.gmWeaponAesthetic;
-         return _loc1_ != null ? _loc1_.Description : "";
+         return _loc1_ != null ? GameMasterLocale.getGameMasterSubString("WEAPON_AESTHETIC_DESCRIPTION",_loc1_.WeaponItemConstant) : "";
       }
       
       override public function  get_iconScale() : Float
@@ -374,6 +375,11 @@ public function  get_legendaryModifier() : UInt
       override public function  get_Name() : String
       {
          return gmWeaponAesthetic.Name;
+      }
+      
+      override public function  get_weaponAestheticConstant() : String
+      {
+         return gmWeaponAesthetic.Constant;
       }
    }
 

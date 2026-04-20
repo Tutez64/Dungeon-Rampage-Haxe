@@ -36,8 +36,8 @@ package dr_floor
       override public function  set_position(param1:Vector3D) :Vector3D      {
          super.position = param1;
          var _loc2_:NavCollider;
-         final __ax4_iter_189 = mParentFloorObject.navCollisions;
-         if (checkNullIteratee(__ax4_iter_189)) for (_tmp_ in __ax4_iter_189)
+         final __ax4_iter_224 = mParentFloorObject.navCollisions;
+         if (checkNullIteratee(__ax4_iter_224)) for (_tmp_ in __ax4_iter_224)
          {
             _loc2_ = _tmp_;
             ASCompat.setProperty(_loc2_, "position", param1);

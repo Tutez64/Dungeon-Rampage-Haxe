@@ -38,6 +38,7 @@ package combat.weapon
       override public function destroy() 
       {
          mDBFacade.hud.stopConsumableCooldown(weapon.slot);
+         super.destroy();
       }
    }
 

@@ -72,6 +72,7 @@ package uI.equipPicker
          mEquipResponseCallback = equipResponseFinishedCallback;
          mSetSelectedHeroCallback = setSelectedHeroIndexCallback;
          mGetSelectedHeroCallback = getSelectedHeroIndexCallback;
+         ASCompat.setProperty((mRoot : ASAny).label, "text", Locale.getString("WEAPON_PICKER_LABEL"));
          mEquipElements = new Vector<AvatarEquipElement>();
          mEquipElements.push(new AvatarEquipElement(mDBFacade,"J",ASCompat.dynamicAs((mRoot : ASAny).UI_weapons.equip_slot_0, flash.display.MovieClip),weaponTooltipClass,unequipItem,handleItemDrop,(0 : UInt),equippedWeaponClicked,equipResponseFinishedCallback,allowEquipmentSwapping));
          mEquipElements.push(new AvatarEquipElement(mDBFacade,"K",ASCompat.dynamicAs((mRoot : ASAny).UI_weapons.equip_slot_1, flash.display.MovieClip),weaponTooltipClass,unequipItem,handleItemDrop,(1 : UInt),equippedWeaponClicked,equipResponseFinishedCallback,allowEquipmentSwapping));
@@ -134,8 +135,8 @@ return param1;
       public function showWeaponComparison(param1:GMWeaponItem, param2:UInt) 
       {
          var _loc3_:HeroElement;
-         final __ax4_iter_143 = mHeroSlots;
-         if (checkNullIteratee(__ax4_iter_143)) for (_tmp_ in __ax4_iter_143)
+         final __ax4_iter_159 = mHeroSlots;
+         if (checkNullIteratee(__ax4_iter_159)) for (_tmp_ in __ax4_iter_159)
          {
             _loc3_ = _tmp_;
             _loc3_.showWeaponComparison(param1,param2);
@@ -145,8 +146,8 @@ return param1;
       public function hideWeaponComparison() 
       {
          var _loc1_:HeroElement;
-         final __ax4_iter_144 = mHeroSlots;
-         if (checkNullIteratee(__ax4_iter_144)) for (_tmp_ in __ax4_iter_144)
+         final __ax4_iter_160 = mHeroSlots;
+         if (checkNullIteratee(__ax4_iter_160)) for (_tmp_ in __ax4_iter_160)
          {
             _loc1_ = _tmp_;
             _loc1_.hideWeaponComparison();
@@ -546,6 +547,48 @@ public function  get_currentlySelectedAvatarInfo() : AvatarInfo
             return true;
          }
          return false;
+      }
+      
+      public function getFirstHeroSlotUIObject() : UIObject
+      {
+         return mHeroSlots[0];
+      }
+      
+      public function setupHeroWithEquipPickerMenuNavigation(param1:ASAny) 
+      {
+         mHeroSlots[0].isToTheLeftOf(mHeroSlots[1]);
+         mHeroSlots[1].isToTheLeftOf(mHeroSlots[2]);
+         mHeroSlots[2].isToTheLeftOf(mHeroSlots[3]);
+         mHeroSlots[3].isToTheLeftOf(mHeroSlots[4]);
+         mHeroSlots[4].isToTheLeftOf(mHeroSlots[5]);
+         mHeroSlots[5].isToTheLeftOf(mHeroSlots[6]);
+         mHeroSlots[6].isToTheLeftOf(mHeroSlots[7]);
+         mHeroSlots[0].upNavigation = ASCompat.dynamicAs(param1, brain.uI.UIObject);
+         mHeroSlots[1].upNavigation = ASCompat.dynamicAs(param1, brain.uI.UIObject);
+         mHeroSlots[2].upNavigation = ASCompat.dynamicAs(param1, brain.uI.UIObject);
+         mHeroSlots[3].upNavigation = ASCompat.dynamicAs(param1, brain.uI.UIObject);
+         mHeroSlots[4].upNavigation = ASCompat.dynamicAs(param1, brain.uI.UIObject);
+         mHeroSlots[5].upNavigation = ASCompat.dynamicAs(param1, brain.uI.UIObject);
+         mHeroSlots[6].upNavigation = ASCompat.dynamicAs(param1, brain.uI.UIObject);
+         mHeroSlots[7].upNavigation = ASCompat.dynamicAs(param1, brain.uI.UIObject);
+         mEquipElements[0].isToTheLeftOf(mEquipElements[1]);
+         mEquipElements[1].isToTheLeftOf(mEquipElements[2]);
+         mEquipElements[2].isToTheLeftOf(mHeroSlots[0]);
+      }
+      
+      public function resetHeroWithEquipPickerMenuNavigation() 
+      {
+         mHeroSlots[0].clearNavigationAndInteractions();
+         mHeroSlots[1].clearNavigationAndInteractions();
+         mHeroSlots[2].clearNavigationAndInteractions();
+         mHeroSlots[3].clearNavigationAndInteractions();
+         mHeroSlots[4].clearNavigationAndInteractions();
+         mHeroSlots[5].clearNavigationAndInteractions();
+         mHeroSlots[6].clearNavigationAndInteractions();
+         mHeroSlots[7].clearNavigationAndInteractions();
+         mEquipElements[0].clearNavigationAndInteractions();
+         mEquipElements[1].clearNavigationAndInteractions();
+         mEquipElements[2].clearNavigationAndInteractions();
       }
    }
 
