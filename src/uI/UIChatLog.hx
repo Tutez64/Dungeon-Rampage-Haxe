@@ -89,7 +89,7 @@ package uI
       
       var mHeroOwner:HeroGameObjectOwner;
       
-      var mEnabledChatEnterEvent:Bool = false;
+      var mEnabledChatEnterEvent:Bool = true;
       
       var mPreviousHeight:Float = 1;
       

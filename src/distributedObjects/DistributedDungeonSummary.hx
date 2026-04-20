@@ -3215,6 +3215,7 @@ function  get_dungeonSuccess() : UInt
             mSceneGraphComponent.destroy();
             mSceneGraphComponent = null;
          }
+         mUIChatLog.enabledChatEnterEvent = true;
          mUIChatLog.destroy();
          _loc4_ = 0;
          while(_loc4_ < mChestRenderers.length)
