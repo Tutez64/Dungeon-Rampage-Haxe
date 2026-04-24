@@ -45,7 +45,7 @@ package brain.utils
          addFeatureFlag("want-mana-bars",false);
          addFeatureFlag("quality-control-button",true);
          addFeatureFlag("want-numbered-hud",false);
-         addFeatureFlag("want-hud-refresh-on-floor-transition",true);
+         addFeatureFlag("want-hud-refresh-on-floor-transition",false);
          addFeatureFlag("experimental-use-steam-input",false);
          addFeatureFlag("want-steam-achievements",false);
       }

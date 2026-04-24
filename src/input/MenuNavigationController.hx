@@ -156,6 +156,20 @@ package input
             mFocusedUiObject.setFocused(true);
          }
       }
+
+      public function replaceLayerUIObjects(param1:String, param2:UIObject, param3:UIObject = null) 
+      {
+         var layerConstant= param1;
+         var defaultUiObject= param2;
+         var selectedUiObject= param3;
+         if(layerConstant == null || mUILayerConstants.indexOf(layerConstant) == -1)
+         {
+            Logger.warn("Cannot replace UI objects for a layer that does not exist: " + Std.string(layerConstant));
+            return;
+         }
+         mDefaultUIObjs[layerConstant] = defaultUiObject;
+         mSelectedUIObjs[layerConstant] = selectedUiObject != null ? selectedUiObject : defaultUiObject;
+      }
       
             
       @:isVar var mFocusedUiObject(get,set):UIObject;

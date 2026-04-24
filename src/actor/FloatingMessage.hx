@@ -72,7 +72,7 @@ package actor
       
       function damageFloaterTween() 
       {
-         var dt= mDBFacade.gameClock.tickLength;
+         var dt= brain.clock.GameClock.ANIMATION_FRAME_DURATION;
          var distance= mFloatSpeed * mTotalDuration * dt;
          var toX= mRoot.x + mFloatDirection.x * distance;
          var toY= mRoot.y + mFloatDirection.y * distance;
@@ -102,7 +102,7 @@ package actor
       
       function buffFloaterTween() 
       {
-         var dt= mDBFacade.gameClock.tickLength;
+         var dt= brain.clock.GameClock.ANIMATION_FRAME_DURATION;
          var distance= mFloatSpeed * mTotalDuration * dt * 2;
          var toX= mRoot.x + mFloatDirection.x * distance;
          var maxY= mRoot.y + mFloatDirection.y * distance * 0.5;

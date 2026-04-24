@@ -4,6 +4,7 @@ package town
    import brain.assetRepository.AssetLoadingComponent;
    import brain.event.EventComponent;
    import brain.render.MovieClipRenderController;
+   import brain.uI.UIObject;
    import brain.workLoop.LogicalWorkComponent;
    import facade.DBFacade;
    import facade.Locale;
@@ -106,8 +107,14 @@ package town
          super.enterState();
          mEventComponent.addListener(FriendInfo.FRIEND_SCORES_PARSED,function(param1:flash.events.Event)
          {
+            var currentNodeButton:UIObject;
             mWorldMap.deinit();
             initMap();
+            currentNodeButton = mWorldMap.getCurrentNodeButton();
+            if(currentNodeButton != null)
+            {
+               mDBFacade.menuNavigationController.replaceLayerUIObjects("MAP_MENU",currentNodeButton,currentNodeButton);
+            }
          });
          if(mWorkComponent == null)
          {

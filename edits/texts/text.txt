@@ -18,7 +18,7 @@ rightmargin 0
 indent 0
 leading 0
 ]<p align="center"><font face="Fat Rhino PB" size="30" color="#FF0000" letterSpacing="0.000000" kerning="1">
-DRH V3 by Tutez
+DRH V4 by Tutez
 Join the Discord server:
 discord.gg/VvWbNspZrQ
 </font></p>

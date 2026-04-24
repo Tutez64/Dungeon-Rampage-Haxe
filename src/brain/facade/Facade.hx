@@ -29,7 +29,7 @@ package brain.facade
       
       public static inline final MAX_TICKS_PER_FRAME= 5;
       
-      public static inline final FPS= (24 : UInt);
+      public static inline final FPS= (120 : UInt);
       
       var mElapsedTime:Float = 0;
       
@@ -288,7 +288,7 @@ public function  get_skippingFrame() : Bool
          mSwfWidth = mStageRef.stageWidth;
          mSwfHeight = mStageRef.stageHeight;
          Logger.init(mStageRef,true);
-         mGameClock = new GameClock(1 / 24);
+         mGameClock = new GameClock(1 / FPS);
          mRealClock = new GameClock(1 / param1.frameRate);
          mEventManager = new EventManager(this);
          mAssetRepository = ASCompat.dynamicAs(ASCompat.createInstance(mAssetRepositoryClass, [this]), brain.assetRepository.AssetRepository);

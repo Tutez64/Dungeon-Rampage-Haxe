@@ -16,69 +16,69 @@ package combat.attack
    import org.as3commons.collections.framework.ILinkedListIterator;
    import org.as3commons.collections.framework.IListIterator;
    import org.as3commons.collections.framework.IMapIterator;
-   
+
     class ScriptTimeline
    {
-      
+
       var mActorGameObject:ActorGameObject;
-      
+
       var mTargetActor:ActorGameObject;
-      
+
       var mActorView:ActorView;
-      
+
       var mScriptJson:ASObject;
-      
+
       var mDBFacade:DBFacade;
-      
+
       var mDistributedDungeonFloor:DistributedDungeonFloor;
-      
+
       var mTimelineActions:Map;
-      
+
       var mFinishedCallback:ASFunction;
-      
+
       var mStopCallback:ASFunction;
-      
+
       var mPlayHeadTime:Float = 0;
-      
+
       var mLastExecutedFrame:Int = -1;
-      
+
       var mFinishedFrame:Int = 0;
-      
+
       var mLoop:Bool = false;
-      
+
       var mHasGoto:Bool = false;
-      
+
       var mAutoAim:Bool = false;
-      
+
       var mIsPlaying:Bool = false;
-      
+
       var mIsLooping:Bool = false;
-      
+
       var mTotalFrames:UInt = 0;
-      
+
       var mLogicalWorkComponent:LogicalWorkComponent;
-      
+
       var mPlayTimelineTask:Task;
-      
+
       var mCurrentAttackType:UInt = 0;
-      
+
       var mCurrentGMAttack:GMAttack;
-      
+
       var mCurrentCombatResult:CombatResult;
-      
+
       var mCurrentAttacker:ActorGameObject;
-      
+
       var mPlaySpeed:Float = 1;
-      
+
       var mContinuousCollisions:ArrayList;
-      
+
       var mRemovalContinuous:ArrayList;
-      
+
       public var mManagedEffects:ArrayList;
-      
+
       public function new(param1:ActorGameObject, param2:ActorView, param3:ASObject, param4:DBFacade, param5:DistributedDungeonFloor)
       {
-         
+
          mDBFacade = param4;
          mDistributedDungeonFloor = param5;
          mLogicalWorkComponent = new LogicalWorkComponent(mDBFacade,"ScriptTimeline");
@@ -91,8 +91,8 @@ package combat.attack
          mRemovalContinuous = new ArrayList();
          mManagedEffects = new ArrayList();
       }
-      
-            
+
+
       @:isVar public var playSpeed(get,set):Float;
 public function  set_playSpeed(param1:Float) :Float      {
          return mPlaySpeed = param1;
@@ -101,19 +101,19 @@ function  get_playSpeed() : Float
       {
          return mPlaySpeed;
       }
-      
+
       public function getPercentageOfTimelinePlayed() : Float
       {
          return mLastExecutedFrame / mTotalFrames;
       }
-      
+
       public function getTimeRemaining() : Float
       {
          var _loc1_:Float = mTotalFrames - mLastExecutedFrame;
-         return _loc1_ * mDBFacade.gameClock.tickLength / playSpeed;
+         return _loc1_ * GameClock.ANIMATION_FRAME_DURATION / playSpeed;
       }
-      
-      function parseJson(param1:ASObject) 
+
+      function parseJson(param1:ASObject)
       {
          var _loc6_:AttackTimelineAction = null;
          var _loc11_:LinkedList = null;
@@ -155,7 +155,7 @@ function  get_playSpeed() : Float
          }
          mFinishedFrame = ASCompat.toInt(param1.totalFrames);
       }
-      
+
       function parseAction(param1:ASObject) : AttackTimelineAction
       {
          mHasGoto = false;
@@ -165,53 +165,53 @@ function  get_playSpeed() : Float
          {
             case "attackSound":
                _loc2_ = SoundAttackTimelineAction.buildFromJson(mActorGameObject,mActorView,mDBFacade,param1);
-               
+
             case "sound":
                _loc2_ = SoundTimelineAction.buildFromJson(mActorGameObject,mActorView,mDBFacade,param1);
-               
+
             case "animFrame":
                _loc2_ = AnimationFrameAttackTimelineAction.buildFromJson(mActorGameObject,mActorView,mDBFacade,param1);
-               
+
             case "playAnim":
                _loc2_ = PlayAnimationAttackTimelineAction.buildFromJson(this,mActorGameObject,mActorView,mDBFacade,param1);
-               
+
             case "move":
                _loc2_ = MovementAttackTimelineAction.buildFromJson(mActorGameObject,mActorView,mDBFacade,param1);
-               
+
             case "runIdleMonitor":
                _loc2_ = RunIdleMonitorTimelineAction.buildFromJson(mActorGameObject,mActorView,mDBFacade,param1);
-               
+
             case "goto":
                mHasGoto = true;
                _loc2_ = GotoTimelineAction.buildFromJson(mActorGameObject,mActorView,mDBFacade,param1,gotoFrame);
-               
+
             case "knockback":
                _loc2_ = KnockBackTimelineAction.buildFromJson(mActorGameObject,mActorView,mDBFacade);
-               
+
             case "shake":
                _loc2_ = CameraShakeTimelineAction.buildFromJson(mActorGameObject,mActorView,mDBFacade,param1);
-               
+
             case "effect":
                _loc2_ = PlayEffectTimelineAction.buildFromJson(mActorGameObject,mActorView,mDBFacade,param1);
-               
+
             case "color":
                _loc2_ = ColorShiftTimelineAction.buildFromJson(mActorGameObject,mActorView,mDBFacade,param1);
-               
+
             case "glow":
                _loc2_ = GlowTimelineAction.buildFromJson(mActorGameObject,mActorView,mDBFacade,param1);
-               
+
             case "fadebackground":
                _loc2_ = FadeBackgroundTimelineAction.buildFromJson(mActorGameObject,mActorView,mDBFacade,param1);
-               
+
             case "visible":
                _loc2_ = HideTimelineAction.buildFromJson(mActorGameObject,mActorView,mDBFacade,param1);
-               
+
             case "hideSpecialEffect":
                _loc2_ = HideSpecialEffectTimelineAction.buildFromJson(mActorGameObject,mActorView,mDBFacade,param1);
-               
+
             case "scale":
                _loc2_ = ScaleAttackTimelineAction.buildFromJson(mActorGameObject,mActorView,mDBFacade,param1);
-			   
+
             case "zoom"
                | "timeScale"
                | "circleCollider"
@@ -219,19 +219,19 @@ function  get_playSpeed() : Float
                | "inputType"
                | "sufferImmunity":
                _loc2_ = SufferImmunityTimeLineAction.buildFromJson(mActorGameObject,mActorView,mDBFacade,param1);
-               
+
             case "knockbackImmunity":
                _loc2_ = KnockbackImmunityTimeLineAction.buildFromJson(mActorGameObject,mActorView,mDBFacade,param1);
-               
+
             case "attemptRevive"
                | "proposeRevive"
                | "spawndoober"
                | "spawnnpc"
                | "invulnerable":
-               
+
             case "teleport":
                _loc2_ = TeleportTimelineAction.buildFromJson(mActorGameObject,mActorView,mDBFacade,param1);
-               
+
             default:
                if(_loc3_.charAt(0) != "#")
                {
@@ -240,7 +240,7 @@ function  get_playSpeed() : Float
          }
          return _loc2_;
       }
-      
+
       @:isVar public var currentAttackType(never,set):UInt;
 public function  set_currentAttackType(param1:UInt) :UInt      {
          mCurrentAttackType = param1;
@@ -251,38 +251,38 @@ public function  set_currentAttackType(param1:UInt) :UInt      {
          }
 return param1;
       }
-      
+
       @:isVar public var currentGMAttack(get,never):GMAttack;
 public function  get_currentGMAttack() : GMAttack
       {
          return mCurrentGMAttack;
       }
-      
+
       @:isVar public var currentCombatResult(never,set):CombatResult;
 public function  set_currentCombatResult(param1:CombatResult) :CombatResult      {
          mCurrentCombatResult = param1;
          currentAttackType = param1.attack.attackType;
 return param1;
       }
-      
+
       @:isVar public var currentAttacker(never,set):ActorGameObject;
 public function  set_currentAttacker(param1:ActorGameObject) :ActorGameObject      {
          return mCurrentAttacker = param1;
       }
-      
+
       @:isVar public var isPlaying(get,never):Bool;
 public function  get_isPlaying() : Bool
       {
          return mIsPlaying;
       }
-      
+
       @:isVar public var loop(get,never):Bool;
 public function  get_loop() : Bool
       {
          return mLoop || mHasGoto;
       }
-      
-            
+
+
       @:isVar public var autoAim(get,set):Bool;
 public function  get_autoAim() : Bool
       {
@@ -291,8 +291,8 @@ public function  get_autoAim() : Bool
 function  set_autoAim(param1:Bool) :Bool      {
          return mAutoAim = param1;
       }
-      
-      public function play(param1:Float, param2:ActorGameObject, param3:ASFunction = null, param4:ASFunction = null, param5:Bool = false) 
+
+      public function play(param1:Float, param2:ActorGameObject, param3:ASFunction = null, param4:ASFunction = null, param5:Bool = false)
       {
          mPlayHeadTime = 0;
          mTargetActor = param2;
@@ -311,13 +311,13 @@ function  set_autoAim(param1:Bool) :Bool      {
          mPlayTimelineTask = mLogicalWorkComponent.doEveryFrame(update);
          update(mLogicalWorkComponent.gameClock);
       }
-      
-      function applyCurrentTimelineValues() 
+
+      function applyCurrentTimelineValues()
       {
          extractActionToUpdateCurrentValues(mTimelineActions);
       }
-      
-      function extractActionToUpdateCurrentValues(param1:Map) 
+
+      function extractActionToUpdateCurrentValues(param1:Map)
       {
          var _loc4_:LinkedList = null;
          var _loc5_:ILinkedListIterator = null;
@@ -334,15 +334,15 @@ function  set_autoAim(param1:Bool) :Bool      {
             }
          }
       }
-      
-      function updateAction(param1:AttackTimelineAction) 
+
+      function updateAction(param1:AttackTimelineAction)
       {
          param1.combatResult = mCurrentCombatResult;
          param1.attacker = mCurrentAttacker;
          param1.attackType = mCurrentAttackType;
       }
-      
-      public function stop() 
+
+      public function stop()
       {
          var _loc1_= 0;
          mIsPlaying = false;
@@ -365,8 +365,8 @@ function  set_autoAim(param1:Bool) :Bool      {
          }
          mManagedEffects.clear();
       }
-      
-      public function stopAndFinish() 
+
+      public function stopAndFinish()
       {
          if(!mIsPlaying)
          {
@@ -382,8 +382,8 @@ function  set_autoAim(param1:Bool) :Bool      {
             Logger.warn("the finished callback on the AttackTimeline was null during a non-loop attack.");
          }
       }
-      
-      function stopAllActions() 
+
+      function stopAllActions()
       {
          var _loc4_:LinkedList = null;
          var _loc5_:ILinkedListIterator = null;
@@ -407,14 +407,14 @@ function  set_autoAim(param1:Bool) :Bool      {
             _loc6_.stop();
          }
       }
-      
-      function gotoFrame(param1:Int) 
+
+      function gotoFrame(param1:Int)
       {
          mPlayHeadTime = param1;
          mIsLooping = true;
       }
-      
-      function processTimelineFrame(param1:Map, param2:Int, param3:GameClock) 
+
+      function processTimelineFrame(param1:Map, param2:Int, param3:GameClock)
       {
          var _loc5_:LinkedList = null;
          var _loc6_:ILinkedListIterator = null;
@@ -434,8 +434,8 @@ function  set_autoAim(param1:Bool) :Bool      {
             }
          }
       }
-      
-      function update(param1:GameClock) 
+
+      function update(param1:GameClock)
       {
          var _loc3_= 0;
          if(mFinishedFrame <= mLastExecutedFrame && mFinishedFrame <= mPlayHeadTime)
@@ -457,19 +457,19 @@ function  set_autoAim(param1:Bool) :Bool      {
          }
          updatePlayHead(param1);
       }
-      
-      function updatePlayHead(param1:GameClock) 
+
+      function updatePlayHead(param1:GameClock)
       {
-         mPlayHeadTime += mPlaySpeed * param1.timeScale;
+         mPlayHeadTime += mPlaySpeed * (param1.tickLength / GameClock.ANIMATION_FRAME_DURATION);
       }
-      
-      function processTimelineActions(param1:Int, param2:GameClock) 
+
+      function processTimelineActions(param1:Int, param2:GameClock)
       {
          processTimelineFrame(mTimelineActions,param1,param2);
          processContinuousCollision();
       }
-      
-      function timelineActionsFinished() 
+
+      function timelineActionsFinished()
       {
          if(mLoop)
          {
@@ -478,8 +478,8 @@ function  set_autoAim(param1:Bool) :Bool      {
          }
          stopAndFinish();
       }
-      
-      public function destroy() 
+
+      public function destroy()
       {
          var _loc1_:ILinkedListIterator = null;
          var _loc4_:LinkedList = null;
@@ -519,31 +519,31 @@ function  set_autoAim(param1:Bool) :Bool      {
          mManagedEffects.clear();
          mManagedEffects = null;
       }
-      
+
       @:isVar public var attackName(get,never):String;
 public function  get_attackName() : String
       {
          return mScriptJson.attackName;
       }
-      
+
       @:isVar public var currentFrame(get,never):UInt;
 public function  get_currentFrame() : UInt
       {
          return (mLastExecutedFrame : UInt);
       }
-      
+
       @:isVar public var targetActor(get,never):ActorGameObject;
 public function  get_targetActor() : ActorGameObject
       {
          return mTargetActor;
       }
-      
-      public function addContinuousCollision(param1:ColliderTimelineAction) 
+
+      public function addContinuousCollision(param1:ColliderTimelineAction)
       {
          mContinuousCollisions.add(param1);
       }
-      
-      public function processContinuousCollision() 
+
+      public function processContinuousCollision()
       {
          var _loc1_:IListIterator = null;
          var _loc2_:ColliderTimelineAction = null;

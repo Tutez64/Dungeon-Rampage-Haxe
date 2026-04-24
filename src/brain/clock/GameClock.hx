@@ -5,6 +5,10 @@ package brain.clock
     class GameClock
    {
       
+      public static inline final ANIMATION_FRAME_RATE:Float = 24;
+      
+      public static inline final ANIMATION_FRAME_DURATION:Float = 1 / ANIMATION_FRAME_RATE;
+      
       static var mServerTimeOffset:Float = 0;
       
       static var mWebServerTimeString:String = "";
