@@ -1,0 +1,795 @@
+Subject: [PATCH] 120 FPS
+---
+Index: src/actor/FloatingMessage.hx
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/actor/FloatingMessage.hx b/src/actor/FloatingMessage.hx
+--- a/src/actor/FloatingMessage.hx	(revision a9e410d8dfab55119fb74203f4469f8148a7f423)
++++ b/src/actor/FloatingMessage.hx	(date 1776994195029)
+@@ -72,7 +72,7 @@
+       
+       function damageFloaterTween() 
+       {
+-         var dt= mDBFacade.gameClock.tickLength;
++         var dt= brain.clock.GameClock.ANIMATION_FRAME_DURATION;
+          var distance= mFloatSpeed * mTotalDuration * dt;
+          var toX= mRoot.x + mFloatDirection.x * distance;
+          var toY= mRoot.y + mFloatDirection.y * distance;
+@@ -102,7 +102,7 @@
+       
+       function buffFloaterTween() 
+       {
+-         var dt= mDBFacade.gameClock.tickLength;
++         var dt= brain.clock.GameClock.ANIMATION_FRAME_DURATION;
+          var distance= mFloatSpeed * mTotalDuration * dt * 2;
+          var toX= mRoot.x + mFloatDirection.x * distance;
+          var maxY= mRoot.y + mFloatDirection.y * distance * 0.5;
+Index: src/uI/map/UIMapWorldMap.hx
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/uI/map/UIMapWorldMap.hx b/src/uI/map/UIMapWorldMap.hx
+--- a/src/uI/map/UIMapWorldMap.hx	(revision a9e410d8dfab55119fb74203f4469f8148a7f423)
++++ b/src/uI/map/UIMapWorldMap.hx	(date 1776994920269)
+@@ -1250,7 +1250,8 @@
+          var _loc3_= ASCompat.toNumber(mCameraTargetX - ASCompat.toNumberField((mRootMovieClip : ASAny).worldmap, "x"));
+          var _loc4_= ASCompat.toNumber(mCameraTargetY - ASCompat.toNumberField((mRootMovieClip : ASAny).worldmap, "y"));
+          var _loc2_= _loc3_ * _loc3_ + _loc4_ * _loc4_;
+-         mCameraVelocityX = _loc3_ * 0.2916666666666667;
++         var _loc5_= 1 - Math.pow(1 - 0.2916666666666667,param1.tickLength / GameClock.ANIMATION_FRAME_DURATION);
++         mCameraVelocityX = _loc3_ * _loc5_;
+          var __tmpAssignObj11:ASAny = (mRootMovieClip : ASAny).worldmap;
+          ASCompat.setProperty(__tmpAssignObj11, "x", __tmpAssignObj11.x + mCameraVelocityX);
+          clampMap();
+Index: src/combat/attack/ScriptTimeline.hx
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/combat/attack/ScriptTimeline.hx b/src/combat/attack/ScriptTimeline.hx
+--- a/src/combat/attack/ScriptTimeline.hx	(revision a9e410d8dfab55119fb74203f4469f8148a7f423)
++++ b/src/combat/attack/ScriptTimeline.hx	(date 1776995404467)
+@@ -16,69 +16,69 @@
+    import org.as3commons.collections.framework.ILinkedListIterator;
+    import org.as3commons.collections.framework.IListIterator;
+    import org.as3commons.collections.framework.IMapIterator;
+-   
++
+     class ScriptTimeline
+    {
+-      
++
+       var mActorGameObject:ActorGameObject;
+-      
++
+       var mTargetActor:ActorGameObject;
+-      
++
+       var mActorView:ActorView;
+-      
++
+       var mScriptJson:ASObject;
+-      
++
+       var mDBFacade:DBFacade;
+-      
++
+       var mDistributedDungeonFloor:DistributedDungeonFloor;
+-      
++
+       var mTimelineActions:Map;
+-      
++
+       var mFinishedCallback:ASFunction;
+-      
++
+       var mStopCallback:ASFunction;
+-      
++
+       var mPlayHeadTime:Float = 0;
+-      
++
+       var mLastExecutedFrame:Int = -1;
+-      
++
+       var mFinishedFrame:Int = 0;
+-      
++
+       var mLoop:Bool = false;
+-      
++
+       var mHasGoto:Bool = false;
+-      
++
+       var mAutoAim:Bool = false;
+-      
++
+       var mIsPlaying:Bool = false;
+-      
++
+       var mIsLooping:Bool = false;
+-      
++
+       var mTotalFrames:UInt = 0;
+-      
++
+       var mLogicalWorkComponent:LogicalWorkComponent;
+-      
++
+       var mPlayTimelineTask:Task;
+-      
++
+       var mCurrentAttackType:UInt = 0;
+-      
++
+       var mCurrentGMAttack:GMAttack;
+-      
++
+       var mCurrentCombatResult:CombatResult;
+-      
++
+       var mCurrentAttacker:ActorGameObject;
+-      
++
+       var mPlaySpeed:Float = 1;
+-      
++
+       var mContinuousCollisions:ArrayList;
+-      
++
+       var mRemovalContinuous:ArrayList;
+-      
++
+       public var mManagedEffects:ArrayList;
+-      
++
+       public function new(param1:ActorGameObject, param2:ActorView, param3:ASObject, param4:DBFacade, param5:DistributedDungeonFloor)
+       {
+-         
++
+          mDBFacade = param4;
+          mDistributedDungeonFloor = param5;
+          mLogicalWorkComponent = new LogicalWorkComponent(mDBFacade,"ScriptTimeline");
+@@ -91,8 +91,8 @@
+          mRemovalContinuous = new ArrayList();
+          mManagedEffects = new ArrayList();
+       }
+-      
+-            
++
++
+       @:isVar public var playSpeed(get,set):Float;
+ public function  set_playSpeed(param1:Float) :Float      {
+          return mPlaySpeed = param1;
+@@ -101,19 +101,19 @@
+       {
+          return mPlaySpeed;
+       }
+-      
++
+       public function getPercentageOfTimelinePlayed() : Float
+       {
+          return mLastExecutedFrame / mTotalFrames;
+       }
+-      
++
+       public function getTimeRemaining() : Float
+       {
+          var _loc1_:Float = mTotalFrames - mLastExecutedFrame;
+-         return _loc1_ * mDBFacade.gameClock.tickLength / playSpeed;
++         return _loc1_ * GameClock.ANIMATION_FRAME_DURATION / playSpeed;
+       }
+-      
+-      function parseJson(param1:ASObject) 
++
++      function parseJson(param1:ASObject)
+       {
+          var _loc6_:AttackTimelineAction = null;
+          var _loc11_:LinkedList = null;
+@@ -155,7 +155,7 @@
+          }
+          mFinishedFrame = ASCompat.toInt(param1.totalFrames);
+       }
+-      
++
+       function parseAction(param1:ASObject) : AttackTimelineAction
+       {
+          mHasGoto = false;
+@@ -165,53 +165,53 @@
+          {
+             case "attackSound":
+                _loc2_ = SoundAttackTimelineAction.buildFromJson(mActorGameObject,mActorView,mDBFacade,param1);
+-               
++
+             case "sound":
+                _loc2_ = SoundTimelineAction.buildFromJson(mActorGameObject,mActorView,mDBFacade,param1);
+-               
++
+             case "animFrame":
+                _loc2_ = AnimationFrameAttackTimelineAction.buildFromJson(mActorGameObject,mActorView,mDBFacade,param1);
+-               
++
+             case "playAnim":
+                _loc2_ = PlayAnimationAttackTimelineAction.buildFromJson(this,mActorGameObject,mActorView,mDBFacade,param1);
+-               
++
+             case "move":
+                _loc2_ = MovementAttackTimelineAction.buildFromJson(mActorGameObject,mActorView,mDBFacade,param1);
+-               
++
+             case "runIdleMonitor":
+                _loc2_ = RunIdleMonitorTimelineAction.buildFromJson(mActorGameObject,mActorView,mDBFacade,param1);
+-               
++
+             case "goto":
+                mHasGoto = true;
+                _loc2_ = GotoTimelineAction.buildFromJson(mActorGameObject,mActorView,mDBFacade,param1,gotoFrame);
+-               
++
+             case "knockback":
+                _loc2_ = KnockBackTimelineAction.buildFromJson(mActorGameObject,mActorView,mDBFacade);
+-               
++
+             case "shake":
+                _loc2_ = CameraShakeTimelineAction.buildFromJson(mActorGameObject,mActorView,mDBFacade,param1);
+-               
++
+             case "effect":
+                _loc2_ = PlayEffectTimelineAction.buildFromJson(mActorGameObject,mActorView,mDBFacade,param1);
+-               
++
+             case "color":
+                _loc2_ = ColorShiftTimelineAction.buildFromJson(mActorGameObject,mActorView,mDBFacade,param1);
+-               
++
+             case "glow":
+                _loc2_ = GlowTimelineAction.buildFromJson(mActorGameObject,mActorView,mDBFacade,param1);
+-               
++
+             case "fadebackground":
+                _loc2_ = FadeBackgroundTimelineAction.buildFromJson(mActorGameObject,mActorView,mDBFacade,param1);
+-               
++
+             case "visible":
+                _loc2_ = HideTimelineAction.buildFromJson(mActorGameObject,mActorView,mDBFacade,param1);
+-               
++
+             case "hideSpecialEffect":
+                _loc2_ = HideSpecialEffectTimelineAction.buildFromJson(mActorGameObject,mActorView,mDBFacade,param1);
+-               
++
+             case "scale":
+                _loc2_ = ScaleAttackTimelineAction.buildFromJson(mActorGameObject,mActorView,mDBFacade,param1);
+-			   
++
+             case "zoom"
+                | "timeScale"
+                | "circleCollider"
+@@ -219,19 +219,19 @@
+                | "inputType"
+                | "sufferImmunity":
+                _loc2_ = SufferImmunityTimeLineAction.buildFromJson(mActorGameObject,mActorView,mDBFacade,param1);
+-               
++
+             case "knockbackImmunity":
+                _loc2_ = KnockbackImmunityTimeLineAction.buildFromJson(mActorGameObject,mActorView,mDBFacade,param1);
+-               
++
+             case "attemptRevive"
+                | "proposeRevive"
+                | "spawndoober"
+                | "spawnnpc"
+                | "invulnerable":
+-               
++
+             case "teleport":
+                _loc2_ = TeleportTimelineAction.buildFromJson(mActorGameObject,mActorView,mDBFacade,param1);
+-               
++
+             default:
+                if(_loc3_.charAt(0) != "#")
+                {
+@@ -240,7 +240,7 @@
+          }
+          return _loc2_;
+       }
+-      
++
+       @:isVar public var currentAttackType(never,set):UInt;
+ public function  set_currentAttackType(param1:UInt) :UInt      {
+          mCurrentAttackType = param1;
+@@ -251,38 +251,38 @@
+          }
+ return param1;
+       }
+-      
++
+       @:isVar public var currentGMAttack(get,never):GMAttack;
+ public function  get_currentGMAttack() : GMAttack
+       {
+          return mCurrentGMAttack;
+       }
+-      
++
+       @:isVar public var currentCombatResult(never,set):CombatResult;
+ public function  set_currentCombatResult(param1:CombatResult) :CombatResult      {
+          mCurrentCombatResult = param1;
+          currentAttackType = param1.attack.attackType;
+ return param1;
+       }
+-      
++
+       @:isVar public var currentAttacker(never,set):ActorGameObject;
+ public function  set_currentAttacker(param1:ActorGameObject) :ActorGameObject      {
+          return mCurrentAttacker = param1;
+       }
+-      
++
+       @:isVar public var isPlaying(get,never):Bool;
+ public function  get_isPlaying() : Bool
+       {
+          return mIsPlaying;
+       }
+-      
++
+       @:isVar public var loop(get,never):Bool;
+ public function  get_loop() : Bool
+       {
+          return mLoop || mHasGoto;
+       }
+-      
+-            
++
++
+       @:isVar public var autoAim(get,set):Bool;
+ public function  get_autoAim() : Bool
+       {
+@@ -291,8 +291,8 @@
+ function  set_autoAim(param1:Bool) :Bool      {
+          return mAutoAim = param1;
+       }
+-      
+-      public function play(param1:Float, param2:ActorGameObject, param3:ASFunction = null, param4:ASFunction = null, param5:Bool = false) 
++
++      public function play(param1:Float, param2:ActorGameObject, param3:ASFunction = null, param4:ASFunction = null, param5:Bool = false)
+       {
+          mPlayHeadTime = 0;
+          mTargetActor = param2;
+@@ -311,13 +311,13 @@
+          mPlayTimelineTask = mLogicalWorkComponent.doEveryFrame(update);
+          update(mLogicalWorkComponent.gameClock);
+       }
+-      
+-      function applyCurrentTimelineValues() 
++
++      function applyCurrentTimelineValues()
+       {
+          extractActionToUpdateCurrentValues(mTimelineActions);
+       }
+-      
+-      function extractActionToUpdateCurrentValues(param1:Map) 
++
++      function extractActionToUpdateCurrentValues(param1:Map)
+       {
+          var _loc4_:LinkedList = null;
+          var _loc5_:ILinkedListIterator = null;
+@@ -334,15 +334,15 @@
+             }
+          }
+       }
+-      
+-      function updateAction(param1:AttackTimelineAction) 
++
++      function updateAction(param1:AttackTimelineAction)
+       {
+          param1.combatResult = mCurrentCombatResult;
+          param1.attacker = mCurrentAttacker;
+          param1.attackType = mCurrentAttackType;
+       }
+-      
+-      public function stop() 
++
++      public function stop()
+       {
+          var _loc1_= 0;
+          mIsPlaying = false;
+@@ -365,8 +365,8 @@
+          }
+          mManagedEffects.clear();
+       }
+-      
+-      public function stopAndFinish() 
++
++      public function stopAndFinish()
+       {
+          if(!mIsPlaying)
+          {
+@@ -382,8 +382,8 @@
+             Logger.warn("the finished callback on the AttackTimeline was null during a non-loop attack.");
+          }
+       }
+-      
+-      function stopAllActions() 
++
++      function stopAllActions()
+       {
+          var _loc4_:LinkedList = null;
+          var _loc5_:ILinkedListIterator = null;
+@@ -407,14 +407,14 @@
+             _loc6_.stop();
+          }
+       }
+-      
+-      function gotoFrame(param1:Int) 
++
++      function gotoFrame(param1:Int)
+       {
+          mPlayHeadTime = param1;
+          mIsLooping = true;
+       }
+-      
+-      function processTimelineFrame(param1:Map, param2:Int, param3:GameClock) 
++
++      function processTimelineFrame(param1:Map, param2:Int, param3:GameClock)
+       {
+          var _loc5_:LinkedList = null;
+          var _loc6_:ILinkedListIterator = null;
+@@ -434,8 +434,8 @@
+             }
+          }
+       }
+-      
+-      function update(param1:GameClock) 
++
++      function update(param1:GameClock)
+       {
+          var _loc3_= 0;
+          if(mFinishedFrame <= mLastExecutedFrame && mFinishedFrame <= mPlayHeadTime)
+@@ -457,19 +457,19 @@
+          }
+          updatePlayHead(param1);
+       }
+-      
+-      function updatePlayHead(param1:GameClock) 
++
++      function updatePlayHead(param1:GameClock)
+       {
+-         mPlayHeadTime += mPlaySpeed * param1.timeScale;
++         mPlayHeadTime += mPlaySpeed * (param1.tickLength / GameClock.ANIMATION_FRAME_DURATION);
+       }
+-      
+-      function processTimelineActions(param1:Int, param2:GameClock) 
++
++      function processTimelineActions(param1:Int, param2:GameClock)
+       {
+          processTimelineFrame(mTimelineActions,param1,param2);
+          processContinuousCollision();
+       }
+-      
+-      function timelineActionsFinished() 
++
++      function timelineActionsFinished()
+       {
+          if(mLoop)
+          {
+@@ -478,8 +478,8 @@
+          }
+          stopAndFinish();
+       }
+-      
+-      public function destroy() 
++
++      public function destroy()
+       {
+          var _loc1_:ILinkedListIterator = null;
+          var _loc4_:LinkedList = null;
+@@ -519,31 +519,31 @@
+          mManagedEffects.clear();
+          mManagedEffects = null;
+       }
+-      
++
+       @:isVar public var attackName(get,never):String;
+ public function  get_attackName() : String
+       {
+          return mScriptJson.attackName;
+       }
+-      
++
+       @:isVar public var currentFrame(get,never):UInt;
+ public function  get_currentFrame() : UInt
+       {
+          return (mLastExecutedFrame : UInt);
+       }
+-      
++
+       @:isVar public var targetActor(get,never):ActorGameObject;
+ public function  get_targetActor() : ActorGameObject
+       {
+          return mTargetActor;
+       }
+-      
+-      public function addContinuousCollision(param1:ColliderTimelineAction) 
++
++      public function addContinuousCollision(param1:ColliderTimelineAction)
+       {
+          mContinuousCollisions.add(param1);
+       }
+-      
+-      public function processContinuousCollision() 
++
++      public function processContinuousCollision()
+       {
+          var _loc1_:IListIterator = null;
+          var _loc2_:ColliderTimelineAction = null;
+Index: src/actor/MovementController.hx
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/actor/MovementController.hx b/src/actor/MovementController.hx
+--- a/src/actor/MovementController.hx	(revision a9e410d8dfab55119fb74203f4469f8148a7f423)
++++ b/src/actor/MovementController.hx	(date 1776994333143)
+@@ -130,7 +130,9 @@
+          var _loc5_:Vector3D = null;
+          var _loc2_= Math.NaN;
+          var _loc3_= Math.NaN;
+-         var _loc4_= (1 - mSmoothFactor) * param1.timeScale;
++         var _loc6_= Math.NaN;
++         var _loc7_= Math.NaN;
++         var _loc4_= 1 - Math.pow(mSmoothFactor,param1.tickLength / GameClock.ANIMATION_FRAME_DURATION);
+          if(mWantSmoothTelemetry)
+          {
+             _loc2_ = mView.position.x * (1 - _loc4_) + mActorGameObject.position.x * _loc4_;
+@@ -142,7 +144,9 @@
+             _loc5_ = mActorGameObject.position;
+          }
+          mView.velocity = _loc5_.subtract(mView.position);
+-         if(mView.velocity.nearEquals(ZERO_VECTOR,1))
++         _loc6_ = Math.max(0.0001,1 - mSmoothFactor);
++         _loc7_ = mSmoothFactor / _loc6_;
++         if(_loc5_.nearEquals(mActorGameObject.position,_loc7_))
+          {
+             if(mPositionLerpTask != null)
+             {
+Index: src/brain/camera/BackgroundFader.hx
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/brain/camera/BackgroundFader.hx b/src/brain/camera/BackgroundFader.hx
+--- a/src/brain/camera/BackgroundFader.hx	(revision a9e410d8dfab55119fb74203f4469f8148a7f423)
++++ b/src/brain/camera/BackgroundFader.hx	(date 1776995404515)
+@@ -8,50 +8,50 @@
+    import brain.workLoop.Task;
+    import flash.display.Sprite;
+    import flash.geom.Vector3D;
+-   
++
+     class BackgroundFader
+    {
+-      
++
+       public static inline final TYPE= "fadebackground";
+-      
++
+       var mFacade:Facade;
+-      
++
+       var mExcludes:Array<ASAny>;
+-      
++
+       var mRectSprite:Sprite;
+-      
++
+       var mDuration:UInt = 0;
+-      
++
+       var mTransitionDuration:Float = Math.NaN;
+-      
++
+       var mColor:Vector3D;
+-      
++
+       var mOffset:Float = Math.NaN;
+-      
++
+       var mAlpha:Float = Math.NaN;
+-      
++
+       var mWorkComponent:LogicalWorkComponent;
+-      
++
+       var mFadeTask:Task;
+-      
+-      var mFramesElapsed:UInt = 0;
+-      
++
++      var mFramesElapsed:Float = 0;
++
+       var mStartTop:Float = Math.NaN;
+-      
++
+       var mStartLeft:Float = Math.NaN;
+-      
++
+       static inline final mPadding:Float = 1300;
+-      
++
+       public function new(param1:Facade)
+       {
+-         
+-         mFramesElapsed = (0 : UInt);
++
++         mFramesElapsed = 0;
+          mFacade = param1;
+          mWorkComponent = new LogicalWorkComponent(param1,"BackgroundFader");
+          MemoryTracker.track(mWorkComponent,"LogicalWorkComponent - created in BackgroundFader()","brain");
+       }
+-      
+-      public function doFade(param1:Array<ASAny>, param2:UInt, param3:Float, param4:Vector3D, param5:Float) 
++
++      public function doFade(param1:Array<ASAny>, param2:UInt, param3:Float, param4:Vector3D, param5:Float)
+       {
+          var _loc6_= 0;
+          if(mRectSprite == null)
+@@ -66,22 +66,22 @@
+          }
+          else
+          {
+-            _loc6_ = (mDuration - mFramesElapsed : Int);
+-            mDuration = (ASCompat.toInt((_loc6_ : UInt) > param2 ? (_loc6_ : UInt) : param2) : UInt);
++            _loc6_ = Std.int(mDuration - mFramesElapsed);
++            mDuration = (ASCompat.toInt(_loc6_ > param2 ? _loc6_ : param2) : UInt);
+             mTransitionDuration = param3;
+-            mFramesElapsed = (0 : UInt);
++            mFramesElapsed = 0;
+             mAlpha = mAlpha > param5 ? mAlpha : param5;
+             mOffset = mAlpha / mTransitionDuration;
+          }
+       }
+-      
+-      function execute() 
++
++      function execute()
+       {
+          if(mFramesElapsed != 0)
+          {
+             ResetFade();
+          }
+-         mFramesElapsed = (0 : UInt);
++         mFramesElapsed = 0;
+          mRectSprite = new Sprite();
+          MemoryTracker.track(mRectSprite,"Sprite - fade rect created in BackgroundFader.execute()","brain");
+          mRectSprite.graphics.beginFill((Std.int(mColor.x) << 16 | Std.int(mColor.y) << 8 | Std.int(mColor.z) : UInt),1);
+@@ -101,8 +101,8 @@
+          }
+          mFadeTask = mWorkComponent.doEveryFrame(UpdateBackgroundFade);
+       }
+-      
+-      public function UpdateBackgroundFade(param1:GameClock) 
++
++      public function UpdateBackgroundFade(param1:GameClock)
+       {
+          if(mRectSprite == null)
+          {
+@@ -111,15 +111,16 @@
+          }
+          mRectSprite.x = mFacade.camera.visibleRectangle.left - mStartLeft - 1300 * 0.5;
+          mRectSprite.y = mFacade.camera.visibleRectangle.top - mStartTop - 1300 * 0.5;
+-         mFramesElapsed = mFramesElapsed + 1;
++         var _loc2_= param1.tickLength / GameClock.ANIMATION_FRAME_DURATION;
++         mFramesElapsed += _loc2_;
+          if(mFramesElapsed <= mTransitionDuration)
+          {
+-            mRectSprite.alpha += mOffset;
++            mRectSprite.alpha += mOffset * _loc2_;
+             mRectSprite.alpha = Math.min(mRectSprite.alpha,mAlpha);
+          }
+          else if(mFramesElapsed >= mDuration - mTransitionDuration)
+          {
+-            mRectSprite.alpha -= mOffset;
++            mRectSprite.alpha -= mOffset * _loc2_;
+             mRectSprite.alpha = Math.max(mRectSprite.alpha,0);
+          }
+          if(mFramesElapsed > mDuration)
+@@ -128,10 +129,10 @@
+             return;
+          }
+       }
+-      
+-      function ResetFade() 
++
++      function ResetFade()
+       {
+-         mFramesElapsed = (0 : UInt);
++         mFramesElapsed = 0;
+          mFacade.sceneGraphManager.removeChild(mRectSprite);
+          var _loc1_:ASAny;
+          final __ax4_iter_204 = mExcludes;
+@@ -145,16 +146,16 @@
+          mFadeTask.destroy();
+          mFadeTask = null;
+       }
+-      
+-      public function forceStop() 
++
++      public function forceStop()
+       {
+          if(mFadeTask != null && mRectSprite != null)
+          {
+             ResetFade();
+          }
+       }
+-      
+-      public function destroy() 
++
++      public function destroy()
+       {
+          if(mFadeTask != null)
+          {
+Index: src/brain/facade/Facade.hx
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/brain/facade/Facade.hx b/src/brain/facade/Facade.hx
+--- a/src/brain/facade/Facade.hx	(revision a9e410d8dfab55119fb74203f4469f8148a7f423)
++++ b/src/brain/facade/Facade.hx	(date 1776994569621)
+@@ -29,7 +29,7 @@
+       
+       public static inline final MAX_TICKS_PER_FRAME= 5;
+       
+-      public static inline final FPS= (24 : UInt);
++      public static inline final FPS= (120 : UInt);
+       
+       var mElapsedTime:Float = 0;
+       
+@@ -288,7 +288,7 @@
+          mSwfWidth = mStageRef.stageWidth;
+          mSwfHeight = mStageRef.stageHeight;
+          Logger.init(mStageRef,true);
+-         mGameClock = new GameClock(1 / 24);
++         mGameClock = new GameClock(1 / FPS);
+          mRealClock = new GameClock(1 / param1.frameRate);
+          mEventManager = new EventManager(this);
+          mAssetRepository = ASCompat.dynamicAs(ASCompat.createInstance(mAssetRepositoryClass, [this]), brain.assetRepository.AssetRepository);
+Index: src/actor/pets/PetPortraitUI.hx
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/actor/pets/PetPortraitUI.hx b/src/actor/pets/PetPortraitUI.hx
+--- a/src/actor/pets/PetPortraitUI.hx	(revision a9e410d8dfab55119fb74203f4469f8148a7f423)
++++ b/src/actor/pets/PetPortraitUI.hx	(date 1776993769464)
+@@ -106,7 +106,7 @@
+          }
+          mCoolDownRenderer = new MovieClipRenderer(mDBFacade,ASCompat.dynamicAs((root : ASAny).cooldown, flash.display.MovieClip));
+          mCoolDownRenderer.clip.visible = false;
+-         mCoolDownClipLength = ASCompat.toNumber(ASCompat.toNumberField((root : ASAny).cooldown, "totalFrames") * mDBFacade.gameClock.tickLength);
++         mCoolDownClipLength = ASCompat.toNumber(ASCompat.toNumberField((root : ASAny).cooldown, "totalFrames") * brain.clock.GameClock.ANIMATION_FRAME_DURATION);
+       }
+       
+       function setHp(param1:UInt, param2:UInt) 
+Index: src/brain/clock/GameClock.hx
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/brain/clock/GameClock.hx b/src/brain/clock/GameClock.hx
+--- a/src/brain/clock/GameClock.hx	(revision a9e410d8dfab55119fb74203f4469f8148a7f423)
++++ b/src/brain/clock/GameClock.hx	(date 1776922357325)
+@@ -5,6 +5,10 @@
+     class GameClock
+    {
+       
++      public static inline final ANIMATION_FRAME_RATE:Float = 24;
++      
++      public static inline final ANIMATION_FRAME_DURATION:Float = 1 / ANIMATION_FRAME_RATE;
++      
+       static var mServerTimeOffset:Float = 0;
+       
+       static var mWebServerTimeString:String = "";
