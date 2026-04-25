@@ -52,264 +52,264 @@ package uI.hud
    import flash.geom.Vector3D;
    import flash.text.TextField;
    import flash.utils.Timer;
-   
+
     class UIHud
    {
-      
+
       static inline final CONDENSEDHUD_BUFF_ICON_X_STARTPOS= 455;
-      
+
       static inline final CONDENSEDHUD_BUFF_ICON_Y_STARTPOS= 865;
-      
+
       static inline final CONDENSEDHUD_BUFF_ICON_X_DISPLACEMENT= 63;
-      
+
       static inline final OLDHUD_BUFF_ICON_X_STARTPOS= 424;
-      
+
       static inline final OLDHUD_BUFF_ICON_Y_STARTPOS= 980;
-      
+
       static inline final OLDHUD_BUFF_ICON_X_DISPLACEMENT= 63;
-      
+
       static inline final MAX_CHAT_CHARS= (44 : UInt);
-      
+
       static inline final TEAMLOOT_POS= -550;
-      
+
       static inline final TEAMLOOT_VISIBLE_TIME:Float = 2;
-      
+
       static inline final TEAMLOOT_TWEEN_TIME:Float = 0.5;
-      
+
       public static inline final UI_HUD_SWF_PATH= "Resources/Art2D/UI/db_UI_HUD.swf";
-      
+
       public static inline final UI_HUD_CHANGE_EVENT= "UI_HUD_CHANGE_EVENT";
-      
+
       static inline final PET_PORTRAIT_SPACING= (69 : UInt);
-      
+
       static inline final PET_PORTRAIT_YPOS= (85 : UInt);
-      
+
       static inline final PET_PORTRAIT_START_XPOS= (20 : UInt);
-      
+
       static inline final ORIGINAL_COOLDOWN_ANIM_PLAY_TIME:Float = 4.1;
-      
+
       public static inline final COMMON_CHEST_ID= (60001 : UInt);
-      
+
       public static inline final UNCOMMON_CHEST_ID= (60002 : UInt);
-      
+
       public static inline final RARE_CHEST_ID= (60003 : UInt);
-      
+
       public static inline final LEGENDARY_CHEST_ID= (60004 : UInt);
-      
+
       public static inline final SMALL_ITEM_BOX_ID= (60005 : UInt);
-      
+
       public static inline final ROYAL_ITEM_BOX_ID= (60006 : UInt);
-      
+
       static final TEAM_DEFAULT:Vector3D = new Vector3D(45,150);
-      
+
       static final PROFILE_DEFAULT:Vector3D = new Vector3D(112,95);
-      
+
       static final COINS_DEFAULT:Vector3D = new Vector3D(813,57);
-      
+
       static final CASH_DEFAULT:Vector3D = new Vector3D(1032,57);
-      
+
       static final EXP_DEFAULT:Vector3D = new Vector3D(1584,78);
-      
+
       static final CROWD_DEFAULT:Vector3D = new Vector3D(1869,1041);
-      
+
       static final TEAM_CONDENSED:Vector3D = new Vector3D(45,150);
-      
+
       static final PROFILE_CONDENSED:Vector3D = new Vector3D(1550,980);
-      
+
       static final COINS_CONDENSED:Vector3D = new Vector3D(60,980);
-      
+
       static final CASH_CONDENSED:Vector3D = new Vector3D(53,1031);
-      
+
       static final EXP_CONDENSED:Vector3D = new Vector3D(54,915);
-      
+
       static final CROWD_CONDENSED:Vector3D = new Vector3D(1555,920);
-      
+
       var mDBFacade:DBFacade;
-      
+
       var mHeroOwner:HeroGameObjectOwner;
-      
+
       var mSceneGraphComponent:SceneGraphComponent;
-      
+
       var mAssetLoadingComponent:AssetLoadingComponent;
-      
+
       var mWantPets:Bool = false;
-      
+
       var mAssetsLoaded:Bool = false;
-      
+
       var mRoot:Sprite;
-      
+
       var mUIRoot:MovieClip;
-      
+
       var mAddCoinButton:UIButton;
-      
+
       var mAddCashButton:UIButton;
-      
+
       var mProfileBox:MovieClip;
-      
+
       var mProfileBulgeTask:Task;
-      
+
       var mFloaterTextClass:Dynamic;
-      
+
       var mHpBar:UIProgressBar;
-      
+
       var mHpText:TextField;
-      
+
       var mFlashingHpBar:UIProgressBar;
-      
+
       var mHealthFullClip:TextField;
-      
+
       var mManaFullClip:TextField;
-      
+
       var mManaBar:UIProgressBar;
-      
+
       var mManaText:TextField;
-      
+
       var mBusterBar:UIProgressBar;
-      
+
       var mBusterValue:UInt = 0;
-      
+
       var mBusterRoot:MovieClip;
-      
+
       var mBasicCurrency:UInt = 0;
-      
+
       var mPremiumCurrency:UInt = 0;
-      
+
       var mBasicCurrencyUI:UIObject;
-      
+
       var mPremiumCurrencyUI:UIObject;
-      
+
       var mBasicCurrencyText:TextField;
-      
+
       var mPremiumCurrencyText:TextField;
-      
+
       var mLevelText:TextField;
-      
+
       var mXpObject:UIObject;
-      
+
       var mXpBar:UIProgressBar;
-      
+
       var mXpText:TextField;
-      
+
       var mXpGotInitialUpdate:Bool = false;
-      
+
       var mXpBulgeTask:Task;
-      
+
       var mXpValue:UInt = 0;
-      
+
       var mTeamLootMC:MovieClipRenderController;
-      
+
       var mLootTween:TweenMax;
-      
+
       var mLootTask:Task;
-      
+
       var mLootMouseArea:Sprite;
-      
+
       var mCloseButton:UIButton;
-      
+
       var mWeaponZButton:UIButton;
-      
+
       var mWeaponXButton:UIButton;
-      
+
       var mWeaponCButton:UIButton;
-      
+
       var mWeaponButtons:Vector<UIButton>;
-      
+
       var mConsumable1Button:UIButton;
-      
+
       var mConsumable2Button:UIButton;
-      
+
       var mConsumableWeaponButtons:Vector<UIButton>;
-      
+
       var mCooldowns:Vector<MovieClipRenderer>;
-      
+
       var mConsumableCooldowns:Vector<MovieClipRenderer>;
-      
+
       var mDungeonBusterButton:UIButton;
-      
+
       var mBusterLabel:TextField;
-      
+
       var mBusterLabelOver:TextField;
-      
+
       var mBusterGlowMc:MovieClipRenderController;
-      
+
       var mXPBonusText:TextField;
-      
+
       var mCoinBonusText:TextField;
-      
+
       var mOptionsButton:UIButton;
-      
+
       var mOptionsPanel:OptionsPanel;
-      
+
       var mStacksHud:UIStacksHud;
-      
+
       var mEventComponent:EventComponent;
-      
+
       var mUITask:Task;
-      
+
       var mLogicalWorkComponent:LogicalWorkComponent;
-      
+
       var mSwfAsset:SwfAsset;
-      
+
       var mOffScreenPlayerManager:UIOffScreenPlayerManager;
-      
+
       var mMaxBusterPoints:UInt = 0;
-      
+
       var mUIChatLog:UIChatLog;
-      
+
       var mSaleLabel:TextField;
-      
+
       var mHealthFullRevealer:Revealer;
-      
+
       var mManaFullRevealer:Revealer;
-      
+
       var mHealthFullFloater:FloatingMessage;
-      
+
       var mManaFullFloater:FloatingMessage;
-      
+
       var mPetPortraitRoot:MovieClip;
-      
+
       var mPetPortraitNoneRoot:MovieClip;
-      
+
       var mPetPortrait:PetPortraitUI;
-      
+
       var mFloorLabel:TextField;
-      
+
       var mDungeonModifer1:UIButton;
-      
+
       var mDungeonModifer2:UIButton;
-      
+
       var mDungeonModifer3:UIButton;
-      
+
       var mDungeonModifer4:UIButton;
-      
+
       var mTeamLootDestination:Vector3D;
-      
+
       var mProfileDestination:Vector3D;
-      
+
       var mCoinsDestination:Vector3D;
-      
+
       var mCashDestination:Vector3D;
-      
+
       var mExpDestination:Vector3D;
-      
+
       var mCrowdDestination:Vector3D;
-      
+
       var mBoosterTimer:Timer;
-      
+
       var mHudType:UInt = 0;
-      
+
       var mVerticalYClipping:Float = Math.NaN;
-      
+
       var mBuffs:Vector<BuffGameObject>;
-      
+
       var mBuffIconButtons:Vector<UIButton>;
-      
+
       var mBuffCooldowns:Vector<MovieClipRenderer>;
-      
+
       public function new(param1:DBFacade)
       {
          var facade= param1;
-         
+
          mDBFacade = facade;
          mRoot = new Sprite();
          mSceneGraphComponent = new SceneGraphComponent(mDBFacade,"UIHud");
@@ -331,37 +331,37 @@ package uI.hud
          mBuffIconButtons = new Vector<UIButton>();
          mBuffCooldowns = new Vector<MovieClipRenderer>();
       }
-      
+
       public static function isThisAConsumbleChestId(param1:Int) : Bool
       {
          return param1 == 60005 || param1 == 60006;
       }
-      
-      function switchHudEvent(param1:UIHudChangeEvent) 
+
+      function switchHudEvent(param1:UIHudChangeEvent)
       {
          this.setupUI(mSwfAsset,param1.hudType);
          resetBuffButtonPositions();
       }
-      
+
       @:isVar public var chatLogContainer(get,never):MovieClip;
 public function  get_chatLogContainer() : MovieClip
       {
          return ASCompat.dynamicAs((mUIRoot : ASAny).chatLogContainer, flash.display.MovieClip);
       }
-      
+
       @:isVar public var ownedHero(get,never):HeroGameObjectOwner;
 public function  get_ownedHero() : HeroGameObjectOwner
       {
          return mHeroOwner;
       }
-      
+
       @:isVar public var swfAsset(get,never):SwfAsset;
 public function  get_swfAsset() : SwfAsset
       {
          return mSwfAsset;
       }
-      
-      function setupOptions(param1:SwfAsset) 
+
+      function setupOptions(param1:SwfAsset)
       {
          var _loc2_= param1.getClass("options_panel_button");
          var _loc7_= ASCompat.dynamicAs(ASCompat.createInstance(_loc2_, []) , MovieClip);
@@ -377,8 +377,8 @@ public function  get_swfAsset() : SwfAsset
          _loc7_.scaleY = _loc6_;
          setOptionsBasedOnHud();
       }
-      
-      function setDooberLocations(param1:UInt) 
+
+      function setDooberLocations(param1:UInt)
       {
          switch(param1)
          {
@@ -389,7 +389,7 @@ public function  get_swfAsset() : SwfAsset
                mCashDestination = CASH_DEFAULT;
                mExpDestination = EXP_DEFAULT;
                mCrowdDestination = CROWD_DEFAULT;
-               
+
             case 1:
                mTeamLootDestination = TEAM_CONDENSED;
                mProfileDestination = PROFILE_CONDENSED;
@@ -397,7 +397,7 @@ public function  get_swfAsset() : SwfAsset
                mCashDestination = CASH_CONDENSED;
                mExpDestination = EXP_CONDENSED;
                mCrowdDestination = CROWD_CONDENSED;
-               
+
             default:
                mTeamLootDestination = TEAM_DEFAULT;
                mProfileDestination = PROFILE_DEFAULT;
@@ -407,8 +407,8 @@ public function  get_swfAsset() : SwfAsset
                mCrowdDestination = CROWD_DEFAULT;
          }
       }
-      
-      function setupUI(param1:SwfAsset, param2:UInt = (0 : UInt)) 
+
+      function setupUI(param1:SwfAsset, param2:UInt = (0 : UInt))
       {
          var hudClassName:String;
          var hudClass:Dynamic;
@@ -428,12 +428,12 @@ public function  get_swfAsset() : SwfAsset
                hudClassName = "ui_hud_old";
                mDBFacade.camera.offset = new Point(0,45);
                mVerticalYClipping = 0;
-               
+
             case 1:
                hudClassName = "ui_hud";
                mDBFacade.camera.offset = new Point(0,0);
                mVerticalYClipping = 90;
-               
+
             default:
                hudClassName = "ui_hud_old";
                mDBFacade.camera.offset = new Point(0,45);
@@ -607,8 +607,8 @@ public function  get_swfAsset() : SwfAsset
             this.initializeHud(mHeroOwner);
          }
       }
-      
-      function setOptionsBasedOnHud() 
+
+      function setOptionsBasedOnHud()
       {
          if(mOptionsPanel == null || mOptionsButton == null)
          {
@@ -621,11 +621,11 @@ public function  get_swfAsset() : SwfAsset
             case 0:
                _loc2_ = new Point(1875,100);
                _loc1_ = new Point(0.9,0.9);
-               
+
             case 1:
                _loc2_ = new Point(1875,100);
                _loc1_ = new Point(0.9,0.9);
-               
+
             default:
                _loc2_ = new Point(1875,100);
                _loc1_ = new Point(0.9,0.9);
@@ -636,14 +636,14 @@ public function  get_swfAsset() : SwfAsset
          mOptionsButton.root.scaleX = _loc1_.x;
          mOptionsButton.root.scaleY = _loc1_.y;
       }
-      
-      function mouseOverXpListener(param1:Event) 
+
+      function mouseOverXpListener(param1:Event)
       {
          ASCompat.setProperty((mUIRoot : ASAny).UI_XP.xp_level_title, "visible", false);
          mXpText.visible = true;
       }
-      
-      function mouseOutXpListener(param1:Event) 
+
+      function mouseOutXpListener(param1:Event)
       {
          if(!mDBFacade.featureFlags.getFlagValue("want-numbered-hud"))
          {
@@ -651,8 +651,8 @@ public function  get_swfAsset() : SwfAsset
             mXpText.visible = false;
          }
       }
-      
-      public function showHealthFullMessage() 
+
+      public function showHealthFullMessage()
       {
          if(mHealthFullRevealer != null || mHealthFullFloater != null)
          {
@@ -675,8 +675,8 @@ public function  get_swfAsset() : SwfAsset
             },"DAMAGE_MOVEMENT_TYPE",true);
          },(1 : UInt));
       }
-      
-      public function showManaFullMessage() 
+
+      public function showManaFullMessage()
       {
          if(mManaFullRevealer != null || mManaFullFloater != null)
          {
@@ -699,8 +699,8 @@ public function  get_swfAsset() : SwfAsset
             },"DAMAGE_MOVEMENT_TYPE",true);
          },(1 : UInt));
       }
-      
-      public function handleBoosterTimeUp(param1:TimerEvent) 
+
+      public function handleBoosterTimeUp(param1:TimerEvent)
       {
          if(mBoosterTimer != null)
          {
@@ -717,14 +717,14 @@ public function  get_swfAsset() : SwfAsset
             mBoosterTimer.start();
          }
       }
-      
-      function handleBoostersParsedEvent(param1:Event) 
+
+      function handleBoostersParsedEvent(param1:Event)
       {
          showBonusXPEffects(param1);
          showBonusCoinEffects(param1);
       }
-      
-      function showBonusXPEffects(param1:Event) 
+
+      function showBonusXPEffects(param1:Event)
       {
          var _loc2_= mDBFacade.dbAccountInfo.inventoryInfo.findHighestBoosterXP();
          if(mDBFacade.accountBonus.isXPBonusActive)
@@ -742,8 +742,8 @@ public function  get_swfAsset() : SwfAsset
             mXPBonusText.visible = false;
          }
       }
-      
-      function showBonusCoinEffects(param1:Event) 
+
+      function showBonusCoinEffects(param1:Event)
       {
          var _loc2_= mDBFacade.dbAccountInfo.inventoryInfo.findHighestBoosterGold();
          if(mDBFacade.accountBonus.isCoinBonusActive)
@@ -761,8 +761,8 @@ public function  get_swfAsset() : SwfAsset
             mCoinBonusText.visible = false;
          }
       }
-      
-      public function registerPet(param1:NPCGameObject) 
+
+      public function registerPet(param1:NPCGameObject)
       {
          if(mPetPortrait != null)
          {
@@ -773,8 +773,8 @@ public function  get_swfAsset() : SwfAsset
             mPetPortrait = new PetPortraitUI(mDBFacade,mPetPortraitRoot,mPetPortraitNoneRoot,param1);
          }
       }
-      
-      public function unregisterPet(param1:NPCGameObject) 
+
+      public function unregisterPet(param1:NPCGameObject)
       {
          if(mPetPortrait != null)
          {
@@ -789,8 +789,8 @@ public function  get_swfAsset() : SwfAsset
             }
          }
       }
-      
-      function createWeaponTooltip(param1:UIButton, param2:UInt) 
+
+      function createWeaponTooltip(param1:UIButton, param2:UInt)
       {
          var button= param1;
          var num= param2;
@@ -805,27 +805,27 @@ public function  get_swfAsset() : SwfAsset
             button.tooltipDelay = 0.4;
          });
       }
-      
-      public function openTeamLoot(param1:UInt) 
+
+      public function openTeamLoot(param1:UInt)
       {
          var _loc4_= "";
          switch(param1 - 60001)
          {
             case 0:
                _loc4_ = "UI_teamloot_basic";
-               
+
             case 1:
                _loc4_ = "UI_teamloot_uncommon";
-               
+
             case 2:
                _loc4_ = "UI_teamloot_rare";
-               
+
             case 3:
                _loc4_ = "UI_teamloot_legendary";
-               
+
             case 4:
                _loc4_ = "UI_teamloot_box_small";
-               
+
             case 5:
                _loc4_ = "UI_teamloot_box_royal";
          }
@@ -848,8 +848,8 @@ public function  get_swfAsset() : SwfAsset
          }
          mLootTask = mLogicalWorkComponent.doLater(2,closeTeamLoot);
       }
-      
-      public function closeTeamLoot(param1:GameClock = null) 
+
+      public function closeTeamLoot(param1:GameClock = null)
       {
          var gameClock= param1;
          var cleanupFunc:ASFunction = function()
@@ -870,8 +870,8 @@ public function  get_swfAsset() : SwfAsset
             "onComplete":cleanupFunc
          });
       }
-      
-      public function detachHero() 
+
+      public function detachHero()
       {
          hide();
          hideBustSign();
@@ -882,8 +882,8 @@ public function  get_swfAsset() : SwfAsset
          (mUIRoot : ASAny).UI_XP.removeEventListener("mouseOver",mouseOverXpListener);
          (mUIRoot : ASAny).UI_XP.removeEventListener("mouseOut",mouseOutXpListener);
       }
-      
-      public function initializeHud(param1:HeroGameObjectOwner) 
+
+      public function initializeHud(param1:HeroGameObjectOwner)
       {
          var boosterTime:Int;
          var equippedWeapons:Vector<WeaponGameObject>;
@@ -979,13 +979,13 @@ public function  get_swfAsset() : SwfAsset
             setupStatsForResourceBars();
          }
       }
-      
-      function setCurrentFloorLabel() 
+
+      function setCurrentFloorLabel()
       {
          mFloorLabel.text = Locale.getString("UI_HUD_FLOOR_LABEL") + Std.string(mHeroOwner.distributedDungeonFloor.getCurrentFloorNum());
       }
-      
-      function setDungeonModifiers() 
+
+      function setDungeonModifiers()
       {
          var _loc1_:UIButton = null;
          var _loc2_= 0;
@@ -1000,13 +1000,13 @@ public function  get_swfAsset() : SwfAsset
             {
                case 0:
                   _loc1_ = mDungeonModifer1;
-                  
+
                case 1:
                   _loc1_ = mDungeonModifer2;
-                  
+
                case 2:
                   _loc1_ = mDungeonModifer3;
-                  
+
                case 3:
                   _loc1_ = mDungeonModifer4;
             }
@@ -1014,8 +1014,8 @@ public function  get_swfAsset() : SwfAsset
             _loc2_ = ASCompat.toInt(_loc2_) + 1;
          }
       }
-      
-      function setupModifiers(param1:UIButton, param2:DungeonModifierHelper) 
+
+      function setupModifiers(param1:UIButton, param2:DungeonModifierHelper)
       {
          var dungeonModButton= param1;
          var gmDungeonModifier= param2;
@@ -1036,8 +1036,8 @@ public function  get_swfAsset() : SwfAsset
             dungeonModButton.root.visible = true;
          });
       }
-      
-      function initializePetPortraits() 
+
+      function initializePetPortraits()
       {
          var _loc1_:NPCGameObject = null;
          if(mPetPortrait != null)
@@ -1046,8 +1046,8 @@ public function  get_swfAsset() : SwfAsset
          }
          registerPet(_loc1_);
       }
-      
-      public function show() 
+
+      public function show()
       {
          mSceneGraphComponent.addChild(mRoot,(50 : UInt));
          mSceneGraphComponent.addChild(mOptionsButton.root,(50 : UInt));
@@ -1055,8 +1055,8 @@ public function  get_swfAsset() : SwfAsset
          mDBFacade.camera.yCilppingFromBottom = mVerticalYClipping;
          initializePetPortraits();
       }
-      
-      public function hide() 
+
+      public function hide()
       {
          mSceneGraphComponent.removeChild(mRoot);
          mSceneGraphComponent.removeChild(mOptionsButton.root);
@@ -1075,18 +1075,18 @@ public function  get_swfAsset() : SwfAsset
             mPetPortrait = null;
          }
       }
-      
-      public function showStacks() 
+
+      public function showStacks()
       {
          mStacksHud.show();
       }
-      
-      public function hideStacks() 
+
+      public function hideStacks()
       {
          mStacksHud.hide();
       }
-      
-      function resetButtons(param1:Vector<UIButton>) 
+
+      function resetButtons(param1:Vector<UIButton>)
       {
          var _loc3_:DisplayObject = null;
          var _loc2_:UIButton;
@@ -1113,8 +1113,8 @@ public function  get_swfAsset() : SwfAsset
             ASCompat.setProperty(_loc2_.root, "filters", []);
          }
       }
-      
-      function setupWeaponUI(param1:Vector<WeaponGameObject>) 
+
+      function setupWeaponUI(param1:Vector<WeaponGameObject>)
       {
          var weaponGameObject:WeaponGameObject;
          var gmWeapon:GMWeaponItem;
@@ -1208,8 +1208,8 @@ public function  get_swfAsset() : SwfAsset
             i = i + 1;
          }
       }
-      
-      function setupConsumableWeaponUI(param1:Vector<ConsumableWeaponGameObject>) 
+
+      function setupConsumableWeaponUI(param1:Vector<ConsumableWeaponGameObject>)
       {
          var consumableWeaponGameObject:ConsumableWeaponGameObject;
          var gmWeapon:GMWeaponItem;
@@ -1242,7 +1242,7 @@ public function  get_swfAsset() : SwfAsset
                {
                   case 0:
                      tooltip = ASCompat.dynamicAs((mUIRoot : ASAny).consumable_tooltip01, flash.display.MovieClip);
-                     
+
                   case 1:
                      tooltip = ASCompat.dynamicAs((mUIRoot : ASAny).consumable_tooltip02, flash.display.MovieClip);
                }
@@ -1277,8 +1277,8 @@ public function  get_swfAsset() : SwfAsset
             i = i + 1;
          }
       }
-      
-      function addListeners() 
+
+      function addListeners()
       {
          var heroOwnerId:UInt;
          mEventComponent.removeAllListeners();
@@ -1322,8 +1322,8 @@ public function  get_swfAsset() : SwfAsset
          (mUIRoot : ASAny).UI_XP.addEventListener("mouseOver",mouseOverXpListener);
          (mUIRoot : ASAny).UI_XP.addEventListener("mouseOut",mouseOutXpListener);
       }
-      
-      function mouseOutProfileBox(param1:Event) 
+
+      function mouseOutProfileBox(param1:Event)
       {
          if(!mDBFacade.featureFlags.getFlagValue("want-numbered-hud"))
          {
@@ -1331,14 +1331,14 @@ public function  get_swfAsset() : SwfAsset
             mManaText.visible = false;
          }
       }
-      
-      function mouseOverProfileBox(param1:Event) 
+
+      function mouseOverProfileBox(param1:Event)
       {
          mHpText.visible = true;
          mManaText.visible = true;
       }
-      
-      function setupStatsForResourceBars() 
+
+      function setupStatsForResourceBars()
       {
          if(mDBFacade.featureFlags.getFlagValue("want-numbered-hud"))
          {
@@ -1355,32 +1355,32 @@ public function  get_swfAsset() : SwfAsset
             ASCompat.setProperty((mUIRoot : ASAny).UI_XP.xp_level_title, "visible", true);
          }
       }
-      
-      function handleBusterPointsEvent(param1:BusterPointsEvent) 
+
+      function handleBusterPointsEvent(param1:BusterPointsEvent)
       {
          mMaxBusterPoints = param1.maxBusterPoints;
          setBusterPoints(param1.busterPoints);
       }
-      
-      function showInvulnerable() 
+
+      function showInvulnerable()
       {
          mFlashingHpBar.value = mHpBar.value;
          mFlashingHpBar.visible = true;
          mHpBar.visible = false;
       }
-      
-      function hideInvulnerable() 
+
+      function hideInvulnerable()
       {
          mFlashingHpBar.visible = false;
          mHpBar.visible = true;
       }
-      
+
       @:isVar public var floaterTextClass(get,never):Dynamic;
 public function  get_floaterTextClass() : Dynamic
       {
          return mFloaterTextClass;
       }
-      
+
       function floaterCallback(param1:MovieClip) : ASFunction
       {
          var clip= param1;
@@ -1389,8 +1389,8 @@ public function  get_floaterTextClass() : Dynamic
             mDBFacade.sceneGraphManager.removeChild(clip);
          };
       }
-      
-      function spawnFloater(param1:String, param2:Float, param3:Float, param4:UInt, param5:Float, param6:UInt, param7:UInt, param8:Float, param9:Float) 
+
+      function spawnFloater(param1:String, param2:Float, param3:Float, param4:UInt, param5:Float, param6:UInt, param7:UInt, param8:Float, param9:Float)
       {
          var _loc10_= ASCompat.dynamicAs(ASCompat.createInstance(mFloaterTextClass, []) , MovieClip);
          ASCompat.setProperty((_loc10_ : ASAny).label, "text", param1);
@@ -1402,8 +1402,8 @@ public function  get_floaterTextClass() : Dynamic
          var _loc11_= new FloatingMessage(_loc10_,mDBFacade,param6,param7,param8,param9,null,floaterCallback(_loc10_));
          mDBFacade.sceneGraphManager.addChild(_loc10_,50);
       }
-      
-      public function setHp(param1:UInt, param2:UInt) 
+
+      public function setHp(param1:UInt, param2:UInt)
       {
          if(!mAssetsLoaded)
          {
@@ -1414,8 +1414,8 @@ public function  get_floaterTextClass() : Dynamic
          mFlashingHpBar.value = _loc3_;
          mHpText.text = Std.string(param1) + " / " + Std.string(param2);
       }
-      
-      public function setMana(param1:UInt, param2:UInt) 
+
+      public function setMana(param1:UInt, param2:UInt)
       {
          if(!mAssetsLoaded)
          {
@@ -1424,12 +1424,12 @@ public function  get_floaterTextClass() : Dynamic
          mManaBar.value = param1 / param2;
          mManaText.text = Std.string(param1) + " / " + Std.string(param2);
       }
-      
-      function spawnBusterFloater(param1:Int, param2:Float) 
+
+      function spawnBusterFloater(param1:Int, param2:Float)
       {
       }
-      
-      public function setBusterPoints(param1:UInt) 
+
+      public function setBusterPoints(param1:UInt)
       {
          if(!mAssetsLoaded)
          {
@@ -1451,8 +1451,8 @@ public function  get_floaterTextClass() : Dynamic
             this.hideBustSign();
          }
       }
-      
-      public function setCurrency(param1:Int, param2:Int) 
+
+      public function setCurrency(param1:Int, param2:Int)
       {
          if(!mAssetsLoaded)
          {
@@ -1461,12 +1461,12 @@ public function  get_floaterTextClass() : Dynamic
          mBasicCurrencyText.text = Std.string(param1);
          mPremiumCurrencyText.text = Std.string(param2);
       }
-      
-      function spawnCoinFloater(param1:Int) 
+
+      function spawnCoinFloater(param1:Int)
       {
       }
-      
-      public function setBasicCurrency(param1:Int) 
+
+      public function setBasicCurrency(param1:Int)
       {
          if(!mAssetsLoaded)
          {
@@ -1480,12 +1480,12 @@ public function  get_floaterTextClass() : Dynamic
          mBasicCurrencyText.text = Std.string(param1);
          mBasicCurrency = (param1 : UInt);
       }
-      
-      function spawnCashFloater(param1:Int) 
+
+      function spawnCashFloater(param1:Int)
       {
       }
-      
-      public function setPremiumCurrency(param1:Int) 
+
+      public function setPremiumCurrency(param1:Int)
       {
          if(!mAssetsLoaded)
          {
@@ -1499,12 +1499,12 @@ public function  get_floaterTextClass() : Dynamic
          mPremiumCurrencyText.text = Std.string(param1);
          mPremiumCurrency = (param1 : UInt);
       }
-      
-      function spawnXpFloater(param1:Int, param2:Float) 
+
+      function spawnXpFloater(param1:Int, param2:Float)
       {
       }
-      
-      public function setXp(param1:UInt) 
+
+      public function setXp(param1:UInt)
       {
          if(!mAssetsLoaded)
          {
@@ -1527,12 +1527,12 @@ public function  get_floaterTextClass() : Dynamic
             bulgeXpBar();
          }
       }
-      
-      function updateXpBulge(param1:GameClock) 
+
+      function updateXpBulge(param1:GameClock)
       {
          var _loc3_= mXpObject.root;
          var _loc2_= _loc3_.scaleX - 1;
-         _loc2_ *= 0.75;
+         _loc2_ *= Math.pow(0.75,param1.tickLength / GameClock.ANIMATION_FRAME_DURATION);
          _loc3_.scaleX = 1 + _loc2_;
          _loc3_.scaleY = 1 + _loc2_;
          if(_loc3_.scaleX <= 1.7)
@@ -1543,8 +1543,8 @@ public function  get_floaterTextClass() : Dynamic
             mXpBulgeTask = null;
          }
       }
-      
-      public function bulgeXpBar() 
+
+      public function bulgeXpBar()
       {
          mXpObject.root.scaleX *= 1.08;
          mXpObject.root.scaleY *= 1.08;
@@ -1553,11 +1553,11 @@ public function  get_floaterTextClass() : Dynamic
             mXpBulgeTask = mLogicalWorkComponent.doEveryFrame(updateXpBulge);
          }
       }
-      
-      function updateProfileBulge(param1:GameClock) 
+
+      function updateProfileBulge(param1:GameClock)
       {
          var _loc2_= mProfileBox.scaleX - 1;
-         _loc2_ *= 0.75;
+         _loc2_ *= Math.pow(0.75,param1.tickLength / GameClock.ANIMATION_FRAME_DURATION);
          mProfileBox.scaleX = 1 + _loc2_;
          mProfileBox.scaleY = 1 + _loc2_;
          if(mProfileBox.scaleX <= 1.7)
@@ -1568,8 +1568,8 @@ public function  get_floaterTextClass() : Dynamic
             mProfileBulgeTask = null;
          }
       }
-      
-      public function bulgeProfileBox() 
+
+      public function bulgeProfileBox()
       {
          mProfileBox.scaleX *= 1.7;
          mProfileBox.scaleY *= 1.7;
@@ -1578,8 +1578,8 @@ public function  get_floaterTextClass() : Dynamic
             mProfileBulgeTask = mLogicalWorkComponent.doEveryFrame(updateProfileBulge);
          }
       }
-      
-      public function destroy() 
+
+      public function destroy()
       {
          var _loc2_= 0;
          var _loc1_:UIButton = null;
@@ -1794,14 +1794,14 @@ public function  get_floaterTextClass() : Dynamic
          mBusterLabelOver = null;
          mSwfAsset = null;
       }
-      
+
       @:isVar public var offScreenPlayerManager(get,never):UIOffScreenPlayerManager;
 public function  get_offScreenPlayerManager() : UIOffScreenPlayerManager
       {
          return mOffScreenPlayerManager;
       }
-      
-      public function showBustSign() 
+
+      public function showBustSign()
       {
          ASCompat.setProperty((mUIRoot : ASAny).UI_buster_glow, "visible", true);
          mBusterGlowMc.play((1 : UInt),false,function()
@@ -1811,23 +1811,23 @@ public function  get_offScreenPlayerManager() : UIOffScreenPlayerManager
             ASCompat.setProperty((mUIRoot : ASAny).UI_buster.buster_activated_glow, "visible", true);
          });
       }
-      
-      public function hideBustSign() 
+
+      public function hideBustSign()
       {
          ASCompat.setProperty((mUIRoot : ASAny).UI_buster_glow, "visible", false);
          ASCompat.setProperty((mUIRoot : ASAny).UI_buster_active, "visible", false);
          ASCompat.setProperty((mUIRoot : ASAny).UI_buster.buster_activated_glow, "visible", false);
       }
-      
-      public function handleBusterBarClickEvent() 
+
+      public function handleBusterBarClickEvent()
       {
          if(mHeroOwner != null && mHeroOwner.dungeonBusterPoints >= mHeroOwner.maxBusterPoints)
          {
             mEventComponent.dispatchEvent(new DungeonBusterControlActivatedEvent());
          }
       }
-      
-      public function setWeaponHighlight(param1:Int) 
+
+      public function setWeaponHighlight(param1:Int)
       {
          var _loc2_:UIButton;
          final __ax4_iter_83 = mWeaponButtons;
@@ -1838,38 +1838,38 @@ public function  get_offScreenPlayerManager() : UIOffScreenPlayerManager
          }
          ASCompat.setProperty((mWeaponButtons[param1].root : ASAny).selectionFrame, "visible", true);
       }
-      
-      public function hideNotEnoughMana() 
+
+      public function hideNotEnoughMana()
       {
          ASCompat.setProperty((mUIRoot : ASAny).UI_center_message, "visible", false);
       }
-      
-      public function showNotEnoughMana() 
+
+      public function showNotEnoughMana()
       {
          ASCompat.setProperty((mUIRoot : ASAny).UI_center_message, "visible", true);
          ASCompat.setProperty((mUIRoot : ASAny).UI_center_message, "text", Locale.getString("NOT_ENOUGH_MANA"));
       }
-      
+
       @:isVar public var chatLog(get,never):UIChatLog;
 public function  get_chatLog() : UIChatLog
       {
          return mUIChatLog;
       }
-      
-      public function isInCooldown() 
+
+      public function isInCooldown()
       {
          showText("IS_IN_COOLDOWN");
       }
-      
-      public function startCooldown(param1:Int, param2:Float) 
+
+      public function startCooldown(param1:Int, param2:Float)
       {
          mCooldowns[param1].clip.visible = true;
          mCooldowns[param1].playRate = 1 / param2 * 4.1;
          mCooldowns[param1].play();
          ASCompat.setProperty((mWeaponButtons[param1].root : ASAny).graphic, "alpha", 0.5);
       }
-      
-      public function stopCooldown(param1:Int) 
+
+      public function stopCooldown(param1:Int)
       {
          var currentWeaponIndex= param1;
          mCooldowns[currentWeaponIndex].stop();
@@ -1889,16 +1889,16 @@ public function  get_chatLog() : UIChatLog
             }
          });
       }
-      
-      public function startConsumableCooldown(param1:Int, param2:Float) 
+
+      public function startConsumableCooldown(param1:Int, param2:Float)
       {
          mConsumableCooldowns[param1].clip.visible = true;
          mConsumableCooldowns[param1].playRate = 1 / param2 * 4.1;
          mConsumableCooldowns[param1].play();
          ASCompat.setProperty((mConsumableWeaponButtons[param1].root : ASAny).graphic, "alpha", 0.5);
       }
-      
-      public function stopConsumableCooldown(param1:Int) 
+
+      public function stopConsumableCooldown(param1:Int)
       {
          var currentWeaponIndex= param1;
          mConsumableCooldowns[currentWeaponIndex].stop();
@@ -1918,19 +1918,19 @@ public function  get_chatLog() : UIChatLog
             }
          });
       }
-      
-      public function decrementConsumableCount(param1:UInt) 
+
+      public function decrementConsumableCount(param1:UInt)
       {
          ASCompat.setProperty((mConsumableWeaponButtons[(param1 : Int)].root : ASAny).quantity, "text", Std.string((ASCompat.toInt((mConsumableWeaponButtons[(param1 : Int)].root : ASAny).quantity.text) - 1)));
       }
-      
-      public function totalConsumableCountReached(param1:UInt) 
+
+      public function totalConsumableCountReached(param1:UInt)
       {
          mConsumableWeaponButtons[(param1 : Int)].enabled = false;
          mConsumableWeaponButtons[(param1 : Int)].root.filters = cast([new ColorMatrixFilter(cast([0.3086,0.6094,0.082,0,0,0.3086,0.6094,0.082,0,0,0.3086,0.6094,0.082,0,0,0,0,0,1,0]))]);
       }
-      
-      public function showText(param1:String) 
+
+      public function showText(param1:String)
       {
          var localeTextName= param1;
          if((mUIRoot : ASAny).UI_center_message.visible == false)
@@ -1947,44 +1947,44 @@ public function  get_chatLog() : UIChatLog
             ASCompat.setProperty((mUIRoot : ASAny).UI_center_message, "text", Locale.getString(localeTextName));
          }
       }
-      
+
       @:isVar public var teamLootDestination(get,never):Vector3D;
 public function  get_teamLootDestination() : Vector3D
       {
          return mTeamLootDestination;
       }
-      
+
       @:isVar public var profileDestination(get,never):Vector3D;
 public function  get_profileDestination() : Vector3D
       {
          return mProfileDestination;
       }
-      
+
       @:isVar public var coinsDestination(get,never):Vector3D;
 public function  get_coinsDestination() : Vector3D
       {
          return mCoinsDestination;
       }
-      
+
       @:isVar public var cashDestination(get,never):Vector3D;
 public function  get_cashDestination() : Vector3D
       {
          return mCashDestination;
       }
-      
+
       @:isVar public var expDestination(get,never):Vector3D;
 public function  get_expDestination() : Vector3D
       {
          return mExpDestination;
       }
-      
+
       @:isVar public var crowdDestination(get,never):Vector3D;
 public function  get_crowdDestination() : Vector3D
       {
          return mCrowdDestination;
       }
-      
-      public function showBuffDisplay(param1:BuffGameObject) 
+
+      public function showBuffDisplay(param1:BuffGameObject)
       {
          var buffGO= param1;
          mAssetLoadingComponent.getSwfAsset(DBFacade.buildFullDownloadPath(buffGO.buffData.IconSwf),function(param1:SwfAsset)
@@ -2010,14 +2010,14 @@ public function  get_crowdDestination() : Vector3D
             startBuffCooldown(mBuffIconButtons.length - 1,buffGO.buffData.Duration);
          });
       }
-      
-      public function startBuffCooldown(param1:Int, param2:Float) 
+
+      public function startBuffCooldown(param1:Int, param2:Float)
       {
          mBuffCooldowns[param1].playRate = 1 / param2 * 4.1;
          mBuffCooldowns[param1].play();
       }
-      
-      public function updateBuffDisplay(param1:GameClock) 
+
+      public function updateBuffDisplay(param1:GameClock)
       {
          var _loc3_= 0;
          var _loc2_:BuffGameObject = null;
@@ -2037,8 +2037,8 @@ public function  get_crowdDestination() : Vector3D
             _loc3_++;
          }
       }
-      
-      public function updateBuffInstance(param1:BuffGameObject) 
+
+      public function updateBuffInstance(param1:BuffGameObject)
       {
          var _loc2_:BuffGameObject = null;
          var _loc3_= 0;
@@ -2056,8 +2056,8 @@ public function  get_crowdDestination() : Vector3D
             _loc3_++;
          }
       }
-      
-      public function resetBuffButtonPositions() 
+
+      public function resetBuffButtonPositions()
       {
          var _loc1_= 0;
          _loc1_ = 0;
@@ -2076,8 +2076,8 @@ public function  get_crowdDestination() : Vector3D
             _loc1_++;
          }
       }
-      
-      public function refreshHUD() 
+
+      public function refreshHUD()
       {
          this.setupUI(mSwfAsset,mHudType);
       }

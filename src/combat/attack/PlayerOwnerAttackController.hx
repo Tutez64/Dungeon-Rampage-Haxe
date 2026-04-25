@@ -2,6 +2,7 @@ package combat.attack
 ;
    import actor.buffs.BuffHandler;
    import actor.player.HeroView;
+   import brain.clock.GameClock;
    import brain.event.EventComponent;
    import brain.logger.Logger;
    import brain.workLoop.LogicalWorkComponent;
@@ -18,47 +19,53 @@ package combat.attack
    import facade.DBFacade;
    import gameMasterDictionary.GMAttack;
    import gameMasterDictionary.GMStackable;
-   
+
     class PlayerOwnerAttackController
    {
-      
+
       public static inline final DUNGEON_BUSTER_WEAPON_INDEX= (3 : UInt);
-      
+
+      static final LEGACY_ATTACK_QUEUE_INTERVAL_MS:Int = Std.int(GameClock.ANIMATION_FRAME_DURATION * 1000);
+
       var CHARGE_UP:String = "CHARGE_UP";
-      
+
       var SCALING:String = "SCALING";
-      
+
       var REPEATER:String = "REPEATER";
-      
+
       var SHIELD:String = "BLOCKING";
-      
+
       var mDistributedPlayerOwner:HeroGameObjectOwner;
-      
+
       var mDBFacade:DBFacade;
-      
+
       var mLogicalWorkComponent:LogicalWorkComponent;
-      
+
       var mEventComponent:EventComponent;
-      
+
       var mPotentialWeaponInputQueue:Array<ASAny>;
-      
+
       var mQueueNextAttackWindow:Float = Math.NaN;
-      
+
+      var mLastQueuedTimeline:ScriptTimeline;
+
+      var mLastQueuedTimelineTick:Int = -1;
+
       var mNextWeaponCommand:PotentialWeaponInputQueueStruct;
-      
+
       var mDungeonBusterGMAttack:GMAttack;
-      
+
       var mDungeonBusterAttackTimeline:AttackTimeline;
-      
+
       var mIsDungeonBusterUsed:Bool = false;
-      
+
       var mWeaponControllers:Vector<WeaponController>;
-      
+
       var mConsumableControllers:Vector<ConsumableWeaponController>;
-      
+
       public function new(param1:HeroGameObjectOwner, param2:HeroView, param3:DBFacade)
       {
-         
+
          mDistributedPlayerOwner = param1;
          mDBFacade = param3;
          mPotentialWeaponInputQueue = [];
@@ -72,8 +79,8 @@ package combat.attack
          buildDungeonBuster();
          mQueueNextAttackWindow = mDBFacade.dbConfigManager.getConfigNumber("QUEUE_NEXT_ATTACK_WINDOW",0.4);
       }
-      
-      function buildWeaponControllers() 
+
+      function buildWeaponControllers()
       {
          var _loc3_:WeaponController = null;
          mWeaponControllers = new Vector<WeaponController>();
@@ -95,8 +102,8 @@ package combat.attack
             _loc2_++;
          }
       }
-      
-      function buildConsumableControllers() 
+
+      function buildConsumableControllers()
       {
          var _loc1_:ConsumableWeaponController = null;
          mConsumableControllers = new Vector<ConsumableWeaponController>();
@@ -118,7 +125,7 @@ package combat.attack
             _loc2_++;
          }
       }
-      
+
       function determineWeaponController(param1:WeaponGameObject) : WeaponController
       {
          var _loc2_:WeaponController = null;
@@ -126,38 +133,38 @@ package combat.attack
          {
             case (_ == CHARGE_UP => true):
                _loc2_ = new ChargeWeaponController(mDBFacade,param1,mDistributedPlayerOwner);
-               
+
             case (_ == SCALING => true):
                _loc2_ = new ScalingWeaponController(mDBFacade,param1,mDistributedPlayerOwner);
-               
+
             case (_ == REPEATER => true):
                _loc2_ = new RepeaterWeaponController(mDBFacade,param1,mDistributedPlayerOwner);
-               
+
             case (_ == SHIELD => true):
                _loc2_ = new ShieldWeaponController(mDBFacade,param1,mDistributedPlayerOwner);
-               
+
             default:
                Logger.warn("Unable to determine weapon controller for GMWeaponItem.WeaponController: " + param1.weaponData.WeaponController + ".  Using ChargeWeaponController as default.");
                _loc2_ = new ChargeWeaponController(mDBFacade,param1,mDistributedPlayerOwner);
          }
          return _loc2_;
       }
-      
-      function buildDungeonBuster() 
+
+      function buildDungeonBuster()
       {
          var _loc1_= mDistributedPlayerOwner.gMHero.DBuster1;
          mDungeonBusterGMAttack = ASCompat.dynamicAs(mDBFacade.gameMaster.attackByConstant.itemFor(_loc1_), gameMasterDictionary.GMAttack);
          mDungeonBusterAttackTimeline = mDBFacade.timelineFactory.createAttackTimeline(mDungeonBusterGMAttack.AttackTimeline,null,mDistributedPlayerOwner,mDistributedPlayerOwner.distributedDungeonFloor);
          mDistributedPlayerOwner.maxBusterPoints = mDungeonBusterGMAttack.CrowdCost;
       }
-      
+
       @:isVar public var weaponControllers(get,never):Vector<WeaponController>;
 public function  get_weaponControllers() : Vector<WeaponController>
       {
          return mWeaponControllers;
       }
-      
-      public function scrollWeapons(param1:Bool) 
+
+      public function scrollWeapons(param1:Bool)
       {
          if(currentWeaponController.currentTimeline == null)
          {
@@ -171,8 +178,8 @@ public function  get_weaponControllers() : Vector<WeaponController>
             }
          }
       }
-      
-      function equipNextWeapon() 
+
+      function equipNextWeapon()
       {
          var _loc2_= this.mDistributedPlayerOwner.currentWeaponIndex;
          var _loc1_= _loc2_ + 1;
@@ -190,8 +197,8 @@ public function  get_weaponControllers() : Vector<WeaponController>
             _loc1_++;
          }
       }
-      
-      function equipPreviousWeapon() 
+
+      function equipPreviousWeapon()
       {
          var _loc2_= this.mDistributedPlayerOwner.currentWeaponIndex;
          var _loc1_= _loc2_ - 1;
@@ -209,8 +216,8 @@ public function  get_weaponControllers() : Vector<WeaponController>
             _loc1_--;
          }
       }
-      
-      public function playDungeonBusterAttack() 
+
+      public function playDungeonBusterAttack()
       {
          if(mDistributedPlayerOwner.stateMachine.currentStateName == "ActorDefaultState" && mDistributedPlayerOwner.canInitiateAnAttack)
          {
@@ -223,7 +230,7 @@ public function  get_weaponControllers() : Vector<WeaponController>
             mDBFacade.hud.hideBustSign();
          }
       }
-      
+
       public function canPlayDungeonBusterAttack() : Bool
       {
          if(mDistributedPlayerOwner.dungeonBusterPoints >= mDistributedPlayerOwner.maxBusterPoints)
@@ -232,8 +239,8 @@ public function  get_weaponControllers() : Vector<WeaponController>
          }
          return false;
       }
-      
-      public function addToPotentialWeaponInputQueue(param1:UInt, param2:Bool, param3:Bool) 
+
+      public function addToPotentialWeaponInputQueue(param1:UInt, param2:Bool, param3:Bool)
       {
          if(mDungeonBusterAttackTimeline != null && mDungeonBusterAttackTimeline.isPlaying)
          {
@@ -249,11 +256,21 @@ public function  get_weaponControllers() : Vector<WeaponController>
             mPotentialWeaponInputQueue.push(new PotentialWeaponInputQueueStruct(mWeaponControllers[(param1 : Int)],param1,param2,param3));
          }
       }
-      
-      public function weaponCommandQueueUpCall() 
+
+      public function weaponCommandQueueUpCall()
       {
          var _loc2_:PotentialWeaponInputQueueStruct = null;
          var _loc1_= false;
+         var _loc3_:ScriptTimeline = currentWeaponController != null ? currentWeaponController.currentTimeline : null;
+         var _loc4_= -1;
+         if(_loc3_ != null)
+         {
+            _loc4_ = Std.int((mDBFacade.gameClock.gameTime - currentWeaponController.currentAttackStartTime) / LEGACY_ATTACK_QUEUE_INTERVAL_MS);
+         }
+         if(_loc3_ != null && mLastQueuedTimeline == _loc3_ && mLastQueuedTimelineTick == _loc4_)
+         {
+            return;
+         }
          while(mPotentialWeaponInputQueue.length > 0)
          {
             _loc2_ = ASCompat.dynamicAs(mPotentialWeaponInputQueue[0], combat.attack.PotentialWeaponInputQueueStruct);
@@ -279,9 +296,11 @@ public function  get_weaponControllers() : Vector<WeaponController>
             mPotentialWeaponInputQueue.shift();
          }
          tryAttack();
+         mLastQueuedTimeline = _loc3_;
+         mLastQueuedTimelineTick = _loc4_;
          mPotentialWeaponInputQueue.resize(0);
       }
-      
+
       function canQueueWeaponDown(param1:PotentialWeaponInputQueueStruct) : Bool
       {
          if(mNextWeaponCommand != null || currentWeaponController.weaponDownActive || param1.weaponController != null && param1.weaponController.IsInCooldown)
@@ -290,7 +309,7 @@ public function  get_weaponControllers() : Vector<WeaponController>
          }
          return true;
       }
-      
+
       function canQueueWeaponUp(param1:PotentialWeaponInputQueueStruct) : Bool
       {
          if(mNextWeaponCommand != null && mNextWeaponCommand.down && mNextWeaponCommand.weaponController == param1.weaponController)
@@ -311,14 +330,14 @@ public function  get_weaponControllers() : Vector<WeaponController>
          }
          return currentWeaponController.canQueue(param1,mQueueNextAttackWindow);
       }
-      
+
       @:isVar var currentWeaponController(get,never):WeaponController;
 function  get_currentWeaponController() : WeaponController
       {
          return mWeaponControllers[mDistributedPlayerOwner.currentWeaponIndex];
       }
-      
-      function tryAttack() 
+
+      function tryAttack()
       {
          var _loc1_:ScriptTimeline = null;
          if(mNextWeaponCommand == null)
@@ -385,7 +404,7 @@ function  get_currentWeaponController() : WeaponController
             mNextWeaponCommand = null;
          }
       }
-      
+
       public function isCharging() : Bool
       {
          var _loc1_= 0;
@@ -400,8 +419,8 @@ function  get_currentWeaponController() : WeaponController
          }
          return false;
       }
-      
-      public function onWeaponDown(param1:UInt, param2:Bool) 
+
+      public function onWeaponDown(param1:UInt, param2:Bool)
       {
          var _loc3_= mDistributedPlayerOwner.weaponControllers[(param1 : Int)];
          if(_loc3_ != null)
@@ -410,8 +429,8 @@ function  get_currentWeaponController() : WeaponController
             _loc3_.onWeaponDown(param2);
          }
       }
-      
-      public function onWeaponUp(param1:UInt, param2:Bool) 
+
+      public function onWeaponUp(param1:UInt, param2:Bool)
       {
          var _loc3_= mDistributedPlayerOwner.weaponControllers[(param1 : Int)];
          if(_loc3_ != null)
@@ -421,8 +440,8 @@ function  get_currentWeaponController() : WeaponController
             mDistributedPlayerOwner.currentWeaponIndex = (param1 : Int);
          }
       }
-      
-      public function resetCombosOnAllBut(param1:UInt = null) 
+
+      public function resetCombosOnAllBut(param1:UInt = null)
 {
          if (param1 == null) param1 = (Std.int(4294967295) : UInt);
          var _loc2_= 0;
@@ -441,8 +460,8 @@ function  get_currentWeaponController() : WeaponController
             _loc2_ = ASCompat.toInt(_loc2_) + 1;
          }
       }
-      
-      public function resetWeapons() 
+
+      public function resetWeapons()
       {
          var _loc1_= 0;
          var _loc2_:WeaponController = null;
@@ -458,8 +477,8 @@ function  get_currentWeaponController() : WeaponController
             _loc1_ = ASCompat.toInt(_loc1_) + 1;
          }
       }
-      
-      public function playPotentialPotionAttack(param1:UInt) 
+
+      public function playPotentialPotionAttack(param1:UInt)
       {
          var _loc3_= ASCompat.dynamicAs(mDBFacade.gameMaster.stackableById.itemFor(param1), gameMasterDictionary.GMStackable);
          if(_loc3_ == null)
@@ -484,8 +503,8 @@ function  get_currentWeaponController() : WeaponController
             mDistributedPlayerOwner.attack(_loc4_.Id,null,_loc4_.AttackSpdF,_loc6_);
          }
       }
-      
-      function berserkModeStart(param1:GameObjectEvent) 
+
+      function berserkModeStart(param1:GameObjectEvent)
       {
          var _loc2_:ChargeWeaponController = null;
          var _loc3_= 0;
@@ -500,8 +519,8 @@ function  get_currentWeaponController() : WeaponController
             _loc3_ = ASCompat.toInt(_loc3_) + 1;
          }
       }
-      
-      function berserkModeEnd(param1:GameObjectEvent) 
+
+      function berserkModeEnd(param1:GameObjectEvent)
       {
          var _loc2_:ChargeWeaponController = null;
          var _loc3_= 0;
@@ -516,22 +535,24 @@ function  get_currentWeaponController() : WeaponController
             _loc3_ = ASCompat.toInt(_loc3_) + 1;
          }
       }
-      
-      public function tryToDoConsumableAttack(param1:UInt) 
+
+      public function tryToDoConsumableAttack(param1:UInt)
       {
          if(mConsumableControllers[(param1 : Int)] != null && !mConsumableControllers[(param1 : Int)].IsInCooldown)
          {
             mConsumableControllers[(param1 : Int)].consume();
          }
       }
-      
-      public function stopAttacking() 
+
+      public function stopAttacking()
       {
          mNextWeaponCommand = null;
+         mLastQueuedTimeline = null;
+         mLastQueuedTimelineTick = -1;
          mPotentialWeaponInputQueue.resize(0);
       }
-      
-      public function clearInput() 
+
+      public function clearInput()
       {
          stopAttacking();
          var _loc1_:WeaponController;
@@ -545,8 +566,8 @@ function  get_currentWeaponController() : WeaponController
             }
          }
       }
-      
-      public function destroy() 
+
+      public function destroy()
       {
          var _loc1_= 0;
          _loc1_ = 0;

@@ -10,41 +10,43 @@ package combat.weapon
    import events.FirstCooldownEvent;
    import facade.DBFacade;
    import gameMasterDictionary.GMAttack;
-   
+
     class WeaponController
    {
-      
+
       static inline final RAMPAGE_ATTACK_CONSTANT= "RAMPAGE";
-      
+
       var mDBFacade:DBFacade;
-      
+
       var mLogicalWorkComponent:LogicalWorkComponent;
-      
+
       var mWeapon:WeaponGameObject;
-      
+
       var mHero:HeroGameObjectOwner;
-      
+
       var mCurrentAttackTimeline:AttackTimeline;
-      
+
       var mNextAttackComboIndex:Int = 0;
-      
+
       var mAttackArray:Array<ASAny>;
-      
+
       var mAutoAim:Bool = false;
-      
+
       var mWeaponDownActive:Bool = false;
-      
+
       var mCoolDownTime:Float = Math.NaN;
-      
+
       var mIsInCooldown:Bool = false;
-      
+
       var mTimeStartedAttack:Float = Math.NaN;
-      
+
+      var mTimeStartedCurrentAttack:Int = 0;
+
       var mQueueAttack:GMAttack;
-      
+
       public function new(param1:DBFacade, param2:WeaponGameObject, param3:HeroGameObjectOwner)
       {
-         
+
          mDBFacade = param1;
          mWeapon = param2;
          mHero = param3;
@@ -52,24 +54,24 @@ package combat.weapon
          mQueueAttack = null;
          buildAttackArray();
       }
-      
-      public function reset() 
+
+      public function reset()
       {
          resetCombos();
          stopCurrentTimeline();
          clear();
       }
-      
-      public function clear() 
+
+      public function clear()
       {
       }
-      
-      function buildAttacks() 
+
+      function buildAttacks()
       {
          buildAttackArray();
       }
-      
-      function stopCurrentTimeline() 
+
+      function stopCurrentTimeline()
       {
          if(mCurrentAttackTimeline != null && mCurrentAttackTimeline.isPlaying)
          {
@@ -77,7 +79,7 @@ package combat.weapon
          }
          mCurrentAttackTimeline = null;
       }
-      
+
       @:isVar public var IsInCooldown(get,never):Bool;
 public function  get_IsInCooldown() : Bool
       {
@@ -87,8 +89,8 @@ public function  get_IsInCooldown() : Bool
          }
          return mIsInCooldown;
       }
-      
-      function attack(param1:UInt, param2:Bool, param3:Float = 1, param4:Bool = true) 
+
+      function attack(param1:UInt, param2:Bool, param3:Float = 1, param4:Bool = true)
       {
          var speedIndex:UInt;
          var actorAttackSpeed:Float;
@@ -122,6 +124,7 @@ public function  get_IsInCooldown() : Bool
          }
          stopCurrentTimeline();
          mCurrentAttackTimeline = mWeapon.getAttackTimeline(attackType);
+         mTimeStartedCurrentAttack = mLogicalWorkComponent.gameClock.gameTime;
          if(mCurrentAttackTimeline == null)
          {
             Logger.error("AttackTimeline for attack: <" + attackType + "> was null. Ignoring onWeaponDown");
@@ -140,8 +143,8 @@ public function  get_IsInCooldown() : Bool
             startCooldown();
          }
       }
-      
-      function finishedAttack(param1:Bool, param2:UInt) 
+
+      function finishedAttack(param1:Bool, param2:UInt)
       {
          if(mQueueAttack != null)
          {
@@ -149,8 +152,8 @@ public function  get_IsInCooldown() : Bool
             mQueueAttack = null;
          }
       }
-      
-      public function doQueue() 
+
+      public function doQueue()
       {
          if(mQueueAttack != null)
          {
@@ -158,8 +161,8 @@ public function  get_IsInCooldown() : Bool
             mQueueAttack = null;
          }
       }
-      
-      public function startCooldown() 
+
+      public function startCooldown()
       {
          mIsInCooldown = true;
          var _loc1_= ASCompat.floatAsBool(currentTimeline.currentGMAttack.CooldownLength) ? currentTimeline.currentGMAttack.CooldownLength : currentTimeline.currentGMAttack.AIRechargeT;
@@ -172,8 +175,8 @@ public function  get_IsInCooldown() : Bool
             mDBFacade.eventManager.dispatchEvent(new FirstCooldownEvent());
          }
       }
-      
-      public function updateCooldown(param1:GameClock) 
+
+      public function updateCooldown(param1:GameClock)
       {
          if(param1.gameTime - mTimeStartedAttack >= mCoolDownTime)
          {
@@ -182,8 +185,8 @@ public function  get_IsInCooldown() : Bool
             updateHudCooldown(false);
          }
       }
-      
-      function updateHudCooldown(param1:Bool) 
+
+      function updateHudCooldown(param1:Bool)
       {
          if(param1)
          {
@@ -194,7 +197,7 @@ public function  get_IsInCooldown() : Bool
             mDBFacade.hud.stopCooldown(weapon.slot);
          }
       }
-      
+
       function getNextAttackId() : UInt
       {
          var _loc2_= 0;
@@ -209,8 +212,8 @@ public function  get_IsInCooldown() : Bool
          }
          return (_loc2_ : UInt);
       }
-      
-      function buildAttackArray() 
+
+      function buildAttackArray()
       {
          var _loc3_:GMAttack = null;
          mAttackArray = [];
@@ -238,12 +241,12 @@ public function  get_IsInCooldown() : Bool
             Logger.warn("Did not find any attacks for weaponId: " + mWeapon.weaponData.Id);
          }
       }
-      
-      public function resetCombos() 
+
+      public function resetCombos()
       {
          mNextAttackComboIndex = 0;
       }
-      
+
       function getAttackFromComboArray() : GMAttack
       {
          var _loc1_= (Std.int(!mWeapon.weaponData.ChooseRandomAttack ? mNextAttackComboIndex : mAttackArray.length * Math.random() - 1) : UInt);
@@ -255,8 +258,8 @@ public function  get_IsInCooldown() : Bool
          incrementCombo();
          return _loc2_;
       }
-      
-      function incrementCombo() 
+
+      function incrementCombo()
       {
          mNextAttackComboIndex = mNextAttackComboIndex + 1;
          if(mNextAttackComboIndex >= mAttackArray.length)
@@ -264,7 +267,7 @@ public function  get_IsInCooldown() : Bool
             mNextAttackComboIndex = 0;
          }
       }
-      
+
       public function canQueue(param1:PotentialWeaponInputQueueStruct, param2:Float) : Bool
       {
          if(mIsInCooldown)
@@ -288,7 +291,7 @@ public function  get_IsInCooldown() : Bool
          }
          return false;
       }
-      
+
       public function canCombo() : Bool
       {
          if(mCurrentAttackTimeline != null)
@@ -301,21 +304,21 @@ public function  get_IsInCooldown() : Bool
          }
          return true;
       }
-      
-      public function berserkModeStart() 
+
+      public function berserkModeStart()
       {
          if(mWeapon.weaponData.ClassType == "MELEE")
          {
             overrideAttacksWithRampage();
          }
       }
-      
-      public function berserkModeEnd() 
+
+      public function berserkModeEnd()
       {
          buildAttacks();
       }
-      
-      function overrideAttacksWithRampage() 
+
+      function overrideAttacksWithRampage()
       {
          var _loc1_= ASCompat.dynamicAs(mDBFacade.gameMaster.attackByConstant.itemFor("RAMPAGE"), gameMasterDictionary.GMAttack);
          if(_loc1_ == null)
@@ -327,47 +330,53 @@ public function  get_IsInCooldown() : Bool
          mAttackArray.push(_loc1_);
          mNextAttackComboIndex = 0;
       }
-      
-      function notEnoughMana() 
+
+      function notEnoughMana()
       {
          mHero.distributedDungeonFloor.effectManager.playNotEnoughManaEffects();
       }
-      
-      public function onWeaponDown(param1:Bool = true) 
+
+      public function onWeaponDown(param1:Bool = true)
       {
          mAutoAim = param1;
       }
-      
+
       @:isVar public var weaponDownActive(get,never):Bool;
 public function  get_weaponDownActive() : Bool
       {
          return mWeaponDownActive;
       }
-      
-      public function onWeaponUp(param1:Bool = true) 
+
+      public function onWeaponUp(param1:Bool = true)
       {
          mAutoAim = param1;
       }
-      
+
       @:isVar public var weapon(get,never):WeaponGameObject;
 public function  get_weapon() : WeaponGameObject
       {
          return mWeapon;
       }
-      
+
       @:isVar public var currentTimeline(get,never):ScriptTimeline;
 public function  get_currentTimeline() : ScriptTimeline
       {
          return mCurrentAttackTimeline;
       }
-      
+
+      @:isVar public var currentAttackStartTime(get,never):Int;
+public function  get_currentAttackStartTime() : Int
+      {
+         return mTimeStartedCurrentAttack;
+      }
+
       @:isVar public var weaponRange(get,never):UInt;
 public function  get_weaponRange() : UInt
       {
          return (0 : UInt);
       }
-      
-      public function queueAttack(param1:String) 
+
+      public function queueAttack(param1:String)
       {
          mQueueAttack = ASCompat.dynamicAs(mDBFacade.gameMaster.attackByConstant.itemFor(param1), gameMasterDictionary.GMAttack);
          if(mQueueAttack == null)
@@ -375,13 +384,13 @@ public function  get_weaponRange() : UInt
             Logger.error("Queue Attack doesn\'t exist!");
          }
       }
-      
+
       public function isRepeater() : Bool
       {
          return false;
       }
-      
-      public function destroy() 
+
+      public function destroy()
       {
          mIsInCooldown = false;
          if(mLogicalWorkComponent != null)

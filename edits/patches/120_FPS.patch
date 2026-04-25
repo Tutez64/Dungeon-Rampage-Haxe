@@ -6,8 +6,8 @@ Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
 <+>UTF-8
 ===================================================================
 diff --git a/src/actor/FloatingMessage.hx b/src/actor/FloatingMessage.hx
---- a/src/actor/FloatingMessage.hx	(revision a9e410d8dfab55119fb74203f4469f8148a7f423)
-+++ b/src/actor/FloatingMessage.hx	(date 1776994195029)
+--- a/src/actor/FloatingMessage.hx	(revision 01acca451363f537dbdaab9a860100b5e1ef999e)
++++ b/src/actor/FloatingMessage.hx	(date 1777079914727)
 @@ -72,7 +72,7 @@
        
        function damageFloaterTween() 
@@ -32,8 +32,8 @@ Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
 <+>UTF-8
 ===================================================================
 diff --git a/src/uI/map/UIMapWorldMap.hx b/src/uI/map/UIMapWorldMap.hx
---- a/src/uI/map/UIMapWorldMap.hx	(revision a9e410d8dfab55119fb74203f4469f8148a7f423)
-+++ b/src/uI/map/UIMapWorldMap.hx	(date 1776994920269)
+--- a/src/uI/map/UIMapWorldMap.hx	(revision 01acca451363f537dbdaab9a860100b5e1ef999e)
++++ b/src/uI/map/UIMapWorldMap.hx	(date 1777079914819)
 @@ -1250,7 +1250,8 @@
           var _loc3_= ASCompat.toNumber(mCameraTargetX - ASCompat.toNumberField((mRootMovieClip : ASAny).worldmap, "x"));
           var _loc4_= ASCompat.toNumber(mCameraTargetY - ASCompat.toNumberField((mRootMovieClip : ASAny).worldmap, "y"));
@@ -44,14 +44,218 @@ diff --git a/src/uI/map/UIMapWorldMap.hx b/src/uI/map/UIMapWorldMap.hx
           var __tmpAssignObj11:ASAny = (mRootMovieClip : ASAny).worldmap;
           ASCompat.setProperty(__tmpAssignObj11, "x", __tmpAssignObj11.x + mCameraVelocityX);
           clampMap();
+Index: src/combat/weapon/ScalingWeaponController.hx
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/combat/weapon/ScalingWeaponController.hx b/src/combat/weapon/ScalingWeaponController.hx
+--- a/src/combat/weapon/ScalingWeaponController.hx	(revision 01acca451363f537dbdaab9a860100b5e1ef999e)
++++ b/src/combat/weapon/ScalingWeaponController.hx	(date 1777079896566)
+@@ -10,61 +10,61 @@
+    import facade.DBFacade;
+    import gameMasterDictionary.GMAttack;
+    import gameMasterDictionary.GMModifier;
+-   
++
+     class ScalingWeaponController extends WeaponController
+    {
+-      
++
+       public static inline final SCALING_EFFECT_SWF= "Resources/Art2D/FX/db_fx_library.swf";
+-      
++
+       var mPowerMultiplier:Float = 1;
+-      
++
+       var mProjectileMinMultiplier:UInt = (1 : UInt);
+-      
++
+       var mProjectileMaxMultiplier:UInt = (1 : UInt);
+-      
++
+       var mProjectileStartScalingAngle:Float = 0;
+-      
++
+       var mProjectileEndScalingAngle:Float = 20;
+-      
++
+       var mProjectileScaleTapAttack:Bool = false;
+-      
++
+       var mDistanceScalingTime:Float = 0;
+-      
++
+       var mDistanceScalingForHeroMin:Float = 0;
+-      
++
+       var mDistanceScalingForHeroMax:Float = 0;
+-      
++
+       var mDistanceScalingForProjectilesMin:Float = 0;
+-      
++
+       var mDistanceScalingForProjectilesMax:Float = 0;
+-      
++
+       var mTotalTime:Float = 0;
+-      
+-      var mFramesFinished:UInt = (0 : UInt);
+-      
++
++      var mFramesFinished:Float = 0;
++
+       var mPlayerExittedState:Bool = false;
+-      
++
+       var mChargeReleaseGMAttack:GMAttack;
+-      
++
+       var NOT_ENOUGH_MANA_ON_CHARGE_DELAY:Float = 0.2;
+-      
++
+       var mNotEnoughManaTask:Task;
+-      
++
+       var mScalingLogicalWorkComponent:LogicalWorkComponent;
+-      
++
+       var mHoldingAttack:GMAttack;
+-      
++
+       var mHoldingAttackTimeline:AttackTimeline;
+-      
++
+       var mTutorialMessageSent:Bool = false;
+-      
++
+       public function new(param1:DBFacade, param2:WeaponGameObject, param3:HeroGameObjectOwner)
+       {
+          super(param1,param2,param3);
+          buildControllerAttacks();
+       }
+-      
+-      public function buildControllerAttacks() 
++
++      public function buildControllerAttacks()
+       {
+          mScalingLogicalWorkComponent = new LogicalWorkComponent(mDBFacade,"ScalingWeaponController");
+          mHoldingAttack = ASCompat.dynamicAs(mDBFacade.gameMaster.attackByConstant.itemFor(mWeapon.weaponData.HoldingAttack), gameMasterDictionary.GMAttack);
+@@ -74,8 +74,8 @@
+          }
+          setAttributes();
+       }
+-      
+-      public function setAttributes() 
++
++      public function setAttributes()
+       {
+          mPowerMultiplier = mWeapon.weaponData.ScalingMaxPowerMultiplier;
+          mProjectileScaleTapAttack = mWeapon.weaponData.ScaleTapAttack;
+@@ -92,8 +92,8 @@
+          mChargeReleaseGMAttack = ASCompat.dynamicAs(mDBFacade.gameMaster.attackByConstant.itemFor(_loc1_), gameMasterDictionary.GMAttack);
+          setTotalTime();
+       }
+-      
+-      public function setTotalTime() 
++
++      public function setTotalTime()
+       {
+          mTotalTime = mWeapon.weaponData.ControllerTimeTillEnd;
+          if(mTotalTime == 0)
+@@ -101,25 +101,25 @@
+             Logger.error("Weapon has no ControllerTimeTillEnd data set !");
+          }
+       }
+-      
++
+       public function setStartEffectTotalTime() : Float
+       {
+          return 1.2;
+       }
+-      
+-      public function startHoldingAttack() 
++
++      public function startHoldingAttack()
+       {
+          var _loc1_= 1 / mTotalTime * setStartEffectTotalTime();
+          attack(mHoldingAttack.Id,mAutoAim,_loc1_);
+       }
+-      
+-      override public function onWeaponDown(param1:Bool = true) 
++
++      override public function onWeaponDown(param1:Bool = true)
+       {
+          var autoAim= param1;
+          if(!mWeaponDownActive)
+          {
+             super.onWeaponDown(autoAim);
+-            mFramesFinished = (0 : UInt);
++            mFramesFinished = 0;
+             mWeaponDownActive = true;
+             mScalingLogicalWorkComponent.clear();
+             if(mTotalTime > 0)
+@@ -146,8 +146,8 @@
+             mPlayerExittedState = false;
+          }
+       }
+-      
+-      override public function onWeaponUp(param1:Bool = true) 
++
++      override public function onWeaponUp(param1:Bool = true)
+       {
+          var _loc12_:GMModifier;
+          var __ax4_iter_0:Vector<GMModifier>;
+@@ -268,15 +268,15 @@
+          }
+          clear();
+       }
+-      
+-      public function update(param1:GameClock) 
++
++      public function update(param1:GameClock)
+       {
+-         mFramesFinished = mFramesFinished + 1;
++         mFramesFinished += param1.tickLength / GameClock.ANIMATION_FRAME_DURATION;
+       }
+-      
+-      override public function clear() 
++
++      override public function clear()
+       {
+-         mFramesFinished = (0 : UInt);
++         mFramesFinished = 0;
+          mScalingLogicalWorkComponent.clear();
+          mWeaponDownActive = false;
+          if(mNotEnoughManaTask != null)
+@@ -285,7 +285,7 @@
+             mNotEnoughManaTask = null;
+          }
+       }
+-      
++
+       override public function canCombo() : Bool
+       {
+          if(mCurrentAttackTimeline != null)
+@@ -302,8 +302,8 @@
+          }
+          return true;
+       }
+-      
+-      override public function destroy() 
++
++      override public function destroy()
+       {
+          super.destroy();
+          mScalingLogicalWorkComponent.destroy();
 Index: src/combat/attack/ScriptTimeline.hx
 IDEA additional info:
 Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
 <+>UTF-8
 ===================================================================
 diff --git a/src/combat/attack/ScriptTimeline.hx b/src/combat/attack/ScriptTimeline.hx
---- a/src/combat/attack/ScriptTimeline.hx	(revision a9e410d8dfab55119fb74203f4469f8148a7f423)
-+++ b/src/combat/attack/ScriptTimeline.hx	(date 1776995404467)
+--- a/src/combat/attack/ScriptTimeline.hx	(revision 01acca451363f537dbdaab9a860100b5e1ef999e)
++++ b/src/combat/attack/ScriptTimeline.hx	(date 1777079914799)
 @@ -16,69 +16,69 @@
     import org.as3commons.collections.framework.ILinkedListIterator;
     import org.as3commons.collections.framework.IListIterator;
@@ -525,14 +729,191 @@ diff --git a/src/combat/attack/ScriptTimeline.hx b/src/combat/attack/ScriptTimel
        {
           var _loc1_:IListIterator = null;
           var _loc2_:ColliderTimelineAction = null;
+Index: src/combat/attack/AutoMoveTimelineAction.hx
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/combat/attack/AutoMoveTimelineAction.hx b/src/combat/attack/AutoMoveTimelineAction.hx
+--- a/src/combat/attack/AutoMoveTimelineAction.hx	(revision 01acca451363f537dbdaab9a860100b5e1ef999e)
++++ b/src/combat/attack/AutoMoveTimelineAction.hx	(date 1777079896590)
+@@ -1,76 +1,96 @@
+ package combat.attack
+ ;
+-   import actor.ActorGameObject;
+-   import actor.ActorView;
+-   import brain.clock.GameClock;
+-   import brain.logger.Logger;
+-   import brain.workLoop.Task;
+-   import distributedObjects.HeroGameObjectOwner;
+-   import facade.DBFacade;
+-   import gameMasterDictionary.GMAttack;
+-   import flash.geom.Vector3D;
+-   
+-    class AutoMoveTimelineAction extends AttackTimelineAction
+-   {
+-      
+-      public static inline final TYPE= "automove";
+-      
+-      var mTask:Task;
+-      
+-      var mAttack:GMAttack;
+-      
+-      var mDistance:Float = Math.NaN;
+-      
+-      var mDuration:Float = Math.NaN;
+-      
+-      var mAngle:Float = Math.NaN;
+-      
+-      public function new(param1:ActorGameObject, param2:ActorView, param3:DBFacade)
+-      {
+-         super(param1,param2,param3);
+-      }
+-      
+-      public static function buildFromJson(param1:ActorGameObject, param2:ActorView, param3:DBFacade) : AutoMoveTimelineAction
+-      {
+-         if(param1.isOwner)
+-         {
+-            return new AutoMoveTimelineAction(param1,param2,param3);
+-         }
+-         return null;
+-      }
+-      
+-      override public function execute(param1:ScriptTimeline) 
+-      {
+-         super.execute(param1);
+-         var _loc4_= cast(mActorGameObject, HeroGameObjectOwner);
+-         if(mDuration <= 0 || Math.isNaN(mAngle))
+-         {
+-            Logger.warn("Invalid data for AutoMoveTimelineAction. mDistance: " + mDistance + " mDuration: " + mDuration + " mAngle: " + mAngle + " attack: " + mAttackType);
+-            return;
+-         }
+-         var _loc5_= mDistance / mDuration;
+-         var _loc3_= mAngle * 3.141592653589793 / 180;
+-         var _loc2_= new Vector3D(Math.cos(_loc3_) * _loc5_,Math.sin(_loc3_) * _loc5_);
+-         _loc4_.autoMoveVelocity = _loc2_;
+-         mTask = mWorkComponent.doLater(mDuration,resetVelocity);
+-      }
+-      
+-      function resetVelocity(param1:GameClock) 
+-      {
+-         var _loc2_= cast(mActorGameObject, HeroGameObjectOwner);
+-         _loc2_.autoMoveVelocity.scaleBy(0);
+-      }
+-      
+-      override public function destroy() 
+-      {
+-         if(mTask != null)
+-         {
+-            resetVelocity(null);
+-            mTask.destroy();
+-            mTask = null;
+-         }
+-         super.destroy();
+-      }
+-   }
++import actor.ActorGameObject;
++import actor.ActorView;
++import brain.clock.GameClock;
++import brain.logger.Logger;
++import box2D.common.B2Settings;
++import brain.workLoop.Task;
++import distributedObjects.HeroGameObjectOwner;
++import facade.DBFacade;
++import gameMasterDictionary.GMAttack;
++import flash.geom.Vector3D;
++
++class AutoMoveTimelineAction extends AttackTimelineAction
++{
++
++   public static inline final TYPE= "automove";
++
++   static final MAX_AUTO_MOVE_TRANSLATION_PER_STEP:Float = B2Settings.b2_maxTranslation * 50;
++   static final LEGACY_MAX_AUTO_MOVE_SPEED:Float = MAX_AUTO_MOVE_TRANSLATION_PER_STEP / GameClock.ANIMATION_FRAME_DURATION;
++
++   var mTask:Task;
++
++   var mAttack:GMAttack;
++
++   var mDistance:Float = Math.NaN;
++
++   var mDuration:Float = Math.NaN;
++
++   var mAngle:Float = Math.NaN;
++
++   public function new(param1:ActorGameObject, param2:ActorView, param3:DBFacade)
++   {
++      super(param1,param2,param3);
++   }
++
++   public static function buildFromJson(param1:ActorGameObject, param2:ActorView, param3:DBFacade) : AutoMoveTimelineAction
++   {
++      if(param1.isOwner)
++      {
++         return new AutoMoveTimelineAction(param1,param2,param3);
++      }
++      return null;
++   }
++
++   override public function execute(param1:ScriptTimeline)
++   {
++      super.execute(param1);
++      var _loc4_= cast(mActorGameObject, HeroGameObjectOwner);
++      var _loc6_= Math.NaN;
++      var _loc7_= 0;
++      var _loc8_= 0;
++      var _loc9_= Math.NaN;
++      var _loc10_= Math.NaN;
++      var _loc11_= 0;
++      var _loc12_= 0;
++      var _loc13_= Math.NaN;
++      if(mDuration <= 0 || Math.isNaN(mAngle))
++      {
++         Logger.warn("Invalid data for AutoMoveTimelineAction. mDistance: " + mDistance + " mDuration: " + mDuration + " mAngle: " + mAngle + " attack: " + mAttackType);
++         return;
++      }
++      _loc6_ = Math.max(mDBFacade.gameClock.tickLength,0.000001);
++      _loc11_ = Std.int(mDuration * 1000);
++      _loc12_ = Std.int(Math.max(Std.int(_loc6_ * 1000),1));
++      _loc7_ = Std.int(Math.ceil(_loc11_ / Math.max(Std.int(GameClock.ANIMATION_FRAME_DURATION * 1000),1))) + 1;
++      _loc8_ = Std.int(Math.ceil(_loc11_ / _loc12_)) + 1;
++      _loc13_ = Math.min(mDistance / mDuration,LEGACY_MAX_AUTO_MOVE_SPEED);
++      _loc9_ = _loc13_ * _loc7_ * GameClock.ANIMATION_FRAME_DURATION;
++      _loc10_ = Math.max(_loc8_ * _loc6_,_loc6_);
++      var _loc5_= _loc9_ / _loc10_;
++      var _loc3_= mAngle * 3.141592653589793 / 180;
++      var _loc2_= new Vector3D(Math.cos(_loc3_) * _loc5_,Math.sin(_loc3_) * _loc5_);
++      _loc4_.autoMoveVelocity = _loc2_;
++      mTask = mWorkComponent.doLater(mDuration,resetVelocity);
++   }
++
++   function resetVelocity(param1:GameClock)
++   {
++      var _loc2_= cast(mActorGameObject, HeroGameObjectOwner);
++      _loc2_.autoMoveVelocity.scaleBy(0);
++   }
++
++   override public function destroy()
++   {
++      if(mTask != null)
++      {
++         resetVelocity(null);
++         mTask.destroy();
++         mTask = null;
++      }
++      super.destroy();
++   }
++}
+ 
+ 
 Index: src/actor/MovementController.hx
 IDEA additional info:
 Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
 <+>UTF-8
 ===================================================================
 diff --git a/src/actor/MovementController.hx b/src/actor/MovementController.hx
---- a/src/actor/MovementController.hx	(revision a9e410d8dfab55119fb74203f4469f8148a7f423)
-+++ b/src/actor/MovementController.hx	(date 1776994333143)
+--- a/src/actor/MovementController.hx	(revision 01acca451363f537dbdaab9a860100b5e1ef999e)
++++ b/src/actor/MovementController.hx	(date 1777079914739)
 @@ -130,7 +130,9 @@
           var _loc5_:Vector3D = null;
           var _loc2_= Math.NaN;
@@ -555,14 +936,789 @@ diff --git a/src/actor/MovementController.hx b/src/actor/MovementController.hx
           {
              if(mPositionLerpTask != null)
              {
+Index: src/combat/attack/PlayerOwnerAttackController.hx
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/combat/attack/PlayerOwnerAttackController.hx b/src/combat/attack/PlayerOwnerAttackController.hx
+--- a/src/combat/attack/PlayerOwnerAttackController.hx	(revision 01acca451363f537dbdaab9a860100b5e1ef999e)
++++ b/src/combat/attack/PlayerOwnerAttackController.hx	(date 1777079896630)
+@@ -2,6 +2,7 @@
+ ;
+    import actor.buffs.BuffHandler;
+    import actor.player.HeroView;
++   import brain.clock.GameClock;
+    import brain.event.EventComponent;
+    import brain.logger.Logger;
+    import brain.workLoop.LogicalWorkComponent;
+@@ -18,47 +19,53 @@
+    import facade.DBFacade;
+    import gameMasterDictionary.GMAttack;
+    import gameMasterDictionary.GMStackable;
+-   
++
+     class PlayerOwnerAttackController
+    {
+-      
++
+       public static inline final DUNGEON_BUSTER_WEAPON_INDEX= (3 : UInt);
+-      
++
++      static final LEGACY_ATTACK_QUEUE_INTERVAL_MS:Int = Std.int(GameClock.ANIMATION_FRAME_DURATION * 1000);
++
+       var CHARGE_UP:String = "CHARGE_UP";
+-      
++
+       var SCALING:String = "SCALING";
+-      
++
+       var REPEATER:String = "REPEATER";
+-      
++
+       var SHIELD:String = "BLOCKING";
+-      
++
+       var mDistributedPlayerOwner:HeroGameObjectOwner;
+-      
++
+       var mDBFacade:DBFacade;
+-      
++
+       var mLogicalWorkComponent:LogicalWorkComponent;
+-      
++
+       var mEventComponent:EventComponent;
+-      
++
+       var mPotentialWeaponInputQueue:Array<ASAny>;
+-      
++
+       var mQueueNextAttackWindow:Float = Math.NaN;
+-      
++
++      var mLastQueuedTimeline:ScriptTimeline;
++
++      var mLastQueuedTimelineTick:Int = -1;
++
+       var mNextWeaponCommand:PotentialWeaponInputQueueStruct;
+-      
++
+       var mDungeonBusterGMAttack:GMAttack;
+-      
++
+       var mDungeonBusterAttackTimeline:AttackTimeline;
+-      
++
+       var mIsDungeonBusterUsed:Bool = false;
+-      
++
+       var mWeaponControllers:Vector<WeaponController>;
+-      
++
+       var mConsumableControllers:Vector<ConsumableWeaponController>;
+-      
++
+       public function new(param1:HeroGameObjectOwner, param2:HeroView, param3:DBFacade)
+       {
+-         
++
+          mDistributedPlayerOwner = param1;
+          mDBFacade = param3;
+          mPotentialWeaponInputQueue = [];
+@@ -72,8 +79,8 @@
+          buildDungeonBuster();
+          mQueueNextAttackWindow = mDBFacade.dbConfigManager.getConfigNumber("QUEUE_NEXT_ATTACK_WINDOW",0.4);
+       }
+-      
+-      function buildWeaponControllers() 
++
++      function buildWeaponControllers()
+       {
+          var _loc3_:WeaponController = null;
+          mWeaponControllers = new Vector<WeaponController>();
+@@ -95,8 +102,8 @@
+             _loc2_++;
+          }
+       }
+-      
+-      function buildConsumableControllers() 
++
++      function buildConsumableControllers()
+       {
+          var _loc1_:ConsumableWeaponController = null;
+          mConsumableControllers = new Vector<ConsumableWeaponController>();
+@@ -118,7 +125,7 @@
+             _loc2_++;
+          }
+       }
+-      
++
+       function determineWeaponController(param1:WeaponGameObject) : WeaponController
+       {
+          var _loc2_:WeaponController = null;
+@@ -126,38 +133,38 @@
+          {
+             case (_ == CHARGE_UP => true):
+                _loc2_ = new ChargeWeaponController(mDBFacade,param1,mDistributedPlayerOwner);
+-               
++
+             case (_ == SCALING => true):
+                _loc2_ = new ScalingWeaponController(mDBFacade,param1,mDistributedPlayerOwner);
+-               
++
+             case (_ == REPEATER => true):
+                _loc2_ = new RepeaterWeaponController(mDBFacade,param1,mDistributedPlayerOwner);
+-               
++
+             case (_ == SHIELD => true):
+                _loc2_ = new ShieldWeaponController(mDBFacade,param1,mDistributedPlayerOwner);
+-               
++
+             default:
+                Logger.warn("Unable to determine weapon controller for GMWeaponItem.WeaponController: " + param1.weaponData.WeaponController + ".  Using ChargeWeaponController as default.");
+                _loc2_ = new ChargeWeaponController(mDBFacade,param1,mDistributedPlayerOwner);
+          }
+          return _loc2_;
+       }
+-      
+-      function buildDungeonBuster() 
++
++      function buildDungeonBuster()
+       {
+          var _loc1_= mDistributedPlayerOwner.gMHero.DBuster1;
+          mDungeonBusterGMAttack = ASCompat.dynamicAs(mDBFacade.gameMaster.attackByConstant.itemFor(_loc1_), gameMasterDictionary.GMAttack);
+          mDungeonBusterAttackTimeline = mDBFacade.timelineFactory.createAttackTimeline(mDungeonBusterGMAttack.AttackTimeline,null,mDistributedPlayerOwner,mDistributedPlayerOwner.distributedDungeonFloor);
+          mDistributedPlayerOwner.maxBusterPoints = mDungeonBusterGMAttack.CrowdCost;
+       }
+-      
++
+       @:isVar public var weaponControllers(get,never):Vector<WeaponController>;
+ public function  get_weaponControllers() : Vector<WeaponController>
+       {
+          return mWeaponControllers;
+       }
+-      
+-      public function scrollWeapons(param1:Bool) 
++
++      public function scrollWeapons(param1:Bool)
+       {
+          if(currentWeaponController.currentTimeline == null)
+          {
+@@ -171,8 +178,8 @@
+             }
+          }
+       }
+-      
+-      function equipNextWeapon() 
++
++      function equipNextWeapon()
+       {
+          var _loc2_= this.mDistributedPlayerOwner.currentWeaponIndex;
+          var _loc1_= _loc2_ + 1;
+@@ -190,8 +197,8 @@
+             _loc1_++;
+          }
+       }
+-      
+-      function equipPreviousWeapon() 
++
++      function equipPreviousWeapon()
+       {
+          var _loc2_= this.mDistributedPlayerOwner.currentWeaponIndex;
+          var _loc1_= _loc2_ - 1;
+@@ -209,8 +216,8 @@
+             _loc1_--;
+          }
+       }
+-      
+-      public function playDungeonBusterAttack() 
++
++      public function playDungeonBusterAttack()
+       {
+          if(mDistributedPlayerOwner.stateMachine.currentStateName == "ActorDefaultState" && mDistributedPlayerOwner.canInitiateAnAttack)
+          {
+@@ -223,7 +230,7 @@
+             mDBFacade.hud.hideBustSign();
+          }
+       }
+-      
++
+       public function canPlayDungeonBusterAttack() : Bool
+       {
+          if(mDistributedPlayerOwner.dungeonBusterPoints >= mDistributedPlayerOwner.maxBusterPoints)
+@@ -232,8 +239,8 @@
+          }
+          return false;
+       }
+-      
+-      public function addToPotentialWeaponInputQueue(param1:UInt, param2:Bool, param3:Bool) 
++
++      public function addToPotentialWeaponInputQueue(param1:UInt, param2:Bool, param3:Bool)
+       {
+          if(mDungeonBusterAttackTimeline != null && mDungeonBusterAttackTimeline.isPlaying)
+          {
+@@ -249,11 +256,21 @@
+             mPotentialWeaponInputQueue.push(new PotentialWeaponInputQueueStruct(mWeaponControllers[(param1 : Int)],param1,param2,param3));
+          }
+       }
+-      
+-      public function weaponCommandQueueUpCall() 
++
++      public function weaponCommandQueueUpCall()
+       {
+          var _loc2_:PotentialWeaponInputQueueStruct = null;
+          var _loc1_= false;
++         var _loc3_:ScriptTimeline = currentWeaponController != null ? currentWeaponController.currentTimeline : null;
++         var _loc4_= -1;
++         if(_loc3_ != null)
++         {
++            _loc4_ = Std.int((mDBFacade.gameClock.gameTime - currentWeaponController.currentAttackStartTime) / LEGACY_ATTACK_QUEUE_INTERVAL_MS);
++         }
++         if(_loc3_ != null && mLastQueuedTimeline == _loc3_ && mLastQueuedTimelineTick == _loc4_)
++         {
++            return;
++         }
+          while(mPotentialWeaponInputQueue.length > 0)
+          {
+             _loc2_ = ASCompat.dynamicAs(mPotentialWeaponInputQueue[0], combat.attack.PotentialWeaponInputQueueStruct);
+@@ -279,9 +296,11 @@
+             mPotentialWeaponInputQueue.shift();
+          }
+          tryAttack();
++         mLastQueuedTimeline = _loc3_;
++         mLastQueuedTimelineTick = _loc4_;
+          mPotentialWeaponInputQueue.resize(0);
+       }
+-      
++
+       function canQueueWeaponDown(param1:PotentialWeaponInputQueueStruct) : Bool
+       {
+          if(mNextWeaponCommand != null || currentWeaponController.weaponDownActive || param1.weaponController != null && param1.weaponController.IsInCooldown)
+@@ -290,7 +309,7 @@
+          }
+          return true;
+       }
+-      
++
+       function canQueueWeaponUp(param1:PotentialWeaponInputQueueStruct) : Bool
+       {
+          if(mNextWeaponCommand != null && mNextWeaponCommand.down && mNextWeaponCommand.weaponController == param1.weaponController)
+@@ -311,14 +330,14 @@
+          }
+          return currentWeaponController.canQueue(param1,mQueueNextAttackWindow);
+       }
+-      
++
+       @:isVar var currentWeaponController(get,never):WeaponController;
+ function  get_currentWeaponController() : WeaponController
+       {
+          return mWeaponControllers[mDistributedPlayerOwner.currentWeaponIndex];
+       }
+-      
+-      function tryAttack() 
++
++      function tryAttack()
+       {
+          var _loc1_:ScriptTimeline = null;
+          if(mNextWeaponCommand == null)
+@@ -385,7 +404,7 @@
+             mNextWeaponCommand = null;
+          }
+       }
+-      
++
+       public function isCharging() : Bool
+       {
+          var _loc1_= 0;
+@@ -400,8 +419,8 @@
+          }
+          return false;
+       }
+-      
+-      public function onWeaponDown(param1:UInt, param2:Bool) 
++
++      public function onWeaponDown(param1:UInt, param2:Bool)
+       {
+          var _loc3_= mDistributedPlayerOwner.weaponControllers[(param1 : Int)];
+          if(_loc3_ != null)
+@@ -410,8 +429,8 @@
+             _loc3_.onWeaponDown(param2);
+          }
+       }
+-      
+-      public function onWeaponUp(param1:UInt, param2:Bool) 
++
++      public function onWeaponUp(param1:UInt, param2:Bool)
+       {
+          var _loc3_= mDistributedPlayerOwner.weaponControllers[(param1 : Int)];
+          if(_loc3_ != null)
+@@ -421,8 +440,8 @@
+             mDistributedPlayerOwner.currentWeaponIndex = (param1 : Int);
+          }
+       }
+-      
+-      public function resetCombosOnAllBut(param1:UInt = null) 
++
++      public function resetCombosOnAllBut(param1:UInt = null)
+ {
+          if (param1 == null) param1 = (Std.int(4294967295) : UInt);
+          var _loc2_= 0;
+@@ -441,8 +460,8 @@
+             _loc2_ = ASCompat.toInt(_loc2_) + 1;
+          }
+       }
+-      
+-      public function resetWeapons() 
++
++      public function resetWeapons()
+       {
+          var _loc1_= 0;
+          var _loc2_:WeaponController = null;
+@@ -458,8 +477,8 @@
+             _loc1_ = ASCompat.toInt(_loc1_) + 1;
+          }
+       }
+-      
+-      public function playPotentialPotionAttack(param1:UInt) 
++
++      public function playPotentialPotionAttack(param1:UInt)
+       {
+          var _loc3_= ASCompat.dynamicAs(mDBFacade.gameMaster.stackableById.itemFor(param1), gameMasterDictionary.GMStackable);
+          if(_loc3_ == null)
+@@ -484,8 +503,8 @@
+             mDistributedPlayerOwner.attack(_loc4_.Id,null,_loc4_.AttackSpdF,_loc6_);
+          }
+       }
+-      
+-      function berserkModeStart(param1:GameObjectEvent) 
++
++      function berserkModeStart(param1:GameObjectEvent)
+       {
+          var _loc2_:ChargeWeaponController = null;
+          var _loc3_= 0;
+@@ -500,8 +519,8 @@
+             _loc3_ = ASCompat.toInt(_loc3_) + 1;
+          }
+       }
+-      
+-      function berserkModeEnd(param1:GameObjectEvent) 
++
++      function berserkModeEnd(param1:GameObjectEvent)
+       {
+          var _loc2_:ChargeWeaponController = null;
+          var _loc3_= 0;
+@@ -516,22 +535,24 @@
+             _loc3_ = ASCompat.toInt(_loc3_) + 1;
+          }
+       }
+-      
+-      public function tryToDoConsumableAttack(param1:UInt) 
++
++      public function tryToDoConsumableAttack(param1:UInt)
+       {
+          if(mConsumableControllers[(param1 : Int)] != null && !mConsumableControllers[(param1 : Int)].IsInCooldown)
+          {
+             mConsumableControllers[(param1 : Int)].consume();
+          }
+       }
+-      
+-      public function stopAttacking() 
++
++      public function stopAttacking()
+       {
+          mNextWeaponCommand = null;
++         mLastQueuedTimeline = null;
++         mLastQueuedTimelineTick = -1;
+          mPotentialWeaponInputQueue.resize(0);
+       }
+-      
+-      public function clearInput() 
++
++      public function clearInput()
+       {
+          stopAttacking();
+          var _loc1_:WeaponController;
+@@ -545,8 +566,8 @@
+             }
+          }
+       }
+-      
+-      public function destroy() 
++
++      public function destroy()
+       {
+          var _loc1_= 0;
+          _loc1_ = 0;
+Index: src/combat/weapon/WeaponController.hx
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/combat/weapon/WeaponController.hx b/src/combat/weapon/WeaponController.hx
+--- a/src/combat/weapon/WeaponController.hx	(revision 01acca451363f537dbdaab9a860100b5e1ef999e)
++++ b/src/combat/weapon/WeaponController.hx	(date 1777079896650)
+@@ -10,41 +10,43 @@
+    import events.FirstCooldownEvent;
+    import facade.DBFacade;
+    import gameMasterDictionary.GMAttack;
+-   
++
+     class WeaponController
+    {
+-      
++
+       static inline final RAMPAGE_ATTACK_CONSTANT= "RAMPAGE";
+-      
++
+       var mDBFacade:DBFacade;
+-      
++
+       var mLogicalWorkComponent:LogicalWorkComponent;
+-      
++
+       var mWeapon:WeaponGameObject;
+-      
++
+       var mHero:HeroGameObjectOwner;
+-      
++
+       var mCurrentAttackTimeline:AttackTimeline;
+-      
++
+       var mNextAttackComboIndex:Int = 0;
+-      
++
+       var mAttackArray:Array<ASAny>;
+-      
++
+       var mAutoAim:Bool = false;
+-      
++
+       var mWeaponDownActive:Bool = false;
+-      
++
+       var mCoolDownTime:Float = Math.NaN;
+-      
++
+       var mIsInCooldown:Bool = false;
+-      
++
+       var mTimeStartedAttack:Float = Math.NaN;
+-      
++
++      var mTimeStartedCurrentAttack:Int = 0;
++
+       var mQueueAttack:GMAttack;
+-      
++
+       public function new(param1:DBFacade, param2:WeaponGameObject, param3:HeroGameObjectOwner)
+       {
+-         
++
+          mDBFacade = param1;
+          mWeapon = param2;
+          mHero = param3;
+@@ -52,24 +54,24 @@
+          mQueueAttack = null;
+          buildAttackArray();
+       }
+-      
+-      public function reset() 
++
++      public function reset()
+       {
+          resetCombos();
+          stopCurrentTimeline();
+          clear();
+       }
+-      
+-      public function clear() 
++
++      public function clear()
+       {
+       }
+-      
+-      function buildAttacks() 
++
++      function buildAttacks()
+       {
+          buildAttackArray();
+       }
+-      
+-      function stopCurrentTimeline() 
++
++      function stopCurrentTimeline()
+       {
+          if(mCurrentAttackTimeline != null && mCurrentAttackTimeline.isPlaying)
+          {
+@@ -77,7 +79,7 @@
+          }
+          mCurrentAttackTimeline = null;
+       }
+-      
++
+       @:isVar public var IsInCooldown(get,never):Bool;
+ public function  get_IsInCooldown() : Bool
+       {
+@@ -87,8 +89,8 @@
+          }
+          return mIsInCooldown;
+       }
+-      
+-      function attack(param1:UInt, param2:Bool, param3:Float = 1, param4:Bool = true) 
++
++      function attack(param1:UInt, param2:Bool, param3:Float = 1, param4:Bool = true)
+       {
+          var speedIndex:UInt;
+          var actorAttackSpeed:Float;
+@@ -122,6 +124,7 @@
+          }
+          stopCurrentTimeline();
+          mCurrentAttackTimeline = mWeapon.getAttackTimeline(attackType);
++         mTimeStartedCurrentAttack = mLogicalWorkComponent.gameClock.gameTime;
+          if(mCurrentAttackTimeline == null)
+          {
+             Logger.error("AttackTimeline for attack: <" + attackType + "> was null. Ignoring onWeaponDown");
+@@ -140,8 +143,8 @@
+             startCooldown();
+          }
+       }
+-      
+-      function finishedAttack(param1:Bool, param2:UInt) 
++
++      function finishedAttack(param1:Bool, param2:UInt)
+       {
+          if(mQueueAttack != null)
+          {
+@@ -149,8 +152,8 @@
+             mQueueAttack = null;
+          }
+       }
+-      
+-      public function doQueue() 
++
++      public function doQueue()
+       {
+          if(mQueueAttack != null)
+          {
+@@ -158,8 +161,8 @@
+             mQueueAttack = null;
+          }
+       }
+-      
+-      public function startCooldown() 
++
++      public function startCooldown()
+       {
+          mIsInCooldown = true;
+          var _loc1_= ASCompat.floatAsBool(currentTimeline.currentGMAttack.CooldownLength) ? currentTimeline.currentGMAttack.CooldownLength : currentTimeline.currentGMAttack.AIRechargeT;
+@@ -172,8 +175,8 @@
+             mDBFacade.eventManager.dispatchEvent(new FirstCooldownEvent());
+          }
+       }
+-      
+-      public function updateCooldown(param1:GameClock) 
++
++      public function updateCooldown(param1:GameClock)
+       {
+          if(param1.gameTime - mTimeStartedAttack >= mCoolDownTime)
+          {
+@@ -182,8 +185,8 @@
+             updateHudCooldown(false);
+          }
+       }
+-      
+-      function updateHudCooldown(param1:Bool) 
++
++      function updateHudCooldown(param1:Bool)
+       {
+          if(param1)
+          {
+@@ -194,7 +197,7 @@
+             mDBFacade.hud.stopCooldown(weapon.slot);
+          }
+       }
+-      
++
+       function getNextAttackId() : UInt
+       {
+          var _loc2_= 0;
+@@ -209,8 +212,8 @@
+          }
+          return (_loc2_ : UInt);
+       }
+-      
+-      function buildAttackArray() 
++
++      function buildAttackArray()
+       {
+          var _loc3_:GMAttack = null;
+          mAttackArray = [];
+@@ -238,12 +241,12 @@
+             Logger.warn("Did not find any attacks for weaponId: " + mWeapon.weaponData.Id);
+          }
+       }
+-      
+-      public function resetCombos() 
++
++      public function resetCombos()
+       {
+          mNextAttackComboIndex = 0;
+       }
+-      
++
+       function getAttackFromComboArray() : GMAttack
+       {
+          var _loc1_= (Std.int(!mWeapon.weaponData.ChooseRandomAttack ? mNextAttackComboIndex : mAttackArray.length * Math.random() - 1) : UInt);
+@@ -255,8 +258,8 @@
+          incrementCombo();
+          return _loc2_;
+       }
+-      
+-      function incrementCombo() 
++
++      function incrementCombo()
+       {
+          mNextAttackComboIndex = mNextAttackComboIndex + 1;
+          if(mNextAttackComboIndex >= mAttackArray.length)
+@@ -264,7 +267,7 @@
+             mNextAttackComboIndex = 0;
+          }
+       }
+-      
++
+       public function canQueue(param1:PotentialWeaponInputQueueStruct, param2:Float) : Bool
+       {
+          if(mIsInCooldown)
+@@ -288,7 +291,7 @@
+          }
+          return false;
+       }
+-      
++
+       public function canCombo() : Bool
+       {
+          if(mCurrentAttackTimeline != null)
+@@ -301,21 +304,21 @@
+          }
+          return true;
+       }
+-      
+-      public function berserkModeStart() 
++
++      public function berserkModeStart()
+       {
+          if(mWeapon.weaponData.ClassType == "MELEE")
+          {
+             overrideAttacksWithRampage();
+          }
+       }
+-      
+-      public function berserkModeEnd() 
++
++      public function berserkModeEnd()
+       {
+          buildAttacks();
+       }
+-      
+-      function overrideAttacksWithRampage() 
++
++      function overrideAttacksWithRampage()
+       {
+          var _loc1_= ASCompat.dynamicAs(mDBFacade.gameMaster.attackByConstant.itemFor("RAMPAGE"), gameMasterDictionary.GMAttack);
+          if(_loc1_ == null)
+@@ -327,47 +330,53 @@
+          mAttackArray.push(_loc1_);
+          mNextAttackComboIndex = 0;
+       }
+-      
+-      function notEnoughMana() 
++
++      function notEnoughMana()
+       {
+          mHero.distributedDungeonFloor.effectManager.playNotEnoughManaEffects();
+       }
+-      
+-      public function onWeaponDown(param1:Bool = true) 
++
++      public function onWeaponDown(param1:Bool = true)
+       {
+          mAutoAim = param1;
+       }
+-      
++
+       @:isVar public var weaponDownActive(get,never):Bool;
+ public function  get_weaponDownActive() : Bool
+       {
+          return mWeaponDownActive;
+       }
+-      
+-      public function onWeaponUp(param1:Bool = true) 
++
++      public function onWeaponUp(param1:Bool = true)
+       {
+          mAutoAim = param1;
+       }
+-      
++
+       @:isVar public var weapon(get,never):WeaponGameObject;
+ public function  get_weapon() : WeaponGameObject
+       {
+          return mWeapon;
+       }
+-      
++
+       @:isVar public var currentTimeline(get,never):ScriptTimeline;
+ public function  get_currentTimeline() : ScriptTimeline
+       {
+          return mCurrentAttackTimeline;
+       }
+-      
++
++      @:isVar public var currentAttackStartTime(get,never):Int;
++public function  get_currentAttackStartTime() : Int
++      {
++         return mTimeStartedCurrentAttack;
++      }
++
+       @:isVar public var weaponRange(get,never):UInt;
+ public function  get_weaponRange() : UInt
+       {
+          return (0 : UInt);
+       }
+-      
+-      public function queueAttack(param1:String) 
++
++      public function queueAttack(param1:String)
+       {
+          mQueueAttack = ASCompat.dynamicAs(mDBFacade.gameMaster.attackByConstant.itemFor(param1), gameMasterDictionary.GMAttack);
+          if(mQueueAttack == null)
+@@ -375,13 +384,13 @@
+             Logger.error("Queue Attack doesn\'t exist!");
+          }
+       }
+-      
++
+       public function isRepeater() : Bool
+       {
+          return false;
+       }
+-      
+-      public function destroy() 
++
++      public function destroy()
+       {
+          mIsInCooldown = false;
+          if(mLogicalWorkComponent != null)
 Index: src/brain/camera/BackgroundFader.hx
 IDEA additional info:
 Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
 <+>UTF-8
 ===================================================================
 diff --git a/src/brain/camera/BackgroundFader.hx b/src/brain/camera/BackgroundFader.hx
---- a/src/brain/camera/BackgroundFader.hx	(revision a9e410d8dfab55119fb74203f4469f8148a7f423)
-+++ b/src/brain/camera/BackgroundFader.hx	(date 1776995404515)
+--- a/src/brain/camera/BackgroundFader.hx	(revision 01acca451363f537dbdaab9a860100b5e1ef999e)
++++ b/src/brain/camera/BackgroundFader.hx	(date 1777079914755)
 @@ -8,50 +8,50 @@
     import brain.workLoop.Task;
     import flash.display.Sprite;
@@ -731,14 +1887,1367 @@ diff --git a/src/brain/camera/BackgroundFader.hx b/src/brain/camera/BackgroundFa
        {
           if(mFadeTask != null)
           {
+Index: src/uI/hud/UIHud.hx
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/uI/hud/UIHud.hx b/src/uI/hud/UIHud.hx
+--- a/src/uI/hud/UIHud.hx	(revision 01acca451363f537dbdaab9a860100b5e1ef999e)
++++ b/src/uI/hud/UIHud.hx	(date 1777079896682)
+@@ -52,264 +52,264 @@
+    import flash.geom.Vector3D;
+    import flash.text.TextField;
+    import flash.utils.Timer;
+-   
++
+     class UIHud
+    {
+-      
++
+       static inline final CONDENSEDHUD_BUFF_ICON_X_STARTPOS= 455;
+-      
++
+       static inline final CONDENSEDHUD_BUFF_ICON_Y_STARTPOS= 865;
+-      
++
+       static inline final CONDENSEDHUD_BUFF_ICON_X_DISPLACEMENT= 63;
+-      
++
+       static inline final OLDHUD_BUFF_ICON_X_STARTPOS= 424;
+-      
++
+       static inline final OLDHUD_BUFF_ICON_Y_STARTPOS= 980;
+-      
++
+       static inline final OLDHUD_BUFF_ICON_X_DISPLACEMENT= 63;
+-      
++
+       static inline final MAX_CHAT_CHARS= (44 : UInt);
+-      
++
+       static inline final TEAMLOOT_POS= -550;
+-      
++
+       static inline final TEAMLOOT_VISIBLE_TIME:Float = 2;
+-      
++
+       static inline final TEAMLOOT_TWEEN_TIME:Float = 0.5;
+-      
++
+       public static inline final UI_HUD_SWF_PATH= "Resources/Art2D/UI/db_UI_HUD.swf";
+-      
++
+       public static inline final UI_HUD_CHANGE_EVENT= "UI_HUD_CHANGE_EVENT";
+-      
++
+       static inline final PET_PORTRAIT_SPACING= (69 : UInt);
+-      
++
+       static inline final PET_PORTRAIT_YPOS= (85 : UInt);
+-      
++
+       static inline final PET_PORTRAIT_START_XPOS= (20 : UInt);
+-      
++
+       static inline final ORIGINAL_COOLDOWN_ANIM_PLAY_TIME:Float = 4.1;
+-      
++
+       public static inline final COMMON_CHEST_ID= (60001 : UInt);
+-      
++
+       public static inline final UNCOMMON_CHEST_ID= (60002 : UInt);
+-      
++
+       public static inline final RARE_CHEST_ID= (60003 : UInt);
+-      
++
+       public static inline final LEGENDARY_CHEST_ID= (60004 : UInt);
+-      
++
+       public static inline final SMALL_ITEM_BOX_ID= (60005 : UInt);
+-      
++
+       public static inline final ROYAL_ITEM_BOX_ID= (60006 : UInt);
+-      
++
+       static final TEAM_DEFAULT:Vector3D = new Vector3D(45,150);
+-      
++
+       static final PROFILE_DEFAULT:Vector3D = new Vector3D(112,95);
+-      
++
+       static final COINS_DEFAULT:Vector3D = new Vector3D(813,57);
+-      
++
+       static final CASH_DEFAULT:Vector3D = new Vector3D(1032,57);
+-      
++
+       static final EXP_DEFAULT:Vector3D = new Vector3D(1584,78);
+-      
++
+       static final CROWD_DEFAULT:Vector3D = new Vector3D(1869,1041);
+-      
++
+       static final TEAM_CONDENSED:Vector3D = new Vector3D(45,150);
+-      
++
+       static final PROFILE_CONDENSED:Vector3D = new Vector3D(1550,980);
+-      
++
+       static final COINS_CONDENSED:Vector3D = new Vector3D(60,980);
+-      
++
+       static final CASH_CONDENSED:Vector3D = new Vector3D(53,1031);
+-      
++
+       static final EXP_CONDENSED:Vector3D = new Vector3D(54,915);
+-      
++
+       static final CROWD_CONDENSED:Vector3D = new Vector3D(1555,920);
+-      
++
+       var mDBFacade:DBFacade;
+-      
++
+       var mHeroOwner:HeroGameObjectOwner;
+-      
++
+       var mSceneGraphComponent:SceneGraphComponent;
+-      
++
+       var mAssetLoadingComponent:AssetLoadingComponent;
+-      
++
+       var mWantPets:Bool = false;
+-      
++
+       var mAssetsLoaded:Bool = false;
+-      
++
+       var mRoot:Sprite;
+-      
++
+       var mUIRoot:MovieClip;
+-      
++
+       var mAddCoinButton:UIButton;
+-      
++
+       var mAddCashButton:UIButton;
+-      
++
+       var mProfileBox:MovieClip;
+-      
++
+       var mProfileBulgeTask:Task;
+-      
++
+       var mFloaterTextClass:Dynamic;
+-      
++
+       var mHpBar:UIProgressBar;
+-      
++
+       var mHpText:TextField;
+-      
++
+       var mFlashingHpBar:UIProgressBar;
+-      
++
+       var mHealthFullClip:TextField;
+-      
++
+       var mManaFullClip:TextField;
+-      
++
+       var mManaBar:UIProgressBar;
+-      
++
+       var mManaText:TextField;
+-      
++
+       var mBusterBar:UIProgressBar;
+-      
++
+       var mBusterValue:UInt = 0;
+-      
++
+       var mBusterRoot:MovieClip;
+-      
++
+       var mBasicCurrency:UInt = 0;
+-      
++
+       var mPremiumCurrency:UInt = 0;
+-      
++
+       var mBasicCurrencyUI:UIObject;
+-      
++
+       var mPremiumCurrencyUI:UIObject;
+-      
++
+       var mBasicCurrencyText:TextField;
+-      
++
+       var mPremiumCurrencyText:TextField;
+-      
++
+       var mLevelText:TextField;
+-      
++
+       var mXpObject:UIObject;
+-      
++
+       var mXpBar:UIProgressBar;
+-      
++
+       var mXpText:TextField;
+-      
++
+       var mXpGotInitialUpdate:Bool = false;
+-      
++
+       var mXpBulgeTask:Task;
+-      
++
+       var mXpValue:UInt = 0;
+-      
++
+       var mTeamLootMC:MovieClipRenderController;
+-      
++
+       var mLootTween:TweenMax;
+-      
++
+       var mLootTask:Task;
+-      
++
+       var mLootMouseArea:Sprite;
+-      
++
+       var mCloseButton:UIButton;
+-      
++
+       var mWeaponZButton:UIButton;
+-      
++
+       var mWeaponXButton:UIButton;
+-      
++
+       var mWeaponCButton:UIButton;
+-      
++
+       var mWeaponButtons:Vector<UIButton>;
+-      
++
+       var mConsumable1Button:UIButton;
+-      
++
+       var mConsumable2Button:UIButton;
+-      
++
+       var mConsumableWeaponButtons:Vector<UIButton>;
+-      
++
+       var mCooldowns:Vector<MovieClipRenderer>;
+-      
++
+       var mConsumableCooldowns:Vector<MovieClipRenderer>;
+-      
++
+       var mDungeonBusterButton:UIButton;
+-      
++
+       var mBusterLabel:TextField;
+-      
++
+       var mBusterLabelOver:TextField;
+-      
++
+       var mBusterGlowMc:MovieClipRenderController;
+-      
++
+       var mXPBonusText:TextField;
+-      
++
+       var mCoinBonusText:TextField;
+-      
++
+       var mOptionsButton:UIButton;
+-      
++
+       var mOptionsPanel:OptionsPanel;
+-      
++
+       var mStacksHud:UIStacksHud;
+-      
++
+       var mEventComponent:EventComponent;
+-      
++
+       var mUITask:Task;
+-      
++
+       var mLogicalWorkComponent:LogicalWorkComponent;
+-      
++
+       var mSwfAsset:SwfAsset;
+-      
++
+       var mOffScreenPlayerManager:UIOffScreenPlayerManager;
+-      
++
+       var mMaxBusterPoints:UInt = 0;
+-      
++
+       var mUIChatLog:UIChatLog;
+-      
++
+       var mSaleLabel:TextField;
+-      
++
+       var mHealthFullRevealer:Revealer;
+-      
++
+       var mManaFullRevealer:Revealer;
+-      
++
+       var mHealthFullFloater:FloatingMessage;
+-      
++
+       var mManaFullFloater:FloatingMessage;
+-      
++
+       var mPetPortraitRoot:MovieClip;
+-      
++
+       var mPetPortraitNoneRoot:MovieClip;
+-      
++
+       var mPetPortrait:PetPortraitUI;
+-      
++
+       var mFloorLabel:TextField;
+-      
++
+       var mDungeonModifer1:UIButton;
+-      
++
+       var mDungeonModifer2:UIButton;
+-      
++
+       var mDungeonModifer3:UIButton;
+-      
++
+       var mDungeonModifer4:UIButton;
+-      
++
+       var mTeamLootDestination:Vector3D;
+-      
++
+       var mProfileDestination:Vector3D;
+-      
++
+       var mCoinsDestination:Vector3D;
+-      
++
+       var mCashDestination:Vector3D;
+-      
++
+       var mExpDestination:Vector3D;
+-      
++
+       var mCrowdDestination:Vector3D;
+-      
++
+       var mBoosterTimer:Timer;
+-      
++
+       var mHudType:UInt = 0;
+-      
++
+       var mVerticalYClipping:Float = Math.NaN;
+-      
++
+       var mBuffs:Vector<BuffGameObject>;
+-      
++
+       var mBuffIconButtons:Vector<UIButton>;
+-      
++
+       var mBuffCooldowns:Vector<MovieClipRenderer>;
+-      
++
+       public function new(param1:DBFacade)
+       {
+          var facade= param1;
+-         
++
+          mDBFacade = facade;
+          mRoot = new Sprite();
+          mSceneGraphComponent = new SceneGraphComponent(mDBFacade,"UIHud");
+@@ -331,37 +331,37 @@
+          mBuffIconButtons = new Vector<UIButton>();
+          mBuffCooldowns = new Vector<MovieClipRenderer>();
+       }
+-      
++
+       public static function isThisAConsumbleChestId(param1:Int) : Bool
+       {
+          return param1 == 60005 || param1 == 60006;
+       }
+-      
+-      function switchHudEvent(param1:UIHudChangeEvent) 
++
++      function switchHudEvent(param1:UIHudChangeEvent)
+       {
+          this.setupUI(mSwfAsset,param1.hudType);
+          resetBuffButtonPositions();
+       }
+-      
++
+       @:isVar public var chatLogContainer(get,never):MovieClip;
+ public function  get_chatLogContainer() : MovieClip
+       {
+          return ASCompat.dynamicAs((mUIRoot : ASAny).chatLogContainer, flash.display.MovieClip);
+       }
+-      
++
+       @:isVar public var ownedHero(get,never):HeroGameObjectOwner;
+ public function  get_ownedHero() : HeroGameObjectOwner
+       {
+          return mHeroOwner;
+       }
+-      
++
+       @:isVar public var swfAsset(get,never):SwfAsset;
+ public function  get_swfAsset() : SwfAsset
+       {
+          return mSwfAsset;
+       }
+-      
+-      function setupOptions(param1:SwfAsset) 
++
++      function setupOptions(param1:SwfAsset)
+       {
+          var _loc2_= param1.getClass("options_panel_button");
+          var _loc7_= ASCompat.dynamicAs(ASCompat.createInstance(_loc2_, []) , MovieClip);
+@@ -377,8 +377,8 @@
+          _loc7_.scaleY = _loc6_;
+          setOptionsBasedOnHud();
+       }
+-      
+-      function setDooberLocations(param1:UInt) 
++
++      function setDooberLocations(param1:UInt)
+       {
+          switch(param1)
+          {
+@@ -389,7 +389,7 @@
+                mCashDestination = CASH_DEFAULT;
+                mExpDestination = EXP_DEFAULT;
+                mCrowdDestination = CROWD_DEFAULT;
+-               
++
+             case 1:
+                mTeamLootDestination = TEAM_CONDENSED;
+                mProfileDestination = PROFILE_CONDENSED;
+@@ -397,7 +397,7 @@
+                mCashDestination = CASH_CONDENSED;
+                mExpDestination = EXP_CONDENSED;
+                mCrowdDestination = CROWD_CONDENSED;
+-               
++
+             default:
+                mTeamLootDestination = TEAM_DEFAULT;
+                mProfileDestination = PROFILE_DEFAULT;
+@@ -407,8 +407,8 @@
+                mCrowdDestination = CROWD_DEFAULT;
+          }
+       }
+-      
+-      function setupUI(param1:SwfAsset, param2:UInt = (0 : UInt)) 
++
++      function setupUI(param1:SwfAsset, param2:UInt = (0 : UInt))
+       {
+          var hudClassName:String;
+          var hudClass:Dynamic;
+@@ -428,12 +428,12 @@
+                hudClassName = "ui_hud_old";
+                mDBFacade.camera.offset = new Point(0,45);
+                mVerticalYClipping = 0;
+-               
++
+             case 1:
+                hudClassName = "ui_hud";
+                mDBFacade.camera.offset = new Point(0,0);
+                mVerticalYClipping = 90;
+-               
++
+             default:
+                hudClassName = "ui_hud_old";
+                mDBFacade.camera.offset = new Point(0,45);
+@@ -607,8 +607,8 @@
+             this.initializeHud(mHeroOwner);
+          }
+       }
+-      
+-      function setOptionsBasedOnHud() 
++
++      function setOptionsBasedOnHud()
+       {
+          if(mOptionsPanel == null || mOptionsButton == null)
+          {
+@@ -621,11 +621,11 @@
+             case 0:
+                _loc2_ = new Point(1875,100);
+                _loc1_ = new Point(0.9,0.9);
+-               
++
+             case 1:
+                _loc2_ = new Point(1875,100);
+                _loc1_ = new Point(0.9,0.9);
+-               
++
+             default:
+                _loc2_ = new Point(1875,100);
+                _loc1_ = new Point(0.9,0.9);
+@@ -636,14 +636,14 @@
+          mOptionsButton.root.scaleX = _loc1_.x;
+          mOptionsButton.root.scaleY = _loc1_.y;
+       }
+-      
+-      function mouseOverXpListener(param1:Event) 
++
++      function mouseOverXpListener(param1:Event)
+       {
+          ASCompat.setProperty((mUIRoot : ASAny).UI_XP.xp_level_title, "visible", false);
+          mXpText.visible = true;
+       }
+-      
+-      function mouseOutXpListener(param1:Event) 
++
++      function mouseOutXpListener(param1:Event)
+       {
+          if(!mDBFacade.featureFlags.getFlagValue("want-numbered-hud"))
+          {
+@@ -651,8 +651,8 @@
+             mXpText.visible = false;
+          }
+       }
+-      
+-      public function showHealthFullMessage() 
++
++      public function showHealthFullMessage()
+       {
+          if(mHealthFullRevealer != null || mHealthFullFloater != null)
+          {
+@@ -675,8 +675,8 @@
+             },"DAMAGE_MOVEMENT_TYPE",true);
+          },(1 : UInt));
+       }
+-      
+-      public function showManaFullMessage() 
++
++      public function showManaFullMessage()
+       {
+          if(mManaFullRevealer != null || mManaFullFloater != null)
+          {
+@@ -699,8 +699,8 @@
+             },"DAMAGE_MOVEMENT_TYPE",true);
+          },(1 : UInt));
+       }
+-      
+-      public function handleBoosterTimeUp(param1:TimerEvent) 
++
++      public function handleBoosterTimeUp(param1:TimerEvent)
+       {
+          if(mBoosterTimer != null)
+          {
+@@ -717,14 +717,14 @@
+             mBoosterTimer.start();
+          }
+       }
+-      
+-      function handleBoostersParsedEvent(param1:Event) 
++
++      function handleBoostersParsedEvent(param1:Event)
+       {
+          showBonusXPEffects(param1);
+          showBonusCoinEffects(param1);
+       }
+-      
+-      function showBonusXPEffects(param1:Event) 
++
++      function showBonusXPEffects(param1:Event)
+       {
+          var _loc2_= mDBFacade.dbAccountInfo.inventoryInfo.findHighestBoosterXP();
+          if(mDBFacade.accountBonus.isXPBonusActive)
+@@ -742,8 +742,8 @@
+             mXPBonusText.visible = false;
+          }
+       }
+-      
+-      function showBonusCoinEffects(param1:Event) 
++
++      function showBonusCoinEffects(param1:Event)
+       {
+          var _loc2_= mDBFacade.dbAccountInfo.inventoryInfo.findHighestBoosterGold();
+          if(mDBFacade.accountBonus.isCoinBonusActive)
+@@ -761,8 +761,8 @@
+             mCoinBonusText.visible = false;
+          }
+       }
+-      
+-      public function registerPet(param1:NPCGameObject) 
++
++      public function registerPet(param1:NPCGameObject)
+       {
+          if(mPetPortrait != null)
+          {
+@@ -773,8 +773,8 @@
+             mPetPortrait = new PetPortraitUI(mDBFacade,mPetPortraitRoot,mPetPortraitNoneRoot,param1);
+          }
+       }
+-      
+-      public function unregisterPet(param1:NPCGameObject) 
++
++      public function unregisterPet(param1:NPCGameObject)
+       {
+          if(mPetPortrait != null)
+          {
+@@ -789,8 +789,8 @@
+             }
+          }
+       }
+-      
+-      function createWeaponTooltip(param1:UIButton, param2:UInt) 
++
++      function createWeaponTooltip(param1:UIButton, param2:UInt)
+       {
+          var button= param1;
+          var num= param2;
+@@ -805,27 +805,27 @@
+             button.tooltipDelay = 0.4;
+          });
+       }
+-      
+-      public function openTeamLoot(param1:UInt) 
++
++      public function openTeamLoot(param1:UInt)
+       {
+          var _loc4_= "";
+          switch(param1 - 60001)
+          {
+             case 0:
+                _loc4_ = "UI_teamloot_basic";
+-               
++
+             case 1:
+                _loc4_ = "UI_teamloot_uncommon";
+-               
++
+             case 2:
+                _loc4_ = "UI_teamloot_rare";
+-               
++
+             case 3:
+                _loc4_ = "UI_teamloot_legendary";
+-               
++
+             case 4:
+                _loc4_ = "UI_teamloot_box_small";
+-               
++
+             case 5:
+                _loc4_ = "UI_teamloot_box_royal";
+          }
+@@ -848,8 +848,8 @@
+          }
+          mLootTask = mLogicalWorkComponent.doLater(2,closeTeamLoot);
+       }
+-      
+-      public function closeTeamLoot(param1:GameClock = null) 
++
++      public function closeTeamLoot(param1:GameClock = null)
+       {
+          var gameClock= param1;
+          var cleanupFunc:ASFunction = function()
+@@ -870,8 +870,8 @@
+             "onComplete":cleanupFunc
+          });
+       }
+-      
+-      public function detachHero() 
++
++      public function detachHero()
+       {
+          hide();
+          hideBustSign();
+@@ -882,8 +882,8 @@
+          (mUIRoot : ASAny).UI_XP.removeEventListener("mouseOver",mouseOverXpListener);
+          (mUIRoot : ASAny).UI_XP.removeEventListener("mouseOut",mouseOutXpListener);
+       }
+-      
+-      public function initializeHud(param1:HeroGameObjectOwner) 
++
++      public function initializeHud(param1:HeroGameObjectOwner)
+       {
+          var boosterTime:Int;
+          var equippedWeapons:Vector<WeaponGameObject>;
+@@ -979,13 +979,13 @@
+             setupStatsForResourceBars();
+          }
+       }
+-      
+-      function setCurrentFloorLabel() 
++
++      function setCurrentFloorLabel()
+       {
+          mFloorLabel.text = Locale.getString("UI_HUD_FLOOR_LABEL") + Std.string(mHeroOwner.distributedDungeonFloor.getCurrentFloorNum());
+       }
+-      
+-      function setDungeonModifiers() 
++
++      function setDungeonModifiers()
+       {
+          var _loc1_:UIButton = null;
+          var _loc2_= 0;
+@@ -1000,13 +1000,13 @@
+             {
+                case 0:
+                   _loc1_ = mDungeonModifer1;
+-                  
++
+                case 1:
+                   _loc1_ = mDungeonModifer2;
+-                  
++
+                case 2:
+                   _loc1_ = mDungeonModifer3;
+-                  
++
+                case 3:
+                   _loc1_ = mDungeonModifer4;
+             }
+@@ -1014,8 +1014,8 @@
+             _loc2_ = ASCompat.toInt(_loc2_) + 1;
+          }
+       }
+-      
+-      function setupModifiers(param1:UIButton, param2:DungeonModifierHelper) 
++
++      function setupModifiers(param1:UIButton, param2:DungeonModifierHelper)
+       {
+          var dungeonModButton= param1;
+          var gmDungeonModifier= param2;
+@@ -1036,8 +1036,8 @@
+             dungeonModButton.root.visible = true;
+          });
+       }
+-      
+-      function initializePetPortraits() 
++
++      function initializePetPortraits()
+       {
+          var _loc1_:NPCGameObject = null;
+          if(mPetPortrait != null)
+@@ -1046,8 +1046,8 @@
+          }
+          registerPet(_loc1_);
+       }
+-      
+-      public function show() 
++
++      public function show()
+       {
+          mSceneGraphComponent.addChild(mRoot,(50 : UInt));
+          mSceneGraphComponent.addChild(mOptionsButton.root,(50 : UInt));
+@@ -1055,8 +1055,8 @@
+          mDBFacade.camera.yCilppingFromBottom = mVerticalYClipping;
+          initializePetPortraits();
+       }
+-      
+-      public function hide() 
++
++      public function hide()
+       {
+          mSceneGraphComponent.removeChild(mRoot);
+          mSceneGraphComponent.removeChild(mOptionsButton.root);
+@@ -1075,18 +1075,18 @@
+             mPetPortrait = null;
+          }
+       }
+-      
+-      public function showStacks() 
++
++      public function showStacks()
+       {
+          mStacksHud.show();
+       }
+-      
+-      public function hideStacks() 
++
++      public function hideStacks()
+       {
+          mStacksHud.hide();
+       }
+-      
+-      function resetButtons(param1:Vector<UIButton>) 
++
++      function resetButtons(param1:Vector<UIButton>)
+       {
+          var _loc3_:DisplayObject = null;
+          var _loc2_:UIButton;
+@@ -1113,8 +1113,8 @@
+             ASCompat.setProperty(_loc2_.root, "filters", []);
+          }
+       }
+-      
+-      function setupWeaponUI(param1:Vector<WeaponGameObject>) 
++
++      function setupWeaponUI(param1:Vector<WeaponGameObject>)
+       {
+          var weaponGameObject:WeaponGameObject;
+          var gmWeapon:GMWeaponItem;
+@@ -1208,8 +1208,8 @@
+             i = i + 1;
+          }
+       }
+-      
+-      function setupConsumableWeaponUI(param1:Vector<ConsumableWeaponGameObject>) 
++
++      function setupConsumableWeaponUI(param1:Vector<ConsumableWeaponGameObject>)
+       {
+          var consumableWeaponGameObject:ConsumableWeaponGameObject;
+          var gmWeapon:GMWeaponItem;
+@@ -1242,7 +1242,7 @@
+                {
+                   case 0:
+                      tooltip = ASCompat.dynamicAs((mUIRoot : ASAny).consumable_tooltip01, flash.display.MovieClip);
+-                     
++
+                   case 1:
+                      tooltip = ASCompat.dynamicAs((mUIRoot : ASAny).consumable_tooltip02, flash.display.MovieClip);
+                }
+@@ -1277,8 +1277,8 @@
+             i = i + 1;
+          }
+       }
+-      
+-      function addListeners() 
++
++      function addListeners()
+       {
+          var heroOwnerId:UInt;
+          mEventComponent.removeAllListeners();
+@@ -1322,8 +1322,8 @@
+          (mUIRoot : ASAny).UI_XP.addEventListener("mouseOver",mouseOverXpListener);
+          (mUIRoot : ASAny).UI_XP.addEventListener("mouseOut",mouseOutXpListener);
+       }
+-      
+-      function mouseOutProfileBox(param1:Event) 
++
++      function mouseOutProfileBox(param1:Event)
+       {
+          if(!mDBFacade.featureFlags.getFlagValue("want-numbered-hud"))
+          {
+@@ -1331,14 +1331,14 @@
+             mManaText.visible = false;
+          }
+       }
+-      
+-      function mouseOverProfileBox(param1:Event) 
++
++      function mouseOverProfileBox(param1:Event)
+       {
+          mHpText.visible = true;
+          mManaText.visible = true;
+       }
+-      
+-      function setupStatsForResourceBars() 
++
++      function setupStatsForResourceBars()
+       {
+          if(mDBFacade.featureFlags.getFlagValue("want-numbered-hud"))
+          {
+@@ -1355,32 +1355,32 @@
+             ASCompat.setProperty((mUIRoot : ASAny).UI_XP.xp_level_title, "visible", true);
+          }
+       }
+-      
+-      function handleBusterPointsEvent(param1:BusterPointsEvent) 
++
++      function handleBusterPointsEvent(param1:BusterPointsEvent)
+       {
+          mMaxBusterPoints = param1.maxBusterPoints;
+          setBusterPoints(param1.busterPoints);
+       }
+-      
+-      function showInvulnerable() 
++
++      function showInvulnerable()
+       {
+          mFlashingHpBar.value = mHpBar.value;
+          mFlashingHpBar.visible = true;
+          mHpBar.visible = false;
+       }
+-      
+-      function hideInvulnerable() 
++
++      function hideInvulnerable()
+       {
+          mFlashingHpBar.visible = false;
+          mHpBar.visible = true;
+       }
+-      
++
+       @:isVar public var floaterTextClass(get,never):Dynamic;
+ public function  get_floaterTextClass() : Dynamic
+       {
+          return mFloaterTextClass;
+       }
+-      
++
+       function floaterCallback(param1:MovieClip) : ASFunction
+       {
+          var clip= param1;
+@@ -1389,8 +1389,8 @@
+             mDBFacade.sceneGraphManager.removeChild(clip);
+          };
+       }
+-      
+-      function spawnFloater(param1:String, param2:Float, param3:Float, param4:UInt, param5:Float, param6:UInt, param7:UInt, param8:Float, param9:Float) 
++
++      function spawnFloater(param1:String, param2:Float, param3:Float, param4:UInt, param5:Float, param6:UInt, param7:UInt, param8:Float, param9:Float)
+       {
+          var _loc10_= ASCompat.dynamicAs(ASCompat.createInstance(mFloaterTextClass, []) , MovieClip);
+          ASCompat.setProperty((_loc10_ : ASAny).label, "text", param1);
+@@ -1402,8 +1402,8 @@
+          var _loc11_= new FloatingMessage(_loc10_,mDBFacade,param6,param7,param8,param9,null,floaterCallback(_loc10_));
+          mDBFacade.sceneGraphManager.addChild(_loc10_,50);
+       }
+-      
+-      public function setHp(param1:UInt, param2:UInt) 
++
++      public function setHp(param1:UInt, param2:UInt)
+       {
+          if(!mAssetsLoaded)
+          {
+@@ -1414,8 +1414,8 @@
+          mFlashingHpBar.value = _loc3_;
+          mHpText.text = Std.string(param1) + " / " + Std.string(param2);
+       }
+-      
+-      public function setMana(param1:UInt, param2:UInt) 
++
++      public function setMana(param1:UInt, param2:UInt)
+       {
+          if(!mAssetsLoaded)
+          {
+@@ -1424,12 +1424,12 @@
+          mManaBar.value = param1 / param2;
+          mManaText.text = Std.string(param1) + " / " + Std.string(param2);
+       }
+-      
+-      function spawnBusterFloater(param1:Int, param2:Float) 
++
++      function spawnBusterFloater(param1:Int, param2:Float)
+       {
+       }
+-      
+-      public function setBusterPoints(param1:UInt) 
++
++      public function setBusterPoints(param1:UInt)
+       {
+          if(!mAssetsLoaded)
+          {
+@@ -1451,8 +1451,8 @@
+             this.hideBustSign();
+          }
+       }
+-      
+-      public function setCurrency(param1:Int, param2:Int) 
++
++      public function setCurrency(param1:Int, param2:Int)
+       {
+          if(!mAssetsLoaded)
+          {
+@@ -1461,12 +1461,12 @@
+          mBasicCurrencyText.text = Std.string(param1);
+          mPremiumCurrencyText.text = Std.string(param2);
+       }
+-      
+-      function spawnCoinFloater(param1:Int) 
++
++      function spawnCoinFloater(param1:Int)
+       {
+       }
+-      
+-      public function setBasicCurrency(param1:Int) 
++
++      public function setBasicCurrency(param1:Int)
+       {
+          if(!mAssetsLoaded)
+          {
+@@ -1480,12 +1480,12 @@
+          mBasicCurrencyText.text = Std.string(param1);
+          mBasicCurrency = (param1 : UInt);
+       }
+-      
+-      function spawnCashFloater(param1:Int) 
++
++      function spawnCashFloater(param1:Int)
+       {
+       }
+-      
+-      public function setPremiumCurrency(param1:Int) 
++
++      public function setPremiumCurrency(param1:Int)
+       {
+          if(!mAssetsLoaded)
+          {
+@@ -1499,12 +1499,12 @@
+          mPremiumCurrencyText.text = Std.string(param1);
+          mPremiumCurrency = (param1 : UInt);
+       }
+-      
+-      function spawnXpFloater(param1:Int, param2:Float) 
++
++      function spawnXpFloater(param1:Int, param2:Float)
+       {
+       }
+-      
+-      public function setXp(param1:UInt) 
++
++      public function setXp(param1:UInt)
+       {
+          if(!mAssetsLoaded)
+          {
+@@ -1527,12 +1527,12 @@
+             bulgeXpBar();
+          }
+       }
+-      
+-      function updateXpBulge(param1:GameClock) 
++
++      function updateXpBulge(param1:GameClock)
+       {
+          var _loc3_= mXpObject.root;
+          var _loc2_= _loc3_.scaleX - 1;
+-         _loc2_ *= 0.75;
++         _loc2_ *= Math.pow(0.75,param1.tickLength / GameClock.ANIMATION_FRAME_DURATION);
+          _loc3_.scaleX = 1 + _loc2_;
+          _loc3_.scaleY = 1 + _loc2_;
+          if(_loc3_.scaleX <= 1.7)
+@@ -1543,8 +1543,8 @@
+             mXpBulgeTask = null;
+          }
+       }
+-      
+-      public function bulgeXpBar() 
++
++      public function bulgeXpBar()
+       {
+          mXpObject.root.scaleX *= 1.08;
+          mXpObject.root.scaleY *= 1.08;
+@@ -1553,11 +1553,11 @@
+             mXpBulgeTask = mLogicalWorkComponent.doEveryFrame(updateXpBulge);
+          }
+       }
+-      
+-      function updateProfileBulge(param1:GameClock) 
++
++      function updateProfileBulge(param1:GameClock)
+       {
+          var _loc2_= mProfileBox.scaleX - 1;
+-         _loc2_ *= 0.75;
++         _loc2_ *= Math.pow(0.75,param1.tickLength / GameClock.ANIMATION_FRAME_DURATION);
+          mProfileBox.scaleX = 1 + _loc2_;
+          mProfileBox.scaleY = 1 + _loc2_;
+          if(mProfileBox.scaleX <= 1.7)
+@@ -1568,8 +1568,8 @@
+             mProfileBulgeTask = null;
+          }
+       }
+-      
+-      public function bulgeProfileBox() 
++
++      public function bulgeProfileBox()
+       {
+          mProfileBox.scaleX *= 1.7;
+          mProfileBox.scaleY *= 1.7;
+@@ -1578,8 +1578,8 @@
+             mProfileBulgeTask = mLogicalWorkComponent.doEveryFrame(updateProfileBulge);
+          }
+       }
+-      
+-      public function destroy() 
++
++      public function destroy()
+       {
+          var _loc2_= 0;
+          var _loc1_:UIButton = null;
+@@ -1794,14 +1794,14 @@
+          mBusterLabelOver = null;
+          mSwfAsset = null;
+       }
+-      
++
+       @:isVar public var offScreenPlayerManager(get,never):UIOffScreenPlayerManager;
+ public function  get_offScreenPlayerManager() : UIOffScreenPlayerManager
+       {
+          return mOffScreenPlayerManager;
+       }
+-      
+-      public function showBustSign() 
++
++      public function showBustSign()
+       {
+          ASCompat.setProperty((mUIRoot : ASAny).UI_buster_glow, "visible", true);
+          mBusterGlowMc.play((1 : UInt),false,function()
+@@ -1811,23 +1811,23 @@
+             ASCompat.setProperty((mUIRoot : ASAny).UI_buster.buster_activated_glow, "visible", true);
+          });
+       }
+-      
+-      public function hideBustSign() 
++
++      public function hideBustSign()
+       {
+          ASCompat.setProperty((mUIRoot : ASAny).UI_buster_glow, "visible", false);
+          ASCompat.setProperty((mUIRoot : ASAny).UI_buster_active, "visible", false);
+          ASCompat.setProperty((mUIRoot : ASAny).UI_buster.buster_activated_glow, "visible", false);
+       }
+-      
+-      public function handleBusterBarClickEvent() 
++
++      public function handleBusterBarClickEvent()
+       {
+          if(mHeroOwner != null && mHeroOwner.dungeonBusterPoints >= mHeroOwner.maxBusterPoints)
+          {
+             mEventComponent.dispatchEvent(new DungeonBusterControlActivatedEvent());
+          }
+       }
+-      
+-      public function setWeaponHighlight(param1:Int) 
++
++      public function setWeaponHighlight(param1:Int)
+       {
+          var _loc2_:UIButton;
+          final __ax4_iter_83 = mWeaponButtons;
+@@ -1838,38 +1838,38 @@
+          }
+          ASCompat.setProperty((mWeaponButtons[param1].root : ASAny).selectionFrame, "visible", true);
+       }
+-      
+-      public function hideNotEnoughMana() 
++
++      public function hideNotEnoughMana()
+       {
+          ASCompat.setProperty((mUIRoot : ASAny).UI_center_message, "visible", false);
+       }
+-      
+-      public function showNotEnoughMana() 
++
++      public function showNotEnoughMana()
+       {
+          ASCompat.setProperty((mUIRoot : ASAny).UI_center_message, "visible", true);
+          ASCompat.setProperty((mUIRoot : ASAny).UI_center_message, "text", Locale.getString("NOT_ENOUGH_MANA"));
+       }
+-      
++
+       @:isVar public var chatLog(get,never):UIChatLog;
+ public function  get_chatLog() : UIChatLog
+       {
+          return mUIChatLog;
+       }
+-      
+-      public function isInCooldown() 
++
++      public function isInCooldown()
+       {
+          showText("IS_IN_COOLDOWN");
+       }
+-      
+-      public function startCooldown(param1:Int, param2:Float) 
++
++      public function startCooldown(param1:Int, param2:Float)
+       {
+          mCooldowns[param1].clip.visible = true;
+          mCooldowns[param1].playRate = 1 / param2 * 4.1;
+          mCooldowns[param1].play();
+          ASCompat.setProperty((mWeaponButtons[param1].root : ASAny).graphic, "alpha", 0.5);
+       }
+-      
+-      public function stopCooldown(param1:Int) 
++
++      public function stopCooldown(param1:Int)
+       {
+          var currentWeaponIndex= param1;
+          mCooldowns[currentWeaponIndex].stop();
+@@ -1889,16 +1889,16 @@
+             }
+          });
+       }
+-      
+-      public function startConsumableCooldown(param1:Int, param2:Float) 
++
++      public function startConsumableCooldown(param1:Int, param2:Float)
+       {
+          mConsumableCooldowns[param1].clip.visible = true;
+          mConsumableCooldowns[param1].playRate = 1 / param2 * 4.1;
+          mConsumableCooldowns[param1].play();
+          ASCompat.setProperty((mConsumableWeaponButtons[param1].root : ASAny).graphic, "alpha", 0.5);
+       }
+-      
+-      public function stopConsumableCooldown(param1:Int) 
++
++      public function stopConsumableCooldown(param1:Int)
+       {
+          var currentWeaponIndex= param1;
+          mConsumableCooldowns[currentWeaponIndex].stop();
+@@ -1918,19 +1918,19 @@
+             }
+          });
+       }
+-      
+-      public function decrementConsumableCount(param1:UInt) 
++
++      public function decrementConsumableCount(param1:UInt)
+       {
+          ASCompat.setProperty((mConsumableWeaponButtons[(param1 : Int)].root : ASAny).quantity, "text", Std.string((ASCompat.toInt((mConsumableWeaponButtons[(param1 : Int)].root : ASAny).quantity.text) - 1)));
+       }
+-      
+-      public function totalConsumableCountReached(param1:UInt) 
++
++      public function totalConsumableCountReached(param1:UInt)
+       {
+          mConsumableWeaponButtons[(param1 : Int)].enabled = false;
+          mConsumableWeaponButtons[(param1 : Int)].root.filters = cast([new ColorMatrixFilter(cast([0.3086,0.6094,0.082,0,0,0.3086,0.6094,0.082,0,0,0.3086,0.6094,0.082,0,0,0,0,0,1,0]))]);
+       }
+-      
+-      public function showText(param1:String) 
++
++      public function showText(param1:String)
+       {
+          var localeTextName= param1;
+          if((mUIRoot : ASAny).UI_center_message.visible == false)
+@@ -1947,44 +1947,44 @@
+             ASCompat.setProperty((mUIRoot : ASAny).UI_center_message, "text", Locale.getString(localeTextName));
+          }
+       }
+-      
++
+       @:isVar public var teamLootDestination(get,never):Vector3D;
+ public function  get_teamLootDestination() : Vector3D
+       {
+          return mTeamLootDestination;
+       }
+-      
++
+       @:isVar public var profileDestination(get,never):Vector3D;
+ public function  get_profileDestination() : Vector3D
+       {
+          return mProfileDestination;
+       }
+-      
++
+       @:isVar public var coinsDestination(get,never):Vector3D;
+ public function  get_coinsDestination() : Vector3D
+       {
+          return mCoinsDestination;
+       }
+-      
++
+       @:isVar public var cashDestination(get,never):Vector3D;
+ public function  get_cashDestination() : Vector3D
+       {
+          return mCashDestination;
+       }
+-      
++
+       @:isVar public var expDestination(get,never):Vector3D;
+ public function  get_expDestination() : Vector3D
+       {
+          return mExpDestination;
+       }
+-      
++
+       @:isVar public var crowdDestination(get,never):Vector3D;
+ public function  get_crowdDestination() : Vector3D
+       {
+          return mCrowdDestination;
+       }
+-      
+-      public function showBuffDisplay(param1:BuffGameObject) 
++
++      public function showBuffDisplay(param1:BuffGameObject)
+       {
+          var buffGO= param1;
+          mAssetLoadingComponent.getSwfAsset(DBFacade.buildFullDownloadPath(buffGO.buffData.IconSwf),function(param1:SwfAsset)
+@@ -2010,14 +2010,14 @@
+             startBuffCooldown(mBuffIconButtons.length - 1,buffGO.buffData.Duration);
+          });
+       }
+-      
+-      public function startBuffCooldown(param1:Int, param2:Float) 
++
++      public function startBuffCooldown(param1:Int, param2:Float)
+       {
+          mBuffCooldowns[param1].playRate = 1 / param2 * 4.1;
+          mBuffCooldowns[param1].play();
+       }
+-      
+-      public function updateBuffDisplay(param1:GameClock) 
++
++      public function updateBuffDisplay(param1:GameClock)
+       {
+          var _loc3_= 0;
+          var _loc2_:BuffGameObject = null;
+@@ -2037,8 +2037,8 @@
+             _loc3_++;
+          }
+       }
+-      
+-      public function updateBuffInstance(param1:BuffGameObject) 
++
++      public function updateBuffInstance(param1:BuffGameObject)
+       {
+          var _loc2_:BuffGameObject = null;
+          var _loc3_= 0;
+@@ -2056,8 +2056,8 @@
+             _loc3_++;
+          }
+       }
+-      
+-      public function resetBuffButtonPositions() 
++
++      public function resetBuffButtonPositions()
+       {
+          var _loc1_= 0;
+          _loc1_ = 0;
+@@ -2076,8 +2076,8 @@
+             _loc1_++;
+          }
+       }
+-      
+-      public function refreshHUD() 
++
++      public function refreshHUD()
+       {
+          this.setupUI(mSwfAsset,mHudType);
+       }
 Index: src/brain/facade/Facade.hx
 IDEA additional info:
 Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
 <+>UTF-8
 ===================================================================
 diff --git a/src/brain/facade/Facade.hx b/src/brain/facade/Facade.hx
---- a/src/brain/facade/Facade.hx	(revision a9e410d8dfab55119fb74203f4469f8148a7f423)
-+++ b/src/brain/facade/Facade.hx	(date 1776994569621)
+--- a/src/brain/facade/Facade.hx	(revision 01acca451363f537dbdaab9a860100b5e1ef999e)
++++ b/src/brain/facade/Facade.hx	(date 1777079914783)
 @@ -29,7 +29,7 @@
        
        public static inline final MAX_TICKS_PER_FRAME= 5;
@@ -763,8 +3272,8 @@ Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
 <+>UTF-8
 ===================================================================
 diff --git a/src/actor/pets/PetPortraitUI.hx b/src/actor/pets/PetPortraitUI.hx
---- a/src/actor/pets/PetPortraitUI.hx	(revision a9e410d8dfab55119fb74203f4469f8148a7f423)
-+++ b/src/actor/pets/PetPortraitUI.hx	(date 1776993769464)
+--- a/src/actor/pets/PetPortraitUI.hx	(revision 01acca451363f537dbdaab9a860100b5e1ef999e)
++++ b/src/actor/pets/PetPortraitUI.hx	(date 1777079914711)
 @@ -106,7 +106,7 @@
           }
           mCoolDownRenderer = new MovieClipRenderer(mDBFacade,ASCompat.dynamicAs((root : ASAny).cooldown, flash.display.MovieClip));
@@ -780,8 +3289,8 @@ Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
 <+>UTF-8
 ===================================================================
 diff --git a/src/brain/clock/GameClock.hx b/src/brain/clock/GameClock.hx
---- a/src/brain/clock/GameClock.hx	(revision a9e410d8dfab55119fb74203f4469f8148a7f423)
-+++ b/src/brain/clock/GameClock.hx	(date 1776922357325)
+--- a/src/brain/clock/GameClock.hx	(revision 01acca451363f537dbdaab9a860100b5e1ef999e)
++++ b/src/brain/clock/GameClock.hx	(date 1777079914767)
 @@ -5,6 +5,10 @@
      class GameClock
     {

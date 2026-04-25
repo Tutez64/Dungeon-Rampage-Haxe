@@ -10,61 +10,61 @@ package combat.weapon
    import facade.DBFacade;
    import gameMasterDictionary.GMAttack;
    import gameMasterDictionary.GMModifier;
-   
+
     class ScalingWeaponController extends WeaponController
    {
-      
+
       public static inline final SCALING_EFFECT_SWF= "Resources/Art2D/FX/db_fx_library.swf";
-      
+
       var mPowerMultiplier:Float = 1;
-      
+
       var mProjectileMinMultiplier:UInt = (1 : UInt);
-      
+
       var mProjectileMaxMultiplier:UInt = (1 : UInt);
-      
+
       var mProjectileStartScalingAngle:Float = 0;
-      
+
       var mProjectileEndScalingAngle:Float = 20;
-      
+
       var mProjectileScaleTapAttack:Bool = false;
-      
+
       var mDistanceScalingTime:Float = 0;
-      
+
       var mDistanceScalingForHeroMin:Float = 0;
-      
+
       var mDistanceScalingForHeroMax:Float = 0;
-      
+
       var mDistanceScalingForProjectilesMin:Float = 0;
-      
+
       var mDistanceScalingForProjectilesMax:Float = 0;
-      
+
       var mTotalTime:Float = 0;
-      
-      var mFramesFinished:UInt = (0 : UInt);
-      
+
+      var mFramesFinished:Float = 0;
+
       var mPlayerExittedState:Bool = false;
-      
+
       var mChargeReleaseGMAttack:GMAttack;
-      
+
       var NOT_ENOUGH_MANA_ON_CHARGE_DELAY:Float = 0.2;
-      
+
       var mNotEnoughManaTask:Task;
-      
+
       var mScalingLogicalWorkComponent:LogicalWorkComponent;
-      
+
       var mHoldingAttack:GMAttack;
-      
+
       var mHoldingAttackTimeline:AttackTimeline;
-      
+
       var mTutorialMessageSent:Bool = false;
-      
+
       public function new(param1:DBFacade, param2:WeaponGameObject, param3:HeroGameObjectOwner)
       {
          super(param1,param2,param3);
          buildControllerAttacks();
       }
-      
-      public function buildControllerAttacks() 
+
+      public function buildControllerAttacks()
       {
          mScalingLogicalWorkComponent = new LogicalWorkComponent(mDBFacade,"ScalingWeaponController");
          mHoldingAttack = ASCompat.dynamicAs(mDBFacade.gameMaster.attackByConstant.itemFor(mWeapon.weaponData.HoldingAttack), gameMasterDictionary.GMAttack);
@@ -74,8 +74,8 @@ package combat.weapon
          }
          setAttributes();
       }
-      
-      public function setAttributes() 
+
+      public function setAttributes()
       {
          mPowerMultiplier = mWeapon.weaponData.ScalingMaxPowerMultiplier;
          mProjectileScaleTapAttack = mWeapon.weaponData.ScaleTapAttack;
@@ -92,8 +92,8 @@ package combat.weapon
          mChargeReleaseGMAttack = ASCompat.dynamicAs(mDBFacade.gameMaster.attackByConstant.itemFor(_loc1_), gameMasterDictionary.GMAttack);
          setTotalTime();
       }
-      
-      public function setTotalTime() 
+
+      public function setTotalTime()
       {
          mTotalTime = mWeapon.weaponData.ControllerTimeTillEnd;
          if(mTotalTime == 0)
@@ -101,25 +101,25 @@ package combat.weapon
             Logger.error("Weapon has no ControllerTimeTillEnd data set !");
          }
       }
-      
+
       public function setStartEffectTotalTime() : Float
       {
          return 1.2;
       }
-      
-      public function startHoldingAttack() 
+
+      public function startHoldingAttack()
       {
          var _loc1_= 1 / mTotalTime * setStartEffectTotalTime();
          attack(mHoldingAttack.Id,mAutoAim,_loc1_);
       }
-      
-      override public function onWeaponDown(param1:Bool = true) 
+
+      override public function onWeaponDown(param1:Bool = true)
       {
          var autoAim= param1;
          if(!mWeaponDownActive)
          {
             super.onWeaponDown(autoAim);
-            mFramesFinished = (0 : UInt);
+            mFramesFinished = 0;
             mWeaponDownActive = true;
             mScalingLogicalWorkComponent.clear();
             if(mTotalTime > 0)
@@ -146,8 +146,8 @@ package combat.weapon
             mPlayerExittedState = false;
          }
       }
-      
-      override public function onWeaponUp(param1:Bool = true) 
+
+      override public function onWeaponUp(param1:Bool = true)
       {
          var _loc12_:GMModifier;
          var __ax4_iter_0:Vector<GMModifier>;
@@ -268,15 +268,15 @@ package combat.weapon
          }
          clear();
       }
-      
-      public function update(param1:GameClock) 
+
+      public function update(param1:GameClock)
       {
-         mFramesFinished = mFramesFinished + 1;
+         mFramesFinished += param1.tickLength / GameClock.ANIMATION_FRAME_DURATION;
       }
-      
-      override public function clear() 
+
+      override public function clear()
       {
-         mFramesFinished = (0 : UInt);
+         mFramesFinished = 0;
          mScalingLogicalWorkComponent.clear();
          mWeaponDownActive = false;
          if(mNotEnoughManaTask != null)
@@ -285,7 +285,7 @@ package combat.weapon
             mNotEnoughManaTask = null;
          }
       }
-      
+
       override public function canCombo() : Bool
       {
          if(mCurrentAttackTimeline != null)
@@ -302,8 +302,8 @@ package combat.weapon
          }
          return true;
       }
-      
-      override public function destroy() 
+
+      override public function destroy()
       {
          super.destroy();
          mScalingLogicalWorkComponent.destroy();
