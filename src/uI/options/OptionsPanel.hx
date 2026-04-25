@@ -125,6 +125,7 @@ package uI.options
             mDBFacade.featureFlags.setFlagDatabaseValueOnFirstLoad("want-damage-floaters",true);
             mDBFacade.featureFlags.setFlagDatabaseValueOnFirstLoad("want-town-animations",true);
             mDBFacade.featureFlags.setFlagDatabaseValueOnFirstLoad("want-buster-background-fade",true);
+            mDBFacade.featureFlags.setFlagDatabaseValueOnFirstLoad("want-pickup-ui-pop",true);
          }
          else if(mGraphicsQuality == "low")
          {
@@ -133,6 +134,7 @@ package uI.options
             mDBFacade.featureFlags.setFlagDatabaseValueOnFirstLoad("want-damage-floaters",false);
             mDBFacade.featureFlags.setFlagDatabaseValueOnFirstLoad("want-town-animations",false);
             mDBFacade.featureFlags.setFlagDatabaseValueOnFirstLoad("want-buster-background-fade",false);
+            mDBFacade.featureFlags.setFlagDatabaseValueOnFirstLoad("want-pickup-ui-pop",false);
          }
          var _loc2_= mDBFacade.dbAccountInfo.getAttribute("optionsHudStyle");
          if(_loc2_ != null)
@@ -249,6 +251,7 @@ package uI.options
             mDBFacade.featureFlags.setFlagOverrideValue("want-damage-floaters",true);
             mDBFacade.featureFlags.setFlagOverrideValue("want-town-animations",true);
             mDBFacade.featureFlags.setFlagOverrideValue("want-buster-background-fade",true);
+            mDBFacade.featureFlags.setFlagOverrideValue("want-pickup-ui-pop",true);
          }
          else if(mGraphicsQuality == "low")
          {
@@ -257,6 +260,7 @@ package uI.options
             mDBFacade.featureFlags.setFlagOverrideValue("want-damage-floaters",false);
             mDBFacade.featureFlags.setFlagOverrideValue("want-town-animations",false);
             mDBFacade.featureFlags.setFlagOverrideValue("want-buster-background-fade",false);
+            mDBFacade.featureFlags.setFlagOverrideValue("want-pickup-ui-pop",false);
          }
       }
       

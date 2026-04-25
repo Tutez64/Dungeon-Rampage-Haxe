@@ -16,6 +16,8 @@ package brain.utils
       public static inline final WANT_TOWN_ANIMATIONS= "want-town-animations";
       
       public static inline final WANT_BUSTER_BACKGROUND_FADE= "want-buster-background-fade";
+
+      public static inline final WANT_PICKUP_UI_POP= "want-pickup-ui-pop";
       
       public static inline final WANT_MANA_BARS= "want-mana-bars";
       
@@ -28,6 +30,8 @@ package brain.utils
       public static inline final EXPERIMENTAL_USE_STEAM_INPUT= "experimental-use-steam-input";
       
       public static inline final WANT_STEAM_ACHIEVEMENTS= "want-steam-achievements";
+
+      public static inline final USE_FALLBACK_SOCKET_PORT= "use-fallback-socket-port";
       
       var mFeatureFlags:ASDictionary<ASAny,ASAny>;
       
@@ -42,12 +46,14 @@ package brain.utils
          addFeatureFlag("want-damage-floaters",false);
          addFeatureFlag("want-town-animations",false);
          addFeatureFlag("want-buster-background-fade",false);
+         addFeatureFlag("want-pickup-ui-pop",false);
          addFeatureFlag("want-mana-bars",false);
          addFeatureFlag("quality-control-button",true);
          addFeatureFlag("want-numbered-hud",false);
          addFeatureFlag("want-hud-refresh-on-floor-transition",false);
          addFeatureFlag("experimental-use-steam-input",false);
          addFeatureFlag("want-steam-achievements",false);
+         addFeatureFlag("use-fallback-socket-port",false);
       }
       
       function addFeatureFlag(param1:String, param2:Bool, param3:String = null, param4:String = null) 

@@ -148,6 +148,8 @@ package uI.hud
 
       var mProfileBulgeTask:Task;
 
+      var mProfileRestScale:Float;
+
       var mFloaterTextClass:Dynamic;
 
       var mHpBar:UIProgressBar;
@@ -193,6 +195,8 @@ package uI.hud
       var mXpGotInitialUpdate:Bool = false;
 
       var mXpBulgeTask:Task;
+
+      var mXpRestScale:Float;
 
       var mXpValue:UInt = 0;
 
@@ -486,6 +490,7 @@ public function  get_swfAsset() : SwfAsset
             mWantPets = true;
          }
          mProfileBox = ASCompat.dynamicAs((mUIRoot : ASAny).UI_profile, flash.display.MovieClip);
+         mProfileRestScale = mProfileBox.scaleX;
          mHpBar = new UIProgressBar(mDBFacade,ASCompat.dynamicAs((mUIRoot : ASAny).UI_profile.HP_bar, flash.display.MovieClip),ASCompat.dynamicAs((mUIRoot : ASAny).UI_profile.HP_bar_delta, flash.display.MovieClip));
          mHpText = ASCompat.dynamicAs((mUIRoot : ASAny).UI_profile.HP_text, flash.text.TextField);
          mHpText.visible = false;
@@ -539,6 +544,7 @@ public function  get_swfAsset() : SwfAsset
          }
          mLevelText = ASCompat.dynamicAs((mUIRoot : ASAny).UI_XP.xp_level, flash.text.TextField);
          mXpObject = new UIObject(mDBFacade,ASCompat.dynamicAs((mUIRoot : ASAny).UI_XP, flash.display.MovieClip));
+         mXpRestScale = mXpObject.root.scaleX;
          mXpBar = new UIProgressBar(mDBFacade,ASCompat.dynamicAs((mUIRoot : ASAny).UI_XP.xp_bar, flash.display.MovieClip),ASCompat.dynamicAs((mUIRoot : ASAny).UI_XP.xp_bar_delta, flash.display.MovieClip));
          ASCompat.setProperty((mUIRoot : ASAny).UI_XP.xp_bar_delta, "alpha", 0.3);
          mXpText = ASCompat.dynamicAs((mUIRoot : ASAny).UI_XP.xp_points, flash.text.TextField);
@@ -1032,6 +1038,7 @@ public function  get_swfAsset() : SwfAsset
             UIObject.scaleToFit(_loc3_,dungeonModButton.root.width);
             _loc3_.x += 10;
             _loc3_.y += 10;
+            dungeonModButton.root.removeChildren();
             dungeonModButton.root.addChild(_loc3_);
             dungeonModButton.root.visible = true;
          });
@@ -1531,14 +1538,14 @@ public function  get_floaterTextClass() : Dynamic
       function updateXpBulge(param1:GameClock)
       {
          var _loc3_= mXpObject.root;
-         var _loc2_= _loc3_.scaleX - 1;
+         var _loc2_= _loc3_.scaleX - mXpRestScale;
          _loc2_ *= Math.pow(0.75,param1.tickLength / GameClock.ANIMATION_FRAME_DURATION);
-         _loc3_.scaleX = 1 + _loc2_;
-         _loc3_.scaleY = 1 + _loc2_;
-         if(_loc3_.scaleX <= 1.7)
+         _loc3_.scaleX = mXpRestScale + _loc2_;
+         _loc3_.scaleY = mXpRestScale + _loc2_;
+         if(Math.abs(_loc2_) <= 0.01)
          {
-            _loc3_.scaleX = 1.7;
-            _loc3_.scaleY = 1.7;
+            _loc3_.scaleX = mXpRestScale;
+            _loc3_.scaleY = mXpRestScale;
             mXpBulgeTask.destroy();
             mXpBulgeTask = null;
          }
@@ -1546,6 +1553,10 @@ public function  get_floaterTextClass() : Dynamic
 
       public function bulgeXpBar()
       {
+         if(!mDBFacade.featureFlags.getFlagValue("want-pickup-ui-pop"))
+         {
+            return;
+         }
          mXpObject.root.scaleX *= 1.08;
          mXpObject.root.scaleY *= 1.08;
          if(mXpBulgeTask == null)
@@ -1556,14 +1567,14 @@ public function  get_floaterTextClass() : Dynamic
 
       function updateProfileBulge(param1:GameClock)
       {
-         var _loc2_= mProfileBox.scaleX - 1;
+         var _loc2_= mProfileBox.scaleX - mProfileRestScale;
          _loc2_ *= Math.pow(0.75,param1.tickLength / GameClock.ANIMATION_FRAME_DURATION);
-         mProfileBox.scaleX = 1 + _loc2_;
-         mProfileBox.scaleY = 1 + _loc2_;
-         if(mProfileBox.scaleX <= 1.7)
+         mProfileBox.scaleX = mProfileRestScale + _loc2_;
+         mProfileBox.scaleY = mProfileRestScale + _loc2_;
+         if(Math.abs(_loc2_) <= 0.01)
          {
-            mProfileBox.scaleX = 1.7;
-            mProfileBox.scaleY = 1.7;
+            mProfileBox.scaleX = mProfileRestScale;
+            mProfileBox.scaleY = mProfileRestScale;
             mProfileBulgeTask.destroy();
             mProfileBulgeTask = null;
          }
@@ -1571,8 +1582,12 @@ public function  get_floaterTextClass() : Dynamic
 
       public function bulgeProfileBox()
       {
-         mProfileBox.scaleX *= 1.7;
-         mProfileBox.scaleY *= 1.7;
+         if(!mDBFacade.featureFlags.getFlagValue("want-pickup-ui-pop"))
+         {
+            return;
+         }
+         mProfileBox.scaleX *= 1.08;
+         mProfileBox.scaleY *= 1.08;
          if(mProfileBulgeTask == null)
          {
             mProfileBulgeTask = mLogicalWorkComponent.doEveryFrame(updateProfileBulge);

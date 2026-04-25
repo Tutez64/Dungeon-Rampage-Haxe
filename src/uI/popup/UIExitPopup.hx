@@ -1,9 +1,12 @@
 package uI.popup
 ;
    import brain.assetRepository.SwfAsset;
+   import brain.uI.UIButton;
+   import dBGlobals.DBGlobal;
    import facade.DBFacade;
    import facade.Locale;
    import flash.desktop.NativeApplication;
+   import flash.net.URLRequest;
    
     class UIExitPopup extends DBUITwoButtonPopup
    {
@@ -11,6 +14,8 @@ package uI.popup
       static inline final SWF_PATH= "Resources/Art2D/UI/db_UI_town.swf";
       
       static inline final POPUP_CLASS_NAME= "popup_exit";
+
+      var mDiscordButton:UIButton;
       
       public function new(param1:DBFacade)
       {
@@ -41,6 +46,16 @@ package uI.popup
          }
          super(param1,_loc4_,_loc6_,_loc2_,_loc5_,_loc8_,_loc3_,true,closePopupAction,true,true,"EXIT_POPUP");
       }
+
+      override public function destroy() 
+      {
+         if(mDiscordButton != null)
+         {
+            mDiscordButton.destroy();
+            mDiscordButton = null;
+         }
+         super.destroy();
+      }
       
       function wishlistAction() 
       {
@@ -59,7 +74,18 @@ package uI.popup
       
       override function setupUI(param1:SwfAsset, param2:String, param3:ASAny, param4:Bool, param5:ASFunction) 
       {
-         super.setupUI(param1,param2,param3,param4,param5);
+         var swfAsset= param1;
+         var titleText= param2;
+         var content:ASAny = param3;
+         var allowClose= param4;
+         var closeCallback= param5;
+         super.setupUI(swfAsset,titleText,content,allowClose,closeCallback);
+         mDiscordButton = new UIButton(mDBFacade,ASCompat.dynamicAs((mPopup : ASAny).discord_button, flash.display.MovieClip));
+         mDiscordButton.releaseCallback = function()
+         {
+            var _loc1_= new URLRequest("https://discord.com/invite/dungeonrampage");
+            flash.Lib.getURL(_loc1_,"_blank");
+         };
          setupMenuNavigationLinks();
       }
       
@@ -78,7 +104,17 @@ package uI.popup
          mCloseButton.clearNavigationAndInteractions();
          mLeftButton.clearNavigationAndInteractions();
          mRightButton.clearNavigationAndInteractions();
-         mRightButton.isToTheLeftOf(mLeftButton);
+         mDiscordButton.clearNavigationAndInteractions();
+         mDiscordButton.navigationSelectedInteraction = function()
+         {
+            DBGlobal.highlightButton(mDiscordButton);
+         };
+         mDiscordButton.navigationSetToUnselectedInteraction = function()
+         {
+            DBGlobal.unHighlightButton(mDiscordButton);
+         };
+         mLeftButton.isToTheLeftOf(mDiscordButton);
+         mDiscordButton.isToTheLeftOf(mRightButton);
          mCloseButton.isAbove(mLeftButton);
          mRightButton.upNavigation = mCloseButton;
       }

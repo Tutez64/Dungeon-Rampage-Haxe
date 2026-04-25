@@ -136,6 +136,8 @@ package facade
       var mGameSocketAddress:String;
       
       var mGameSocketPort:Int = 0;
+
+      var mGameSocketFallbackPort:Int = 0;
       
       var mWebAPIRoot:String;
       
@@ -690,6 +692,7 @@ public function  get_kongregateAPI() : ASAny
          mWebServicesUrl = ASCompat.asString(param1.webServicesUrl );
          mGameSocketAddress = ASCompat.asString(param1.gameSocketAddress );
          mGameSocketPort = ASCompat.asInt(param1.gameSocketPort );
+         mGameSocketFallbackPort = param1.gameSocketFallbackPort != null ? ASCompat.asInt(param1.gameSocketFallbackPort ) : 0;
          mWebAPIRoot = mWebServicesUrl + "/api/";
          mRPCRoot = mWebServicesUrl + "/rpc/";
          mSteamAPIRoot = mWebServicesUrl + "/steam/";
@@ -906,6 +909,8 @@ public function  get_sCode() : Int
       
       public function powerUpDistributedObjectManager() 
       {
+         var useFallbackSocketPort:Bool = false;
+         var gameSocketPort:Int = 0;
          Logger.info("*****************Starting powerUpDistributedObjectManager");
          this.loadingBarTick();
          if(mDistributedObjectManager == null)
@@ -915,15 +920,17 @@ public function  get_sCode() : Int
                Logger.fatal("GameSocketAddress is empty.  Unable to continue.");
                return;
             }
-            if(mGameSocketPort == 0)
+            useFallbackSocketPort = featureFlags.getFlagValue("use-fallback-socket-port");
+            gameSocketPort = useFallbackSocketPort ? mGameSocketFallbackPort : mGameSocketPort;
+            if(gameSocketPort == 0)
             {
-               Logger.fatal("GameSocketPort is empty.  Unable to continue.");
+               Logger.fatal("GameSocketPort is empty (useFallback=" + useFallbackSocketPort + ").  Unable to continue.");
                return;
             }
             Security.loadPolicyFile("xmlsocket://" + mGameSocketAddress + ":843");
             mDistributedObjectManager = new DistributedObjectManager(this);
             MemoryTracker.track(mDistributedObjectManager,"DistributedObjectManager - created in DBFacade.startGame()");
-            mDistributedObjectManager.Initialize(mGameSocketAddress,mGameSocketPort,validationToken,demographicsJson,accountId,(Std.int(dbConfigManager.networkId) : UInt),NODE_RULES);
+            mDistributedObjectManager.Initialize(mGameSocketAddress,gameSocketPort,validationToken,demographicsJson,accountId,(Std.int(dbConfigManager.networkId) : UInt),NODE_RULES);
          }
       }
       
