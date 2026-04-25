@@ -67,7 +67,7 @@ package brain.camera
          else
          {
             _loc6_ = Std.int(mDuration - mFramesElapsed);
-            mDuration = (ASCompat.toInt(_loc6_ > param2 ? _loc6_ : param2) : UInt);
+            mDuration = (ASCompat.toInt((_loc6_ : UInt) > param2 ? (_loc6_ : UInt) : param2) : UInt);
             mTransitionDuration = param3;
             mFramesElapsed = 0;
             mAlpha = mAlpha > param5 ? mAlpha : param5;

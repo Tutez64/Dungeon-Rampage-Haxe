@@ -1799,7 +1799,7 @@ diff --git a/src/brain/camera/BackgroundFader.hx b/src/brain/camera/BackgroundFa
 -            _loc6_ = (mDuration - mFramesElapsed : Int);
 -            mDuration = (ASCompat.toInt((_loc6_ : UInt) > param2 ? (_loc6_ : UInt) : param2) : UInt);
 +            _loc6_ = Std.int(mDuration - mFramesElapsed);
-+            mDuration = (ASCompat.toInt(_loc6_ > param2 ? _loc6_ : param2) : UInt);
++            mDuration = (ASCompat.toInt((_loc6_ : UInt) > param2 ? (_loc6_ : UInt) : param2) : UInt);
              mTransitionDuration = param3;
 -            mFramesElapsed = (0 : UInt);
 +            mFramesElapsed = 0;
