@@ -1,0 +1,34 @@
+Subject: [PATCH] This prevents an error from DR (which results in a crash in native targets)
+---
+Index: src/town/HomeState.hx
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/town/HomeState.hx b/src/town/HomeState.hx
+--- a/src/town/HomeState.hx	(revision 2f9d4f984897b82af463574c270bf7ee6faa7c07)
++++ b/src/town/HomeState.hx	(date 1777149832994)
+@@ -289,11 +289,6 @@
+          mShopButton.isToTheLeftOf(mCreditsButton);
+          setupHeaderLinks();
+          mDBFacade.menuNavigationController.pushNewLayer("TOWN_MENU",mTownStateMachine.townHeader.determineCallback,mBattleButton,mBattleButton);
+-         if(mFriendLeaderboardDelayMenuNavigationLinkageTask != null)
+-         {
+-            mFriendLeaderboardDelayMenuNavigationLinkageTask.destroy();
+-         }
+-         mFriendLeaderboardDelayMenuNavigationLinkageTask = mLogicalWorkComponent.doLater(2,setupFriendLinks);
+       }
+       
+       public function setupFriendLinks(param1:GameClock = null) 
+@@ -851,6 +846,11 @@
+             mUILeaderboard.currentStateName = "HomeState";
+             mUILeaderboard.hidePopup();
+          }
++         if(mFriendLeaderboardDelayMenuNavigationLinkageTask != null)
++         {
++            mFriendLeaderboardDelayMenuNavigationLinkageTask.destroy();
++         }
++         mFriendLeaderboardDelayMenuNavigationLinkageTask = mLogicalWorkComponent.doLater(2,setupFriendLinks);
+          mTownStateMachine.townHeader.title = Locale.getString("TOWN_HEADER");
+          mTownStateMachine.townHeader.inHomeState = true;
+          mTownStateMachine.townHeader.showCloseButton(true);

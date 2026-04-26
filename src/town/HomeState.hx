@@ -289,11 +289,6 @@ package town
          mShopButton.isToTheLeftOf(mCreditsButton);
          setupHeaderLinks();
          mDBFacade.menuNavigationController.pushNewLayer("TOWN_MENU",mTownStateMachine.townHeader.determineCallback,mBattleButton,mBattleButton);
-         if(mFriendLeaderboardDelayMenuNavigationLinkageTask != null)
-         {
-            mFriendLeaderboardDelayMenuNavigationLinkageTask.destroy();
-         }
-         mFriendLeaderboardDelayMenuNavigationLinkageTask = mLogicalWorkComponent.doLater(2,setupFriendLinks);
       }
       
       public function setupFriendLinks(param1:GameClock = null) 
@@ -851,6 +846,11 @@ package town
             mUILeaderboard.currentStateName = "HomeState";
             mUILeaderboard.hidePopup();
          }
+         if(mFriendLeaderboardDelayMenuNavigationLinkageTask != null)
+         {
+            mFriendLeaderboardDelayMenuNavigationLinkageTask.destroy();
+         }
+         mFriendLeaderboardDelayMenuNavigationLinkageTask = mLogicalWorkComponent.doLater(2,setupFriendLinks);
          mTownStateMachine.townHeader.title = Locale.getString("TOWN_HEADER");
          mTownStateMachine.townHeader.inHomeState = true;
          mTownStateMachine.townHeader.showCloseButton(true);
