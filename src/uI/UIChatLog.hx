@@ -455,6 +455,16 @@ default:
             mSlider.destroy();
          }
          mSlider = null;
+         if(mChatInputText != null)
+         {
+            mChatInputText.destroy();
+         }
+         mChatInputText = null;
+         if(mChatSendButton != null)
+         {
+            mChatSendButton.destroy();
+         }
+         mChatSendButton = null;
          if(mChatLogButton != null)
          {
             mChatLogButton.destroy();

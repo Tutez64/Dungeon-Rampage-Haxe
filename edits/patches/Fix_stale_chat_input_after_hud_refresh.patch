@@ -1,0 +1,27 @@
+Subject: [PATCH] Fix stale chat input after hud refresh causing crash
+---
+Index: src/uI/UIChatLog.hx
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/uI/UIChatLog.hx b/src/uI/UIChatLog.hx
+--- a/src/uI/UIChatLog.hx	(revision bba02df8e2a1f54d0d7d7724a003fe1d9a18d611)
++++ b/src/uI/UIChatLog.hx	(date 1777303942397)
+@@ -455,6 +455,16 @@
+             mSlider.destroy();
+          }
+          mSlider = null;
++         if(mChatInputText != null)
++         {
++            mChatInputText.destroy();
++         }
++         mChatInputText = null;
++         if(mChatSendButton != null)
++         {
++            mChatSendButton.destroy();
++         }
++         mChatSendButton = null;
+          if(mChatLogButton != null)
+          {
+             mChatLogButton.destroy();
