@@ -1,0 +1,344 @@
+Subject: [PATCH] Add debug auto repro modes for trophy summary crash. Used with Fix_trophy_panel_state_25_crash.patch
+---
+Index: src/distributedObjects/DistributedDungeonSummary.hx
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/distributedObjects/DistributedDungeonSummary.hx b/src/distributedObjects/DistributedDungeonSummary.hx
+--- a/src/distributedObjects/DistributedDungeonSummary.hx	(revision 897a687accaa302668dbe25425e5de7511bddfe2)
++++ b/src/distributedObjects/DistributedDungeonSummary.hx	(date 1777324149662)
+@@ -85,7 +85,7 @@
+ import flash.display.DisplayObject;
+ import flash.display.MovieClip;
+    
+-    class DistributedDungeonSummary extends GameObject implements IDistributedDungeonSummary
++	    class DistributedDungeonSummary extends GameObject implements IDistributedDungeonSummary
+    {
+       
+       static inline final SCORE_REPORT_PATH= "Resources/Art2D/UI/db_UI_score_report.swf";
+@@ -107,7 +107,15 @@
+       static inline final HIDE_TROPHY_AWARD_STATE= (25 : UInt);
+       
+       static inline final MAP_NODE_DEFEATED_FEED_POST= (30 : UInt);
+-      
++
++      static inline final DEBUG_AUTO_REPRO_MODE_OFF= (0 : UInt);
++
++      static inline final DEBUG_AUTO_REPRO_MODE_STANDARD_RARE= (1 : UInt);
++
++      static inline final DEBUG_AUTO_REPRO_MODE_UR_WEEKLY= (2 : UInt);
++
++      static inline final DEBUG_AUTO_REPRO_MODE= DEBUG_AUTO_REPRO_MODE_STANDARD_RARE;
++
+       static inline final REVEAL_STATE_BONUS_XP= (2 : UInt);
+       
+       static inline final REVEAL_STATE_BONUS_XP_TICK= (3 : UInt);
+@@ -235,7 +243,11 @@
+       var mTrophyGetMovieClipRenderer:MovieClipRenderer;
+       
+       var mDungeonAchievementPanelMovieClipRenderer:MovieClipRenderer;
+-      
++
++      var mDebugForcedReceivedTrophy:UInt = 0;
++
++      var mDebugForcedAchievementChestId:UInt = 0;
++
+       var mTransactionSuccessCallback:ASFunction;
+       
+       var mFacebookPicHolder:MovieClip;
+@@ -463,10 +475,142 @@
+       
+       function setRevealState(param1:UInt, param2:Float) 
+       {
++         Logger.warn("[TrophyReveal] schedule state transition from=" + Std.string(mRevealState) + " to=" + Std.string(param1) + " delay=" + Std.string(param2));
+          mRevealState = param1;
+          mWorkComponent.doLater(param2,updateRevealState);
+       }
+-      
++
++      function getEffectiveReceivedTrophy() : UInt
++      {
++         if(mDebugForcedReceivedTrophy != 0)
++         {
++            return mDebugForcedReceivedTrophy;
++         }
++         if(mDungeonReport == null || mDungeonReport.length == 0)
++         {
++            return (0 : UInt);
++         }
++         return mDungeonReport[0].receivedTrophy;
++      }
++
++      function getAchievementRewardChestId() : UInt
++      {
++         if(mDungeonReport == null || mDungeonReport.length == 0)
++         {
++            return (0 : UInt);
++         }
++         if(mDungeonReport[0].loot_type_2 > 0)
++         {
++            return mDungeonReport[0].loot_type_2;
++         }
++         return mDungeonReport[0].loot_type_1;
++      }
++
++      function getEffectiveAchievementRewardChestId() : UInt
++      {
++         if(mDebugForcedAchievementChestId != 0)
++         {
++            return mDebugForcedAchievementChestId;
++         }
++         return getAchievementRewardChestId();
++      }
++
++      function isInfiniteDungeonSummary() : Bool
++      {
++         return mCurrentMapNode != null && mCurrentMapNode.InfiniteDungeon != null;
++      }
++
++      function setDebugForcedTrophyOnly(param1:String)
++      {
++         var reason= param1;
++         mDebugForcedReceivedTrophy = (1 : UInt);
++         mDebugForcedAchievementChestId = (0 : UInt);
++         Logger.warn("[TrophyReveal] " + reason + " armed trophy-only revealState=" + Std.string(mRevealState));
++      }
++
++      function armDebugForcedTrophyReveal(param1:UInt, param2:String)
++      {
++         var chestId= param1;
++         var reason= param2;
++         mDebugForcedReceivedTrophy = (1 : UInt);
++         mDebugForcedAchievementChestId = chestId;
++         Logger.warn("[TrophyReveal] " + reason + " armed chestId=" + Std.string(chestId) + " revealState=" + Std.string(mRevealState));
++      }
++
++      function setDebugForcedLootSlot(param1:DungeonReport, param2:UInt, param3:UInt) : Bool
++      {
++         var report= param1;
++         var slot= param2;
++         var chestId= param3;
++         var gmDoober = ASCompat.dynamicAs(mDBFacade.gameMaster.dooberByChestId.itemFor(chestId), gameMasterDictionary.GMDoober);
++         if(report == null)
++         {
++            return false;
++         }
++         if(gmDoober == null)
++         {
++            Logger.warn("[TrophyReveal] debug auto repro skipped: no doober found for chestId=" + Std.string(chestId));
++            return false;
++         }
++         switch(slot)
++         {
++            case 0:
++               report.loot_type_1 = chestId;
++               report.chest_type_1 = gmDoober.Id;
++            case 1:
++               report.loot_type_2 = chestId;
++               report.chest_type_2 = gmDoober.Id;
++            case 2:
++               report.loot_type_3 = chestId;
++               report.chest_type_3 = gmDoober.Id;
++            case 3:
++               report.loot_type_4 = chestId;
++               report.chest_type_4 = gmDoober.Id;
++            default:
++               Logger.warn("[TrophyReveal] debug auto repro skipped: unsupported loot slot=" + Std.string(slot));
++               return false;
++         }
++         return true;
++      }
++
++      function applyDebugAutoReproProfile()
++      {
++         var report:DungeonReport = null;
++         if(DEBUG_AUTO_REPRO_MODE == DEBUG_AUTO_REPRO_MODE_OFF)
++         {
++            return;
++         }
++         if(mDungeonReport == null || mDungeonReport.length == 0)
++         {
++            Logger.warn("[TrophyReveal] debug auto repro skipped: no dungeon report available");
++            return;
++         }
++         report = mDungeonReport[0];
++         switch(DEBUG_AUTO_REPRO_MODE)
++         {
++            case DEBUG_AUTO_REPRO_MODE_STANDARD_RARE:
++               if(isInfiniteDungeonSummary())
++               {
++                  Logger.warn("[TrophyReveal] debug auto repro standard-rare skipped on infinite dungeon summary");
++                  return;
++               }
++               armDebugForcedTrophyReveal(UIHud.RARE_CHEST_ID,"debug auto standard rare");
++            case DEBUG_AUTO_REPRO_MODE_UR_WEEKLY:
++               if(!isInfiniteDungeonSummary())
++               {
++                  Logger.warn("[TrophyReveal] debug auto repro UR-weekly skipped on non-infinite dungeon summary");
++                  return;
++               }
++               if(setDebugForcedLootSlot(report,(0 : UInt),UIHud.SMALL_ITEM_BOX_ID) && setDebugForcedLootSlot(report,(1 : UInt),UIHud.ROYAL_ITEM_BOX_ID) && setDebugForcedLootSlot(report,(2 : UInt),UIHud.RARE_CHEST_ID) && setDebugForcedLootSlot(report,(3 : UInt),UIHud.LEGENDARY_CHEST_ID))
++               {
++                  setDebugForcedTrophyOnly("debug auto UR weekly");
++                  Logger.warn("[TrophyReveal] debug auto UR weekly forced loot loot=[" + Std.string(report.loot_type_1) + "," + Std.string(report.loot_type_2) + "," + Std.string(report.loot_type_3) + "," + Std.string(report.loot_type_4) + "] chestTypes=[" + Std.string(report.chest_type_1) + "," + Std.string(report.chest_type_2) + "," + Std.string(report.chest_type_3) + "," + Std.string(report.chest_type_4) + "]");
++               }
++            default:
++               Logger.warn("[TrophyReveal] debug auto repro skipped: unknown mode=" + Std.string(DEBUG_AUTO_REPRO_MODE));
++         }
++      }
++
+       function setUILootSlotsTwoTreasuresVisible(param1:Bool) 
+       {
+          var _loc3_= 0;
+@@ -555,6 +699,7 @@
+          var j:Int;
+          var clock= param1;
+          var stats:Array<ASAny> = [(mScoreReportRoot : ASAny).stats_a,(mScoreReportRoot : ASAny).stats_b,(mScoreReportRoot : ASAny).stats_c,(mScoreReportRoot : ASAny).stats_d];
++         Logger.warn("[TrophyReveal] updateRevealState enter state=" + Std.string(mRevealState) + " clockNull=" + Std.string(clock == null) + " rendererNull=" + Std.string(mDungeonAchievementPanelMovieClipRenderer == null) + " clipNull=" + Std.string(mDungeonAchievementPanelMovieClipRenderer == null || mDungeonAchievementPanelMovieClipRenderer.clip == null));
+          do {
+                   switch(mRevealState)
+          {
+@@ -582,37 +727,50 @@
+                setRevealState((20 : UInt),0.45);
+                
+             case 20:
+-               if(mDungeonReport[0].receivedTrophy == 0)
++               Logger.warn("[TrophyReveal] enter state=20 receivedTrophy=" + Std.string(getEffectiveReceivedTrophy()) + " rendererNull=" + Std.string(mDungeonAchievementPanelMovieClipRenderer == null) + " clipNull=" + Std.string(mDungeonAchievementPanelMovieClipRenderer == null || mDungeonAchievementPanelMovieClipRenderer.clip == null));
++               if(getEffectiveReceivedTrophy() == 0)
+                {
+                   setRevealState((2 : UInt),0.45);
+-                  break;
++                  return;
+                }
++               Logger.warn("[TrophyReveal] state=20 before show/play clipVisible=" + Std.string(mDungeonAchievementPanelMovieClipRenderer.clip.visible));
+                mDungeonAchievementPanelMovieClipRenderer.clip.visible = true;
+                ASCompat.setProperty((mScoreReportRoot : ASAny).stats_a.stats.trophies, "filters", [new GlowFilter((16633879 : UInt),1,8,8,10)]);
+                trophies = ASCompat.toInt((mScoreReportRoot : ASAny).stats_a.stats.trophies.trophies.text);
+                trophies = trophies + 1;
+                ASCompat.setProperty((mScoreReportRoot : ASAny).stats_a.stats.trophies.trophies, "text", Std.string(trophies));
+                trophyGetClipLength = (4 : UInt);
++               Logger.warn("[TrophyReveal] state=20 calling play trophyText=" + Std.string(trophies) + " trophyGetClipLength=" + Std.string(trophyGetClipLength));
+                mDungeonAchievementPanelMovieClipRenderer.play();
++               Logger.warn("[TrophyReveal] state=20 returned from play clipVisible=" + Std.string(mDungeonAchievementPanelMovieClipRenderer.clip.visible));
+                if(mSmashSfx != null)
+                {
+                   mSoundComponent.playSfxOneShot(mSmashSfx);
+                }
+                mLogicalWorkComponent.doLater(1.5833333333333333,function(param1:GameClock)
+                {
++                  Logger.warn("[TrophyReveal] delayed smash callback state=" + Std.string(mRevealState) + " rendererNull=" + Std.string(mDungeonAchievementPanelMovieClipRenderer == null) + " clipNull=" + Std.string(mDungeonAchievementPanelMovieClipRenderer == null || mDungeonAchievementPanelMovieClipRenderer.clip == null));
+                   if(mSmashSfx != null)
+                   {
+                      mSoundComponent.playSfxOneShot(mSmashSfx);
+                   }
+                });
+                setRevealState((25 : UInt),trophyGetClipLength);
+-               
++
+             case 25:
++               Logger.warn("[TrophyReveal] enter state=25 rendererNull=" + Std.string(mDungeonAchievementPanelMovieClipRenderer == null) + " clipNull=" + Std.string(mDungeonAchievementPanelMovieClipRenderer == null || mDungeonAchievementPanelMovieClipRenderer.clip == null));
+                if(mDungeonAchievementPanelMovieClipRenderer != null && mDungeonAchievementPanelMovieClipRenderer.clip != null)
+                {
+                   mDungeonAchievementPanelMovieClipRenderer.stop();
++                  Logger.warn("[TrophyReveal] state=25 after stop clipVisible=" + Std.string(mDungeonAchievementPanelMovieClipRenderer.clip.visible));
+                   mDungeonAchievementPanelMovieClipRenderer.clip.visible = false;
+                }
++               else
++               {
++                  Logger.warn("[TrophyReveal] state=25 skipping stop/hide because achievement panel renderer was already destroyed");
++               }
++               mDebugForcedReceivedTrophy = (0 : UInt);
++               mDebugForcedAchievementChestId = (0 : UInt);
+                setRevealState((30 : UInt),0.45);
+                
+             case 30:
+@@ -2690,16 +2848,16 @@
+             callBackFunc(DR.name,iconContainer,DR.id,button);
+          });
+       }
+-      
+-      function fadeAwayTitle() 
++
++      function fadeAwayTitle()
+       {
+          TweenMax.to(mBgRenderer.clip,1,{
+             "alpha":0,
+             "onComplete":killFadeAwayTitle
+          });
+       }
+-      
+-      function killFadeAwayTitle() 
++
++      function killFadeAwayTitle()
+       {
+          ASCompat.setProperty((mScoreReportRoot : ASAny).bg, "visible", false);
+          mBgRenderer.destroy();
+@@ -2881,6 +3039,7 @@
+             titleText = Locale.getString("CASHED_OUT");
+          }
+          ASCompat.setProperty((mScoreReportRoot : ASAny).bg.banner_text.title, "text", titleText);
++         applyDebugAutoReproProfile();
+          setupXPBars();
+          setupLoot();
+          setupChat();
+@@ -2892,6 +3051,7 @@
+          mRevealState = (1 : UInt);
+          updateRevealState(null);
+          mDungeonAchievementPanelMovieClipRenderer = new MovieClipRenderer(mDBFacade,ASCompat.dynamicAs((mScoreReportRoot : ASAny).achievement, flash.display.MovieClip),destroyAchievementBossPanel);
++         Logger.warn("[TrophyReveal] renderer created clipNull=" + Std.string(mDungeonAchievementPanelMovieClipRenderer.clip == null) + " receivedTrophy=" + Std.string(mDungeonReport[0].receivedTrophy));
+          mDungeonAchievementPanelMovieClipRenderer.clip.visible = false;
+          ASCompat.setProperty((mScoreReportRoot : ASAny).achievement.label.label, "text", Locale.getString("DUNGEON_SUMMARY_REWARD_PANEL_LABEL"));
+          if(mCurrentMapNode.InfiniteDungeon != null)
+@@ -2902,19 +3062,22 @@
+          {
+             ASCompat.setProperty((mScoreReportRoot : ASAny).achievement.label_boss.label, "text", Locale.getString("DUNGEON_SUMMARY_REWARD_PANEL_LABEL_BOSS"));
+          }
+-         if(mDungeonReport[0].receivedTrophy != 0)
++         if(getEffectiveReceivedTrophy() != 0)
+          {
++            Logger.warn("[TrophyReveal] requesting achievement chest asset loot1=" + Std.string(mDungeonReport[0].loot_type_1) + " loot2=" + Std.string(mDungeonReport[0].loot_type_2));
+             mAssetLoadingComponent.getSwfAsset(DBFacade.buildFullDownloadPath("Resources/Art2D/Doobers/db_items_doobers.swf"),function(param1:SwfAsset)
+             {
+                var _loc4_:GMChest = null;
+                var _loc3_:String = null;
+                var _loc2_:String = null;
+-               var _loc5_= mDungeonReport[0].loot_type_2 > 0 ? mDungeonReport[0].loot_type_2 : mDungeonReport[0].loot_type_1;
++               var _loc5_= getEffectiveAchievementRewardChestId();
++               Logger.warn("[TrophyReveal] achievement chest asset callback chestType=" + Std.string(_loc5_) + " infinite=" + Std.string(ASCompat.stringAsBool(mCurrentMapNode.InfiniteDungeon)));
+                if(_loc5_ != 0 && !ASCompat.stringAsBool(mCurrentMapNode.InfiniteDungeon))
+                {
+                   _loc4_ = ASCompat.dynamicAs(mDBFacade.gameMaster.chestsById.itemFor(_loc5_), gameMasterDictionary.GMChest);
+                   _loc3_ = _loc4_.IconSwf;
+                   _loc2_ = _loc4_.IconName;
++                  Logger.warn("[TrophyReveal] loading achievement chest icon swf=" + _loc3_ + " icon=" + _loc2_);
+                   ChestInfo.loadItemIcon(_loc3_,_loc2_,ASCompat.dynamicAs((mScoreReportRoot : ASAny).achievement.chest, flash.display.DisplayObjectContainer),mDBFacade,(400 : UInt),(150 : UInt),mAssetLoadingComponent);
+                }
+             });
+@@ -2924,8 +3087,8 @@
+             ASCompat.setProperty((mScoreReportRoot : ASAny).achievement.chest.defaultPic, "visible", false);
+          }
+       }
+-      
+-      function destroyAchievementBossPanel() 
++
++      function destroyAchievementBossPanel()
+       {
+          mDungeonAchievementPanelMovieClipRenderer.destroy();
+          ASCompat.setProperty((mScoreReportRoot : ASAny).achievement, "visible", false);
+@@ -3063,6 +3226,7 @@
+          var _loc2_:FacebookPicHelper = null;
+          var _loc4_= 0;
+          var _loc7_= 0;
++         Logger.warn("[TrophyReveal] DistributedDungeonSummary.destroy enter revealState=" + Std.string(mRevealState) + " rendererNull=" + Std.string(mDungeonAchievementPanelMovieClipRenderer == null) + " clipNull=" + Std.string(mDungeonAchievementPanelMovieClipRenderer == null || mDungeonAchievementPanelMovieClipRenderer.clip == null));
+          if(mCountDownTextXP != null)
+          {
+             mCountDownTextXP.destroy();
+@@ -3259,6 +3423,7 @@
+          mWeaponTooltips = null;
+          mXpBar.resize(0);
+          mXpBar = null;
++         Logger.warn("[TrophyReveal] DistributedDungeonSummary.destroy exit");
+          mDBFacade = null;
+       }
+       

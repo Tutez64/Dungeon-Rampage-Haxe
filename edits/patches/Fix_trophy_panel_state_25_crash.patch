@@ -1,0 +1,24 @@
+Subject: [PATCH] Fix crash happening when getting a trophy and a (rare) chest
+---
+Index: src/distributedObjects/DistributedDungeonSummary.hx
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/distributedObjects/DistributedDungeonSummary.hx b/src/distributedObjects/DistributedDungeonSummary.hx
+--- a/src/distributedObjects/DistributedDungeonSummary.hx	(revision 7ba3d3c30a7b88863f967a7f4d411ecea16ee4b4)
++++ b/src/distributedObjects/DistributedDungeonSummary.hx	(date 1777323868727)
+@@ -608,8 +608,11 @@
+                setRevealState((25 : UInt),trophyGetClipLength);
+                
+             case 25:
+-               mDungeonAchievementPanelMovieClipRenderer.stop();
+-               mDungeonAchievementPanelMovieClipRenderer.clip.visible = false;
++               if(mDungeonAchievementPanelMovieClipRenderer != null && mDungeonAchievementPanelMovieClipRenderer.clip != null)
++               {
++                  mDungeonAchievementPanelMovieClipRenderer.stop();
++                  mDungeonAchievementPanelMovieClipRenderer.clip.visible = false;
++               }
+                setRevealState((30 : UInt),0.45);
+                
+             case 30:

@@ -608,8 +608,11 @@ import flash.display.MovieClip;
                setRevealState((25 : UInt),trophyGetClipLength);
                
             case 25:
-               mDungeonAchievementPanelMovieClipRenderer.stop();
-               mDungeonAchievementPanelMovieClipRenderer.clip.visible = false;
+               if(mDungeonAchievementPanelMovieClipRenderer != null && mDungeonAchievementPanelMovieClipRenderer.clip != null)
+               {
+                  mDungeonAchievementPanelMovieClipRenderer.stop();
+                  mDungeonAchievementPanelMovieClipRenderer.clip.visible = false;
+               }
                setRevealState((30 : UInt),0.45);
                
             case 30:
