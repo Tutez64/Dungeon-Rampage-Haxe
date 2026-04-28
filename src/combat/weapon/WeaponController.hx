@@ -90,7 +90,7 @@ public function  get_IsInCooldown() : Bool
          return mIsInCooldown;
       }
 
-      function attack(param1:UInt, param2:Bool, param3:Float = 1, param4:Bool = true)
+      function attack(param1:UInt, param2:Bool, param3:Float = 1, param4:Bool = true) : Bool
       {
          var speedIndex:UInt;
          var actorAttackSpeed:Float;
@@ -111,7 +111,7 @@ public function  get_IsInCooldown() : Bool
          if(mHero.manaPoints < trueManaCosts)
          {
             notEnoughMana();
-            return;
+            return false;
          }
          if(gmAttack.StatOffsets != null)
          {
@@ -128,7 +128,7 @@ public function  get_IsInCooldown() : Bool
          if(mCurrentAttackTimeline == null)
          {
             Logger.error("AttackTimeline for attack: <" + attackType + "> was null. Ignoring onWeaponDown");
-            return;
+            return false;
          }
          stopCallback = function()
          {
@@ -138,10 +138,15 @@ public function  get_IsInCooldown() : Bool
          {
             finishedAttack(autoAim,(Std.int(attackSpeedModifier) : UInt));
          },stopCallback,false,autoAim);
-         if(autoStartCooldown && gmAttack.CooldownLength > 0)
+         
+         var attackStarted = (mCurrentAttackTimeline == null || mCurrentAttackTimeline.isPlaying);
+         
+         if(attackStarted && autoStartCooldown && gmAttack.CooldownLength > 0)
          {
             startCooldown();
          }
+         
+         return attackStarted;
       }
 
       function finishedAttack(param1:Bool, param2:UInt)

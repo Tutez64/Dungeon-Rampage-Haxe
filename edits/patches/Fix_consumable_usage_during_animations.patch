@@ -1,0 +1,75 @@
+Subject: [PATCH] Fix consumable usage during animations to avoid crash
+---
+Index: src/combat/weapon/WeaponController.hx
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/combat/weapon/WeaponController.hx b/src/combat/weapon/WeaponController.hx
+--- a/src/combat/weapon/WeaponController.hx	(revision 3f55643a2ef43bf030c0a1528217ca25846d46d8)
++++ b/src/combat/weapon/WeaponController.hx	(date 1777407833090)
+@@ -90,7 +90,7 @@
+          return mIsInCooldown;
+       }
+ 
+-      function attack(param1:UInt, param2:Bool, param3:Float = 1, param4:Bool = true)
++      function attack(param1:UInt, param2:Bool, param3:Float = 1, param4:Bool = true) : Bool
+       {
+          var speedIndex:UInt;
+          var actorAttackSpeed:Float;
+@@ -111,7 +111,7 @@
+          if(mHero.manaPoints < trueManaCosts)
+          {
+             notEnoughMana();
+-            return;
++            return false;
+          }
+          if(gmAttack.StatOffsets != null)
+          {
+@@ -128,7 +128,7 @@
+          if(mCurrentAttackTimeline == null)
+          {
+             Logger.error("AttackTimeline for attack: <" + attackType + "> was null. Ignoring onWeaponDown");
+-            return;
++            return false;
+          }
+          stopCallback = function()
+          {
+@@ -138,10 +138,15 @@
+          {
+             finishedAttack(autoAim,(Std.int(attackSpeedModifier) : UInt));
+          },stopCallback,false,autoAim);
+-         if(autoStartCooldown && gmAttack.CooldownLength > 0)
++         
++         var attackStarted = (mCurrentAttackTimeline == null || mCurrentAttackTimeline.isPlaying);
++         
++         if(attackStarted && autoStartCooldown && gmAttack.CooldownLength > 0)
+          {
+             startCooldown();
+          }
++         
++         return attackStarted;
+       }
+ 
+       function finishedAttack(param1:Bool, param2:UInt)
+Index: src/combat/weapon/ConsumableWeaponController.hx
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/combat/weapon/ConsumableWeaponController.hx b/src/combat/weapon/ConsumableWeaponController.hx
+--- a/src/combat/weapon/ConsumableWeaponController.hx	(revision 3f55643a2ef43bf030c0a1528217ca25846d46d8)
++++ b/src/combat/weapon/ConsumableWeaponController.hx	(date 1777407018512)
+@@ -18,8 +18,10 @@
+       {
+          if(consumableWeapon.canExecute() && consumableWeapon.getConsumableAttack() != null && consumableWeapon.getConsumableCount() > 0)
+          {
+-            attack(consumableWeapon.getConsumableAttack().Id,false,1,consumableWeapon.getConsumableCount() > 1);
+-            consumableWeapon.consume();
++            if (attack(consumableWeapon.getConsumableAttack().Id,false,1,consumableWeapon.getConsumableCount() > 1))
++            {
++               consumableWeapon.consume();
++            }
+          }
+       }
+       

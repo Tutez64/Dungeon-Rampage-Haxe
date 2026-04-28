@@ -18,8 +18,10 @@ package combat.weapon
       {
          if(consumableWeapon.canExecute() && consumableWeapon.getConsumableAttack() != null && consumableWeapon.getConsumableCount() > 0)
          {
-            attack(consumableWeapon.getConsumableAttack().Id,false,1,consumableWeapon.getConsumableCount() > 1);
-            consumableWeapon.consume();
+            if (attack(consumableWeapon.getConsumableAttack().Id,false,1,consumableWeapon.getConsumableCount() > 1))
+            {
+               consumableWeapon.consume();
+            }
          }
       }
       
