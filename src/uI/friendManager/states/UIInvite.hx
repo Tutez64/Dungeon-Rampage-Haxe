@@ -86,7 +86,7 @@ package uI.friendManager.states
          mInviteViaEmailButton.releaseCallback = function()
          {
             var _loc1_= new compat.RegExp("[\\s\\r\\n]*", "gim");
-            ASCompat.setProperty((mInviteUIMC : ASAny).friend_enterEmailId.textField, "text", (mInviteUIMC : ASAny).friend_enterEmailId.textField.text.replace(_loc1_,""));
+            ASCompat.setProperty((mInviteUIMC : ASAny).friend_enterEmailId.textField, "text", _loc1_.replace(Std.string((mInviteUIMC : ASAny).friend_enterEmailId.textField.text),""));
             inviteViaEmail((mInviteUIMC : ASAny).friend_enterEmailId.textField.text,inviteViaEmailSuccessCallback);
             ASCompat.setProperty((mInviteUIMC : ASAny).friend_enterEmailId.textField, "text", "");
          };

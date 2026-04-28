@@ -116,7 +116,7 @@ package account
          }
          if(ASCompat.toBool(friendJson.identifier))
          {
-            identifier = ASCompat.dynamicAs(friendJson.identifier.split("_"), Array);
+            identifier = ASCompat.dynamicAs(Std.string(friendJson.identifier).split("_"), Array);
             if(identifier.length > 1)
             {
                network = identifier[0];

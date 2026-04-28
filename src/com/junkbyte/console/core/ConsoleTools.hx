@@ -208,7 +208,7 @@ package com.junkbyte.console.core
          var _loc10_= 2;
          while(_loc10_ < _loc7_)
          {
-            if(!_loc9_ && ASCompat.toNumber(_loc6_[_loc10_].search(_loc8_)) != 0)
+            if(!_loc9_ && ASCompat.toNumber(_loc8_.search(Std.string(_loc6_[_loc10_]))) != 0)
             {
                _loc9_ = true;
             }
