@@ -6,10 +6,10 @@
 
 	<set name="APP_FILE" value="DungeonBustersProject" />
 
-	<haxelib name="SteamWrap" path="../SteamWrap" if="cpp" />
-	<haxelib name="lime" path="../lime" if="cpp" />
-	<haxelib name="swf" path="../swf" if="cpp" />
-	<haxelib name="openfl" path="../openfl" />
+	<haxelib name="SteamWrap" path="submodules/SteamWrap" if="cpp" />
+	<haxelib name="lime" path="submodules/lime" if="cpp" />
+	<haxelib name="swf" path="submodules/swf" if="cpp" />
+	<haxelib name="openfl" path="submodules/openfl" />
 	<haxelib name="format" if="cpp" />
 
 	<setenv name="STEAM_APP_ID" value="3053950" if="cpp" />

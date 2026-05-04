@@ -23,3 +23,90 @@ This project required months of hard work, most of it being put into the followi
 - [ax4](https://github.com/Tutez64/ax4), my AS3 to Haxe converter, based on ax3.
 - [OpenFL](https://github.com/Tutez64/openfl), [SWF](https://github.com/Tutez64/swf) and [Lime](https://github.com/Tutez64/lime)
 - [SteamWrap](https://github.com/Tutez64/SteamWrap), to replace the Steam ANE.
+
+# How to compile it yourself
+
+The project depends on forked versions of OpenFL, Lime, SWF and SteamWrap, which are included as Git submodules.
+
+## Requirements
+
+- Haxe
+- A C++ toolchain supported by hxcpp
+
+Install the regular haxelib dependencies first:
+
+```bash
+haxelib install hxcpp
+haxelib install format
+haxelib install hxp
+```
+
+## Clone the repository
+
+```bash
+git clone --recurse-submodules https://github.com/Tutez64/Dungeon-Rampage-Haxe
+cd Dungeon-Rampage-Haxe
+```
+
+If you cloned without `--recurse-submodules`, initialize the submodules afterwards:
+
+```bash
+git submodule update --init --recursive
+```
+
+## Configure local development libraries
+
+The project file references the submodules directly, but registering them with haxelib is useful for commands such as `haxelib run openfl` and for rebuilding tools:
+
+```bash
+haxelib dev lime submodules/lime
+haxelib dev openfl submodules/openfl
+haxelib dev swf submodules/swf
+haxelib dev steamwrap submodules/SteamWrap
+```
+
+## Rebuild helper tools
+
+Rebuild the SWF command-line tools:
+
+```bash
+cd submodules/swf
+haxe rebuild.hxml
+cd ../..
+```
+
+SteamWrap already includes usable prebuilt binaries for Windows and Linux, so rebuilding it is usually not needed on these platforms.
+
+The macOS binaries need to be rebuilt locally:
+
+```bash
+cd submodules/SteamWrap
+./setup.sh
+./build
+cd ../..
+```
+
+On Windows, the equivalent commands are:
+
+```bat
+cd submodules\SteamWrap
+setup.bat
+build.bat
+cd ..\..
+```
+
+## Build the game
+
+From the repository root:
+
+```bash
+haxelib run openfl build project.xml cpp
+```
+
+For a debug build:
+
+```bash
+haxelib run openfl build project.xml cpp -debug
+```
+
+Replace `build` with `test` if you want the game to launch automatically after compiling.

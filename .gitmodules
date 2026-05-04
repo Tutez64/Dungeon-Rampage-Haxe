@@ -1,0 +1,12 @@
+[submodule "submodules/openfl"]
+	path = submodules/openfl
+	url = https://github.com/Tutez64/openfl
+[submodule "submodules/lime"]
+	path = submodules/lime
+	url = https://github.com/Tutez64/lime
+[submodule "submodules/swf"]
+	path = submodules/swf
+	url = https://github.com/Tutez64/swf
+[submodule "submodules/SteamWrap"]
+	path = submodules/SteamWrap
+	url = https://github.com/Tutez64/SteamWrap

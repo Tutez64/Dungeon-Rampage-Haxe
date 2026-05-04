@@ -19,44 +19,44 @@
     <orderEntry type="module-library" scope="PROVIDED">
       <library name="Haxelib: steamwrap:1.0.0 [dev]">
         <CLASSES>
-          <root url="file://$MODULE_DIR$/../SteamWrap" />
+          <root url="file://$MODULE_DIR$/submodules/SteamWrap" />
         </CLASSES>
         <JAVADOC />
         <SOURCES>
-          <root url="file://$MODULE_DIR$/../SteamWrap" />
+          <root url="file://$MODULE_DIR$/submodules/SteamWrap" />
         </SOURCES>
       </library>
     </orderEntry>
     <orderEntry type="module-library" scope="PROVIDED">
       <library name="Haxelib: lime:8.3.1 [dev]">
         <CLASSES>
-          <root url="file://$MODULE_DIR$/../lime/src" />
+          <root url="file://$MODULE_DIR$/submodules/lime/src" />
         </CLASSES>
         <JAVADOC />
         <SOURCES>
-          <root url="file://$MODULE_DIR$/../lime/src" />
+          <root url="file://$MODULE_DIR$/submodules/lime/src" />
         </SOURCES>
       </library>
     </orderEntry>
     <orderEntry type="module-library" scope="PROVIDED">
       <library name="Haxelib: swf:3.4.0 [dev]">
         <CLASSES>
-          <root url="file://$MODULE_DIR$/../swf/src" />
+          <root url="file://$MODULE_DIR$/submodules/swf/src" />
         </CLASSES>
         <JAVADOC />
         <SOURCES>
-          <root url="file://$MODULE_DIR$/../swf/src" />
+          <root url="file://$MODULE_DIR$/submodules/swf/src" />
         </SOURCES>
       </library>
     </orderEntry>
     <orderEntry type="module-library" scope="PROVIDED">
       <library name="Haxelib: openfl:9.5.1 [dev]">
         <CLASSES>
-          <root url="file://$MODULE_DIR$/../openfl/src" />
+          <root url="file://$MODULE_DIR$/submodules/openfl/src" />
         </CLASSES>
         <JAVADOC />
         <SOURCES>
-          <root url="file://$MODULE_DIR$/../openfl/src" />
+          <root url="file://$MODULE_DIR$/submodules/openfl/src" />
         </SOURCES>
       </library>
     </orderEntry>
