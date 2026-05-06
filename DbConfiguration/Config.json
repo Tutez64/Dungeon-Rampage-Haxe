@@ -1,7 +1,7 @@
 {
   "gameMasterPath":"Resources/Levels/DB_GameMaster.json",
-  "EnvironmentPrefix": "gr",
-  "ServiceDiscoveryUrl":"https://api.green.prod.dr.g17s.net",
+  "EnvironmentPrefix": "bl",
+  "ServiceDiscoveryUrl":"https://api.blue.prod.dr.g17s.net",
   "AccountId":1000000005,
   "API_ValidationToken":"2045627941:FakeTokenThisShouldUseSteamAndPopulateFromTheServerInstead",
   "Currency":"USD",

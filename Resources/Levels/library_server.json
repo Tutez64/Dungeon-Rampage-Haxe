@@ -31685,6 +31685,36 @@
     "type": "LECollectable"
   },
   {
+    "assetClassName": "doober_tacos",
+    "assetPath": "Resources/Art2D/Doobers/db_items_doobers.swf",
+    "constant": "CINCO_DE_MAYO_TACOS",
+    "type": "LECollectable"
+  },
+  {
+    "assetClassName": "doober_pepper",
+    "assetPath": "Resources/Art2D/Doobers/db_items_doobers.swf",
+    "constant": "CINCO_DE_MAYO_PEPPER",
+    "type": "LECollectable"
+  },
+  {
+    "assetClassName": "doober_nachos",
+    "assetPath": "Resources/Art2D/Doobers/db_items_doobers.swf",
+    "constant": "CINCO_DE_MAYO_NACHOS",
+    "type": "LECollectable"
+  },
+  {
+    "assetClassName": "doober_combo_enchiladas",
+    "assetPath": "Resources/Art2D/Doobers/db_items_doobers.swf",
+    "constant": "CINCO_DE_MAYO_ENCHILADAS",
+    "type": "LECollectable"
+  },
+  {
+    "assetClassName": "doober_combo_chips",
+    "assetPath": "Resources/Art2D/Doobers/db_items_doobers.swf",
+    "constant": "CINCO_DE_MAYO_CHIPS",
+    "type": "LECollectable"
+  },
+  {
     "constant": "HERO_SPAWN_PROP",
     "type": "LEHeroSpawnProp"
   },
