@@ -10,3 +10,6 @@
 [submodule "submodules/SteamWrap"]
 	path = submodules/SteamWrap
 	url = https://github.com/Tutez64/SteamWrap
+[submodule "submodules/hxcpp"]
+	path = submodules/hxcpp
+	url = https://github.com/Tutez64/hxcpp

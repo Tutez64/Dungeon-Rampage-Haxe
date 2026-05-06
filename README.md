@@ -21,12 +21,12 @@ More info are available in the [Discord server](https://discord.gg/VvWbNspZrQ). 
 # How?
 This project required months of hard work, most of it being put into the following open-source projects:
 - [ax4](https://github.com/Tutez64/ax4), my AS3 to Haxe converter, based on ax3.
-- [OpenFL](https://github.com/Tutez64/openfl), [SWF](https://github.com/Tutez64/swf) and [Lime](https://github.com/Tutez64/lime)
+- [OpenFL](https://github.com/Tutez64/openfl), [SWF](https://github.com/Tutez64/swf), [Lime](https://github.com/Tutez64/lime) and [SWF](https://github.com/Tutez64/hxcpp)
 - [SteamWrap](https://github.com/Tutez64/SteamWrap), to replace the Steam ANE.
 
 # How to compile it yourself
 
-The project depends on forked versions of OpenFL, Lime, SWF and SteamWrap, which are included as Git submodules.
+The project depends on forked versions of OpenFL, Lime, SWF, hxcpp and SteamWrap, which are included as Git submodules.
 
 ## Requirements
 
@@ -63,6 +63,7 @@ haxelib dev lime submodules/lime
 haxelib dev openfl submodules/openfl
 haxelib dev swf submodules/swf
 haxelib dev steamwrap submodules/SteamWrap
+haxelib dev hxcpp submodules/hxcpp
 ```
 
 ## Rebuild helper tools
@@ -73,6 +74,11 @@ Rebuild the SWF command-line tools:
 cd submodules/swf
 haxe rebuild.hxml
 cd ../..
+```
+
+Rebuild the hxcpp command-line tools::
+```bash
+haxelib run lime rebuild hxcpp
 ```
 
 SteamWrap already includes usable prebuilt binaries for Windows and Linux, so rebuilding it is usually not needed on these platforms.

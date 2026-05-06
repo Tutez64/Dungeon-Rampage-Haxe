@@ -61,6 +61,17 @@
       </library>
     </orderEntry>
     <orderEntry type="module-library" scope="PROVIDED">
+      <library name="Haxelib: hxcpp:4.3.0 [dev]">
+        <CLASSES>
+          <root url="file://$MODULE_DIR$/submodules/hxcpp/src" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES>
+          <root url="file://$MODULE_DIR$/submodules/hxcpp/src" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library" scope="PROVIDED">
       <library name="Haxelib: format:3.8.0">
         <CLASSES>
           <root url="file://$USER_HOME$/haxelib/format/3,8,0" />

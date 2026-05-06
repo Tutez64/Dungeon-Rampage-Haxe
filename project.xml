@@ -7,10 +7,13 @@
 	<set name="APP_FILE" value="DungeonBustersProject" />
 
 	<haxelib name="SteamWrap" path="submodules/SteamWrap" if="cpp" />
+	<haxelib name="hxcpp" path="submodules/hxcpp" if="cpp" />
 	<haxelib name="lime" path="submodules/lime" if="cpp" />
 	<haxelib name="swf" path="submodules/swf" if="cpp" />
 	<haxelib name="openfl" path="submodules/openfl" />
 	<haxelib name="format" if="cpp" />
+
+	<haxedef name="HXCPP_GC_BIG_BLOCKS" />
 
 	<setenv name="STEAM_APP_ID" value="3053950" if="cpp" />
 	<dependency name="com.amanitadesign.steam.FRESteamWorks" path="extensions/FRESteamWorks.ane" if="air" />
