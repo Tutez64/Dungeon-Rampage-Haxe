@@ -75,24 +75,13 @@ haxelib run lime rebuild hxcpp
 haxelib run lime rebuild swf
 ```
 
-SteamWrap already includes usable prebuilt binaries for Windows and Linux, so rebuilding it is usually not needed on these platforms.
-
-The macOS binaries need to be rebuilt locally:
+SteamWrap:
 
 ```bash
 cd submodules/SteamWrap
-./setup.sh
-./build
+./setup.sh # (.bat on Windows)
+./build # (.bat on Windows)
 cd ../..
-```
-
-On Windows, the equivalent commands are:
-
-```bat
-cd submodules\SteamWrap
-setup.bat
-build.bat
-cd ..\..
 ```
 
 ## Build the game
