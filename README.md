@@ -68,17 +68,11 @@ haxelib dev hxcpp submodules/hxcpp
 
 ## Rebuild helper tools
 
-Rebuild the SWF command-line tools:
-
 ```bash
-cd submodules/swf
-haxe rebuild.hxml
-cd ../..
-```
-
-Rebuild the hxcpp command-line tools::
-```bash
+haxelib run lime rebuild cpp -debug
+haxelib run lime rebuild tools
 haxelib run lime rebuild hxcpp
+haxelib run lime rebuild swf
 ```
 
 SteamWrap already includes usable prebuilt binaries for Windows and Linux, so rebuilding it is usually not needed on these platforms.

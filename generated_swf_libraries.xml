@@ -77,7 +77,6 @@
 	<library path="Resources/Art2D/UI/db_UI_screens.swf" id="ax4_swf_resources_art2d_ui_db_ui_screens_swf" preload="false" generate="false" />
 	<library path="Resources/Art2D/UI/db_UI_skip_button.swf" id="ax4_swf_resources_art2d_ui_db_ui_skip_button_swf" preload="false" generate="false" />
 	<library path="Resources/Art2D/UI/db_UI_town.swf" id="ax4_swf_resources_art2d_ui_db_ui_town_swf" preload="false" generate="false" />
-	<library path="Resources/Art2D/UI/loading_screen - Copie.swf" id="ax4_swf_resources_art2d_ui_loading_screen_copie_swf" preload="false" generate="false" />
 	<library path="Resources/Art2D/UI/loading_screen.swf" id="ax4_swf_resources_art2d_ui_loading_screen_swf" preload="false" generate="false" />
 	<library path="Resources/Art3D/Avatar/Berserker/db_char_berserker.swf" id="ax4_swf_resources_art3d_avatar_berserker_db_char_berserker_swf" preload="false" generate="false" />
 	<library path="Resources/Art3D/Avatar/Berserker/db_char_berserker_axe01A.swf" id="ax4_swf_resources_art3d_avatar_berserker_db_char_berserker_axe01a_swf" preload="false" generate="false" />
