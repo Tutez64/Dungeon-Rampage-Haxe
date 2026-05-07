@@ -210,19 +210,42 @@ package actor.buffs
             mEventComponent.dispatchEvent(new GameObjectEvent(BERSERK_MODE_DONE,mActorGameObject.id));
          }
       }
-      
-      function processSwappableBuffDisplays(param1:GameClock = null) 
+
+      function processSwappableBuffDisplays(param1:GameClock = null)
       {
+         var _loc1_:BuffGameObject = null;
+         var _loc2_:BuffGameObject = null;
+         if(mSwappableBuffs == null || mSwappableBuffs.length < 2)
+         {
+            mCurrentSwappableBuff = 0;
+            return;
+         }
+         if(mCurrentSwappableBuff > mSwappableBuffs.length)
+         {
+            mCurrentSwappableBuff = 0;
+         }
          if(mCurrentSwappableBuff == mSwappableBuffs.length)
          {
             mCurrentSwappableBuff = 0;
-            mSwappableBuffs[mSwappableBuffs.length - 1].buffView.show(0.5);
+            _loc1_ = mSwappableBuffs[mSwappableBuffs.length - 1];
+            if(_loc1_ != null && _loc1_.buffView != null)
+            {
+               _loc1_.buffView.show(0.5);
+            }
          }
          else if(mCurrentSwappableBuff > 0)
          {
-            mSwappableBuffs[mCurrentSwappableBuff - 1].buffView.show(0.5);
+            _loc1_ = mSwappableBuffs[mCurrentSwappableBuff - 1];
+            if(_loc1_ != null && _loc1_.buffView != null)
+            {
+               _loc1_.buffView.show(0.5);
+            }
          }
-         mSwappableBuffs[mCurrentSwappableBuff].buffView.hide(0.5);
+         _loc2_ = mSwappableBuffs[mCurrentSwappableBuff];
+         if(_loc2_ != null && _loc2_.buffView != null)
+         {
+            _loc2_.buffView.hide(0.5);
+         }
          mCurrentSwappableBuff = mCurrentSwappableBuff + 1;
       }
       
