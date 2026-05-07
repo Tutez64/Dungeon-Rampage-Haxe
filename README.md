@@ -21,7 +21,7 @@ More info are available in the [Discord server](https://discord.gg/VvWbNspZrQ). 
 # How?
 This project required months of hard work, most of it being put into the following open-source projects:
 - [ax4](https://github.com/Tutez64/ax4), my AS3 to Haxe converter, based on ax3.
-- [OpenFL](https://github.com/Tutez64/openfl), [SWF](https://github.com/Tutez64/swf), [Lime](https://github.com/Tutez64/lime) and [SWF](https://github.com/Tutez64/hxcpp)
+- [OpenFL](https://github.com/Tutez64/openfl), [SWF](https://github.com/Tutez64/swf), [Lime](https://github.com/Tutez64/lime) and [hxcpp](https://github.com/Tutez64/hxcpp)
 - [SteamWrap](https://github.com/Tutez64/SteamWrap), to replace the Steam ANE.
 
 # How to compile it yourself
