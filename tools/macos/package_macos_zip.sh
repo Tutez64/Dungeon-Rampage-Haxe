@@ -8,8 +8,8 @@ Usage:
   package_macos_zip.sh <app.bundle> [output.zip]
 
 Examples:
-  package_macos_zip.sh bin/macos/bin/DungeonBustersProject.app
-  package_macos_zip.sh bin/macos/bin/DungeonBustersProject.app "bin/macos/bin/Dungeon Rampage Haxe macOS.zip"
+  package_macos_zip.sh "bin/macos/bin/Dungeon Rampage Haxe.app"
+  package_macos_zip.sh "bin/macos/bin/Dungeon Rampage Haxe.app" "bin/macos/bin/Dungeon Rampage Haxe macOS.zip"
 
 Notes:
   - Uses `ditto` because it is the safest way to archive a macOS app bundle.

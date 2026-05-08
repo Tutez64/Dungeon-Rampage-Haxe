@@ -9,13 +9,13 @@ Usage:
 
 Examples:
   make_universal_macos_app.sh \
-    bin/macos/bin/DungeonBustersProject-x86_64.app \
-    bin/macos/bin/DungeonBustersProject-arm64.app \
-    bin/macos/bin/DungeonBustersProject.app
+    "bin/macos/bin/Dungeon Rampage Haxe-x86_64.app" \
+    "bin/macos/bin/Dungeon Rampage Haxe-arm64.app" \
+    "bin/macos/bin/Dungeon Rampage Haxe.app"
 
   make_universal_macos_app.sh --no-sign \
-    bin/macos/bin/DungeonBustersProject-x86_64.app \
-    bin/macos/bin/DungeonBustersProject-arm64.app
+    "bin/macos/bin/Dungeon Rampage Haxe-x86_64.app" \
+    "bin/macos/bin/Dungeon Rampage Haxe-arm64.app"
 
 Notes:
   - The output bundle is copied from the arm64 app, then Mach-O files present in both bundles

@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <project>
 	<meta title="Dungeon Rampage Haxe" package="com.dungeonrampage.haxe" version="1.0.0" company="Tutez" />
-	<app main="DungeonBustersProject" file="DungeonBustersProject" swf-version="32" />
-	<window width="1920" height="1080" fps="120" background="#000000" hardware="true" allow-shaders="true" require-shaders="true"/>
+	<app main="DungeonBustersProject" file="Dungeon Rampage Haxe" swf-version="32" />
+	<window width="1920" height="1080" fps="120" background="#000000" hardware="true" allow-shaders="true" require-shaders="true" />
 
-	<set name="APP_FILE" value="DungeonBustersProject" />
+	<set name="APP_FILE" value="Dungeon Rampage Haxe" />
 
 	<haxelib name="SteamWrap" path="submodules/SteamWrap" if="cpp" />
 	<haxelib name="hxcpp" path="submodules/hxcpp" if="cpp" />

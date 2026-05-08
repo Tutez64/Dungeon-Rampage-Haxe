@@ -23,7 +23,7 @@ EOF
 PROJECT_FILE="project.xml"
 OPENFL_BIN="${OPENFL_BIN:-openfl}"
 TARGET_NAME="macos"
-BUILD_APP="bin/macos/bin/DungeonBustersProject.app"
+BUILD_APP="bin/macos/bin/Dungeon Rampage Haxe.app"
 X86_APP=""
 ARM_APP=""
 EXTRA_ARGS=()

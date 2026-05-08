@@ -1,6 +1,6 @@
 # Profiling natif C++
 
-Le binaire [`bin/linux/bin/DungeonBustersProject`](/home/tutez/Projets/Personnels/Haxe/DungeonRampageHaxe/bin/linux/bin/DungeonBustersProject) n'est pas strippe, donc `perf` peut deja remonter les symboles Haxe/hxcpp.
+Le binaire [`bin/linux/bin/Dungeon Rampage Haxe`](/home/tutez/Projets/Personnels/Haxe/DungeonRampageHaxe/bin/linux/bin/DungeonBustersProject) n'est pas strippe, donc `perf` peut deja remonter les symboles Haxe/hxcpp.
 
 ## Session recommandeee
 
@@ -8,7 +8,7 @@ Le binaire [`bin/linux/bin/DungeonBustersProject`](/home/tutez/Projets/Personnel
 2. Recuperer son PID:
 
 ```bash
-pidof DungeonBustersProject
+pidof "Dungeon Rampage Haxe"
 ```
 
 3. Demarrer l'echantillonnage memoire:
