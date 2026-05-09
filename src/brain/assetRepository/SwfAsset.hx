@@ -114,6 +114,11 @@ class SwfAsset extends Asset
         return ~/[_]+/g.replace(_loc2_.toString(), "_");
     }
 
+    public static function hasPreprocessedBundleForPath(param1:String) : Bool
+    {
+        return FileSystem.exists(getPreprocessedBundlePath(getPreprocessedLibraryId(param1)));
+    }
+
     static function normalizeSwfAssetPath(param1:String) : String
     {
         var _loc1_ = param1;
@@ -310,6 +315,11 @@ class SwfAsset extends Asset
         {
             mPreprocessedLibrary = loadPreprocessedLibrarySync(mPreprocessedLibraryName,mSwfPath);
         }
+    }
+
+    public function preloadPreprocessedLibraries() : Void
+    {
+        ensurePreprocessedLibrariesLoaded();
     }
 
     #if cpp

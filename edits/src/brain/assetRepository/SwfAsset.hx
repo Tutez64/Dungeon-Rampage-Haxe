@@ -15,6 +15,7 @@ import openfl.utils.Assets;
 import openfl.utils.AssetType;
 import swf.exporters.animate.AnimateLibrary;
 import sys.FileSystem;
+import brain.logger.Logger;
 #end
 
 class SwfAsset extends Asset
@@ -111,6 +112,11 @@ class SwfAsset extends Asset
             _loc3_++;
         }
         return ~/[_]+/g.replace(_loc2_.toString(), "_");
+    }
+
+    public static function hasPreprocessedBundleForPath(param1:String) : Bool
+    {
+        return FileSystem.exists(getPreprocessedBundlePath(getPreprocessedLibraryId(param1)));
     }
 
     static function normalizeSwfAssetPath(param1:String) : String
@@ -309,6 +315,11 @@ class SwfAsset extends Asset
         {
             mPreprocessedLibrary = loadPreprocessedLibrarySync(mPreprocessedLibraryName,mSwfPath);
         }
+    }
+
+    public function preloadPreprocessedLibraries() : Void
+    {
+        ensurePreprocessedLibrariesLoaded();
     }
 
     #if cpp

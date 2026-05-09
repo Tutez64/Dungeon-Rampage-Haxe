@@ -22,8 +22,9 @@
 	<source path="src" />
 	<source path="compat" />
 
-	<assets path="Resources" rename="Resources" embed="false" />
-	<assets path="DbConfiguration" rename="DbConfiguration" embed="false" />
+	<assets path="Resources" embed="false" exclude="*.swf" if="cpp" />
+	<assets path="Resources" embed="false" if="air" />
+	<assets path="DbConfiguration" embed="false" />
 
 	<include path="generated_swf_libraries.xml" if="cpp" />
 	<library path="src/_assets/assets.swf" preload="true" if="cpp" />

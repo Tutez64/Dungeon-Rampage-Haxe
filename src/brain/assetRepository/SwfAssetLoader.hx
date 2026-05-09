@@ -4,6 +4,7 @@ package brain.assetRepository
    import brain.logger.Logger;
    import flash.display.MovieClip;
    import flash.filesystem.File;
+   import haxe.Timer;
    
     class SwfAssetLoader extends AssetLoader
    {
@@ -15,7 +16,11 @@ package brain.assetRepository
       var mHdAssetLoader:AssetLoader;
       
       var mIsHdLoader:Bool = false;
-      
+
+      #if cpp
+      var mPreprocessedTimer:Timer;
+      #end
+
       public function new(param1:Facade, param2:AssetLoaderInfo, param3:ASFunction, param4:ASFunction, param5:Bool = false)
       {
          mIsHdLoader = param5;
@@ -37,7 +42,55 @@ package brain.assetRepository
          mSwfAsset = new SwfAsset(_loc2_,mAssetLoaderInfo.getRawAssetPath());
          return mSwfAsset;
       }
-      
+
+      #if cpp
+      override function loadAsset(param1:Facade, param2:String, param3:Bool = true)
+      {
+         if(isSwfPath(param2) && SwfAsset.hasPreprocessedBundleForPath(param2))
+         {
+            var _loc1_ = mAssetLoaderInfo;
+            var _loc2_ = mAssetCreatedCallback;
+            var _loc4_ = mErrorCallback;
+            Logger.info("SwfAssetLoader: using preprocessed library without raw SWF: " + param2);
+            mSwfAsset = new SwfAsset(null,_loc1_.getRawAssetPath());
+            var _loc3_ = mSwfAsset;
+            mPreprocessedTimer = Timer.delay(function()
+            {
+               mPreprocessedTimer = null;
+               try
+               {
+                  _loc3_.preloadPreprocessedLibraries();
+                  if(_loc2_ != null)
+                  {
+                     _loc2_(_loc1_,_loc3_);
+                  }
+               }
+               catch(e:Dynamic)
+               {
+                  Logger.error("SwfAssetLoader: failed to load preprocessed library: " + _loc1_.getRawAssetPath(),e);
+                  if(_loc4_ != null)
+                  {
+                     _loc4_(_loc1_);
+                  }
+               }
+            },0);
+            return;
+         }
+         super.loadAsset(param1,param2,param3);
+      }
+
+      static function isSwfPath(param1:String) : Bool
+      {
+         var _loc1_= param1;
+         if(_loc1_ == null)
+         {
+            return false;
+         }
+         _loc1_ = _loc1_.split("?")[0].toLowerCase();
+         return StringTools.endsWith(_loc1_,".swf");
+      }
+      #end
+
       function hdAwareLoadedCallback(param1:AssetLoaderInfo, param2:Asset) 
       {
          var _loc3_:AssetLoaderInfo = null;
@@ -80,6 +133,12 @@ package brain.assetRepository
          var _loc2_:File = null;
          try
          {
+            #if cpp
+            if(SwfAsset.hasPreprocessedBundleForPath(param1))
+            {
+               return true;
+            }
+            #end
             _loc4_ = param1;
             if(ASCompat.toNumber(_loc4_.indexOf("./")) == 0)
             {
@@ -117,6 +176,13 @@ package brain.assetRepository
       
       override public function destroy() 
       {
+         #if cpp
+         if(mPreprocessedTimer != null)
+         {
+            mPreprocessedTimer.stop();
+            mPreprocessedTimer = null;
+         }
+         #end
          mSwfAsset = null;
          mOriginalLoadedCallback = null;
          mHdAssetLoader = null;
