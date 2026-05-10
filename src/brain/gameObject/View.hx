@@ -140,7 +140,37 @@ function  set_rotation(param1:Float) :Float      {
          return mRoot.rotation = param1;
       }
 
-      
+
+      @:isVar public var rotationX(get,set):Float;
+public function  get_rotationX() : Float
+      {
+         return mRoot.rotationX;
+      }
+function  set_rotationX(param1:Float) :Float      {
+         return mRoot.rotationX = param1;
+      }
+
+
+      @:isVar public var rotationY(get,set):Float;
+public function  get_rotationY() : Float
+      {
+         return mRoot.rotationY;
+      }
+function  set_rotationY(param1:Float) :Float      {
+         return mRoot.rotationY = param1;
+      }
+
+
+      @:isVar public var rotationZ(get,set):Float;
+public function  get_rotationZ() : Float
+      {
+         return mRoot.rotationZ;
+      }
+function  set_rotationZ(param1:Float) :Float      {
+         return mRoot.rotationZ = param1;
+      }
+
+
       @:isVar public var root(get,never):Sprite;
 public function  get_root() : Sprite
       {

@@ -48,7 +48,7 @@ package effects
       {
          var _loc19_= new LerpEffectGameObject(mDBFacade,param1,param2,param17,(0 : UInt),param18,param5,param6,param7);
          MemoryTracker.track(_loc19_,"LerpEffectGameObject \'" + param1 + ":" + param2 + "\' - created in EffectManager.playLerpedEffect()","pool");
-         _loc19_.view.root.scaleX = _loc19_.view.root.scaleY = param9;
+         _loc19_.view.root.scaleX = _loc19_.view.root.scaleY = _loc19_.view.root.scaleZ = param9;
          _loc19_.position = param4.position.add(param3);
          _loc19_.layer = SceneGraphManager.getLayerFromName(param15);
          _loc19_.view.addToStage();
@@ -82,8 +82,11 @@ package effects
          {
             effectGameObject = ASCompat.reinterpretAs(mDBFacade.effectPool.checkout(mDBFacade,swfPath,className,assetLoadedCallback) , EffectGameObject);
          }
-         effectGameObject.view.root.scaleX = effectGameObject.view.root.scaleY = scale;
+         effectGameObject.view.root.scaleX = effectGameObject.view.root.scaleY = effectGameObject.view.root.scaleZ = scale;
          effectGameObject.rotation = rotation;
+         effectGameObject.view.rotationX = rotationX;
+         effectGameObject.view.rotationY = rotationY;
+         effectGameObject.view.rotationZ = rotationZ;
          effectGameObject.position = position;
          if(parentObject != null)
          {
