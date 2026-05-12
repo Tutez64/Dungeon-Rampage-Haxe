@@ -30,13 +30,13 @@ The project depends on forked versions of OpenFL, Lime, SWF, hxcpp and SteamWrap
 
 ## Requirements
 
-- Haxe
+- [Haxe](https://haxe.org/)
 - A C++ toolchain supported by hxcpp
+  - Windows: install the [Build Tools for Visual Studio](https://visualstudio.microsoft.com/downloads) (tick `Desktop development with C++`)
 
-Install the regular haxelib dependencies first:
+Install the regular haxelib dependencies:
 
 ```bash
-haxelib install hxcpp
 haxelib install format
 haxelib install hxp
 ```
