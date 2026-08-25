@@ -77,7 +77,7 @@ class WeaponController {
 		return mIsInCooldown;
 	}
 
-	function attack(attackType:UInt, autoAim:Bool, attackSpeedModifier:Float = 1, autoStartCooldown:Bool = true) {
+	function attack(attackType:UInt, autoAim:Bool, attackSpeedModifier:Float = 1, autoStartCooldown:Bool = true):Bool {
 		var speedIndex:UInt;
 		var actorAttackSpeed:Float;
 		var buffMult:Float;
@@ -91,7 +91,7 @@ class WeaponController {
 		}
 		if (mHero.manaPoints < trueManaCosts) {
 			notEnoughMana();
-			return;
+			return false;
 		}
 		if (gmAttack.StatOffsets != null) {
 			speedIndex = (Std.int(gmAttack.StatOffsets.speed) : UInt);
@@ -105,7 +105,7 @@ class WeaponController {
 		mCurrentAttackTimeline = mWeapon.getAttackTimeline(attackType);
 		if (mCurrentAttackTimeline == null) {
 			Logger.error("AttackTimeline for attack: <" + attackType + "> was null. Ignoring onWeaponDown");
-			return;
+			return false;
 		}
 		stopCallback = function() {
 			mCurrentAttackTimeline = null;
@@ -113,9 +113,14 @@ class WeaponController {
 		mHero.attack(attackType, null, attackSpeedMultiplier, mCurrentAttackTimeline, function() {
 			finishedAttack(autoAim, (Std.int(attackSpeedModifier) : UInt));
 		}, stopCallback, false, autoAim);
-		if (autoStartCooldown && gmAttack.CooldownLength > 0) {
+
+		var attackStarted = (mCurrentAttackTimeline == null || mCurrentAttackTimeline.isPlaying);
+
+		if (attackStarted && autoStartCooldown && gmAttack.CooldownLength > 0) {
 			startCooldown();
 		}
+
+		return attackStarted;
 	}
 
 	function finishedAttack(autoAim:Bool, attackSpeedModifier:UInt) {
