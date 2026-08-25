@@ -622,8 +622,10 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 						mHideTrophyArtTask.destroy();
 						mHideTrophyArtTask = null;
 					}
-					mDungeonAchievementPanelMovieClipRenderer.stop();
-					mDungeonAchievementPanelMovieClipRenderer.clip.visible = false;
+					if (mDungeonAchievementPanelMovieClipRenderer != null && mDungeonAchievementPanelMovieClipRenderer.clip != null) {
+						mDungeonAchievementPanelMovieClipRenderer.stop();
+						mDungeonAchievementPanelMovieClipRenderer.clip.visible = false;
+					}
 					setRevealState((2 : UInt), 0.45);
 
 				case 2:
