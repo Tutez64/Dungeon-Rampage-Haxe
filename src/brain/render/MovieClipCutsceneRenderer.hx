@@ -111,6 +111,7 @@ class MovieClipCutsceneRenderer extends MovieClipRenderer {
 		if (!mIsPlaying) {
 			return;
 		}
+		var previousFrame = Math.fround(mPlayHead);
 		mPlayHead += mFrameRate * gameClock.tickLength * mPlayRate;
 		if (mPlayHead > mNextPauseFrame) {
 			mIsPlaying = false;
@@ -128,7 +129,9 @@ class MovieClipCutsceneRenderer extends MovieClipRenderer {
 			}
 			return;
 		}
-		this.updateClip(mClip);
+		if (previousFrame != Math.fround(mPlayHead)) {
+			this.updateClip(mClip);
+		}
 	}
 
 	override function determineFrames(clip:MovieClip) {
