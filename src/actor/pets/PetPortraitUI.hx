@@ -96,7 +96,7 @@ class PetPortraitUI extends UIObject {
 		}
 		mCoolDownRenderer = new MovieClipRenderer(mDBFacade, ASCompat.coerce((root : ASAny).cooldown, flash.display.MovieClip));
 		mCoolDownRenderer.clip.visible = false;
-		mCoolDownClipLength = ASCompat.toNumberField((root : ASAny).cooldown, "totalFrames") * mDBFacade.gameClock.tickLength;
+		mCoolDownClipLength = ASCompat.toNumberField((root : ASAny).cooldown, "totalFrames") * brain.clock.GameClock.ANIMATION_FRAME_DURATION;
 	}
 
 	function setHp(current:UInt, max:UInt) {

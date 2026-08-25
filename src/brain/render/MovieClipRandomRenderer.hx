@@ -34,11 +34,16 @@ class MovieClipRandomRenderer extends MovieClipRenderer {
 		if (!mIsPlaying) {
 			return;
 		}
+		var previousFrame = Math.fround(mPlayHead);
+		var forceUpdate = false;
 		mPlayHead += mFrameRate * gameClock.tickLength * mPlayRate;
 		if (mPlayHead >= mCurrentRandomLabel.endFrameNumber) {
 			playNewRandomLabel();
+			forceUpdate = true;
 		}
-		this.updateClip(mClip);
+		if (forceUpdate || previousFrame != Math.fround(mPlayHead)) {
+			this.updateClip(mClip);
+		}
 	}
 
 	function playNewRandomLabel() {
