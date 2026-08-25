@@ -29,7 +29,7 @@ class PlayEffectAttackTimelineAction extends PlayEffectTimelineAction {
 			weapon:WeaponGameObject, registerChargeEffectCallback:ASFunction, effectName:String, effectPath:String, xOffset:Float = 0, yOffset:Float = 0,
 			headingOffset:Float = 0, headingOffsetAngle:Float = 0, playAtTarget:Bool = false, parentToActor:Bool = false, behindAvatar:Bool = false,
 			scale:Float = 1, autoAdjustHeading:Bool = false, loop:Bool = false, layer:String = "sorted", managed:Bool = false, useTimelineSpeed:Bool = false,
-			invertAngles:Bool = false, insertParentName:String = "", insertIconPath:String = "", insertIconName:String = "") {
+			invertAngles:Bool = false, insertParentName:String = null, insertIconPath:String = null, insertIconName:String = null) {
 		super(actorGameObject, actorView, dbFacade, effectName, effectPath, xOffset, yOffset, headingOffset, headingOffsetAngle, playAtTarget, parentToActor,
 			behindAvatar, scale, autoAdjustHeading, loop, layer, managed, useTimelineSpeed, invertAngles, insertParentName, insertIconPath, insertIconName);
 		mDistributedDungeonFloor = distributedDungeonFloor;
