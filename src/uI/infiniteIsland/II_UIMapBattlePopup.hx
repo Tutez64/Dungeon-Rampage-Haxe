@@ -136,6 +136,9 @@ class II_UIMapBattlePopup extends UIMapBattlePopup {
 			return;
 		}
 		var _loc2_ = mDBFacade.getInfiniteDungeonDetailForNodeId(mCurrentDungeon.Id);
+		if (_loc2_ == null) {
+			return;
+		}
 		var _loc5_ = ASCompat.dynamicAs(mDBFacade.gameMaster.infiniteDungeonsByConstant.itemFor(mCurrentDungeon.InfiniteDungeon),
 			gameMasterDictionary.GMInfiniteDungeon);
 		_loc3_ = 0;
@@ -175,11 +178,13 @@ class II_UIMapBattlePopup extends UIMapBattlePopup {
 	function populateChests() {
 		var _loc7_ = 0;
 		var _loc1_ = 0;
+		var _loc2_ = 0;
 		var _loc3_:GMDoober = null;
 		var _loc9_:GMChest = null;
 		var _loc10_:Dynamic = null;
 		var _loc4_:MovieClip = null;
 		var _loc8_:MovieClipRenderController = null;
+		var _loc12_:FriendInfo = null;
 		if (mCurrentDungeon == null || mPopup == null) {
 			return;
 		}
@@ -191,8 +196,11 @@ class II_UIMapBattlePopup extends UIMapBattlePopup {
 		mRewardSlots.push(ASCompat.dynamicAs((mPopup : ASAny).loot_04, flash.display.MovieClip));
 		var _loc11_ = ASCompat.dynamicAs(mDBFacade.gameMaster.infiniteDungeonsByConstant.itemFor(mCurrentDungeon.InfiniteDungeon),
 			gameMasterDictionary.GMInfiniteDungeon);
-		var _loc2_ = mDBFacade.dbAccountInfo.localFriendInfo.getIIAvatarScoreForNode((mDBFacade.dbAccountInfo.activeAvatarId : Int),
-			(mCurrentDungeon.Id : Int));
+		_loc12_ = mDBFacade.dbAccountInfo.localFriendInfo;
+		if (_loc11_ == null || _loc12_ == null) {
+			return;
+		}
+		_loc2_ = _loc12_.getIIAvatarScoreForNode((mDBFacade.dbAccountInfo.activeAvatarId : Int), (mCurrentDungeon.Id : Int));
 		_loc7_ = 0;
 		while (_loc7_ < 4) {
 			while (mRewardSlots[_loc7_].numChildren > 1) {
