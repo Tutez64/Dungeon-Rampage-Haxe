@@ -65,7 +65,8 @@ class PlayEffectTimelineAction extends AttackTimelineAction {
 	public function new(actorGameObject:ActorGameObject, actorView:ActorView, dbFacade:DBFacade, effectName:String, effectPath:String, xOffset:Float = 0,
 			yOffset:Float = 0, headingOffset:Float = 0, headingOffsetAngle:Float = 0, playAtTarget:Bool = false, parentToActor:Bool = false,
 			behindAvatar:Bool = false, scale:Float = 1, autoAdjustHeading:Bool = false, loop:Bool = false, layer:String = "sorted", managed:Bool = false,
-			useTimelineSpeed:Bool = false, invertAngles:Bool = false, insertParentName:String = "", insertIconPath:String = "", insertIconName:String = "") {
+			useTimelineSpeed:Bool = false, invertAngles:Bool = false, insertParentName:String = null, insertIconPath:String = null,
+			insertIconName:String = null) {
 		super(actorGameObject, actorView, dbFacade);
 		mEffectName = effectName;
 		mEffectPath = effectPath;
