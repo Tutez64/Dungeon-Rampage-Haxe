@@ -18,7 +18,7 @@ class Revealer {
 
 	var mFinishedCallback:ASFunction;
 
-	var mStartFrame:UInt = 0;
+	var mFramesElapsed:Float = 0;
 
 	var mDuration:UInt = 0;
 
@@ -31,7 +31,7 @@ class Revealer {
 		mRoot = root;
 		mFinishedCallback = finishedCallback;
 		mDuration = duration;
-		mStartFrame = dbFacade.gameClock.frame;
+		mFramesElapsed = 0;
 		mTargetScale = root.scaleX;
 		mRevealType = revealType;
 		mWorkComponent = new LogicalWorkComponent(mDBFacade, "Revealer");
@@ -42,7 +42,8 @@ class Revealer {
 		var _loc4_ = Math.NaN;
 		var _loc2_ = Math.NaN;
 		var _loc3_ = Math.NaN;
-		var _loc5_ = clock.frame - mStartFrame;
+		mFramesElapsed += clock.tickLength * GameClock.LEGACY_STAGE_FRAME_RATE;
+		var _loc5_ = mFramesElapsed;
 		if (_loc5_ > mDuration) {
 			mRoot.alpha = 1;
 			mRoot.scaleX = mRoot.scaleY = mTargetScale;

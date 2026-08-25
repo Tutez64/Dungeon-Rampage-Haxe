@@ -4,6 +4,7 @@ import actor.ActorGameObject;
 import brain.assetRepository.AssetLoadingComponent;
 import brain.gameObject.GameObject;
 import brain.logger.Logger;
+import brain.render.MovieClipRenderController;
 import brain.sound.SoundHandle;
 import brain.utils.MemoryTracker;
 import doobers.DooberGameObject;
@@ -378,23 +379,24 @@ class DistributedDungeonFloor extends Floor implements IDistributedDungeonFloor 
 			mAssetLoadingComponent.getSwfAsset(DBFacade.buildFullDownloadPath(mIntroMovieSwfFilePath), function(param1:brain.assetRepository.SwfAsset) {
 				var stopMovie:ASFunction = null;
 				var onKeyDown:ASFunction = null;
+				var movieRenderer:MovieClipRenderController = null;
 				var asset = param1;
 				var movieClass = asset.getClass(mIntroMovieAssetClassName);
 				var movie = ASCompat.dynamicAs(ASCompat.createInstance(movieClass, []), flash.display.MovieClip);
-				stopMovie = function(param1:Event = null) {
-					if (movie.currentFrame == movie.totalFrames || param1 == null) {
-						mDBFacade.stageRef.removeEventListener("keyDown", onKeyDown);
-						mDBFacade.removeRootDisplayObject(movie);
-						movie.removeEventListener("enterFrame", stopMovie);
-						mEventComponent.dispatchEvent(new Event("REQUEST_ENTRY_PLAYER_HERO"));
-						movie.stop();
-						mDBFacade.assetRepository.removeFromCache(asset);
-						movie = null;
+				stopMovie = function() {
+					mDBFacade.stageRef.removeEventListener("keyDown", onKeyDown);
+					mDBFacade.removeRootDisplayObject(movie);
+					if (movieRenderer != null) {
+						movieRenderer.destroy();
+						movieRenderer = null;
 					}
+					mEventComponent.dispatchEvent(new Event("REQUEST_ENTRY_PLAYER_HERO"));
+					mDBFacade.assetRepository.removeFromCache(asset);
+					movie = null;
 				};
 				mDBFacade.addRootDisplayObject(movie);
-				movie.addEventListener("enterFrame", stopMovie);
-				movie.gotoAndPlay(1);
+				movieRenderer = new MovieClipRenderController(mDBFacade, movie, stopMovie);
+				movieRenderer.play((0 : UInt), false);
 				movie.x = 972.5;
 				movie.y = 320;
 				onKeyDown = function(param1:flash.events.KeyboardEvent) {

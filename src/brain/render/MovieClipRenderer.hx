@@ -16,6 +16,8 @@ class MovieClipRenderer {
 
 	static inline final NO_LOOP_LABEL = "noloop";
 
+	static inline final RENDERER_OWNER_PROPERTY = "MCR_renderer";
+
 	var mFrameRate:Float = 24;
 
 	var mPlayRate:Float = 1;
@@ -94,6 +96,9 @@ class MovieClipRenderer {
 		if (mClip != null) {
 			mClip.removeEventListener("addedToStage", onAdd);
 			mClip.removeEventListener("removedFromStage", onRemove);
+			if (ASCompat.getProperty(mClip, RENDERER_OWNER_PROPERTY) == this) {
+				ASCompat.deleteProperty(mClip, RENDERER_OWNER_PROPERTY);
+			}
 		}
 		if (mOnFrameTask != null) {
 			mOnFrameTask.destroy();
@@ -168,6 +173,7 @@ class MovieClipRenderer {
 		if (!mIsPlaying) {
 			return;
 		}
+		var previousFrame = Math.fround(mPlayHead);
 		mPlayHead += mFrameRate * gameClock.tickLength * mPlayRate;
 		if (mPlayHead > mMaxFrames - 1 && !mLoop) {
 			mIsPlaying = false;
@@ -183,7 +189,9 @@ class MovieClipRenderer {
 			}
 			return;
 		}
-		this.updateClip(mClip);
+		if (previousFrame != Math.fround(mPlayHead)) {
+			this.updateClip(mClip);
+		}
 	}
 
 	@:isVar public var clip(get, set):MovieClip;
@@ -192,7 +200,11 @@ class MovieClipRenderer {
 		if (value == mClip) {
 			return value;
 		}
+		if (mClip != null && ASCompat.getProperty(mClip, RENDERER_OWNER_PROPERTY) == this) {
+			ASCompat.deleteProperty(mClip, RENDERER_OWNER_PROPERTY);
+		}
 		mClip = value;
+		ASCompat.setProperty(mClip, RENDERER_OWNER_PROPERTY, this);
 		mPlayHead = mStartFrame;
 		mMaxFrames = initialize(mClip);
 		this.updateClip(mClip);
@@ -213,6 +225,10 @@ class MovieClipRenderer {
 	}
 
 	function updateClip(parent:DisplayObjectContainer) {
+		var rendererOwner = ASCompat.getProperty(parent, RENDERER_OWNER_PROPERTY);
+		if (parent != mClip && rendererOwner != null && rendererOwner != this) {
+			return;
+		}
 		var _loc5_:MovieClip = null;
 		var _loc4_:DisplayObject = null;
 		var _loc7_:DisplayObjectContainer = null;
@@ -274,6 +290,10 @@ class MovieClipRenderer {
 	}
 
 	function initialize(parent:DisplayObjectContainer, currentMax:UInt = (0 : UInt), indent:String = ""):UInt {
+		var rendererOwner = ASCompat.getProperty(parent, RENDERER_OWNER_PROPERTY);
+		if (parent != mClip && rendererOwner != null && rendererOwner != this) {
+			return currentMax;
+		}
 		var _loc7_:DisplayObject = null;
 		var _loc4_:MovieClip = null;
 		var _loc5_:DisplayObjectContainer = null;

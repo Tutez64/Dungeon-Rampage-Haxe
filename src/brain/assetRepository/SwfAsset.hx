@@ -3,6 +3,7 @@ package brain.assetRepository;
 import brain.logger.Logger;
 import flash.display.MovieClip;
 #if cpp
+import brain.clock.GameClock;
 import flash.display.DisplayObject;
 import flash.display.DisplayObjectContainer;
 import flash.media.Sound;
@@ -717,6 +718,7 @@ class SwfAsset extends Asset {
 		}
 		library = cast Assets.getLibrary(libraryId);
 		if (library != null) {
+			applyLegacyTimelineFrameRate(library);
 			sLoadedPreprocessedLibraries.set(libraryId, library);
 			return library;
 		}
@@ -728,6 +730,7 @@ class SwfAsset extends Asset {
 			if (Std.isOfType(library, AnimateLibrary)) {
 				cast(library, AnimateLibrary).load();
 			}
+			applyLegacyTimelineFrameRate(library);
 			Assets.registerLibrary(libraryId, library);
 			sLoadedPreprocessedLibraries.set(libraryId, library);
 			return library;
@@ -743,6 +746,13 @@ class SwfAsset extends Asset {
 		}
 		sFailedPreprocessedLibraries.set(libraryId, true);
 		return null;
+	}
+
+	static function applyLegacyTimelineFrameRate(library:AssetLibrary):Void {
+		var animateLibrary:AnimateLibrary = Std.isOfType(library, AnimateLibrary) ? cast library : null;
+		if (animateLibrary != null) {
+			@:privateAccess animateLibrary.frameRate = GameClock.LEGACY_STAGE_FRAME_RATE;
+		}
 	}
 
 	static function getPreprocessedBundlePath(libraryId:String):String {

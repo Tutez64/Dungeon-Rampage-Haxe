@@ -3,6 +3,12 @@ package brain.clock;
 import com.greensock.TweenMax;
 
 class GameClock {
+	public static inline final ANIMATION_FRAME_RATE:Float = 24;
+
+	public static inline final ANIMATION_FRAME_DURATION:Float = 1 / ANIMATION_FRAME_RATE;
+
+	public static inline final LEGACY_STAGE_FRAME_RATE:Float = 60;
+
 	static var mServerTimeOffset:Float = 0;
 
 	static var mWebServerTimeString:String = "";

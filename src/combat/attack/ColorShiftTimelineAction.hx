@@ -25,7 +25,7 @@ class ColorShiftTimelineAction extends AttackTimelineAction {
 
 	var mColorTransformTask:Task;
 
-	var mFramesElapsed:UInt = (0 : UInt);
+	var mFramesElapsed:Float = 0;
 
 	var mOffsets:ColorTransform;
 
@@ -80,31 +80,31 @@ class ColorShiftTimelineAction extends AttackTimelineAction {
 		mOffsets.greenOffset = (color_target.greenOffset - color_src.greenOffset) / duration;
 	}
 
-	function AddColorTransformOffsets():ColorTransform {
+	function AddColorTransformOffsets(scale:Float):ColorTransform {
 		var _loc1_ = new ColorTransform();
 		var _loc2_ = mActorView.body.transform.colorTransform;
-		_loc1_.alphaMultiplier = _loc2_.alphaMultiplier + mOffsets.alphaMultiplier;
-		_loc1_.alphaOffset = _loc2_.alphaOffset + mOffsets.alphaOffset;
-		_loc1_.blueMultiplier = _loc2_.blueMultiplier + mOffsets.blueMultiplier;
-		_loc1_.blueOffset = _loc2_.blueOffset + mOffsets.blueOffset;
-		_loc1_.redMultiplier = _loc2_.redMultiplier + mOffsets.redMultiplier;
-		_loc1_.redOffset = _loc2_.redOffset + mOffsets.redOffset;
-		_loc1_.greenMultiplier = _loc2_.greenMultiplier + mOffsets.greenMultiplier;
-		_loc1_.greenOffset = _loc2_.greenOffset + mOffsets.greenOffset;
+		_loc1_.alphaMultiplier = _loc2_.alphaMultiplier + mOffsets.alphaMultiplier * scale;
+		_loc1_.alphaOffset = _loc2_.alphaOffset + mOffsets.alphaOffset * scale;
+		_loc1_.blueMultiplier = _loc2_.blueMultiplier + mOffsets.blueMultiplier * scale;
+		_loc1_.blueOffset = _loc2_.blueOffset + mOffsets.blueOffset * scale;
+		_loc1_.redMultiplier = _loc2_.redMultiplier + mOffsets.redMultiplier * scale;
+		_loc1_.redOffset = _loc2_.redOffset + mOffsets.redOffset * scale;
+		_loc1_.greenMultiplier = _loc2_.greenMultiplier + mOffsets.greenMultiplier * scale;
+		_loc1_.greenOffset = _loc2_.greenOffset + mOffsets.greenOffset * scale;
 		return _loc1_;
 	}
 
-	function SubtractColorTransformOffsets():ColorTransform {
+	function SubtractColorTransformOffsets(scale:Float):ColorTransform {
 		var _loc1_ = new ColorTransform();
 		var _loc2_ = mActorView.body.transform.colorTransform;
-		_loc1_.alphaMultiplier = _loc2_.alphaMultiplier - mOffsets.alphaMultiplier;
-		_loc1_.alphaOffset = _loc2_.alphaOffset - mOffsets.alphaOffset;
-		_loc1_.blueMultiplier = _loc2_.blueMultiplier - mOffsets.blueMultiplier;
-		_loc1_.blueOffset = _loc2_.blueOffset - mOffsets.blueOffset;
-		_loc1_.redMultiplier = _loc2_.redMultiplier - mOffsets.redMultiplier;
-		_loc1_.redOffset = _loc2_.redOffset - mOffsets.redOffset;
-		_loc1_.greenMultiplier = _loc2_.greenMultiplier - mOffsets.greenMultiplier;
-		_loc1_.greenOffset = _loc2_.greenOffset - mOffsets.greenOffset;
+		_loc1_.alphaMultiplier = _loc2_.alphaMultiplier - mOffsets.alphaMultiplier * scale;
+		_loc1_.alphaOffset = _loc2_.alphaOffset - mOffsets.alphaOffset * scale;
+		_loc1_.blueMultiplier = _loc2_.blueMultiplier - mOffsets.blueMultiplier * scale;
+		_loc1_.blueOffset = _loc2_.blueOffset - mOffsets.blueOffset * scale;
+		_loc1_.redMultiplier = _loc2_.redMultiplier - mOffsets.redMultiplier * scale;
+		_loc1_.redOffset = _loc2_.redOffset - mOffsets.redOffset * scale;
+		_loc1_.greenMultiplier = _loc2_.greenMultiplier - mOffsets.greenMultiplier * scale;
+		_loc1_.greenOffset = _loc2_.greenOffset - mOffsets.greenOffset * scale;
 		return _loc1_;
 	}
 
@@ -113,7 +113,7 @@ class ColorShiftTimelineAction extends AttackTimelineAction {
 		if (mFramesElapsed != 0) {
 			ResetColorTransform();
 		}
-		mFramesElapsed = (0 : UInt);
+		mFramesElapsed = 0;
 		mOldColorTransform = CopyColorTransform(new ColorTransform());
 		var _loc2_ = new ColorTransform(mColorMul.x, mColorMul.y, mColorMul.z, mAlphaMul, mColorAdd.x, mColorAdd.y, mColorAdd.z, mAlphaAdd);
 		CalculateColorTransformOffsets(mOldColorTransform, _loc2_, mTransitionDuration);
@@ -128,11 +128,12 @@ class ColorShiftTimelineAction extends AttackTimelineAction {
 
 	public function UpdateColorShift(clock:GameClock) {
 		if (mActorView != null && mActorView.body != null) {
-			mFramesElapsed = mFramesElapsed + 1;
+			var _loc1_ = clock.tickLength / GameClock.ANIMATION_FRAME_DURATION;
+			mFramesElapsed += _loc1_;
 			if (mFramesElapsed <= mTransitionDuration) {
-				mActorView.body.transform.colorTransform = AddColorTransformOffsets();
+				mActorView.body.transform.colorTransform = AddColorTransformOffsets(_loc1_);
 			} else if (mFramesElapsed >= mDuration - mTransitionDuration) {
-				mActorView.body.transform.colorTransform = SubtractColorTransformOffsets();
+				mActorView.body.transform.colorTransform = SubtractColorTransformOffsets(_loc1_);
 			}
 			if (mFramesElapsed > mDuration) {
 				ResetColorTransform();
@@ -144,7 +145,7 @@ class ColorShiftTimelineAction extends AttackTimelineAction {
 	}
 
 	function ResetColorTransform() {
-		mFramesElapsed = (0 : UInt);
+		mFramesElapsed = 0;
 		if (mActorView != null && mActorView.body != null) {
 			mActorView.body.transform.colorTransform = CopyColorTransform(mOldColorTransform);
 		}

@@ -38,6 +38,8 @@ class WeaponController {
 
 	var mTimeStartedAttack:Float = Math.NaN;
 
+	var mTimeStartedCurrentAttack:Int = 0;
+
 	var mQueueAttack:GMAttack;
 
 	public function new(dbFacade:DBFacade, controlledWeapon:WeaponGameObject, hero:HeroGameObjectOwner) {
@@ -103,6 +105,7 @@ class WeaponController {
 		}
 		stopCurrentTimeline();
 		mCurrentAttackTimeline = mWeapon.getAttackTimeline(attackType);
+		mTimeStartedCurrentAttack = mLogicalWorkComponent.gameClock.gameTime;
 		if (mCurrentAttackTimeline == null) {
 			Logger.error("AttackTimeline for attack: <" + attackType + "> was null. Ignoring onWeaponDown");
 			return false;
@@ -121,6 +124,12 @@ class WeaponController {
 		}
 
 		return attackStarted;
+	}
+
+	@:isVar public var currentAttackStartTime(get, never):Int;
+
+	public function get_currentAttackStartTime():Int {
+		return mTimeStartedCurrentAttack;
 	}
 
 	function finishedAttack(autoAim:Bool, attackSpeedModifier:UInt) {

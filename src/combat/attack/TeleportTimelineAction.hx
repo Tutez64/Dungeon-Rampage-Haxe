@@ -11,7 +11,7 @@ import flash.geom.Vector3D;
 class TeleportTimelineAction extends AttackTimelineAction {
 	public static inline final TYPE = "teleport";
 
-	var mFramesElapsed:UInt = 0;
+	var mFramesElapsed:Float = 0;
 
 	var mDuration:UInt = 0;
 
@@ -38,7 +38,7 @@ class TeleportTimelineAction extends AttackTimelineAction {
 		if (mFramesElapsed != 0) {
 			ResetMovement();
 		}
-		mFramesElapsed = (0 : UInt);
+		mFramesElapsed = 0;
 		if (mMovementTask != null) {
 			mMovementTask.destroy();
 			mMovementTask = null;
@@ -106,8 +106,9 @@ class TeleportTimelineAction extends AttackTimelineAction {
 
 	public function UpdateMovement(clock:GameClock) {
 		if (mActorView != null && mActorView.body != null) {
-			mFramesElapsed = mFramesElapsed + 1;
-			if (mFramesElapsed == 1) {
+			var _loc1_ = clock.tickLength / GameClock.ANIMATION_FRAME_DURATION;
+			mFramesElapsed += _loc1_;
+			if (mFramesElapsed <= _loc1_) {
 				stopHeroMovement();
 				initMovementData();
 			} else if (mFramesElapsed <= mDuration) {
@@ -123,7 +124,7 @@ class TeleportTimelineAction extends AttackTimelineAction {
 
 	function ResetMovement() {
 		var _loc1_:HeroGameObjectOwner = null;
-		mFramesElapsed = (0 : UInt);
+		mFramesElapsed = 0;
 		if (mActorView != null && mActorView.body != null) {}
 		if (mMovementTask != null) {
 			mMovementTask.destroy();

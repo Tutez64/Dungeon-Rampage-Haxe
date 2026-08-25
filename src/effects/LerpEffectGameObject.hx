@@ -1,6 +1,7 @@
 package effects;
 
 import actor.ActorGameObject;
+import brain.clock.GameClock;
 import brain.event.EventComponent;
 import facade.DBFacade;
 import com.greensock.TimelineMax;
@@ -58,7 +59,7 @@ class LerpEffectGameObject extends EffectGameObject {
 			_loc4_ = _loc3_.subtract(mEffectView.position);
 			_loc2_ = _loc4_.length;
 			_loc4_.normalize();
-			_loc4_.scaleBy(mLerpTempSpeed);
+			_loc4_.scaleBy(mLerpTempSpeed * mDBFacade.realClock.tickLength * GameClock.LEGACY_STAGE_FRAME_RATE);
 			mEffectView.position = mEffectView.position.add(_loc4_);
 			if (_loc2_ < 15) {
 				TweenMax.to(mLerpTargetActor.actorView.body, 0.05, {
