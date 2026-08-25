@@ -273,10 +273,6 @@ class HomeState extends TownSubState {
 		mShopButton.isToTheLeftOf(mCreditsButton);
 		setupHeaderLinks();
 		mDBFacade.menuNavigationController.pushNewLayer("TOWN_MENU", mTownStateMachine.townHeader.determineCallback, mBattleButton, mBattleButton);
-		if (mFriendLeaderboardDelayMenuNavigationLinkageTask != null) {
-			mFriendLeaderboardDelayMenuNavigationLinkageTask.destroy();
-		}
-		mFriendLeaderboardDelayMenuNavigationLinkageTask = mLogicalWorkComponent.doLater(2, setupFriendLinks);
 	}
 
 	public function setupFriendLinks(gameClock:GameClock = null) {
@@ -741,6 +737,10 @@ class HomeState extends TownSubState {
 			mUILeaderboard.currentStateName = "HomeState";
 			mUILeaderboard.hidePopup();
 		}
+		if (mFriendLeaderboardDelayMenuNavigationLinkageTask != null) {
+			mFriendLeaderboardDelayMenuNavigationLinkageTask.destroy();
+		}
+		mFriendLeaderboardDelayMenuNavigationLinkageTask = mLogicalWorkComponent.doLater(2, setupFriendLinks);
 		mTownStateMachine.townHeader.title = Locale.getString("TOWN_HEADER");
 		mTownStateMachine.townHeader.inHomeState = true;
 		mTownStateMachine.townHeader.showCloseButton(true);
