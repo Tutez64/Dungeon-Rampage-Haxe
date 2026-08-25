@@ -982,6 +982,21 @@ class UIMapWorldMap {
 		if (mEventComponent != null) {
 			mEventComponent.removeAllListeners();
 		}
+		clearTooltipLayer();
+	}
+
+	function clearTooltipLayer() {
+		var tooltipLayer:flash.display.DisplayObjectContainer;
+		if (mDBFacade == null || mDBFacade.sceneGraphManager == null) {
+			return;
+		}
+		tooltipLayer = mDBFacade.sceneGraphManager.getLayer(107);
+		if (tooltipLayer == null) {
+			return;
+		}
+		while (tooltipLayer.numChildren > 0) {
+			tooltipLayer.removeChildAt(0);
+		}
 	}
 
 	function killCameraLerp() {
