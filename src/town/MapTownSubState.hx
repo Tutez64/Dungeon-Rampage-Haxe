@@ -128,6 +128,10 @@ class MapTownSubState extends TownSubState {
 	}
 
 	override public function destroy() {
+		if (mWorldMap != null) {
+			mWorldMap.deinit();
+			mWorldMap = null;
+		}
 		if (mEventComponent != null) {
 			mEventComponent.destroy();
 			mEventComponent = null;
