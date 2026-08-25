@@ -193,6 +193,14 @@ class DBUIPopup extends UIObject {
 	}
 
 	function close(callback:ASFunction, offer:GMOffer = null) {
+		// Pop this popup's nav layer before the callback. Otherwise callbacks that
+		// pop a parent layer (e.g. DISTRIBUTED_DUNGEON_SUMMARY after the abandon-loot
+		// confirm) fail because this popup layer is still on top, leaking a stale
+		// UIObject reference that later Null Object Reference crashes town teardown.
+		if (ASCompat.stringAsBool(mUILayerName)) {
+			popMenuNavigationLayer();
+			mUILayerName = null;
+		}
 		if (callback != null) {
 			if (offer == null) {
 				callback();
