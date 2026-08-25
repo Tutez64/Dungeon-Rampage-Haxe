@@ -1356,7 +1356,7 @@ class UIHud {
 	function updateXpBulge(clock:GameClock) {
 		var _loc3_ = mXpObject.root;
 		var _loc2_ = _loc3_.scaleX - mXpRestScale;
-		_loc2_ *= 0.75;
+		_loc2_ *= Math.pow(0.75, clock.tickLength / GameClock.ANIMATION_FRAME_DURATION);
 		_loc3_.scaleX = mXpRestScale + _loc2_;
 		_loc3_.scaleY = mXpRestScale + _loc2_;
 		if (Math.abs(_loc2_) <= 0.01) {
@@ -1380,7 +1380,7 @@ class UIHud {
 
 	function updateProfileBulge(clock:GameClock) {
 		var _loc2_ = mProfileBox.scaleX - mProfileRestScale;
-		_loc2_ *= 0.75;
+		_loc2_ *= Math.pow(0.75, clock.tickLength / GameClock.ANIMATION_FRAME_DURATION);
 		mProfileBox.scaleX = mProfileRestScale + _loc2_;
 		mProfileBox.scaleY = mProfileRestScale + _loc2_;
 		if (Math.abs(_loc2_) <= 0.01) {

@@ -1,5 +1,6 @@
 package brain.assetRepository;
 
+import brain.clock.GameClock;
 import brain.logger.Logger;
 import flash.display.Bitmap;
 import flash.display.DisplayObject;
@@ -587,6 +588,7 @@ class SwfAsset extends Asset {
 		}
 		_loc1_ = cast Assets.getLibrary(param1);
 		if (_loc1_ != null) {
+			applyLegacyTimelineFrameRate(_loc1_);
 			sLoadedPreprocessedLibraries.set(param1, _loc1_);
 			return _loc1_;
 		}
@@ -598,6 +600,7 @@ class SwfAsset extends Asset {
 			if (Std.isOfType(_loc1_, AnimateLibrary)) {
 				cast(_loc1_, AnimateLibrary).load();
 			}
+			applyLegacyTimelineFrameRate(_loc1_);
 			Assets.registerLibrary(param1, _loc1_);
 			sLoadedPreprocessedLibraries.set(param1, _loc1_);
 			return _loc1_;
@@ -613,6 +616,13 @@ class SwfAsset extends Asset {
 		}
 		sFailedPreprocessedLibraries.set(param1, true);
 		return null;
+	}
+
+	static function applyLegacyTimelineFrameRate(param1:AssetLibrary):Void {
+		var _loc1_:AnimateLibrary = Std.isOfType(param1, AnimateLibrary) ? cast param1 : null;
+		if (_loc1_ != null) {
+			@:privateAccess _loc1_.frameRate = GameClock.LEGACY_STAGE_FRAME_RATE;
+		}
 	}
 
 	static function getPreprocessedBundlePath(param1:String):String {

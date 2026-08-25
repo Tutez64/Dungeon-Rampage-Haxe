@@ -105,7 +105,7 @@ class ScriptTimeline {
 
 	public function getTimeRemaining():Float {
 		var _loc1_:Float = mTotalFrames - mLastExecutedFrame;
-		return _loc1_ * mDBFacade.gameClock.tickLength / playSpeed;
+		return _loc1_ * GameClock.ANIMATION_FRAME_DURATION / playSpeed;
 	}
 
 	function parseJson(jsonObj:ASObject) {
@@ -418,7 +418,7 @@ class ScriptTimeline {
 	}
 
 	function updatePlayHead(gameClock:GameClock) {
-		mPlayHeadTime += mPlaySpeed * gameClock.timeScale;
+		mPlayHeadTime += mPlaySpeed * (gameClock.tickLength / GameClock.ANIMATION_FRAME_DURATION);
 	}
 
 	function processTimelineActions(frame:Int, gameClock:GameClock) {

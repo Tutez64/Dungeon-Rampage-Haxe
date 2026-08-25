@@ -38,7 +38,7 @@ class ScalingWeaponController extends WeaponController {
 
 	var mTotalTime:Float = 0;
 
-	var mFramesFinished:UInt = (0 : UInt);
+	var mFramesFinished:Float = 0;
 
 	var mPlayerExittedState:Bool = false;
 
@@ -106,7 +106,7 @@ class ScalingWeaponController extends WeaponController {
 	override public function onWeaponDown(autoAim:Bool = true) {
 		if (!mWeaponDownActive) {
 			super.onWeaponDown(autoAim);
-			mFramesFinished = (0 : UInt);
+			mFramesFinished = 0;
 			mWeaponDownActive = true;
 			mScalingLogicalWorkComponent.clear();
 			if (mTotalTime > 0) {
@@ -226,11 +226,11 @@ class ScalingWeaponController extends WeaponController {
 	}
 
 	public function update(gameClock:GameClock) {
-		mFramesFinished = mFramesFinished + 1;
+		mFramesFinished += gameClock.tickLength / GameClock.ANIMATION_FRAME_DURATION;
 	}
 
 	override public function clear() {
-		mFramesFinished = (0 : UInt);
+		mFramesFinished = 0;
 		mScalingLogicalWorkComponent.clear();
 		mWeaponDownActive = false;
 		if (mNotEnoughManaTask != null) {

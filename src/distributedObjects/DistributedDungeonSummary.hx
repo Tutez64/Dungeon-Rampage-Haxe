@@ -444,7 +444,7 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 
 	function setRevealState(reveal_state:UInt, delay:Float) {
 		mRevealState = reveal_state;
-		mWorkComponent.doLater(delay, updateRevealState);
+		mWorkComponent.doLater(Math.max(delay, GameClock.ANIMATION_FRAME_DURATION), updateRevealState);
 	}
 
 	function setUILootSlotsTwoTreasuresVisible(isVisible:Bool) {
@@ -2324,7 +2324,7 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 
 	function updateBannerAlpha(clock:GameClock) {
 		var _loc2_ = ASCompat.toNumber(1 - ASCompat.toNumberField((mScoreReportRoot : ASAny).stats_a, "alpha"));
-		_loc2_ = 1 - _loc2_ * _loc2_;
+		_loc2_ = 1 - Math.pow(_loc2_, Math.pow(2, clock.tickLength / GameClock.ANIMATION_FRAME_DURATION));
 		ASCompat.setProperty((mScoreReportRoot : ASAny).stats_a, "alpha", _loc2_);
 		ASCompat.setProperty((mScoreReportRoot : ASAny).stats_b, "alpha", _loc2_);
 		ASCompat.setProperty((mScoreReportRoot : ASAny).stats_c, "alpha", _loc2_);

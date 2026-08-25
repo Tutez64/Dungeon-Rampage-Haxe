@@ -115,7 +115,9 @@ class MovementController {
 		var _loc5_:Vector3D = null;
 		var _loc2_ = Math.NaN;
 		var _loc3_ = Math.NaN;
-		var _loc4_ = (1 - mSmoothFactor) * gameClock.timeScale;
+		var _loc6_ = Math.NaN;
+		var _loc7_ = Math.NaN;
+		var _loc4_ = 1 - Math.pow(mSmoothFactor, gameClock.tickLength / GameClock.ANIMATION_FRAME_DURATION);
 		if (mWantSmoothTelemetry) {
 			_loc2_ = mView.position.x * (1 - _loc4_) + mActorGameObject.position.x * _loc4_;
 			_loc3_ = mView.position.y * (1 - _loc4_) + mActorGameObject.position.y * _loc4_;
@@ -124,7 +126,9 @@ class MovementController {
 			_loc5_ = mActorGameObject.position;
 		}
 		mView.velocity = _loc5_.subtract(mView.position);
-		if (mView.velocity.nearEquals(ZERO_VECTOR, 1)) {
+		_loc6_ = Math.max(0.0001, 1 - mSmoothFactor);
+		_loc7_ = mSmoothFactor / _loc6_;
+		if (_loc5_.nearEquals(mActorGameObject.position, _loc7_)) {
 			if (mPositionLerpTask != null) {
 				mPositionLerpTask.destroy();
 				mPositionLerpTask = null;

@@ -32,7 +32,7 @@ class BackgroundFader {
 
 	var mFadeTask:Task;
 
-	var mFramesElapsed:UInt = 0;
+	var mFramesElapsed:Float = 0;
 
 	var mStartTop:Float = Math.NaN;
 
@@ -41,7 +41,7 @@ class BackgroundFader {
 	static inline final mPadding:Float = 1300;
 
 	public function new(facade:Facade) {
-		mFramesElapsed = (0 : UInt);
+		mFramesElapsed = 0;
 		mFacade = facade;
 		mWorkComponent = new LogicalWorkComponent(facade, "BackgroundFader");
 		MemoryTracker.track(mWorkComponent, "LogicalWorkComponent - created in BackgroundFader()", "brain");
@@ -58,10 +58,10 @@ class BackgroundFader {
 			mExcludes = excludes;
 			execute();
 		} else {
-			_loc6_ = (mDuration - mFramesElapsed : Int);
+			_loc6_ = Std.int(mDuration - mFramesElapsed);
 			mDuration = (ASCompat.toInt((_loc6_ : UInt) > duration ? (_loc6_ : UInt) : duration) : UInt);
 			mTransitionDuration = transitionDur;
-			mFramesElapsed = (0 : UInt);
+			mFramesElapsed = 0;
 			mAlpha = mAlpha > alpha ? mAlpha : alpha;
 			mOffset = mAlpha / mTransitionDuration;
 		}
@@ -71,7 +71,7 @@ class BackgroundFader {
 		if (mFramesElapsed != 0) {
 			ResetFade();
 		}
-		mFramesElapsed = (0 : UInt);
+		mFramesElapsed = 0;
 		mRectSprite = new Sprite();
 		MemoryTracker.track(mRectSprite, "Sprite - fade rect created in BackgroundFader.execute()", "brain");
 		mRectSprite.graphics.beginFill((Std.int(mColor.x) << 16 | Std.int(mColor.y) << 8 | Std.int(mColor.z):UInt), 1);
@@ -99,12 +99,13 @@ class BackgroundFader {
 		}
 		mRectSprite.x = mFacade.camera.visibleRectangle.left - mStartLeft - 1300 * 0.5;
 		mRectSprite.y = mFacade.camera.visibleRectangle.top - mStartTop - 1300 * 0.5;
-		mFramesElapsed = mFramesElapsed + 1;
+		var _loc2_ = clock.tickLength / GameClock.ANIMATION_FRAME_DURATION;
+		mFramesElapsed += _loc2_;
 		if (mFramesElapsed <= mTransitionDuration) {
-			mRectSprite.alpha += mOffset;
+			mRectSprite.alpha += mOffset * _loc2_;
 			mRectSprite.alpha = Math.min(mRectSprite.alpha, mAlpha);
 		} else if (mFramesElapsed >= mDuration - mTransitionDuration) {
-			mRectSprite.alpha -= mOffset;
+			mRectSprite.alpha -= mOffset * _loc2_;
 			mRectSprite.alpha = Math.max(mRectSprite.alpha, 0);
 		}
 		if (mFramesElapsed > mDuration) {
@@ -114,7 +115,7 @@ class BackgroundFader {
 	}
 
 	function ResetFade() {
-		mFramesElapsed = (0 : UInt);
+		mFramesElapsed = 0;
 		mFacade.sceneGraphManager.removeChild(mRectSprite);
 		var _loc1_:Sprite;
 		final __ax4_iter_204 = mExcludes;

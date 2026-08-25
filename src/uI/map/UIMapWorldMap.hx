@@ -1129,7 +1129,8 @@ class UIMapWorldMap {
 		var _loc3_ = ASCompat.toNumber(mCameraTargetX - ASCompat.toNumberField((mRootMovieClip : ASAny).worldmap, "x"));
 		var _loc4_ = ASCompat.toNumber(mCameraTargetY - ASCompat.toNumberField((mRootMovieClip : ASAny).worldmap, "y"));
 		var _loc2_ = _loc3_ * _loc3_ + _loc4_ * _loc4_;
-		mCameraVelocityX = _loc3_ * 0.2916666666666667;
+		var _loc5_ = 1 - Math.pow(1 - 0.2916666666666667, clock.tickLength / GameClock.ANIMATION_FRAME_DURATION);
+		mCameraVelocityX = _loc3_ * _loc5_;
 		var __tmpAssignObj9:ASAny = (mRootMovieClip : ASAny).worldmap;
 		ASCompat.setProperty(__tmpAssignObj9, "x", __tmpAssignObj9.x + mCameraVelocityX);
 		clampMap();

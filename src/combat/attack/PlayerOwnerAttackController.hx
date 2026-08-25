@@ -1,6 +1,7 @@
 package combat.attack;
 
 import actor.buffs.BuffHandler;
+import brain.clock.GameClock;
 import actor.player.HeroView;
 import brain.event.EventComponent;
 import brain.logger.Logger;
@@ -22,6 +23,8 @@ import gameMasterDictionary.GMStackable;
 class PlayerOwnerAttackController {
 	public static inline final DUNGEON_BUSTER_WEAPON_INDEX = (3 : UInt);
 
+	static final LEGACY_ATTACK_QUEUE_INTERVAL_MS:Int = Std.int(GameClock.ANIMATION_FRAME_DURATION * 1000);
+
 	var CHARGE_UP:String = "CHARGE_UP";
 
 	var SCALING:String = "SCALING";
@@ -42,7 +45,15 @@ class PlayerOwnerAttackController {
 
 	var mQueueNextAttackWindow:Float = Math.NaN;
 
+	var mLastQueuedTimeline:ScriptTimeline;
+
+	var mLastQueuedTimelineTick:Int = -1;
+
 	var mNextWeaponCommand:PotentialWeaponInputQueueStruct;
+
+	var mComboTransitionCommand:PotentialWeaponInputQueueStruct;
+
+	var mComboTransitionReadyTime:Int = -1;
 
 	var mDungeonBusterGMAttack:GMAttack;
 
@@ -218,6 +229,15 @@ class PlayerOwnerAttackController {
 	public function weaponCommandQueueUpCall() {
 		var _loc2_:PotentialWeaponInputQueueStruct = null;
 		var _loc1_ = false;
+		var _loc3_:ScriptTimeline = currentWeaponController != null ? currentWeaponController.currentTimeline : null;
+		var _loc4_ = -1;
+		if (_loc3_ != null) {
+			_loc4_ = Std.int((mDBFacade.gameClock.gameTime - currentWeaponController.currentAttackStartTime) / LEGACY_ATTACK_QUEUE_INTERVAL_MS);
+		}
+		if (_loc3_ != null && mLastQueuedTimeline == _loc3_ && mLastQueuedTimelineTick == _loc4_) {
+			tryAttack();
+			return;
+		}
 		while (mPotentialWeaponInputQueue.length > 0) {
 			_loc2_ = ASCompat.dynamicAs(mPotentialWeaponInputQueue[0], combat.attack.PotentialWeaponInputQueueStruct);
 			_loc1_ = false;
@@ -237,6 +257,8 @@ class PlayerOwnerAttackController {
 			mPotentialWeaponInputQueue.shift();
 		}
 		tryAttack();
+		mLastQueuedTimeline = _loc3_;
+		mLastQueuedTimelineTick = _loc4_;
 		mPotentialWeaponInputQueue.resize(0);
 	}
 
@@ -274,20 +296,24 @@ class PlayerOwnerAttackController {
 	function tryAttack() {
 		var _loc1_:ScriptTimeline = null;
 		if (mNextWeaponCommand == null) {
+			clearComboTransitionDelay();
 			return;
 		}
 		if (mDungeonBusterAttackTimeline != null && mDungeonBusterAttackTimeline.isPlaying) {
 			mNextWeaponCommand = null;
+			clearComboTransitionDelay();
 			return;
 		}
 		var _loc2_ = false;
 		var _loc3_ = mNextWeaponCommand.weaponController;
+		var _loc4_ = mComboTransitionCommand == mNextWeaponCommand;
 		if (mDistributedPlayerOwner.stateMachine.currentStateName == "ActorDefaultState" && mDistributedPlayerOwner.canInitiateAnAttack) {
 			if (mNextWeaponCommand.weaponIndex == 3) {
 				if (mDistributedPlayerOwner.dungeonBusterPoints >= mDistributedPlayerOwner.maxBusterPoints) {
 					playDungeonBusterAttack();
 				}
 				mNextWeaponCommand = null;
+				clearComboTransitionDelay();
 				return;
 			}
 			_loc1_ = currentWeaponController.currentTimeline;
@@ -296,19 +322,30 @@ class PlayerOwnerAttackController {
 					_loc2_ = true;
 				}
 			} else if (_loc1_ == null) {
+				_loc2_ = !_loc4_ || mLogicalWorkComponent.gameClock.gameTime >= mComboTransitionReadyTime;
+			} else if (currentWeaponController.isRepeater() && currentWeaponController.weaponDownActive) {
 				_loc2_ = true;
-			} else if (currentWeaponController.isRepeater()
-				&& currentWeaponController.weaponDownActive
-				|| currentWeaponController.canCombo()) {
-				_loc2_ = true;
+			} else if (currentWeaponController.canCombo()) {
+				if (!_loc4_) {
+					mComboTransitionCommand = mNextWeaponCommand;
+					mComboTransitionReadyTime = getLegacyAttackQueueReadyTime(_loc1_);
+					_loc4_ = true;
+				}
+				_loc2_ = mLogicalWorkComponent.gameClock.gameTime >= mComboTransitionReadyTime;
 			} else {
 				_loc2_ = false;
 			}
 		} else {
 			mNextWeaponCommand = null;
+			clearComboTransitionDelay();
+			_loc4_ = false;
 		}
 		if (_loc1_ == null) {
-			resetCombosOnAllBut();
+			if (_loc4_) {
+				resetCombosOnAllBut(mNextWeaponCommand.weaponIndex);
+			} else {
+				resetCombosOnAllBut();
+			}
 		}
 		if (_loc2_) {
 			if (mNextWeaponCommand.down) {
@@ -317,7 +354,23 @@ class PlayerOwnerAttackController {
 				onWeaponUp(mNextWeaponCommand.weaponIndex, mNextWeaponCommand.autoAim);
 			}
 			mNextWeaponCommand = null;
+			clearComboTransitionDelay();
 		}
+	}
+
+	function clearComboTransitionDelay() {
+		mComboTransitionCommand = null;
+		mComboTransitionReadyTime = -1;
+	}
+
+	function getLegacyAttackQueueReadyTime(timeline:ScriptTimeline):Int {
+		var _loc1_ = mLogicalWorkComponent.gameClock.gameTime;
+		var _loc2_ = currentWeaponController.currentAttackStartTime;
+		var _loc3_ = Std.int((_loc1_ - _loc2_) / LEGACY_ATTACK_QUEUE_INTERVAL_MS);
+		if (mLastQueuedTimeline != timeline || mLastQueuedTimelineTick != _loc3_) {
+			return _loc1_;
+		}
+		return _loc2_ + (_loc3_ + 1) * LEGACY_ATTACK_QUEUE_INTERVAL_MS;
 	}
 
 	public function isCharging():Bool {
@@ -436,6 +489,9 @@ class PlayerOwnerAttackController {
 
 	public function stopAttacking() {
 		mNextWeaponCommand = null;
+		clearComboTransitionDelay();
+		mLastQueuedTimeline = null;
+		mLastQueuedTimelineTick = -1;
 		mPotentialWeaponInputQueue.resize(0);
 	}
 

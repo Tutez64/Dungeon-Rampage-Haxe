@@ -27,8 +27,7 @@ import org.as3commons.collections.Map;
 class Facade {
 	public static inline final MAX_TICKS_PER_FRAME = 5;
 
-	public static inline final FPS = (24 : UInt);
-
+	// The simulation cadence is read from Stage.frameRate during initialization.
 	var mElapsedTime:Float = 0;
 
 	var mStageRef:Stage;
@@ -261,7 +260,7 @@ class Facade {
 		mSwfWidth = mStageRef.stageWidth;
 		mSwfHeight = mStageRef.stageHeight;
 		Logger.init(mStageRef, true);
-		mGameClock = new GameClock(1 / 24);
+		mGameClock = new GameClock(1 / stageRef.frameRate);
 		mRealClock = new GameClock(1 / stageRef.frameRate);
 		mEventManager = new EventManager(this);
 		mAssetRepository = ASCompat.dynamicAs(ASCompat.createInstance(mAssetRepositoryClass, [this]), brain.assetRepository.AssetRepository);

@@ -14,7 +14,7 @@ class LetterboxEffect {
 
 	var mRectSprite:Sprite;
 
-	var mDuration:UInt = 0;
+	var mDuration:Float = 0;
 
 	var mTransitionDuration:Float = Math.NaN;
 
@@ -28,19 +28,19 @@ class LetterboxEffect {
 
 	var mFadeTask:Task;
 
-	var mFramesElapsed:UInt = 0;
+	var mFramesElapsed:Float = 0;
 
 	static inline final mPadding:Float = 512;
 
 	public function new(facade:Facade) {
-		mFramesElapsed = (0 : UInt);
+		mFramesElapsed = 0;
 		mFacade = facade;
 		mWorkComponent = new LogicalWorkComponent(facade, "LetterboxEffect");
 		MemoryTracker.track(mWorkComponent, "LogicalWorkComponent - created in LetterboxEffect()", "brain");
 	}
 
 	public function doFade(duration:UInt, transitionDur:Float, color:Vector3D, alpha:Float) {
-		var _loc5_ = 0;
+		var _loc5_:Float = 0;
 		if (mRectSprite == null) {
 			mDuration = duration;
 			mTransitionDuration = transitionDur;
@@ -49,10 +49,10 @@ class LetterboxEffect {
 			mOffset = alpha / transitionDur;
 			execute();
 		} else {
-			_loc5_ = (mDuration - mFramesElapsed : Int);
-			mDuration = (ASCompat.toInt((_loc5_ : UInt) > duration ? (_loc5_ : UInt) : duration) : UInt);
+			_loc5_ = mDuration - mFramesElapsed;
+			mDuration = Math.max(_loc5_, duration);
 			mTransitionDuration = transitionDur;
-			mFramesElapsed = (0 : UInt);
+			mFramesElapsed = 0;
 			mAlpha = mAlpha > alpha ? mAlpha : alpha;
 			mOffset = mAlpha / mTransitionDuration;
 		}
@@ -62,7 +62,7 @@ class LetterboxEffect {
 		if (mFramesElapsed != 0) {
 			ResetFade();
 		}
-		mFramesElapsed = (0 : UInt);
+		mFramesElapsed = 0;
 		mRectSprite = new Sprite();
 		MemoryTracker.track(mRectSprite, "Sprite - letterbox rect created in LetterboxEffect.execute()", "brain");
 		mRectSprite.graphics.beginFill((Std.int(mColor.x) << 16 | Std.int(mColor.y) << 8 | Std.int(mColor.z):UInt), 1);
@@ -80,12 +80,13 @@ class LetterboxEffect {
 			Logger.warn("LetterboxEffect with null RectSprite");
 			return;
 		}
-		mFramesElapsed = mFramesElapsed + 1;
+		var _loc1_ = clock.tickLength / GameClock.ANIMATION_FRAME_DURATION;
+		mFramesElapsed += _loc1_;
 		if (mFramesElapsed <= mTransitionDuration) {
-			mRectSprite.alpha += mOffset;
+			mRectSprite.alpha += mOffset * _loc1_;
 			mRectSprite.alpha = Math.min(mRectSprite.alpha, mAlpha);
 		} else if (mFramesElapsed >= mDuration - mTransitionDuration) {
-			mRectSprite.alpha -= mOffset;
+			mRectSprite.alpha -= mOffset * _loc1_;
 			mRectSprite.alpha = Math.max(mRectSprite.alpha, 0);
 		} else if (mFramesElapsed > mTransitionDuration) {
 			mRectSprite.alpha = mAlpha;
@@ -97,7 +98,7 @@ class LetterboxEffect {
 	}
 
 	function ResetFade() {
-		mFramesElapsed = (0 : UInt);
+		mFramesElapsed = 0;
 		mFacade.sceneGraphManager.removeChild(mRectSprite);
 		mRectSprite = null;
 		mFadeTask.destroy();
