@@ -11,7 +11,7 @@ class Db_UI_skip_button_swf extends MovieClip {
 	public function new() {
 		super();
 		#if cpp
-		SwfAsset.applyExportedFontById(this, "assets", 39, "Db_UI_skip_button_swf");
+		SwfAsset.applyExportedFontsForBind(this, "assets");
 		#end
 	}
 }

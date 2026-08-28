@@ -16,11 +16,22 @@ import lime.utils.AssetBundle;
 import openfl.utils.AssetLibrary;
 import openfl.utils.Assets;
 import openfl.utils.AssetType;
+import swf.exporters.animate.AnimateButtonSymbol;
+import swf.exporters.animate.AnimateDynamicTextSymbol;
 import swf.exporters.animate.AnimateLibrary;
+import swf.exporters.animate.AnimateSpriteSymbol;
+import swf.exporters.animate.AnimateSymbol;
+import swf.exporters.animate.AnimateTimeline;
 import sys.FileSystem;
 import brain.logger.Logger;
 #end
 
+#if cpp
+@:access(openfl.display.MovieClip)
+@:access(swf.exporters.animate.AnimateLibrary)
+@:access(swf.exporters.animate.AnimateSpriteSymbol)
+@:access(swf.exporters.animate.AnimateTimeline)
+#end
 class SwfAsset extends Asset {
 	#if cpp
 	static var sLoadedPreprocessedLibraries:StringMap<AssetLibrary> = new StringMap<AssetLibrary>();
@@ -415,19 +426,161 @@ class SwfAsset extends Asset {
 		#end
 	}
 
-	public static function applyExportedFontById(param1:DisplayObject, param2:String, param3:Int, param4:String = ""):Void {
-		var _loc1_:String = null;
+	public static function applyExportedFontsForBind(param1:DisplayObject, param2:String, param3:String = ""):Void {
 		#if cpp
+		var _loc1_:AnimateTimeline = null;
+		var _loc2_:Array<Int> = null;
+		var _loc3_:String = null;
 		if (param1 == null || param2 == null) {
 			return;
 		}
-		_loc1_ = getExportedFontPathById(param2, param3);
-		if (_loc1_ == null) {
+		if (param3 == null || param3.length == 0) {
+			param3 = Type.getClassName(Type.getClass(param1));
+		}
+		_loc1_ = getBindTimeline(param1);
+		if (_loc1_ == null || _loc1_.__library == null || _loc1_.__symbol == null) {
 			return;
 		}
-		applyExportedFontPathRecursive(param1, _loc1_, param4);
+		_loc2_ = collectDynamicTextFontIDs(_loc1_.__library, _loc1_.__symbol);
+		if (_loc2_.length == 0) {
+			return;
+		}
+		if (_loc2_.length == 1) {
+			_loc3_ = getExportedFontPathById(param2, _loc2_[0]);
+			if (_loc3_ != null) {
+				applyExportedFontPathRecursive(param1, _loc3_, param3);
+			}
+			return;
+		}
+		applyExportedFontsForBindRecursive(param1, param2, param3);
 		#end
 	}
+
+	#if cpp
+	static function applyExportedFontsForBindRecursive(param1:DisplayObject, param2:String, param3:String):Void {
+		var _loc1_:TextField = ASCompat.dynamicAs(param1, TextField);
+		var _loc2_:DisplayObjectContainer = null;
+		var _loc3_:Int = 0;
+		var _loc4_:Int = 0;
+		var _loc5_:String = null;
+		if (_loc1_ != null) {
+			_loc4_ = resolveBindFontId(_loc1_);
+			if (_loc4_ >= 0) {
+				_loc5_ = getExportedFontPathById(param2, _loc4_);
+				if (_loc5_ != null) {
+					applyExportedFontPathToTextField(_loc1_, _loc5_, param3);
+				}
+			}
+			return;
+		}
+		_loc2_ = ASCompat.dynamicAs(param1, DisplayObjectContainer);
+		if (_loc2_ != null) {
+			_loc3_ = 0;
+			while (_loc3_ < _loc2_.numChildren) {
+				applyExportedFontsForBindRecursive(_loc2_.getChildAt(_loc3_), param2, param3);
+				_loc3_++;
+			}
+		}
+	}
+
+	static function resolveBindFontId(param1:DisplayObject):Int {
+		var _loc1_:DisplayObject = param1;
+		var _loc2_:AnimateTimeline = null;
+		var _loc3_:Array<Int> = null;
+		while (_loc1_ != null && _loc1_.parent != null) {
+			_loc2_ = getBindTimeline(_loc1_.parent);
+			if (_loc2_ != null) {
+				_loc3_ = getFontIDsForBindChild(_loc2_, _loc1_);
+				if (_loc3_.length == 1) {
+					return _loc3_[0];
+				}
+			}
+			_loc1_ = _loc1_.parent;
+		}
+		return -1;
+	}
+
+	static function getBindTimeline(param1:DisplayObject):AnimateTimeline {
+		var _loc1_ = ASCompat.dynamicAs(param1, MovieClip);
+		if (_loc1_ == null || _loc1_.__timeline == null) {
+			return null;
+		}
+		if (!Std.isOfType(_loc1_.__timeline, AnimateTimeline)) {
+			return null;
+		}
+		return cast _loc1_.__timeline;
+	}
+
+	static function getFontIDsForBindChild(param1:AnimateTimeline, param2:DisplayObject):Array<Int> {
+		var _loc1_:Array<Dynamic> = null;
+		var _loc2_:Dynamic = null;
+		if (param1.__activeInstances == null || param1.__library == null || param1.__library.symbols == null) {
+			return [];
+		}
+		_loc1_ = cast param1.__activeInstances;
+		for (_loc2_ in _loc1_) {
+			if (_loc2_.displayObject == param2) {
+				return collectDynamicTextFontIDs(param1.__library, param1.__library.symbols.get(_loc2_.characterID));
+			}
+		}
+		return [];
+	}
+
+	static function collectDynamicTextFontIDs(param1:AnimateLibrary, param2:AnimateSymbol):Array<Int> {
+		var _loc1_ = new Array<Int>();
+		if (param1 == null || param1.symbols == null || param2 == null) {
+			return _loc1_;
+		}
+		collectDynamicTextFontIDsRecursive(param1, param2, new Map(), _loc1_);
+		return _loc1_;
+	}
+
+	static function collectDynamicTextFontIDsRecursive(param1:AnimateLibrary, param2:AnimateSymbol, param3:Map<Int, Bool>, param4:Array<Int>):Void {
+		var _loc1_:AnimateButtonSymbol = null;
+		var _loc2_:AnimateSpriteSymbol = null;
+		var _loc3_:Int = 0;
+		if (param2 == null || param3.exists(param2.id)) {
+			return;
+		}
+		param3.set(param2.id, true);
+		if (Std.isOfType(param2, AnimateDynamicTextSymbol)) {
+			_loc3_ = cast(param2, AnimateDynamicTextSymbol).fontID;
+			if (param4.indexOf(_loc3_) == -1) {
+				param4.push(_loc3_);
+			}
+			return;
+		}
+		if (Std.isOfType(param2, AnimateButtonSymbol)) {
+			_loc1_ = cast param2;
+			collectDynamicTextFontIDsRecursive(param1, _loc1_.upState, param3, param4);
+			collectDynamicTextFontIDsRecursive(param1, _loc1_.overState, param3, param4);
+			collectDynamicTextFontIDsRecursive(param1, _loc1_.downState, param3, param4);
+			collectDynamicTextFontIDsRecursive(param1, _loc1_.hitState, param3, param4);
+			return;
+		}
+		if (!Std.isOfType(param2, AnimateSpriteSymbol)) {
+			return;
+		}
+		_loc2_ = cast param2;
+		if (_loc2_.frames != null) {
+			for (_loc4_ in _loc2_.frames) {
+				if (_loc4_.objects == null) {
+					continue;
+				}
+				for (_loc5_ in _loc4_.objects) {
+					collectDynamicTextFontIDsRecursive(param1, param1.symbols.get(_loc5_.symbol), param3, param4);
+				}
+			}
+		}
+		if (_loc2_.compactTimeline != null) {
+			_loc3_ = 0;
+			while (_loc3_ < _loc2_.compactTimeline.objects.length) {
+				collectDynamicTextFontIDsRecursive(param1, param1.symbols.get(Std.int(_loc2_.compactTimeline.objects[_loc3_ + 2])), param3, param4);
+				_loc3_ = _loc2_.compactTimeline.getNextObjectPosition(_loc3_);
+			}
+		}
+	}
+	#end
 
 	static function applyExportedFontPathRecursive(param1:DisplayObject, param2:String, param3:String):Void {
 		var _loc1_:TextField = null;

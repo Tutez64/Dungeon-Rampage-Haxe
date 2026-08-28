@@ -11,7 +11,7 @@ class Loading_screen_swf extends MovieClip {
 	public function new() {
 		super();
 		#if cpp
-		SwfAsset.applyExportedFontById(this, "assets", 27, "Loading_screen_swf");
+		SwfAsset.applyExportedFontsForBind(this, "assets");
 		#end
 	}
 }
