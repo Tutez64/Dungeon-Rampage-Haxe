@@ -4,6 +4,7 @@ import brain.facade.Facade;
 import brain.logger.Logger;
 import flash.display.MovieClip;
 import flash.filesystem.File;
+import haxe.Timer;
 
 class SwfAssetLoader extends AssetLoader {
 	var mSwfAsset:SwfAsset;
@@ -13,6 +14,10 @@ class SwfAssetLoader extends AssetLoader {
 	var mHdAssetLoader:AssetLoader;
 
 	var mIsHdLoader:Bool = false;
+
+	#if cpp
+	var mPreprocessedTimer:Timer;
+	#end
 
 	public function new(facade:Facade, assetLoaderInfo:AssetLoaderInfo, loadedCallback:ASFunction, errorCallback:ASFunction, isHdLoader:Bool = false) {
 		mIsHdLoader = isHdLoader;
@@ -31,6 +36,43 @@ class SwfAssetLoader extends AssetLoader {
 		mSwfAsset = new SwfAsset(_loc2_, mAssetLoaderInfo.getRawAssetPath());
 		return mSwfAsset;
 	}
+
+	#if cpp
+	override function loadAsset(facade:Facade, assetPath:String, useCache:Bool = true) {
+		if (isSwfPath(assetPath) && SwfAsset.hasPreprocessedBundleForPath(assetPath)) {
+			var loaderInfo = mAssetLoaderInfo;
+			var createdCallback = mAssetCreatedCallback;
+			var errorCallback = mErrorCallback;
+			Logger.info("SwfAssetLoader: using preprocessed library without raw SWF: " + assetPath);
+			mSwfAsset = new SwfAsset(null, loaderInfo.getRawAssetPath());
+			var swfAsset = mSwfAsset;
+			mPreprocessedTimer = Timer.delay(function() {
+				mPreprocessedTimer = null;
+				try {
+					swfAsset.preloadPreprocessedLibraries();
+					if (createdCallback != null) {
+						createdCallback(loaderInfo, swfAsset);
+					}
+				} catch (e:Dynamic) {
+					Logger.error("SwfAssetLoader: failed to load preprocessed library: " + loaderInfo.getRawAssetPath(), e);
+					if (errorCallback != null) {
+						errorCallback(loaderInfo);
+					}
+				}
+			}, 0);
+			return;
+		}
+		super.loadAsset(facade, assetPath, useCache);
+	}
+
+	static function isSwfPath(assetPath:String):Bool {
+		if (assetPath == null) {
+			return false;
+		}
+		assetPath = assetPath.split("?")[0].toLowerCase();
+		return StringTools.endsWith(assetPath, ".swf");
+	}
+	#end
 
 	function hdAwareLoadedCallback(assetLoaderInfo:AssetLoaderInfo, asset:Asset) {
 		var _loc3_:AssetLoaderInfo = null;
@@ -66,6 +108,11 @@ class SwfAssetLoader extends AssetLoader {
 		var _loc3_:String = null;
 		var _loc2_:File = null;
 		try {
+			#if cpp
+			if (SwfAsset.hasPreprocessedBundleForPath(hdPath)) {
+				return true;
+			}
+			#end
 			_loc4_ = hdPath;
 			if (_loc4_.indexOf("./") == 0) {
 				_loc4_ = _loc4_.substring(2);
@@ -96,6 +143,12 @@ class SwfAssetLoader extends AssetLoader {
 	}
 
 	override public function destroy() {
+		#if cpp
+		if (mPreprocessedTimer != null) {
+			mPreprocessedTimer.stop();
+			mPreprocessedTimer = null;
+		}
+		#end
 		mSwfAsset = null;
 		mOriginalLoadedCallback = null;
 		mHdAssetLoader = null;
