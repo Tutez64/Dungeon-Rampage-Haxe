@@ -40,23 +40,23 @@ class SwfAssetLoader extends AssetLoader {
 	#if cpp
 	override function loadAsset(facade:Facade, assetPath:String, useCache:Bool = true) {
 		if (isSwfPath(assetPath) && SwfAsset.hasPreprocessedBundleForPath(assetPath)) {
-			var _loc1_ = mAssetLoaderInfo;
-			var _loc2_ = mAssetCreatedCallback;
-			var _loc4_ = mErrorCallback;
+			var loaderInfo = mAssetLoaderInfo;
+			var createdCallback = mAssetCreatedCallback;
+			var errorCallback = mErrorCallback;
 			Logger.info("SwfAssetLoader: using preprocessed library without raw SWF: " + assetPath);
-			mSwfAsset = new SwfAsset(null, _loc1_.getRawAssetPath());
-			var _loc3_ = mSwfAsset;
+			mSwfAsset = new SwfAsset(null, loaderInfo.getRawAssetPath());
+			var swfAsset = mSwfAsset;
 			mPreprocessedTimer = Timer.delay(function() {
 				mPreprocessedTimer = null;
 				try {
-					_loc3_.preloadPreprocessedLibraries();
-					if (_loc2_ != null) {
-						_loc2_(_loc1_, _loc3_);
+					swfAsset.preloadPreprocessedLibraries();
+					if (createdCallback != null) {
+						createdCallback(loaderInfo, swfAsset);
 					}
 				} catch (e:Dynamic) {
-					Logger.error("SwfAssetLoader: failed to load preprocessed library: " + _loc1_.getRawAssetPath(), e);
-					if (_loc4_ != null) {
-						_loc4_(_loc1_);
+					Logger.error("SwfAssetLoader: failed to load preprocessed library: " + loaderInfo.getRawAssetPath(), e);
+					if (errorCallback != null) {
+						errorCallback(loaderInfo);
 					}
 				}
 			}, 0);
@@ -66,12 +66,11 @@ class SwfAssetLoader extends AssetLoader {
 	}
 
 	static function isSwfPath(assetPath:String):Bool {
-		var _loc1_ = assetPath;
-		if (_loc1_ == null) {
+		if (assetPath == null) {
 			return false;
 		}
-		_loc1_ = _loc1_.split("?")[0].toLowerCase();
-		return StringTools.endsWith(_loc1_, ".swf");
+		assetPath = assetPath.split("?")[0].toLowerCase();
+		return StringTools.endsWith(assetPath, ".swf");
 	}
 	#end
 

@@ -1,16 +1,15 @@
 package brain.assetRepository;
 
-import brain.clock.GameClock;
 import brain.logger.Logger;
-import flash.display.Bitmap;
+import flash.display.MovieClip;
+#if cpp
+import brain.clock.GameClock;
 import flash.display.DisplayObject;
 import flash.display.DisplayObjectContainer;
-import flash.display.MovieClip;
 import flash.media.Sound;
 import flash.text.TextField;
 import flash.text.TextFormat;
 import haxe.ds.StringMap;
-#if cpp
 import haxe.io.Path;
 import lime.utils.AssetBundle;
 import openfl.utils.AssetLibrary;
@@ -23,7 +22,6 @@ import swf.exporters.animate.AnimateSpriteSymbol;
 import swf.exporters.animate.AnimateSymbol;
 import swf.exporters.animate.AnimateTimeline;
 import sys.FileSystem;
-import brain.logger.Logger;
 #end
 
 #if cpp
@@ -39,11 +37,11 @@ class SwfAsset extends Asset {
 	static var sFontMaps:StringMap<StringMap<String>> = new StringMap<StringMap<String>>();
 	#end
 
-	var mRootObject:Dynamic;
+	var mRootClip:MovieClip;
 
 	var mSwfPath:String;
 
-	var mHdRootObject:Dynamic = null;
+	var mHdRootClip:MovieClip = null;
 
 	var mHdSwfPath:String = null;
 
@@ -56,32 +54,39 @@ class SwfAsset extends Asset {
 	var mRootInstancePropertiesApplied:Bool = false;
 	#end
 
-	public function new(param1:Dynamic, param2:String) {
-		mRootObject = param1;
-		mSwfPath = param2;
+	public function new(rootClip:MovieClip, swfPath:String) {
+		mRootClip = rootClip;
+		mSwfPath = swfPath;
 		#if cpp
-		mPreprocessedLibraryName = getPreprocessedLibraryId(param2);
+		mPreprocessedLibraryName = getPreprocessedLibraryId(swfPath);
 		#end
 		super();
 	}
 
 	override public function destroy() {
-		unloadSwfRoot(mRootObject);
-		mRootObject = null;
-		mSwfPath = null;
 		#if cpp
+		unloadSwfRoot(mRootClip);
+		mRootClip = null;
+		mSwfPath = null;
 		mPreprocessedLibrary = null;
 		mHdPreprocessedLibrary = null;
 		if (mPreprocessedRootObject != null) {
 			unloadSwfRoot(mPreprocessedRootObject);
 			mPreprocessedRootObject = null;
 		}
-		#end
-		if (mHdRootObject != null) {
-			unloadSwfRoot(mHdRootObject);
-			mHdRootObject = null;
+		if (mHdRootClip != null) {
+			unloadSwfRoot(mHdRootClip);
+			mHdRootClip = null;
 		}
 		mHdSwfPath = null;
+		#else
+		mRootClip.loaderInfo.loader.unloadAndStop();
+		mRootClip = null;
+		if (mHdRootClip != null) {
+			mHdRootClip.loaderInfo.loader.unloadAndStop();
+			mHdRootClip = null;
+		}
+		#end
 	}
 
 	@:isVar public var swfPath(get, never):String;
@@ -90,55 +95,18 @@ class SwfAsset extends Asset {
 		return mSwfPath;
 	}
 
-	public function setHdAsset(param1:Dynamic, param2:String) {
-		mHdRootObject = param1;
-		mHdSwfPath = param2;
+	public function setHdAsset(hdRootClip:MovieClip, hdSwfPath:String) {
+		mHdRootClip = hdRootClip;
+		mHdSwfPath = hdSwfPath;
 		#if cpp
-		mHdPreprocessedLibraryName = getPreprocessedLibraryId(param2);
+		mHdPreprocessedLibraryName = getPreprocessedLibraryId(hdSwfPath);
 		#end
 	}
-
-	#if cpp
-	public static function getPreprocessedLibraryId(param1:String):String {
-		var _loc1_ = normalizeSwfAssetPath(param1).toLowerCase();
-		var _loc2_ = new StringBuf();
-		var _loc3_:Int = 0;
-		var _loc4_:String = null;
-		_loc2_.add("ax4_swf_");
-		_loc3_ = 0;
-		while (_loc3_ < _loc1_.length) {
-			_loc4_ = _loc1_.charAt(_loc3_);
-			if ((_loc4_ >= "a" && _loc4_ <= "z") || (_loc4_ >= "0" && _loc4_ <= "9")) {
-				_loc2_.add(_loc4_);
-			} else {
-				_loc2_.add("_");
-			}
-			_loc3_++;
-		}
-		return ~/[_]+/g.replace(_loc2_.toString(), "_");
-	}
-
-	public static function hasPreprocessedBundleForPath(param1:String):Bool {
-		return FileSystem.exists(getPreprocessedBundlePath(getPreprocessedLibraryId(param1)));
-	}
-
-	static function normalizeSwfAssetPath(param1:String):String {
-		var _loc1_ = param1;
-		if (_loc1_ == null) {
-			return "";
-		}
-		_loc1_ = StringTools.replace(_loc1_, "\\", "/");
-		while (StringTools.startsWith(_loc1_, "./")) {
-			_loc1_ = _loc1_.substr(2);
-		}
-		return _loc1_;
-	}
-	#end
 
 	@:isVar public var hasHdAsset(get, never):Bool;
 
 	public function get_hasHdAsset():Bool {
-		return mHdRootObject != null;
+		return mHdRootClip != null;
 	}
 
 	@:isVar public var hdSwfPath(get, never):String;
@@ -150,18 +118,15 @@ class SwfAsset extends Asset {
 	@:isVar public var root(get, never):MovieClip;
 
 	public function get_root():MovieClip {
-		var _loc1_ = ASCompat.dynamicAs(mRootObject, MovieClip);
-		if (_loc1_ != null) {
-			#if cpp
+		#if cpp
+		if (mRootClip != null) {
 			ensurePreprocessedLibrariesLoaded();
 			if (!mRootInstancePropertiesApplied) {
-				applyRootInstanceProperties(_loc1_, mPreprocessedLibrary, mSwfPath);
+				applyRootInstanceProperties(mRootClip, mPreprocessedLibrary, mSwfPath);
 				mRootInstancePropertiesApplied = true;
 			}
-			#end
-			return _loc1_;
+			return mRootClip;
 		}
-		#if cpp
 		ensurePreprocessedLibrariesLoaded();
 		if (mPreprocessedRootObject == null) {
 			mPreprocessedRootObject = instantiatePreprocessedRootObject(mPreprocessedLibrary, mSwfPath);
@@ -172,117 +137,158 @@ class SwfAsset extends Asset {
 		}
 		return mPreprocessedRootObject;
 		#else
-		return null;
+		return mRootClip;
 		#end
 	}
 
-	public function getClass(param1:String, param2:Bool = false):Dynamic {
-		var _loc3_ = getApplicationDomain(mHdRootObject);
-		var _loc4_ = getApplicationDomain(mRootObject);
-		var _loc5_:Dynamic = null;
-		if (_loc3_ != null && _loc3_.hasDefinition(param1)) {
-			return (_loc3_.getDefinition(param1) : Dynamic);
-		}
-		if (_loc4_ != null && _loc4_.hasDefinition(param1)) {
-			return (_loc4_.getDefinition(param1) : Dynamic);
-		}
+	public function getClass(className:String, suppressWarnings:Bool = false):Dynamic {
 		#if cpp
-		if (hasPreprocessedAsset(param1)) {
-			return cast((new SwfClassProxy(this, param1) : Dynamic));
+		var hdDomain = getApplicationDomain(mHdRootClip);
+		var rootDomain = getApplicationDomain(mRootClip);
+		if (hdDomain != null && hdDomain.hasDefinition(className)) {
+			return (hdDomain.getDefinition(className) : Dynamic);
 		}
-		#end
-		if (!param2) {
-			if (_loc4_ == null) {
+		if (rootDomain != null && rootDomain.hasDefinition(className)) {
+			return (rootDomain.getDefinition(className) : Dynamic);
+		}
+		if (hasPreprocessedAsset(className)) {
+			return cast((new SwfClassProxy(this, className) : Dynamic));
+		}
+		if (!suppressWarnings) {
+			if (rootDomain == null) {
 				Logger.warn("Could not resolve applicationDomain for SwfAsset "
 					+ mSwfPath
 					+ " while looking for class: "
-					+ param1
+					+ className
 					+ ". rootType="
-					+ objectTypeName(mRootObject)
-					+ (mHdRootObject != null ? " hdRootType=" + objectTypeName(mHdRootObject) : ""));
+					+ objectTypeName(mRootClip)
+					+ (mHdRootClip != null ? " hdRootType=" + objectTypeName(mHdRootClip) : ""));
 			} else {
 				Logger.warn("Could not find class name: "
-					+ param1
+					+ className
 					+ " in SwfAsset "
 					+ mSwfPath
 					+ (mHdSwfPath != null ? " or HD asset " + mHdSwfPath : ""));
 			}
 		}
-		_loc5_ = Type.resolveClass(param1);
-		return _loc5_;
-	}
-
-	public function instantiateRuntimeSymbol(param1:String, param2:Array<Dynamic>):Dynamic {
-		#if cpp
-		var _loc3_ = instantiatePreprocessedSymbol(param1);
-		if (_loc3_ != null) {
-			return _loc3_;
-		}
-		_loc3_ = instantiateFromLoadedRoot(param1);
-		if (_loc3_ != null) {
-			bindTimelineFields(_loc3_);
-			return _loc3_;
-		}
-		Logger.warn("SwfAsset.instantiateRuntimeSymbol: failed to instantiate symbol " + param1 + " in " + mSwfPath);
-		#end
-		return null;
-	}
-
-	function hasPreprocessedAsset(param1:String):Bool {
-		#if cpp
-		ensurePreprocessedLibrariesLoaded();
-		if (param1 == null) {
-			return false;
-		}
-		return libraryHasPreprocessedSymbol(mHdPreprocessedLibrary, param1) || libraryHasPreprocessedSymbol(mPreprocessedLibrary, param1);
+		return Type.resolveClass(className);
 		#else
-		return false;
+		if (mHdRootClip != null && mHdRootClip.loaderInfo.applicationDomain.hasDefinition(className)) {
+			return (mHdRootClip.loaderInfo.applicationDomain.getDefinition(className) : Dynamic);
+		}
+		if (!mRootClip.loaderInfo.applicationDomain.hasDefinition(className)) {
+			if (!suppressWarnings) {
+				Logger.warn("Could not find class name: "
+					+ className
+					+ " in SwfAsset "
+					+ mRootClip.loaderInfo.url
+					+ (mHdRootClip != null ? " or HD asset " + mHdRootClip.loaderInfo.url : ""));
+			}
+			return null;
+		}
+		return (mRootClip.loaderInfo.applicationDomain.getDefinition(className) : Dynamic);
 		#end
 	}
 
 	#if cpp
-	function libraryHasPreprocessedSymbol(param1:AssetLibrary, param2:String):Bool {
-		if (param1 == null || param2 == null) {
+	public static function getPreprocessedLibraryId(swfPath:String):String {
+		var normalized = normalizeSwfAssetPath(swfPath).toLowerCase();
+		var buf = new StringBuf();
+		var i:Int = 0;
+		var ch:String = null;
+		buf.add("ax4_swf_");
+		i = 0;
+		while (i < normalized.length) {
+			ch = normalized.charAt(i);
+			if ((ch >= "a" && ch <= "z") || (ch >= "0" && ch <= "9")) {
+				buf.add(ch);
+			} else {
+				buf.add("_");
+			}
+			i++;
+		}
+		return ~/[_]+/g.replace(buf.toString(), "_");
+	}
+
+	public static function hasPreprocessedBundleForPath(swfPath:String):Bool {
+		return FileSystem.exists(getPreprocessedBundlePath(getPreprocessedLibraryId(swfPath)));
+	}
+
+	static function normalizeSwfAssetPath(path:String):String {
+		if (path == null) {
+			return "";
+		}
+		path = StringTools.replace(path, "\\", "/");
+		while (StringTools.startsWith(path, "./")) {
+			path = path.substr(2);
+		}
+		return path;
+	}
+
+	public function instantiateRuntimeSymbol(className:String, args:Array<Dynamic>):Dynamic {
+		var instance = instantiatePreprocessedSymbol(className);
+		if (instance != null) {
+			return instance;
+		}
+		instance = instantiateFromLoadedRoot(className);
+		if (instance != null) {
+			bindTimelineFields(instance);
+			return instance;
+		}
+		Logger.warn("SwfAsset.instantiateRuntimeSymbol: failed to instantiate symbol " + className + " in " + mSwfPath);
+		return null;
+	}
+
+	function hasPreprocessedAsset(className:String):Bool {
+		ensurePreprocessedLibrariesLoaded();
+		if (className == null) {
 			return false;
 		}
-		return param1.exists(param2, null);
+		return libraryHasPreprocessedSymbol(mHdPreprocessedLibrary, className) || libraryHasPreprocessedSymbol(mPreprocessedLibrary, className);
 	}
 
-	function instantiatePreprocessedSymbol(param1:String):Dynamic {
-		ensurePreprocessedLibrariesLoaded();
-		var _loc1_ = instantiatePreprocessedFromSource(mHdPreprocessedLibrary, mHdPreprocessedLibraryName, param1);
-		if (_loc1_ != null) {
-			return _loc1_;
+	function libraryHasPreprocessedSymbol(library:AssetLibrary, className:String):Bool {
+		if (library == null || className == null) {
+			return false;
 		}
-		return instantiatePreprocessedFromSource(mPreprocessedLibrary, mPreprocessedLibraryName, param1);
+		return library.exists(className, null);
 	}
 
-	function instantiatePreprocessedFromSource(param1:AssetLibrary, param2:String, param3:String):Dynamic {
-		return instantiatePreprocessedSymbolFromLibrary(param1, param2, param3);
+	function instantiatePreprocessedSymbol(className:String):Dynamic {
+		ensurePreprocessedLibrariesLoaded();
+		var instance = instantiatePreprocessedFromSource(mHdPreprocessedLibrary, mHdPreprocessedLibraryName, className);
+		if (instance != null) {
+			return instance;
+		}
+		return instantiatePreprocessedFromSource(mPreprocessedLibrary, mPreprocessedLibraryName, className);
 	}
 
-	function instantiatePreprocessedSymbolFromLibrary(param1:AssetLibrary, param2:String, param3:String):Dynamic {
-		var _loc4_:MovieClip = null;
-		var _loc5_ = null;
-		if (param1 == null || param3 == null) {
+	function instantiatePreprocessedFromSource(library:AssetLibrary, libraryName:String, className:String):Dynamic {
+		return instantiatePreprocessedSymbolFromLibrary(library, libraryName, className);
+	}
+
+	function instantiatePreprocessedSymbolFromLibrary(library:AssetLibrary, libraryName:String, className:String):Dynamic {
+		var clip:MovieClip = null;
+		var audio = null;
+		if (library == null || className == null) {
 			return null;
 		}
-		if (param1.exists(param3, cast AssetType.MOVIE_CLIP)) {
-			_loc4_ = param1.getMovieClip(param3);
-			if (_loc4_ != null) {
-				bindTimelineFields(_loc4_);
-				applyExportedFonts(_loc4_, param2, mSwfPath);
-				return _loc4_;
+		if (library.exists(className, cast AssetType.MOVIE_CLIP)) {
+			clip = library.getMovieClip(className);
+			if (clip != null) {
+				bindTimelineFields(clip);
+				applyExportedFonts(clip, libraryName, mSwfPath);
+				return clip;
 			}
 		}
-		if (param1.exists(param3, cast AssetType.SOUND) || param1.exists(param3, cast AssetType.MUSIC)) {
-			_loc5_ = param1.getAudioBuffer(param3);
-			if (_loc5_ != null) {
-				return Sound.fromAudioBuffer(_loc5_);
+		if (library.exists(className, cast AssetType.SOUND) || library.exists(className, cast AssetType.MUSIC)) {
+			audio = library.getAudioBuffer(className);
+			if (audio != null) {
+				return Sound.fromAudioBuffer(audio);
 			}
 		}
-		if (param2 != null && Assets.exists(param2 + ":" + param3, cast AssetType.IMAGE)) {
-			return Assets.getBitmapData(param2 + ":" + param3);
+		if (libraryName != null && Assets.exists(libraryName + ":" + className, cast AssetType.IMAGE)) {
+			return Assets.getBitmapData(libraryName + ":" + className);
 		}
 		return null;
 	}
@@ -300,697 +306,667 @@ class SwfAsset extends Asset {
 		ensurePreprocessedLibrariesLoaded();
 	}
 
-	#if cpp
-	function applyRootInstanceProperties(param1:MovieClip, param2:AssetLibrary, param3:String):Void {
-		var _loc4_:AnimateLibrary = null;
-		var _loc5_:Dynamic = null;
-		var _loc6_:String = null;
-		if (param1 == null || param2 == null) {
+	function applyRootInstanceProperties(clip:MovieClip, library:AssetLibrary, swfPath:String):Void {
+		var animateLibrary:AnimateLibrary = null;
+		var properties:Dynamic = null;
+		var field:String = null;
+		if (clip == null || library == null) {
 			return;
 		}
-		_loc4_ = Std.isOfType(param2, AnimateLibrary) ? cast param2 : null;
-		if (_loc4_ == null) {
+		animateLibrary = Std.isOfType(library, AnimateLibrary) ? cast library : null;
+		if (animateLibrary == null) {
 			return;
 		}
-		_loc5_ = _loc4_.getRootInstanceProperties();
-		if (_loc5_ == null) {
+		properties = animateLibrary.getRootInstanceProperties();
+		if (properties == null) {
 			return;
 		}
-		for (_loc6_ in Reflect.fields(_loc5_)) {
+		for (field in Reflect.fields(properties)) {
 			try {
-				ASCompat.setProperty(param1, _loc6_, cloneInstanceProperty(Reflect.field(_loc5_, _loc6_)));
+				ASCompat.setProperty(clip, field, cloneInstanceProperty(Reflect.field(properties, field)));
 			} catch (e:Dynamic) {
-				Logger.warn("SwfAsset.applyRootInstanceProperties: failed to set field " + _loc6_ + " on " + param3 + ": " + Std.string(e));
+				Logger.warn("SwfAsset.applyRootInstanceProperties: failed to set field " + field + " on " + swfPath + ": " + Std.string(e));
 			}
 		}
 	}
 
-	function cloneInstanceProperty(param1:Dynamic):Dynamic {
-		var _loc2_:Array<Dynamic> = null;
-		var _loc3_:Dynamic = null;
-		var _loc4_:String = null;
-		if (param1 == null || Std.isOfType(param1, String) || Std.isOfType(param1, Bool) || Std.isOfType(param1, Int) || Std.isOfType(param1, Float)) {
-			return param1;
+	function cloneInstanceProperty(value:Dynamic):Dynamic {
+		var clonedArray:Array<Dynamic> = null;
+		var cloned:Dynamic = null;
+		var field:String = null;
+		if (value == null || Std.isOfType(value, String) || Std.isOfType(value, Bool) || Std.isOfType(value, Int) || Std.isOfType(value, Float)) {
+			return value;
 		}
-		if (Std.isOfType(param1, Array)) {
-			_loc2_ = [];
-			for (_loc3_ in cast(param1, Array<Dynamic>)) {
-				_loc2_.push(cloneInstanceProperty(_loc3_));
+		if (Std.isOfType(value, Array)) {
+			clonedArray = [];
+			for (item in cast(value, Array<Dynamic>)) {
+				clonedArray.push(cloneInstanceProperty(item));
 			}
-			return _loc2_;
+			return clonedArray;
 		}
-		_loc3_ = {};
-		for (_loc4_ in Reflect.fields(param1)) {
-			Reflect.setField(_loc3_, _loc4_, cloneInstanceProperty(Reflect.field(param1, _loc4_)));
+		cloned = {};
+		for (field in Reflect.fields(value)) {
+			Reflect.setField(cloned, field, cloneInstanceProperty(Reflect.field(value, field)));
 		}
-		return _loc3_;
+		return cloned;
 	}
 
-	function instantiatePreprocessedRootObject(param1:AssetLibrary, param2:String):MovieClip {
-		var _loc3_:AnimateLibrary = null;
-		if (param1 == null) {
+	function instantiatePreprocessedRootObject(library:AssetLibrary, swfPath:String):MovieClip {
+		var animateLibrary:AnimateLibrary = null;
+		if (library == null) {
 			return null;
 		}
-		_loc3_ = Std.isOfType(param1, AnimateLibrary) ? cast param1 : null;
-		if (_loc3_ == null) {
+		animateLibrary = Std.isOfType(library, AnimateLibrary) ? cast library : null;
+		if (animateLibrary == null) {
 			return null;
 		}
 		try {
-			return _loc3_.getMovieClip("");
+			return animateLibrary.getMovieClip("");
 		} catch (e:Dynamic) {
-			Logger.warn("SwfAsset.instantiatePreprocessedRootObject: failed for " + param2 + ": " + Std.string(e));
+			Logger.warn("SwfAsset.instantiatePreprocessedRootObject: failed for " + swfPath + ": " + Std.string(e));
 		}
 		return null;
 	}
 
-	function applyExportedFonts(param1:DisplayObject, param2:String, param3:String):Void {
-		var _loc1_:StringMap<String> = null;
-		#if cpp
-		if (param1 == null || param2 == null) {
+	function applyExportedFonts(target:DisplayObject, libraryName:String, swfPath:String):Void {
+		var fontMap:StringMap<String> = null;
+		if (target == null || libraryName == null) {
 			return;
 		}
-		_loc1_ = getExportedFontMap(param2);
-		if (_loc1_ == null) {
+		fontMap = getExportedFontMap(libraryName);
+		if (fontMap == null) {
 			return;
 		}
-		applyExportedFontsRecursive(param1, _loc1_, param3);
-		#end
+		applyExportedFontsRecursive(target, fontMap, swfPath);
 	}
 
-	function applyExportedFontsRecursive(param1:DisplayObject, param2:StringMap<String>, param3:String):Void {
-		var _loc1_:TextField = null;
-		var _loc2_:DisplayObjectContainer = null;
-		var _loc3_:Int = 0;
-		#if cpp
-		_loc1_ = ASCompat.dynamicAs(param1, TextField);
-		if (_loc1_ != null) {
-			applyExportedFontToTextField(_loc1_, param2, param3);
+	function applyExportedFontsRecursive(target:DisplayObject, fontMap:StringMap<String>, swfPath:String):Void {
+		var textField:TextField = ASCompat.dynamicAs(target, TextField);
+		var container:DisplayObjectContainer = null;
+		var i:Int = 0;
+		if (textField != null) {
+			applyExportedFontToTextField(textField, fontMap, swfPath);
 		}
-		_loc2_ = ASCompat.dynamicAs(param1, DisplayObjectContainer);
-		if (_loc2_ != null) {
-			_loc3_ = 0;
-			while (_loc3_ < _loc2_.numChildren) {
-				applyExportedFontsRecursive(_loc2_.getChildAt(_loc3_), param2, param3);
-				_loc3_++;
+		container = ASCompat.dynamicAs(target, DisplayObjectContainer);
+		if (container != null) {
+			i = 0;
+			while (i < container.numChildren) {
+				applyExportedFontsRecursive(container.getChildAt(i), fontMap, swfPath);
+				i++;
 			}
 		}
-		#end
 	}
 
-	function applyExportedFontToTextField(param1:TextField, param2:StringMap<String>, param3:String):Void {
-		var _loc1_:TextFormat = null;
-		var _loc2_:String = null;
-		var _loc3_:String = null;
-		#if cpp
+	function applyExportedFontToTextField(textField:TextField, fontMap:StringMap<String>, swfPath:String):Void {
+		var format:TextFormat = null;
+		var lookup:String = null;
+		var fontPath:String = null;
 		try {
-			_loc1_ = param1.defaultTextFormat;
-			if (_loc1_ == null || _loc1_.font == null) {
+			format = textField.defaultTextFormat;
+			if (format == null || format.font == null) {
 				return;
 			}
-			_loc2_ = normalizeFontLookupName(_loc1_.font);
-			_loc3_ = param2.get(_loc2_);
-			if (_loc3_ == null) {
+			lookup = normalizeFontLookupName(format.font);
+			fontPath = fontMap.get(lookup);
+			if (fontPath == null) {
 				return;
 			}
-			_loc1_.font = _loc3_;
-			param1.embedFonts = true;
-			param1.defaultTextFormat = _loc1_;
-			if (param1.length > 0) {
-				_loc1_ = param1.getTextFormat();
-				_loc1_.font = _loc3_;
-				param1.setTextFormat(_loc1_);
+			format.font = fontPath;
+			textField.embedFonts = true;
+			textField.defaultTextFormat = format;
+			if (textField.length > 0) {
+				format = textField.getTextFormat();
+				format.font = fontPath;
+				textField.setTextFormat(format);
 			}
 		} catch (e:Dynamic) {
-			Logger.warn("SwfAsset.applyExportedFontToTextField: failed for " + param3 + ": " + Std.string(e));
+			Logger.warn("SwfAsset.applyExportedFontToTextField: failed for " + swfPath + ": " + Std.string(e));
 		}
-		#end
 	}
 
-	public static function applyExportedFontsForBind(param1:DisplayObject, param2:String, param3:String = ""):Void {
-		#if cpp
-		var _loc1_:AnimateTimeline = null;
-		var _loc2_:Array<Int> = null;
-		var _loc3_:String = null;
-		if (param1 == null || param2 == null) {
+	public static function applyExportedFontsForBind(target:DisplayObject, libraryName:String, className:String = ""):Void {
+		var timeline:AnimateTimeline = null;
+		var fontIds:Array<Int> = null;
+		var fontPath:String = null;
+		if (target == null || libraryName == null) {
 			return;
 		}
-		if (param3 == null || param3.length == 0) {
-			param3 = Type.getClassName(Type.getClass(param1));
+		if (className == null || className.length == 0) {
+			className = Type.getClassName(Type.getClass(target));
 		}
-		_loc1_ = getBindTimeline(param1);
-		if (_loc1_ == null || _loc1_.__library == null || _loc1_.__symbol == null) {
+		timeline = getBindTimeline(target);
+		if (timeline == null || timeline.__library == null || timeline.__symbol == null) {
 			return;
 		}
-		_loc2_ = collectDynamicTextFontIDs(_loc1_.__library, _loc1_.__symbol);
-		if (_loc2_.length == 0) {
+		fontIds = collectDynamicTextFontIDs(timeline.__library, timeline.__symbol);
+		if (fontIds.length == 0) {
 			return;
 		}
-		if (_loc2_.length == 1) {
-			_loc3_ = getExportedFontPathById(param2, _loc2_[0]);
-			if (_loc3_ != null) {
-				applyExportedFontPathRecursive(param1, _loc3_, param3);
+		if (fontIds.length == 1) {
+			fontPath = getExportedFontPathById(libraryName, fontIds[0]);
+			if (fontPath != null) {
+				applyExportedFontPathRecursive(target, fontPath, className);
 			}
 			return;
 		}
-		applyExportedFontsForBindRecursive(param1, param2, param3);
-		#end
+		applyExportedFontsForBindRecursive(target, libraryName, className);
 	}
 
-	#if cpp
-	static function applyExportedFontsForBindRecursive(param1:DisplayObject, param2:String, param3:String):Void {
-		var _loc1_:TextField = ASCompat.dynamicAs(param1, TextField);
-		var _loc2_:DisplayObjectContainer = null;
-		var _loc3_:Int = 0;
-		var _loc4_:Int = 0;
-		var _loc5_:String = null;
-		if (_loc1_ != null) {
-			_loc4_ = resolveBindFontId(_loc1_);
-			if (_loc4_ >= 0) {
-				_loc5_ = getExportedFontPathById(param2, _loc4_);
-				if (_loc5_ != null) {
-					applyExportedFontPathToTextField(_loc1_, _loc5_, param3);
+	static function applyExportedFontsForBindRecursive(target:DisplayObject, libraryName:String, className:String):Void {
+		var textField:TextField = ASCompat.dynamicAs(target, TextField);
+		var container:DisplayObjectContainer = null;
+		var i:Int = 0;
+		var fontId:Int = 0;
+		var fontPath:String = null;
+		if (textField != null) {
+			fontId = resolveBindFontId(textField);
+			if (fontId >= 0) {
+				fontPath = getExportedFontPathById(libraryName, fontId);
+				if (fontPath != null) {
+					applyExportedFontPathToTextField(textField, fontPath, className);
 				}
 			}
 			return;
 		}
-		_loc2_ = ASCompat.dynamicAs(param1, DisplayObjectContainer);
-		if (_loc2_ != null) {
-			_loc3_ = 0;
-			while (_loc3_ < _loc2_.numChildren) {
-				applyExportedFontsForBindRecursive(_loc2_.getChildAt(_loc3_), param2, param3);
-				_loc3_++;
+		container = ASCompat.dynamicAs(target, DisplayObjectContainer);
+		if (container != null) {
+			i = 0;
+			while (i < container.numChildren) {
+				applyExportedFontsForBindRecursive(container.getChildAt(i), libraryName, className);
+				i++;
 			}
 		}
 	}
 
-	static function resolveBindFontId(param1:DisplayObject):Int {
-		var _loc1_:DisplayObject = param1;
-		var _loc2_:AnimateTimeline = null;
-		var _loc3_:Array<Int> = null;
-		while (_loc1_ != null && _loc1_.parent != null) {
-			_loc2_ = getBindTimeline(_loc1_.parent);
-			if (_loc2_ != null) {
-				_loc3_ = getFontIDsForBindChild(_loc2_, _loc1_);
-				if (_loc3_.length == 1) {
-					return _loc3_[0];
+	static function resolveBindFontId(target:DisplayObject):Int {
+		var current:DisplayObject = target;
+		var timeline:AnimateTimeline = null;
+		var fontIds:Array<Int> = null;
+		while (current != null && current.parent != null) {
+			timeline = getBindTimeline(current.parent);
+			if (timeline != null) {
+				fontIds = getFontIDsForBindChild(timeline, current);
+				if (fontIds.length == 1) {
+					return fontIds[0];
 				}
 			}
-			_loc1_ = _loc1_.parent;
+			current = current.parent;
 		}
 		return -1;
 	}
 
-	static function getBindTimeline(param1:DisplayObject):AnimateTimeline {
-		var _loc1_ = ASCompat.dynamicAs(param1, MovieClip);
-		if (_loc1_ == null || _loc1_.__timeline == null) {
+	static function getBindTimeline(target:DisplayObject):AnimateTimeline {
+		var clip = ASCompat.dynamicAs(target, MovieClip);
+		if (clip == null || clip.__timeline == null) {
 			return null;
 		}
-		if (!Std.isOfType(_loc1_.__timeline, AnimateTimeline)) {
+		if (!Std.isOfType(clip.__timeline, AnimateTimeline)) {
 			return null;
 		}
-		return cast _loc1_.__timeline;
+		return cast clip.__timeline;
 	}
 
-	static function getFontIDsForBindChild(param1:AnimateTimeline, param2:DisplayObject):Array<Int> {
-		var _loc1_:Array<Dynamic> = null;
-		var _loc2_:Dynamic = null;
-		if (param1.__activeInstances == null || param1.__library == null || param1.__library.symbols == null) {
+	static function getFontIDsForBindChild(timeline:AnimateTimeline, child:DisplayObject):Array<Int> {
+		var instances:Array<Dynamic> = null;
+		var instance:Dynamic = null;
+		if (timeline.__activeInstances == null || timeline.__library == null || timeline.__library.symbols == null) {
 			return [];
 		}
-		_loc1_ = cast param1.__activeInstances;
-		for (_loc2_ in _loc1_) {
-			if (_loc2_.displayObject == param2) {
-				return collectDynamicTextFontIDs(param1.__library, param1.__library.symbols.get(_loc2_.characterID));
+		instances = cast timeline.__activeInstances;
+		for (instance in instances) {
+			if (instance.displayObject == child) {
+				return collectDynamicTextFontIDs(timeline.__library, timeline.__library.symbols.get(instance.characterID));
 			}
 		}
 		return [];
 	}
 
-	static function collectDynamicTextFontIDs(param1:AnimateLibrary, param2:AnimateSymbol):Array<Int> {
-		var _loc1_ = new Array<Int>();
-		if (param1 == null || param1.symbols == null || param2 == null) {
-			return _loc1_;
+	static function collectDynamicTextFontIDs(library:AnimateLibrary, symbol:AnimateSymbol):Array<Int> {
+		var fontIds = new Array<Int>();
+		if (library == null || library.symbols == null || symbol == null) {
+			return fontIds;
 		}
-		collectDynamicTextFontIDsRecursive(param1, param2, new Map(), _loc1_);
-		return _loc1_;
+		collectDynamicTextFontIDsRecursive(library, symbol, new Map(), fontIds);
+		return fontIds;
 	}
 
-	static function collectDynamicTextFontIDsRecursive(param1:AnimateLibrary, param2:AnimateSymbol, param3:Map<Int, Bool>, param4:Array<Int>):Void {
-		var _loc1_:AnimateButtonSymbol = null;
-		var _loc2_:AnimateSpriteSymbol = null;
-		var _loc3_:Int = 0;
-		if (param2 == null || param3.exists(param2.id)) {
+	static function collectDynamicTextFontIDsRecursive(library:AnimateLibrary, symbol:AnimateSymbol, seen:Map<Int, Bool>, fontIds:Array<Int>):Void {
+		var button:AnimateButtonSymbol = null;
+		var sprite:AnimateSpriteSymbol = null;
+		var fontId:Int = 0;
+		if (symbol == null || seen.exists(symbol.id)) {
 			return;
 		}
-		param3.set(param2.id, true);
-		if (Std.isOfType(param2, AnimateDynamicTextSymbol)) {
-			_loc3_ = cast(param2, AnimateDynamicTextSymbol).fontID;
-			if (param4.indexOf(_loc3_) == -1) {
-				param4.push(_loc3_);
+		seen.set(symbol.id, true);
+		if (Std.isOfType(symbol, AnimateDynamicTextSymbol)) {
+			fontId = cast(symbol, AnimateDynamicTextSymbol).fontID;
+			if (fontIds.indexOf(fontId) == -1) {
+				fontIds.push(fontId);
 			}
 			return;
 		}
-		if (Std.isOfType(param2, AnimateButtonSymbol)) {
-			_loc1_ = cast param2;
-			collectDynamicTextFontIDsRecursive(param1, _loc1_.upState, param3, param4);
-			collectDynamicTextFontIDsRecursive(param1, _loc1_.overState, param3, param4);
-			collectDynamicTextFontIDsRecursive(param1, _loc1_.downState, param3, param4);
-			collectDynamicTextFontIDsRecursive(param1, _loc1_.hitState, param3, param4);
+		if (Std.isOfType(symbol, AnimateButtonSymbol)) {
+			button = cast symbol;
+			collectDynamicTextFontIDsRecursive(library, button.upState, seen, fontIds);
+			collectDynamicTextFontIDsRecursive(library, button.overState, seen, fontIds);
+			collectDynamicTextFontIDsRecursive(library, button.downState, seen, fontIds);
+			collectDynamicTextFontIDsRecursive(library, button.hitState, seen, fontIds);
 			return;
 		}
-		if (!Std.isOfType(param2, AnimateSpriteSymbol)) {
+		if (!Std.isOfType(symbol, AnimateSpriteSymbol)) {
 			return;
 		}
-		_loc2_ = cast param2;
-		if (_loc2_.frames != null) {
-			for (_loc4_ in _loc2_.frames) {
-				if (_loc4_.objects == null) {
+		sprite = cast symbol;
+		if (sprite.frames != null) {
+			for (frame in sprite.frames) {
+				if (frame.objects == null) {
 					continue;
 				}
-				for (_loc5_ in _loc4_.objects) {
-					collectDynamicTextFontIDsRecursive(param1, param1.symbols.get(_loc5_.symbol), param3, param4);
+				for (object in frame.objects) {
+					collectDynamicTextFontIDsRecursive(library, library.symbols.get(object.symbol), seen, fontIds);
 				}
 			}
 		}
-		if (_loc2_.compactTimeline != null) {
-			_loc3_ = 0;
-			while (_loc3_ < _loc2_.compactTimeline.objects.length) {
-				collectDynamicTextFontIDsRecursive(param1, param1.symbols.get(Std.int(_loc2_.compactTimeline.objects[_loc3_ + 2])), param3, param4);
-				_loc3_ = _loc2_.compactTimeline.getNextObjectPosition(_loc3_);
+		if (sprite.compactTimeline != null) {
+			fontId = 0;
+			while (fontId < sprite.compactTimeline.objects.length) {
+				collectDynamicTextFontIDsRecursive(library, library.symbols.get(Std.int(sprite.compactTimeline.objects[fontId + 2])), seen, fontIds);
+				fontId = sprite.compactTimeline.getNextObjectPosition(fontId);
 			}
 		}
 	}
-	#end
 
-	static function applyExportedFontPathRecursive(param1:DisplayObject, param2:String, param3:String):Void {
-		var _loc1_:TextField = null;
-		var _loc2_:DisplayObjectContainer = null;
-		var _loc3_:Int = 0;
-		#if cpp
-		_loc1_ = ASCompat.dynamicAs(param1, TextField);
-		if (_loc1_ != null) {
-			applyExportedFontPathToTextField(_loc1_, param2, param3);
+	static function applyExportedFontPathRecursive(target:DisplayObject, fontPath:String, className:String):Void {
+		var textField:TextField = ASCompat.dynamicAs(target, TextField);
+		var container:DisplayObjectContainer = null;
+		var i:Int = 0;
+		if (textField != null) {
+			applyExportedFontPathToTextField(textField, fontPath, className);
 		}
-		_loc2_ = ASCompat.dynamicAs(param1, DisplayObjectContainer);
-		if (_loc2_ != null) {
-			_loc3_ = 0;
-			while (_loc3_ < _loc2_.numChildren) {
-				applyExportedFontPathRecursive(_loc2_.getChildAt(_loc3_), param2, param3);
-				_loc3_++;
+		container = ASCompat.dynamicAs(target, DisplayObjectContainer);
+		if (container != null) {
+			i = 0;
+			while (i < container.numChildren) {
+				applyExportedFontPathRecursive(container.getChildAt(i), fontPath, className);
+				i++;
 			}
 		}
-		#end
 	}
 
-	static function applyExportedFontPathToTextField(param1:TextField, param2:String, param3:String):Void {
-		var _loc1_:TextFormat = null;
-		#if cpp
+	static function applyExportedFontPathToTextField(textField:TextField, fontPath:String, className:String):Void {
+		var format:TextFormat = null;
 		try {
-			_loc1_ = param1.defaultTextFormat;
-			if (_loc1_ == null || _loc1_.font == null || isDeviceFontName(_loc1_.font)) {
+			format = textField.defaultTextFormat;
+			if (format == null || format.font == null || isDeviceFontName(format.font)) {
 				return;
 			}
-			_loc1_.font = param2;
-			param1.embedFonts = true;
-			param1.defaultTextFormat = _loc1_;
-			if (param1.length > 0) {
-				_loc1_ = param1.getTextFormat();
-				_loc1_.font = param2;
-				param1.setTextFormat(_loc1_);
+			format.font = fontPath;
+			textField.embedFonts = true;
+			textField.defaultTextFormat = format;
+			if (textField.length > 0) {
+				format = textField.getTextFormat();
+				format.font = fontPath;
+				textField.setTextFormat(format);
 			}
 		} catch (e:Dynamic) {
-			Logger.warn("SwfAsset.applyExportedFontPathToTextField: failed for " + param3 + ": " + Std.string(e));
+			Logger.warn("SwfAsset.applyExportedFontPathToTextField: failed for " + className + ": " + Std.string(e));
 		}
-		#end
 	}
 
-	static function getExportedFontPathById(param1:String, param2:Int):String {
-		var _loc1_:String = null;
-		var _loc2_:String = null;
-		var _loc3_:String = null;
-		#if cpp
-		_loc1_ = getExportedFontDirectory(param1);
-		if (_loc1_ == null || !FileSystem.exists(_loc1_) || !FileSystem.isDirectory(_loc1_)) {
+	static function getExportedFontPathById(libraryName:String, fontId:Int):String {
+		var directory:String = null;
+		var prefix:String = null;
+		var entry:String = null;
+		directory = getExportedFontDirectory(libraryName);
+		if (directory == null || !FileSystem.exists(directory) || !FileSystem.isDirectory(directory)) {
 			return null;
 		}
-		_loc2_ = Std.string(param2) + "_";
-		for (_loc3_ in FileSystem.readDirectory(_loc1_)) {
-			if (StringTools.startsWith(_loc3_, _loc2_)) {
-				_loc2_ = _loc3_.toLowerCase();
-				if (StringTools.endsWith(_loc2_, ".ttf") || StringTools.endsWith(_loc2_, ".otf")) {
-					return Path.normalize(Path.join([_loc1_, _loc3_]));
+		prefix = Std.string(fontId) + "_";
+		for (entry in FileSystem.readDirectory(directory)) {
+			if (StringTools.startsWith(entry, prefix)) {
+				prefix = entry.toLowerCase();
+				if (StringTools.endsWith(prefix, ".ttf") || StringTools.endsWith(prefix, ".otf")) {
+					return Path.normalize(Path.join([directory, entry]));
 				}
 			}
 		}
-		#end
 		return null;
 	}
 
-	static function getExportedFontMap(param1:String):StringMap<String> {
-		var _loc1_:StringMap<String> = null;
-		var _loc2_:String = null;
-		var _loc3_:String = null;
-		var _loc4_:String = null;
-		var _loc5_:Int = 0;
-		#if cpp
-		if (sFontMaps.exists(param1)) {
-			return sFontMaps.get(param1);
+	static function getExportedFontMap(libraryName:String):StringMap<String> {
+		var fontMap:StringMap<String> = null;
+		var directory:String = null;
+		var entry:String = null;
+		var lookup:String = null;
+		var separator:Int = 0;
+		if (sFontMaps.exists(libraryName)) {
+			return sFontMaps.get(libraryName);
 		}
-		_loc1_ = new StringMap<String>();
-		_loc2_ = getExportedFontDirectory(param1);
-		if (_loc2_ != null && FileSystem.exists(_loc2_) && FileSystem.isDirectory(_loc2_)) {
-			for (_loc3_ in FileSystem.readDirectory(_loc2_)) {
-				_loc4_ = _loc3_.toLowerCase();
-				if (!StringTools.endsWith(_loc4_, ".ttf") && !StringTools.endsWith(_loc4_, ".otf")) {
+		fontMap = new StringMap<String>();
+		directory = getExportedFontDirectory(libraryName);
+		if (directory != null && FileSystem.exists(directory) && FileSystem.isDirectory(directory)) {
+			for (entry in FileSystem.readDirectory(directory)) {
+				lookup = entry.toLowerCase();
+				if (!StringTools.endsWith(lookup, ".ttf") && !StringTools.endsWith(lookup, ".otf")) {
 					continue;
 				}
-				_loc5_ = _loc3_.indexOf("_");
-				if (_loc5_ <= 0) {
+				separator = entry.indexOf("_");
+				if (separator <= 0) {
 					continue;
 				}
-				_loc4_ = _loc3_.substr(_loc5_ + 1);
-				_loc4_ = Path.withoutExtension(_loc4_);
-				if (isDeviceFontName(_loc4_)) {
+				lookup = entry.substr(separator + 1);
+				lookup = Path.withoutExtension(lookup);
+				if (isDeviceFontName(lookup)) {
 					continue;
 				}
-				_loc1_.set(normalizeFontLookupName(_loc4_), Path.normalize(Path.join([_loc2_, _loc3_])));
+				fontMap.set(normalizeFontLookupName(lookup), Path.normalize(Path.join([directory, entry])));
 			}
 		}
-		sFontMaps.set(param1, _loc1_);
-		return _loc1_;
-		#else
-		return null;
-		#end
+		sFontMaps.set(libraryName, fontMap);
+		return fontMap;
 	}
 
-	static function getExportedFontDirectory(param1:String):String {
-		var _loc1_:String = null;
-		var _loc2_:Array<String> = null;
-		var _loc3_:String = null;
-		#if cpp
-		_loc1_ = Path.directory(Sys.programPath());
-		if (_loc1_ == null || _loc1_.length == 0) {
+	static function getExportedFontDirectory(libraryName:String):String {
+		var programDir:String = Path.directory(Sys.programPath());
+		var candidates:Array<String> = null;
+		var candidate:String = null;
+		if (programDir == null || programDir.length == 0) {
 			return null;
 		}
-		_loc2_ = [
-			Path.normalize(Path.join([_loc1_, "Resources", "ffdec_fonts", param1])),
-			Path.normalize(Path.join([_loc1_, "..", "Resources", "Resources", "ffdec_fonts", param1])),
+		candidates = [
+			Path.normalize(Path.join([programDir, "Resources", "ffdec_fonts", libraryName])),
+			Path.normalize(Path.join([programDir, "..", "Resources", "Resources", "ffdec_fonts", libraryName])),
 		];
-		for (_loc3_ in _loc2_) {
-			if (FileSystem.exists(_loc3_)) {
-				return _loc3_;
+		for (candidate in candidates) {
+			if (FileSystem.exists(candidate)) {
+				return candidate;
 			}
 		}
-		return _loc2_[0];
-		#else
-		return null;
-		#end
+		return candidates[0];
 	}
 
-	static function normalizeFontLookupName(param1:String):String {
-		if (param1 == null) {
+	static function normalizeFontLookupName(name:String):String {
+		if (name == null) {
 			return "";
 		}
-		param1 = StringTools.replace(param1, "\x00", "");
-		param1 = StringTools.trim(param1);
-		return param1.toLowerCase();
+		name = StringTools.replace(name, "\x00", "");
+		name = StringTools.trim(name);
+		return name.toLowerCase();
 	}
 
-	static function isDeviceFontName(param1:String):Bool {
-		param1 = normalizeFontLookupName(param1);
-		return param1 == "arial" || param1 == "_sans" || param1 == "_serif" || param1 == "_typewriter";
+	static function isDeviceFontName(name:String):Bool {
+		name = normalizeFontLookupName(name);
+		return name == "arial" || name == "_sans" || name == "_serif" || name == "_typewriter";
 	}
-	#end
 
-	static function loadPreprocessedLibrarySync(param1:String, param2:String):AssetLibrary {
-		var _loc1_:AssetLibrary = null;
-		var _loc2_:String = null;
-		if (param1 == null || param1.length == 0) {
+	static function loadPreprocessedLibrarySync(libraryId:String, swfPath:String):AssetLibrary {
+		var library:AssetLibrary = null;
+		var bundlePath:String = null;
+		if (libraryId == null || libraryId.length == 0) {
 			return null;
 		}
-		if (sLoadedPreprocessedLibraries.exists(param1)) {
-			return sLoadedPreprocessedLibraries.get(param1);
+		if (sLoadedPreprocessedLibraries.exists(libraryId)) {
+			return sLoadedPreprocessedLibraries.get(libraryId);
 		}
-		if (sFailedPreprocessedLibraries.exists(param1)) {
+		if (sFailedPreprocessedLibraries.exists(libraryId)) {
 			return null;
 		}
-		_loc2_ = getPreprocessedBundlePath(param1);
-		if (_loc2_ == null || !FileSystem.exists(_loc2_)) {
-			sFailedPreprocessedLibraries.set(param1, true);
+		bundlePath = getPreprocessedBundlePath(libraryId);
+		if (bundlePath == null || !FileSystem.exists(bundlePath)) {
+			sFailedPreprocessedLibraries.set(libraryId, true);
 			return null;
 		}
-		_loc1_ = cast Assets.getLibrary(param1);
-		if (_loc1_ != null) {
-			applyLegacyTimelineFrameRate(_loc1_);
-			sLoadedPreprocessedLibraries.set(param1, _loc1_);
-			return _loc1_;
+		library = cast Assets.getLibrary(libraryId);
+		if (library != null) {
+			applyLegacyTimelineFrameRate(library);
+			sLoadedPreprocessedLibraries.set(libraryId, library);
+			return library;
 		}
 		try {
-			_loc1_ = AssetLibrary.fromBundle(AssetBundle.fromFile(_loc2_));
-			if (_loc1_ == null) {
+			library = AssetLibrary.fromBundle(AssetBundle.fromFile(bundlePath));
+			if (library == null) {
 				throw "AssetLibrary.fromBundle returned null";
 			}
-			if (Std.isOfType(_loc1_, AnimateLibrary)) {
-				cast(_loc1_, AnimateLibrary).load();
+			if (Std.isOfType(library, AnimateLibrary)) {
+				cast(library, AnimateLibrary).load();
 			}
-			applyLegacyTimelineFrameRate(_loc1_);
-			Assets.registerLibrary(param1, _loc1_);
-			sLoadedPreprocessedLibraries.set(param1, _loc1_);
-			return _loc1_;
+			applyLegacyTimelineFrameRate(library);
+			Assets.registerLibrary(libraryId, library);
+			sLoadedPreprocessedLibraries.set(libraryId, library);
+			return library;
 		} catch (e:Dynamic) {
 			Logger.warn("SwfAsset.loadPreprocessedLibrarySync: failed for "
-				+ param2
+				+ swfPath
 				+ " id="
-				+ param1
+				+ libraryId
 				+ " bundle="
-				+ _loc2_
+				+ bundlePath
 				+ ": "
 				+ Std.string(e));
 		}
-		sFailedPreprocessedLibraries.set(param1, true);
+		sFailedPreprocessedLibraries.set(libraryId, true);
 		return null;
 	}
 
-	static function applyLegacyTimelineFrameRate(param1:AssetLibrary):Void {
-		var _loc1_:AnimateLibrary = Std.isOfType(param1, AnimateLibrary) ? cast param1 : null;
-		if (_loc1_ != null) {
-			@:privateAccess _loc1_.frameRate = GameClock.LEGACY_STAGE_FRAME_RATE;
+	static function applyLegacyTimelineFrameRate(library:AssetLibrary):Void {
+		var animateLibrary:AnimateLibrary = Std.isOfType(library, AnimateLibrary) ? cast library : null;
+		if (animateLibrary != null) {
+			@:privateAccess animateLibrary.frameRate = GameClock.LEGACY_STAGE_FRAME_RATE;
 		}
 	}
 
-	static function getPreprocessedBundlePath(param1:String):String {
-		var _loc1_ = Path.directory(Sys.programPath());
-		var _loc2_:Array<String> = null;
-		var _loc3_:String = null;
-		var _loc4_:String = null;
-		if (_loc1_ == null || _loc1_.length == 0) {
+	static function getPreprocessedBundlePath(libraryId:String):String {
+		var programDir = Path.directory(Sys.programPath());
+		var candidates:Array<String> = null;
+		var candidate:String = null;
+		var previous:String = null;
+		if (programDir == null || programDir.length == 0) {
 			return null;
 		}
-		_loc2_ = [
-			Path.normalize(Path.join([_loc1_, "lib", param1 + ".zip"])),
-			Path.normalize(Path.join([_loc1_, "..", "Resources", "lib", param1 + ".zip"]))
+		candidates = [
+			Path.normalize(Path.join([programDir, "lib", libraryId + ".zip"])),
+			Path.normalize(Path.join([programDir, "..", "Resources", "lib", libraryId + ".zip"]))
 		];
-		for (_loc3_ in _loc2_) {
-			if (_loc4_ != _loc3_ && FileSystem.exists(_loc3_)) {
-				return _loc3_;
+		for (candidate in candidates) {
+			if (previous != candidate && FileSystem.exists(candidate)) {
+				return candidate;
 			}
-			_loc4_ = _loc3_;
+			previous = candidate;
 		}
-		return _loc2_[0];
-	}
-	#end
-
-	static function extractSimpleSymbolName(param1:String):String {
-		var _loc1_ = param1;
-		var _loc2_ = _loc1_.lastIndexOf("::");
-		if (_loc2_ != -1) {
-			_loc1_ = _loc1_.substring(_loc2_ + 2);
-		}
-		_loc2_ = _loc1_.lastIndexOf(".");
-		if (_loc2_ != -1) {
-			_loc1_ = _loc1_.substring(_loc2_ + 1);
-		}
-		return _loc1_;
+		return candidates[0];
 	}
 
-	function instantiateFromLoadedRoot(param1:String):Dynamic {
-		var _loc1_:DisplayObjectContainer = null;
-		var _loc2_:DisplayObject = null;
-		var _loc3_:String = null;
-		_loc1_ = ASCompat.dynamicAs(mRootObject, DisplayObjectContainer);
-		if (_loc1_ == null) {
-			_loc1_ = ASCompat.dynamicAs(mHdRootObject, DisplayObjectContainer);
+	static function extractSimpleSymbolName(className:String):String {
+		var name = className;
+		var sep = name.lastIndexOf("::");
+		if (sep != -1) {
+			name = name.substring(sep + 2);
 		}
-		if (_loc1_ == null) {
+		sep = name.lastIndexOf(".");
+		if (sep != -1) {
+			name = name.substring(sep + 1);
+		}
+		return name;
+	}
+
+	function instantiateFromLoadedRoot(className:String):Dynamic {
+		var container:DisplayObjectContainer = null;
+		var found:DisplayObject = null;
+		var simpleName:String = null;
+		container = ASCompat.dynamicAs(mRootClip, DisplayObjectContainer);
+		if (container == null) {
+			container = ASCompat.dynamicAs(mHdRootClip, DisplayObjectContainer);
+		}
+		if (container == null) {
 			return null;
 		}
-		_loc3_ = SwfAsset.extractSimpleSymbolName(param1);
-		_loc2_ = findDisplayObjectByNameRecursive(_loc1_, _loc3_);
-		if (_loc2_ == null && _loc3_ != param1) {
-			_loc2_ = findDisplayObjectByNameRecursive(_loc1_, param1);
+		simpleName = SwfAsset.extractSimpleSymbolName(className);
+		found = findDisplayObjectByNameRecursive(container, simpleName);
+		if (found == null && simpleName != className) {
+			found = findDisplayObjectByNameRecursive(container, className);
 		}
-		if (_loc2_ != null) {
+		if (found != null) {
 			try {
-				if (_loc2_.parent != null) {
-					_loc2_.parent.removeChild(_loc2_);
+				if (found.parent != null) {
+					found.parent.removeChild(found);
 				}
 			} catch (e:Dynamic) {}
 		}
-		return _loc2_;
+		return found;
 	}
 
-	function findDisplayObjectByNameRecursive(param1:DisplayObjectContainer, param2:String):DisplayObject {
-		var _loc3_:DisplayObject = null;
-		var _loc4_:DisplayObjectContainer = null;
-		var _loc1_ = 0;
-		if (param1 == null || param2 == null || param2.length == 0) {
+	function findDisplayObjectByNameRecursive(container:DisplayObjectContainer, objectName:String):DisplayObject {
+		var child:DisplayObject = null;
+		var nested:DisplayObjectContainer = null;
+		var i = 0;
+		if (container == null || objectName == null || objectName.length == 0) {
 			return null;
 		}
-		if (param1.name == param2) {
-			return param1;
+		if (container.name == objectName) {
+			return container;
 		}
-		while (_loc1_ < param1.numChildren) {
-			_loc3_ = param1.getChildAt(_loc1_);
-			if (_loc3_ != null) {
-				if (_loc3_.name == param2) {
-					return _loc3_;
+		while (i < container.numChildren) {
+			child = container.getChildAt(i);
+			if (child != null) {
+				if (child.name == objectName) {
+					return child;
 				}
-				_loc4_ = ASCompat.dynamicAs(_loc3_, DisplayObjectContainer);
-				if (_loc4_ != null) {
-					_loc3_ = findDisplayObjectByNameRecursive(_loc4_, param2);
-					if (_loc3_ != null) {
-						return _loc3_;
+				nested = ASCompat.dynamicAs(child, DisplayObjectContainer);
+				if (nested != null) {
+					child = findDisplayObjectByNameRecursive(nested, objectName);
+					if (child != null) {
+						return child;
 					}
 				}
 			}
-			_loc1_++;
+			i++;
 		}
 		return null;
 	}
 
-	function bindTimelineFields(param1:Dynamic) {
-		var _loc2_:DisplayObjectContainer = null;
-		#if cpp
-		_loc2_ = ASCompat.dynamicAs(param1, DisplayObjectContainer);
-		if (_loc2_ == null) {
+	function bindTimelineFields(target:Dynamic) {
+		var container:DisplayObjectContainer = ASCompat.dynamicAs(target, DisplayObjectContainer);
+		if (container == null) {
 			return;
 		}
-		bindTimelineFieldsRecursive(_loc2_);
-		#end
+		bindTimelineFieldsRecursive(container);
 	}
 
-	function bindTimelineFieldsRecursive(param1:DisplayObjectContainer) {
-		var _loc3_:DisplayObject = null;
-		var _loc4_:DisplayObjectContainer = null;
-		var _loc5_:String = null;
-		var _loc6_:DisplayObject = null;
-		var _loc7_:DisplayObjectContainer = null;
-		var _loc2_ = 0;
-		if (param1 == null) {
+	function bindTimelineFieldsRecursive(container:DisplayObjectContainer) {
+		var child:DisplayObject = null;
+		var nested:DisplayObjectContainer = null;
+		var childName:String = null;
+		var label:DisplayObject = null;
+		var state:DisplayObjectContainer = null;
+		var i = 0;
+		if (container == null) {
 			return;
 		}
-		while (_loc2_ < param1.numChildren) {
-			_loc3_ = param1.getChildAt(_loc2_);
-			if (_loc3_ != null) {
-				_loc5_ = _loc3_.name;
-				if (_loc5_ != null && _loc5_.length > 0) {
+		while (i < container.numChildren) {
+			child = container.getChildAt(i);
+			if (child != null) {
+				childName = child.name;
+				if (childName != null && childName.length > 0) {
 					try {
-						if (!Reflect.hasField(param1, _loc5_) || Reflect.field(param1, _loc5_) == null) {
-							Reflect.setField(param1, _loc5_, _loc3_);
-							if (Reflect.field(param1, _loc5_) == null) {
-								Reflect.setProperty(param1, _loc5_, _loc3_);
+						if (!Reflect.hasField(container, childName) || Reflect.field(container, childName) == null) {
+							Reflect.setField(container, childName, child);
+							if (Reflect.field(container, childName) == null) {
+								Reflect.setProperty(container, childName, child);
 							}
 						}
 					} catch (e:Dynamic) {}
 				}
-				_loc4_ = ASCompat.dynamicAs(_loc3_, DisplayObjectContainer);
-				if (_loc4_ != null) {
-					bindTimelineFieldsRecursive(_loc4_);
+				nested = ASCompat.dynamicAs(child, DisplayObjectContainer);
+				if (nested != null) {
+					bindTimelineFieldsRecursive(nested);
 				}
 			}
-			_loc2_++;
+			i++;
 		}
-		if (!Reflect.hasField(param1, "label") || Reflect.field(param1, "label") == null) {
-			_loc6_ = param1.getChildByName("label");
-			if (_loc6_ == null) {
-				_loc7_ = ASCompat.dynamicAs(param1.getChildByName("up"), DisplayObjectContainer);
-				if (_loc7_ != null) {
-					_loc6_ = _loc7_.getChildByName("label");
+		if (!Reflect.hasField(container, "label") || Reflect.field(container, "label") == null) {
+			label = container.getChildByName("label");
+			if (label == null) {
+				state = ASCompat.dynamicAs(container.getChildByName("up"), DisplayObjectContainer);
+				if (state != null) {
+					label = state.getChildByName("label");
 				}
 			}
-			if (_loc6_ == null) {
-				_loc7_ = ASCompat.dynamicAs(param1.getChildByName("over"), DisplayObjectContainer);
-				if (_loc7_ != null) {
-					_loc6_ = _loc7_.getChildByName("label");
+			if (label == null) {
+				state = ASCompat.dynamicAs(container.getChildByName("over"), DisplayObjectContainer);
+				if (state != null) {
+					label = state.getChildByName("label");
 				}
 			}
-			if (_loc6_ != null) {
+			if (label != null) {
 				try {
-					Reflect.setField(param1, "label", _loc6_);
+					Reflect.setField(container, "label", label);
 				} catch (e:Dynamic) {}
 			}
 		}
 	}
 
-	function unloadSwfRoot(param1:Dynamic) {
-		var _loc2_:Dynamic = null;
-		var _loc3_:Dynamic = null;
-		if (param1 == null) {
+	function unloadSwfRoot(root:Dynamic) {
+		var loaderInfo:Dynamic = null;
+		var loader:Dynamic = null;
+		if (root == null) {
 			return;
 		}
 		try {
-			_loc2_ = Reflect.field(param1, "loaderInfo");
-			if (_loc2_ == null) {
+			loaderInfo = Reflect.field(root, "loaderInfo");
+			if (loaderInfo == null) {
 				return;
 			}
-			_loc3_ = Reflect.field(_loc2_, "loader");
-			if (_loc3_ != null && Reflect.hasField(_loc3_, "unloadAndStop")) {
-				Reflect.callMethod(_loc3_, Reflect.field(_loc3_, "unloadAndStop"), []);
+			loader = Reflect.field(loaderInfo, "loader");
+			if (loader != null && Reflect.hasField(loader, "unloadAndStop")) {
+				Reflect.callMethod(loader, Reflect.field(loader, "unloadAndStop"), []);
 			}
 		} catch (e:Dynamic) {}
 	}
 
-	function getApplicationDomain(param1:Dynamic):Dynamic {
-		var _loc2_:Dynamic = null;
-		if (param1 == null) {
+	function getApplicationDomain(root:Dynamic):Dynamic {
+		var loaderInfo:Dynamic = null;
+		if (root == null) {
 			return null;
 		}
 		try {
-			_loc2_ = Reflect.field(param1, "loaderInfo");
-			if (_loc2_ == null) {
+			loaderInfo = Reflect.field(root, "loaderInfo");
+			if (loaderInfo == null) {
 				return null;
 			}
-			return Reflect.field(_loc2_, "applicationDomain");
+			return Reflect.field(loaderInfo, "applicationDomain");
 		} catch (e:Dynamic) {}
 		return null;
 	}
 
-	function objectTypeName(param1:Dynamic):String {
-		var _loc2_:Dynamic = null;
-		if (param1 == null) {
+	function objectTypeName(value:Dynamic):String {
+		var cls:Dynamic = null;
+		if (value == null) {
 			return "null";
 		}
-		_loc2_ = Type.getClass(param1);
-		if (_loc2_ == null) {
+		cls = Type.getClass(value);
+		if (cls == null) {
 			return "unknown";
 		}
-		return Type.getClassName(_loc2_);
+		return Type.getClassName(cls);
 	}
+	#end
 }
 
+#if cpp
 class SwfClassProxy {
 	var mSwfAsset:SwfAsset;
 	var mClassName:String;
 
-	public function new(param1:SwfAsset, param2:String) {
-		mSwfAsset = param1;
-		mClassName = param2;
+	public function new(swfAsset:SwfAsset, className:String) {
+		mSwfAsset = swfAsset;
+		mClassName = className;
 	}
 
-	public function create(param1:Array<Dynamic>):Dynamic {
+	public function create(args:Array<Dynamic>):Dynamic {
 		if (mSwfAsset == null) {
 			return null;
 		}
-		return mSwfAsset.instantiateRuntimeSymbol(mClassName, param1);
+		return mSwfAsset.instantiateRuntimeSymbol(mClassName, args);
 	}
 }
+#end
