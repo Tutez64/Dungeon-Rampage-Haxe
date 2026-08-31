@@ -6,24 +6,34 @@ import flash.display.MovieClip;
 import flash.display.DisplayObject;
 import flash.display.DisplayObjectContainer;
 import flash.media.Sound;
+import flash.text.TextField;
+import flash.text.TextFormat;
 import haxe.ds.StringMap;
 import haxe.io.Path;
 import lime.utils.AssetBundle;
 import openfl.utils.AssetLibrary;
 import openfl.utils.Assets;
 import openfl.utils.AssetType;
+import swf.exporters.animate.AnimateButtonSymbol;
+import swf.exporters.animate.AnimateDynamicTextSymbol;
 import swf.exporters.animate.AnimateLibrary;
+import swf.exporters.animate.AnimateSpriteSymbol;
+import swf.exporters.animate.AnimateSymbol;
+import swf.exporters.animate.AnimateTimeline;
 import sys.FileSystem;
 #end
 
 #if cpp
 @:access(openfl.display.MovieClip)
 @:access(swf.exporters.animate.AnimateLibrary)
+@:access(swf.exporters.animate.AnimateSpriteSymbol)
+@:access(swf.exporters.animate.AnimateTimeline)
 #end
 class SwfAsset extends Asset {
 	#if cpp
 	static var sLoadedPreprocessedLibraries:StringMap<AssetLibrary> = new StringMap<AssetLibrary>();
 	static var sFailedPreprocessedLibraries:StringMap<Bool> = new StringMap<Bool>();
+	static var sFontMaps:StringMap<StringMap<String>> = new StringMap<StringMap<String>>();
 	#end
 
 	var mRootClip:MovieClip;
@@ -121,6 +131,7 @@ class SwfAsset extends Asset {
 			mPreprocessedRootObject = instantiatePreprocessedRootObject(mPreprocessedLibrary, mSwfPath);
 			if (mPreprocessedRootObject != null) {
 				applyRootInstanceProperties(mPreprocessedRootObject, mPreprocessedLibrary, mSwfPath);
+				applyExportedFonts(mPreprocessedRootObject, mPreprocessedLibraryName, mSwfPath);
 			}
 		}
 		return mPreprocessedRootObject;
@@ -265,6 +276,7 @@ class SwfAsset extends Asset {
 			clip = library.getMovieClip(className);
 			if (clip != null) {
 				bindTimelineFields(clip);
+				applyExportedFonts(clip, libraryName, mSwfPath);
 				return clip;
 			}
 		}
@@ -355,6 +367,336 @@ class SwfAsset extends Asset {
 		return null;
 	}
 
+	function applyExportedFonts(target:DisplayObject, libraryName:String, swfPath:String):Void {
+		var fontMap:StringMap<String> = null;
+		if (target == null || libraryName == null) {
+			return;
+		}
+		fontMap = getExportedFontMap(libraryName);
+		if (fontMap == null) {
+			return;
+		}
+		applyExportedFontsRecursive(target, fontMap, swfPath);
+	}
+
+	function applyExportedFontsRecursive(target:DisplayObject, fontMap:StringMap<String>, swfPath:String):Void {
+		var textField:TextField = ASCompat.dynamicAs(target, TextField);
+		var container:DisplayObjectContainer = null;
+		var i:Int = 0;
+		if (textField != null) {
+			applyExportedFontToTextField(textField, fontMap, swfPath);
+		}
+		container = ASCompat.dynamicAs(target, DisplayObjectContainer);
+		if (container != null) {
+			i = 0;
+			while (i < container.numChildren) {
+				applyExportedFontsRecursive(container.getChildAt(i), fontMap, swfPath);
+				i++;
+			}
+		}
+	}
+
+	function applyExportedFontToTextField(textField:TextField, fontMap:StringMap<String>, swfPath:String):Void {
+		var format:TextFormat = null;
+		var lookup:String = null;
+		var fontPath:String = null;
+		try {
+			format = textField.defaultTextFormat;
+			if (format == null || format.font == null) {
+				return;
+			}
+			lookup = normalizeFontLookupName(format.font);
+			fontPath = fontMap.get(lookup);
+			if (fontPath == null) {
+				return;
+			}
+			format.font = fontPath;
+			textField.embedFonts = true;
+			textField.defaultTextFormat = format;
+			if (textField.length > 0) {
+				format = textField.getTextFormat();
+				format.font = fontPath;
+				textField.setTextFormat(format);
+			}
+		} catch (e:Dynamic) {
+			Logger.warn("SwfAsset.applyExportedFontToTextField: failed for " + swfPath + ": " + Std.string(e));
+		}
+	}
+
+	public static function applyExportedFontsForBind(target:DisplayObject, libraryName:String, className:String = ""):Void {
+		var timeline:AnimateTimeline = null;
+		var fontIds:Array<Int> = null;
+		var fontPath:String = null;
+		if (target == null || libraryName == null) {
+			return;
+		}
+		if (className == null || className.length == 0) {
+			className = Type.getClassName(Type.getClass(target));
+		}
+		timeline = getBindTimeline(target);
+		if (timeline == null || timeline.__library == null || timeline.__symbol == null) {
+			return;
+		}
+		fontIds = collectDynamicTextFontIDs(timeline.__library, timeline.__symbol);
+		if (fontIds.length == 0) {
+			return;
+		}
+		if (fontIds.length == 1) {
+			fontPath = getExportedFontPathById(libraryName, fontIds[0]);
+			if (fontPath != null) {
+				applyExportedFontPathRecursive(target, fontPath, className);
+			}
+			return;
+		}
+		applyExportedFontsForBindRecursive(target, libraryName, className);
+	}
+
+	static function applyExportedFontsForBindRecursive(target:DisplayObject, libraryName:String, className:String):Void {
+		var textField:TextField = ASCompat.dynamicAs(target, TextField);
+		var container:DisplayObjectContainer = null;
+		var i:Int = 0;
+		var fontId:Int = 0;
+		var fontPath:String = null;
+		if (textField != null) {
+			fontId = resolveBindFontId(textField);
+			if (fontId >= 0) {
+				fontPath = getExportedFontPathById(libraryName, fontId);
+				if (fontPath != null) {
+					applyExportedFontPathToTextField(textField, fontPath, className);
+				}
+			}
+			return;
+		}
+		container = ASCompat.dynamicAs(target, DisplayObjectContainer);
+		if (container != null) {
+			i = 0;
+			while (i < container.numChildren) {
+				applyExportedFontsForBindRecursive(container.getChildAt(i), libraryName, className);
+				i++;
+			}
+		}
+	}
+
+	static function resolveBindFontId(target:DisplayObject):Int {
+		var current:DisplayObject = target;
+		var timeline:AnimateTimeline = null;
+		var fontIds:Array<Int> = null;
+		while (current != null && current.parent != null) {
+			timeline = getBindTimeline(current.parent);
+			if (timeline != null) {
+				fontIds = getFontIDsForBindChild(timeline, current);
+				if (fontIds.length == 1) {
+					return fontIds[0];
+				}
+			}
+			current = current.parent;
+		}
+		return -1;
+	}
+
+	static function getBindTimeline(target:DisplayObject):AnimateTimeline {
+		var clip = ASCompat.dynamicAs(target, MovieClip);
+		if (clip == null || clip.__timeline == null) {
+			return null;
+		}
+		if (!Std.isOfType(clip.__timeline, AnimateTimeline)) {
+			return null;
+		}
+		return cast clip.__timeline;
+	}
+
+	static function getFontIDsForBindChild(timeline:AnimateTimeline, child:DisplayObject):Array<Int> {
+		var instances:Array<Dynamic> = null;
+		var instance:Dynamic = null;
+		if (timeline.__activeInstances == null || timeline.__library == null || timeline.__library.symbols == null) {
+			return [];
+		}
+		instances = cast timeline.__activeInstances;
+		for (instance in instances) {
+			if (instance.displayObject == child) {
+				return collectDynamicTextFontIDs(timeline.__library, timeline.__library.symbols.get(instance.characterID));
+			}
+		}
+		return [];
+	}
+
+	static function collectDynamicTextFontIDs(library:AnimateLibrary, symbol:AnimateSymbol):Array<Int> {
+		var fontIds = new Array<Int>();
+		if (library == null || library.symbols == null || symbol == null) {
+			return fontIds;
+		}
+		collectDynamicTextFontIDsRecursive(library, symbol, new Map(), fontIds);
+		return fontIds;
+	}
+
+	static function collectDynamicTextFontIDsRecursive(library:AnimateLibrary, symbol:AnimateSymbol, seen:Map<Int, Bool>, fontIds:Array<Int>):Void {
+		var button:AnimateButtonSymbol = null;
+		var sprite:AnimateSpriteSymbol = null;
+		var fontId:Int = 0;
+		if (symbol == null || seen.exists(symbol.id)) {
+			return;
+		}
+		seen.set(symbol.id, true);
+		if (Std.isOfType(symbol, AnimateDynamicTextSymbol)) {
+			fontId = cast(symbol, AnimateDynamicTextSymbol).fontID;
+			if (fontIds.indexOf(fontId) == -1) {
+				fontIds.push(fontId);
+			}
+			return;
+		}
+		if (Std.isOfType(symbol, AnimateButtonSymbol)) {
+			button = cast symbol;
+			collectDynamicTextFontIDsRecursive(library, button.upState, seen, fontIds);
+			collectDynamicTextFontIDsRecursive(library, button.overState, seen, fontIds);
+			collectDynamicTextFontIDsRecursive(library, button.downState, seen, fontIds);
+			collectDynamicTextFontIDsRecursive(library, button.hitState, seen, fontIds);
+			return;
+		}
+		if (!Std.isOfType(symbol, AnimateSpriteSymbol)) {
+			return;
+		}
+		sprite = cast symbol;
+		if (sprite.frames != null) {
+			for (frame in sprite.frames) {
+				if (frame.objects == null) {
+					continue;
+				}
+				for (object in frame.objects) {
+					collectDynamicTextFontIDsRecursive(library, library.symbols.get(object.symbol), seen, fontIds);
+				}
+			}
+		}
+		if (sprite.compactTimeline != null) {
+			fontId = 0;
+			while (fontId < sprite.compactTimeline.objects.length) {
+				collectDynamicTextFontIDsRecursive(library, library.symbols.get(Std.int(sprite.compactTimeline.objects[fontId + 2])), seen, fontIds);
+				fontId = sprite.compactTimeline.getNextObjectPosition(fontId);
+			}
+		}
+	}
+
+	static function applyExportedFontPathRecursive(target:DisplayObject, fontPath:String, className:String):Void {
+		var textField:TextField = ASCompat.dynamicAs(target, TextField);
+		var container:DisplayObjectContainer = null;
+		var i:Int = 0;
+		if (textField != null) {
+			applyExportedFontPathToTextField(textField, fontPath, className);
+		}
+		container = ASCompat.dynamicAs(target, DisplayObjectContainer);
+		if (container != null) {
+			i = 0;
+			while (i < container.numChildren) {
+				applyExportedFontPathRecursive(container.getChildAt(i), fontPath, className);
+				i++;
+			}
+		}
+	}
+
+	static function applyExportedFontPathToTextField(textField:TextField, fontPath:String, className:String):Void {
+		var format:TextFormat = null;
+		try {
+			format = textField.defaultTextFormat;
+			if (format == null || format.font == null || isDeviceFontName(format.font)) {
+				return;
+			}
+			format.font = fontPath;
+			textField.embedFonts = true;
+			textField.defaultTextFormat = format;
+			if (textField.length > 0) {
+				format = textField.getTextFormat();
+				format.font = fontPath;
+				textField.setTextFormat(format);
+			}
+		} catch (e:Dynamic) {
+			Logger.warn("SwfAsset.applyExportedFontPathToTextField: failed for " + className + ": " + Std.string(e));
+		}
+	}
+
+	static function getExportedFontPathById(libraryName:String, fontId:Int):String {
+		var directory:String = null;
+		var prefix:String = null;
+		var entry:String = null;
+		directory = getExportedFontDirectory(libraryName);
+		if (directory == null || !FileSystem.exists(directory) || !FileSystem.isDirectory(directory)) {
+			return null;
+		}
+		prefix = Std.string(fontId) + "_";
+		for (entry in FileSystem.readDirectory(directory)) {
+			if (StringTools.startsWith(entry, prefix)) {
+				prefix = entry.toLowerCase();
+				if (StringTools.endsWith(prefix, ".ttf") || StringTools.endsWith(prefix, ".otf")) {
+					return Path.normalize(Path.join([directory, entry]));
+				}
+			}
+		}
+		return null;
+	}
+
+	static function getExportedFontMap(libraryName:String):StringMap<String> {
+		var fontMap:StringMap<String> = null;
+		var directory:String = null;
+		var entry:String = null;
+		var lookup:String = null;
+		var separator:Int = 0;
+		if (sFontMaps.exists(libraryName)) {
+			return sFontMaps.get(libraryName);
+		}
+		fontMap = new StringMap<String>();
+		directory = getExportedFontDirectory(libraryName);
+		if (directory != null && FileSystem.exists(directory) && FileSystem.isDirectory(directory)) {
+			for (entry in FileSystem.readDirectory(directory)) {
+				lookup = entry.toLowerCase();
+				if (!StringTools.endsWith(lookup, ".ttf") && !StringTools.endsWith(lookup, ".otf")) {
+					continue;
+				}
+				separator = entry.indexOf("_");
+				if (separator <= 0) {
+					continue;
+				}
+				lookup = entry.substr(separator + 1);
+				lookup = Path.withoutExtension(lookup);
+				if (isDeviceFontName(lookup)) {
+					continue;
+				}
+				fontMap.set(normalizeFontLookupName(lookup), Path.normalize(Path.join([directory, entry])));
+			}
+		}
+		sFontMaps.set(libraryName, fontMap);
+		return fontMap;
+	}
+
+	static function getExportedFontDirectory(libraryName:String):String {
+		var programDir:String = Path.directory(Sys.programPath());
+		var candidates:Array<String> = null;
+		var candidate:String = null;
+		if (programDir == null || programDir.length == 0) {
+			return null;
+		}
+		candidates = [
+			Path.normalize(Path.join([programDir, "Resources", "ffdec_fonts", libraryName])),
+			Path.normalize(Path.join([programDir, "..", "Resources", "Resources", "ffdec_fonts", libraryName])),
+		];
+		for (candidate in candidates) {
+			if (FileSystem.exists(candidate)) {
+				return candidate;
+			}
+		}
+		return candidates[0];
+	}
+
+	static function normalizeFontLookupName(name:String):String {
+		if (name == null) {
+			return "";
+		}
+		name = StringTools.replace(name, "\x00", "");
+		name = StringTools.trim(name);
+		return name.toLowerCase();
+	}
+
+	static function isDeviceFontName(name:String):Bool {
+		name = normalizeFontLookupName(name);
+		return name == "arial" || name == "_sans" || name == "_serif" || name == "_typewriter";
+	}
 
 	static function loadPreprocessedLibrarySync(libraryId:String, swfPath:String):AssetLibrary {
 		var library:AssetLibrary = null;
