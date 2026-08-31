@@ -1,3 +1,4 @@
+import brain.assetRepository.SwfAsset;
 import flash.display.MovieClip;
 
 @:bind
@@ -9,5 +10,8 @@ class Loading_screen_swf extends MovieClip {
 
 	public function new() {
 		super();
+		#if cpp
+		SwfAsset.applyExportedFontsForBind(this, "assets");
+		#end
 	}
 }
