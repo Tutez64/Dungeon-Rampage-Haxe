@@ -7,6 +7,7 @@ PROJECT_ROOT="$(cd -- "$SCRIPT_DIR/../.." && pwd)"
 FEATURE_FLAGS_FILE="$PROJECT_ROOT/src/brain/utils/FeatureFlags.hx"
 PROJECT_FILE="$PROJECT_ROOT/project.xml"
 OPTIONS_FILE="$SCRIPT_DIR/launch_options.tsv"
+STAMP_FILE="$PROJECT_ROOT/edits/conversion/stamp"
 DEFAULT_DIST_DIR="$PROJECT_ROOT/dist"
 
 usage() {
@@ -33,6 +34,10 @@ src/brain/utils/FeatureFlags.hx:
   - recommended values are preserved unless they matched the previous default
   - new flags are added and, in an interactive terminal, the script asks for
     the recommended value
+
+steam_buildid is copied from edits/conversion/stamp (the official Steam
+BuildID this src/ was converted from). DRH Launcher compares it to the
+live public branch so it can warn when official Dungeon Rampage has moved on.
 EOF
 }
 
@@ -227,7 +232,7 @@ for platform in linux-x64 windows-x64 macos-universal; do
   require_archive "$(platform_archive "$platform")"
 done
 
-python3 - "$VERSION" "$DIST_DIR" "$OPTIONS_FILE" "$PROJECT_FILE" "$OUTPUT" <<'PY'
+python3 - "$VERSION" "$DIST_DIR" "$OPTIONS_FILE" "$PROJECT_FILE" "$OUTPUT" "$STAMP_FILE" <<'PY'
 import csv
 import hashlib
 import json
@@ -241,6 +246,25 @@ dist_dir = Path(sys.argv[2])
 options_file = Path(sys.argv[3])
 project_file = Path(sys.argv[4])
 output = Path(sys.argv[5])
+stamp_file = Path(sys.argv[6])
+
+
+def read_steam_buildid(path: Path) -> int:
+    if not path.is_file():
+        raise SystemExit(
+            f"Could not read official Steam BuildID from {path}. "
+            "The conversion stamp is required to write steam_buildid into the release manifest."
+        )
+    for line in path.read_text(encoding="utf-8").splitlines():
+        if line.startswith("buildid="):
+            value = line.split("=", 1)[1].strip()
+            if value.isdigit() and int(value) > 0:
+                return int(value)
+            raise SystemExit(f"Invalid buildid in {path}: {value!r}")
+    raise SystemExit(f"No buildid= line in {path}")
+
+
+steam_buildid = read_steam_buildid(stamp_file)
 
 archive_names = {
     "linux-x64": f"Dungeon.Rampage.Haxe.{version}.Linux.tar.gz",
@@ -348,6 +372,7 @@ if project_default != str(auto_fallback):
 
 manifest = {
     "version": version,
+    "steam_buildid": steam_buildid,
     "platforms": platforms,
     "launch_options": {
         "frame_rate": frame_rate,
@@ -357,4 +382,5 @@ manifest = {
 
 output.write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
 print(output)
+print(f"steam_buildid={steam_buildid}", file=sys.stderr)
 PY

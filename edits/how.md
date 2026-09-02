@@ -75,6 +75,8 @@ jpexs=<sha>
 ax4=<sha>
 ```
 
+`tools/release/generate_manifest.sh` copies that `buildid` into the GitHub release manifest as `steam_buildid`. Already published releases keep their original manifests; DRH Launcher maps those versions itself.
+
 ### Workflow
 
 The polyglot script `./edits/conversion/refresh.cmd` (Bash + PowerShell) drives the git steps. Replay and squash run in a throwaway worktree so the main checkout stays full-tree.
