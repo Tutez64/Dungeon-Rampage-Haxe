@@ -11,7 +11,7 @@ Each row has a status: `open` (not decided), `recommended` (working direction, n
 | Topic | Status | Notes |
 | --- | --- | --- |
 | Fairness / catalog morals | decided | No fairness police. Index does not reject mods for in-game advantage. See [Policy](#policy). |
-| `layers` (client / data / gameplay) | decided | **Dropped.** That split is the same muddy line as fair play. How you hook is `uses`. Checksum/protocol footguns are a targeted warning, not a layer enum. See [Policy](#policy). |
+| `layers` (client / data / gameplay) | decided | **Dropped.** That split is the same muddy line as fair play. How you hook is `uses`. See [Policy](#policy). |
 | First-run mods disclosure | decided | Once in DRHL, before the first launch (or first enable) with mods. Not an EULA scare. See [First-run disclosure](#first-run-disclosure). |
 | API surface | decided | **C + F:** stable documented `modding.*` wrappers (recommended) plus host `extends` / `replace` for what the facade cannot do yet. First *usable* release wants both; `replace` can wait on hxScript or a DRH factory. See [API surface](#api-surface). |
 | Mod kinds (`api` / `extends` / `replace`) | decided | Declared in `mod.json`. Recommend `api`. `extends` and especially `replace` have version and inter-mod costs. See [Mod kinds](#mod-kinds). |
@@ -20,6 +20,7 @@ Each row has a status: `open` (not decided), `recommended` (working direction, n
 | Scanning mods outside the launcher (debug) | decided | Same `--mods-dir`. Optional later: `--mods-all`, `--mod <id>`. No implicit scan next to the exe. |
 | Lifecycle | decided | Boot: `onInit` **once** at end of `DungeonBustersProject.onInvoke` (after `processArguments`), `onReady` on `ManagersLoadedEvent`, `onDispose` on shutdown. `api: 1` also freezes `heroSpawned` / `heroDespawned` / `floorEnter` / `floorExit`. See [Lifecycle](#lifecycle). |
 | hxScript `Environment` isolation | decided | **One `Environment` per mod**, `Compiler.compile(env)` per mod. No inter-mod script types in v1; no `dependencies` in `mod.json`. See [Compilation](#compilation). |
+| Checksummed JSON overlay | decided | **No** dedicated warn or block in index, launcher, or host. `sCode` is a weak int-fold; server use unknown; a mismatch would fail dungeon entry, which the author sees. Sideload is already labeled. See [Policy](#policy). |
 | Exact `mod.json` schema | open | Draft below, not frozen. |
 | cppia bytecode cache | open | Future optimization, not a v1 requirement. |
 | Private / offline mode for scripted gameplay | open | Out of scope while DRH only talks to official servers. |
@@ -41,7 +42,7 @@ Constraints that shape the rest:
 
 - Compiled mods target **hxcpp** only. There is no HashLink target today (`project.xml`).
 - Current boot without mods: `DungeonBustersProject` creates `DBFacade`, then `onInvoke` inits Steam and `processArguments`. `LoadingState` later runs service discovery and `preLoadJson` (GameMaster, `library_server.json`, AttackTimeline). With mods, `--mods-dir` is parsed in the constructor from `Sys.args()`; `onInit` runs **once** at the end of `onInvoke`; `onReady` runs after those three JSON files — account, hero, and floor are still missing. Live state arrives later as events. See [Lifecycle](#lifecycle).
-- The game is **fully multiplayer** on official servers. The client computes checksums (`mSecurityGM` + `mSecurityTL` + `mSecuritySL` in `DBFacade`) and may call `blockCheater()` / `logCheater()`. A JSON overlay is not "just cosmetic".
+- The game is **fully multiplayer** on official servers. The client folds some int fields from GameMaster, AttackTimeline, and `library_server.json` into `sCode` (sent on dungeon entry). That is not a reason to special-case those paths in the catalog. See [Policy](#policy).
 - Updates replace `Dungeon Rampage Haxe/current/`. Mods must live **outside** that directory.
 - The vendored hxcpp (`submodules/hxcpp`) is not yet the `MeguminBOT/hxcpp` `patched-hxscript` fork required for cppia and the interpreter to agree. See [Technical prerequisites](#technical-prerequisites).
 
@@ -89,7 +90,9 @@ Compiling "to actually get the performance" means `Compiler.compile(env)` **per 
 
 **How you hook** is `uses` (`api` / `extends` / `replace`). That is the catalog taxonomy. A three-way `layers` field (client / data / gameplay) was dropped: it is not clear (FOV is “client” and a large advantage; a mana-check patch sits in a weapon controller), and it duplicated the fairness debate we already closed.
 
-**Integrity (targeted, not a layer):** `Resources/Levels/DB_GameMaster.json`, `Resources/Combat/AttackTimeline.json`, and `Resources/Levels/library_server.json` feed `mSecurityGM` / `mSecurityTL` / `mSecuritySL`. Overlaying them can trip `blockCheater()` / `LogCheater` and brick launch. Prefer **detecting those paths in the zip** (index CI + launcher) over a self-declared tag. Warn; do not moralize. Index / review still refuses or yanks malware, undeclared checksum-table patches that make the game unlaunchable, and combat bots / protocol spoof if we do not want to host that. Sideload remains for everything else. The hxScript sandbox is not a review criterion: it is not a jail (see [Compilation](#compilation)).
+**Official tables and `sCode`:** `Resources/Levels/DB_GameMaster.json`, `Resources/Combat/AttackTimeline.json`, and `Resources/Levels/library_server.json` feed `mSecurityGM` / `mSecurityTL` / `mSecuritySL`. The fold only counts runtime `"int"` fields, and for AttackTimeline it is **shallow** (top-level keys of each attack: name, flags, `totalFrames`, the `frames` array object — not nested actions). Nested string actions such as `{ "type": "helloMod" }` do not change `mSecurityTL`. Timeline/library values are then `% 1097`. `blockCheater()` is only `Hero.BaseMove > 250` in the loaded GameMaster, not a general overlay check. `sCode` is sent on `ClientRequestEntry`; what the server does with it is **unknown**. A mismatch would at most fail dungeon entry (`ResponceCode != 0`), which the author notices immediately. It is not an automatic ban in the client.
+
+**v1 does not warn or block** those three paths in the index, the launcher, or the host. An indexed mod was reviewed and plays; sideload is already labeled unreviewed in the first-run / catalog copy. Index / review still refuses or yanks malware and combat bots / protocol spoof if we do not want to host that. The hxScript sandbox is not a review criterion: it is not a jail (see [Compilation](#compilation)).
 
 ## First-run disclosure
 
@@ -98,7 +101,7 @@ DRHL shows this **once**, stored in launcher config, the first time the user wou
 What to make clear:
 
 1. **Code in-process.** Mods are Haxe/cppia inside the game, not a skin pack. Index review is human, not a proof. Sideload is weaker. The sandbox is a mistake guard on the interpreter fallback, not a jail; compiled mods are not blacklisted.
-2. **Official servers.** Same servers as vanilla DRH. Patching checksummed tables can **fail to launch**. No promise about bans either way.
+2. **Official servers.** Same servers as vanilla DRH. No promise about bans either way.
 3. **Updates.** `api` mods follow `api: N`. `extends` / `replace` can break on a DRH update with no `api` bump. A modded session is not supported like vanilla.
 4. **Several mods.** `replace` on the same rewritten surface can clash. Load order is in the launcher.
 5. **Back to vanilla.** Disable all mods / Play with an empty list. Nothing is written into `current/`.
@@ -329,7 +332,6 @@ In:
 
 - Fetch and cache the index (same defensive pattern as game updates: size, hash, no silent third-party redirects).
 - List available mods: name, version, author, short description, compat vs installed DRH, `uses`.
-- Warn when the zip (or review) touches checksummed tables — not a `layers` tag.
 - Install: download zip → verify SHA-256 → extract under `mods/<id>/` (directory name = `id`; sideload folders may differ, resolved via `mod.json`).
 - Show installed vs listed, enable / disable, load order.
 - Write `enabled.json` in the mods folder (ordered ids).
@@ -352,7 +354,7 @@ Out of v1 (polish later, same index):
 - Fetch the index and present the v1 catalog above.
 - Scan directories that have a `mod.json`.
 - Enable / disable, load order, `drh` compat vs the installed version.
-- Show `uses` as tags; recommend `api`. Warn that `extends` may break on DRH updates and that `replace` may clash. Warn when a listing would patch checksummed tables (launch footgun), not because it is "too strong".
+- Show `uses` as tags; recommend `api`. Warn that `extends` may break on DRH updates and that `replace` may clash.
 - Once, [first-run disclosure](#first-run-disclosure) before the user actually runs with mods.
 - Write `<install-dir>/mods/enabled.json` (ordered ids).
 - Launch with `--mods-dir` pointing at that folder. Do not pass the id list on the CLI in prod.
