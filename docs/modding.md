@@ -16,9 +16,9 @@ Each row has a status: `open` (not decided), `recommended` (working direction, n
 | API surface | decided | **C + F:** stable documented `modding.*` wrappers (recommended) plus host `extends` / `replace` for what the facade cannot do yet. First *usable* release wants both; `replace` can wait on hxScript or a DRH factory. See [API surface](#api-surface). |
 | Mod kinds (`api` / `extends` / `replace`) | decided | Declared in `mod.json`. Recommend `api`. `extends` and especially `replace` have version and inter-mod costs. See [Mod kinds](#mod-kinds). |
 | Virtual `new` for `@:scriptable` types | recommended | Opt-in. `extend` ≠ replace. Disjoint `replace` merge in hxScript, not DRH. MeguminBOT (Discord): good idea, will experiment, PRs welcome. Needed for a comfortable `replace` story; not a blocker to start the facade. See [API surface](#api-surface). |
-| How the enabled mod list reaches the game | decided | `<install-dir>/mods/enabled.json` (order = load order) plus `--mods-dir <absolute path>`. No prod CLI id list. Naked exe without the flag loads no mods. See [Passing the list](#passing-the-list). |
+| How the enabled mod list reaches the game | decided | `<install-dir>/mods/enabled.json` (order = load order) plus `--mods-dir <absolute path>`. Game parses `--mods-dir` from `Sys.args()` in the constructor, like `--fps`. No prod CLI id list. Naked exe without the flag loads no mods. See [Passing the list](#passing-the-list). |
 | Scanning mods outside the launcher (debug) | decided | Same `--mods-dir`. Optional later: `--mods-all`, `--mod <id>`. No implicit scan next to the exe. |
-| Lifecycle | decided | `onInit` / `onReady` / `onDispose` on `modding.Mod`, all optional. See [Lifecycle](#lifecycle). |
+| Lifecycle | decided | Boot: `onInit` **once** at end of `DungeonBustersProject.onInvoke` (after `processArguments`), `onReady` on `ManagersLoadedEvent`, `onDispose` on shutdown. `api: 1` also freezes `heroSpawned` / `heroDespawned` / `floorEnter` / `floorExit`. See [Lifecycle](#lifecycle). |
 | Exact `mod.json` schema | open | Draft below, not frozen. |
 | cppia bytecode cache | open | Future optimization, not a v1 requirement. |
 | Private / offline mode for scripted gameplay | open | Out of scope while DRH only talks to official servers. |
@@ -39,7 +39,7 @@ The chosen script runtime is [hxScript](https://github.com/MeguminBOT/hxscript):
 Constraints that shape the rest:
 
 - Compiled mods target **hxcpp** only. There is no HashLink target today (`project.xml`).
-- Current boot without mods: `DungeonBustersProject` creates `DBFacade`, which loads GameMaster, `library_server.json`, and `AttackTimeline.json` in `preLoadJson`. With mods, `onInit` runs **before** that load; `onReady` runs **after**. See [Lifecycle](#lifecycle).
+- Current boot without mods: `DungeonBustersProject` creates `DBFacade`, then `onInvoke` inits Steam and `processArguments`. `LoadingState` later runs service discovery and `preLoadJson` (GameMaster, `library_server.json`, AttackTimeline). With mods, `--mods-dir` is parsed in the constructor from `Sys.args()`; `onInit` runs **once** at the end of `onInvoke`; `onReady` runs after those three JSON files — account, hero, and floor are still missing. Live state arrives later as events. See [Lifecycle](#lifecycle).
 - The game is **fully multiplayer** on official servers. The client computes checksums (`mSecurityGM` + `mSecurityTL` + `mSecuritySL` in `DBFacade`) and may call `blockCheater()` / `logCheater()`. A JSON overlay is not "just cosmetic".
 - Updates replace `Dungeon Rampage Haxe/current/`. Mods must live **outside** that directory.
 - The vendored hxcpp (`submodules/hxcpp`) is not yet the `MeguminBOT/hxcpp` `patched-hxscript` fork required for cppia and the interpreter to agree. See [Technical prerequisites](#technical-prerequisites).
@@ -116,11 +116,11 @@ What a script can do without much `modding.*`:
 - `extend` a compiled class only if that class is `@:scriptable`. No `@:scriptable` → no override of native methods.
 - Not: `private` / `inline` / `final` native methods, macros, or swapping one comparison inside a compiled function.
 
-So a "mana cost uses the base value" fix is easy **as a reviewed mod** only if that check is a virtual public method on a scriptable type, or the host adds a hook. With a poor API and no scriptable combat class, hxScript cannot reach into that `if`. UI mods (HP bars, macros, meters) need far less: a place to draw and a way to read state.
+So a "mana cost uses the base value" fix is easy **as a reviewed mod** only if that check is a virtual public method on a scriptable type, or the host adds a hook. With a poor API and no scriptable combat class, hxScript cannot reach into that `if`. Overlay / HUD / macro mods need far less: a place to draw and a way to read state.
 
 **Decided for the first usable release: C + F.**
 
-- **C — stable facade.** Package `modding.*` only: lifecycle (`onInit` / `onReady` / `onDispose`), overlay/HUD root, input, and a **window on live state through wrappers** (`ModHero`, floor, inventory, camera, chat — names TBD). Not raw `HeroGameObject`. Wrappers are what `api: 1` promises across DRH tags; Starling may reimplement them without bumping `api` if the wrapper contract holds. This is the recommended path and the one that composes with other mods.
+- **C — stable facade.** Package `modding.*` only: boot lifecycle (`onInit` / `onReady` / `onDispose`), gameplay events (`heroSpawned` / `heroDespawned` / `floorEnter` / `floorExit`), overlay/HUD root, input, and a **window on live state through wrappers** (`ModHero`, floor, inventory, camera, chat — names TBD). Not raw `HeroGameObject`. Wrappers that need a hero or floor stay empty until the matching event. Wrappers + those events are what `api: 1` promises across DRH tags; Starling may reimplement them without bumping `api` if the wrapper contract holds. This is the recommended path and the one that composes with other mods.
 - **F — host types.** `@:scriptable` on game classes plus, when it lands, virtual `new` / explicit `replace`. Until then, DRH can use a hand-written `ModHost.create` for a few types. This is the escape hatch while the facade is thin, especially early on.
 
 Do not hand out internal instances as the “stable API”. A HUD that peeks `actor.HeroGameObject` is an `extends`-kind mod, not an `api` one, even if it only reads fields.
@@ -164,19 +164,36 @@ Players see a short warning on `extends` / `replace` (may break on game updates;
 
 ## Lifecycle
 
-Part of the `api` contract. Names are frozen. Extra moments (`floorEnter`, HUD of the vanilla game, …) come later as **events**, without renaming these three.
+Part of the `api` contract. The three methods are **boot** hooks; names are frozen. They are not "gameplay ready": `onReady` is `ManagersLoadedEvent` (GameMaster + AttackTimeline + `library_server.json`). `LoadingState` has not loaded the account yet, and there is no hero or floor. Live moments are **events**, frozen for `api: 1` so facade mods can hook the world without `extends`.
 
 `mod.json` `entry` is a class that extends `modding.Mod`. All three methods are optional (empty defaults on the base class).
 
 | Method | When | Typical use |
 | --- | --- | --- |
-| `onInit(ctx:ModContext)` | After compile, host is up, **before** `DBFacade.preLoadJson` | `replace(...)`, subscribe, overlay on `stage` (already exists). No GameMaster yet; state wrappers are empty. |
-| `onReady(ctx:ModContext)` | After GameMaster, AttackTimeline, and `library_server` have loaded; wrappers are usable | HP, inventory, camera, chat. Closest to Unity `Start`. |
+| `onInit(ctx:ModContext)` | **Once**, at the end of `DungeonBustersProject.onInvoke`, after `processArguments`. Host, stage, Steam, and CLI feature flags are up. `LoadingState`, service discovery, and `preLoadJson` have not started. Later AIR `invoke` events must not call it again. | `replace(...)`, subscribe to events, overlay on `stage`. No GameMaster yet; state wrappers are empty. |
+| `onReady(ctx:ModContext)` | After GameMaster, AttackTimeline, and `library_server` have loaded. Account, heroes, and floors are **not** there. Config-based feature flags may already be applied (`LoadingState.configReady` runs before `preLoadJson`). | Read static tables (names, stats from GameMaster). Not Unity `Start`. Live wrappers stay empty. |
 | `onDispose()` | Process shutdown (unload later if we ever need it) | Timers, listeners. Must not block exiting. |
 
-`ModContext`: overlay root, log, `replace`, and the state window (usable from `onReady`). Load order follows `enabled.json`.
+`--mods-dir` is parsed earlier, in the constructor from `Sys.args()` (like `--fps`), so compile can finish before `onInit`. See [Passing the list](#passing-the-list).
 
-A throw in `onInit` / `onReady` isolates **that** mod; boot continues. A throw in `onDispose` is logged and ignored.
+### Gameplay events (`api: 1`)
+
+Subscribe from `onInit` or `onReady`. The host emits these; they are not existing game `Event` class names.
+
+These four are the minimum to attach state to the live world (local + other players, town + dungeon, floor-scoped teardown). Town enter/exit and account-loaded are **not** frozen; they can join later without a bump if they only add.
+
+| Event | When | Typical use |
+| --- | --- | --- |
+| `heroSpawned` / `heroDespawned` | A hero (local **or** other players) enters / leaves the world. Town and dungeon. | Per-hero overlay or roster. |
+| `floorEnter` / `floorExit` | A dungeon floor starts / ends. Not town. | Floor-scoped UI or counters; teardown on exit. |
+
+Pattern: subscribe in `onInit`, react to spawn/floor, use `onReady` only for GameMaster lookups. Do not assume a hero exists in `onReady`.
+
+Later events (vanilla HUD ready, inventory, chat, town enter, account loaded, …) can join without a bump if they only add; a change to an existing event or wrapper is an `api` bump.
+
+`ModContext`: overlay root, log, `replace`, event subscribe, and the state window (hero/floor wrappers filled after the matching event). Load order follows `enabled.json`.
+
+A throw in `onInit` / `onReady` isolates **that** mod; boot continues. A throw in `onDispose` is logged and ignored. A throw in an event handler isolates that mod for that dispatch.
 
 ## Disk layout
 
@@ -218,7 +235,7 @@ The launcher writes `<install-dir>/mods/enabled.json`:
 
 Array order is load order. Disabled mods are omitted, not flagged in the author's zip.
 
-On Play it passes **`--mods-dir <absolute path to mods/>`**. The game reads `enabled.json` there and resolves each `id` to a folder (scan `mod.json` if the directory name differs from `id`). Prod CLI does **not** list ids (Windows command-line length, quoting). Session logs already capture the flag.
+On Play it passes **`--mods-dir <absolute path to mods/>`**. The game parses that flag from `Sys.args()` in the `DungeonBustersProject` constructor (same pattern as `--fps`). Compile after that parse and before `onInit`. Then read `enabled.json` in that folder and resolve each `id` to a directory (scan `mod.json` if the folder name differs from `id`). Prod CLI does **not** list ids (Windows command-line length, quoting). Session logs already capture the flag.
 
 No `--mods-dir` (double-click the exe in `current/`) → **no mods**. Intentional vanilla.
 
@@ -344,9 +361,9 @@ The launcher Mods page is the v1 catalog, not a permanent placeholder.
 
 ### Game
 
-- Read `--mods-dir` / `enabled.json`. Without the flag, load nothing.
-- Create the hxScript `Environment`, load modules, compile (`Compiler.compile`), interpret what was skipped.
-- Call [lifecycle](#lifecycle): `onInit` before `preLoadJson`, `onReady` after GM/timelines/library, `onDispose` on shutdown.
+- Parse `--mods-dir` from `Sys.args()` in the constructor (like `--fps`). Without the flag, load nothing. Read `enabled.json`.
+- Create the hxScript `Environment`, load modules, compile (`Compiler.compile`) before `onInit`, interpret what was skipped.
+- Call [lifecycle](#lifecycle): `onInit` once at end of `onInvoke`, `onReady` after GM/timelines/library, gameplay events when heroes/floors appear, `onDispose` on shutdown.
 - Isolate errors: a throwing mod must not take down the whole boot.
 
 Target package (not implemented): `src/modding/`, with `-D hxscript_host=modding`.
@@ -399,7 +416,7 @@ Out of scope for this documentation pass; needed before a real host:
 1. hxScript dependency (`haxelib` git or a pin in `project.xml`).
 2. hxcpp: `submodules/hxcpp` does not yet include the cppia fixes from [`MeguminBOT/hxcpp`, `patched-hxscript` branch](https://github.com/MeguminBOT/hxcpp/tree/patched-hxscript). Without them, a compiled script can disagree with the same script interpreted. Interpreting is not blocked.
 3. `-D hxscript_cppia` and `-D scriptable` in the cpp build.
-4. `src/modding/` host: `onInit` before `preLoadJson`, `onReady` after those JSON files. For `replace`, `-D hxscript_host` (or bridge packages) must include the host types we mark `@:scriptable`, not only `modding`.
+4. `src/modding/` host: parse `--mods-dir` in the constructor; `onInit` once at end of `onInvoke`; `onReady` after the JSON files; plus `heroSpawned` / `heroDespawned` / `floorEnter` / `floorExit`. For `replace`, `-D hxscript_host` (or bridge packages) must include the host types we mark `@:scriptable`, not only `modding`.
 5. Launcher side: index fetch, catalog install (hash-verify), `enabled.json`, `--mods-dir`, scan, enable, order — no destructive overlay.
 6. Index repository (separate from DRH / DRHL), with PR + CI for new versions.
 
