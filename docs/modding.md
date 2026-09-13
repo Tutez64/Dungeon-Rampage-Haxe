@@ -19,6 +19,7 @@ Each row has a status: `open` (not decided), `recommended` (working direction, n
 | How the enabled mod list reaches the game | decided | `<install-dir>/mods/enabled.json` (order = load order) plus `--mods-dir <absolute path>`. Game parses `--mods-dir` from `Sys.args()` in the constructor, like `--fps`. No prod CLI id list. Naked exe without the flag loads no mods. See [Passing the list](#passing-the-list). |
 | Scanning mods outside the launcher (debug) | decided | Same `--mods-dir`. Optional later: `--mods-all`, `--mod <id>`. No implicit scan next to the exe. |
 | Lifecycle | decided | Boot: `onInit` **once** at end of `DungeonBustersProject.onInvoke` (after `processArguments`), `onReady` on `ManagersLoadedEvent`, `onDispose` on shutdown. `api: 1` also freezes `heroSpawned` / `heroDespawned` / `floorEnter` / `floorExit`. See [Lifecycle](#lifecycle). |
+| hxScript `Environment` isolation | decided | **One `Environment` per mod**, `Compiler.compile(env)` per mod. No inter-mod script types in v1; no `dependencies` in `mod.json`. See [Compilation](#compilation). |
 | Exact `mod.json` schema | open | Draft below, not frozen. |
 | cppia bytecode cache | open | Future optimization, not a v1 requirement. |
 | Private / offline mode for scripted gameplay | open | Out of scope while DRH only talks to official servers. |
@@ -59,7 +60,7 @@ flowchart LR
   end
   subgraph game [DRH hxcpp]
     host["modding host"]
-    hxscript["hxScript Environment"]
+    hxscript["per-mod Environment"]
     cppia["compile cppia or interp"]
     api["public API"]
     gameCore["GameMaster timelines UI"]
@@ -76,11 +77,11 @@ flowchart LR
   api --> gameCore
 ```
 
-Core idea: the launcher does not compile. It discovers mods, keeps the enabled set and load order, then passes them to the game. The game loads `.hx` sources, asks hxScript to compile them to cppia when it can, and falls back to the interpreter when a module is skipped. The **recommended** path is the `modding.*` facade. `extends` / `replace` may reach host types; that is an explicit, costlier kind, not the default contract.
+Core idea: the launcher does not compile. It discovers mods, keeps the enabled set and load order, then passes them to the game. The game gives each mod its own hxScript `Environment`, compiles that world to cppia when it can, and falls back to the interpreter when a module is skipped. Mods do not share script types. The **recommended** path is the `modding.*` facade. `extends` / `replace` may reach host types; that is an explicit, costlier kind, not the default contract.
 
 Discovery is the same contract: an index of **artifacts**, consumed in v1 by a small DRHL catalog. A later website can read that index without changing how authors publish.
 
-Compiling "to actually get the performance" means `Compiler.compile(env)` at load inside the game process: not a native rebuild of the DRH binary, and not a Haxe compile in the launcher.
+Compiling "to actually get the performance" means `Compiler.compile(env)` **per mod** at load inside the game process: not a native rebuild of the DRH binary, and not a Haxe compile in the launcher.
 
 ## Policy
 
@@ -266,10 +267,10 @@ Draft. Evolving schema, not frozen. Shared launcher/game contract.
 | `author` | Author |
 | `api` | `modding.*` contract version the mod targets |
 | `drh` | Game tag range (exact syntax still to freeze) |
-| `entry` | hxScript entry class (e.g. `Main` extends `modding.Mod`) |
+| `entry` | hxScript entry class in **that** mod's `Environment` (e.g. `Main` extends `modding.Mod`). Short names do not collide across mods. |
 | `uses` | One or more of `api`, `extends`, `replace` (see [Mod kinds](#mod-kinds)) |
 
-Load order is owned by the launcher, not by the mod.
+Load order is owned by the launcher, not by the mod. There is **no** `dependencies` field in v1: mods do not import each other's script types. They compose only through the host (overlay, events, `replace` registry, load order).
 
 A directory without `mod.json` is not a mod.
 
@@ -339,7 +340,7 @@ In:
 Out of v1 (polish later, same index):
 
 - Ratings, comments, screenshot galleries, collections.
-- Fancy dependency solver UI.
+- Fancy dependency solver UI (there is no `dependencies` field in v1).
 - A separate website (optional consumer of the index).
 - Publishing from inside DRHL (authors still PR to the index).
 
@@ -362,7 +363,7 @@ The launcher Mods page is the v1 catalog, not a permanent placeholder.
 ### Game
 
 - Parse `--mods-dir` from `Sys.args()` in the constructor (like `--fps`). Without the flag, load nothing. Read `enabled.json`.
-- Create the hxScript `Environment`, load modules, compile (`Compiler.compile`) before `onInit`, interpret what was skipped.
+- Create **one** hxScript `Environment` per enabled mod, load that mod's modules, `Compiler.compile(env)` before `onInit`, interpret what was skipped. Do not share script types across mods.
 - Call [lifecycle](#lifecycle): `onInit` once at end of `onInvoke`, `onReady` after GM/timelines/library, gameplay events when heroes/floors appear, `onDispose` on shutdown.
 - Isolate errors: a throwing mod must not take down the whole boot.
 
@@ -391,7 +392,9 @@ Intended game build flags:
 -D hxscript_sandbox
 ```
 
-The compiled path is not automatic: the host must call `Compiler.compile` and wire `Compiler.ambient` / `Compiler.statics` (hxScript trap: interpreter ambients are not the compiler's).
+The compiled path is not automatic: the host must call `Compiler.compile(env)` **for each mod's `Environment`** and wire `Compiler.ambient` / `Compiler.statics` on that env (hxScript trap: interpreter ambients are not the compiler's).
+
+**Isolation (v1):** one `Environment` per mod. hxScript cannot share a short type name across modules in the same world (`entry: "Main"` in two mods would collide). A scripted class referenced from another world also stays interpreted. So worlds are not shared, and `mod.json` has no `dependencies`. Mods talk to the host (facade, events, `replace` registry), not to each other's types.
 
 Bytecode cache: hxScript can hand back cppia bytes. A disk cache (invalidated when the game version, `mod.json`, or sources change) is a future optimization, not a requirement for mods to be "compiled".
 
@@ -416,7 +419,7 @@ Out of scope for this documentation pass; needed before a real host:
 1. hxScript dependency (`haxelib` git or a pin in `project.xml`).
 2. hxcpp: `submodules/hxcpp` does not yet include the cppia fixes from [`MeguminBOT/hxcpp`, `patched-hxscript` branch](https://github.com/MeguminBOT/hxcpp/tree/patched-hxscript). Without them, a compiled script can disagree with the same script interpreted. Interpreting is not blocked.
 3. `-D hxscript_cppia` and `-D scriptable` in the cpp build.
-4. `src/modding/` host: parse `--mods-dir` in the constructor; `onInit` once at end of `onInvoke`; `onReady` after the JSON files; plus `heroSpawned` / `heroDespawned` / `floorEnter` / `floorExit`. For `replace`, `-D hxscript_host` (or bridge packages) must include the host types we mark `@:scriptable`, not only `modding`.
+4. `src/modding/` host: parse `--mods-dir` in the constructor; one `Environment` per mod; `onInit` once at end of `onInvoke`; `onReady` after the JSON files; plus `heroSpawned` / `heroDespawned` / `floorEnter` / `floorExit`. For `replace`, `-D hxscript_host` (or bridge packages) must include the host types we mark `@:scriptable`, not only `modding`.
 5. Launcher side: index fetch, catalog install (hash-verify), `enabled.json`, `--mods-dir`, scan, enable, order — no destructive overlay.
 6. Index repository (separate from DRH / DRHL), with PR + CI for new versions.
 
