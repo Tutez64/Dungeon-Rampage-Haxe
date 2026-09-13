@@ -32,6 +32,7 @@ Each row has a status: `open` (not decided), `recommended` (working direction, n
 | Thunderstore / Nexus / itch as mirrors | open | Optional later; must not replace `mod.json` or the index. |
 | Resource overlay rules | open | `Resources/` in a mod is composited at runtime; precedence, SWF vs JSON, and locale merge are not specified yet. |
 | `-D hxscript_sandbox` vs cppia | decided | Interpreter-only blacklist (`Sys` and four `sys.*` types). **Not a security boundary.** cppia has no blacklist. Trust is index review + SHA-256. See [Compilation](#compilation). |
+| Host build (cppia) | decided | Keep Haxe default `-dce std` (stdlib only). Patch vendored hxcpp with hxScript's `apply-hxcpp.py`. Enable the cppia JIT once at startup. First host build uses `-D hxscript_verbose`. See [Compilation](#compilation). |
 
 ## Context
 
@@ -45,7 +46,7 @@ Constraints that shape the rest:
 - Current boot without mods: `DungeonBustersProject` creates `DBFacade`, then `onInvoke` inits Steam and `processArguments`. `LoadingState` later runs service discovery and `preLoadJson` (GameMaster, `library_server.json`, AttackTimeline). With mods, `--mods-dir` is parsed in the constructor from `Sys.args()`; `onInit` runs **once** at the end of `onInvoke`; `onReady` runs after those three JSON files — account, hero, and floor are still missing. Live state arrives later as events. See [Lifecycle](#lifecycle).
 - The game is **fully multiplayer** on official servers. The client folds some int fields from GameMaster, AttackTimeline, and `library_server.json` into `sCode` (sent on dungeon entry). That is not a reason to special-case those paths in the catalog. See [Policy](#policy).
 - Updates replace `Dungeon Rampage Haxe/current/`. Mods must live **outside** that directory.
-- The vendored hxcpp (`submodules/hxcpp`) is not yet the `MeguminBOT/hxcpp` `patched-hxscript` fork required for cppia and the interpreter to agree. See [Technical prerequisites](#technical-prerequisites).
+- The vendored hxcpp (`submodules/hxcpp`) does not yet include hxScript's cppia fixes. Apply them with hxScript's `patches/apply-hxcpp.py` (the `MeguminBOT/hxcpp` `patched-hxscript` branch is the same patch set, not a required remote change). See [Technical prerequisites](#technical-prerequisites).
 
 ## Architecture
 
@@ -435,6 +436,16 @@ Intended game build flags:
 -D hxscript_sandbox
 ```
 
+**DCE:** DRH does not pass `-dce`. Lime's cpp templates do not either (unlike html5 `-dce full`). Haxe's default is **`-dce std`**: unused members of the **standard library** only. Game code, OpenFL, Lime, SteamWrap are not DCE'd. hxScript's `extraParams.hxml` already runs `Keep` so the std types scripts hit by reflection (`IntIterator`, `Reflect`, `Type`, …) survive under `-dce std`. **Do not add `-dce no`** unless a script hits `Cannot call null` on a std member `Keep` does not cover; then prefer `-D hxscript_keep=…` first. A large host also keeps many std members by accident because the game already calls them.
+
+**OpenFL:** DRH vendors OpenFL (`submodules/openfl`) with `<define name="draft" />` and an extra `-cp` so Lime's draft `Context3D` does not overlay. hxScript's OpenFL preset assumes a stock OpenFL. The first host build must use **`-D hxscript_verbose`** and we read what it actually bridged.
+
+**hxcpp:** patch the existing `submodules/hxcpp` with hxScript's `python patches/apply-hxcpp.py --path submodules/hxcpp` rather than switching the submodule to `MeguminBOT/hxcpp`. Until that apply, `-D hxscript_cppia_bool_compat` is the Bool/JIT palliative.
+
+**JIT:** `cpp.cppia.Host.enableJit(true)` once, process-wide, **before** any module loads. hxScript's `modes.md`: if we compile, we jit; it does not add measurable load time. A known hxcpp JIT segfault on `'' + (n == 1)` is in the same patch set.
+
+**Size / time:** `-D scriptable` and autowired OpenFL/Lime bridges are the real binary cost, not DCE. Measure a first cppia-enabled build against current DRH before treating compiled mods as free.
+
 `-D hxscript_sandbox` is kept. Verified in hxScript `Boot.blacklist()`: it adds `Sys`, `sys.io.File`, `sys.io.Process`, `sys.FileSystem`, and `sys.net.Socket` to `Config.blacklist`. Enforcement is `TypeProxy` (the interpreter's `Type`); `hxscript.cppia` never reads the blacklist. OpenFL/Lime types such as `openfl.net.URLLoader`, `openfl.net.Socket`, and `lime.system.System` are bridged and not on that list. Interpreter `Type.createInstance` still goes through the proxy (so the five names stay blocked); cppia uses native `Type`, so it does not.
 
 **Trust model:** index review + artifact SHA-256. The sandbox is a guard against accidental `Sys` / file / process use on the interpreted fallback, not a prison and not something to review "escapes" against.
@@ -464,8 +475,8 @@ Vanilla code will follow DR.
 Out of scope for this documentation pass; needed before a real host:
 
 1. hxScript dependency (`haxelib` git or a pin in `project.xml`).
-2. hxcpp: `submodules/hxcpp` does not yet include the cppia fixes from [`MeguminBOT/hxcpp`, `patched-hxscript` branch](https://github.com/MeguminBOT/hxcpp/tree/patched-hxscript). Without them, a compiled script can disagree with the same script interpreted. Interpreting is not blocked.
-3. `-D hxscript_cppia` and `-D scriptable` in the cpp build.
+2. hxcpp: run hxScript's `patches/apply-hxcpp.py` on `submodules/hxcpp` (same fixes as [`MeguminBOT/hxcpp`, `patched-hxscript`](https://github.com/MeguminBOT/hxcpp/tree/patched-hxscript)). Without them, a compiled script can disagree with the same script interpreted. Interpreting is not blocked. `-D hxscript_cppia_bool_compat` only until the apply.
+3. `-D hxscript_cppia`, `-D scriptable`, and a first build with `-D hxscript_verbose`. Stay on default `-dce std`. Call `cpp.cppia.Host.enableJit(true)` before loading mods.
 4. `src/modding/` host: parse `--mods-dir` in the constructor; one `Environment` per mod; `onInit` once at end of `onInvoke`; `onReady` after the JSON files; plus `heroSpawned` / `heroDespawned` / `floorEnter` / `floorExit`. For `replace`, `-D hxscript_host` (or bridge packages) must include the host types we mark `@:scriptable`, not only `modding`.
 5. Launcher side: index fetch, catalog install (hash-verify), `enabled.json`, `--mods-dir`, scan, enable, order, display `last-run.json` — no destructive overlay.
 6. Index repository (separate from DRH / DRHL), with PR + CI for new versions.
