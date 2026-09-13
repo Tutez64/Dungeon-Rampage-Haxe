@@ -39,6 +39,11 @@ Like the official game, restarting before each new party is recommended because 
 Join the [Discord server](https://discord.gg/VvWbNspZrQ) to discuss DRH and DRH Launcher,
 get update notifications, and see occasional previews.
 
+## Modding
+
+Modding is not implemented yet. The living design document is
+[docs/modding.md](docs/modding.md).
+
 ## Technical overview
 
 DRH is a port of Dungeon Rampage from AS3/AIR
