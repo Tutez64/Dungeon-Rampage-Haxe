@@ -21,6 +21,7 @@ Each row has a status: `open` (not decided), `recommended` (working direction, n
 | Lifecycle | decided | Boot: `onInit` **once** at end of `DungeonBustersProject.onInvoke` (after `processArguments`), `onReady` on `ManagersLoadedEvent`, `onDispose` on shutdown. `api: 1` also freezes `heroSpawned` / `heroDespawned` / `floorEnter` / `floorExit`. See [Lifecycle](#lifecycle). |
 | hxScript `Environment` isolation | decided | **One `Environment` per mod**, `Compiler.compile(env)` per mod. No inter-mod script types in v1; no `dependencies` in `mod.json`. See [Compilation](#compilation). |
 | Checksummed JSON overlay | decided | **No** dedicated warn or block in index, launcher, or host. `sCode` is a weak int-fold; server use unknown; a mismatch would fail dungeon entry, which the author sees. Sideload is already labeled. See [Policy](#policy). |
+| Game → launcher status | decided | `mods/last-run.json`, written by the game when `--mods-dir` is set. Mods page shows it. Not live IPC. See [Last-run report](#last-run-report). |
 | Exact `mod.json` schema | open | Draft below, not frozen. |
 | cppia bytecode cache | open | Future optimization, not a v1 requirement. |
 | Private / offline mode for scripted gameplay | open | Out of scope while DRH only talks to official servers. |
@@ -197,7 +198,7 @@ Later events (vanilla HUD ready, inventory, chat, town enter, account loaded, �
 
 `ModContext`: overlay root, log, `replace`, event subscribe, and the state window (hero/floor wrappers filled after the matching event). Load order follows `enabled.json`.
 
-A throw in `onInit` / `onReady` isolates **that** mod; boot continues. A throw in `onDispose` is logged and ignored. A throw in an event handler isolates that mod for that dispatch.
+A throw in `onInit` / `onReady` isolates **that** mod; boot continues. A throw in `onDispose` is logged and ignored. A throw in an event handler isolates that mod for that dispatch. Outcomes land in [last-run.json](#last-run-report) so the launcher Mods page can show them.
 
 ## Disk layout
 
@@ -211,6 +212,7 @@ Mods live outside `Dungeon Rampage Haxe/current/`, so they survive updates and r
     previous/         # launcher rollback
   mods/
     enabled.json      # launcher-owned: enabled ids, load order
+    last-run.json     # game-owned: last session outcome per mod
     SomeMod/
       mod.json
       src/            # .hx sources
@@ -231,7 +233,7 @@ The launcher writes `<install-dir>/mods/enabled.json`:
 ```json
 {
   "mods": [
-    { "id": "hp-bars" },
+    { "id": "example-hud" },
     { "id": "chat-macros" }
   ]
 }
@@ -244,6 +246,44 @@ On Play it passes **`--mods-dir <absolute path to mods/>`**. The game parses tha
 No `--mods-dir` (double-click the exe in `current/`) → **no mods**. Intentional vanilla.
 
 Debug: the same flag, e.g. `--mods-dir /path/to/mods`. Later optional `--mods-all` (ignore enabled.json, load every `mod.json` in the dir) and `--mod <id>` (extra on top). No environment variables (the launcher already sanitizes env; wrappers like `prime-run` make that channel unreliable).
+
+## Last-run report
+
+The session log already captures stdout. That is not a Mods-page UI. When `--mods-dir` is set, the game writes `<install-dir>/mods/last-run.json` (same folder as `enabled.json`, outside `current/`). Without the flag, it writes nothing.
+
+Draft shape, not frozen:
+
+```json
+{
+  "mods": [
+    {
+      "id": "example-hud",
+      "version": "0.1.0",
+      "status": "ok",
+      "mode": "compiled"
+    },
+    {
+      "id": "broken-replace",
+      "version": "1.0.0",
+      "status": "failed",
+      "mode": "interpreted",
+      "error": "replace overlap on RepeaterWeaponController.onWeaponDown"
+    }
+  ]
+}
+```
+
+| Field | Role |
+| --- | --- |
+| `status` | `ok` / `failed` / `skipped` (id in `enabled.json` but folder or `mod.json` missing) |
+| `mode` | `compiled` or `interpreted` (plus skip reason in `error` when the emitter skipped) |
+| `error` | Present on `failed` / interpreted-with-reason / `replace` overlap. One line; full stack stays in the session log. |
+
+Write after compile + `onInit` (the boot report). Update the same file if a later `replace` conflict happens. A crash before the write leaves the previous run's file; the Mods page should treat it as stale if it wants, not as live IPC.
+
+The launcher reads it when the Mods page is shown (including after Play). That is also where « Overlap → error » becomes visible: error for **that mod**, on the Mods page, not only in a log file.
+
+Out of v1: in-session toasts, a pipe back to a running launcher.
 
 ## `mod.json`
 
@@ -357,6 +397,7 @@ Out of v1 (polish later, same index):
 - Show `uses` as tags; recommend `api`. Warn that `extends` may break on DRH updates and that `replace` may clash.
 - Once, [first-run disclosure](#first-run-disclosure) before the user actually runs with mods.
 - Write `<install-dir>/mods/enabled.json` (ordered ids).
+- After Play, read `last-run.json` and show per-mod `ok` / `failed` / `skipped` (and interpreted-with-reason) on the Mods page.
 - Launch with `--mods-dir` pointing at that folder. Do not pass the id list on the CLI in prod.
 - **Do not compile.** No Haxe toolchain in the launcher.
 
@@ -367,7 +408,7 @@ The launcher Mods page is the v1 catalog, not a permanent placeholder.
 - Parse `--mods-dir` from `Sys.args()` in the constructor (like `--fps`). Without the flag, load nothing. Read `enabled.json`.
 - Create **one** hxScript `Environment` per enabled mod, load that mod's modules, `Compiler.compile(env)` before `onInit`, interpret what was skipped. Do not share script types across mods.
 - Call [lifecycle](#lifecycle): `onInit` once at end of `onInvoke`, `onReady` after GM/timelines/library, gameplay events when heroes/floors appear, `onDispose` on shutdown.
-- Isolate errors: a throwing mod must not take down the whole boot.
+- Isolate errors: a throwing mod must not take down the whole boot. Write [last-run.json](#last-run-report) when `--mods-dir` is set.
 
 Target package (not implemented): `src/modding/`, with `-D hxscript_host=modding`.
 
@@ -426,7 +467,7 @@ Out of scope for this documentation pass; needed before a real host:
 2. hxcpp: `submodules/hxcpp` does not yet include the cppia fixes from [`MeguminBOT/hxcpp`, `patched-hxscript` branch](https://github.com/MeguminBOT/hxcpp/tree/patched-hxscript). Without them, a compiled script can disagree with the same script interpreted. Interpreting is not blocked.
 3. `-D hxscript_cppia` and `-D scriptable` in the cpp build.
 4. `src/modding/` host: parse `--mods-dir` in the constructor; one `Environment` per mod; `onInit` once at end of `onInvoke`; `onReady` after the JSON files; plus `heroSpawned` / `heroDespawned` / `floorEnter` / `floorExit`. For `replace`, `-D hxscript_host` (or bridge packages) must include the host types we mark `@:scriptable`, not only `modding`.
-5. Launcher side: index fetch, catalog install (hash-verify), `enabled.json`, `--mods-dir`, scan, enable, order — no destructive overlay.
+5. Launcher side: index fetch, catalog install (hash-verify), `enabled.json`, `--mods-dir`, scan, enable, order, display `last-run.json` — no destructive overlay.
 6. Index repository (separate from DRH / DRHL), with PR + CI for new versions.
 
 ## Out of scope for this document
