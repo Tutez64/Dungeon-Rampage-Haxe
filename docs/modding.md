@@ -29,7 +29,7 @@ Each row has a status: `open` (not decided), `recommended` (working direction, n
 | Exact index schema / repo URL | open | Draft shape in [Distribution](#distribution). |
 | Thunderstore / Nexus / itch as mirrors | open | Optional later; must not replace `mod.json` or the index. |
 | Resource overlay rules | open | `Resources/` in a mod is composited at runtime; precedence, SWF vs JSON, and locale merge are not specified yet. |
-| `-D hxscript_sandbox` vs cppia | open | Interpreter blacklist may not apply to compiled modules. Confirm before shipping `replace` / any native-speed path. |
+| `-D hxscript_sandbox` vs cppia | decided | Interpreter-only blacklist (`Sys` and four `sys.*` types). **Not a security boundary.** cppia has no blacklist. Trust is index review + SHA-256. See [Compilation](#compilation). |
 
 ## Context
 
@@ -89,7 +89,7 @@ Compiling "to actually get the performance" means `Compiler.compile(env)` **per 
 
 **How you hook** is `uses` (`api` / `extends` / `replace`). That is the catalog taxonomy. A three-way `layers` field (client / data / gameplay) was dropped: it is not clear (FOV is “client” and a large advantage; a mana-check patch sits in a weapon controller), and it duplicated the fairness debate we already closed.
 
-**Integrity (targeted, not a layer):** `Resources/Levels/DB_GameMaster.json`, `Resources/Combat/AttackTimeline.json`, and `Resources/Levels/library_server.json` feed `mSecurityGM` / `mSecurityTL` / `mSecuritySL`. Overlaying them can trip `blockCheater()` / `LogCheater` and brick launch. Prefer **detecting those paths in the zip** (index CI + launcher) over a self-declared tag. Warn; do not moralize. Index / review still refuses or yanks malware, sandbox escapes, undeclared checksum-table patches that make the game unlaunchable, and combat bots / protocol spoof if we do not want to host that. Sideload remains for everything else.
+**Integrity (targeted, not a layer):** `Resources/Levels/DB_GameMaster.json`, `Resources/Combat/AttackTimeline.json`, and `Resources/Levels/library_server.json` feed `mSecurityGM` / `mSecurityTL` / `mSecuritySL`. Overlaying them can trip `blockCheater()` / `LogCheater` and brick launch. Prefer **detecting those paths in the zip** (index CI + launcher) over a self-declared tag. Warn; do not moralize. Index / review still refuses or yanks malware, undeclared checksum-table patches that make the game unlaunchable, and combat bots / protocol spoof if we do not want to host that. Sideload remains for everything else. The hxScript sandbox is not a review criterion: it is not a jail (see [Compilation](#compilation)).
 
 ## First-run disclosure
 
@@ -97,7 +97,7 @@ DRHL shows this **once**, stored in launcher config, the first time the user wou
 
 What to make clear:
 
-1. **Code in-process.** Mods are Haxe/cppia inside the game, not a skin pack. Index review is human, not a proof. Sideload is weaker. The sandbox is not a jail (especially once cppia is confirmed).
+1. **Code in-process.** Mods are Haxe/cppia inside the game, not a skin pack. Index review is human, not a proof. Sideload is weaker. The sandbox is a mistake guard on the interpreter fallback, not a jail; compiled mods are not blacklisted.
 2. **Official servers.** Same servers as vanilla DRH. Patching checksummed tables can **fail to launch**. No promise about bans either way.
 3. **Updates.** `api` mods follow `api: N`. `extends` / `replace` can break on a DRH update with no `api` bump. A modded session is not supported like vanilla.
 4. **Several mods.** `replace` on the same rewritten surface can clash. Load order is in the launcher.
@@ -369,7 +369,7 @@ The launcher Mods page is the v1 catalog, not a permanent placeholder.
 
 Target package (not implemented): `src/modding/`, with `-D hxscript_host=modding`.
 
-Intended sandbox: `-D hxscript_sandbox` (no `Sys`, files, or sockets from a mod).
+Keep `-D hxscript_sandbox` as an interpreter footgun guard (`Sys` / a few `sys.*` types). It is **not** a security boundary: cppia ignores it, and OpenFL/Lime I/O stay reachable. Trust is index review + SHA-256. See [Compilation](#compilation).
 
 ### Mod author
 
@@ -391,6 +391,10 @@ Intended game build flags:
 -D hxscript_host=modding
 -D hxscript_sandbox
 ```
+
+`-D hxscript_sandbox` is kept. Verified in hxScript `Boot.blacklist()`: it adds `Sys`, `sys.io.File`, `sys.io.Process`, `sys.FileSystem`, and `sys.net.Socket` to `Config.blacklist`. Enforcement is `TypeProxy` (the interpreter's `Type`); `hxscript.cppia` never reads the blacklist. OpenFL/Lime types such as `openfl.net.URLLoader`, `openfl.net.Socket`, and `lime.system.System` are bridged and not on that list. Interpreter `Type.createInstance` still goes through the proxy (so the five names stay blocked); cppia uses native `Type`, so it does not.
+
+**Trust model:** index review + artifact SHA-256. The sandbox is a guard against accidental `Sys` / file / process use on the interpreted fallback, not a prison and not something to review "escapes" against.
 
 The compiled path is not automatic: the host must call `Compiler.compile(env)` **for each mod's `Environment`** and wire `Compiler.ambient` / `Compiler.statics` on that env (hxScript trap: interpreter ambients are not the compiler's).
 
