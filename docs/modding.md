@@ -34,7 +34,7 @@ Each row has a status: `open` (not decided), `recommended` (working direction, n
 | `-D hxscript_sandbox` vs cppia | decided | Interpreter-only blacklist (`Sys` and four `sys.*` types). **Not a security boundary.** cppia has no blacklist. Trust is index review + SHA-256. See [Compilation](#compilation). |
 | Host build (cppia) | decided | Keep Haxe default `-dce std` (stdlib only). Patch vendored hxcpp with hxScript's `apply-hxcpp.py`. Enable the cppia JIT once at startup. First host build uses `-D hxscript_verbose`. See [Compilation](#compilation). |
 | Mod `id` and zip extract | decided | `id` is `^[a-z0-9][a-z0-9-]{1,62}[a-z0-9]$` (3–64, kebab, no leading/trailing hyphen). Zip install reuses the game-archive extractor (no zip-slip). No uncompressed size cap. See [`mod.json`](#modjson). |
-| `drh` in `mod.json` | decided | Closed string of tag numbers, no `V`, no `>=`: `"20"`, `"20,21"`, or `"20-22"`. Required if `uses` has `extends` / `replace`; optional for `api`-only (forward compat is `api: N`). See [`mod.json`](#modjson). |
+| `drh` in `mod.json` | decided | **Always required.** Closed string of tag numbers, no `V`, no `>=`: `"20"`, `"20,21"`, or `"20-22"`. Additive facade growth stays `api: N`; `drh` is the floor for new wrappers. Mismatch **warns**, does not block. See [`mod.json`](#modjson). |
 
 ## Context
 
@@ -150,7 +150,7 @@ So: very powerful for "I am the weapon controller", optional, explicit, and conf
 Target rules:
 
 - Only `modding.*` wrappers are the **stable** API. `facade.DBFacade`, `actor.*`, `combat.*`, and `uI.*` are host types: usable via `extends` / `replace`, not covered by `api` compatibility.
-- Version the facade (`api: 1`) **independently** of the DRH tag (`V20`).
+- Version the facade (`api: 1`) **independently** of the DRH tag (`V20`). **Adding** wrappers without changing existing ones stays `api: 1` (V14 ships the first surface, V15 can grow it). Mods that need the new bits set `drh` so the smallest tag in the set is that release. Bump `api` only when an existing wrapper's contract breaks (rename, remove, behavior change). A bump to `api: 2` would force every V14-only HUD to update for no reason.
 - A Starling landing that breaks the **wrapper** contract is an API bump; internals moving behind wrappers is not.
 - Official examples in the repo for all three kinds, rebuilt on every bump.
 
@@ -312,7 +312,7 @@ Draft. Evolving schema, not frozen. Shared launcher/game contract.
 | `version` | Mod version |
 | `author` | Author |
 | `api` | `modding.*` contract version. **Required** if `uses` contains `api`; omit when the mod is only `extends` / `replace`. |
-| `drh` | DRH tag numbers this **artifact** supports (no `V` prefix, no open `>=`). `"20"` (one tag), `"20,21"` (list), `"20-22"` (closed inclusive range). **Required** if `uses` contains `extends` or `replace`. Optional for `api`-only mods: they follow `api: N` across tags. The launcher: installed tag in the set → OK; older → too old; newer → OK for `api`-only, **warn** for `extends` / `replace`. |
+| `drh` | **Always required.** Tag numbers this artifact was built/tested for (no `V`, no `>=`). `"20"`, `"20,21"`, or `"20-22"` (closed, inclusive). The launcher never blocks Play or enablement on a `drh` mismatch; it **warns**: installed tag **older** than the set's minimum (missing wrappers / host types) — all kinds; installed tag **newer** than the set's maximum — `extends` / `replace` only (`api`-only trusts `api: N` forward). |
 | `entry` | hxScript entry class in **that** mod's `Environment` (e.g. `Main` extends `modding.Mod`). Short names do not collide across mods. |
 | `uses` | One or more of `api`, `extends`, `replace` (see [Mod kinds](#mod-kinds)) |
 
@@ -376,7 +376,7 @@ Minimal and functional, not a store. Same fetch the future site would use.
 In:
 
 - Fetch and cache the index (same defensive pattern as game updates: size, hash, no silent third-party redirects).
-- List available mods: name, version, author, short description, compat vs installed DRH, `uses`. `api`-only: `api: N`. `extends` / `replace`: `drh` closed set; warn if the install is newer.
+- List available mods: name, version, author, short description, compat vs installed DRH, `uses`. Warn on `drh` mismatch (older: all kinds; newer: `extends` / `replace` only). Do not block.
 - Install: download zip → verify SHA-256 → extract under `mods/<id>/` with the same zip-slip rules as game archives (directory name = `id`; sideload folders may differ, resolved via `mod.json`).
 - Show installed vs listed, enable / disable, load order.
 - Write `enabled.json` in the mods folder (ordered ids).
@@ -398,7 +398,7 @@ Out of v1 (polish later, same index):
 - Create / open `<install-dir>/mods/`.
 - Fetch the index and present the v1 catalog above.
 - Scan directories that have a `mod.json`.
-- Enable / disable, load order. For `api` mods, compat vs installed DRH is `api: N`. For `extends` / `replace`, `drh` must include the installed tag (warn if the install is newer).
+- Enable / disable, load order. `drh` is required on every mod. Warn if the installed tag is older than the set (all kinds) or newer (`extends` / `replace` only). Never refuse to enable or Play for that.
 - Show `uses` as tags; recommend `api`. Warn that `extends` may break on DRH updates and that `replace` may clash.
 - Once, [first-run disclosure](#first-run-disclosure) before the user actually runs with mods.
 - Write `<install-dir>/mods/enabled.json` (ordered ids).
@@ -471,8 +471,8 @@ This is **not**:
 Vanilla code will follow DR.
 
 - **`api` mods** must not depend on internal packages. Wrappers stay the contract. Internals can move with no `api` bump if wrappers hold; a wrapper break **is** a bump, with official examples updated.
-- **`extends` / `replace` mods** *do* depend on host types. They can break on Starling without an `api` bump; that is the cost of those kinds. `drh` in `mod.json` is the lever to warn or refuse them.
-- `mod.json` declares `uses`, and when needed `api` / `drh`, so launcher and game can refuse or warn. `api` mods track the facade; `extends` / `replace` track `drh` tags.
+- **`extends` / `replace` mods** *do* depend on host types. They can break on Starling without an `api` bump; that is the cost of those kinds. `drh` is how the launcher warns (not a hard refuse).
+- `mod.json` always has `drh`. `api` is present when `uses` contains `api`. The launcher warns on mismatch; the game still tries to load (failures go to `last-run.json`).
 
 ## Technical prerequisites
 
