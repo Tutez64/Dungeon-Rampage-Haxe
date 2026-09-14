@@ -33,6 +33,7 @@ Each row has a status: `open` (not decided), `recommended` (working direction, n
 | Resource overlay rules | open | `Resources/` in a mod is composited at runtime; precedence, SWF vs JSON, and locale merge are not specified yet. |
 | `-D hxscript_sandbox` vs cppia | decided | Interpreter-only blacklist (`Sys` and four `sys.*` types). **Not a security boundary.** cppia has no blacklist. Trust is index review + SHA-256. See [Compilation](#compilation). |
 | Host build (cppia) | decided | Keep Haxe default `-dce std` (stdlib only). Patch vendored hxcpp with hxScript's `apply-hxcpp.py`. Enable the cppia JIT once at startup. First host build uses `-D hxscript_verbose`. See [Compilation](#compilation). |
+| Mod `id` and zip extract | decided | `id` is `^[a-z0-9][a-z0-9-]{1,62}[a-z0-9]$` (3–64, kebab, no leading/trailing hyphen). Zip install reuses the game-archive extractor (no zip-slip). No uncompressed size cap. See [`mod.json`](#modjson). |
 
 ## Context
 
@@ -276,7 +277,7 @@ Draft shape, not frozen:
 
 | Field | Role |
 | --- | --- |
-| `status` | `ok` / `failed` / `skipped` (id in `enabled.json` but folder or `mod.json` missing) |
+| `status` | `ok` / `failed` / `skipped` (id in `enabled.json` but folder, `mod.json`, or valid `id` missing) |
 | `mode` | `compiled` or `interpreted` (plus skip reason in `error` when the emitter skipped) |
 | `error` | Present on `failed` / interpreted-with-reason / `replace` overlap. One line; full stack stays in the session log. |
 
@@ -305,7 +306,7 @@ Draft. Evolving schema, not frozen. Shared launcher/game contract.
 
 | Field | Role |
 | --- | --- |
-| `id` | Stable identifier, unique among installed mods |
+| `id` | Stable identifier and install folder name. Must match `^[a-z0-9][a-z0-9-]{1,62}[a-z0-9]$` (3–64 chars, lowercase kebab, hyphen only in the middle). Display name stays in `name`. |
 | `name` | Display name |
 | `version` | Mod version |
 | `author` | Author |
@@ -315,6 +316,8 @@ Draft. Evolving schema, not frozen. Shared launcher/game contract.
 | `uses` | One or more of `api`, `extends`, `replace` (see [Mod kinds](#mod-kinds)) |
 
 Load order is owned by the launcher, not by the mod. There is **no** `dependencies` field in v1: mods do not import each other's script types. They compose only through the host (overlay, events, `replace` registry, load order).
+
+The launcher refuses to install (index or local zip) if `id` fails that regex, and extracts to `mods/<id>/` with the **same** path rules as game releases (`enclosed_name` / `safe_relative_path`: no `..`, no absolute paths, files and directories only). There is **no** uncompressed size cap: index artifacts already have a declared download size + SHA-256; sideload is a file the user picked. A hand-copied folder whose directory name differs from `id` can still be scanned via `mod.json`, but a bad `id` is skipped (game) or not treated as a mod (launcher).
 
 A directory without `mod.json` is not a mod.
 
@@ -373,7 +376,7 @@ In:
 
 - Fetch and cache the index (same defensive pattern as game updates: size, hash, no silent third-party redirects).
 - List available mods: name, version, author, short description, compat vs installed DRH, `uses`.
-- Install: download zip → verify SHA-256 → extract under `mods/<id>/` (directory name = `id`; sideload folders may differ, resolved via `mod.json`).
+- Install: download zip → verify SHA-256 → extract under `mods/<id>/` with the same zip-slip rules as game archives (directory name = `id`; sideload folders may differ, resolved via `mod.json`).
 - Show installed vs listed, enable / disable, load order.
 - Write `enabled.json` in the mods folder (ordered ids).
 - Offer update when the index has a newer artifact for the same `id`.
@@ -406,7 +409,7 @@ The launcher Mods page is the v1 catalog, not a permanent placeholder.
 
 ### Game
 
-- Parse `--mods-dir` from `Sys.args()` in the constructor (like `--fps`). Without the flag, load nothing. Read `enabled.json`.
+- Parse `--mods-dir` from `Sys.args()` in the constructor (like `--fps`). Without the flag, load nothing. Read `enabled.json`. Skip an entry whose `id` is not the kebab regex above.
 - Create **one** hxScript `Environment` per enabled mod, load that mod's modules, `Compiler.compile(env)` before `onInit`, interpret what was skipped. Do not share script types across mods.
 - Call [lifecycle](#lifecycle): `onInit` once at end of `onInvoke`, `onReady` after GM/timelines/library, gameplay events when heroes/floors appear, `onDispose` on shutdown.
 - Isolate errors: a throwing mod must not take down the whole boot. Write [last-run.json](#last-run-report) when `--mods-dir` is set.
