@@ -13,9 +13,9 @@ Each row has a status: `open` (not decided), `recommended` (working direction, n
 | Fairness / catalog morals | decided | No fairness police. Index does not reject mods for in-game advantage. See [Policy](#policy). |
 | `layers` (client / data / gameplay) | decided | **Dropped.** That split is the same muddy line as fair play. How you hook is `uses`. See [Policy](#policy). |
 | First-run mods disclosure | decided | Once in DRHL, before the first launch or first enable with mods. `--play` with a non-empty `enabled.json` and no confirmation yet opens the full UI (same filet as updates). Not an EULA scare. See [First-run disclosure](#first-run-disclosure). |
-| API surface | decided | **C + F:** stable documented `modding.*` wrappers (recommended) plus host `extends` / `replace` for what the facade cannot do yet. First *usable* release wants both; `replace` can wait on hxScript or a DRH factory. See [API surface](#api-surface). |
-| Mod kinds (`api` / `extends` / `replace`) | decided | Declared in `mod.json`. Recommend `api`. `extends` and especially `replace` have version and inter-mod costs. See [Mod kinds](#mod-kinds). |
-| Virtual `new` for `@:scriptable` types | recommended | Opt-in. `extend` ≠ replace. Disjoint `replace` merge in hxScript, not DRH. MeguminBOT (Discord): good idea, will experiment, PRs welcome. Needed for a comfortable `replace` story; not a blocker to start the facade. See [API surface](#api-surface). |
+| API surface | decided | **C + F in v1.** Facade `modding.*` (recommended) plus host `extends` / `replace`. Max power is a v1 foundation. See [API surface](#api-surface). |
+| hxScript fork | decided | Lasting dependency: a **fork** of hxScript with package-wide scriptable bases and explicit `replace`. We keep the fork even if those features land upstream. See [API surface](#api-surface). |
+| Mod kinds (`api` / `extends` / `replace`) | decided | Declared in `mod.json`. Recommend `api`. `extends` / `replace` have version and inter-mod costs; both ship in v1. See [Mod kinds](#mod-kinds). |
 | How the enabled mod list reaches the game | decided | `<install-dir>/mods/enabled.json` (order = load order) plus `--mods-dir <absolute path>`. Game parses `--mods-dir` from `Sys.args()` in the constructor, like `--fps`. No prod CLI id list. Naked exe without the flag loads no mods. See [Passing the list](#passing-the-list). |
 | Scanning mods outside the launcher (debug) | decided | Same `--mods-dir`. Optional later: `--mods-all`, `--mod <id>`. No implicit scan next to the exe. |
 | Lifecycle | decided | Boot: `onInit` **once** at end of `DungeonBustersProject.onInvoke` (after `processArguments`), `onReady` on `ManagersLoadedEvent`, `onDispose` on shutdown. `api: 1` also freezes `heroSpawned` / `heroDespawned` / `floorEnter` / `floorExit`. See [Lifecycle](#lifecycle). |
@@ -40,7 +40,7 @@ Each row has a status: `open` (not decided), `recommended` (working direction, n
 
 Dungeon Rampage Haxe (DRH) is a Haxe/OpenFL port of Dungeon Rampage, compiled natively with **hxcpp**. Official Dungeon Rampage is still moving (art overhaul, Starling for 1.0), so DRH internals will keep changing.
 
-The chosen script runtime is [hxScript](https://github.com/MeguminBOT/hxscript): mods written in Haxe, compiled **in-process** to cppia on hxcpp, with no Haxe toolchain on the player's machine.
+The chosen script runtime is a **fork** of [hxScript](https://github.com/MeguminBOT/hxscript): mods written in Haxe, compiled **in-process** to cppia on hxcpp, with no Haxe toolchain on the player's machine. Stock hxScript has neither package-wide `@:scriptable` nor `replace`; both are v1 work in the fork. We keep using the fork even if those features land upstream, so later changes stay on our side.
 
 Constraints that shape the rest:
 
@@ -82,7 +82,7 @@ flowchart LR
   api --> gameCore
 ```
 
-Core idea: the launcher does not compile. It discovers mods, keeps the enabled set and load order, then passes them to the game. The game gives each mod its own hxScript `Environment`, compiles that world to cppia when it can, and falls back to the interpreter when a module is skipped. Mods do not share script types. The **recommended** path is the `modding.*` facade. `extends` / `replace` may reach host types; that is an explicit, costlier kind, not the default contract.
+Core idea: the launcher does not compile. It discovers mods, keeps the enabled set and load order, then passes them to the game. The game gives each mod its own hxScript `Environment`, compiles that world to cppia when it can, and falls back to the interpreter when a module is skipped. Mods do not share script types. The **recommended** path is the `modding.*` facade. `extends` / `replace` reach host types through the hxScript fork; that is an explicit, costlier kind, not the default contract.
 
 Discovery is the same contract: an index of **artifacts**, consumed in v1 by a small DRHL catalog. A later website can read that index without changing how authors publish.
 
@@ -115,37 +115,21 @@ Confirm to proceed; do not block browsing the catalog.
 
 ## API surface
 
-hxScript is ordinary Haxe in-process, not a JS-style "patch any function" runtime. A small first API does **not** mean a mod can still rewrite the mana check by magic.
+hxScript is ordinary Haxe in-process, not a JS-style "patch any function" runtime. `private` / `inline` / `final` methods and a comparison buried inside a compiled function stay out of reach. Overlay / HUD mods need far less: a parent to draw on and a way to read state.
 
-What a script can do without much `modding.*`:
+**v1 is C + F.** The facade is the recommended path. Host `extends` / `replace` exist so a mod can still reach what wrappers do not cover. That power is a v1 foundation, not a later add-on. Both pieces land in a **fork of hxScript**, not as DRH stamps or factories. We pin that fork for good: even if the same features land upstream (not a given, and not soon), staying on the fork is simpler when we need further changes.
 
-- Declare its own classes, use OpenFL/Lime types (hxScript wires those when they are in the game build). HUD / extra `DisplayObject`s are realistic if the host hands a parent (stage, HUD layer).
-- `import` host types that exist in the binary and call **public** members on instances it actually holds.
-- `extend` a compiled class only if that class is `@:scriptable`. No `@:scriptable` → no override of native methods.
-- Not: `private` / `inline` / `final` native methods, macros, or swapping one comparison inside a compiled function.
-
-So a "mana cost uses the base value" fix is easy **as a reviewed mod** only if that check is a virtual public method on a scriptable type, or the host adds a hook. With a poor API and no scriptable combat class, hxScript cannot reach into that `if`. Overlay / HUD / macro mods need far less: a place to draw and a way to read state.
-
-**Decided for the first usable release: C + F.**
-
-- **C — stable facade.** Package `modding.*` only: boot lifecycle (`onInit` / `onReady` / `onDispose`), gameplay events (`heroSpawned` / `heroDespawned` / `floorEnter` / `floorExit`), overlay/HUD root, input, and a **window on live state through wrappers** (`ModHero`, floor, inventory, camera, chat — names TBD). Not raw `HeroGameObject`. Wrappers that need a hero or floor stay empty until the matching event. Wrappers + those events are what `api: 1` promises across DRH tags; Starling may reimplement them without bumping `api` if the wrapper contract holds. This is the recommended path and the one that composes with other mods.
-- **F — host types.** `@:scriptable` on game classes plus, when it lands, virtual `new` / explicit `replace`. Until then, DRH can use a hand-written `ModHost.create` for a few types. This is the escape hatch while the facade is thin, especially early on.
+- **C — stable facade.** Package `modding.*` only: boot lifecycle (`onInit` / `onReady` / `onDispose`), gameplay events (`heroSpawned` / `heroDespawned` / `floorEnter` / `floorExit`), overlay/HUD root, input, and a **window on live state through wrappers** (`ModHero`, floor, inventory, camera, chat — names TBD). Not raw `HeroGameObject`. Wrappers that need a hero or floor stay empty until the matching event. Wrappers + those events are what `api: 1` promises across DRH tags; Starling may reimplement them without bumping `api` if the wrapper contract holds.
+- **F — host types (hxScript fork).** Two features, both required for v1:
+  1. **General `@:scriptable`.** Packages named by `-D hxscript_host` are bridged wholesale (not `final` / `extern` / `interface` / `private`). DRH lists its own packages (`actor`, `combat`, `facade`, `uI`, `modding`, …). Out: OpenFL/Lime (already preset-bridged), vendored `box2D` / `org` / `com`, `generatedCode`, `_assets`. Opt-out: `final`. (`-D scriptable` is hxcpp's cppia flag; it does not generate extend bridges.) Cost is one generated override per inherited non-inline method; if the first cppia build is too fat, drop a package or mark hot types `final`.
+  2. **`replace`.** Explicit `replace(HostClass, Sub)` so host `new HostClass(...)` constructs the subclass. `extend` ≠ replace: a helper `class HudIcon extends Sprite` must not steal every OpenFL `new Sprite()`. Never auto-replace OpenFL/Lime. Disjoint-method merge lives in hxScript; DRH just calls `replace` and gets one class or a conflict.
 
 Do not hand out internal instances as the “stable API”. A HUD that peeks `actor.HeroGameObject` is an `extends`-kind mod, not an `api` one, even if it only reads fields.
 
-**Virtual `new` (opt-in, recommended / contrib):** a compile-time rewrite so host `new RepeaterWeaponController(...)` goes through a registry. Combined with `@:scriptable`, a registered subclass is what actually runs. It must **not** be hxScript's default: `@:scriptable` today only means scripts *may* extend. Turning it on globally would break `class HudIcon extends Sprite` by replacing every OpenFL `new Sprite()`.
+`replace` rules:
 
-MeguminBOT (hxScript, Discord) called the idea good, will play with it, and welcomed a PR as a second direction. Start the facade without waiting. Ship `replace` when the lib (or a DRH factory) exists — there is time; the first usable release should include it, not block on it to begin work. If we PR: smallest spike first (flag + explicit `replace` + tests). Disjoint-method merge is a follow-up.
-
-Rules if we enable it for DRH:
-
-- Off by default in hxScript (define / separate meta such as `@:scriptReplaceable`, or a host flag). A major hxScript version that flips the default would be the other way to signal the break.
-- **Register explicitly.** The subclass does nothing to host `new` until the mod says so, e.g. `replace(RepeaterWeaponController, BuggyRepeater)` or a flag on that class. Any number of mods may `extend RepeaterWeaponController` for their own types (`new MyHelper()`, extra behaviour they instantiate themselves). Only **replace** steals vanilla construction. `class HudIcon extends Sprite` stays a HUD widget; it must not become every `new Sprite()` in OpenFL.
-- Never auto-replace OpenFL/Lime types even if they are bridged.
-- **Replace occupies what it actually rewrites, not the whole vanilla class.** Any number of mods may `extend` without `replace`. Several `replace` on the same base are OK if their rewritten surface does not overlap (different `override` methods, different fields, at most one `new`). Overlap → error or explicit priority. Residual risk: `A.update` can call `this.onWeaponDown()` and hit `B`'s override on the **same** instance (shared `this` / fields). That is tighter than calling into another type that a different mod replaced, but it is the same family of surprise. We accept it to keep the lock as small as the edit. A wrap/`callNext` chain is still the honest way to *intentionally* stack on one method. Out of scope to prove disjoint `this` use statically.
-- **Merging disjoint replacers belongs in hxScript** (or whatever implements `replace`), not in DRH. The host does not see method bodies in a form it can weave; duplicating the parser/emitter just to concatenate two subclasses would be worse than writing factories by hand. DRH should only call `replace` twice and get either one effective class or a conflict.
-
-So: very powerful for "I am the weapon controller", optional, explicit, and conflicts are a catalog/load-order problem, not a silent merge.
+- Off by default: a type is replaceable because a mod registered it, not because it is scriptable.
+- Any number of mods may `extend` without `replace`. Several `replace` on the same base are OK if rewritten methods/fields/`new` do not overlap. Overlap → error or explicit priority. Residual risk: `A.update` can call `this.onWeaponDown()` and hit `B`'s override on the same instance. A wrap/`callNext` chain is how you *intentionally* stack one method. Out of scope to prove disjoint `this` use statically.
 
 Target rules:
 
@@ -162,7 +146,7 @@ A mod declares how it talks to the game. Recommend **`api`**. The other two exis
 | --- | --- | --- | --- |
 | `api` | Uses only `modding.*` (wrappers, events, overlay root). OpenFL/Lime for drawing on that root is OK; `actor.*` / `combat.*` / `facade.*` are not. | Tied to `api` in `mod.json`. Same or backward-compatible facade → expected to keep working across DRH tags. | Best. No `replace` occupancy. |
 | `extends` | Subclasses or calls **host** types (`actor.*`, `combat.*`, …) but does **not** `replace` vanilla `new`. Helpers, `new MyRepeater()`, reading public members of internals. | Tied to those class/method names. Starling / conversions can break it even if `api` is unchanged. | Usually fine with others: does not steal host construction. Still shares live objects with a `replace` on the same type (`is RepeaterWeaponController` remains true). |
-| `replace` | Explicit `replace(HostClass, Sub)` (or DRH factory). Host `new HostClass(...)` becomes the subclass (merge if rewritten methods/fields/`new` are disjoint). | Same host-type fragility as `extends`, plus construction. | Conflicts when rewritten surfaces overlap. One occupancy per method/field/`new`. |
+| `replace` | Explicit `replace(HostClass, Sub)` at `onInit`. Host `new HostClass(...)` becomes the subclass (hxScript fork; merge if rewritten methods/fields/`new` are disjoint). | Same host-type fragility as `extends`, plus construction. | Conflicts when rewritten surfaces overlap. One occupancy per method/field/`new`. |
 
 `extends` is the middle: more power than the facade, no lock on vanilla `new`, but **not** the stable contract.
 
@@ -418,7 +402,7 @@ The launcher Mods page is the v1 catalog, not a permanent placeholder.
 - Call [lifecycle](#lifecycle): `onInit` once at end of `onInvoke`, `onReady` after GM/timelines/library, gameplay events when heroes/floors appear, `onDispose` on shutdown.
 - Isolate errors: a throwing mod must not take down the whole boot. Write [last-run.json](#last-run-report) when `--mods-dir` is set. Log one `Logger.info` line per mod at load (`id`, `version`, `uses`, compiled vs interpreted).
 
-Target package (not implemented): `src/modding/`, with `-D hxscript_host=modding`.
+Target package (not implemented): `src/modding/`. `-D hxscript_host` names every DRH-owned package under `src/` (including `modding`). The fork bridges those packages; DRH does not annotate each class.
 
 Keep `-D hxscript_sandbox` as an interpreter footgun guard (`Sys` / a few `sys.*` types). It is **not** a security boundary: cppia ignores it, and OpenFL/Lime I/O stay reachable. Trust is index review + SHA-256. See [Compilation](#compilation).
 
@@ -433,13 +417,13 @@ Keep `-D hxscript_sandbox` as an interpreter footgun guard (`Sys` / a few `sys.*
 
 hxScript parses `.hx` at runtime. On hxcpp, a module can become [cppia](https://haxe.org/manual/target-cppia.html) loaded as a real class. The interpreter stays the default and the safety net: anything the emitter cannot express is skipped with a reason and keeps running interpreted.
 
-Intended game build flags:
+Intended game build flags (the `hxscript` lib is **our fork**, not stock `MeguminBOT/hxscript`):
 
 ```text
 -lib hxscript
 -D hxscript_cppia
 -D scriptable
--D hxscript_host=modding
+-D hxscript_host=<DRH-owned packages>
 -D hxscript_sandbox
 ```
 
@@ -451,7 +435,7 @@ Intended game build flags:
 
 **JIT:** `cpp.cppia.Host.enableJit(true)` once, process-wide, **before** any module loads. hxScript's `modes.md`: if we compile, we jit; it does not add measurable load time. A known hxcpp JIT segfault on `'' + (n == 1)` is in the same patch set.
 
-**Size / time:** `-D scriptable` and autowired OpenFL/Lime bridges are the real binary cost, not DCE. Measure a first cppia-enabled build against current DRH before treating compiled mods as free.
+**Size / time:** `-D scriptable`, autowired OpenFL/Lime bridges, and the fork's package-wide host bridges (one override per inherited method) are the real binary cost, not DCE. Measure a first cppia-enabled build against current DRH before treating compiled mods as free.
 
 `-D hxscript_sandbox` is kept. Verified in hxScript `Boot.blacklist()`: it adds `Sys`, `sys.io.File`, `sys.io.Process`, `sys.FileSystem`, and `sys.net.Socket` to `Config.blacklist`. Enforcement is `TypeProxy` (the interpreter's `Type`); `hxscript.cppia` never reads the blacklist. OpenFL/Lime types such as `openfl.net.URLLoader`, `openfl.net.Socket`, and `lime.system.System` are bridged and not on that list. Interpreter `Type.createInstance` still goes through the proxy (so the five names stay blocked); cppia uses native `Type`, so it does not.
 
@@ -481,10 +465,10 @@ Vanilla code will follow DR.
 
 Out of scope for this documentation pass; needed before a real host:
 
-1. hxScript dependency (`haxelib` git or a pin in `project.xml`).
+1. Pin the **hxScript fork** as the lasting `hxscript` dependency (package-wide `@:scriptable` + `replace`). Stock `MeguminBOT/hxscript` is what we branch from; we do not switch back to it if the same features land there.
 2. hxcpp: run hxScript's `patches/apply-hxcpp.py` on `submodules/hxcpp` (same fixes as [`MeguminBOT/hxcpp`, `patched-hxscript`](https://github.com/MeguminBOT/hxcpp/tree/patched-hxscript)). Without them, a compiled script can disagree with the same script interpreted. Interpreting is not blocked. `-D hxscript_cppia_bool_compat` only until the apply.
 3. `-D hxscript_cppia`, `-D scriptable`, and a first build with `-D hxscript_verbose`. Stay on default `-dce std`. Call `cpp.cppia.Host.enableJit(true)` before loading mods.
-4. `src/modding/` host: parse `--mods-dir` in the constructor; one `Environment` per mod; `onInit` once at end of `onInvoke`; `onReady` after the JSON files; plus `heroSpawned` / `heroDespawned` / `floorEnter` / `floorExit`. For `replace`, `-D hxscript_host` (or bridge packages) must include the host types we mark `@:scriptable`, not only `modding`.
+4. `src/modding/` host: parse `--mods-dir` in the constructor; one `Environment` per mod; `onInit` once at end of `onInvoke`; `onReady` after the JSON files; plus `heroSpawned` / `heroDespawned` / `floorEnter` / `floorExit`. Point `-D hxscript_host` at DRH-owned packages; call `replace` from `onInit`.
 5. Launcher side: index fetch, catalog install (hash-verify), `enabled.json`, `--mods-dir`, scan, enable, order, display `last-run.json` — no destructive overlay.
 6. Index repository (separate from DRH / DRHL), with PR + CI for new versions.
 
