@@ -243,6 +243,8 @@ The launcher writes `<install-dir>/mods/enabled.json`:
 
 Array order is load order. Disabled mods are omitted, not flagged in the author's zip.
 
+If an id in `enabled.json` has no folder / no `mod.json`, the game **skips** it, logs, and records `skipped` in `last-run.json`. It does not abort boot. The launcher, when scanning the Mods page (not during a silent `--play`), drops those ids and rewrites `enabled.json`. No extra popup: the last-run row is enough if the user opens Mods.
+
 On Play it passes **`--mods-dir <absolute path to mods/>`**. The game parses that flag from `Sys.args()` in the `DungeonBustersProject` constructor (same pattern as `--fps`). Compile after that parse and before `onInit`. Then read `enabled.json` in that folder and resolve each `id` to a directory (scan `mod.json` if the folder name differs from `id`). Prod CLI does **not** list ids (Windows command-line length, quoting). Session logs already capture the flag.
 
 No `--mods-dir` (double-click the exe in `current/`) → **no mods**. Intentional vanilla.
@@ -398,7 +400,7 @@ Out of v1 (polish later, same index):
 
 - Create / open `<install-dir>/mods/`.
 - Fetch the index and present the v1 catalog above.
-- Scan directories that have a `mod.json`.
+- Scan directories that have a `mod.json`. Drop `enabled.json` ids whose folder is gone (on the Mods page scan, not during `--play`).
 - Enable / disable, load order. `drh` is required on every mod. Warn if the installed tag is older than the set (all kinds) or newer (`extends` / `replace` only). Never refuse to enable or Play for that.
 - Show `uses` as tags; recommend `api`. Warn that `extends` may break on DRH updates and that `replace` may clash.
 - Once, [first-run disclosure](#first-run-disclosure) before the user actually runs with mods.
@@ -411,7 +413,7 @@ The launcher Mods page is the v1 catalog, not a permanent placeholder.
 
 ### Game
 
-- Parse `--mods-dir` from `Sys.args()` in the constructor (like `--fps`). Without the flag, load nothing. Read `enabled.json`. Skip an entry whose `id` is not the kebab regex above.
+- Parse `--mods-dir` from `Sys.args()` in the constructor (like `--fps`). Without the flag, load nothing. Read `enabled.json`. Skip an entry whose `id` is not the kebab regex, or whose folder / `mod.json` is missing (log + `last-run` `skipped`).
 - Create **one** hxScript `Environment` per enabled mod, load that mod's modules, `Compiler.compile(env)` before `onInit`, interpret what was skipped. Do not share script types across mods.
 - Call [lifecycle](#lifecycle): `onInit` once at end of `onInvoke`, `onReady` after GM/timelines/library, gameplay events when heroes/floors appear, `onDispose` on shutdown.
 - Isolate errors: a throwing mod must not take down the whole boot. Write [last-run.json](#last-run-report) when `--mods-dir` is set. Log one `Logger.info` line per mod at load (`id`, `version`, `uses`, compiled vs interpreted).
