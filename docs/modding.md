@@ -30,7 +30,7 @@ Each row has a status: `open` (not decided), `recommended` (working direction, n
 | v1 discovery UI | decided | Minimal but functional catalog in DRHL, fed by the same index a later site can reuse. |
 | Exact index schema / repo URL | open | Draft shape in [Distribution](#distribution). |
 | Thunderstore / Nexus / itch as mirrors | open | Optional later; must not replace `mod.json` or the index. |
-| Resource overlay rules | open | `Resources/` in a mod is composited at runtime; precedence, SWF vs JSON, and locale merge are not specified yet. |
+| Resource overlay rules | open | `Resources/` in a mod is composited at runtime; precedence, SWF vs JSON, and `Resources/Locale/` merge are not specified yet. There is no separate `locale/` tree. |
 | `-D hxscript_sandbox` vs cppia | decided | Interpreter-only blacklist (`Sys` and four `sys.*` types). **Not a security boundary.** cppia has no blacklist. Trust is index review + SHA-256. See [Compilation](#compilation). |
 | Host build (cppia) | decided | Keep Haxe default `-dce std` (stdlib only). Patch vendored hxcpp with hxScript's `apply-hxcpp.py`. Enable the cppia JIT once at startup. First host build uses `-D hxscript_verbose`. See [Compilation](#compilation). |
 | Mod `id` and zip extract | decided | `id` is `^[a-z0-9][a-z0-9-]{1,62}[a-z0-9]$` (3–64, kebab, no leading/trailing hyphen). Zip install reuses the game-archive extractor (no zip-slip). No uncompressed size cap. See [`mod.json`](#modjson). |
@@ -219,8 +219,7 @@ Mods live outside `Dungeon Rampage Haxe/current/`, so they survive updates and r
     SomeMod/
       mod.json
       src/            # .hx sources
-      Resources/      # non-destructive overlay
-      locale/
+      Resources/      # non-destructive overlay (including Locale/)
 ```
 
 `<install-dir>` is the DRH Launcher managed content root (not the launcher executable directory). On Linux the current default looks like `~/.local/share/DRH Launcher`.
