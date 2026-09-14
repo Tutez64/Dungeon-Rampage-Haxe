@@ -121,14 +121,25 @@ hxScript is ordinary Haxe in-process, not a JS-style "patch any function" runtim
 
 - **C — stable facade.** Package `modding.*` only: boot lifecycle (`onInit` / `onReady` / `onDispose`), gameplay events (`heroSpawned` / `heroDespawned` / `floorEnter` / `floorExit`), overlay/HUD root, input, and a **window on live state through wrappers** (`ModHero`, floor, inventory, camera, chat — names TBD). Not raw `HeroGameObject`. Wrappers that need a hero or floor stay empty until the matching event. Wrappers + those events are what `api: 1` promises across DRH tags; Starling may reimplement them without bumping `api` if the wrapper contract holds.
 - **F — host types (hxScript fork).** Two features, both required for v1:
-  1. **General `@:scriptable`.** Packages named by `-D hxscript_host` are bridged wholesale (not `final` / `extern` / `interface` / `private`). DRH lists its own packages (`actor`, `combat`, `facade`, `uI`, `modding`, …). Out: OpenFL/Lime (already preset-bridged), vendored `box2D` / `org` / `com`, `generatedCode`, `_assets`. Opt-out: `final`. (`-D scriptable` is hxcpp's cppia flag; it does not generate extend bridges.) Cost is one generated override per inherited non-inline method; if the first cppia build is too fat, drop a package or mark hot types `final`.
-  2. **`replace`.** Explicit `replace(HostClass, Sub)` so host `new HostClass(...)` constructs the subclass. `extend` ≠ replace: a helper `class HudIcon extends Sprite` must not steal every OpenFL `new Sprite()`. Never auto-replace OpenFL/Lime. Disjoint-method merge lives in hxScript; DRH just calls `replace` and gets one class or a conflict.
+  1. **General `@:scriptable`.** Packages named by `-D hxscript_host` are bridged wholesale. That is **every package under `src/`**, including vendored (`box2D`, `org`, `com`) and `generatedCode`. OpenFL/Lime are not under `src/`. Stock hxScript only lists `Sprite` as an OpenFL base and **no** Lime bases: that is a **default-size curation**, not a hard limit. `DisplayObject` does bridge (awkward methods fall through to `super`); the cost is one generated override per inherited method on a very wide surface. Lime is windows/input/timing — few types are meant to be subclassed. v1 turns on `-D hxscript_bridge_packages=openfl,lime` so HUD code can `extend Sprite`, `MovieClip`, `Bitmap`, `TextField`, … (`-D scriptable` is hxcpp's cppia flag; it does not generate extend bridges.) If the first cppia build is too fat, mark a hot **DRH** type `final` rather than dropping a package.
+  2. **`replace`.** Explicit `replace(HostClass, Sub)` so host `new HostClass(...)` constructs the subclass. **`extend` is not `replace`.** `class HudIcon extends Sprite` is a widget; it does not steal OpenFL's `new Sprite()`. Only an explicit `replace(Sprite, …)` would. Same rule for every type, including OpenFL/Lime: no special blacklist. Disjoint-method merge lives in hxScript; DRH just calls `replace` and gets one class or a conflict.
+
+The fork still does not bridge `final` / `extern` / `interface` / `private` types. That is Haxe, not a timid filter:
+
+| Kind | Why a script cannot `extend` it |
+| --- | --- |
+| `final class` | Haxe forbids the subclass. Un-`final` the host type if we own it and want it extendable (kills hxcpp de-virtualisation on that type). Almost none of `src/` is `final`. |
+| `extern class` | No Haxe body (usually a native binding). Nothing to subclass. Scripts can still *call* it. |
+| `interface` | Not a class base. Scripts **`implements`** a native interface; that already works. |
+| `private class` | Invisible from a mod package. Bridging would not make `extends foo.Helper` compile. Make it `public` in DRH if a mod needs it. |
+
+`final` / `inline` **methods** on an otherwise scriptable class still cannot be overridden. Same language rule.
 
 Do not hand out internal instances as the “stable API”. A HUD that peeks `actor.HeroGameObject` is an `extends`-kind mod, not an `api` one, even if it only reads fields.
 
 `replace` rules:
 
-- Off by default: a type is replaceable because a mod registered it, not because it is scriptable.
+- Off by default: a type is replaceable because a mod registered it, not because it is scriptable or because a script `extend`s it. `extends Sprite` never becomes `replace(Sprite, …)`.
 - Any number of mods may `extend` without `replace`. Several `replace` on the same base are OK if rewritten methods/fields/`new` do not overlap. Overlap → error or explicit priority. Residual risk: `A.update` can call `this.onWeaponDown()` and hit `B`'s override on the same instance. A wrap/`callNext` chain is how you *intentionally* stack one method. Out of scope to prove disjoint `this` use statically.
 
 Target rules:
@@ -402,7 +413,7 @@ The launcher Mods page is the v1 catalog, not a permanent placeholder.
 - Call [lifecycle](#lifecycle): `onInit` once at end of `onInvoke`, `onReady` after GM/timelines/library, gameplay events when heroes/floors appear, `onDispose` on shutdown.
 - Isolate errors: a throwing mod must not take down the whole boot. Write [last-run.json](#last-run-report) when `--mods-dir` is set. Log one `Logger.info` line per mod at load (`id`, `version`, `uses`, compiled vs interpreted).
 
-Target package (not implemented): `src/modding/`. `-D hxscript_host` names every DRH-owned package under `src/` (including `modding`). The fork bridges those packages; DRH does not annotate each class.
+Target package (not implemented): `src/modding/`. `-D hxscript_host` names every package under `src/` (including `modding`, `box2D`, `org`, `com`, `generatedCode`). The fork bridges those packages; DRH does not annotate each class.
 
 Keep `-D hxscript_sandbox` as an interpreter footgun guard (`Sys` / a few `sys.*` types). It is **not** a security boundary: cppia ignores it, and OpenFL/Lime I/O stay reachable. Trust is index review + SHA-256. See [Compilation](#compilation).
 
@@ -423,19 +434,20 @@ Intended game build flags (the `hxscript` lib is **our fork**, not stock `Megumi
 -lib hxscript
 -D hxscript_cppia
 -D scriptable
--D hxscript_host=<DRH-owned packages>
+-D hxscript_host=<every package under src/>
+-D hxscript_bridge_packages=openfl,lime
 -D hxscript_sandbox
 ```
 
 **DCE:** DRH does not pass `-dce`. Lime's cpp templates do not either (unlike html5 `-dce full`). Haxe's default is **`-dce std`**: unused members of the **standard library** only. Game code, OpenFL, Lime, SteamWrap are not DCE'd. hxScript's `extraParams.hxml` already runs `Keep` so the std types scripts hit by reflection (`IntIterator`, `Reflect`, `Type`, …) survive under `-dce std`. **Do not add `-dce no`** unless a script hits `Cannot call null` on a std member `Keep` does not cover; then prefer `-D hxscript_keep=…` first. A large host also keeps many std members by accident because the game already calls them.
 
-**OpenFL:** DRH vendors OpenFL (`submodules/openfl`) with `<define name="draft" />` and an extra `-cp` so Lime's draft `Context3D` does not overlay. hxScript's OpenFL preset assumes a stock OpenFL. The first host build must use **`-D hxscript_verbose`** and we read what it actually bridged.
+**OpenFL / Lime:** DRH vendors OpenFL (`submodules/openfl`) with `<define name="draft" />` and an extra `-cp` so Lime's draft `Context3D` does not overlay. hxScript's stock preset is thin on purpose (binary size): OpenFL scripts can *import* the display list but only *extend* `Sprite`; Lime has no extendable bases. That is not an impossibility — OpenFL display objects bridge, with skipped methods left to `super`. v1 adds `-D hxscript_bridge_packages=openfl,lime`. The first host build must use **`-D hxscript_verbose`** and we read what it actually bridged. `replace` on those types is the same explicit `replace(...)` as anywhere else.
 
 **hxcpp:** patch the existing `submodules/hxcpp` with hxScript's `python patches/apply-hxcpp.py --path submodules/hxcpp` rather than switching the submodule to `MeguminBOT/hxcpp`. Until that apply, `-D hxscript_cppia_bool_compat` is the Bool/JIT palliative.
 
 **JIT:** `cpp.cppia.Host.enableJit(true)` once, process-wide, **before** any module loads. hxScript's `modes.md`: if we compile, we jit; it does not add measurable load time. A known hxcpp JIT segfault on `'' + (n == 1)` is in the same patch set.
 
-**Size / time:** `-D scriptable`, autowired OpenFL/Lime bridges, and the fork's package-wide host bridges (one override per inherited method) are the real binary cost, not DCE. Measure a first cppia-enabled build against current DRH before treating compiled mods as free.
+**Size / time:** `-D scriptable`, OpenFL/Lime package bridges (a `DisplayObject` base has a large method surface), and the fork's host bridges are the real binary cost, not DCE. Measure a first cppia-enabled build against current DRH before treating compiled mods as free.
 
 `-D hxscript_sandbox` is kept. Verified in hxScript `Boot.blacklist()`: it adds `Sys`, `sys.io.File`, `sys.io.Process`, `sys.FileSystem`, and `sys.net.Socket` to `Config.blacklist`. Enforcement is `TypeProxy` (the interpreter's `Type`); `hxscript.cppia` never reads the blacklist. OpenFL/Lime types such as `openfl.net.URLLoader`, `openfl.net.Socket`, and `lime.system.System` are bridged and not on that list. Interpreter `Type.createInstance` still goes through the proxy (so the five names stay blocked); cppia uses native `Type`, so it does not.
 
@@ -468,7 +480,7 @@ Out of scope for this documentation pass; needed before a real host:
 1. Pin the **hxScript fork** as the lasting `hxscript` dependency (package-wide `@:scriptable` + `replace`). Stock `MeguminBOT/hxscript` is what we branch from; we do not switch back to it if the same features land there.
 2. hxcpp: run hxScript's `patches/apply-hxcpp.py` on `submodules/hxcpp` (same fixes as [`MeguminBOT/hxcpp`, `patched-hxscript`](https://github.com/MeguminBOT/hxcpp/tree/patched-hxscript)). Without them, a compiled script can disagree with the same script interpreted. Interpreting is not blocked. `-D hxscript_cppia_bool_compat` only until the apply.
 3. `-D hxscript_cppia`, `-D scriptable`, and a first build with `-D hxscript_verbose`. Stay on default `-dce std`. Call `cpp.cppia.Host.enableJit(true)` before loading mods.
-4. `src/modding/` host: parse `--mods-dir` in the constructor; one `Environment` per mod; `onInit` once at end of `onInvoke`; `onReady` after the JSON files; plus `heroSpawned` / `heroDespawned` / `floorEnter` / `floorExit`. Point `-D hxscript_host` at DRH-owned packages; call `replace` from `onInit`.
+4. `src/modding/` host: parse `--mods-dir` in the constructor; one `Environment` per mod; `onInit` once at end of `onInvoke`; `onReady` after the JSON files; plus `heroSpawned` / `heroDespawned` / `floorEnter` / `floorExit`. Point `-D hxscript_host` at every package under `src/`; `-D hxscript_bridge_packages=openfl,lime`; call `replace` from `onInit`.
 5. Launcher side: index fetch, catalog install (hash-verify), `enabled.json`, `--mods-dir`, scan, enable, order, display `last-run.json` — no destructive overlay.
 6. Index repository (separate from DRH / DRHL), with PR + CI for new versions.
 
