@@ -34,6 +34,7 @@ Each row has a status: `open` (not decided), `recommended` (working direction, n
 | `-D hxscript_sandbox` vs cppia | decided | Interpreter-only blacklist (`Sys` and four `sys.*` types). **Not a security boundary.** cppia has no blacklist. Trust is index review + SHA-256. See [Compilation](#compilation). |
 | Host build (cppia) | decided | Keep Haxe default `-dce std` (stdlib only). Patch vendored hxcpp with hxScript's `apply-hxcpp.py`. Enable the cppia JIT once at startup. First host build uses `-D hxscript_verbose`. See [Compilation](#compilation). |
 | Mod `id` and zip extract | decided | `id` is `^[a-z0-9][a-z0-9-]{1,62}[a-z0-9]$` (3–64, kebab, no leading/trailing hyphen). Zip install reuses the game-archive extractor (no zip-slip). No uncompressed size cap. See [`mod.json`](#modjson). |
+| `drh` in `mod.json` | decided | Closed string of tag numbers, no `V`, no `>=`: `"20"`, `"20,21"`, or `"20-22"`. Required if `uses` has `extends` / `replace`; optional for `api`-only (forward compat is `api: N`). See [`mod.json`](#modjson). |
 
 ## Context
 
@@ -298,7 +299,7 @@ Draft. Evolving schema, not frozen. Shared launcher/game contract.
   "version": "0.1.0",
   "author": "example",
   "api": 1,
-  "drh": ">=V20",
+  "drh": "20",
   "entry": "Main",
   "uses": ["api"]
 }
@@ -310,8 +311,8 @@ Draft. Evolving schema, not frozen. Shared launcher/game contract.
 | `name` | Display name |
 | `version` | Mod version |
 | `author` | Author |
-| `api` | `modding.*` contract version the mod targets |
-| `drh` | Game tag range (exact syntax still to freeze) |
+| `api` | `modding.*` contract version. **Required** if `uses` contains `api`; omit when the mod is only `extends` / `replace`. |
+| `drh` | DRH tag numbers this **artifact** supports (no `V` prefix, no open `>=`). `"20"` (one tag), `"20,21"` (list), `"20-22"` (closed inclusive range). **Required** if `uses` contains `extends` or `replace`. Optional for `api`-only mods: they follow `api: N` across tags. The launcher: installed tag in the set → OK; older → too old; newer → OK for `api`-only, **warn** for `extends` / `replace`. |
 | `entry` | hxScript entry class in **that** mod's `Environment` (e.g. `Main` extends `modding.Mod`). Short names do not collide across mods. |
 | `uses` | One or more of `api`, `extends`, `replace` (see [Mod kinds](#mod-kinds)) |
 
@@ -358,7 +359,7 @@ Not frozen. Enough to implement a launcher list:
   "author": "example",
   "description": "Short summary for the catalog.",
   "api": 1,
-  "drh": ">=V20",
+  "drh": "20",
   "uses": ["api"],
   "url": "https://github.com/example/some-mod/releases/download/0.1.0/some-mod-0.1.0.zip",
   "sha256": "...",
@@ -375,7 +376,7 @@ Minimal and functional, not a store. Same fetch the future site would use.
 In:
 
 - Fetch and cache the index (same defensive pattern as game updates: size, hash, no silent third-party redirects).
-- List available mods: name, version, author, short description, compat vs installed DRH, `uses`.
+- List available mods: name, version, author, short description, compat vs installed DRH, `uses`. `api`-only: `api: N`. `extends` / `replace`: `drh` closed set; warn if the install is newer.
 - Install: download zip → verify SHA-256 → extract under `mods/<id>/` with the same zip-slip rules as game archives (directory name = `id`; sideload folders may differ, resolved via `mod.json`).
 - Show installed vs listed, enable / disable, load order.
 - Write `enabled.json` in the mods folder (ordered ids).
@@ -397,7 +398,7 @@ Out of v1 (polish later, same index):
 - Create / open `<install-dir>/mods/`.
 - Fetch the index and present the v1 catalog above.
 - Scan directories that have a `mod.json`.
-- Enable / disable, load order, `drh` compat vs the installed version.
+- Enable / disable, load order. For `api` mods, compat vs installed DRH is `api: N`. For `extends` / `replace`, `drh` must include the installed tag (warn if the install is newer).
 - Show `uses` as tags; recommend `api`. Warn that `extends` may break on DRH updates and that `replace` may clash.
 - Once, [first-run disclosure](#first-run-disclosure) before the user actually runs with mods.
 - Write `<install-dir>/mods/enabled.json` (ordered ids).
@@ -471,7 +472,7 @@ Vanilla code will follow DR.
 
 - **`api` mods** must not depend on internal packages. Wrappers stay the contract. Internals can move with no `api` bump if wrappers hold; a wrapper break **is** a bump, with official examples updated.
 - **`extends` / `replace` mods** *do* depend on host types. They can break on Starling without an `api` bump; that is the cost of those kinds. `drh` in `mod.json` is the lever to warn or refuse them.
-- `mod.json` declares `api`, `uses`, and `drh` so launcher and game can refuse or warn on a too-old mod.
+- `mod.json` declares `uses`, and when needed `api` / `drh`, so launcher and game can refuse or warn. `api` mods track the facade; `extends` / `replace` track `drh` tags.
 
 ## Technical prerequisites
 
