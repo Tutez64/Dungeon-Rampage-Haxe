@@ -18,7 +18,7 @@ Each row has a status: `open` (not decided), `recommended` (working direction, n
 | Mod kinds (`api` / `extends` / `replace`) | decided | Declared in `mod.json`. Recommend `api`. `extends` / `replace` have version and inter-mod costs; both ship in v1. See [Mod kinds](#mod-kinds). |
 | How the enabled mod list reaches the game | decided | `<install-dir>/mods/enabled.json` (order = load order) plus `--mods-dir <absolute path>`. Game parses `--mods-dir` from `Sys.args()` in the constructor, like `--fps`. No prod CLI id list. Naked exe without the flag loads no mods. See [Passing the list](#passing-the-list). |
 | Scanning mods outside the launcher (debug) | decided | Same `--mods-dir`. Optional later: `--mods-all`, `--mod <id>`. No implicit scan next to the exe. |
-| Lifecycle | decided | Boot: `onInit` in the `DungeonBustersProject` constructor, after `--mods-dir` parse + compile and **before `new DBFacade()`** (nothing of the game exists yet, so `replace` covers everything), `onReady` on `ManagersLoadedEvent`, `onDispose` on shutdown. No separate early hook. `api: 1` also freezes `heroSpawned` / `heroDespawned` / `floorEnter` / `floorExit`. See [Lifecycle](#lifecycle). |
+| Lifecycle | decided | Boot: `onInit` in the `DungeonBustersProject` constructor, after `--mods-dir` parse + compile and **before `new DBFacade()`** (nothing of the game exists yet, so `replace` covers everything), `onReady` on `LoadingFinishedEvent` inside `DBFacade.architectureLoaded`, after the account is set and **before `mainStateMachine.start()`** (every singleton is up; strictly precedes any gameplay event), `onDispose` on shutdown. No separate early hook, no fourth method; `ManagersLoaded` is the additive `tablesLoaded` event. `api: 1` also freezes `heroSpawned` / `heroDespawned` / `floorEnter` / `floorExit`. See [Lifecycle](#lifecycle). |
 | hxScript `Environment` isolation | decided | **One `Environment` per mod**, `Compiler.compile(env)` per mod. No inter-mod script types in v1; no `dependencies` in `mod.json`. See [Compilation](#compilation). |
 | Checksummed JSON overlay | decided | **No** dedicated warn or block in index, launcher, or host. `sCode` is a weak int-fold; server use unknown; a mismatch would fail dungeon entry, which the author sees. Sideload is already labeled. See [Policy](#policy). |
 | Game → launcher status | decided | `mods/last-run.json` plus one `Logger.info` line per mod at load (`id`, `version`, `uses`, compiled/interpreted). Mods page reads the JSON. See [Last-run report](#last-run-report). |
@@ -45,7 +45,7 @@ The chosen script runtime is a **fork** of [hxScript](https://github.com/Megumin
 Constraints that shape the rest:
 
 - Compiled mods target **hxcpp** only. There is no HashLink target today (`project.xml`).
-- Current boot without mods: `DungeonBustersProject` parses `--fps`, creates `DBFacade` (trivial constructor), calls `DBFacade.init(stage)` (which builds `UIHud`, `DBSoundManager`, `SteamInputManager`, `MainStateMachine`, …), then `onInvoke` inits Steam and `processArguments`. `LoadingState` later runs service discovery and `preLoadJson` (GameMaster, `library_server.json`, AttackTimeline). With mods, `--mods-dir` is parsed in the constructor from `Sys.args()`, mods are compiled, and `onInit` runs **before `new DBFacade()`** so a `replace` reaches every host construction; `onReady` runs after those three JSON files — account, hero, and floor are still missing. Live state arrives later as events. See [Lifecycle](#lifecycle).
+- Current boot without mods: `DungeonBustersProject` parses `--fps`, creates `DBFacade` (trivial constructor), calls `DBFacade.init(stage)` (which builds `UIHud`, `DBSoundManager`, `SteamInputManager`, `MainStateMachine`, …), then `onInvoke` inits Steam and `processArguments`. `LoadingState` later runs service discovery, `preLoadJson` (GameMaster, `library_server.json`, AttackTimeline → `ManagersLoadedEvent`), then the account, matchmaker, transitions and server time; when all are in it dispatches `LoadingFinishedEvent`, and `DBFacade.architectureLoaded` sets the account, starts the game clock and loop, and calls `mainStateMachine.start()` (town, or the tutorial dungeon). With mods, `--mods-dir` is parsed in the constructor from `Sys.args()`, mods are compiled, and `onInit` runs **before `new DBFacade()`** so a `replace` reaches every host construction; `onReady` runs in `architectureLoaded` **before `mainStateMachine.start()`** — tables, account, inventory, clock are there; no hero or floor yet. Live state arrives as events. See [Lifecycle](#lifecycle).
 - The game is **fully multiplayer** on official servers. The client folds some int fields from GameMaster, AttackTimeline, and `library_server.json` into `sCode` (sent on dungeon entry). That is not a reason to special-case those paths in the catalog. See [Policy](#policy).
 - Updates replace `Dungeon Rampage Haxe/current/`. Mods must live **outside** that directory.
 - The vendored hxcpp (`submodules/hxcpp`) does not yet include hxScript's cppia fixes. Apply them with hxScript's `patches/apply-hxcpp.py` (the `MeguminBOT/hxcpp` `patched-hxscript` branch is the same patch set, not a required remote change). See [Technical prerequisites](#technical-prerequisites).
@@ -171,19 +171,27 @@ Players see a short warning on `extends` / `replace` (may break on game updates;
 
 ## Lifecycle
 
-Part of the `api` contract. The three methods are **boot** hooks; names are frozen. They are not "gameplay ready": `onReady` is `ManagersLoadedEvent` (GameMaster + AttackTimeline + `library_server.json`). `LoadingState` has not loaded the account yet, and there is no hero or floor. Live moments are **events**, frozen for `api: 1` so facade mods can hook the world without `extends`.
+Part of the `api` contract. The three methods are **boot** hooks; names are frozen. Two stable anchors: `onInit` = nothing of the game exists yet; `onReady` = every singleton exists (tables, account, inventory, clock, network) and the game loop is about to start. Neither means "a hero is on screen": live moments are **events**, frozen for `api: 1` so facade mods can hook the world without `extends`.
 
 `mod.json` `entry` is a class that extends `modding.Mod`. All three methods are optional (empty defaults on the base class).
 
 | Method | When | Typical use |
 | --- | --- | --- |
 | `onInit(ctx:ModContext)` | In the `DungeonBustersProject` constructor, after `--mods-dir` parse and compile, **before `new DBFacade()`**. The process and `stage` are up; **nothing of the game is constructed yet** (no facade, no HUD, no state machine, no Steam, no feature flags). | `replace(...)`, subscribe to events, overlay on `stage`. No GameMaster yet; state wrappers are empty. Read feature flags in `onReady`, not here. |
-| `onReady(ctx:ModContext)` | After GameMaster, AttackTimeline, and `library_server` have loaded. Account, heroes, and floors are **not** there. Config-based feature flags may already be applied (`LoadingState.configReady` runs before `preLoadJson`). | Read static tables (names, stats from GameMaster). Not Unity `Start`. Live wrappers stay empty. |
+| `onReady(ctx:ModContext)` | On `LoadingFinishedEvent`, inside `DBFacade.architectureLoaded`, after `mDBAccountInfo` is set and `gameClock.initTime()`, **before `mainStateMachine.start()`**. GameMaster, AttackTimeline, `library_server`, account (inventory, active avatar, friends), feature flags (CLI + config), matchmaker, server time, game clock are all up. No town, hero, or floor yet. **Once** per process. | Read tables and account-level wrappers (inventory, profile). Closest to Unity `Start`. Hero / floor wrappers stay empty until the matching event. |
 | `onDispose()` | Process shutdown (unload later if we ever need it) | Timers, listeners. Must not block exiting. |
 
 `--mods-dir` is parsed just before, in the constructor from `Sys.args()` (like `--fps`), so compile finishes before `onInit`. See [Passing the list](#passing-the-list).
 
-Why that early, and why not a second hook: `DBFacade.init(stage)` constructs `UIHud`, `DBSoundManager`, `SteamInputManager`, `MenuNavigationController`, `MainStateMachine`, …. A `replace` registered later would miss all of them, and the vanilla HUD is an obvious target. A dedicated early hook for `replace` would hand mods a `ModContext` with half its fields null and a second "what exists here" rule to learn; that rule would move with every boot refactor (Starling). Two stable anchors instead: "before anything" (`onInit`) and "static data loaded" (`onReady`). What `onInit` gives up by moving is weak: Steam identity is asynchronous anyway, and feature flags are only complete after `LoadingState.configReady` (config over CLI), so `onReady` was already the honest place to read them.
+Why that early, and why not a second hook: `DBFacade.init(stage)` constructs `UIHud`, `DBSoundManager`, `SteamInputManager`, `MenuNavigationController`, `MainStateMachine`, …. A `replace` registered later would miss all of them, and the vanilla HUD is an obvious target. A dedicated early hook for `replace` would hand mods a `ModContext` with half its fields null and a second "what exists here" rule to learn; that rule would move with every boot refactor (Starling). Two stable anchors instead: "before anything" (`onInit`) and "everything singleton is up, the loop is about to start" (`onReady`). What `onInit` gives up by moving is weak: Steam identity is asynchronous anyway, and feature flags are only complete after `LoadingState.configReady` (config over CLI), so `onReady` was already the honest place to read them.
+
+Why `onReady` is `LoadingFinishedEvent` and not `ManagersLoadedEvent`: the facade promises an **inventory** wrapper, and inventory is account data that only exists once `LoadingFinishedEvent` fires. At `ManagersLoaded` the tables are in but the account, matchmaker, clock and network are not — the same half-ready ambiguity we removed from `onInit`. The only thing that window is good for is mutating GameMaster before the account is parsed against it (an `extends` use); that is the additive `tablesLoaded` event below, not a frozen method. No fourth method (`onStart` next to a not-ready `onReady` is what this avoids).
+
+**Ordering guarantee:** `onInit` → (`tablesLoaded`) → `onReady` → any gameplay event. Town or the tutorial dungeon is only entered by the `mainStateMachine.start()` that follows `onReady`, so no `heroSpawned` / `floorEnter` can precede it.
+
+**Boot that never reaches `onReady`:** `SocketErrorState` (service discovery failed), an account with no active avatar (`start()` returns without a transition), `blockCheater()`. Mods must tolerate `onReady` not being called; `last-run.json` records `ready: false` so the Mods page does not show a misleading `ok`.
+
+**Return to town after a dungeon (`ReloadTownState`) is not a second `onReady`.** That is `townEnter` (additive event). Authors should not wait for `onReady` twice.
 
 Host obligations that follow:
 
@@ -195,18 +203,24 @@ Host obligations that follow:
 
 Subscribe from `onInit` or `onReady`. The host emits these; they are not existing game `Event` class names.
 
-These four are the minimum to attach state to the live world (local + other players, town + dungeon, floor-scoped teardown). Town enter/exit and account-loaded are **not** frozen; they can join later without a bump if they only add.
+These four are the minimum to attach state to the live world (local + other players, town + dungeon, floor-scoped teardown). Town enter/exit and `tablesLoaded` are **not** frozen; they can join later without a bump if they only add.
 
 | Event | When | Typical use |
 | --- | --- | --- |
 | `heroSpawned` / `heroDespawned` | A hero (local **or** other players) enters / leaves the world. Town and dungeon. | Per-hero overlay or roster. |
 | `floorEnter` / `floorExit` | A dungeon floor starts / ends. Not town. | Floor-scoped UI or counters; teardown on exit. |
 
-Pattern: subscribe in `onInit`, react to spawn/floor, use `onReady` only for GameMaster lookups. Do not assume a hero exists in `onReady`.
+Pattern: subscribe in `onInit`, read tables and account in `onReady`, react to spawn/floor for anything with a hero in it. Do not assume a hero exists in `onReady`.
 
-Later events (vanilla HUD ready, inventory, chat, town enter, account loaded, …) can join without a bump if they only add; a change to an existing event or wrapper is an `api` bump.
+Additive events, planned but not frozen (adding is not a bump; changing an existing one is):
 
-`ModContext`: overlay root, log, `replace`, event subscribe, and the state window (hero/floor wrappers filled after the matching event). Load order follows `enabled.json`.
+| Event | When |
+| --- | --- |
+| `tablesLoaded` | `ManagersLoadedEvent`: GameMaster, AttackTimeline, `library_server` are in, the account is not yet parsed against them. The window to mutate tables (`extends` use). |
+| `townEnter` / `townExit` | `TownState` entered / left, including `ReloadTownState` after a dungeon. |
+| `hudReady`, inventory, chat, … | As the facade grows. |
+
+`ModContext`: overlay root, log, `replace`, event subscribe, and the state window (account-level wrappers filled from `onReady`; hero/floor wrappers filled after the matching event). Load order follows `enabled.json`.
 
 A throw in `onInit` / `onReady` isolates **that** mod; boot continues. A throw in `onDispose` is logged and ignored. A throw in an event handler isolates that mod for that dispatch. Outcomes land in [last-run.json](#last-run-report) so the launcher Mods page can show them.
 
@@ -266,6 +280,9 @@ Draft shape, not frozen:
 
 ```json
 {
+  "drh": 20,
+  "started": "2026-09-15T13:20:00Z",
+  "ready": true,
   "mods": [
     {
       "id": "example-hud",
@@ -286,11 +303,13 @@ Draft shape, not frozen:
 
 | Field | Role |
 | --- | --- |
+| `drh` / `started` | Game tag and UTC start time of the run that wrote the file, so the Mods page can tell a stale file from the last Play. |
+| `ready` | `false` until `onReady` has run; stays `false` when boot never gets there (`SocketErrorState`, invalid account, `blockCheater()`). A mod `ok` with `ready: false` only got `onInit`. |
 | `status` | `ok` / `failed` / `skipped` (id in `enabled.json` but folder, `mod.json`, or valid `id` missing) |
 | `mode` | `compiled` or `interpreted` (plus skip reason in `error` when the emitter skipped) |
 | `error` | Present on `failed` / interpreted-with-reason / `replace` overlap. One line; full stack stays in the session log. |
 
-Write after compile + `onInit` (the boot report). Update the same file if a later `replace` conflict happens. A crash before the write leaves the previous run's file; the Mods page should treat it as stale if it wants, not as live IPC.
+Write after compile + `onInit` (the boot report, `ready: false`). Rewrite after `onReady` (`ready: true`, plus any `onReady` failure per mod). Update the same file if a later `replace` conflict happens. A crash before the write leaves the previous run's file; the Mods page should treat it as stale if it wants, not as live IPC.
 
 The launcher reads it when the Mods page is shown (including after Play). That is also where « Overlap → error » becomes visible: error for **that mod**, on the Mods page, not only in a log file.
 
@@ -422,7 +441,7 @@ The launcher Mods page is the v1 catalog, not a permanent placeholder.
 
 - Parse `--mods-dir` from `Sys.args()` in the constructor (like `--fps`). Without the flag, load nothing. Read `enabled.json`. Skip an entry whose `id` is not the kebab regex, or whose folder / `mod.json` is missing (log + `last-run` `skipped`).
 - Create **one** hxScript `Environment` per enabled mod, load that mod's modules, `Compiler.compile(env)` before `onInit`, interpret what was skipped. Do not share script types across mods.
-- Call [lifecycle](#lifecycle): `onInit` in the constructor before `new DBFacade()`, `onReady` after GM/timelines/library, gameplay events when heroes/floors appear, `onDispose` on shutdown. Keep the overlay root above the facade's layers.
+- Call [lifecycle](#lifecycle): `onInit` in the constructor before `new DBFacade()`, `onReady` in `architectureLoaded` before `mainStateMachine.start()`, `tablesLoaded` on `ManagersLoadedEvent`, gameplay events when heroes/floors appear, `onDispose` on shutdown. Keep the overlay root above the facade's layers.
 - Isolate errors: a throwing mod must not take down the whole boot. Write [last-run.json](#last-run-report) when `--mods-dir` is set. Log one `Logger.info` line per mod at load (`id`, `version`, `uses`, compiled vs interpreted).
 
 Target package (not implemented): `src/modding/`. `-D hxscript_bridge_classpath=src` (fork) bridges every eligible class under `src/`; DRH does not annotate each class. `-D hxscript_host=modding` only covers `@:scriptAmbient` / `@:scriptStatic` in the facade.
@@ -494,7 +513,7 @@ Out of scope for this documentation pass; needed before a real host:
 1. Pin the **hxScript fork** as the lasting `hxscript` dependency (classpath bridge scan + exclude, `replace`). Same model as the other submodules: rebased on `MeguminBOT/hxscript`, our commits on top, PRs upstream right after they work for DRH, no waiting on acceptance.
 2. hxcpp: run hxScript's `patches/apply-hxcpp.py` on `submodules/hxcpp` (same fixes as [`MeguminBOT/hxcpp`, `patched-hxscript`](https://github.com/MeguminBOT/hxcpp/tree/patched-hxscript)). Without them, a compiled script can disagree with the same script interpreted. Interpreting is not blocked. `-D hxscript_cppia_bool_compat` only until the apply.
 3. `-D hxscript_cppia`, `-D scriptable`, and a first build with `-D hxscript_verbose`. Stay on default `-dce std`. Call `cpp.cppia.Host.enableJit(true)` before loading mods.
-4. `src/modding/` host: parse `--mods-dir` in the constructor; one `Environment` per mod; compile, then `onInit` before `new DBFacade()`; `onReady` after the JSON files; plus `heroSpawned` / `heroDespawned` / `floorEnter` / `floorExit`. `-D hxscript_host=modding`; `-D hxscript_bridge_classpath=src`; `-D hxscript_bridge_packages=openfl,lime`; call `replace` from `onInit`.
+4. `src/modding/` host: parse `--mods-dir` in the constructor; one `Environment` per mod; compile, then `onInit` before `new DBFacade()`; `onReady` in `architectureLoaded` before `mainStateMachine.start()`; plus `heroSpawned` / `heroDespawned` / `floorEnter` / `floorExit`. `-D hxscript_host=modding`; `-D hxscript_bridge_classpath=src`; `-D hxscript_bridge_packages=openfl,lime`; call `replace` from `onInit`.
 5. Launcher side: index fetch, catalog install (hash-verify), `enabled.json`, `--mods-dir`, scan, enable, order, display `last-run.json` — no destructive overlay.
 6. Index repository (separate from DRH / DRHL), with PR + CI for new versions.
 
