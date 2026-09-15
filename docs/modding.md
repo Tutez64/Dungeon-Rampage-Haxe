@@ -19,7 +19,7 @@ Each row has a status: `open` (not decided), `recommended` (working direction, n
 | How the enabled mod list reaches the game | decided | `<install-dir>/mods/enabled.json` (order = load order) plus `--mods-dir <absolute path>`. Game parses `--mods-dir` from `Sys.args()` in the constructor, like `--fps`. No prod CLI id list. Naked exe without the flag loads no mods. See [Passing the list](#passing-the-list). |
 | Scanning mods outside the launcher (debug) | decided | Same `--mods-dir`. Optional later: `--mods-all`, `--mod <id>`. No implicit scan next to the exe. |
 | Lifecycle | decided | Boot: `onInit` in the `DungeonBustersProject` constructor, after `--mods-dir` parse + compile and **before `new DBFacade()`** (nothing of the game exists yet, so `replace` covers everything), `onReady` on `LoadingFinishedEvent` inside `DBFacade.architectureLoaded`, after the account is set and **before `run()` and `mainStateMachine.start()`** (every singleton is up, the loop has not ticked; strictly precedes any gameplay event), `onDispose` in `DungeonBustersProject.onExit` before `mSteamworks.dispose()`, synchronous and local (the launcher force-kills after 3 s). No separate early hook, no fourth method; `ManagersLoaded` is the additive `tablesLoaded` event. `api: 1` also freezes `heroSpawned` / `heroDespawned` / `floorEnter` / `floorExit`. See [Lifecycle](#lifecycle). |
-| hxScript `Environment` isolation | decided | **One `Environment` per mod**, `Compiler.compile(env)` per mod. No inter-mod script types in v1; no `dependencies` in `mod.json`. See [Compilation](#compilation). |
+| hxScript `Environment` | decided | **One shared `Environment`** for all enabled mods, **one `Compiler.compile(env)`** batch. Mods may import each other's script types; that is the only way inter-mod use can also be compiled (cppia does not link across batches). Every mod lives in package **`mods.<id>`**, checked by the host, so nothing collides. `mod.json` has `dependencies` (ids only) for load order and a launcher warning. See [Compilation](#compilation). |
 | Checksummed JSON overlay | decided | **No** dedicated warn or block in index, launcher, or host. `sCode` is a weak int-fold; server use unknown; a mismatch would fail dungeon entry, which the author sees. Sideload is already labeled. See [Policy](#policy). |
 | Game → launcher status | decided | `mods/last-run.json` plus one `Logger.info` line per mod at load (`id`, `version`, `uses`, compiled/interpreted). Mods page reads the JSON. See [Last-run report](#last-run-report). |
 | Exact `mod.json` schema | open | Draft below, not frozen. |
@@ -33,7 +33,7 @@ Each row has a status: `open` (not decided), `recommended` (working direction, n
 | Resource overlay rules | open | `Resources/` in a mod is composited at runtime; precedence, SWF vs JSON, and `Resources/Locale/` merge are not specified yet. There is no separate `locale/` tree. |
 | `-D hxscript_sandbox` vs cppia | decided | Interpreter-only blacklist (`Sys` and four `sys.*` types). **Not a security boundary.** cppia has no blacklist. Trust is index review + SHA-256. See [Compilation](#compilation). |
 | Host build (cppia) | decided | `-dce no` (hxScript's own cppia setting) plus a forced include of the std (`haxe` minus `haxe.macro`, `sys` minus `sys.db`) — that part is a DRH choice beyond hxScript; measure, and trim the include list if it hurts, never back to `-dce std`. Patch vendored hxcpp with hxScript's `apply-hxcpp.py`. Enable the cppia JIT once at startup. First host build uses `-D hxscript_verbose`. See [Compilation](#compilation). |
-| Mod `id` and zip extract | decided | `id` is `^[a-z0-9][a-z0-9-]{1,62}[a-z0-9]$` (3–64, kebab, no leading/trailing hyphen). Zip install reuses the game-archive extractor (no zip-slip). No uncompressed size cap. See [`mod.json`](#modjson). |
+| Mod `id` and zip extract | decided | `id` is `^[a-z][a-z0-9_]{1,62}[a-z0-9]$` (3–64, snake_case, starts with a letter, no trailing underscore) — a valid Haxe package segment, so `id` = install folder = the mod's package `mods.<id>` with no conversion anywhere. Zip install reuses the game-archive extractor (no zip-slip). No uncompressed size cap. See [`mod.json`](#modjson). |
 | `drh` in `mod.json` | decided | **Always required.** Closed string of tag numbers, no `V`, no `>=`: `"20"`, `"20,21"`, or `"20-22"`. Additive facade growth stays `api: N`; `drh` is the floor for new wrappers. Mismatch **warns**, does not block. See [`mod.json`](#modjson). |
 
 ## Context
@@ -65,7 +65,7 @@ flowchart LR
   end
   subgraph game [DRH hxcpp]
     host["modding host"]
-    hxscript["per-mod Environment"]
+    hxscript["one shared Environment"]
     cppia["compile cppia or interp"]
     api["public API"]
     gameCore["GameMaster timelines UI"]
@@ -82,11 +82,11 @@ flowchart LR
   api --> gameCore
 ```
 
-Core idea: the launcher does not compile. It discovers mods, keeps the enabled set and load order, then passes them to the game. The game gives each mod its own hxScript `Environment`, compiles that world to cppia when it can, and falls back to the interpreter when a module is skipped. Mods do not share script types. The **recommended** path is the `modding.*` facade. `extends` / `replace` reach host types through the hxScript fork; that is an explicit, costlier kind, not the default contract.
+Core idea: the launcher does not compile. It discovers mods, keeps the enabled set and load order, then passes them to the game. The game loads every enabled mod into **one** hxScript `Environment`, each under its own package `mods.<id>`, compiles that world to cppia in one batch when it can, and falls back to the interpreter for the modules that were skipped. Mods may import each other's script types; `dependencies` in `mod.json` orders them. The **recommended** path is the `modding.*` facade. `extends` / `replace` reach host types through the hxScript fork; that is an explicit, costlier kind, not the default contract.
 
 Discovery is the same contract: an index of **artifacts**, consumed in v1 by a small DRHL catalog. A later website can read that index without changing how authors publish.
 
-Compiling "to actually get the performance" means `Compiler.compile(env)` **per mod** at load inside the game process: not a native rebuild of the DRH binary, and not a Haxe compile in the launcher.
+Compiling "to actually get the performance" means one `Compiler.compile(env)` over all enabled mods at load inside the game process: not a native rebuild of the DRH binary, and not a Haxe compile in the launcher.
 
 ## Policy
 
@@ -133,7 +133,7 @@ hxScript is ordinary Haxe in-process, not a JS-style "patch any function" runtim
      | `submodules/swf` | `swf` | how Animate symbols and timelines are instantiated; the likeliest home of an experimental optimisation shipped as a mod |
      | `submodules/SteamWrap` | `steamwrap` | the binding under `src-steam`; mostly `@:cffi` / statics, so few eligibles, near-zero cost |
      | `submodules/hxcpp` | — | **nothing to bridge**: C++ runtime, build tool (`hxcpp/Builder.hx`), one macro. `cpp.*` lives in the Haxe std, not here |
-     | hxScript (`-lib hxscript`) | `hxscript` | **the mod loader, not game content.** `replace(hxscript.Environment, …)` from mod A could only affect mods compiled after it — exactly the cross-mod leak `Environment` isolation exists to prevent. Bridges over `compile.*` / `cppia.*` would also break on every fork rebase. Whoever needs to change the runtime changes the fork |
+     | hxScript (`-lib hxscript`) | `hxscript` | **the mod loader, not game content.** `replace(hxscript.Environment, …)` from a mod could only affect how the host runs the next compile or reload — a mod rewriting the loader that loaded it. Bridges over `compile.*` / `cppia.*` would also break on every fork rebase. Whoever needs to change the runtime changes the fork |
      | Haxe std, `cpp.*` | — | presets handle the std; `cpp.*` is almost all `extern` / `abstract` / `@:coreType` |
      | haxelib `format` | `format` | declared in `project.xml` but reached only from Lime / OpenFL / swf internals (PNG, JPEG, `ByteArray`, SWF export), never from `src/`; not vendored, not modified by us. Add it the day someone has a use |
 
@@ -256,11 +256,13 @@ Mods live outside `Dungeon Rampage Haxe/current/`, so they survive updates and r
     current/          # game, replaced on every update
     previous/         # launcher rollback
   mods/
-    enabled.json      # launcher-owned: enabled ids, load order
+    enabled.json      # launcher-owned: enabled ids, load order (dependencies first)
     last-run.json     # game-owned: last session outcome per mod
-    SomeMod/
+    some_mod/         # folder name = id
       mod.json
-      src/            # .hx sources
+      src/            # .hx sources; package mods.some_mod (+ subfolders)
+        Main.hx       #   package mods.some_mod;
+        ui/Panel.hx   #   package mods.some_mod.ui;
       Resources/      # non-destructive overlay (including Locale/)
 ```
 
@@ -277,13 +279,13 @@ The launcher writes `<install-dir>/mods/enabled.json`:
 ```json
 {
   "mods": [
-    { "id": "example-hud" },
-    { "id": "chat-macros" }
+    { "id": "example_hud" },
+    { "id": "chat_macros" }
   ]
 }
 ```
 
-Array order is load order. Disabled mods are omitted, not flagged in the author's zip.
+Array order is load order. The launcher writes it so that every mod comes **after** its `dependencies`; the user's ordering is respected where the dependency graph leaves it free. Disabled mods are omitted, not flagged in the author's zip. If an enabled mod's dependency is not enabled, the launcher warns (Mods page) and still writes the file; the game loads the mod anyway and the missing types surface as that mod's own compile / parse failure.
 
 If an id in `enabled.json` has no folder / no `mod.json`, the game **skips** it, logs, and records `skipped` in `last-run.json`. It does not abort boot. The launcher, when scanning the Mods page (not during a silent `--play`), drops those ids and rewrites `enabled.json`. No extra popup: the last-run row is enough if the user opens Mods.
 
@@ -306,13 +308,13 @@ Draft shape, not frozen:
   "ready": true,
   "mods": [
     {
-      "id": "example-hud",
+      "id": "example_hud",
       "version": "0.1.0",
       "status": "ok",
       "mode": "compiled"
     },
     {
-      "id": "broken-replace",
+      "id": "broken_replace",
       "version": "1.0.0",
       "status": "failed",
       "mode": "interpreted",
@@ -344,29 +346,33 @@ Draft. Evolving schema, not frozen. Shared launcher/game contract.
 
 ```json
 {
-  "id": "some-mod",
+  "id": "some_mod",
   "name": "Some Mod",
   "version": "0.1.0",
   "author": "example",
   "api": 1,
   "drh": "20",
   "entry": "Main",
-  "uses": ["api"]
+  "uses": ["api"],
+  "dependencies": []
 }
 ```
 
 | Field | Role |
 | --- | --- |
-| `id` | Stable identifier and install folder name. Must match `^[a-z0-9][a-z0-9-]{1,62}[a-z0-9]$` (3–64 chars, lowercase kebab, hyphen only in the middle). Display name stays in `name`. |
+| `id` | Stable identifier, install folder name, and the mod's **package**: every source file is in `mods.<id>` or a sub-package of it. Must match `^[a-z][a-z0-9_]{1,62}[a-z0-9]$` (3–64 chars, snake_case, starts with a letter, no trailing underscore) — exactly a valid Haxe package segment, so nothing is converted anywhere. Display name stays in `name`. |
 | `name` | Display name |
 | `version` | Mod version |
 | `author` | Author |
 | `api` | `modding.*` contract version. **Required** if `uses` contains `api`; omit when the mod is only `extends` / `replace`. |
 | `drh` | **Always required.** Tag numbers this artifact was built/tested for (no `V`, no `>=`). `"20"`, `"20,21"`, or `"20-22"` (closed, inclusive). The launcher never blocks Play or enablement on a `drh` mismatch; it **warns**: installed tag **older** than the set's minimum (missing wrappers / host types) — all kinds; installed tag **newer** than the set's maximum — `extends` / `replace` only (`api`-only trusts `api: N` forward). |
-| `entry` | hxScript entry class in **that** mod's `Environment` (e.g. `Main` extends `modding.Mod`). Short names do not collide across mods. |
+| `entry` | Short class name, resolved by the host as `mods.<id>.<entry>` (e.g. `Main` → `mods.some_mod.Main`, which extends `modding.Mod`). It cannot name anything outside the mod's package, so the prefix is not repeated here. |
 | `uses` | One or more of `api`, `extends`, `replace` (see [Mod kinds](#mod-kinds)) |
+| `dependencies` | Ids of mods whose script types this one imports (`import mods.cool_lib.Api;`). **Ids only, no versions.** Used for two things: the launcher orders `enabled.json` so dependencies load first, and warns when one is not enabled. Nothing else: no auto-install, no version solving. May be empty or absent. |
 
-Load order is owned by the launcher, not by the mod. There is **no** `dependencies` field in v1: mods do not import each other's script types. They compose only through the host (overlay, events, `replace` registry, load order).
+**Package rule.** hxScript requires the package the host passes for a module to be the one the file declares. The host derives it from the file's place under `src/`: `mods/<id>/src/ui/Panel.hx` is `mods.<id>.ui`, `src/Main.hx` is `mods.<id>`. No extra directory: the prefix is the host's, the sub-packages are the folders. A file that declares anything else is a parse error naming both (hxScript's own), the module declares nothing, and the mod is reported `failed`. Because ids are unique (index) and the host refuses a second mod with the same `id` (sideload), two mods can never declare the same type, in the interpreter (`Environment.modules` would otherwise silently replace the earlier module) or in hxcpp's global cppia class table (which otherwise overwrites, last wins). `mods.` keeps a mod's package from ever shadowing a host or engine root package (`combat`, `com`, `openfl`, …).
+
+**Using another mod's types is `extends`-fragile.** A mod that imports `mods.cool_lib.Api` breaks when `cool_lib` changes it, the same way an `extends` on a host type breaks on a DRH update. Nothing in v1 pins versions between mods; authors coordinate. The facade (`modding.*`) remains the stable surface; inter-mod types are a convenience, not a contract the index enforces.
 
 The launcher refuses to install (index or local zip) if `id` fails that regex, and extracts to `mods/<id>/` with the **same** path rules as game releases (`enclosed_name` / `safe_relative_path`: no `..`, no absolute paths, files and directories only). There is **no** uncompressed size cap: index artifacts already have a declared download size + SHA-256; sideload is a file the user picked. A hand-copied folder whose directory name differs from `id` can still be scanned via `mod.json`, but a bad `id` is skipped (game) or not treated as a mod (launcher).
 
@@ -403,7 +409,7 @@ Not frozen. Enough to implement a launcher list:
 
 ```json
 {
-  "id": "some-mod",
+  "id": "some_mod",
   "name": "Some Mod",
   "version": "0.1.0",
   "author": "example",
@@ -411,6 +417,7 @@ Not frozen. Enough to implement a launcher list:
   "api": 1,
   "drh": "20",
   "uses": ["api"],
+  "dependencies": [],
   "url": "https://github.com/example/some-mod/releases/download/0.1.0/some-mod-0.1.0.zip",
   "sha256": "...",
   "source": "https://github.com/example/some-mod"
@@ -428,8 +435,8 @@ In:
 - Fetch and cache the index (same defensive pattern as game updates: size, hash, no silent third-party redirects).
 - List available mods: name, version, author, short description, compat vs installed DRH, `uses`. Warn on `drh` mismatch (older: all kinds; newer: `extends` / `replace` only). Do not block.
 - Install: download zip → verify SHA-256 → extract under `mods/<id>/` with the same zip-slip rules as game archives (directory name = `id`; sideload folders may differ, resolved via `mod.json`).
-- Show installed vs listed, enable / disable, load order.
-- Write `enabled.json` in the mods folder (ordered ids).
+- Show installed vs listed, enable / disable, load order. Dependencies (ids) are shown; warn when an enabled mod's dependency is not enabled.
+- Write `enabled.json` in the mods folder (ordered ids, dependencies before dependents).
 - Offer update when the index has a newer artifact for the same `id`.
 - Open mods folder; install from a local zip (unlisted).
 - Empty state that points at Discord / the index docs.
@@ -437,7 +444,7 @@ In:
 Out of v1 (polish later, same index):
 
 - Ratings, comments, screenshot galleries, collections.
-- Fancy dependency solver UI (there is no `dependencies` field in v1).
+- Dependency solving beyond ordering and a warning (`dependencies` is ids only: no versions, no auto-install).
 - A separate website (optional consumer of the index).
 - Publishing from inside DRHL (authors still PR to the index).
 
@@ -448,7 +455,7 @@ Out of v1 (polish later, same index):
 - Create / open `<install-dir>/mods/`.
 - Fetch the index and present the v1 catalog above.
 - Scan directories that have a `mod.json`. Drop `enabled.json` ids whose folder is gone (on the Mods page scan, not during `--play`).
-- Enable / disable, load order. `drh` is required on every mod. Warn if the installed tag is older than the set (all kinds) or newer (`extends` / `replace` only). Never refuse to enable or Play for that.
+- Enable / disable, load order (topological on `dependencies`, the user's order where free; warn on a dependency that is not enabled). `drh` is required on every mod. Warn if the installed tag is older than the set (all kinds) or newer (`extends` / `replace` only). Never refuse to enable or Play for that.
 - Show `uses` as tags; recommend `api`. Warn that `extends` may break on DRH updates and that `replace` may clash.
 - Once, [first-run disclosure](#first-run-disclosure) before the user actually runs with mods.
 - Write `<install-dir>/mods/enabled.json` (ordered ids).
@@ -460,8 +467,8 @@ The launcher Mods page is the v1 catalog, not a permanent placeholder.
 
 ### Game
 
-- Parse `--mods-dir` from `Sys.args()` in the constructor (like `--fps`). Without the flag, load nothing. Read `enabled.json`. Skip an entry whose `id` is not the kebab regex, or whose folder / `mod.json` is missing (log + `last-run` `skipped`).
-- Create **one** hxScript `Environment` per enabled mod, load that mod's modules, `Compiler.compile(env)` before `onInit`, interpret what was skipped. Do not share script types across mods.
+- Parse `--mods-dir` from `Sys.args()` in the constructor (like `--fps`). Without the flag, load nothing. Read `enabled.json`. Skip an entry whose `id` is not the snake_case regex, whose folder / `mod.json` is missing, or whose `id` was already loaded (log + `last-run` `skipped`).
+- Create **one** hxScript `Environment`. For each enabled mod, in `enabled.json` order, add its `src/**` modules with package `mods.<id>` + sub-folders; a file declaring another package is hxScript's parse error and that mod is `failed`. Then **one** `Compiler.compile(env)` before `onInit`; interpret what was skipped. Attribute each module's compiled / skipped status to its mod by package prefix.
 - Call [lifecycle](#lifecycle): `onInit` in the constructor before `new DBFacade()`, `onReady` in `architectureLoaded` before `run()` and `mainStateMachine.start()`, `tablesLoaded` on `ManagersLoadedEvent`, gameplay events when heroes/floors appear, `onDispose` in `onExit` before `mSteamworks.dispose()`, reverse load order. Keep the overlay root above the facade's layers (`addRootDisplayObject`, above the letterbox).
 - Isolate errors: a throwing mod must not take down the whole boot. Write [last-run.json](#last-run-report) when `--mods-dir` is set. Log one `Logger.info` line per mod at load (`id`, `version`, `uses`, compiled vs interpreted).
 
@@ -515,9 +522,15 @@ Intended game build flags (the `hxscript` lib is **our fork**, not stock `Megumi
 
 **Trust model:** index review + artifact SHA-256. The sandbox is a guard against accidental `Sys` / file / process use on the interpreted fallback, not a prison and not something to review "escapes" against.
 
-The compiled path is not automatic: the host must call `Compiler.compile(env)` **for each mod's `Environment`** and wire `Compiler.ambient` / `Compiler.statics` on that env (hxScript trap: interpreter ambients are not the compiler's).
+The compiled path is not automatic: the host must call `Compiler.compile(env)` on the shared `Environment` and wire `Compiler.ambient` / `Compiler.statics` on it (hxScript trap: interpreter ambients are not the compiler's).
 
-**Isolation (v1):** one `Environment` per mod. hxScript cannot share a short type name across modules in the same world (`entry: "Main"` in two mods would collide). A scripted class referenced from another world also stays interpreted. So worlds are not shared, and `mod.json` has no `dependencies`. Mods talk to the host (facade, events, `replace` registry), not to each other's types.
+**One world, one batch (v1).** All enabled mods go into a single `Environment` and a single `Compiler.compile(env)`. That is what lets a mod import another's types *and* stay compiled: hxScript leaves a module interpreted when it names a scripted class from another batch ("cppia resolves a class either inside the module being loaded or as a host class, and a scripted class elsewhere is neither"). Inside one batch, "every module is declared before any is emitted, so they may refer to each other in any order". The price is known and accepted:
+
+- **Skips cascade.** If `mods.cool_lib.Api` is refused, every module naming it is skipped too (`uses mods.cool_lib.Api, which is interpreted`) and runs interpreted. A parse error in `cool_lib` means it declares nothing and its dependents fail at their import. `dependencies` in `mod.json` makes that visible and orders the load; it does not remove the coupling.
+- **Blast radius of `Module.boot()`.** One cppia module for everyone: if hxScript's pre-checks let through something the loader rejects, the whole batch is reported and every mod runs interpreted — slower, not broken. Per-mod worlds would confine that; they would also forbid compiled inter-mod use. The trade is taken.
+- **No selective unload.** Dropping the world drops all mods. We do not unload in v1.
+
+Name collisions are excluded by the [package rule](#modjson), not by isolation: `Environment.addModule` silently replaces a module at the same path, and hxcpp's cppia class table overwrites a same-named class (`CppiaClasses.cpp`, `linkClass`: "Overwrite cppia classes"), so the host refuses a duplicate `id` and hxScript refuses a file whose package is not `mods.<id>…` before either can happen.
 
 Bytecode cache: hxScript can hand back cppia bytes. A disk cache (invalidated when the game version, `mod.json`, or sources change) is a future optimization, not a requirement for mods to be "compiled".
 
@@ -542,7 +555,7 @@ Out of scope for this documentation pass; needed before a real host:
 1. Pin the **hxScript fork** as the lasting `hxscript` dependency (classpath-entry bridge scan + exclude, `*.macro.hx` skipped, `replace`). Same model as the other submodules: rebased on `MeguminBOT/hxscript`, our commits on top, PRs upstream right after they work for DRH, no waiting on acceptance.
 2. hxcpp: run hxScript's `patches/apply-hxcpp.py` on `submodules/hxcpp` (same fixes as [`MeguminBOT/hxcpp`, `patched-hxscript`](https://github.com/MeguminBOT/hxcpp/tree/patched-hxscript)). Without them, a compiled script can disagree with the same script interpreted. Interpreting is not blocked. `-D hxscript_cppia_bool_compat` only until the apply.
 3. `-D hxscript_cppia`, `-D scriptable`, and a first build with `-D hxscript_verbose`. `-dce no` plus `include('haxe')` / `include('sys')` with ignore lists filled in by what fails on hxcpp. Call `cpp.cppia.Host.enableJit(true)` before loading mods.
-4. `src/modding/` host: move the `uncaughtError` listener to the top of the constructor (null-guard `mDBFacade`); parse `--mods-dir`; one `Environment` per mod; compile, then `onInit` before `new DBFacade()`; re-register the overlay root with `addRootDisplayObject` above the letterbox after `init()`; `onReady` in `architectureLoaded` after `initTime()`, before `run()` and `mainStateMachine.start()`; plus `heroSpawned` / `heroDespawned` / `floorEnter` / `floorExit`. `-D hxscript_host=modding`; `-D hxscript_bridge_classpath=src,src-steam,compat` with `DungeonBustersProject` excluded; `-D hxscript_bridge_packages=openfl,lime,swf,steamwrap`; `-D hxscript_keep=cpp.vm.Gc,cpp.vm.Profiler`; route `ASCompat.createInstance` through the `replace` table; call `replace` from `onInit`.
+4. `src/modding/` host: move the `uncaughtError` listener to the top of the constructor (null-guard `mDBFacade`); parse `--mods-dir`; one shared `Environment`, modules under `mods.<id>`, one compile batch, then `onInit` before `new DBFacade()`; re-register the overlay root with `addRootDisplayObject` above the letterbox after `init()`; `onReady` in `architectureLoaded` after `initTime()`, before `run()` and `mainStateMachine.start()`; plus `heroSpawned` / `heroDespawned` / `floorEnter` / `floorExit`. `-D hxscript_host=modding`; `-D hxscript_bridge_classpath=src,src-steam,compat` with `DungeonBustersProject` excluded; `-D hxscript_bridge_packages=openfl,lime,swf,steamwrap`; `-D hxscript_keep=cpp.vm.Gc,cpp.vm.Profiler`; route `ASCompat.createInstance` through the `replace` table; call `replace` from `onInit`.
 5. Launcher side: index fetch, catalog install (hash-verify), `enabled.json`, `--mods-dir`, scan, enable, order, display `last-run.json` — no destructive overlay.
 6. Index repository (separate from DRH / DRHL), with PR + CI for new versions.
 
