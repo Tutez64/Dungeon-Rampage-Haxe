@@ -18,7 +18,7 @@ Each row has a status: `open` (not decided), `recommended` (working direction, n
 | Mod kinds (`api` / `extends` / `replace`) | decided | Declared in `mod.json`. Recommend `api`. `extends` / `replace` have version and inter-mod costs; both ship in v1. See [Mod kinds](#mod-kinds). |
 | How the enabled mod list reaches the game | decided | `<install-dir>/mods/enabled.json` (order = load order) plus `--mods-dir <absolute path>`. Game parses `--mods-dir` from `Sys.args()` in the constructor, like `--fps`. No prod CLI id list. Naked exe without the flag loads no mods. See [Passing the list](#passing-the-list). |
 | Scanning mods outside the launcher (debug) | decided | Same `--mods-dir`. Optional later: `--mods-all`, `--mod <id>`. No implicit scan next to the exe. |
-| Lifecycle | decided | Boot: `onInit` **once** at end of `DungeonBustersProject.onInvoke` (after `processArguments`), `onReady` on `ManagersLoadedEvent`, `onDispose` on shutdown. `api: 1` also freezes `heroSpawned` / `heroDespawned` / `floorEnter` / `floorExit`. See [Lifecycle](#lifecycle). |
+| Lifecycle | decided | Boot: `onInit` in the `DungeonBustersProject` constructor, after `--mods-dir` parse + compile and **before `new DBFacade()`** (nothing of the game exists yet, so `replace` covers everything), `onReady` on `ManagersLoadedEvent`, `onDispose` on shutdown. No separate early hook. `api: 1` also freezes `heroSpawned` / `heroDespawned` / `floorEnter` / `floorExit`. See [Lifecycle](#lifecycle). |
 | hxScript `Environment` isolation | decided | **One `Environment` per mod**, `Compiler.compile(env)` per mod. No inter-mod script types in v1; no `dependencies` in `mod.json`. See [Compilation](#compilation). |
 | Checksummed JSON overlay | decided | **No** dedicated warn or block in index, launcher, or host. `sCode` is a weak int-fold; server use unknown; a mismatch would fail dungeon entry, which the author sees. Sideload is already labeled. See [Policy](#policy). |
 | Game → launcher status | decided | `mods/last-run.json` plus one `Logger.info` line per mod at load (`id`, `version`, `uses`, compiled/interpreted). Mods page reads the JSON. See [Last-run report](#last-run-report). |
@@ -45,7 +45,7 @@ The chosen script runtime is a **fork** of [hxScript](https://github.com/Megumin
 Constraints that shape the rest:
 
 - Compiled mods target **hxcpp** only. There is no HashLink target today (`project.xml`).
-- Current boot without mods: `DungeonBustersProject` creates `DBFacade`, then `onInvoke` inits Steam and `processArguments`. `LoadingState` later runs service discovery and `preLoadJson` (GameMaster, `library_server.json`, AttackTimeline). With mods, `--mods-dir` is parsed in the constructor from `Sys.args()`; `onInit` runs **once** at the end of `onInvoke`; `onReady` runs after those three JSON files — account, hero, and floor are still missing. Live state arrives later as events. See [Lifecycle](#lifecycle).
+- Current boot without mods: `DungeonBustersProject` parses `--fps`, creates `DBFacade` (trivial constructor), calls `DBFacade.init(stage)` (which builds `UIHud`, `DBSoundManager`, `SteamInputManager`, `MainStateMachine`, …), then `onInvoke` inits Steam and `processArguments`. `LoadingState` later runs service discovery and `preLoadJson` (GameMaster, `library_server.json`, AttackTimeline). With mods, `--mods-dir` is parsed in the constructor from `Sys.args()`, mods are compiled, and `onInit` runs **before `new DBFacade()`** so a `replace` reaches every host construction; `onReady` runs after those three JSON files — account, hero, and floor are still missing. Live state arrives later as events. See [Lifecycle](#lifecycle).
 - The game is **fully multiplayer** on official servers. The client folds some int fields from GameMaster, AttackTimeline, and `library_server.json` into `sCode` (sent on dungeon entry). That is not a reason to special-case those paths in the catalog. See [Policy](#policy).
 - Updates replace `Dungeon Rampage Haxe/current/`. Mods must live **outside** that directory.
 - The vendored hxcpp (`submodules/hxcpp`) does not yet include hxScript's cppia fixes. Apply them with hxScript's `patches/apply-hxcpp.py` (the `MeguminBOT/hxcpp` `patched-hxscript` branch is the same patch set, not a required remote change). See [Technical prerequisites](#technical-prerequisites).
@@ -177,11 +177,19 @@ Part of the `api` contract. The three methods are **boot** hooks; names are froz
 
 | Method | When | Typical use |
 | --- | --- | --- |
-| `onInit(ctx:ModContext)` | **Once**, at the end of `DungeonBustersProject.onInvoke`, after `processArguments`. Host, stage, Steam, and CLI feature flags are up. `LoadingState`, service discovery, and `preLoadJson` have not started. Later AIR `invoke` events must not call it again. | `replace(...)`, subscribe to events, overlay on `stage`. No GameMaster yet; state wrappers are empty. |
+| `onInit(ctx:ModContext)` | In the `DungeonBustersProject` constructor, after `--mods-dir` parse and compile, **before `new DBFacade()`**. The process and `stage` are up; **nothing of the game is constructed yet** (no facade, no HUD, no state machine, no Steam, no feature flags). | `replace(...)`, subscribe to events, overlay on `stage`. No GameMaster yet; state wrappers are empty. Read feature flags in `onReady`, not here. |
 | `onReady(ctx:ModContext)` | After GameMaster, AttackTimeline, and `library_server` have loaded. Account, heroes, and floors are **not** there. Config-based feature flags may already be applied (`LoadingState.configReady` runs before `preLoadJson`). | Read static tables (names, stats from GameMaster). Not Unity `Start`. Live wrappers stay empty. |
 | `onDispose()` | Process shutdown (unload later if we ever need it) | Timers, listeners. Must not block exiting. |
 
-`--mods-dir` is parsed earlier, in the constructor from `Sys.args()` (like `--fps`), so compile can finish before `onInit`. See [Passing the list](#passing-the-list).
+`--mods-dir` is parsed just before, in the constructor from `Sys.args()` (like `--fps`), so compile finishes before `onInit`. See [Passing the list](#passing-the-list).
+
+Why that early, and why not a second hook: `DBFacade.init(stage)` constructs `UIHud`, `DBSoundManager`, `SteamInputManager`, `MenuNavigationController`, `MainStateMachine`, …. A `replace` registered later would miss all of them, and the vanilla HUD is an obvious target. A dedicated early hook for `replace` would hand mods a `ModContext` with half its fields null and a second "what exists here" rule to learn; that rule would move with every boot refactor (Starling). Two stable anchors instead: "before anything" (`onInit`) and "static data loaded" (`onReady`). What `onInit` gives up by moving is weak: Steam identity is asynchronous anyway, and feature flags are only complete after `LoadingState.configReady` (config over CLI), so `onReady` was already the honest place to read them.
+
+Host obligations that follow:
+
+- **Overlay root stays on top.** Created before the facade adds its own layers, it would otherwise end up underneath. The host re-raises it after `DBFacade.init` (or keeps it topmost on stage `ADDED`). Authors do not manage z-order against vanilla.
+- **Throw isolation is the host's.** The game's `uncaughtError` listener is installed at the end of the constructor; `onInit` runs before it. The host wraps each mod's `onInit` itself.
+- **Startup cost.** Parse + compile of every enabled mod happens before the first frame (hxScript: ≈10 ms per module). Measure with real mods; a bytecode cache is the later lever.
 
 ### Gameplay events (`api: 1`)
 
@@ -414,7 +422,7 @@ The launcher Mods page is the v1 catalog, not a permanent placeholder.
 
 - Parse `--mods-dir` from `Sys.args()` in the constructor (like `--fps`). Without the flag, load nothing. Read `enabled.json`. Skip an entry whose `id` is not the kebab regex, or whose folder / `mod.json` is missing (log + `last-run` `skipped`).
 - Create **one** hxScript `Environment` per enabled mod, load that mod's modules, `Compiler.compile(env)` before `onInit`, interpret what was skipped. Do not share script types across mods.
-- Call [lifecycle](#lifecycle): `onInit` once at end of `onInvoke`, `onReady` after GM/timelines/library, gameplay events when heroes/floors appear, `onDispose` on shutdown.
+- Call [lifecycle](#lifecycle): `onInit` in the constructor before `new DBFacade()`, `onReady` after GM/timelines/library, gameplay events when heroes/floors appear, `onDispose` on shutdown. Keep the overlay root above the facade's layers.
 - Isolate errors: a throwing mod must not take down the whole boot. Write [last-run.json](#last-run-report) when `--mods-dir` is set. Log one `Logger.info` line per mod at load (`id`, `version`, `uses`, compiled vs interpreted).
 
 Target package (not implemented): `src/modding/`. `-D hxscript_bridge_classpath=src` (fork) bridges every eligible class under `src/`; DRH does not annotate each class. `-D hxscript_host=modding` only covers `@:scriptAmbient` / `@:scriptStatic` in the facade.
@@ -486,7 +494,7 @@ Out of scope for this documentation pass; needed before a real host:
 1. Pin the **hxScript fork** as the lasting `hxscript` dependency (classpath bridge scan + exclude, `replace`). Same model as the other submodules: rebased on `MeguminBOT/hxscript`, our commits on top, PRs upstream right after they work for DRH, no waiting on acceptance.
 2. hxcpp: run hxScript's `patches/apply-hxcpp.py` on `submodules/hxcpp` (same fixes as [`MeguminBOT/hxcpp`, `patched-hxscript`](https://github.com/MeguminBOT/hxcpp/tree/patched-hxscript)). Without them, a compiled script can disagree with the same script interpreted. Interpreting is not blocked. `-D hxscript_cppia_bool_compat` only until the apply.
 3. `-D hxscript_cppia`, `-D scriptable`, and a first build with `-D hxscript_verbose`. Stay on default `-dce std`. Call `cpp.cppia.Host.enableJit(true)` before loading mods.
-4. `src/modding/` host: parse `--mods-dir` in the constructor; one `Environment` per mod; `onInit` once at end of `onInvoke`; `onReady` after the JSON files; plus `heroSpawned` / `heroDespawned` / `floorEnter` / `floorExit`. `-D hxscript_host=modding`; `-D hxscript_bridge_classpath=src`; `-D hxscript_bridge_packages=openfl,lime`; call `replace` from `onInit`.
+4. `src/modding/` host: parse `--mods-dir` in the constructor; one `Environment` per mod; compile, then `onInit` before `new DBFacade()`; `onReady` after the JSON files; plus `heroSpawned` / `heroDespawned` / `floorEnter` / `floorExit`. `-D hxscript_host=modding`; `-D hxscript_bridge_classpath=src`; `-D hxscript_bridge_packages=openfl,lime`; call `replace` from `onInit`.
 5. Launcher side: index fetch, catalog install (hash-verify), `enabled.json`, `--mods-dir`, scan, enable, order, display `last-run.json` — no destructive overlay.
 6. Index repository (separate from DRH / DRHL), with PR + CI for new versions.
 
