@@ -5,7 +5,6 @@ import brain.uI.UIButton;
 import dBGlobals.DBGlobal;
 import facade.DBFacade;
 import facade.Locale;
-import flash.desktop.NativeApplication;
 import flash.net.URLRequest;
 
 class UIExitPopup extends DBUITwoButtonPopup {
@@ -46,7 +45,7 @@ class UIExitPopup extends DBUITwoButtonPopup {
 	}
 
 	function exitApplicationAction() {
-		NativeApplication.nativeApplication.exit();
+		mDBFacade.exitApplication();
 	}
 
 	function closePopupAction() {
