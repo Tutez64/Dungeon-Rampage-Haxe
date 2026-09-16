@@ -29,6 +29,8 @@ class DungeonBustersProject extends GameEntry {
 
 	var mDBFacade:DBFacade;
 
+	var mSteamDisposed:Bool = false;
+
 	public function new() {
 		super();
 		var _loc1_:String = null;
@@ -175,6 +177,10 @@ class DungeonBustersProject extends GameEntry {
 	}
 
 	function onExit(e:Event) {
+		if (mSteamDisposed) {
+			return;
+		}
+		mSteamDisposed = true;
 		Logger.info("Exiting application, cleaning up Steam");
 		mDBFacade.mSteamworks.dispose();
 	}

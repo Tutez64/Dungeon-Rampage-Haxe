@@ -47,6 +47,7 @@ import flash.display.Loader;
 import flash.display.MovieClip;
 import flash.display.Shape;
 import flash.display.Stage;
+import flash.desktop.NativeApplication;
 import flash.events.Event;
 import flash.events.FocusEvent;
 import flash.events.KeyboardEvent;
@@ -842,6 +843,14 @@ class DBFacade extends Facade {
 	public function errorPopup(title:String, message:String, UILayerName:String = "") {
 		var _loc4_ = new DBUIOneButtonPopup(this, title, message, Locale.getString("OK"), null, true, null, null, null, ASCompat.stringAsBool(UILayerName));
 		MemoryTracker.track(_loc4_, "DBUIOneButtonPopup - created in DBFacade.errorPopup()");
+	}
+
+	public function exitApplication(code:Int = 0) {
+		var exiting = new Event(Event.EXITING, false, true);
+		if (!NativeApplication.nativeApplication.dispatchEvent(exiting)) {
+			return;
+		}
+		NativeApplication.nativeApplication.exit(code);
 	}
 
 	function getUserAgent():String {
