@@ -19,6 +19,8 @@ class DungeonBustersProject extends GameEntry {
 
 	var mSteamStarted:Bool = false;
 
+	var mSteamDisposed:Bool = false;
+
 	public function new() {
 		super();
 		stage.scaleMode = "noScale";
@@ -71,6 +73,10 @@ class DungeonBustersProject extends GameEntry {
 	}
 
 	function onExit(e:Event) {
+		if (mSteamDisposed) {
+			return;
+		}
+		mSteamDisposed = true;
 		Logger.info("Exiting application, cleaning up Steam");
 		mDBFacade.mSteamworks.dispose();
 		TweeningProxy.shutdown();
