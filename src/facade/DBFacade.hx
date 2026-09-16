@@ -62,6 +62,7 @@ import flash.display.DisplayObject;
 import flash.display.MovieClip;
 import flash.display.Shape;
 import flash.display.Stage;
+import flash.desktop.NativeApplication;
 import flash.events.Event;
 import flash.events.FocusEvent;
 import flash.events.KeyboardEvent;
@@ -940,6 +941,14 @@ class DBFacade extends Facade {
 		}
 		var _loc4_ = new DBUIOneButtonPopup(this, uiLayerName, title, message, Locale.getString("OK"), null);
 		MemoryTracker.track(_loc4_, "DBUIOneButtonPopup - created in DBFacade.errorPopup()");
+	}
+
+	public function exitApplication(code:Int = 0) {
+		var exiting = new Event(Event.EXITING, false, true);
+		if (!NativeApplication.nativeApplication.dispatchEvent(exiting)) {
+			return;
+		}
+		NativeApplication.nativeApplication.exit(code);
 	}
 
 	function getUserAgent():String {
