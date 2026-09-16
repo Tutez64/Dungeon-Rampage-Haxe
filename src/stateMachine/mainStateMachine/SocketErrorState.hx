@@ -5,7 +5,6 @@ import brain.utils.MemoryTracker;
 import facade.DBFacade;
 import facade.Locale;
 import uI.popup.DBUIOneButtonPopup;
-import flash.desktop.NativeApplication;
 
 class SocketErrorState extends State {
 	public static inline final NAME = "SocketErrorState";
@@ -32,7 +31,7 @@ class SocketErrorState extends State {
 	}
 
 	function errorDialogResponce() {
-		NativeApplication.nativeApplication.exit();
+		mDBFacade.exitApplication();
 	}
 
 	public function enterReason(errorCode:UInt, errorText:String = ""):DBUIOneButtonPopup {
