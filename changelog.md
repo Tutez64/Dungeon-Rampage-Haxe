@@ -18,4 +18,5 @@ At tag time, copy these sections into the GitHub release notes under `Changelog`
 ### Improved
 
 - Internal: Lime, OpenFL, and hxcpp submodules updated. OpenFL draft APIs
-  compile, which the upcoming hxScript host needs.
+  compile, which the upcoming hxScript host needs. hxScript is vendored as
+  `submodules/hxscript` ([Tutez64/hxscript](https://github.com/Tutez64/hxscript)).

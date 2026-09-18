@@ -41,7 +41,7 @@ The game owns the runtime. The launcher owns the folder, enablement, and launch.
 
 Dungeon Rampage Haxe (DRH) is a Haxe/OpenFL port, compiled natively with **hxcpp**. Official Dungeon Rampage is still moving (art overhaul, Starling for 1.0), so DRH internals will keep changing.
 
-The script runtime is a **fork** of [hxScript](https://github.com/MeguminBOT/hxscript): mods in ordinary Haxe, compiled **in-process** to cppia, no Haxe toolchain on the player's machine. Same model as `submodules/*`: rebase on upstream, stack our commits, PR immediately, do not wait for acceptance. Stock hxScript already bridges whole packages (`-D hxscript_bridge_packages`) but has no classpath-entry scan and no `replace`; both are v1 work in the fork.
+The script runtime is a **fork** of [hxScript](https://github.com/MeguminBOT/hxscript), pinned as [`submodules/hxscript`](https://github.com/Tutez64/hxscript): mods in ordinary Haxe, compiled **in-process** to cppia, no Haxe toolchain on the player's machine. Same model as the other submodules: rebase on upstream, stack our commits, PR immediately, do not wait for acceptance. Stock hxScript already bridges whole packages (`-D hxscript_bridge_packages`) but has no classpath-entry scan and no `replace`; both are v1 work in the fork.
 
 Constraints:
 
@@ -491,7 +491,7 @@ Vanilla code will follow DR.
 
 Needed before a real host; not a restatement of the rules above.
 
-1. Pin the hxScript fork (`hxscript_bridge_classpath` + exclude, skip `*.macro.hx`, `replace`).
+1. Pin the hxScript fork (`submodules/hxscript`). Still to add on the fork: classpath-entry scan + exclude, skip `*.macro.hx`, `replace`.
 2. Apply `patches/apply-hxcpp.py` to `submodules/hxcpp`. Interpreting is not blocked. `-D hxscript_cppia_bool_compat` only until the apply.
 3. First cppia build: `-D hxscript_cppia`, `-D scriptable`, `-D hxscript_verbose`, `-dce no`, std includes, `enableJit(true)` before loading mods. Fill ignore lists from what fails.
 4. Implement `src/modding/` per this document (`uncaughtError` / `exiting` at the top of the constructor, `--mods-dir`, one world, lifecycle, overlay re-register, `ASCompat.createInstance` → `replace` table). Bake the release tag number (no `V`) into the host so `last-run.json` can write `drh`.

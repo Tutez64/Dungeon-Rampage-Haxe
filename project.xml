@@ -15,6 +15,7 @@
 	<haxelib name="openfl" path="submodules/openfl" />
 	<!-- Last -cp wins; Lime appends draft-api after OpenFL src, which overlays Context3D. -->
 	<source path="submodules/openfl/src" if="cpp" />
+	<haxelib name="hxscript" path="submodules/hxscript" if="cpp" />
 	<haxelib name="format" if="cpp" />
 
 	<haxedef name="HXCPP_GC_BIG_BLOCKS" />

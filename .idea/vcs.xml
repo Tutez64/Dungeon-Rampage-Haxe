@@ -4,6 +4,7 @@
     <mapping directory="$PROJECT_DIR$" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/submodules/SteamWrap" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/submodules/hxcpp" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/submodules/hxscript" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/submodules/lime" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/submodules/openfl" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/submodules/swf" vcs="Git" />

@@ -13,3 +13,6 @@
 [submodule "submodules/hxcpp"]
 	path = submodules/hxcpp
 	url = https://github.com/Tutez64/hxcpp
+[submodule "submodules/hxscript"]
+	path = submodules/hxscript
+	url = https://github.com/Tutez64/hxscript

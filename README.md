@@ -57,10 +57,11 @@ This project required months of work, most of it in the following open-source pr
 - [ax4](https://github.com/Tutez64/ax4), my AS3 to Haxe converter based on ax3.
 - [OpenFL](https://github.com/Tutez64/openfl), [SWF](https://github.com/Tutez64/swf), [Lime](https://github.com/Tutez64/lime), and [hxcpp](https://github.com/Tutez64/hxcpp).
 - [SteamWrap](https://github.com/Tutez64/SteamWrap), used to replace the Steam ANE.
+- [hxScript](https://github.com/Tutez64/hxscript), the in-process Haxe/cppia runtime for mods.
 
 ## Build from source
 
-The project depends on forked versions of OpenFL, Lime, SWF, hxcpp, and SteamWrap,
+The project depends on forked versions of OpenFL, Lime, SWF, hxcpp, SteamWrap, and hxScript,
 which are included as Git submodules.
 
 ### Requirements
@@ -100,6 +101,7 @@ haxelib dev openfl submodules/openfl
 haxelib dev swf submodules/swf
 haxelib dev steamwrap submodules/SteamWrap
 haxelib dev hxcpp submodules/hxcpp
+haxelib dev hxscript submodules/hxscript
 ```
 
 ### Rebuild helper tools
