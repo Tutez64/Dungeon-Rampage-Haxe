@@ -41,14 +41,13 @@ The game owns the runtime. The launcher owns the folder, enablement, and launch.
 
 Dungeon Rampage Haxe (DRH) is a Haxe/OpenFL port, compiled natively with **hxcpp**. Official Dungeon Rampage is still moving (art overhaul, Starling for 1.0), so DRH internals will keep changing.
 
-The script runtime is a **fork** of [hxScript](https://github.com/MeguminBOT/hxscript), pinned as [`submodules/hxscript`](https://github.com/Tutez64/hxscript): mods in ordinary Haxe, compiled **in-process** to cppia, no Haxe toolchain on the player's machine. Same model as the other submodules: rebase on upstream, stack our commits, PR immediately, do not wait for acceptance. Stock hxScript already bridges whole packages (`-D hxscript_bridge_packages`) but has no classpath-entry scan and no `replace`; both are v1 work in the fork.
+The script runtime is a **fork** of [hxScript](https://github.com/MeguminBOT/hxscript), pinned as [`submodules/hxscript`](https://github.com/Tutez64/hxscript): mods in ordinary Haxe, compiled **in-process** to cppia, no Haxe toolchain on the player's machine. Same model as the other submodules: rebase on upstream, stack our commits, PR immediately, do not wait for acceptance. Stock hxScript bridges whole packages (`-D hxscript_bridge_packages`). The fork adds the classpath-entry scan, the exclude list, and `replace`.
 
 Constraints:
 
 - hxcpp only (`project.xml`).
 - Fully multiplayer on official servers. The client `sCode` fold is not a catalog special case ([Policy](#policy)).
 - Updates replace `Dungeon Rampage Haxe/current/`. Mods live **outside** that directory.
-- Vendored hxcpp (`submodules/hxcpp`) still needs hxScript's cppia fixes (`patches/apply-hxcpp.py`). [Prerequisites](#technical-prerequisites).
 
 ## Architecture
 
@@ -451,7 +450,7 @@ Intended game build flags (`hxscript` = **our fork**):
 -D hxscript_sandbox
 ```
 
-**Bridge scan (fork).** Submodules each have one root package, so stock `-D hxscript_bridge_packages=openfl,lime,swf,steamwrap` covers them (recursive; presets' ignore lists do not apply). DRH's own roots need a **classpath-entry scan** — walking the empty root would include the std — so the fork adds `-D hxscript_bridge_classpath=src,src-steam,compat` and `-D hxscript_bridge_exclude`. Necessity is `compat/` (root-level types no package scan can reach); for `src/` alone a 35-package list would do. The define names **classpath entries** walked with an **empty package**, not a package called `src` (`modulesUnder("src")` would look for `src/src/` and emit `src.actor.Hero`). The walk skips `*.macro.hx`. `-D hxscript_host=modding` stays upstream's meaning: packages scanned for `@:scriptAmbient` / `@:scriptStatic`. `-D scriptable` is hxcpp's cppia flag; it does not generate extend bridges.
+**Bridge scan (fork).** Submodules each have one root package, so stock `-D hxscript_bridge_packages=openfl,lime,swf,steamwrap` covers them (recursive; presets' ignore lists do not apply). DRH's own roots need a **classpath-entry scan** — walking the empty root would include the std — so the pinned fork has `-D hxscript_bridge_classpath=src,src-steam,compat` and `-D hxscript_bridge_exclude`. Necessity is `compat/` (root-level types no package scan can reach); for `src/` alone a 35-package list would do. The define names **classpath entries** walked with an **empty package**, not a package called `src` (`modulesUnder("src")` would look for `src/src/` and emit `src.actor.Hero`). The walk skips `*.macro.hx`. `-D hxscript_host=modding` stays upstream's meaning: packages scanned for `@:scriptAmbient` / `@:scriptStatic`. `-D scriptable` is hxcpp's cppia flag; it does not generate extend bridges.
 
 If the first verbose build is too fat: exclude `openfl._internal` and Lime backends first, then consider narrowing to display roots (`openfl.display`, `openfl.text`, `openfl.geom`, `openfl.events`) plus named types.
 
@@ -459,7 +458,7 @@ If the first verbose build is too fat: exclude `openfl._internal` and Lime backe
 
 `-dce no` keeps what is **typed**; it does not type what nothing references. A mod calling `haxe.crypto.Sha256` when nothing in the host names it gets `Type not found`. Libraries are already covered (Autowire + the bridge scan). The std is the gap. DRH goes **further than hxScript** and force-includes it: `--macro include('haxe', true, ['haxe.macro'])` and `include('sys', true, ['sys.db'])`. `sys` is 34 modules and Lime already types most of them; the net addition is `Http`, `FileStat`, thread pools, `EventLoop`, `Condition`, `Semaphore`, `ssl.Digest`. `sys.db` is excluded up front (`Sqlite` / `Mysql` need linking). Expect the `haxe` ignore list to grow at the first build. Force-typing `sys.io.File` and friends is not at odds with the sandbox blacklisting those names: the blacklist is interpreter-only, cppia never reads it, and Lime types those classes anyway. `cpp.*` is **not** included wholesale (`cpp.objc`, `cpp.link`); name what a mod may want via `-D hxscript_keep`. Cost is mostly **build time** (one `.cpp` per class). If it hurts, grow the ignore list; never return to `-dce std`.
 
-**hxcpp.** Patch the existing submodule: `python patches/apply-hxcpp.py --path submodules/hxcpp`. Do not switch the remote to `MeguminBOT/hxcpp`. Until that apply, `-D hxscript_cppia_bool_compat` is the Bool/JIT palliative.
+**hxcpp.** Patched with `patches/apply-hxcpp.py` on `submodules/hxcpp`.
 
 **JIT.** `cpp.cppia.Host.enableJit(true)` once, process-wide, **before** any module loads. If we compile, we jit. A known hxcpp JIT segfault on `'' + (n == 1)` is in the same patch set.
 
@@ -491,8 +490,8 @@ Vanilla code will follow DR.
 
 Needed before a real host; not a restatement of the rules above.
 
-1. Pin the hxScript fork (`submodules/hxscript`). Still to add on the fork: classpath-entry scan + exclude, skip `*.macro.hx`, `replace`.
-2. Apply `patches/apply-hxcpp.py` to `submodules/hxcpp`. Interpreting is not blocked. `-D hxscript_cppia_bool_compat` only until the apply.
+1. **Done**. Patch hxScript. Except `replace` which is still missing. Further generator fixes may still show up on the first cppia build.
+2. **Done.** hxcpp cppia patch.
 3. First cppia build: `-D hxscript_cppia`, `-D scriptable`, `-D hxscript_verbose`, `-dce no`, std includes, `enableJit(true)` before loading mods. Fill ignore lists from what fails.
 4. Implement `src/modding/` per this document (`uncaughtError` / `exiting` at the top of the constructor, `--mods-dir`, one world, lifecycle, overlay re-register, `ASCompat.createInstance` → `replace` table). Bake the release tag number (no `V`) into the host so `last-run.json` can write `drh`.
 5. Launcher: index fetch, catalog install, `enabled.json`, `--mods-dir`, `last-run.json` display — no destructive overlay.
