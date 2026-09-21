@@ -30,7 +30,7 @@ The game owns the runtime. The launcher owns the folder, enablement, and launch.
 | Index schema / repo URL | open | Draft shape in [Distribution](#distribution). |
 | Thunderstore / Nexus / itch as mirrors | open | Optional later; must not replace `mod.json` or the index. |
 | Resource overlay rules | open | `Resources/` is composited at runtime; precedence, SWF vs JSON, and `Locale/` merge are unspecified. No separate `locale/` tree. |
-| `-D hxscript_sandbox` | decided | Interpreter-only blacklist. Not a security boundary. [Compilation](#compilation) |
+| Type blacklist | decided | None. Interpreted and compiled see the same types. [Compilation](#compilation) |
 | Host build (cppia) | decided | `-dce no`, force-include std, patch hxcpp, JIT on, first build verbose. [Compilation](#compilation) |
 | Mod `id` and zip extract | decided | `id` = folder = package `mods.<id>`. Regex + keyword/reserved-name lists. No zip-slip, no size cap. [`mod.json`](#modjson) |
 | `dependencies` cycles | decided | Not an error. Launcher warns, keeps user order inside the cycle. [Passing the list](#passing-the-list) |
@@ -99,13 +99,13 @@ How you hook is `uses` (`api` / `extends` / `replace`). A `layers` field (client
 
 **Official tables and `sCode`.** `Resources/Levels/DB_GameMaster.json`, `Resources/Combat/AttackTimeline.json`, and `Resources/Levels/library_server.json` feed `mSecurityGM` / `mSecurityTL` / `mSecuritySL`. The fold only counts runtime `"int"` fields; AttackTimeline is **shallow** (top-level keys of each attack: name, flags, `totalFrames`, the `frames` array object — not nested actions). `{ "type": "helloMod" }` does not change `mSecurityTL`. Timeline/library values are then `% 1097`. `blockCheater()` is only `Hero.BaseMove > 250` in the loaded GameMaster. `sCode` is sent on `ClientRequestEntry`; server use is **unknown**. A mismatch would at most fail dungeon entry (`ResponceCode != 0`). It is not an automatic ban in the client.
 
-v1 does **not** warn or block those three paths in the index, the launcher, or the host. An indexed mod was reviewed and plays; sideload is already labeled unreviewed. Index review still refuses or yanks malware and combat bots / protocol spoof. The hxScript sandbox is not a review criterion ([Compilation](#compilation)).
+v1 does **not** warn or block those three paths in the index, the launcher, or the host. An indexed mod was reviewed and plays; sideload is already labeled unreviewed. Index review still refuses or yanks malware and combat bots / protocol spoof.
 
 ## First-run disclosure
 
 DRHL shows this **once** (launcher config) the first time the user would actually use mods: first enable, or first Play with a non-empty `enabled.json`. Do not nag every launch. **`--play`** with a non-empty `enabled.json` and no confirmation yet opens the **full UI**, like an available update. Browsing the catalog does not require it. Not an EULA lecture: one line that DRH is already a modified client is enough.
 
-1. **Code in-process.** Haxe/cppia inside the game, not a skin pack. Index review is human, not a proof. Sideload is weaker. The sandbox is an interpreter mistake guard, not a jail; compiled mods are not blacklisted.
+1. **Code in-process.** Haxe/cppia inside the game, not a skin pack. Index review is human, not a proof. Sideload is weaker.
 2. **Official servers.** Same as vanilla DRH. No promise about bans either way.
 3. **Updates.** `api` mods follow `api: N`. `extends` / `replace` can break on a DRH update with no `api` bump. A modded session is not supported like vanilla.
 4. **Several mods.** `replace` on the same rewritten surface can clash. Load order is in the launcher.
@@ -447,7 +447,6 @@ Intended game build flags (`hxscript` = **our fork**):
 --macro include('haxe', true, ['haxe.macro'])         # DRH: force-type the std; ignore list grows with what fails on hxcpp
 --macro include('sys', true, ['sys.db'])             # sys.db is @:cffi over hxcpp sqlite/mysql
 -D hxscript_keep=cpp.vm.Gc,cpp.vm.Profiler           # cpp.* by name (package has objc / link)
--D hxscript_sandbox
 ```
 
 **Bridge scan (fork).** Submodules each have one root package, so stock `-D hxscript_bridge_packages=openfl,lime,swf,steamwrap` covers them (recursive; presets' ignore lists do not apply). DRH's own roots need a **classpath-entry scan** — walking the empty root would include the std — so the pinned fork has `-D hxscript_bridge_classpath=src,src-steam,compat` and `-D hxscript_bridge_exclude`. Necessity is `compat/` (root-level types no package scan can reach); for `src/` alone a 35-package list would do. The define names **classpath entries** walked with an **empty package**, not a package called `src` (`modulesUnder("src")` would look for `src/src/` and emit `src.actor.Hero`). The walk skips `*.macro.hx`. `-D hxscript_host=modding` stays upstream's meaning: packages scanned for `@:scriptAmbient` / `@:scriptStatic`. `-D scriptable` is hxcpp's cppia flag; it does not generate extend bridges.
@@ -456,7 +455,7 @@ If the first verbose build is too fat: exclude `openfl._internal` and Lime backe
 
 **DCE.** DRH and Lime's cpp templates pass no `-dce`, so the build is Haxe's default **`-dce std`**: unused *standard library* members are stripped; game / OpenFL / Lime / swf / SteamWrap never were. The host switches to **`-dce no`**. That is hxScript's cppia position (`-D scriptable` resolves host classes by name at load; DCE removes whatever no compiled call site references). Its probe: 42 of 83 commonly-scripted std members unreachable under `-dce std`, 3 under `-dce no`. `hxscript_keep` as the *primary* mechanism is the same curated list we rejected for bridges.
 
-`-dce no` keeps what is **typed**; it does not type what nothing references. A mod calling `haxe.crypto.Sha256` when nothing in the host names it gets `Type not found`. Libraries are already covered (Autowire + the bridge scan). The std is the gap. DRH goes **further than hxScript** and force-includes it: `--macro include('haxe', true, ['haxe.macro'])` and `include('sys', true, ['sys.db'])`. `sys` is 34 modules and Lime already types most of them; the net addition is `Http`, `FileStat`, thread pools, `EventLoop`, `Condition`, `Semaphore`, `ssl.Digest`. `sys.db` is excluded up front (`Sqlite` / `Mysql` need linking). Expect the `haxe` ignore list to grow at the first build. Force-typing `sys.io.File` and friends is not at odds with the sandbox blacklisting those names: the blacklist is interpreter-only, cppia never reads it, and Lime types those classes anyway. `cpp.*` is **not** included wholesale (`cpp.objc`, `cpp.link`); name what a mod may want via `-D hxscript_keep`. Cost is mostly **build time** (one `.cpp` per class). If it hurts, grow the ignore list; never return to `-dce std`.
+`-dce no` keeps what is **typed**; it does not type what nothing references. A mod calling `haxe.crypto.Sha256` when nothing in the host names it gets `Type not found`. Libraries are already covered (Autowire + the bridge scan). The std is the gap. DRH goes **further than hxScript** and force-includes it: `--macro include('haxe', true, ['haxe.macro'])` and `include('sys', true, ['sys.db'])`. `sys` is 34 modules and Lime already types most of them; the net addition is `Http`, `FileStat`, thread pools, `EventLoop`, `Condition`, `Semaphore`, `ssl.Digest`. `sys.db` is excluded up front (`Sqlite` / `Mysql` need linking). Expect the `haxe` ignore list to grow at the first build. `cpp.*` is **not** included wholesale (`cpp.objc`, `cpp.link`); name what a mod may want via `-D hxscript_keep`. Cost is mostly **build time** (one `.cpp` per class). If it hurts, grow the ignore list; never return to `-dce std`.
 
 **hxcpp.** Patched with `patches/apply-hxcpp.py` on `submodules/hxcpp`.
 
@@ -464,14 +463,14 @@ If the first verbose build is too fat: exclude `openfl._internal` and Lime backe
 
 **Size / time.** Real binary cost: `-D scriptable`, OpenFL/Lime/swf bridges (`DisplayObject` has a large method surface; swf ~240 modules; SteamWrap / `src-steam` / `compat` are negligible), and the `src/` classpath bridges. `-dce no` plus the std include is mostly build time. Measure a first cppia build against current DRH before treating compiled mods as free.
 
-**Sandbox.** `-D hxscript_sandbox` blacklists `Sys`, `sys.io.File`, `sys.io.Process`, `sys.FileSystem`, `sys.net.Socket` (`Boot.blacklist()` → `Config.blacklist`, enforced by `TypeProxy`). `hxscript.cppia` never reads it. OpenFL/Lime I/O (`openfl.net.URLLoader`, `lime.system.System`, …) is bridged and not on that list. Trust is index review + SHA-256, not this flag.
+**No type blacklist.** Do not set `-D hxscript_sandbox`. Interpreted and compiled resolve the same types.
 
 The compiled path is not automatic: the host must call `Compiler.compile(env)` and wire `Compiler.ambient` / `Compiler.statics` (hxScript trap: interpreter ambients are not the compiler's).
 
 **One world, one batch (v1).** All enabled mods go into a single `Environment` and a single `Compiler.compile(env)`. That is what lets a mod import another's types *and* stay compiled: cppia resolves a class either inside the module being loaded or as a host class; a scripted class in another batch is neither. Inside one batch, every module is declared before any is emitted. Price:
 
 - **Skips cascade.** If `mods.cool_lib.Api` is refused, every module naming it is skipped too. A parse error in `cool_lib` means it declares nothing and dependents fail at import. `dependencies` makes that visible; it does not remove the coupling.
-- **Blast radius of `Module.boot()`.** One cppia module for everyone: a loader reject reports the whole batch and every mod runs interpreted — slower, not broken. Per-mod worlds would confine that and forbid compiled inter-mod use.
+- **Blast radius of `Module.boot()`.** A loader reject splits the batch (`narrowOnFailure`, default on) until the bad module is left interpreted. The rest still compile. Per-mod worlds would confine that and forbid compiled inter-mod use.
 - **No selective unload.** Dropping the world drops all mods. v1 does not unload.
 
 Name collisions are excluded by the [package rule](#modjson), not by isolation.
