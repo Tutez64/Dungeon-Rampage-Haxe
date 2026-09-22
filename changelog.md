@@ -20,3 +20,6 @@ At tag time, copy these sections into the GitHub release notes under `Changelog`
 - Internal: Lime, OpenFL, and hxcpp were fixed for the upcoming hxScript
   host. I forked hxScript to improve and fix it (`submodules/hxscript`,
   [Tutez64/hxscript](https://github.com/Tutez64/hxscript)).
+- Internal: Lime, OpenFL, swf, hxcpp, SteamWrap, and hxScript are resolved
+  with `haxelib dev` on the submodules. `project.xml` no longer passes
+  `path=`.
