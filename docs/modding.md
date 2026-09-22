@@ -35,7 +35,7 @@ The game owns the runtime. The launcher owns the folder, enablement, and launch.
 | Mod `id` and zip extract | decided | `id` = folder = package `mods.<id>`. Regex + keyword/reserved-name lists. No zip-slip, no size cap. [`mod.json`](#modjson) |
 | `dependencies` cycles | decided | Not an error. Launcher warns, keeps user order inside the cycle. [Passing the list](#passing-the-list) |
 | `import.hx` in a mod | decided | Skipped with a warning. [`mod.json`](#modjson) |
-| `drh` in `mod.json` | decided | Always required. Closed tag-number string. Mismatch warns, does not block. [`mod.json`](#modjson) |
+| `drh` in `mod.json` | decided | Always required. Closed tag string. Warns, does not block; `api`-only uses the minimum. [`mod.json`](#modjson) |
 
 ## Context
 
@@ -118,7 +118,7 @@ hxScript is ordinary Haxe in-process, not a JS-style "patch any function" runtim
 
 **v1 is facade + host types.** The facade is the recommended path. `extends` / `replace` exist so a mod can still reach what wrappers do not cover. That power is a v1 foundation. Both land in the **hxScript fork**. The `submodules/hxscript` commit is the pin, rebased on upstream, PR'd once it works for DRH. The build finds it through `haxelib dev`. hxScript's compiler is BETA; `replace` touches bridge generation and the emitter, so rebases will conflict more than on lime/openfl. Accepted: the goal is a clean `replace`, not the smallest diff.
 
-- **Facade (`modding.*`).** Boot lifecycle (`onInit` / `onReady` / `onDispose`), gameplay events (`heroSpawned` / `heroDespawned` / `floorEnter` / `floorExit`), overlay/HUD root, input, and a window on live state through wrappers (`ModHero`, floor, inventory, camera, chat — names TBD). Not raw `HeroGameObject`. Wrappers that need a hero or floor stay empty until the matching event. Wrappers + those events are what `api: 1` promises across DRH tags; Starling may reimplement them without bumping `api` if the wrapper contract holds.
+- **Facade (`modding.*`).** Boot lifecycle (`onInit` / `onReady` / `onDispose`), gameplay events (`heroSpawned` / `heroDespawned` / `floorEnter` / `floorExit`), overlay/HUD root, input, and a window on live state through wrappers (`ModHero`, floor, inventory, camera, chat — names TBD). Not raw `HeroGameObject`. Wrappers that need a hero or floor stay empty until the matching event. What `api: N` freezes is in [Versioning](#versioning).
 - **Host types (fork).** Two features, both required for v1:
 
 ### Bridges
@@ -174,9 +174,8 @@ Disjoint-method merge lives in hxScript; DRH calls `replace` and gets one class 
 ### Versioning
 
 - Only `modding.*` wrappers are the **stable** API. `facade.DBFacade`, `actor.*`, `combat.*`, `uI.*` are host types: usable via `extends` / `replace`, not covered by `api` compatibility.
-- Version the facade (`api: 1`) **independently** of the DRH tag (`V20`). **Adding** wrappers without changing existing ones stays `api: 1`. Mods that need the new bits set `drh` so the smallest tag in the set is that release. Bump `api` only when an existing wrapper's contract breaks. A bump to `api: 2` would force every older HUD to update for no reason.
-- A Starling landing that breaks the **wrapper** contract is an API bump; internals moving behind wrappers is not.
-- Official examples in the repo for all three kinds, rebuilt on every bump.
+- `api: N` freezes the written contract of that facade: when an event fires, what a wrapper represents, and the empty-until-event rules. Adding a wrapper without changing an existing one stays `api: N`. Changing that text bumps `api`. Game content behind a stable reading, and OpenFL/Lime used to draw on the overlay, are outside it. The number is a host constant and the same field on the release manifest. The launcher compares `mod.json` to the installed release and warns either way on a mismatch. It does not ask the running game. A release that omits the field has no facade.
+- Official examples for all three kinds live in the repo and are recompiled against the host on every tag. A signature break fails that compile. Whether a call site still matches the written when/what is review.
 
 ## Mod kinds
 
@@ -184,7 +183,7 @@ Recommend **`api`**. The other two exist because the facade will not cover every
 
 | Kind | What it means | DRH versions | Other mods |
 | --- | --- | --- | --- |
-| `api` | Uses only `modding.*` (wrappers, events, overlay root). OpenFL/Lime for drawing on that root is OK; `actor.*` / `combat.*` / `facade.*` are not. | Tied to `api` in `mod.json`. Same or backward-compatible facade → expected to keep working across DRH tags. | Best. No `replace` occupancy. |
+| `api` | Uses only `modding.*` (wrappers, events, overlay root). OpenFL/Lime for drawing on that root is OK; `actor.*` / `combat.*` / `facade.*` are not. | Tied to `api`. [Versioning](#versioning). | Best. No `replace` occupancy. |
 | `extends` | Subclasses or calls **host** types but does **not** `replace` vanilla `new`. Helpers, `new MyRepeater()`, reading public internals. | Tied to those class/method names. Starling / conversions can break it even if `api` is unchanged. | Usually fine with others. Still shares live objects with a `replace` on the same type (`is RepeaterWeaponController` remains true). |
 | `replace` | Explicit `replace(HostClass, Sub)` at `onInit`. Host `new HostClass(...)` becomes the subclass (merge if rewritten methods/fields/`new` are disjoint). | Same host-type fragility as `extends`, plus construction. | Conflicts when rewritten surfaces overlap. One occupancy per method/field/`new`. |
 
@@ -364,8 +363,8 @@ Draft. Shared launcher/game contract, not frozen.
 | `name` | Display name |
 | `version` | Mod version |
 | `author` | Author |
-| `api` | `modding.*` contract version. **Required** if `uses` contains `api`; omit when the mod is only `extends` / `replace`. |
-| `drh` | **Always required.** Tag numbers this artifact was built/tested for (no `V`, no `>=`). `"20"`, `"20,21"`, or `"20-22"` (closed, inclusive). The launcher never blocks Play or enablement on a mismatch; it **warns**: installed tag **older** than the set's minimum (all kinds); installed tag **newer** than the set's maximum — `extends` / `replace` only (`api`-only trusts `api: N` forward). |
+| `api` | `modding.*` version. **Required** if `uses` contains `api`; omit otherwise. [Versioning](#versioning). |
+| `drh` | **Always required.** Tags this artifact was built for (no `V`, no `>=`). `"20"`, `"20,21"`, or `"20-22"` (closed, inclusive). Never blocks. `extends` / `replace`: warn when the installed tag is not in the set. `api` only: warn only when it is older than the minimum, which the author sets to the tag that added the wrappers the mod uses. |
 | `entry` | Short class name, resolved as `mods.<id>.<entry>` (e.g. `Main` → `mods.some_mod.Main`, extends `modding.Mod`). Cannot name anything outside the mod's package. |
 | `uses` | One or more of `api`, `extends`, `replace` |
 | `dependencies` | Ids whose script types this one imports. **Ids only, no versions.** Launcher orders `enabled.json` and warns when one is not enabled. No auto-install, no version solving. May be empty or absent. A cycle is not an error ([Passing the list](#passing-the-list)). |
@@ -482,7 +481,7 @@ Bytecode cache (cppia bytes on disk, invalidated when the game version, `mod.jso
 
 Vanilla code will follow DR.
 
-- **`api` mods** must not depend on internal packages. Wrappers stay the contract. Internals can move with no `api` bump if wrappers hold; a wrapper break **is** a bump.
+- **`api` mods** follow [Versioning](#versioning). Internals can move behind wrappers.
 - **`extends` / `replace`** depend on host types. They can break on Starling without an `api` bump. `drh` is how the launcher warns (not a hard refuse).
 - The game still tries to load; failures go to `last-run.json`.
 
@@ -493,7 +492,7 @@ Needed before a real host; not a restatement of the rules above.
 1. **Done**. Patch hxScript. Except `replace` which is still missing. Further generator fixes may still show up on the first cppia build.
 2. **Done.** hxcpp cppia patch.
 3. First cppia build: `-D hxscript_cppia`, `-D scriptable`, `-D hxscript_verbose`, `-dce no`, std includes, `enableJit(true)` before loading mods. Fill ignore lists from what fails.
-4. Implement `src/modding/` per this document (`uncaughtError` / `exiting` at the top of the constructor, `--mods-dir`, one world, lifecycle, overlay re-register, `ASCompat.createInstance` → `replace` table). Bake the release tag number (no `V`) into the host so `last-run.json` can write `drh`.
+4. Implement `src/modding/` per this document (`uncaughtError` / `exiting` at the top of the constructor, `--mods-dir`, one world, lifecycle, overlay re-register, `ASCompat.createInstance` → `replace` table). Bake the release tag (no `V`) and the `api` number into the host ([Versioning](#versioning)).
 5. Launcher: index fetch, catalog install, `enabled.json`, `--mods-dir`, `last-run.json` display — no destructive overlay.
 6. Index repository (separate from DRH / DRHL), PR + CI for new versions.
 
