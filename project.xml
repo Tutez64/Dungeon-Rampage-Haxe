@@ -7,7 +7,7 @@
 
 	<set name="APP_FILE" value="Dungeon Rampage Haxe" />
 
-	<haxelib name="SteamWrap" if="cpp" />
+	<haxelib name="steamwrap" if="cpp" />
 	<haxelib name="hxcpp" if="cpp" />
 	<haxelib name="lime" if="cpp" />
 	<haxelib name="swf" if="cpp" />

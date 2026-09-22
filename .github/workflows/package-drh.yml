@@ -120,6 +120,7 @@ jobs:
           haxelib dev openfl "$PWD/submodules/openfl"
           haxelib dev swf "$PWD/submodules/swf"
           haxelib dev steamwrap "$PWD/submodules/SteamWrap"
+          haxelib dev hxscript "$PWD/submodules/hxscript"
 
       - name: Bootstrap hxcpp
         shell: bash
