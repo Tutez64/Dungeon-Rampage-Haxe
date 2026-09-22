@@ -7,15 +7,15 @@
 
 	<set name="APP_FILE" value="Dungeon Rampage Haxe" />
 
-	<haxelib name="SteamWrap" path="submodules/SteamWrap" if="cpp" />
-	<haxelib name="hxcpp" path="submodules/hxcpp" if="cpp" />
-	<haxelib name="lime" path="submodules/lime" if="cpp" />
-	<haxelib name="swf" path="submodules/swf" if="cpp" />
+	<haxelib name="SteamWrap" if="cpp" />
+	<haxelib name="hxcpp" if="cpp" />
+	<haxelib name="lime" if="cpp" />
+	<haxelib name="swf" if="cpp" />
 	<define name="draft" />
-	<haxelib name="openfl" path="submodules/openfl" />
+	<haxelib name="openfl" />
 	<!-- Last -cp wins; Lime appends draft-api after OpenFL src, which overlays Context3D. -->
 	<source path="submodules/openfl/src" if="cpp" />
-	<haxelib name="hxscript" path="submodules/hxscript" if="cpp" />
+	<haxelib name="hxscript" if="cpp" />
 	<haxelib name="format" if="cpp" />
 
 	<haxedef name="HXCPP_GC_BIG_BLOCKS" />

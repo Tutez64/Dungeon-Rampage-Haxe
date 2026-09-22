@@ -90,10 +90,10 @@ If you cloned without `--recurse-submodules`, initialize the submodules afterwar
 git submodule update --init --recursive
 ```
 
-### Configure local development libraries
+### Register the submodules with haxelib
 
-The project file references the submodules directly, but registering them with haxelib
-is useful for commands such as `haxelib run openfl` and for rebuilding tools:
+The build resolves these libraries through haxelib. `haxelib dev` is required, and it
+is global: two checkouts share one link. Run the commands from the repository root:
 
 ```bash
 haxelib dev lime submodules/lime
