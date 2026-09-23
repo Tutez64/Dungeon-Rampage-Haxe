@@ -328,8 +328,8 @@ Draft, not frozen:
 | `drh` / `started` | Tag-number string of the game that wrote the file (`"20"`, no `V` — same space as `mod.json`) and UTC start time. The launcher compares `started` with the Play time **it** recorded; `started` alone cannot reveal a crash before the first write (the previous run's file is still there). |
 | `ready` | `false` until `onReady` has run; stays `false` when boot never gets there (`SocketErrorState`, `blockCheater()`). A mod `ok` with `ready: false` only got `onInit`. While the game is still loading the file also says `false`; the launcher disambiguates with process state (alive → loading, exited → boot stopped before `LoadingFinished`). No active avatar still reports `true`. |
 | `status` | `ok` / `failed` / `skipped` (id in `enabled.json` but folder, `mod.json`, or valid `id` missing) |
-| `mode` | `compiled` or `interpreted` (skip reason in `error` when the emitter skipped) |
-| `error` | Present on `failed` / interpreted-with-reason / `replace` overlap. One line; full stack stays in the session log. |
+| `mode` | `compiled` if every module of the mod compiled, `interpreted` if none did, `mixed` otherwise. |
+| `error` | Present on `failed`, `mixed`, an interpreted skip, or a `replace` overlap. One line (`2 modules left interpreted`). Per-module reasons stay in the session log. |
 
 Write after compile + `onInit` (`ready: false`). Rewrite after `onReady` (`ready: true`, plus any `onReady` failure). Update the same file if a later `replace` conflict happens. A crash before the write leaves the previous file; treat it as stale, not live IPC. A missing file (first launch, or crash before the first write) is the same as a stale `started`.
 
