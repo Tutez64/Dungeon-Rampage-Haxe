@@ -267,14 +267,13 @@ jobs:
 
       # SWF zip + generated classes are identical on every cpp target. Lime still
       # writes them under bin/<platform>, so the cache is staged in one place and
-      # copied into the target tree. hashFiles is the real freshness check: after
-      # a git checkout the sources are newer than a restored zip, and Lime would
-      # otherwise rerun Neko.
+      # copied into the target tree. v2 stores a per-library source hash: a
+      # prefix hit refreshes only the libraries that still match.
       - uses: actions/cache@0400d5f644dc74513175e3cd8d07132dd4860809 # v4.2.4
         id: swf-cache
         with:
           path: .ci-cache/swf
-          key: swf-libs-${{ hashFiles('Resources/**/*.swf', 'src/_assets/**/*.swf', 'generated_swf_libraries.xml', 'submodules/swf/**', 'submodules/lime/src/lime/tools/AssetHelper.hx') }}
+          key: swf-libs-v2-${{ hashFiles('Resources/**/*.swf', 'src/_assets/**/*.swf', 'generated_swf_libraries.xml', 'submodules/swf/**', 'submodules/lime/src/lime/tools/AssetHelper.hx', 'tools/release/swf_cache.py') }}
           restore-keys: |
             swf-libs-
 
@@ -290,20 +289,7 @@ jobs:
 
       - name: Install cached SWF libraries
         shell: bash
-        run: |
-          set -euo pipefail
-          platform="${{ inputs.platform }}"
-          stage=".ci-cache/swf"
-          lib="bin/${platform}/obj/libraries"
-          gen="bin/${platform}/haxe/_generated"
-          mkdir -p "$stage/libraries" "$stage/generated" "$lib" "$gen"
-          if [ -n "$(ls -A "$stage/libraries" 2>/dev/null || true)" ]; then
-            cp -a "$stage/libraries/." "$lib/"
-          fi
-          if [ -n "$(ls -A "$stage/generated" 2>/dev/null || true)" ]; then
-            cp -a "$stage/generated/." "$gen/"
-          fi
-          find "$lib" "$gen" -exec touch {} +
+        run: python tools/release/swf_cache.py install --platform "${{ inputs.platform }}"
 
       - name: Build Linux
         if: inputs.platform == 'linux'
@@ -383,17 +369,7 @@ jobs:
 
       - name: Stage SWF libraries for cache
         shell: bash
-        run: |
-          set -euo pipefail
-          platform="${{ inputs.platform }}"
-          stage=".ci-cache/swf"
-          mkdir -p "$stage/libraries" "$stage/generated"
-          if [ -d "bin/${platform}/obj/libraries" ]; then
-            cp -a "bin/${platform}/obj/libraries/." "$stage/libraries/"
-          fi
-          if [ -d "bin/${platform}/haxe/_generated" ]; then
-            cp -a "bin/${platform}/haxe/_generated/." "$stage/generated/"
-          fi
+        run: python tools/release/swf_cache.py stage --platform "${{ inputs.platform }}"
 
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
