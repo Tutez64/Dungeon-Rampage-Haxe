@@ -122,7 +122,22 @@ jobs:
           haxelib dev steamwrap "$PWD/submodules/SteamWrap"
           haxelib dev hxscript "$PWD/submodules/hxscript"
 
+      # ndlls and neko tools. A hit skips the rebuilds below. The key is the
+      # native sources, so a game-only commit restores this and moves on.
+      - uses: actions/cache@0400d5f644dc74513175e3cd8d07132dd4860809 # v4.2.4
+        id: native-cache
+        with:
+          path: |
+            submodules/lime/ndll
+            submodules/lime/run.n
+            submodules/lime/tools/tools.n
+            submodules/swf/run.n
+            submodules/hxcpp/hxcpp.n
+            submodules/SteamWrap/ndll
+          key: native-${{ inputs.platform }}-${{ hashFiles('submodules/lime/**', 'submodules/hxcpp/**', 'submodules/swf/**', 'submodules/SteamWrap/**', 'tools/release/**') }}
+
       - name: Bootstrap hxcpp
+        if: steps.native-cache.outputs.cache-hit != 'true'
         shell: bash
         run: |
           cd submodules/hxcpp/tools/hxcpp
@@ -194,6 +209,7 @@ jobs:
           esac
 
       - name: Rebuild Lime helper tools
+        if: steps.native-cache.outputs.cache-hit != 'true'
         shell: bash
         run: |
           set -euo pipefail
@@ -211,6 +227,7 @@ jobs:
           haxelib run lime rebuild swf
 
       - name: Rebuild Lime native libraries
+        if: steps.native-cache.outputs.cache-hit != 'true'
         shell: bash
         run: |
           set -euo pipefail
@@ -229,6 +246,7 @@ jobs:
           esac
 
       - name: Build SteamWrap
+        if: steps.native-cache.outputs.cache-hit != 'true'
         shell: bash
         run: |
           set -euo pipefail
@@ -246,6 +264,46 @@ jobs:
               haxelib run hxcpp Build.xml -DHXCPP_ARM64 -DHXCPP_ARCH=arm64 -DHXCPP_OPTIMIZE_LINK
               ;;
           esac
+
+      # SWF zip + generated classes are identical on every cpp target. Lime still
+      # writes them under bin/<platform>, so the cache is staged in one place and
+      # copied into the target tree. hashFiles is the real freshness check: after
+      # a git checkout the sources are newer than a restored zip, and Lime would
+      # otherwise rerun Neko.
+      - uses: actions/cache@0400d5f644dc74513175e3cd8d07132dd4860809 # v4.2.4
+        id: swf-cache
+        with:
+          path: .ci-cache/swf
+          key: swf-libs-${{ hashFiles('Resources/**/*.swf', 'src/_assets/**/*.swf', 'generated_swf_libraries.xml', 'submodules/swf/**', 'submodules/lime/src/lime/tools/AssetHelper.hx') }}
+          restore-keys: |
+            swf-libs-
+
+      # hxcpp rebuilds a .cpp only when it changed. restore-keys hands back the
+      # previous object tree for this platform when the exact key misses.
+      - uses: actions/cache@0400d5f644dc74513175e3cd8d07132dd4860809 # v4.2.4
+        id: cpp-cache
+        with:
+          path: bin/${{ inputs.platform }}/obj
+          key: cpp-obj-${{ inputs.platform }}-${{ hashFiles('project.xml', 'src/**', 'src-steam/**', 'compat/**', 'generated_swf_libraries.xml', 'submodules/hxcpp/**', 'submodules/hxscript/**', 'submodules/openfl/**', 'submodules/lime/**', 'submodules/swf/**', 'submodules/SteamWrap/**') }}
+          restore-keys: |
+            cpp-obj-${{ inputs.platform }}-
+
+      - name: Install cached SWF libraries
+        shell: bash
+        run: |
+          set -euo pipefail
+          platform="${{ inputs.platform }}"
+          stage=".ci-cache/swf"
+          lib="bin/${platform}/obj/libraries"
+          gen="bin/${platform}/haxe/_generated"
+          mkdir -p "$stage/libraries" "$stage/generated" "$lib" "$gen"
+          if [ -n "$(ls -A "$stage/libraries" 2>/dev/null || true)" ]; then
+            cp -a "$stage/libraries/." "$lib/"
+          fi
+          if [ -n "$(ls -A "$stage/generated" 2>/dev/null || true)" ]; then
+            cp -a "$stage/generated/." "$gen/"
+          fi
+          find "$lib" "$gen" -exec touch {} +
 
       - name: Build Linux
         if: inputs.platform == 'linux'
@@ -322,6 +380,20 @@ jobs:
           test -f "$macos_app/Contents/MacOS/libsteam_api.dylib"
           test -f "$macos_app/Contents/MacOS/steam_appid.txt"
           test -n "$(find "$macos_app/Contents/Resources/Resources/ffdec_fonts" -name '*.ttf' | head -n 1)"
+
+      - name: Stage SWF libraries for cache
+        shell: bash
+        run: |
+          set -euo pipefail
+          platform="${{ inputs.platform }}"
+          stage=".ci-cache/swf"
+          mkdir -p "$stage/libraries" "$stage/generated"
+          if [ -d "bin/${platform}/obj/libraries" ]; then
+            cp -a "bin/${platform}/obj/libraries/." "$stage/libraries/"
+          fi
+          if [ -d "bin/${platform}/haxe/_generated" ]; then
+            cp -a "bin/${platform}/haxe/_generated/." "$stage/generated/"
+          fi
 
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
