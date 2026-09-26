@@ -134,7 +134,7 @@ jobs:
             submodules/swf/run.n
             submodules/hxcpp/hxcpp.n
             submodules/SteamWrap/ndll
-          key: native-${{ inputs.platform }}-${{ hashFiles('submodules/lime/**', 'submodules/hxcpp/**', 'submodules/swf/**', 'submodules/SteamWrap/**', 'tools/release/**') }}
+          key: native-${{ inputs.platform }}-${{ hashFiles('submodules/lime/**', 'submodules/hxcpp/**', 'submodules/swf/**', 'submodules/SteamWrap/**', 'tools/release/hxcpp-x86-64-v2.xml', 'tools/release/lime-ci-config.xml') }}
 
       - name: Bootstrap hxcpp
         if: steps.native-cache.outputs.cache-hit != 'true'
