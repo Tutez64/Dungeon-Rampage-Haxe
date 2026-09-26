@@ -265,27 +265,27 @@ jobs:
               ;;
           esac
 
-      # SWF zip + generated classes are identical on every cpp target. Lime still
-      # writes them under bin/<platform>, so the cache is staged in one place and
-      # copied into the target tree. v2 stores a per-library source hash: a
-      # prefix hit refreshes only the libraries that still match.
+      # The tool hash is part of the restore prefix, so a Lime or swf change does
+      # not reuse old zips. A source-only change still restores the previous
+      # tree; install then drops the libraries whose SWF hash differs.
       - uses: actions/cache@0400d5f644dc74513175e3cd8d07132dd4860809 # v4.2.4
         id: swf-cache
         with:
           path: .ci-cache/swf
-          key: swf-libs-v2-${{ hashFiles('Resources/**/*.swf', 'src/_assets/**/*.swf', 'generated_swf_libraries.xml', 'submodules/swf/**', 'submodules/lime/src/lime/tools/AssetHelper.hx', 'tools/release/swf_cache.py') }}
+          key: swf-libs-${{ hashFiles('submodules/swf/**', 'submodules/lime/src/lime/tools/AssetHelper.hx', 'tools/release/swf_cache.py') }}-${{ hashFiles('Resources/**/*.swf', 'src/_assets/**/*.swf', 'generated_swf_libraries.xml') }}
           restore-keys: |
-            swf-libs-
+            swf-libs-${{ hashFiles('submodules/swf/**', 'submodules/lime/src/lime/tools/AssetHelper.hx', 'tools/release/swf_cache.py') }}-
 
-      # hxcpp rebuilds a .cpp only when it changed. restore-keys hands back the
-      # previous object tree for this platform when the exact key misses.
+      # Same split: a compiler or library change does not reuse old objects.
+      # A game-source change restores this platform's previous tree, and hxcpp
+      # recompiles only the .cpp files that are newer than their .o.
       - uses: actions/cache@0400d5f644dc74513175e3cd8d07132dd4860809 # v4.2.4
         id: cpp-cache
         with:
           path: bin/${{ inputs.platform }}/obj
-          key: cpp-obj-${{ inputs.platform }}-${{ hashFiles('project.xml', 'src/**', 'src-steam/**', 'compat/**', 'generated_swf_libraries.xml', 'submodules/hxcpp/**', 'submodules/hxscript/**', 'submodules/openfl/**', 'submodules/lime/**', 'submodules/swf/**', 'submodules/SteamWrap/**') }}
+          key: cpp-obj-${{ inputs.platform }}-${{ hashFiles('project.xml', 'submodules/hxcpp/**', 'submodules/hxscript/**', 'submodules/openfl/**', 'submodules/lime/**', 'submodules/swf/**', 'submodules/SteamWrap/**') }}-${{ hashFiles('src/**', 'src-steam/**', 'compat/**', 'generated_swf_libraries.xml') }}
           restore-keys: |
-            cpp-obj-${{ inputs.platform }}-
+            cpp-obj-${{ inputs.platform }}-${{ hashFiles('project.xml', 'submodules/hxcpp/**', 'submodules/hxscript/**', 'submodules/openfl/**', 'submodules/lime/**', 'submodules/swf/**', 'submodules/SteamWrap/**') }}-
 
       - name: Install cached SWF libraries
         shell: bash

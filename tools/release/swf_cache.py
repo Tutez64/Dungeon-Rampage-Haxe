@@ -104,11 +104,15 @@ def install(platform):
     current = libraries()
     known = read_manifest()
     if known is None:
-        for path in (libraries_dir, generated):
-            for child in path.rglob("*"):
-                touch(child)
-            touch(path)
-        print("SWF cache has no manifest; refreshed every restored library")
+        # No restored manifest means the tool key missed. Zips left in obj/ by
+        # the C++ cache must not be refreshed, or Lime would keep them.
+        for zip_path in libraries_dir.glob("*.zip"):
+            classes_path = libraries_dir / f"{zip_path.stem}.classes.txt"
+            for hx_path in class_files(classes_path, generated):
+                remove(hx_path)
+            remove(classes_path)
+            remove(zip_path)
+        print("SWF cache has no manifest; Lime will process every library")
         return
 
     kept = 0
