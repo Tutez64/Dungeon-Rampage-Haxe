@@ -134,7 +134,7 @@ jobs:
             submodules/swf/run.n
             submodules/hxcpp/hxcpp.n
             submodules/SteamWrap/ndll
-          key: native-${{ inputs.platform }}-${{ hashFiles('submodules/lime/**', 'submodules/hxcpp/**', 'submodules/swf/**', 'submodules/SteamWrap/**', 'tools/release/hxcpp-x86-64-v2.xml', 'tools/release/lime-ci-config.xml') }}
+          key: native-${{ inputs.platform }}-nolto-${{ hashFiles('submodules/lime/**', 'submodules/hxcpp/**', 'submodules/swf/**', 'submodules/SteamWrap/**', 'tools/release/hxcpp-x86-64-v2.xml', 'tools/release/lime-ci-config.xml') }}
 
       - name: Bootstrap hxcpp
         if: steps.native-cache.outputs.cache-hit != 'true'
@@ -234,14 +234,14 @@ jobs:
 
           case "${{ inputs.platform }}" in
             linux)
-              haxelib run lime rebuild linux -64 -DHXCPP_OPTIMIZE_LINK
+              haxelib run lime rebuild linux -64
               ;;
             windows)
-              haxelib run lime rebuild windows -64 -DHXCPP_OPTIMIZE_LINK
+              haxelib run lime rebuild windows -64
               ;;
             macos)
-              haxelib run lime rebuild mac -x86_64 -DHXCPP_ARCH=x86_64 -DHXCPP_OPTIMIZE_LINK
-              haxelib run lime rebuild mac -arm64 -DHXCPP_ARCH=arm64 -DHXCPP_OPTIMIZE_LINK
+              haxelib run lime rebuild mac -x86_64 -DHXCPP_ARCH=x86_64
+              haxelib run lime rebuild mac -arm64 -DHXCPP_ARCH=arm64
               ;;
           esac
 
@@ -256,12 +256,12 @@ jobs:
 
           case "${{ inputs.platform }}" in
             linux|windows)
-              haxelib run hxcpp Build.xml -DHXCPP_M64 -DHXCPP_OPTIMIZE_LINK
+              haxelib run hxcpp Build.xml -DHXCPP_M64
               ;;
             macos)
-              haxelib run hxcpp Build.xml -DHXCPP_M64 -DHXCPP_ARCH=x86_64 -DHXCPP_OPTIMIZE_LINK
+              haxelib run hxcpp Build.xml -DHXCPP_M64 -DHXCPP_ARCH=x86_64
               rm -rf ../obj
-              haxelib run hxcpp Build.xml -DHXCPP_ARM64 -DHXCPP_ARCH=arm64 -DHXCPP_OPTIMIZE_LINK
+              haxelib run hxcpp Build.xml -DHXCPP_ARM64 -DHXCPP_ARCH=arm64
               ;;
           esac
 
@@ -283,9 +283,9 @@ jobs:
         id: cpp-cache
         with:
           path: bin/${{ inputs.platform }}/obj
-          key: cpp-obj-${{ inputs.platform }}-${{ hashFiles('project.xml', 'submodules/hxcpp/**', 'submodules/hxscript/**', 'submodules/openfl/**', 'submodules/lime/**', 'submodules/swf/**', 'submodules/SteamWrap/**') }}-${{ hashFiles('src/**', 'src-steam/**', 'compat/**', 'generated_swf_libraries.xml') }}
+          key: cpp-obj-${{ inputs.platform }}-nolto-${{ hashFiles('project.xml', 'submodules/hxcpp/**', 'submodules/hxscript/**', 'submodules/openfl/**', 'submodules/lime/**', 'submodules/swf/**', 'submodules/SteamWrap/**') }}-${{ hashFiles('src/**', 'src-steam/**', 'compat/**', 'generated_swf_libraries.xml') }}
           restore-keys: |
-            cpp-obj-${{ inputs.platform }}-${{ hashFiles('project.xml', 'submodules/hxcpp/**', 'submodules/hxscript/**', 'submodules/openfl/**', 'submodules/lime/**', 'submodules/swf/**', 'submodules/SteamWrap/**') }}-
+            cpp-obj-${{ inputs.platform }}-nolto-${{ hashFiles('project.xml', 'submodules/hxcpp/**', 'submodules/hxscript/**', 'submodules/openfl/**', 'submodules/lime/**', 'submodules/swf/**', 'submodules/SteamWrap/**') }}-
 
       - name: Install cached SWF libraries
         shell: bash
@@ -294,7 +294,7 @@ jobs:
       - name: Build Linux
         if: inputs.platform == 'linux'
         shell: bash
-        run: haxelib run openfl build project.xml cpp -DHXCPP_OPTIMIZE_LINK
+        run: haxelib run openfl build project.xml cpp
 
       - name: Package Linux
         if: inputs.platform == 'linux'
@@ -321,7 +321,7 @@ jobs:
       - name: Build Windows
         if: inputs.platform == 'windows'
         shell: pwsh
-        run: haxelib run openfl build project.xml cpp -DHXCPP_OPTIMIZE_LINK
+        run: haxelib run openfl build project.xml cpp
 
       - name: Package Windows
         if: inputs.platform == 'windows'
@@ -355,8 +355,7 @@ jobs:
           mkdir -p dist
           output_zip="dist/Dungeon.Rampage.Haxe.${{ inputs.version }}.macOS.zip"
           tools/macos/release_macos_all.sh \
-            --output-zip "$output_zip" \
-            -- -DHXCPP_OPTIMIZE_LINK
+            --output-zip "$output_zip"
 
           macos_app="bin/macos/bin/Dungeon Rampage Haxe.app"
 
