@@ -31,7 +31,7 @@ The game owns the runtime. The launcher owns the folder, enablement, and launch.
 | Thunderstore / Nexus / itch as mirrors | open | Optional later; must not replace `mod.json` or the index. |
 | Resource overlay rules | open | `Resources/` is composited at runtime; precedence, SWF vs JSON, and `Locale/` merge are unspecified. No separate `locale/` tree. |
 | Type blacklist | decided | None. Interpreted and compiled see the same types. [Compilation](#compilation) |
-| Host build (cppia) | decided | `-dce no`, force-include std, patch hxcpp, JIT on, first build verbose. [Compilation](#compilation) |
+| Host build (cppia) | decided | `-dce no`, force-include std, patch hxcpp, JIT on, verbose log. [Compilation](#compilation) |
 | Mod `id` and zip extract | decided | `id` = folder = package `mods.<id>`. Regex + keyword/reserved-name lists. No zip-slip, no size cap. [`mod.json`](#modjson) |
 | `dependencies` cycles | decided | Not an error. Launcher warns, keeps user order inside the cycle. [Passing the list](#passing-the-list) |
 | `import.hx` in a mod | decided | Skipped with a warning. [`mod.json`](#modjson) |
@@ -439,27 +439,37 @@ Intended game build flags (`hxscript` = **our fork**):
 -lib hxscript
 -D hxscript_cppia
 -D scriptable
+-D hxscript_verbose                                         # the CI log is where a skipped module is explained
 -D hxscript_host=modding
--D hxscript_bridge_classpath=src,src-steam,compat   # fork: classpath entries walked with an empty package
--D hxscript_bridge_exclude=DungeonBustersProject    # more only after measuring
--D hxscript_bridge_packages=openfl,lime,swf,steamwrap   # stock; whole trees until measured
--dce no                                              # hxScript's own cppia setting
---macro include('haxe', true, ['haxe.macro'])         # DRH: force-type the std; ignore list grows with what fails on hxcpp
---macro include('sys', true, ['sys.db'])             # sys.db is @:cffi over hxcpp sqlite/mysql
--D hxscript_keep=cpp.vm.Gc,cpp.vm.Profiler           # cpp.* by name (package has objc / link)
+-D hxscript_bridge_classpath=src,src-steam,compat           # classpath entries walked with an empty package
+-D hxscript_bridge_exclude=DungeonBustersProject,...        # value in project.xml, explained below
+-D hxscript_bridge_packages=openfl,lime,swf,steamwrap       # stock; whole trees until measured
+-dce no                                                     # hxScript's own cppia setting
+--macro include('haxe', true, ['haxe.macro', 'haxe.atomic.AtomicObject'])   # force-type the std; AtomicObject is #error on hxcpp
+--macro include('sys', true, ['sys.db'])                    # sys.db is @:cffi over hxcpp sqlite/mysql
+-D hxscript_keep=cpp.vm.Gc,cpp.vm.Profiler                  # cpp.* by name (package has objc / link)
 ```
 
 **Bridge scan (fork).** Submodules each have one root package, so stock `-D hxscript_bridge_packages=openfl,lime,swf,steamwrap` covers them (recursive; presets' ignore lists do not apply). DRH's own roots need a **classpath-entry scan** — walking the empty root would include the std — so the pinned fork has `-D hxscript_bridge_classpath=src,src-steam,compat` and `-D hxscript_bridge_exclude`. Necessity is `compat/` (root-level types no package scan can reach); for `src/` alone a 35-package list would do. The define names **classpath entries** walked with an **empty package**, not a package called `src` (`modulesUnder("src")` would look for `src/src/` and emit `src.actor.Hero`). The walk skips `*.macro.hx`. `-D hxscript_host=modding` stays upstream's meaning: packages scanned for `@:scriptAmbient` / `@:scriptStatic`. `-D scriptable` is hxcpp's cppia flag; it does not generate extend bridges.
 
-If the first verbose build is too fat: exclude `openfl._internal` and Lime backends first, then consider narrowing to display roots (`openfl.display`, `openfl.text`, `openfl.geom`, `openfl.events`) plus named types.
+What the first cppia build does not compile:
+
+- `DungeonBustersProject` is the entry point, not a base a mod extends.
+- `openfl.fl` imports `openfl._internal.formats.xfl`, absent here. `openfl.data` is `#if windows` with no else. `WebSocket` and `ServerWebSocket` have no `openfl.utils.io.ByteArray`. `openfl.xml`: `XML` has no `Namespace`, and `XMLList`'s inlined methods do not type in C++ under `-D scriptable`.
+- `openfl.display._internal.native`, `NativeLocalConnection` and `NativeVideoBackend` `@:include` a file that pulls `Windows.h`.
+- Lime's cpp backend is `native`. The exclude drops `html5`, `air`, `flash`, `emscripten`, and `lime.tools` (the CLI).
+- The swf exporters and `SWFLiteLoader` import `hxp`. `ActionNextFrame`, `ActionGotoFrame`, `ActionGetURL` and `ActionGotoLabel` have a `package` line with no semicolon. `AS3GraphicsDataShapeExporter` and `FrameScriptParser` do not type on cpp.
+- `b2internal` and `as3commons_collections` are leftover AS3 `namespace` files.
+
+If the binary is too fat, cut `openfl._internal` and Lime backends first, then narrow to display roots (`openfl.display`, `openfl.text`, `openfl.geom`, `openfl.events`).
 
 **DCE.** DRH and Lime's cpp templates pass no `-dce`, so the build is Haxe's default **`-dce std`**: unused *standard library* members are stripped; game / OpenFL / Lime / swf / SteamWrap never were. The host switches to **`-dce no`**. That is hxScript's cppia position (`-D scriptable` resolves host classes by name at load; DCE removes whatever no compiled call site references). Its probe: 42 of 83 commonly-scripted std members unreachable under `-dce std`, 3 under `-dce no`. `hxscript_keep` as the *primary* mechanism is the same curated list we rejected for bridges.
 
-`-dce no` keeps what is **typed**; it does not type what nothing references. A mod calling `haxe.crypto.Sha256` when nothing in the host names it gets `Type not found`. Libraries are already covered (Autowire + the bridge scan). The std is the gap. DRH goes **further than hxScript** and force-includes it: `--macro include('haxe', true, ['haxe.macro'])` and `include('sys', true, ['sys.db'])`. `sys` is 34 modules and Lime already types most of them; the net addition is `Http`, `FileStat`, thread pools, `EventLoop`, `Condition`, `Semaphore`, `ssl.Digest`. `sys.db` is excluded up front (`Sqlite` / `Mysql` need linking). Expect the `haxe` ignore list to grow at the first build. `cpp.*` is **not** included wholesale (`cpp.objc`, `cpp.link`); name what a mod may want via `-D hxscript_keep`. Cost is mostly **build time** (one `.cpp` per class). If it hurts, grow the ignore list; never return to `-dce std`.
+`-dce no` keeps what is **typed**; it does not type what nothing references. A mod calling `haxe.crypto.Sha256` when nothing in the host names it gets `Type not found`. Libraries are already covered (Autowire + the bridge scan). The std is the gap. DRH goes **further than hxScript** and force-includes it: `--macro include('haxe', true, ['haxe.macro'])` and `include('sys', true, ['sys.db'])`. `sys` is 34 modules and Lime already types most of them; the net addition is `Http`, `FileStat`, thread pools, `EventLoop`, `Condition`, `Semaphore`, `ssl.Digest`. `sys.db` is excluded up front (`Sqlite` / `Mysql` need linking). `haxe.atomic.AtomicObject` is `#error` on hxcpp, so it is on the ignore list; anything else that fails to type joins it. `cpp.*` is **not** included wholesale (`cpp.objc`, `cpp.link`); name what a mod may want via `-D hxscript_keep`. Cost is mostly **build time** (one `.cpp` per class). If it hurts, grow the ignore list; never return to `-dce std`.
 
 **hxcpp.** Patched with `patches/apply-hxcpp.py` on `submodules/hxcpp`.
 
-**JIT.** `cpp.cppia.Host.enableJit(true)` once, process-wide, **before** any module loads. If we compile, we jit. A known hxcpp JIT segfault on `'' + (n == 1)` is in the same patch set.
+**JIT.** One process-wide `enableJit(true)` before any module loads.
 
 **Size / time.** Real binary cost: `-D scriptable`, OpenFL/Lime/swf bridges (`DisplayObject` has a large method surface; swf ~240 modules; SteamWrap / `src-steam` / `compat` are negligible), and the `src/` classpath bridges. `-dce no` plus the std include is mostly build time. Measure a first cppia build against current DRH before treating compiled mods as free.
 
@@ -491,8 +501,8 @@ Needed before a real host; not a restatement of the rules above.
 
 1. **Done**. Patch hxScript. Except `replace` which is still missing. Further generator fixes may still show up on the first cppia build.
 2. **Done.** hxcpp cppia patch.
-3. First cppia build: `-D hxscript_cppia`, `-D scriptable`, `-D hxscript_verbose`, `-dce no`, std includes, `enableJit(true)` before loading mods. Fill ignore lists from what fails.
-4. Implement `src/modding/` per this document (`uncaughtError` / `exiting` at the top of the constructor, `--mods-dir`, one world, lifecycle, overlay re-register, `ASCompat.createInstance` → `replace` table). Bake the release tag (no `V`) and the `api` number into the host ([Versioning](#versioning)).
+3. **Done.** The flags above are in `project.xml`.
+4. Implement `src/modding/` per this document (`uncaughtError` / `exiting` at the top of the constructor, `--mods-dir`, one world, lifecycle, overlay re-register, `ASCompat.createInstance` → `replace` table). Call `cpp.cppia.Host.enableJit(true)` once there, before any module loads. Bake the release tag (no `V`) and the `api` number into the host ([Versioning](#versioning)).
 5. Launcher: index fetch, catalog install, `enabled.json`, `--mods-dir`, `last-run.json` display — no destructive overlay.
 6. Index repository (separate from DRH / DRHL), PR + CI for new versions.
 
