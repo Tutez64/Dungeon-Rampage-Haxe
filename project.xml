@@ -24,14 +24,7 @@
 	<haxedef name="hxscript_verbose" if="cpp" />
 	<haxedef name="hxscript_host" value="modding" if="cpp" />
 	<haxedef name="hxscript_bridge_classpath" value="src,src-steam,compat" if="cpp" />
-	<haxedef name="hxscript_bridge_exclude" value="DungeonBustersProject,openfl.fl,openfl.data,openfl.net.WebSocket,
-	openfl.net.ServerWebSocket,openfl.net._internal.NativeLocalConnection,openfl.xml,openfl.display._internal.native,
-	openfl.media._internal.NativeVideoBackend,lime._internal.backend.html5,lime._internal.backend.air,
-	lime._internal.backend.flash,lime._internal.backend.emscripten,lime.tools,swf.exporters.AnimateLibraryExporter,
-	swf.exporters.SWFLiteExporter,swf.exporters.swflite.SWFLiteLoader,swf.exporters.AS3GraphicsDataShapeExporter,
-	swf.exporters.FrameScriptParser,swf.data.actions.swf3.ActionNextFrame,swf.data.actions.swf3.ActionGotoFrame,
-	swf.data.actions.swf3.ActionGetURL,swf.data.actions.swf3.ActionGotoLabel,box2D.common.b2internal,
-	org.as3commons.collections.framework.core.as3commons_collections" if="cpp" />
+	<haxedef name="hxscript_bridge_exclude" value="DungeonBustersProject,openfl.fl,openfl.data,openfl.net.WebSocket,openfl.net.ServerWebSocket,openfl.net._internal.NativeLocalConnection,openfl.xml,openfl.display._internal.native,openfl.media._internal.NativeVideoBackend,lime._internal.backend.html5,lime._internal.backend.air,lime._internal.backend.flash,lime._internal.backend.emscripten,lime.tools,swf.exporters.AnimateLibraryExporter,swf.exporters.SWFLiteExporter,swf.exporters.swflite.SWFLiteLoader,swf.exporters.AS3GraphicsDataShapeExporter,swf.exporters.FrameScriptParser,swf.data.actions.swf3.ActionNextFrame,swf.data.actions.swf3.ActionGotoFrame,swf.data.actions.swf3.ActionGetURL,swf.data.actions.swf3.ActionGotoLabel,box2D.common.b2internal,org.as3commons.collections.framework.core.as3commons_collections" if="cpp" />
 	<haxedef name="hxscript_bridge_packages" value="openfl,lime,swf,steamwrap" if="cpp" />
 	<haxedef name="hxscript_keep" value="cpp.vm.Gc,cpp.vm.Profiler" if="cpp" />
 	<haxeflag name="-dce" value="no" if="cpp" />
