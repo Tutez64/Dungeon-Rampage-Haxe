@@ -14,12 +14,21 @@ At tag time, copy these sections into the GitHub release notes under `Changelog`
   open window; the in-game Quit popup and the connection-error dialog dispatch
   `exiting` before `exit()` instead of skipping it. Steam dispose only runs once
   if that event fires twice.
+- Internal: the preprocessing of the SWF files no longer occasionally fails
+  with `std@sys_create_dir`, as Lime now creates the shared SWF directory
+  once before the parallel handlers.
 
 ### Improved
 
 - Internal: Lime, OpenFL, and hxcpp were fixed for the upcoming hxScript
   host. I forked hxScript to improve and fix it (`submodules/hxscript`,
-  [Tutez64/hxscript](https://github.com/Tutez64/hxscript)).
+  [Tutez64/hxscript](https://github.com/Tutez64/hxscript)), and added
+  the cppia host and hxScript flags to `project.xml`.
+- Internal: package builds cache native libraries, preprocessed SWFs, and
+  C++ objects. A game file or one SWF change reuses the rest. A compiler,
+  Lime, or `project.xml` change does not.
+- Internal: Link-time optimization is removed: it now resulted in bigger
+  executables, while tripling compile time.
 - Internal: Lime, OpenFL, swf, hxcpp, SteamWrap, and hxScript are resolved
   with `haxelib dev` on the submodules. `project.xml` no longer passes
   `path=`.
