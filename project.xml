@@ -30,6 +30,7 @@
 	<haxeflag name="-dce" value="no" if="cpp" />
 	<haxeflag name="--macro" value="include('haxe', true, ['haxe.macro', 'haxe.atomic.AtomicObject'])" if="cpp" />
 	<haxeflag name="--macro" value="include('sys', true, ['sys.db'])" if="cpp" />
+	<haxedef name="hxscript_bridge_eager" />
 
 	<haxedef name="HXCPP_GC_BIG_BLOCKS" />
 	<haxedef name="HXCPP_GC_GENERATIONAL" />
