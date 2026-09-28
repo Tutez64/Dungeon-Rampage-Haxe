@@ -17,6 +17,9 @@ import events.GameObjectEvent;
 import events.HpEvent;
 import events.ManaEvent;
 import facade.DBFacade;
+#if cpp
+import modding.Host;
+#end
 import facade.Locale;
 import dr_floor.FloorMessageView;
 import dr_floor.FloorView;
@@ -88,6 +91,10 @@ class HeroGameObject extends ActorGameObject implements IHeroGameObject {
 		mWantNavCollisions = true;
 		mChatEventComponent = new EventComponent(dbFacade);
 		mCanInitiateAnAttack = true;
+		#if cpp
+		if (!Std.isOfType(this, HeroGameObjectOwner))
+			Host.heroSpawned(this, false);
+		#end
 	}
 
 	override function processJsonNavCollisions(navCollisions:Array<ASAny>, addFunc:ASFunction) {
@@ -146,6 +153,10 @@ class HeroGameObject extends ActorGameObject implements IHeroGameObject {
 	}
 
 	override public function destroy() {
+		#if cpp
+		if (!Std.isOfType(this, HeroGameObjectOwner))
+			Host.heroDespawned(this);
+		#end
 		mChatEventComponent.destroy();
 		mHeroStateMachine.destroy();
 		mHeroStateMachine = null;

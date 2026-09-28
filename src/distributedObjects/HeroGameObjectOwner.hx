@@ -21,6 +21,9 @@ import dungeon.Tile;
 import events.HpEvent;
 import events.ManaEvent;
 import facade.DBFacade;
+#if cpp
+import modding.Host;
+#end
 import dr_floor.FloorObject;
 import dr_floor.FloorView;
 import gameMasterDictionary.GMAttack;
@@ -112,6 +115,9 @@ class HeroGameObjectOwner extends HeroGameObject implements IHeroGameObjectOwner
 		autoAimEnabled = true;
 		mCanSuffer = true;
 		actorClickedToAttack = null;
+		#if cpp
+		Host.heroSpawned(this, true);
+		#end
 	}
 
 	override public function get_isOwner():Bool {
@@ -455,6 +461,9 @@ class HeroGameObjectOwner extends HeroGameObject implements IHeroGameObjectOwner
 	}
 
 	override public function destroy() {
+		#if cpp
+		Host.heroDespawned(this);
+		#end
 		mDBFacade.stageRef.removeEventListener("keyDown", this.debugKey);
 		if (mPlayerOwnerAttackController != null) {
 			mPlayerOwnerAttackController.destroy();
