@@ -1,0 +1,947 @@
+package modding;
+
+import account.DBAccountInfo;
+import facade.DBFacade;
+import distributedObjects.DistributedDungeonFloor;
+import distributedObjects.HeroGameObject;
+import flash.display.Sprite;
+import flash.display.Stage;
+import haxe.Json;
+
+/**
+ * Loads every enabled mod into one hxScript world. No `--mods-dir` means no mods
+ * and nothing written. `replace` is intentionally absent until the fork has it.
+ *
+ * Contract: docs/modding.md (lifecycle, passing the list, last-run report).
+ */
+class Host {
+	/** Above the letterbox (1000), the side backgrounds (1001) and the session id (1002). */
+	static inline final OVERLAY_LAYER:Float = 1003;
+
+	static inline final MODS_DIR_ARGUMENT = "--mods-dir";
+
+	static var ID = ~/^[a-z][a-z0-9_]{1,62}[a-z0-9]$/;
+
+	static var ENTRY = ~/^[A-Za-z_][A-Za-z0-9_]*$/;
+
+	static var booted:Bool = false;
+
+	static var disposed:Bool = false;
+
+	static var flushed:Bool = false;
+
+	static var reportReady:Bool = false;
+
+	static var modsRoot:String = "";
+
+	static var started:String = "";
+
+	static var stage:Stage;
+
+	static var overlay:Sprite;
+
+	static var state:ModState;
+
+	static var records:Array<ModRecord> = [];
+
+	static var pending:Array<LogLine> = [];
+
+	static var listeners:Map<String, Array<Listener>> = new Map();
+
+	static var heroes:Map<UInt, ModHero> = new Map();
+
+	static var floors:Map<UInt, ModFloor> = new Map();
+
+	static var world:hxscript.Environment;
+
+	static var modModules:Map<String, Array<hxscript.Module>> = new Map();
+
+	static var moduleOwner:Map<String, String> = new Map();
+
+	static var parseErrors:Map<String, String> = new Map();
+
+	public static function boot(stage:Stage, args:Array<String>):Void {
+		if (booted)
+			return;
+		var directory = modsDirectory(args);
+		if (directory == null)
+			return;
+		booted = true;
+		Host.stage = stage;
+		started = utcNow();
+		modsRoot = directory;
+		state = new ModState();
+		try {
+			hxscript.error.Sink.listen(onDiagnostic);
+			hxscript.macro.Expose.apply();
+			if (sys.FileSystem.exists(directory) && sys.FileSystem.isDirectory(directory)) {
+				try modsRoot = sys.FileSystem.absolutePath(directory) catch (_:Dynamic) {}
+				loadEnabled();
+			} else {
+				note("warn", "modding: mods directory not found: " + directory);
+			}
+		} catch (e:Dynamic) {
+			note("warn", "modding: " + errorText(e));
+		}
+		writeReport();
+		for (record in records)
+			note("info", summary(record));
+	}
+
+	public static function flush():Void {
+		if (flushed)
+			return;
+		flushed = true;
+		for (line in pending) {
+			if (line.level == "warn")
+				brain.logger.Logger.warn(line.text);
+			else
+				brain.logger.Logger.info(line.text);
+		}
+		pending = [];
+	}
+
+	/** Moves the overlay into the facade's layer list, above the letterbox. */
+	public static function attachOverlay(facade:DBFacade):Void {
+		if (overlay == null || facade == null)
+			return;
+		facade.addRootDisplayObject(overlay, OVERLAY_LAYER);
+	}
+
+	public static function ready(facade:DBFacade):Void {
+		if (!booted || reportReady)
+			return;
+		if (state != null)
+			state.setAccount(ModAccount.from(facade == null ? null : facade.dbAccountInfo));
+		for (record in records) {
+			if (record.status != "ok" || record.instance == null || record.context == null)
+				continue;
+			try {
+				record.instance.onReady(record.context);
+			} catch (e:Dynamic) {
+				record.status = "failed";
+				record.error = errorText(e);
+				logNow("warn", summary(record));
+			}
+		}
+		reportReady = true;
+		writeReport();
+	}
+
+	public static function dispose():Void {
+		if (!booted || disposed)
+			return;
+		disposed = true;
+		var index = records.length - 1;
+		while (index >= 0) {
+			var record = records[index];
+			index--;
+			if (record.instance == null)
+				continue;
+			try {
+				record.instance.onDispose();
+			} catch (e:Dynamic) {
+				logNow("warn", "mod " + record.id + ": onDispose: " + errorText(e));
+			}
+		}
+	}
+
+	public static function tablesLoaded():Void {
+		emit(ModContext.TABLES_LOADED, null);
+	}
+
+	public static function townEnter():Void {
+		emit(ModContext.TOWN_ENTER, null);
+	}
+
+	public static function townExit():Void {
+		emit(ModContext.TOWN_EXIT, null);
+	}
+
+	public static function heroSpawned(hero:HeroGameObject, local:Bool):Void {
+		if (!booted || state == null || hero == null || heroes.exists(hero.id))
+			return;
+		var wrap = new ModHero(hero, local);
+		heroes.set(hero.id, wrap);
+		state.heroes.push(wrap);
+		emit(ModContext.HERO_SPAWNED, wrap);
+	}
+
+	public static function heroDespawned(hero:HeroGameObject):Void {
+		if (!booted || state == null || hero == null)
+			return;
+		var wrap = heroes.get(hero.id);
+		if (wrap == null)
+			return;
+		heroes.remove(hero.id);
+		state.heroes.remove(wrap);
+		emit(ModContext.HERO_DESPAWNED, wrap);
+	}
+
+	public static function floorEnter(floor:DistributedDungeonFloor):Void {
+		if (!booted || state == null || floor == null || floors.exists(floor.id))
+			return;
+		var wrap = new ModFloor(floor);
+		floors.set(floor.id, wrap);
+		state.setFloor(wrap);
+		emit(ModContext.FLOOR_ENTER, wrap);
+	}
+
+	public static function floorExit(floor:DistributedDungeonFloor):Void {
+		if (!booted || state == null || floor == null)
+			return;
+		var wrap = floors.get(floor.id);
+		if (wrap == null)
+			return;
+		floors.remove(floor.id);
+		if (state.floor == wrap) {
+			var next:Null<ModFloor> = null;
+			for (other in floors)
+				next = other;
+			state.setFloor(next);
+		}
+		emit(ModContext.FLOOR_EXIT, wrap);
+	}
+
+	@:allow(modding.ModContext)
+	static function modLog(id:String, message:String):Void {
+		note("info", "mod " + id + ": " + message);
+	}
+
+	@:allow(modding.ModContext)
+	static function listen(id:String, event:String, handler:Dynamic):Void {
+		var list = listeners.get(event);
+		if (list == null) {
+			list = [];
+			listeners.set(event, list);
+		}
+		list.push({id: id, handler: handler});
+	}
+
+	@:allow(modding.ModContext)
+	static function unlisten(id:String, event:String, handler:Dynamic):Void {
+		var list = listeners.get(event);
+		if (list == null)
+			return;
+		var index = 0;
+		while (index < list.length) {
+			var listener = list[index];
+			if (listener.id == id && listener.handler == handler) {
+				list.splice(index, 1);
+				return;
+			}
+			index++;
+		}
+	}
+
+	static function emit(event:String, payload:Dynamic):Void {
+		if (!booted)
+			return;
+		var list = listeners.get(event);
+		if (list == null)
+			return;
+		for (listener in list.copy()) {
+			try {
+				listener.handler(payload);
+			} catch (e:Dynamic) {
+				logNow("warn", "mod " + listener.id + ": " + event + ": " + errorText(e));
+			}
+		}
+	}
+
+	static function onDiagnostic(d:hxscript.error.Diagnostic):Void {
+		note(d.fatal ? "warn" : "info", oneLine(d.toString()));
+		if (d.phase == hxscript.error.Phase.PParse && d.fatal && d.origin != null)
+			parseErrors.set(d.origin, oneLine(d.message));
+	}
+
+	static function loadEnabled():Void {
+		var path = modsRoot + "/enabled.json";
+		if (!sys.FileSystem.exists(path))
+			return;
+		var text = readText(path);
+		if (text == null) {
+			note("warn", "modding: could not read enabled.json");
+			return;
+		}
+		var parsed:Dynamic = null;
+		try {
+			parsed = Json.parse(text);
+		} catch (e:Dynamic) {
+			note("warn", "modding: enabled.json: " + errorText(e));
+			return;
+		}
+		var mods:Dynamic = parsed == null ? null : Reflect.field(parsed, "mods");
+		if (mods == null)
+			return;
+		if (!Std.isOfType(mods, Array)) {
+			note("warn", "modding: enabled.json mods is not a list");
+			return;
+		}
+		var seen = new Map<String, Bool>();
+		for (item in (mods : Array<Dynamic>)) {
+			var id:Dynamic = item == null ? null : Reflect.field(item, "id");
+			if (!Std.isOfType(id, String)) {
+				var record = new ModRecord(Std.string(id), "skipped");
+				record.error = "invalid enabled entry";
+				records.push(record);
+				continue;
+			}
+			var name:String = id;
+			if (seen.exists(name)) {
+				var duplicate = new ModRecord(name, "failed");
+				duplicate.error = "duplicate id";
+				records.push(duplicate);
+				continue;
+			}
+			seen.set(name, true);
+			records.push(resolve(name));
+		}
+		compileWorld();
+		assignModes();
+		startInterpreted();
+		runInits();
+	}
+
+	static function resolve(id:String):ModRecord {
+		var record = new ModRecord(id, "skipped");
+		if (!validId(id)) {
+			record.error = "invalid id";
+			return record;
+		}
+		var directory = findDirectory(id);
+		if (directory == null) {
+			record.error = "no folder";
+			return record;
+		}
+		var manifestPath = directory + "/mod.json";
+		if (!sys.FileSystem.exists(manifestPath)) {
+			record.error = "no mod.json";
+			return record;
+		}
+		var text = readText(manifestPath);
+		if (text == null) {
+			record.error = "no mod.json";
+			return record;
+		}
+		var manifest:Dynamic = null;
+		try {
+			manifest = Json.parse(text);
+		} catch (e:Dynamic) {
+			record.error = "mod.json: " + errorText(e);
+			return record;
+		}
+		var declared:Dynamic = Reflect.field(manifest, "id");
+		if (declared != id) {
+			record.error = "mod.json id does not match";
+			return record;
+		}
+		record.directory = directory;
+		record.status = "ok";
+		var version:Dynamic = Reflect.field(manifest, "version");
+		if (Std.isOfType(version, String))
+			record.version = version;
+		if (!readUses(Reflect.field(manifest, "uses"), record))
+			return record;
+		var entry:Dynamic = Reflect.field(manifest, "entry");
+		if (!Std.isOfType(entry, String) || !ENTRY.match(entry)) {
+			record.status = "failed";
+			record.error = "entry must be a short class name";
+			return record;
+		}
+		record.entry = entry;
+		var api:Dynamic = Reflect.field(manifest, "api");
+		if (record.uses.indexOf("api") >= 0 && !Std.isOfType(api, Int))
+			note("warn", "mod " + id + ": api is required when uses contains api");
+		warnDrh(record, Reflect.field(manifest, "drh"));
+		if (record.status == "ok")
+			loadSources(record);
+		return record;
+	}
+
+	static function findDirectory(id:String):Null<String> {
+		var direct = modsRoot + "/" + id;
+		if (sys.FileSystem.exists(direct) && sys.FileSystem.isDirectory(direct) && manifestId(direct) == id)
+			return direct;
+		if (!sys.FileSystem.exists(modsRoot))
+			return null;
+		var names = sys.FileSystem.readDirectory(modsRoot);
+		names.sort(function(a, b) return a < b ? -1 : a > b ? 1 : 0);
+		for (name in names) {
+			if (name == "enabled.json" || name == "last-run.json")
+				continue;
+			var directory = modsRoot + "/" + name;
+			if (!sys.FileSystem.isDirectory(directory))
+				continue;
+			if (manifestId(directory) == id)
+				return directory;
+		}
+		return null;
+	}
+
+	static function manifestId(directory:String):Null<String> {
+		var path = directory + "/mod.json";
+		if (!sys.FileSystem.exists(path))
+			return null;
+		var text = readText(path);
+		if (text == null)
+			return null;
+		try {
+			var manifest:Dynamic = Json.parse(text);
+			var id:Dynamic = Reflect.field(manifest, "id");
+			return Std.isOfType(id, String) ? id : null;
+		} catch (_:Dynamic) {
+			return null;
+		}
+	}
+
+	static function loadSources(record:ModRecord):Void {
+		var srcRoot = record.directory + "/src";
+		if (!sys.FileSystem.exists(srcRoot) || !sys.FileSystem.isDirectory(srcRoot)) {
+			record.status = "failed";
+			record.error = "no src directory";
+			return;
+		}
+		if (world == null)
+			world = new hxscript.Environment();
+		var modules = [];
+		modModules.set(record.id, modules);
+		var seen = new Map<String, Bool>();
+		walk(srcRoot, seen, function(path:String) {
+			var name = fileName(path);
+			if (name == "import.hx") {
+				note("warn", "mod " + record.id + ": import.hx ignored");
+				return;
+			}
+			if (!StringTools.endsWith(name, ".hx"))
+				return;
+			var stem = name.substr(0, name.length - 3);
+			var pack = ["mods", record.id];
+			var relative = relativeTo(srcRoot, path);
+			var slash = relative.lastIndexOf("/");
+			var folder = slash < 0 ? "" : relative.substr(0, slash);
+			if (folder != "") {
+				for (segment in folder.split("/")) {
+					if (segment != "")
+						pack.push(segment);
+				}
+			}
+			var modulePath = pack.join(".") + "." + stem;
+			if (moduleOwner.exists(modulePath)) {
+				fail(record, "duplicate type " + modulePath);
+				return;
+			}
+			var source = readText(path);
+			if (source == null) {
+				fail(record, "could not read " + relative);
+				return;
+			}
+			var module = new hxscript.Module(source, stem, pack, path);
+			if (parseErrors.exists(path)) {
+				fail(record, parseErrors.get(path));
+				return;
+			}
+			world.addModule(module);
+			modules.push(module);
+			moduleOwner.set(module.path, record.id);
+		});
+		if (record.status == "ok" && modules.length == 0) {
+			record.status = "failed";
+			record.error = "no scripts";
+		}
+	}
+
+	static function compileWorld():Void {
+		if (world == null)
+			return;
+		try {
+			cpp.cppia.Host.enableJit(true);
+		} catch (e:Dynamic) {
+			note("warn", "modding: JIT: " + errorText(e));
+		}
+		try {
+			hxscript.compile.Compiler.compile(world);
+		} catch (e:Dynamic) {
+			var message = errorText(e);
+			for (record in records) {
+				if (record.status != "ok")
+					continue;
+				record.status = "failed";
+				record.error = message;
+			}
+		}
+	}
+
+	static function assignModes():Void {
+		for (record in records) {
+			var modules = modModules.get(record.id);
+			if (modules == null)
+				continue;
+			var compiled = 0;
+			var interpreted = 0;
+			for (module in modules) {
+				var paths = hxscript.cppia.Backend.declaredPaths(module.decls);
+				if (paths.length == 0)
+					continue;
+				if (compiledModule(module))
+					compiled++;
+				else
+					interpreted++;
+			}
+			if (compiled == 0 && interpreted == 0)
+				continue;
+			if (interpreted == 0)
+				record.mode = "compiled";
+			else if (compiled == 0)
+				record.mode = "interpreted";
+			else
+				record.mode = "mixed";
+			if (record.status == "ok" && interpreted > 0) {
+				var noun = interpreted == 1 ? "module" : "modules";
+				record.error = interpreted + " " + noun + " left interpreted";
+			}
+		}
+	}
+
+	static function compiledModule(module:hxscript.Module):Bool {
+		if (world == null)
+			return false;
+		var paths = hxscript.cppia.Backend.declaredPaths(module.decls);
+		if (paths.length == 0)
+			return false;
+		for (path in paths)
+			if (!world.compiled.exists(path))
+				return false;
+		return true;
+	}
+
+	static function startInterpreted():Void {
+		if (world == null)
+			return;
+		var pendingModules = [];
+		for (module in world.modules)
+			if (!compiledModule(module))
+				pendingModules.push(module);
+		for (module in pendingModules)
+			guard(module, function() {
+				module.init(world);
+			});
+		for (module in pendingModules)
+			guard(module, function() {
+				module.start(world);
+			});
+		for (module in pendingModules)
+			guard(module, function() {
+				module.startTypes(world);
+			});
+	}
+
+	static function guard(module:hxscript.Module, call:Void->Void):Void {
+		var owner = moduleOwner.get(module.path);
+		if (owner == null)
+			return;
+		try {
+			call();
+		} catch (e:Dynamic) {
+			fail(recordById(owner), errorText(e));
+		}
+	}
+
+	static function runInits():Void {
+		var needsOverlay = false;
+		for (record in records) {
+			if (record.status == "ok")
+				needsOverlay = true;
+		}
+		if (needsOverlay)
+			createOverlay();
+		for (record in records) {
+			if (record.status != "ok")
+				continue;
+			var path = "mods." + record.id + "." + record.entry;
+			var instance:Null<Mod> = null;
+			try {
+				instance = createEntry(path);
+			} catch (e:Dynamic) {
+				fail(record, errorText(e));
+				continue;
+			}
+			if (instance == null) {
+				fail(record, "entry " + path + " was not found or does not extend modding.Mod");
+				continue;
+			}
+			record.instance = instance;
+			record.context = new ModContext(record.id, overlay, state);
+			record.context.beginCall();
+			try {
+				instance.onInit(record.context);
+				record.context.commitCall();
+			} catch (e:Dynamic) {
+				record.context.rollbackCall();
+				record.status = "failed";
+				record.error = errorText(e);
+			}
+		}
+	}
+
+	static function createEntry(path:String):Null<Mod> {
+		if (world != null && world.compiled.exists(path)) {
+			var made:Dynamic = Type.createInstance(world.compiled.get(path), []);
+			return Std.downcast(made, Mod);
+		}
+		var scripted = world == null ? null : world.resolve(path);
+		if (scripted is hxscript.types.ScriptedClass) {
+			var made:Dynamic = (cast scripted : hxscript.types.ScriptedClass).typeCreateInstance([]);
+			return Std.downcast(made, Mod);
+		}
+		return null;
+	}
+
+	static function createOverlay():Void {
+		overlay = new Sprite();
+		overlay.name = "ModOverlay";
+		overlay.mouseEnabled = false;
+		if (stage != null && overlay.parent == null)
+			stage.addChild(overlay);
+	}
+
+	/** First failure wins, so a later interpreted-module note does not replace it. */
+	static function fail(record:ModRecord, message:String):Void {
+		if (record == null || record.status == "failed")
+			return;
+		record.status = "failed";
+		record.error = message;
+	}
+
+	static function recordById(id:String):Null<ModRecord> {
+		for (record in records)
+			if (record.id == id)
+				return record;
+		return null;
+	}
+
+	static function writeReport():Void {
+		if (!booted || modsRoot == "")
+			return;
+		var body = new StringBuf();
+		body.add("{\n");
+		body.add('  "drh": ${Json.stringify(Version.TAG)},\n');
+		body.add('  "started": ${Json.stringify(started)},\n');
+		body.add('  "ready": ${reportReady ? "true" : "false"},\n');
+		body.add('  "mods": [\n');
+		for (index in 0...records.length) {
+			var record = records[index];
+			body.add("    {\n");
+			body.add('      "id": ${Json.stringify(record.id)}');
+			if (record.version != "")
+				body.add(',\n      "version": ${Json.stringify(record.version)}');
+			body.add(',\n      "status": ${Json.stringify(record.status)}');
+			if (record.mode != "")
+				body.add(',\n      "mode": ${Json.stringify(record.mode)}');
+			if (record.error != null)
+				body.add(',\n      "error": ${Json.stringify(record.error)}');
+			body.add("\n    }");
+			if (index < records.length - 1)
+				body.add(",");
+			body.add("\n");
+		}
+		body.add("  ]\n}\n");
+		try {
+			sys.io.File.saveContent(modsRoot + "/last-run.json", body.toString());
+		} catch (e:Dynamic) {
+			note("warn", "modding: could not write last-run.json: " + errorText(e));
+		}
+	}
+
+	static function summary(record:ModRecord):String {
+		var parts = ["mod " + record.id];
+		if (record.version != "")
+			parts.push("version=" + record.version);
+		if (record.uses.length > 0)
+			parts.push("uses=" + record.uses.join(","));
+		if (record.mode != "")
+			parts.push("mode=" + record.mode);
+		parts.push("status=" + record.status);
+		if (record.error != null)
+			parts.push(record.error);
+		return parts.join(" ");
+	}
+
+	static function readUses(value:Dynamic, record:ModRecord):Bool {
+		if (!Std.isOfType(value, Array)) {
+			record.status = "failed";
+			record.error = "uses must list api, extends, or replace";
+			return false;
+		}
+		var list:Array<Dynamic> = value;
+		if (list.length == 0) {
+			record.status = "failed";
+			record.error = "uses must list api, extends, or replace";
+			return false;
+		}
+		var seen = new Map<String, Bool>();
+		for (item in list) {
+			if (!Std.isOfType(item, String)) {
+				record.status = "failed";
+				record.error = "invalid uses value";
+				return false;
+			}
+			var kind:String = item;
+			if (kind != "api" && kind != "extends" && kind != "replace") {
+				record.status = "failed";
+				record.error = "invalid uses value: " + kind;
+				return false;
+			}
+			if (!seen.exists(kind)) {
+				seen.set(kind, true);
+				record.uses.push(kind);
+			}
+		}
+		return true;
+	}
+
+	static function warnDrh(record:ModRecord, spec:Dynamic):Void {
+		if (!Std.isOfType(spec, String) || spec == "") {
+			note("warn", "mod " + record.id + ": drh is required");
+			return;
+		}
+		var text:String = spec;
+		var parsed = parseDrh(text);
+		if (parsed == null) {
+			note("warn", 'mod ${record.id}: drh "$text" is not a closed tag set');
+			return;
+		}
+		var installed = Std.parseInt(Version.TAG);
+		if (installed == null)
+			return;
+		var extendsOrReplace = record.uses.indexOf("extends") >= 0 || record.uses.indexOf("replace") >= 0;
+		if (extendsOrReplace) {
+			if (parsed.indexOf(installed) < 0)
+				note("warn", 'mod ${record.id}: drh $text does not include this build (${Version.TAG})');
+		} else if (record.uses.indexOf("api") >= 0) {
+			var min = parsed[0];
+			for (value in parsed)
+				if (value < min)
+					min = value;
+			if (installed < min)
+				note("warn", 'mod ${record.id}: drh minimum is $min; this build is ${Version.TAG}');
+		}
+	}
+
+	static function parseDrh(spec:String):Null<Array<Int>> {
+		var out = [];
+		for (part in spec.split(",")) {
+			var token = StringTools.trim(part);
+			if (token == "")
+				return null;
+			var dash = token.indexOf("-");
+			if (dash < 0) {
+				if (!wholeNumber(token))
+					return null;
+				out.push(Std.parseInt(token));
+			} else if (token.indexOf("-", dash + 1) >= 0) {
+				return null;
+			} else {
+				var left = token.substr(0, dash);
+				var right = token.substr(dash + 1);
+				if (!wholeNumber(left) || !wholeNumber(right))
+					return null;
+				var from = Std.parseInt(left);
+				var to = Std.parseInt(right);
+				if (from > to)
+					return null;
+				var value = from;
+				while (value <= to) {
+					out.push(value);
+					value++;
+				}
+			}
+		}
+		return out.length == 0 ? null : out;
+	}
+
+	static function wholeNumber(token:String):Bool {
+		var value = Std.parseInt(token);
+		return value != null && Std.string(value) == token;
+	}
+
+	static function validId(id:String):Bool {
+		return id != null && ID.match(id) && !isKeyword(id) && !isReserved(id);
+	}
+
+	static function isKeyword(id:String):Bool {
+		return switch (id) {
+			case "abstract", "break", "case", "cast", "catch", "class", "continue", "default", "dynamic", "else", "enum",
+				"extends", "extern", "false", "final", "for", "function", "implements", "import", "inline", "interface",
+				"macro", "new", "null", "operator", "overload", "override", "package", "private", "public", "return",
+				"static", "switch", "this", "throw", "true", "try", "typedef", "untyped", "using", "var", "while":
+				true;
+			default:
+				false;
+		}
+	}
+
+	static function isReserved(id:String):Bool {
+		if (id == "con" || id == "prn" || id == "aux" || id == "nul")
+			return true;
+		if (id.length != 4)
+			return false;
+		var prefix = id.substr(0, 3);
+		if (prefix != "com" && prefix != "lpt")
+			return false;
+		var digit = id.charCodeAt(3);
+		return digit >= "1".code && digit <= "9".code;
+	}
+
+	static function modsDirectory(args:Array<String>):Null<String> {
+		var index = 0;
+		while (index < args.length) {
+			var arg = args[index];
+			if (arg == MODS_DIR_ARGUMENT) {
+				if (index + 1 >= args.length || StringTools.startsWith(args[index + 1], "--")) {
+					trace("modding: ignoring --mods-dir without a value");
+					return null;
+				}
+				return args[index + 1];
+			}
+			if (StringTools.startsWith(arg, MODS_DIR_ARGUMENT + "=")) {
+				var value = arg.substr(MODS_DIR_ARGUMENT.length + 1);
+				if (value == "") {
+					trace("modding: ignoring --mods-dir without a value");
+					return null;
+				}
+				return value;
+			}
+			index++;
+		}
+		return null;
+	}
+
+	static function walk(dir:String, seen:Map<String, Bool>, visit:String->Void):Void {
+		var absolute = dir;
+		try absolute = sys.FileSystem.absolutePath(dir) catch (_:Dynamic) {}
+		if (seen.exists(absolute))
+			return;
+		seen.set(absolute, true);
+		var names = sys.FileSystem.readDirectory(dir);
+		names.sort(function(a, b) return a < b ? -1 : a > b ? 1 : 0);
+		for (name in names) {
+			var path = dir + "/" + name;
+			if (sys.FileSystem.isDirectory(path))
+				walk(path, seen, visit);
+			else
+				visit(path);
+		}
+	}
+
+	static function relativeTo(root:String, path:String):String {
+		var normalizedRoot = root.split("\\").join("/");
+		var normalizedPath = path.split("\\").join("/");
+		if (!StringTools.endsWith(normalizedRoot, "/"))
+			normalizedRoot += "/";
+		if (StringTools.startsWith(normalizedPath, normalizedRoot))
+			return normalizedPath.substr(normalizedRoot.length);
+		return fileName(normalizedPath);
+	}
+
+	static function fileName(path:String):String {
+		var normalized = path.split("\\").join("/");
+		var slash = normalized.lastIndexOf("/");
+		return slash < 0 ? normalized : normalized.substr(slash + 1);
+	}
+
+	static function readText(path:String):Null<String> {
+		try {
+			var text = sys.io.File.getContent(path);
+			if (text.length > 0 && text.charCodeAt(0) == 0xFEFF)
+				return text.substr(1);
+			return text;
+		} catch (_:Dynamic) {
+			return null;
+		}
+	}
+
+	static function note(level:String, text:String):Void {
+		if (flushed)
+			logNow(level, text);
+		else
+			pending.push({level: level, text: text});
+	}
+
+	static function logNow(level:String, text:String):Void {
+		if (level == "warn")
+			brain.logger.Logger.warn(text);
+		else
+			brain.logger.Logger.info(text);
+	}
+
+	static function errorText(value:Dynamic):String {
+		if (value == null)
+			return "unknown error";
+		if (Std.isOfType(value, String))
+			return oneLine(value);
+		var message:Dynamic = null;
+		try message = Reflect.field(value, "message") catch (_:Dynamic) {}
+		if (message != null)
+			return oneLine(Std.string(message));
+		return oneLine(Std.string(value));
+	}
+
+	static function oneLine(text:String):String {
+		if (text == null)
+			return "unknown error";
+		var flat = ~/[\r\n]+/g.replace(text, " ");
+		return StringTools.trim(~/ {2,}/g.replace(flat, " "));
+	}
+
+	static function utcNow():String {
+		var now = Date.now();
+		var utc = Date.fromTime(now.getTime() + now.getTimezoneOffset() * 60 * 1000);
+		return pad(utc.getFullYear(), 4) + "-" + pad(utc.getMonth() + 1, 2) + "-" + pad(utc.getDate(), 2) + "T"
+			+ pad(utc.getHours(), 2) + ":" + pad(utc.getMinutes(), 2) + ":" + pad(utc.getSeconds(), 2) + "Z";
+	}
+
+	static function pad(value:Int, width:Int):String {
+		var text = Std.string(value);
+		while (text.length < width)
+			text = "0" + text;
+		return text;
+	}
+}
+
+private class ModRecord {
+	public var id:String;
+
+	public var version:String = "";
+
+	public var uses:Array<String> = [];
+
+	public var status:String;
+
+	public var mode:String = "";
+
+	public var error:Null<String>;
+
+	public var entry:String = "";
+
+	public var directory:String = "";
+
+	public var instance:Null<Mod>;
+
+	public var context:Null<ModContext>;
+
+	public function new(id:String, status:String) {
+		this.id = id;
+		this.status = status;
+	}
+}
+
+private typedef LogLine = {
+	var level:String;
+	var text:String;
+}
+
+private typedef Listener = {
+	var id:String;
+	var handler:Dynamic;
+}

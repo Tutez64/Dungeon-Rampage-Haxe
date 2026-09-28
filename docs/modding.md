@@ -441,7 +441,7 @@ Intended game build flags (`hxscript` = **our fork**):
 -D scriptable
 -D hxscript_verbose                                         # the CI log is where a skipped module is explained
 -D hxscript_host=modding
--D hxscript_bridge_classpath=src,src-steam,compat           # classpath entries walked with an empty package
+-D hxscript_bridge_classpath=src,src-steam,compat,src-modding   # classpath entries walked with an empty package
 -D hxscript_bridge_exclude=DungeonBustersProject,...        # value in project.xml, explained below
 -D hxscript_bridge_packages=openfl,lime,swf,steamwrap       # stock; whole trees until measured
 -dce no                                                     # hxScript's own cppia setting
@@ -450,7 +450,7 @@ Intended game build flags (`hxscript` = **our fork**):
 -D hxscript_keep=cpp.vm.Gc,cpp.vm.Profiler                  # cpp.* by name (package has objc / link)
 ```
 
-**Bridge scan (fork).** Submodules each have one root package, so stock `-D hxscript_bridge_packages=openfl,lime,swf,steamwrap` covers them (recursive; presets' ignore lists do not apply). DRH's own roots need a **classpath-entry scan** — walking the empty root would include the std — so the pinned fork has `-D hxscript_bridge_classpath=src,src-steam,compat` and `-D hxscript_bridge_exclude`. Necessity is `compat/` (root-level types no package scan can reach); for `src/` alone a 35-package list would do. The define names **classpath entries** walked with an **empty package**, not a package called `src` (`modulesUnder("src")` would look for `src/src/` and emit `src.actor.Hero`). The walk skips `*.macro.hx`. `-D hxscript_host=modding` stays upstream's meaning: packages scanned for `@:scriptAmbient` / `@:scriptStatic`. `-D scriptable` is hxcpp's cppia flag; it does not generate extend bridges.
+**Bridge scan (fork).** Submodules each have one root package, so stock `-D hxscript_bridge_packages=openfl,lime,swf,steamwrap` covers them (recursive; presets' ignore lists do not apply). DRH's own roots need a **classpath-entry scan** — walking the empty root would include the std — so the pinned fork has `-D hxscript_bridge_classpath=src,src-steam,compat,src-modding` and `-D hxscript_bridge_exclude`. `src-modding` is the cpp-only host (`modding.Mod`). Necessity is `compat/` (root-level types no package scan can reach); for `src/` alone a 35-package list would do. The define names **classpath entries** walked with an **empty package**, not a package called `src` (`modulesUnder("src")` would look for `src/src/` and emit `src.actor.Hero`). The walk skips `*.macro.hx`. `-D hxscript_host=modding` stays upstream's meaning: packages scanned for `@:scriptAmbient` / `@:scriptStatic`. `-D scriptable` is hxcpp's cppia flag; it does not generate extend bridges.
 
 What the first cppia build does not compile:
 
@@ -502,7 +502,7 @@ Needed before a real host; not a restatement of the rules above.
 1. **Done**. Patch hxScript. Except `replace` which is still missing. Further generator fixes may still show up on the first cppia build.
 2. **Done.** hxcpp cppia patch.
 3. **Done.** The flags above are in `project.xml`.
-4. Implement `src/modding/` per this document (`uncaughtError` / `exiting` at the top of the constructor, `--mods-dir`, one world, lifecycle, overlay re-register, `ASCompat.createInstance` → `replace` table). Call `cpp.cppia.Host.enableJit(true)` once there, before any module loads. Bake the release tag (no `V`) and the `api` number into the host ([Versioning](#versioning)).
+4. **Done**, except `replace`. `src-modding/` loads `--mods-dir` into one world, runs the lifecycle, re-registers the overlay, turns the JIT on before any module loads, and bakes the release tag (no `V`) plus `api` into the host ([Versioning](#versioning)). `uncaughtError` and the mod `exiting` listener sit at the top of the constructor. Still later: `ASCompat.createInstance` consulting the `replace` table, once the fork has `replace`.
 5. Launcher: index fetch, catalog install, `enabled.json`, `--mods-dir`, `last-run.json` display — no destructive overlay.
 6. Index repository (separate from DRH / DRHL), PR + CI for new versions.
 
