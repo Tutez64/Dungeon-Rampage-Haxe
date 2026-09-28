@@ -2,3 +2,4 @@ bin
 out
 dist
 edits/conversion/.tmp
+examples/mods/last-run.json

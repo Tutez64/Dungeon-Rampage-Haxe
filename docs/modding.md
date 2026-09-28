@@ -175,7 +175,7 @@ Disjoint-method merge lives in hxScript; DRH calls `replace` and gets one class 
 
 - Only `modding.*` wrappers are the **stable** API. `facade.DBFacade`, `actor.*`, `combat.*`, `uI.*` are host types: usable via `extends` / `replace`, not covered by `api` compatibility.
 - `api: N` freezes the written contract of that facade: when an event fires, what a wrapper represents, and the empty-until-event rules. Adding a wrapper without changing an existing one stays `api: N`. Changing that text bumps `api`. Game content behind a stable reading, and OpenFL/Lime used to draw on the overlay, are outside it. The number is a host constant and the same field on the release manifest. The launcher compares `mod.json` to the installed release and warns either way on a mismatch. It does not ask the running game. A release that omits the field has no facade.
-- Official examples for all three kinds live in the repo and are recompiled against the host on every tag. A signature break fails that compile. Whether a call site still matches the written when/what is review.
+- Official examples for all three kinds live in [`examples/mods/`](../examples/mods/) (`api` so far) and are recompiled against the host on every tag. A signature break fails that compile. Whether a call site still matches the written when/what is review.
 
 ## Mod kinds
 
