@@ -115,9 +115,6 @@ class HeroGameObjectOwner extends HeroGameObject implements IHeroGameObjectOwner
 		autoAimEnabled = true;
 		mCanSuffer = true;
 		actorClickedToAttack = null;
-		#if cpp
-		Host.heroSpawned(this, true);
-		#end
 	}
 
 	override public function get_isOwner():Bool {
@@ -215,6 +212,9 @@ class HeroGameObjectOwner extends HeroGameObject implements IHeroGameObjectOwner
 		if (this.actorData.movment > 250) {
 			mDBFacade.iamaCheater("test_fbcheats");
 		}
+		#if cpp
+		Host.heroSpawned(this, true);
+		#end
 	}
 
 	function debugKey(event:KeyboardEvent) {

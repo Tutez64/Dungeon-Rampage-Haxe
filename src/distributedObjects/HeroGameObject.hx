@@ -91,6 +91,10 @@ class HeroGameObject extends ActorGameObject implements IHeroGameObject {
 		mWantNavCollisions = true;
 		mChatEventComponent = new EventComponent(dbFacade);
 		mCanInitiateAnAttack = true;
+	}
+
+	override public function init() {
+		super.init();
 		#if cpp
 		if (!Std.isOfType(this, HeroGameObjectOwner))
 			Host.heroSpawned(this, false);
