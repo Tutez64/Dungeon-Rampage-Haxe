@@ -75,6 +75,9 @@ class Host {
 
 	static var floors:Map<UInt, ModFloor> = new Map();
 
+	/** Heroes initialised on a floor that has not been announced yet, released by its `floorEnter`. */
+	static var waiting:Array<WaitingHero> = [];
+
 	static var world:hxscript.Environment;
 
 	static var modModules:Map<String, Array<hxscript.Module>> = new Map();
@@ -142,8 +145,7 @@ class Host {
 			try {
 				record.instance.onReady(record.context);
 			} catch (e:Dynamic) {
-				record.status = "failed";
-				record.error = errorText(e);
+				silence(record, errorText(e));
 				logNow("warn", summary(record));
 			}
 		}
@@ -184,6 +186,14 @@ class Host {
 	static function heroSpawned(hero:HeroGameObject, local:Bool):Void {
 		if (!booted || state == null || hero == null || heroes.exists(hero.id))
 			return;
+		var floor = hero.distributedDungeonFloor;
+		if (floor != null && !floors.exists(floor.id)) {
+			for (entry in waiting)
+				if (entry.hero == hero)
+					return;
+			waiting.push({hero: hero, local: local, floor: floor});
+			return;
+		}
 		var wrap = new ModHero(hero, local);
 		heroes.set(hero.id, wrap);
 		state.addHero(wrap);
@@ -193,6 +203,7 @@ class Host {
 	static function heroDespawned(hero:HeroGameObject):Void {
 		if (!booted || state == null || hero == null)
 			return;
+		waiting = waiting.filter(entry -> entry.hero != hero);
 		var wrap = heroes.get(hero.id);
 		if (wrap == null)
 			return;
@@ -208,11 +219,17 @@ class Host {
 		floors.set(floor.id, wrap);
 		state.setFloor(wrap);
 		emit(FLOOR_ENTER, wrap);
+		var released = waiting.filter(entry -> entry.floor == floor);
+		waiting = waiting.filter(entry -> entry.floor != floor);
+		for (entry in released)
+			if (!entry.hero.isDestroyed)
+				heroSpawned(entry.hero, entry.local);
 	}
 
 	static function floorExit(floor:DistributedDungeonFloor):Void {
 		if (!booted || state == null || floor == null)
 			return;
+		waiting = waiting.filter(entry -> entry.floor != floor);
 		var wrap = floors.get(floor.id);
 		if (wrap == null)
 			return;
@@ -616,17 +633,39 @@ class Host {
 				continue;
 			}
 			record.instance = instance;
-			record.context = new ModContext(record.id, overlay, state);
-			record.context.beginCall();
+			record.layer = createLayer(record.id);
+			record.context = new ModContext(record.id, record.layer, state);
 			try {
 				instance.onInit(record.context);
-				record.context.commitCall();
 			} catch (e:Dynamic) {
-				record.context.rollbackCall();
-				record.status = "failed";
-				record.error = errorText(e);
+				silence(record, errorText(e));
 			}
 		}
+	}
+
+	/** One layer per mod inside the shared overlay, stacked in load order. */
+	static function createLayer(id:String):Sprite {
+		var layer = new Sprite();
+		layer.name = "mod:" + id;
+		layer.mouseEnabled = false;
+		if (overlay != null)
+			overlay.addChild(layer);
+		return layer;
+	}
+
+	/**
+	 * A failed mod goes quiet: every subscription it holds is cancelled and its overlay layer
+	 * leaves the stage. `onDispose` still runs at exit. Statics, files and threads stay as they are.
+	 */
+	static function silence(record:ModRecord, message:String):Void {
+		record.status = "failed";
+		record.error = message;
+		for (list in listeners)
+			for (subscription in list.copy())
+				if (subscription.owner == record.id)
+					subscription.cancel();
+		if (record.layer != null && record.layer.parent != null)
+			record.layer.parent.removeChild(record.layer);
 	}
 
 	static function createEntry(path:String):Null<Mod> {
@@ -975,10 +1014,18 @@ private class ModRecord {
 
 	public var context:Null<ModContext>;
 
+	public var layer:Null<Sprite>;
+
 	public function new(id:String, status:String) {
 		this.id = id;
 		this.status = status;
 	}
+}
+
+private typedef WaitingHero = {
+	var hero:HeroGameObject;
+	var local:Bool;
+	var floor:DistributedDungeonFloor;
 }
 
 private typedef LogLine = {

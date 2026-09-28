@@ -1,6 +1,5 @@
 package modding;
 
-import flash.display.DisplayObject;
 import flash.display.Sprite;
 
 /**
@@ -11,18 +10,12 @@ import flash.display.Sprite;
  * to cancel. `replace` is not part of this build.
  */
 class ModContext {
-	/** Draw root. The host keeps it above the letterbox; mods do not set z-order. */
+	/** This mod's layer of the overlay, above the letterbox and stacked in load order. Removed if the mod fails. */
 	public var overlay(default, null):Sprite;
 
 	public var state(default, null):ModState;
 
 	var id:String;
-
-	var tracking:Bool = false;
-
-	var added:Array<ModSubscription> = [];
-
-	var children:Array<DisplayObject> = [];
 
 	@:allow(modding.Host)
 	function new(id:String, overlay:Sprite, state:ModState) {
@@ -35,7 +28,7 @@ class ModContext {
 		Host.modLog(id, message);
 	}
 
-	/** A hero, local or remote, is on a dungeon floor and initialised. Not town. */
+	/** A hero, local or remote, is on a dungeon floor and initialised. Not town. Always after that floor's `onFloorEnter`. */
 	public function onHeroSpawned(handler:ModHero->Void):ModSubscription {
 		return listen(Host.HERO_SPAWNED, handler);
 	}
@@ -45,7 +38,7 @@ class ModContext {
 		return listen(Host.HERO_DESPAWNED, handler);
 	}
 
-	/** A dungeon floor starts. Its tiles may still be building. */
+	/** A dungeon floor starts: its grid is built and its map node set. Art may still be loading. */
 	public function onFloorEnter(handler:ModFloor->Void):ModSubscription {
 		return listen(Host.FLOOR_ENTER, handler);
 	}
@@ -71,54 +64,6 @@ class ModContext {
 	function listen(event:String, handler:Dynamic):ModSubscription {
 		if (handler == null)
 			throw event + ": handler is null";
-		var subscription = Host.listen(id, event, handler);
-		if (tracking)
-			added.push(subscription);
-		return subscription;
-	}
-
-	@:allow(modding.Host)
-	function beginCall():Void {
-		tracking = true;
-		added = [];
-		children = snapshot();
-	}
-
-	@:allow(modding.Host)
-	function commitCall():Void {
-		tracking = false;
-		added = [];
-		children = [];
-	}
-
-	/** Drops subscriptions and overlay children added during the call that just failed. */
-	@:allow(modding.Host)
-	function rollbackCall():Void {
-		for (subscription in added)
-			subscription.cancel();
-		added = [];
-		tracking = false;
-		if (overlay == null)
-			return;
-		var keep = new Map<DisplayObject, Bool>();
-		for (child in children)
-			keep.set(child, true);
-		var index = overlay.numChildren - 1;
-		while (index >= 0) {
-			var child = overlay.getChildAt(index);
-			if (!keep.exists(child))
-				overlay.removeChildAt(index);
-			index--;
-		}
-		children = [];
-	}
-
-	function snapshot():Array<DisplayObject> {
-		var out = [];
-		if (overlay == null)
-			return out;
-		for (index in 0...overlay.numChildren)
-			out.push(overlay.getChildAt(index));
-		return out;
+		return Host.listen(id, event, handler);
 	}
 }
