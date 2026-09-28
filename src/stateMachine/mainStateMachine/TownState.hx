@@ -7,6 +7,9 @@ import brain.sceneGraph.SceneGraphComponent;
 import brain.stateMachine.State;
 import facade.DBFacade;
 import facade.TrickleCacheLoader;
+#if cpp
+import modding.Host;
+#end
 import town.TownStateMachine;
 import uI.leaderboard.UILeaderboard;
 import flash.display.MovieClip;
@@ -72,9 +75,15 @@ class TownState extends State {
 		loadNecessarySwfs();
 		mDBFacade.camera.centerCameraOnPoint(new Vector3D());
 		mSceneGraphComponent.fadeIn(0.5);
+		#if cpp
+		Host.townEnter();
+		#end
 	}
 
 	override public function exitState() {
+		#if cpp
+		Host.townExit();
+		#end
 		mTownStateMachine.exit();
 		mTownStateMachine.destroy();
 		mTownStateMachine = null;

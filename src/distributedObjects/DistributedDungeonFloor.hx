@@ -15,6 +15,9 @@ import dungeon.TileGrid;
 import effects.EffectManager;
 import events.ActorLifetimeEvent;
 import facade.DBFacade;
+#if cpp
+import modding.Host;
+#end
 import dr_floor.FloorMessageView;
 import dr_floor.FloorObject;
 import gameMasterDictionary.GMColiseumTier;
@@ -204,6 +207,9 @@ class DistributedDungeonFloor extends Floor implements IDistributedDungeonFloor 
 		this.playIntroMovie();
 		this.playMusic();
 		buildFloorEndingGui();
+		#if cpp
+		Host.floorEnter(this);
+		#end
 	}
 
 	override public function victory() {
@@ -510,6 +516,9 @@ class DistributedDungeonFloor extends Floor implements IDistributedDungeonFloor 
 
 	override public function destroy() {
 		var _loc2_:DooberGameObject = null;
+		#if cpp
+		Host.floorExit(this);
+		#end
 		Logger.debug("destroy DistributedDungeonFloor " + Std.string(id));
 		mEventComponent.dispatchEvent(new Event("DUNGEON_FLOOR_DESTROY"));
 		mActiveOwnerAvatar = null;
