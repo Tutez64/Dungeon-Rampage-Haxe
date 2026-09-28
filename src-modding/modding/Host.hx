@@ -1,6 +1,5 @@
 package modding;
 
-import account.DBAccountInfo;
 import facade.DBFacade;
 import distributedObjects.DistributedDungeonFloor;
 import distributedObjects.HeroGameObject;
@@ -12,9 +11,33 @@ import haxe.Json;
  * Loads every enabled mod into one hxScript world. No `--mods-dir` means no mods
  * and nothing written. `replace` is intentionally absent until the fork has it.
  *
+ * Nothing here is for mods: the game calls the hooks, mods go through `ModContext`.
+ *
  * Contract: docs/modding.md (lifecycle, passing the list, last-run report).
  */
+@:allow(DungeonBustersProject)
+@:allow(facade.DBFacade)
+@:allow(stateMachine.mainStateMachine.TownState)
+@:allow(distributedObjects.HeroGameObject)
+@:allow(distributedObjects.HeroGameObjectOwner)
+@:allow(distributedObjects.DistributedDungeonFloor)
+@:allow(modding.ModContext)
+@:allow(modding.ModSubscription)
 class Host {
+	static inline final HERO_SPAWNED = "heroSpawned";
+
+	static inline final HERO_DESPAWNED = "heroDespawned";
+
+	static inline final FLOOR_ENTER = "floorEnter";
+
+	static inline final FLOOR_EXIT = "floorExit";
+
+	static inline final TABLES_LOADED = "tablesLoaded";
+
+	static inline final TOWN_ENTER = "townEnter";
+
+	static inline final TOWN_EXIT = "townExit";
+
 	/** Above the letterbox (1000), the side backgrounds (1001) and the session id (1002). */
 	static inline final OVERLAY_LAYER:Float = 1003;
 
@@ -46,7 +69,7 @@ class Host {
 
 	static var pending:Array<LogLine> = [];
 
-	static var listeners:Map<String, Array<Listener>> = new Map();
+	static var listeners:Map<String, Array<ModSubscription>> = new Map();
 
 	static var heroes:Map<UInt, ModHero> = new Map();
 
@@ -60,7 +83,7 @@ class Host {
 
 	static var parseErrors:Map<String, String> = new Map();
 
-	public static function boot(stage:Stage, args:Array<String>):Void {
+	static function boot(stage:Stage, args:Array<String>):Void {
 		if (booted)
 			return;
 		var directory = modsDirectory(args);
@@ -88,7 +111,7 @@ class Host {
 			note("info", summary(record));
 	}
 
-	public static function flush():Void {
+	static function flush():Void {
 		if (flushed)
 			return;
 		flushed = true;
@@ -102,17 +125,17 @@ class Host {
 	}
 
 	/** Moves the overlay into the facade's layer list, above the letterbox. */
-	public static function attachOverlay(facade:DBFacade):Void {
+	static function attachOverlay(facade:DBFacade):Void {
 		if (overlay == null || facade == null)
 			return;
 		facade.addRootDisplayObject(overlay, OVERLAY_LAYER);
 	}
 
-	public static function ready(facade:DBFacade):Void {
+	static function ready(facade:DBFacade):Void {
 		if (!booted || reportReady)
 			return;
 		if (state != null)
-			state.setAccount(ModAccount.from(facade == null ? null : facade.dbAccountInfo));
+			state.setAccount(ModAccount.from(facade));
 		for (record in records) {
 			if (record.status != "ok" || record.instance == null || record.context == null)
 				continue;
@@ -128,7 +151,7 @@ class Host {
 		writeReport();
 	}
 
-	public static function dispose():Void {
+	static function dispose():Void {
 		if (!booted || disposed)
 			return;
 		disposed = true;
@@ -146,48 +169,48 @@ class Host {
 		}
 	}
 
-	public static function tablesLoaded():Void {
-		emit(ModContext.TABLES_LOADED, null);
+	static function tablesLoaded():Void {
+		emit(TABLES_LOADED, null);
 	}
 
-	public static function townEnter():Void {
-		emit(ModContext.TOWN_ENTER, null);
+	static function townEnter():Void {
+		emit(TOWN_ENTER, null);
 	}
 
-	public static function townExit():Void {
-		emit(ModContext.TOWN_EXIT, null);
+	static function townExit():Void {
+		emit(TOWN_EXIT, null);
 	}
 
-	public static function heroSpawned(hero:HeroGameObject, local:Bool):Void {
+	static function heroSpawned(hero:HeroGameObject, local:Bool):Void {
 		if (!booted || state == null || hero == null || heroes.exists(hero.id))
 			return;
 		var wrap = new ModHero(hero, local);
 		heroes.set(hero.id, wrap);
-		state.heroes.push(wrap);
-		emit(ModContext.HERO_SPAWNED, wrap);
+		state.addHero(wrap);
+		emit(HERO_SPAWNED, wrap);
 	}
 
-	public static function heroDespawned(hero:HeroGameObject):Void {
+	static function heroDespawned(hero:HeroGameObject):Void {
 		if (!booted || state == null || hero == null)
 			return;
 		var wrap = heroes.get(hero.id);
 		if (wrap == null)
 			return;
 		heroes.remove(hero.id);
-		state.heroes.remove(wrap);
-		emit(ModContext.HERO_DESPAWNED, wrap);
+		state.removeHero(wrap);
+		emit(HERO_DESPAWNED, wrap);
 	}
 
-	public static function floorEnter(floor:DistributedDungeonFloor):Void {
+	static function floorEnter(floor:DistributedDungeonFloor):Void {
 		if (!booted || state == null || floor == null || floors.exists(floor.id))
 			return;
 		var wrap = new ModFloor(floor);
 		floors.set(floor.id, wrap);
 		state.setFloor(wrap);
-		emit(ModContext.FLOOR_ENTER, wrap);
+		emit(FLOOR_ENTER, wrap);
 	}
 
-	public static function floorExit(floor:DistributedDungeonFloor):Void {
+	static function floorExit(floor:DistributedDungeonFloor):Void {
 		if (!booted || state == null || floor == null)
 			return;
 		var wrap = floors.get(floor.id);
@@ -200,38 +223,28 @@ class Host {
 				next = other;
 			state.setFloor(next);
 		}
-		emit(ModContext.FLOOR_EXIT, wrap);
+		emit(FLOOR_EXIT, wrap);
 	}
 
-	@:allow(modding.ModContext)
 	static function modLog(id:String, message:String):Void {
 		note("info", "mod " + id + ": " + message);
 	}
 
-	@:allow(modding.ModContext)
-	static function listen(id:String, event:String, handler:Dynamic):Void {
+	static function listen(id:String, event:String, handler:Dynamic->Void):ModSubscription {
 		var list = listeners.get(event);
 		if (list == null) {
 			list = [];
 			listeners.set(event, list);
 		}
-		list.push({id: id, handler: handler});
+		var subscription = new ModSubscription(id, event, handler);
+		list.push(subscription);
+		return subscription;
 	}
 
-	@:allow(modding.ModContext)
-	static function unlisten(id:String, event:String, handler:Dynamic):Void {
-		var list = listeners.get(event);
-		if (list == null)
-			return;
-		var index = 0;
-		while (index < list.length) {
-			var listener = list[index];
-			if (listener.id == id && listener.handler == handler) {
-				list.splice(index, 1);
-				return;
-			}
-			index++;
-		}
+	static function unlisten(subscription:ModSubscription):Void {
+		var list = listeners.get(subscription.event);
+		if (list != null)
+			list.remove(subscription);
 	}
 
 	static function emit(event:String, payload:Dynamic):Void {
@@ -240,11 +253,13 @@ class Host {
 		var list = listeners.get(event);
 		if (list == null)
 			return;
-		for (listener in list.copy()) {
+		for (subscription in list.copy()) {
+			if (!subscription.active)
+				continue;
 			try {
-				listener.handler(payload);
+				subscription.call(payload);
 			} catch (e:Dynamic) {
-				logNow("warn", "mod " + listener.id + ": " + event + ": " + errorText(e));
+				logNow("warn", "mod " + subscription.owner + ": " + event + ": " + errorText(e));
 			}
 		}
 	}
@@ -297,9 +312,10 @@ class Host {
 			seen.set(name, true);
 			records.push(resolve(name));
 		}
+		dropFailedModules();
+		startWorld();
 		compileWorld();
 		assignModes();
-		startInterpreted();
 		runInits();
 	}
 
@@ -311,7 +327,7 @@ class Host {
 		}
 		var directory = findDirectory(id);
 		if (directory == null) {
-			record.error = "no folder";
+			record.error = folderError(id);
 			return record;
 		}
 		var manifestPath = directory + "/mod.json";
@@ -379,6 +395,16 @@ class Host {
 		return null;
 	}
 
+	/** Why `findDirectory` found nothing, named after the folder that has the id's name. */
+	static function folderError(id:String):String {
+		var direct = modsRoot + "/" + id;
+		if (!sys.FileSystem.exists(direct) || !sys.FileSystem.isDirectory(direct))
+			return "no folder";
+		if (!sys.FileSystem.exists(direct + "/mod.json"))
+			return "no mod.json";
+		return "mod.json id does not match";
+	}
+
 	static function manifestId(directory:String):Null<String> {
 		var path = directory + "/mod.json";
 		if (!sys.FileSystem.exists(path))
@@ -441,6 +467,9 @@ class Host {
 				fail(record, parseErrors.get(path));
 				return;
 			}
+			// hxScript reports these and carries on; for the host they fail the mod.
+			module.onProgramError = function(e:haxe.Exception) fail(record, errorText(e));
+			module.onTypeError = function(e:haxe.Exception, _) fail(record, errorText(e));
 			world.addModule(module);
 			modules.push(module);
 			moduleOwner.set(module.path, record.id);
@@ -451,14 +480,51 @@ class Host {
 		}
 	}
 
+	/** A mod that failed while loading declares nothing, so its other files do not start or compile. */
+	static function dropFailedModules():Void {
+		if (world == null)
+			return;
+		for (record in records) {
+			if (record.status != "failed")
+				continue;
+			var modules = modModules.get(record.id);
+			if (modules == null)
+				continue;
+			for (module in modules) {
+				world.removeModule(module);
+				moduleOwner.remove(module.path);
+			}
+			modModules.remove(record.id);
+		}
+	}
+
+	/**
+	 * Upstream order: every module is initialised and started before the compile, which resolves
+	 * bare names through each module's interpreter. Module-level code therefore runs interpreted
+	 * once, compiled modules included.
+	 */
+	static function startWorld():Void {
+		if (world == null)
+			return;
+		var modules = [for (module in world.modules) module];
+		for (module in modules)
+			guard(module, function() {
+				module.init(world);
+			});
+		for (module in modules)
+			guard(module, function() {
+				module.start(world);
+			});
+		for (module in modules)
+			guard(module, function() {
+				module.startTypes(world);
+			});
+	}
+
+	/** hxScript turns the JIT on itself before the first module loads (`Compiler.jit`, on by default). */
 	static function compileWorld():Void {
 		if (world == null)
 			return;
-		try {
-			cpp.cppia.Host.enableJit(true);
-		} catch (e:Dynamic) {
-			note("warn", "modding: JIT: " + errorText(e));
-		}
 		try {
 			hxscript.compile.Compiler.compile(world);
 		} catch (e:Dynamic) {
@@ -513,27 +579,6 @@ class Host {
 			if (!world.compiled.exists(path))
 				return false;
 		return true;
-	}
-
-	static function startInterpreted():Void {
-		if (world == null)
-			return;
-		var pendingModules = [];
-		for (module in world.modules)
-			if (!compiledModule(module))
-				pendingModules.push(module);
-		for (module in pendingModules)
-			guard(module, function() {
-				module.init(world);
-			});
-		for (module in pendingModules)
-			guard(module, function() {
-				module.start(world);
-			});
-		for (module in pendingModules)
-			guard(module, function() {
-				module.startTypes(world);
-			});
 	}
 
 	static function guard(module:hxscript.Module, call:Void->Void):Void {
@@ -712,7 +757,7 @@ class Host {
 			return;
 		}
 		var installed = Std.parseInt(Version.TAG);
-		if (installed == null)
+		if (installed == null || installed == 0)
 			return;
 		var extendsOrReplace = record.uses.indexOf("extends") >= 0 || record.uses.indexOf("replace") >= 0;
 		if (extendsOrReplace) {
@@ -939,9 +984,4 @@ private class ModRecord {
 private typedef LogLine = {
 	var level:String;
 	var text:String;
-}
-
-private typedef Listener = {
-	var id:String;
-	var handler:Dynamic;
 }

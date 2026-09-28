@@ -6,25 +6,11 @@ import flash.display.Sprite;
 /**
  * What a mod receives in `onInit` and `onReady`.
  *
- * Event names are the strings below. Subscribe from `onInit` for `tablesLoaded`
- * (it fires before `onReady`) and for anything that can happen as the world appears.
- * `replace` is not part of this build.
+ * Subscribe from `onInit` for `onTablesLoaded` (it fires before `onReady`) and for
+ * anything that can happen as the world appears. Each `on*` returns the subscription
+ * to cancel. `replace` is not part of this build.
  */
 class ModContext {
-	public static inline final HERO_SPAWNED = "heroSpawned";
-
-	public static inline final HERO_DESPAWNED = "heroDespawned";
-
-	public static inline final FLOOR_ENTER = "floorEnter";
-
-	public static inline final FLOOR_EXIT = "floorExit";
-
-	public static inline final TABLES_LOADED = "tablesLoaded";
-
-	public static inline final TOWN_ENTER = "townEnter";
-
-	public static inline final TOWN_EXIT = "townExit";
-
 	/** Draw root. The host keeps it above the letterbox; mods do not set z-order. */
 	public var overlay(default, null):Sprite;
 
@@ -34,7 +20,7 @@ class ModContext {
 
 	var tracking:Bool = false;
 
-	var added:Array<Subscription> = [];
+	var added:Array<ModSubscription> = [];
 
 	var children:Array<DisplayObject> = [];
 
@@ -49,17 +35,46 @@ class ModContext {
 		Host.modLog(id, message);
 	}
 
-	/** `handler` is called with the wrapper, or with null when the event has no payload. */
-	public function subscribe(event:String, handler:Dynamic):Void {
-		if (handler == null || event == null || event == "")
-			return;
-		Host.listen(id, event, handler);
-		if (tracking)
-			added.push({event: event, handler: handler});
+	/** A hero, local or remote, is on a dungeon floor and initialised. Not town. */
+	public function onHeroSpawned(handler:ModHero->Void):ModSubscription {
+		return listen(Host.HERO_SPAWNED, handler);
 	}
 
-	public function unsubscribe(event:String, handler:Dynamic):Void {
-		Host.unlisten(id, event, handler);
+	/** A hero leaves the floor. Its wrapper reads empty afterwards. */
+	public function onHeroDespawned(handler:ModHero->Void):ModSubscription {
+		return listen(Host.HERO_DESPAWNED, handler);
+	}
+
+	/** A dungeon floor starts. Its tiles may still be building. */
+	public function onFloorEnter(handler:ModFloor->Void):ModSubscription {
+		return listen(Host.FLOOR_ENTER, handler);
+	}
+
+	public function onFloorExit(handler:ModFloor->Void):ModSubscription {
+		return listen(Host.FLOOR_EXIT, handler);
+	}
+
+	/** Tables are in, the account is not parsed against them yet. Fires before `onReady`. */
+	public function onTablesLoaded(handler:Void->Void):ModSubscription {
+		return listen(Host.TABLES_LOADED, handler == null ? null : function(_:Dynamic) handler());
+	}
+
+	/** Town entered, including a return from a dungeon. */
+	public function onTownEnter(handler:Void->Void):ModSubscription {
+		return listen(Host.TOWN_ENTER, handler == null ? null : function(_:Dynamic) handler());
+	}
+
+	public function onTownExit(handler:Void->Void):ModSubscription {
+		return listen(Host.TOWN_EXIT, handler == null ? null : function(_:Dynamic) handler());
+	}
+
+	function listen(event:String, handler:Dynamic):ModSubscription {
+		if (handler == null)
+			throw event + ": handler is null";
+		var subscription = Host.listen(id, event, handler);
+		if (tracking)
+			added.push(subscription);
+		return subscription;
 	}
 
 	@:allow(modding.Host)
@@ -79,8 +94,8 @@ class ModContext {
 	/** Drops subscriptions and overlay children added during the call that just failed. */
 	@:allow(modding.Host)
 	function rollbackCall():Void {
-		for (sub in added)
-			Host.unlisten(id, sub.event, sub.handler);
+		for (subscription in added)
+			subscription.cancel();
 		added = [];
 		tracking = false;
 		if (overlay == null)
@@ -106,9 +121,4 @@ class ModContext {
 			out.push(overlay.getChildAt(index));
 		return out;
 	}
-}
-
-private typedef Subscription = {
-	var event:String;
-	var handler:Dynamic;
 }

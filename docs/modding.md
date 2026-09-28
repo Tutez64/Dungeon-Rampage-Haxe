@@ -207,7 +207,7 @@ Part of the `api` contract. The three methods are **boot** hooks; names are froz
 
 `onReady` is `LoadingFinishedEvent`, not `ManagersLoadedEvent`, because the facade promises an **inventory** wrapper and inventory is account data. At `ManagersLoaded` the tables are in and the account / matchmaker / `initTime()` are not. Mutating GameMaster before the account is parsed against it is the additive `tablesLoaded` event, not a fourth method.
 
-**Order:** `onInit` → (`tablesLoaded`) → `onReady` → any gameplay event. Town / tutorial dungeon is entered by the `mainStateMachine.start()` that follows `onReady`, so no `heroSpawned` / `floorEnter` can precede it.
+**Order:** `onInit` → (`tablesLoaded`) → `onReady` → any gameplay event. Town / tutorial dungeon is entered by the `mainStateMachine.start()` that follows `onReady`, so no `heroSpawned` / `floorEnter` can precede it. Inside a dungeon, the order between `floorEnter` and the first `heroSpawned` is not specified yet (to measure on a real run).
 
 **Boot that never reaches `onReady`:** `SocketErrorState` (service discovery failed) and `blockCheater()` — `ManagersLoadedEvent` never fires. Mods must tolerate a missing `onReady`; `last-run.json` records `ready: false`. An account with **no active avatar** is *not* that case: `MainStateMachine.start()` logs and returns, but it runs **after** `onReady`, so `ready: true` and no town. Wait for `heroSpawned`, do not infer a hero from `onReady`.
 
@@ -218,19 +218,21 @@ Host obligations:
 - **Overlay root stays on top.** Root z-order is `Facade.addRootDisplayObject(child, layer)` (letterbox at 1000, loading clip at 0), not `stage.addChild`. A child added during `onInit` is unknown to `mChildLayer` and counts as layer 0, so the letterbox lands above it. After `DBFacade.init` the host re-registers the overlay above the letterbox. Authors do not manage z-order against vanilla.
 - **No `Logger` during `onInit`.** `Logger.init` runs inside `Facade.init`. The host buffers compile / `onInit` logs and flushes them, or uses `trace`.
 - **Throw isolation.** Move the game's `uncaughtError` listener to the **top** of the constructor (null-guard `mDBFacade`) so compile, `onInit` and `new DBFacade()` are inside it. That listener catches event-dispatch errors, not a synchronous throw in the constructor chain: the host still wraps each mod's compile and `onInit` in try/catch. Isolation is the `modding.*` contour (`onInit` / `onReady` / facade event handlers). A throw in `onDispose` is logged and ignored. A throw from a **replaced host method** is a host throw. A `replace` subclass whose **constructor throws while `new DBFacade()` or `init()` constructs it** kills the boot. Accepted. `last-run.json` is written right after `onInit` (`ready: false`); the launcher's "process exited + `ready: false`" reading covers it.
-- **Failed `onInit`.** `replace`, subscriptions, and overlay children added through `ctx` apply during the call and are dropped if it throws, before the next mod and before `new DBFacade()`. No `onReady`. `onDispose` still runs at process exit. Later mods still start: the failed mod's types stay, its registrations do not, and `last-run` is `failed`. Files, threads, and statics it already touched are not rolled back. A throw in `onReady` does not undo a `replace`.
+- **Failed `onInit`.** `replace`, subscriptions, and overlay children added through `ctx` apply during the call and are dropped if it throws, before the next mod and before `new DBFacade()`. No `onReady`. `onDispose` still runs at process exit. Later mods still start: the failed mod's types stay, its registrations do not, and `last-run` is `failed`. Files, threads, and statics it already touched are not rolled back. A throw in `onReady` does not undo a `replace` or a subscription: the mod is `failed` in `last-run`, its handlers keep firing.
 - **Startup cost.** Parse + compile of every enabled mod happens before the first frame (hxScript: ≈10 ms per module). Measure with real mods. If it becomes a visible black window, the fix is a splash **before `new DBFacade()`** (OpenFL preloader, or a Lime-level clip), not a split of `init()`: `new DBFacade()` already constructs `FRESteamWorks`. A bytecode cache is the later lever.
 
 ### Gameplay events (`api: 1`)
 
-Subscribe from `onInit` or `onReady`. Host-emitted; not existing game `Event` class names. These four are frozen so facade mods can hook the live world (local + other players, town + dungeon, floor-scoped teardown) without `extends`. Adding an event later is not a bump; changing one of these is.
+Subscribe from `onInit` or `onReady` through typed methods on `ModContext` (`onHeroSpawned(f:ModHero->Void)`, `onFloorEnter(f:ModFloor->Void)`, `onTownEnter(f:Void->Void)`, …). Each returns a `ModSubscription` whose `cancel()` stops it. No string event names: a typo is a compile error, not a handler that never fires. Host-emitted; not existing game `Event` class names. These four are frozen so facade mods can hook the live dungeon (local + other players, floor-scoped teardown) without `extends`. Adding an event later is not a bump; changing one of these is.
 
 | Event | When | Typical use |
 | --- | --- | --- |
-| `heroSpawned` / `heroDespawned` | A hero (local **or** other players) enters / leaves the world. Town and dungeon. | Per-hero overlay or roster. |
-| `floorEnter` / `floorExit` | A dungeon floor starts / ends. Not town. | Floor-scoped UI or counters; teardown on exit. |
+| `heroSpawned` / `heroDespawned` | A hero (local **or** other players) is initialised on a dungeon floor (`ActorGameObject.init`, after the network fields and the floor are in) / starts being destroyed. **Dungeon only**: town has no hero objects. | Per-hero overlay or roster. |
+| `floorEnter` / `floorExit` | A dungeon floor starts (`postGenerate`; tiles may still be building) / is destroyed. Not town. | Floor-scoped UI or counters; teardown on exit. |
 
 Pattern: subscribe in `onInit`, read tables and account in `onReady`, react to spawn/floor for anything with a hero in it. Do not assume a hero exists in `onReady`.
+
+Town is account data, not a world: the selected avatar is `state.account` (read live, follows a change of selection), friends' selected avatars are a later account-level wrapper. Neither is a spawn.
 
 Additive (not frozen):
 
@@ -240,7 +242,9 @@ Additive (not frozen):
 | `townEnter` / `townExit` | `TownState` entered / left, including `ReloadTownState`. |
 | `hudReady`, inventory, chat, … | As the facade grows. |
 
-`ModContext`: overlay root, log, `replace`, event subscribe, state window (account-level wrappers filled from `onReady`; hero/floor wrappers after the matching event). Load order follows `enabled.json`. Outcomes land in [last-run.json](#last-run-report).
+`ModContext`: overlay root, log, `replace`, typed event subscriptions, state window (account-level wrappers filled from `onReady` and read live; hero/floor wrappers after the matching event; `state.heroes` is a copy). Load order follows `enabled.json`. Outcomes land in [last-run.json](#last-run-report).
+
+`modding.Host` is not API: its hooks are private and `@:allow`ed to the game classes that call them. That keeps them out of the `modding.*` surface, not out of reach (a mod runs in-process and reflection ignores `private`).
 
 ## Disk layout
 
@@ -364,7 +368,7 @@ Draft. Shared launcher/game contract, not frozen.
 | `version` | Mod version |
 | `author` | Author |
 | `api` | `modding.*` version. **Required** if `uses` contains `api`; omit otherwise. [Versioning](#versioning). |
-| `drh` | **Always required.** Tags this artifact was built for (no `V`, no `>=`). `"20"`, `"20,21"`, or `"20-22"` (closed, inclusive). Never blocks. `extends` / `replace`: warn when the installed tag is not in the set. `api` only: warn only when it is older than the minimum, which the author sets to the tag that added the wrappers the mod uses. |
+| `drh` | **Always required.** Tags this artifact was built for (no `V`, no `>=`). `"20"`, `"20,21"`, or `"20-22"` (closed, inclusive). Never blocks. A build without a tag (local, `drh` `"0"`) skips the check. `extends` / `replace`: warn when the installed tag is not in the set. `api` only: warn only when it is older than the minimum, which the author sets to the tag that added the wrappers the mod uses. |
 | `entry` | Short class name, resolved as `mods.<id>.<entry>` (e.g. `Main` → `mods.some_mod.Main`, extends `modding.Mod`). Cannot name anything outside the mod's package. |
 | `uses` | One or more of `api`, `extends`, `replace` |
 | `dependencies` | Ids whose script types this one imports. **Ids only, no versions.** Launcher orders `enabled.json` and warns when one is not enabled. No auto-install, no version solving. May be empty or absent. A cycle is not an error ([Passing the list](#passing-the-list)). |
@@ -469,7 +473,9 @@ If the binary is too fat, cut `openfl._internal` and Lime backends first, then n
 
 **hxcpp.** Patched with `patches/apply-hxcpp.py` on `submodules/hxcpp`.
 
-**JIT.** One process-wide `enableJit(true)` before any module loads.
+**JIT.** One process-wide `enableJit(true)` before any module loads. hxScript does it in `Compiler.compile` (`Compiler.jit`, on by default), and retries a batch once without the JIT if the loader refuses it; the host does not call `enableJit` itself.
+
+**Start before compile.** The host follows upstream's order: every module is `init` / `start` / `startTypes`-ed, then the world is compiled. The emitter resolves bare names through each module's interpreter, which `init` fills. Module-level code (static initialisers) therefore runs once interpreted, compiled modules included; an initialiser with side effects sees it. A module-level throw or a type that fails to initialise fails its mod. A mod that failed while loading (parse error, missing `src/`) has its other files removed from the world before that start.
 
 **Size / time.** Real binary cost: `-D scriptable`, OpenFL/Lime/swf bridges (`DisplayObject` has a large method surface; swf ~240 modules; SteamWrap / `src-steam` / `compat` are negligible), and the `src/` classpath bridges. `-dce no` plus the std include is mostly build time. Measure a first cppia build against current DRH before treating compiled mods as free.
 
@@ -502,7 +508,7 @@ Needed before a real host; not a restatement of the rules above.
 1. **Done**. Patch hxScript. Except `replace` which is still missing. Further generator fixes may still show up on the first cppia build.
 2. **Done.** hxcpp cppia patch.
 3. **Done.** The flags above are in `project.xml`.
-4. **Done**, except `replace`. `src-modding/` loads `--mods-dir` into one world, runs the lifecycle, re-registers the overlay, turns the JIT on before any module loads, and bakes the release tag (no `V`) plus `api` into the host ([Versioning](#versioning)). `uncaughtError` and the mod `exiting` listener sit at the top of the constructor. Still later: `ASCompat.createInstance` consulting the `replace` table, once the fork has `replace`.
+4. **Done**, except `replace`. `src-modding/` loads `--mods-dir` into one world, runs the lifecycle, re-registers the overlay, starts then compiles the world (hxScript turns the JIT on before the first module loads), and bakes the release tag (no `V`) plus `api` into the host ([Versioning](#versioning)). `uncaughtError` and the mod `exiting` listener sit at the top of the constructor. Still later: `ASCompat.createInstance` consulting the `replace` table, once the fork has `replace`.
 5. Launcher: index fetch, catalog install, `enabled.json`, `--mods-dir`, `last-run.json` display — no destructive overlay.
 6. Index repository (separate from DRH / DRHL), PR + CI for new versions.
 
