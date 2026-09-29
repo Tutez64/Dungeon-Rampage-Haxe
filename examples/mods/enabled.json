@@ -2,6 +2,7 @@
   "mods": [
     { "id": "api_tour" },
     { "id": "broken_init" },
+    { "id": "null_ready" },
     { "id": "not_installed" }
   ]
 }
