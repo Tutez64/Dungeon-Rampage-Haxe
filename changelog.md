@@ -8,6 +8,9 @@ At tag time, copy these sections into the GitHub release notes under `Changelog`
   runs `onInit` / `onReady` / `onDispose`. Gameplay hooks cover hero spawn,
   dungeon floors, and town. The session writes `mods/last-run.json`. `replace`
   is not available yet.
+- `examples/mods/` holds an example mod that uses the whole modding API and
+  checks it as it runs, plus test mods for load and runtime failures. Run the
+  game with `--mods-dir` pointing at it.
 - Release manifests now include the official Steam BuildID this version was
   converted from, so DRH Launcher can warn when official Dungeon Rampage has
   moved on.

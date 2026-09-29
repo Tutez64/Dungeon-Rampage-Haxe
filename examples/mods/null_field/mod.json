@@ -1,0 +1,11 @@
+{
+  "id": "null_field",
+  "name": "Null field in onInit",
+  "version": "1.0.0",
+  "author": "DRH",
+  "api": 1,
+  "drh": "14",
+  "entry": "Main",
+  "uses": ["api"],
+  "dependencies": []
+}
