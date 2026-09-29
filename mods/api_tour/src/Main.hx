@@ -69,6 +69,14 @@ class Main extends Mod {
 		ctx.onTownExit(function() {
 			check("townExit after onReady", readySeen);
 		});
+		// A closure run long after it was made, once per return to town. One made the same way logged
+		// a native handle instead of its message after a minute of play: its captures or its literal
+		// were read from memory the GC had reused.
+		ctx.onTownEnter(function() {
+			var literal = "closure literal";
+			check("closure keeps its captured argument", ctx == this.ctx);
+			check("closure keeps its string literal", literal.length == 15 && literal.charAt(8) == "l");
+		});
 		ctx.onFloorEnter(onFloorEnter);
 		ctx.onFloorExit(onFloorExit);
 		ctx.onHeroSpawned(onHeroSpawned);
