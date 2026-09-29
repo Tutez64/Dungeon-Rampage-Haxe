@@ -32,6 +32,9 @@
 	<haxeflag name="--macro" value="include('sys', true, ['sys.db'])" if="cpp" />
 	<haxedef name="hxscript_bridge_eager" />
 
+	<!-- A null dereference throws, and the game's uncaughtError listener keeps it running like AIR,
+	     instead of crashing. Covers mod code too. About 7-8% more CPU in a dungeon. -->
+	<haxedef name="HXCPP_CHECK_POINTER" />
 	<haxedef name="HXCPP_GC_BIG_BLOCKS" />
 	<haxedef name="HXCPP_GC_GENERATIONAL" />
 	<haxedef name="HXCPP_GC_SUMMARY" />

@@ -14,6 +14,9 @@ At tag time, copy these sections into the GitHub release notes under `Changelog`
 
 ### Fixed
 
+- A null object reference inside the game loop no longer crashes the game. It
+  is logged as an `UncaughtError` and the game keeps running, as the official
+  client does. This costs about 7-8% more CPU.
 - Closing the window and choosing **Quit** now both run Steam cleanup.
   Lime treats the window-manager quit (`SDL_QUIT`) as a close request on every
   open window; the in-game Quit popup and the connection-error dialog dispatch
