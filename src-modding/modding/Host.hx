@@ -22,6 +22,8 @@ import haxe.Json;
 @:allow(distributedObjects.HeroGameObjectOwner)
 @:allow(distributedObjects.DistributedDungeonFloor)
 @:allow(modding.ModContext)
+@:allow(modding.ModHero)
+@:allow(modding.ModArt)
 @:allow(modding.ModSubscription)
 class Host {
 	static inline final HERO_SPAWNED = "heroSpawned";
@@ -37,6 +39,8 @@ class Host {
 	static inline final TOWN_ENTER = "townEnter";
 
 	static inline final TOWN_EXIT = "townExit";
+
+	static inline final KEY_DOWN = "keyDown";
 
 	/** Above the letterbox (1000), the side backgrounds (1001) and the session id (1002). */
 	static inline final OVERLAY_LAYER:Float = 1003;
@@ -60,6 +64,14 @@ class Host {
 	static var started:String = "";
 
 	static var stage:Stage;
+
+	/** Set at `onReady`, for the wrappers that talk to the game. */
+	static var facade:Null<DBFacade>;
+
+	static var keysHooked:Bool = false;
+
+	/** Keys down now, so a held key's repeats do not reach mods; true when a mod kept the key. */
+	static var keysDown:Map<Int, Bool> = new Map();
 
 	static var overlay:Sprite;
 
@@ -137,6 +149,7 @@ class Host {
 	static function ready(facade:DBFacade):Void {
 		if (!booted || reportReady)
 			return;
+		Host.facade = facade;
 		if (state != null)
 			state.setAccount(ModAccount.from(facade));
 		for (record in records) {
@@ -207,6 +220,7 @@ class Host {
 		var wrap = heroes.get(hero.id);
 		if (wrap == null)
 			return;
+		wrap.detach();
 		heroes.remove(hero.id);
 		state.removeHero(wrap);
 		emit(HERO_DESPAWNED, wrap);
@@ -248,6 +262,8 @@ class Host {
 	}
 
 	static function listen(id:String, event:String, handler:Dynamic->Void):ModSubscription {
+		if (event == KEY_DOWN)
+			hookKeys();
 		var list = listeners.get(event);
 		if (list == null) {
 			list = [];
@@ -262,6 +278,68 @@ class Host {
 		var list = listeners.get(subscription.event);
 		if (list != null)
 			list.remove(subscription);
+	}
+
+	static function knownHeroes():Array<ModHero> {
+		return [for (hero in heroes) hero];
+	}
+
+	/** Runs a mod's callback from game code, which must not see its error. */
+	static function callback(handler:Null<Void->Void>):Void {
+		if (handler == null)
+			return;
+		try {
+			handler();
+		} catch (e:Dynamic) {
+			logNow("warn", "modding: callback: " + errorText(e));
+		}
+	}
+
+	static function hookKeys():Void {
+		if (keysHooked || stage == null)
+			return;
+		keysHooked = true;
+		stage.addEventListener("keyDown", onStageKey);
+		stage.addEventListener("keyUp", function(event:flash.events.KeyboardEvent) keysDown.remove(event.keyCode));
+		// A key released while the window is in the background never sends its keyUp.
+		stage.addEventListener("deactivate", function(_) keysDown.clear());
+	}
+
+	/**
+	 * Keys typed into a text field (chat, search) are not for mods, and neither are a held key's
+	 * repeats. A handler that returns true keeps the key: its default action, such as Tab moving the
+	 * focus to the chat, does not run.
+	 */
+	static function onStageKey(event:flash.events.KeyboardEvent):Void {
+		if (keysDown.exists(event.keyCode)) {
+			// A kept key stays kept while held.
+			if (keysDown.get(event.keyCode))
+				event.preventDefault();
+			return;
+		}
+		keysDown.set(event.keyCode, false);
+		var focus = stage.focus;
+		if (Std.isOfType(focus, flash.text.TextField) && (cast focus : flash.text.TextField).type == flash.text.TextFieldType.INPUT)
+			return;
+		var list = listeners.get(KEY_DOWN);
+		if (list == null)
+			return;
+		var kept = false;
+		for (subscription in list.copy()) {
+			if (!subscription.active)
+				continue;
+			try {
+				var handler:Dynamic = subscription.call;
+				if (handler(event.keyCode) == true)
+					kept = true;
+			} catch (e:Dynamic) {
+				logNow("warn", "mod " + subscription.owner + ": " + KEY_DOWN + ": " + errorText(e));
+			}
+		}
+		if (kept) {
+			keysDown.set(event.keyCode, true);
+			event.preventDefault();
+		}
 	}
 
 	static function emit(event:String, payload:Dynamic):Void {

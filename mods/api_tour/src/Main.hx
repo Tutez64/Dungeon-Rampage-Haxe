@@ -33,6 +33,8 @@ class Main extends Mod {
 
 	var heroesSpawned:Int = 0;
 
+	var keySeen:Bool = false;
+
 	override public function onInit(ctx:ModContext):Void {
 		this.ctx = ctx;
 		panel = new Panel();
@@ -81,6 +83,14 @@ class Main extends Mod {
 		ctx.onFloorExit(onFloorExit);
 		ctx.onHeroSpawned(onHeroSpawned);
 		ctx.onHeroDespawned(onHeroDespawned);
+		// Never keeps a key: the game's own use of it must still happen.
+		ctx.onKeyDown(function(key:UInt):Bool {
+			if (!keySeen) {
+				keySeen = true;
+				check("keyDown: a key code", key > 0);
+			}
+			return false;
+		});
 	}
 
 	override public function onReady(ctx:ModContext):Void {
@@ -94,6 +104,7 @@ class Main extends Mod {
 			ctx.log("account " + account.id + ", active avatar " + account.activeAvatarId);
 		}
 		check("onReady: no floor", ctx.state.floor == null);
+		check("onReady: view size set", ctx.viewWidth > 0 && ctx.viewHeight > 0);
 		var copy = ctx.state.heroes;
 		copy.push(null);
 		check("state.heroes is a copy", ctx.state.heroes.length == copy.length - 1);
@@ -122,11 +133,29 @@ class Main extends Mod {
 		check("heroSpawned: after its floorEnter", ctx.state.floor != null);
 		check("heroSpawned: name set", hero.name != "");
 		check("heroSpawned: in state.heroes", ctx.state.heroes.indexOf(hero) >= 0);
-		ctx.log("hero " + hero.id + " " + hero.name + (hero.local ? " (local)" : ""));
+		check("heroSpawned: account, hero and level set", hero.accountId != 0 && hero.heroId != 0 && hero.heroName != "" && hero.level > 0);
+		var weapons = hero.weapons;
+		check("heroSpawned: at least one weapon", weapons.length > 0);
+		weapons.push(null);
+		check("hero.weapons is a copy", hero.weapons.length == weapons.length - 1);
+		// Social actions are left out on purpose: a test must not send a friend request, a block or a report.
+		check("local hero is no one to act on", !hero.local || !hero.addFriend());
+		// Art is loaded and released by the sprites themselves; building and dropping them must not throw.
+		var portrait = hero.createPortrait(32);
+		ctx.overlay.addChild(portrait);
+		ctx.overlay.removeChild(portrait);
+		if (weapons[0] != null) {
+			var icon = weapons[0].createIcon(32);
+			ctx.overlay.addChild(icon);
+			ctx.overlay.removeChild(icon);
+		}
+		ctx.log("hero " + hero.id + " " + hero.name + (hero.local ? " (local)" : "") + ", " + hero.heroName + " lv " + hero.level
+			+ ", friend " + hero.isFriend);
 	}
 
 	function onHeroDespawned(hero:ModHero):Void {
 		check("heroDespawned: out of state.heroes", ctx.state.heroes.indexOf(hero) < 0);
+		check("heroDespawned: live fields read empty", hero.accountId == 0 && hero.level == 0 && hero.weapons.length == 0);
 	}
 
 	function check(label:String, ok:Bool):Void {

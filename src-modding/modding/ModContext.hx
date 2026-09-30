@@ -15,6 +15,11 @@ class ModContext {
 
 	public var state(default, null):ModState;
 
+	/** Size of the game's view in overlay coordinates. 0 before `onReady`. */
+	public var viewWidth(get, never):Float;
+
+	public var viewHeight(get, never):Float;
+
 	var id:String;
 
 	@:allow(modding.Host)
@@ -22,6 +27,14 @@ class ModContext {
 		this.id = id;
 		this.overlay = overlay;
 		this.state = state;
+	}
+
+	function get_viewWidth():Float {
+		return Host.facade == null ? 0 : Host.facade.viewWidth;
+	}
+
+	function get_viewHeight():Float {
+		return Host.facade == null ? 0 : Host.facade.viewHeight;
 	}
 
 	public function log(message:String):Void {
@@ -59,6 +72,15 @@ class ModContext {
 
 	public function onTownExit(handler:Void->Void):ModSubscription {
 		return listen(Host.TOWN_EXIT, handler == null ? null : function(_:Dynamic) handler());
+	}
+
+	/**
+	 * A key goes down, with its key code: once per press, not for a held key's repeats, and not while a
+	 * text field such as the chat has focus.
+	 * Return true to keep the key: its default action (Tab moving the focus to the chat) does not run.
+	 */
+	public function onKeyDown(handler:UInt->Bool):ModSubscription {
+		return listen(Host.KEY_DOWN, handler);
 	}
 
 	function listen(event:String, handler:Dynamic):ModSubscription {

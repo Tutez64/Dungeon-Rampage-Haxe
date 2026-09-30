@@ -240,9 +240,12 @@ Additive (not frozen):
 | --- | --- |
 | `tablesLoaded` | `ManagersLoadedEvent`: tables in, account not yet parsed against them. Window to mutate tables (`extends` use). |
 | `townEnter` / `townExit` | `TownState` entered / left, including `ReloadTownState`. |
+| `keyDown` | A key goes down: once per press, not while a text field (chat) has focus. A handler returning `true` keeps the key: its default action does not run. |
 | `hudReady`, inventory, chat, … | As the facade grows. |
 
-`ModContext`: overlay layer, log, `replace`, event subscriptions, state window (account-level wrappers filled from `onReady`; hero/floor wrappers after the matching event; `state.heroes` is a copy). Load order follows `enabled.json`. Outcomes land in [last-run.json](#last-run-report). `modding.Host` is not API: its hooks are private, `@:allow`ed to their game callers.
+`ModContext`: overlay layer and view size, log, `replace`, event subscriptions, state window (account-level wrappers filled from `onReady`; hero/floor wrappers after the matching event; `state.heroes` is a copy).
+
+`ModHero` reads the player behind a hero (account, screen name, hero class, level, `weapons` as `ModWeapon` copies, `isFriend`) and acts on them the way the end screen does: `addFriend`, `block` and `report` (the game's own popups for the last two), still possible after the hero has left. Game art comes as plain sprites that load themselves and are released when removed from their parent: `ModHero.createPortrait` (the skin icon, as on the end screen) and `ModWeapon.createIcon` (icon on its rarity background, with the game's tooltip on hover, drawn above the overlay). Load order follows `enabled.json`. Outcomes land in [last-run.json](#last-run-report). `modding.Host` is not API: its hooks are private, `@:allow`ed to their game callers.
 
 ## Disk layout
 
