@@ -67,6 +67,7 @@ class Main extends Mod {
 			check("townEnter after onReady", readySeen);
 			check("cancelled handler never ran", cancelledCalls == 0);
 			check("town: no floor", ctx.state.floor == null);
+			check("town: no players", ctx.state.players.length == 0);
 		});
 		ctx.onTownExit(function() {
 			check("townExit after onReady", readySeen);
@@ -131,17 +132,24 @@ class Main extends Mod {
 	function onHeroSpawned(hero:ModHero):Void {
 		heroesSpawned++;
 		check("heroSpawned: after its floorEnter", ctx.state.floor != null);
-		check("heroSpawned: name set", hero.name != "");
 		check("heroSpawned: in state.heroes", ctx.state.heroes.indexOf(hero) >= 0);
-		check("heroSpawned: account, hero and level set", hero.accountId != 0 && hero.heroId != 0 && hero.heroName != "" && hero.level > 0);
+		check("heroSpawned: class and level set", hero.classId != 0 && hero.className != "" && hero.level > 0);
+		var player = hero.player;
+		check("heroSpawned: player set", player != null);
+		if (player == null)
+			return;
+		check("player: account and name set", player.accountId != 0 && player.name != "");
+		check("player: its hero is this one", player.hero == hero);
+		check("player: local matches its hero", player.local == hero.local);
+		check("player: in state.players", ctx.state.players.indexOf(player) >= 0);
 		var weapons = hero.weapons;
 		check("heroSpawned: at least one weapon", weapons.length > 0);
 		weapons.push(null);
 		check("hero.weapons is a copy", hero.weapons.length == weapons.length - 1);
 		// Social actions are left out on purpose: a test must not send a friend request, a block or a report.
-		check("local hero is no one to act on", !hero.local || !hero.addFriend());
+		check("local player is no one to act on", !player.local || !player.addFriend());
 		// Art is loaded and released by the sprites themselves; building and dropping them must not throw.
-		var portrait = hero.createPortrait(32);
+		var portrait = player.createPortrait(32);
 		ctx.overlay.addChild(portrait);
 		ctx.overlay.removeChild(portrait);
 		if (weapons[0] != null) {
@@ -149,13 +157,18 @@ class Main extends Mod {
 			ctx.overlay.addChild(icon);
 			ctx.overlay.removeChild(icon);
 		}
-		ctx.log("hero " + hero.id + " " + hero.name + (hero.local ? " (local)" : "") + ", " + hero.heroName + " lv " + hero.level
-			+ ", friend " + hero.isFriend);
+		ctx.log("hero " + hero.id + " of " + player.accountId + " " + player.name + (hero.local ? " (local)" : "") + ", " + hero.className
+			+ " lv " + hero.level + ", friend " + player.isFriend);
 	}
 
 	function onHeroDespawned(hero:ModHero):Void {
 		check("heroDespawned: out of state.heroes", ctx.state.heroes.indexOf(hero) < 0);
-		check("heroDespawned: live fields read empty", hero.accountId == 0 && hero.level == 0 && hero.weapons.length == 0);
+		check("heroDespawned: live fields read empty", hero.classId == 0 && hero.level == 0 && hero.weapons.length == 0);
+		var player = hero.player;
+		if (player != null) {
+			check("heroDespawned: player no longer on it", player.hero != hero);
+			check("heroDespawned: player kept, name too", ctx.state.players.indexOf(player) >= 0 && player.name != "");
+		}
 	}
 
 	function check(label:String, ok:Bool):Void {

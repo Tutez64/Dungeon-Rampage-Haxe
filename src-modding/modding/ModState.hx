@@ -16,12 +16,24 @@ class ModState {
 	/** Heroes currently on a dungeon floor, local and remote. A copy: changing it changes nothing. */
 	public var heroes(get, never):Array<ModHero>;
 
+	/**
+	 * Players met in the dungeon in progress, in order of arrival, those who left included. Emptied on
+	 * `townEnter`. A copy.
+	 */
+	public var players(get, never):Array<ModPlayer>;
+
 	var heroList:Array<ModHero> = [];
+
+	var playerList:Array<ModPlayer> = [];
 
 	public function new() {}
 
 	function get_heroes():Array<ModHero> {
 		return heroList.copy();
+	}
+
+	function get_players():Array<ModPlayer> {
+		return playerList.copy();
 	}
 
 	@:allow(modding.Host)
@@ -42,5 +54,15 @@ class ModState {
 	@:allow(modding.Host)
 	function removeHero(hero:ModHero):Void {
 		heroList.remove(hero);
+	}
+
+	@:allow(modding.Host)
+	function addPlayer(player:ModPlayer):Void {
+		playerList.push(player);
+	}
+
+	@:allow(modding.Host)
+	function clearPlayers():Void {
+		playerList = [];
 	}
 }

@@ -23,6 +23,7 @@ import haxe.Json;
 @:allow(distributedObjects.DistributedDungeonFloor)
 @:allow(modding.ModContext)
 @:allow(modding.ModHero)
+@:allow(modding.ModPlayer)
 @:allow(modding.ModArt)
 @:allow(modding.ModSubscription)
 class Host {
@@ -84,6 +85,9 @@ class Host {
 	static var listeners:Map<String, Array<ModSubscription>> = new Map();
 
 	static var heroes:Map<UInt, ModHero> = new Map();
+
+	/** Players met in the dungeon in progress, by account. Emptied on the return to town. */
+	static var players:Map<UInt, ModPlayer> = new Map();
 
 	static var floors:Map<UInt, ModFloor> = new Map();
 
@@ -189,6 +193,9 @@ class Host {
 	}
 
 	static function townEnter():Void {
+		players = new Map();
+		if (state != null)
+			state.clearPlayers();
 		emit(TOWN_ENTER, null);
 	}
 
@@ -207,7 +214,19 @@ class Host {
 			waiting.push({hero: hero, local: local, floor: floor});
 			return;
 		}
-		var wrap = new ModHero(hero, local);
+		var account:UInt = hero.playerID;
+		var player:Null<ModPlayer> = null;
+		if (account != 0) {
+			player = players.get(account);
+			if (player == null) {
+				player = new ModPlayer(account, local);
+				players.set(account, player);
+				state.addPlayer(player);
+			}
+		}
+		var wrap = new ModHero(hero, local, player);
+		if (player != null)
+			player.setHero(wrap);
 		heroes.set(hero.id, wrap);
 		state.addHero(wrap);
 		emit(HERO_SPAWNED, wrap);
@@ -280,8 +299,8 @@ class Host {
 			list.remove(subscription);
 	}
 
-	static function knownHeroes():Array<ModHero> {
-		return [for (hero in heroes) hero];
+	static function knownPlayers():Array<ModPlayer> {
+		return state == null ? [] : state.players;
 	}
 
 	/** Runs a mod's callback from game code, which must not see its error. */

@@ -245,7 +245,9 @@ Additive (not frozen):
 
 `ModContext`: overlay layer and view size, log, `replace`, event subscriptions, state window (account-level wrappers filled from `onReady`; hero/floor wrappers after the matching event; `state.heroes` is a copy).
 
-`ModHero` reads the player behind a hero (account, screen name, hero class, level, `weapons` as `ModWeapon` copies, `isFriend`) and acts on them the way the end screen does: `addFriend`, `block` and `report` (the game's own popups for the last two), still possible after the hero has left. Game art comes as plain sprites that load themselves and are released when removed from their parent: `ModHero.createPortrait` (the skin icon, as on the end screen) and `ModWeapon.createIcon` (icon on its rarity background, with the game's tooltip on hover, drawn above the overlay). Load order follows `enabled.json`. Outcomes land in [last-run.json](#last-run-report). `modding.Host` is not API: its hooks are private, `@:allow`ed to their game callers.
+A hero and its player are two wrappers. `ModHero` is what a player plays on one floor (class, level, `weapons` as `ModWeapon` copies); each floor gives a new one, and its fields go empty at `heroDespawned`. `ModPlayer` is the account behind it (`hero.player`): one instance from its first hero to the return to town, listed in `state.players` with those who left, with `hero` null while it has none. It holds the screen name, `isFriend`, and the end screen's `addFriend`, `block` and `report` (the game's own popups for the last two). Game art comes as plain sprites that load themselves and are released when removed from their parent: `ModPlayer.createPortrait` (the skin icon, as on the end screen) and `ModWeapon.createIcon` (icon on its rarity background, with the game's tooltip on hover, drawn above the overlay).
+
+Load order follows `enabled.json`. Outcomes land in [last-run.json](#last-run-report). `modding.Host` is not API: its hooks are private, `@:allow`ed to their game callers.
 
 ## Disk layout
 

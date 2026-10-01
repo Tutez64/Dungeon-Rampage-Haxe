@@ -17,7 +17,7 @@ import uI.inventory.UIWeaponTooltip;
  * removed from its parent. Not for mods: they go through `ModWeapon` and `ModHero`.
  */
 @:allow(modding.ModWeapon)
-@:allow(modding.ModHero)
+@:allow(modding.ModPlayer)
 class ModArt {
 	/** Holds the weapon tooltip template, as on the end screen. */
 	static inline final TOWN_SWF = "Resources/Art2D/UI/db_UI_town.swf";
