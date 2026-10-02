@@ -116,6 +116,8 @@ class Host {
 		try {
 			hxscript.error.Sink.listen(onDiagnostic);
 			hxscript.macro.Expose.apply();
+			// A field of a null object throws, as a null dereference in the game does, instead of reading null.
+			hxscript.Config.strictNullAccess = true;
 			if (sys.FileSystem.exists(directory) && sys.FileSystem.isDirectory(directory)) {
 				try modsRoot = sys.FileSystem.absolutePath(directory) catch (_:Dynamic) {}
 				loadEnabled();
