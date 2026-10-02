@@ -637,20 +637,18 @@ class Host {
 			});
 	}
 
-	/** hxScript turns the JIT on itself before the first module loads (`Compiler.jit`, on by default). */
+	/**
+	 * hxScript turns the JIT on itself before the first module loads (`Compiler.jit`, on by default).
+	 * A throw is the compiler's fault, not a mod's: every module already started interpreted, so what
+	 * did not compile keeps running that way and `assignModes` reports it.
+	 */
 	static function compileWorld():Void {
 		if (world == null)
 			return;
 		try {
 			hxscript.compile.Compiler.compile(world);
 		} catch (e:Dynamic) {
-			var message = errorText(e);
-			for (record in records) {
-				if (record.status != "ok")
-					continue;
-				record.status = "failed";
-				record.error = message;
-			}
+			note("warn", "modding: compile failed, mods run interpreted: " + errorText(e));
 		}
 	}
 

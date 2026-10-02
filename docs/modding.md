@@ -478,7 +478,7 @@ If the binary is too fat, cut `openfl._internal` and Lime backends first, then n
 
 **JIT.** On before any module loads: `Compiler.compile` does it (`Compiler.jit`) and retries a refused batch once without it.
 
-**Start, then compile** (upstream's order: the emitter resolves bare names through each module's interpreter). Static initialisers therefore run once interpreted, compiled modules included. A module-level or type-init throw fails its mod; a mod that failed to load has its files removed first.
+**Start, then compile** (upstream's order: the emitter resolves bare names through each module's interpreter). Static initialisers therefore run once interpreted, compiled modules included. A module-level or type-init throw fails its mod; a mod that failed to load has its files removed first. A throw inside the compiler fails no mod: the emitter skips the module it was writing, and if `Compiler.compile` throws anyway, everything stays interpreted.
 
 **Size / time.** Real binary cost: `-D scriptable`, OpenFL/Lime/swf bridges (`DisplayObject` has a large method surface; swf ~240 modules; SteamWrap / `src-steam` / `compat` are negligible), and the `src/` classpath bridges. `-dce no` plus the std include is mostly build time. Measure a first cppia build against current DRH before treating compiled mods as free.
 
