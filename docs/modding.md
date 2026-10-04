@@ -1,6 +1,6 @@
 # DRH modding
 
-Living design document. Not a user guide, a frozen schema, or an implementation commitment.
+Living design document. Not a user guide or an implementation commitment. `decided` rows below are frozen.
 
 The game owns the runtime. The launcher owns the folder, enablement, and launch. Launcher-side catalog and install: [DRH Launcher architecture](https://github.com/Tutez64/DRH-Launcher/blob/master/docs/architecture.md) (Mods). This document is the source of truth for how mods load and talk to DRH.
 
@@ -12,16 +12,17 @@ The game owns the runtime. The launcher owns the folder, enablement, and launch.
 | --- | --- | --- |
 | Fairness / `layers` | decided | No fairness police. `layers` dropped; taxonomy is `uses`. [Policy](#policy) |
 | First-run disclosure | decided | Once in DRHL; `--play` gated like updates. [First-run disclosure](#first-run-disclosure) |
-| API surface | decided | Facade `modding.*` (recommended) plus host `extends` / `replace` in v1. [API surface](#api-surface) |
+| API surface | decided | Host core `modding.*` + `api` mod + host `extends` / `replace`. [API surface](#api-surface) |
 | hxScript fork | decided | Lasting fork: classpath-entry scan + `replace`. [API surface](#api-surface), [Compilation](#compilation) |
-| Mod kinds | decided | `uses`: `api` / `extends` / `replace`. Recommend `api`. [Mod kinds](#mod-kinds) |
+| Mod kinds | decided | Every mod builds on `api`. `uses`: `extends` / `replace`, empty for stable only (recommended). [Mod kinds](#mod-kinds) |
+| Dependencies | decided | Versioned. The launcher installs them; a failure fails the dependents. [`mod.json`](#modjson) |
 | Enabled list | decided | `mods/enabled.json` + `--mods-dir`. No flag → no mods. [Passing the list](#passing-the-list) |
 | Debug scan | decided | Same `--mods-dir`. Later optional: `--mods-all`, `--mod <id>`. No implicit scan next to the exe. |
 | Lifecycle | decided | `onInit` before `new DBFacade()`, `onReady` before the loop, `onDispose` on `exiting`. [Lifecycle](#lifecycle) |
 | hxScript `Environment` | decided | One shared world, one compile batch, package `mods.<id>`. [Compilation](#compilation) |
 | Checksummed JSON overlay | decided | No extra warn/block. [Policy](#policy) |
 | Game → launcher status | decided | `mods/last-run.json` + one log line per mod. [Last-run report](#last-run-report) |
-| `mod.json` schema | open | Draft below, not frozen. |
+| `mod.json` schema | decided | [`mod.json`](#modjson) |
 | cppia bytecode cache | open | Future optimization, not v1. |
 | Private / offline scripted gameplay | open | Out of scope while DRH only talks to official servers. |
 | Distribution | decided | Pointer index we control; not a monorepo; not Thunderstore/Nexus as identity. [Distribution](#distribution) |
@@ -35,7 +36,7 @@ The game owns the runtime. The launcher owns the folder, enablement, and launch.
 | Mod `id` and zip extract | decided | `id` = folder = package `mods.<id>`. Regex + keyword/reserved-name lists. No zip-slip, no size cap. [`mod.json`](#modjson) |
 | `dependencies` cycles | decided | Not an error. Launcher warns, keeps user order inside the cycle. [Passing the list](#passing-the-list) |
 | `import.hx` in a mod | decided | Skipped with a warning. [`mod.json`](#modjson) |
-| `drh` in `mod.json` | decided | Always required. Closed tag string. Warns, does not block; `api`-only uses the minimum. [`mod.json`](#modjson) |
+| `drh` in `mod.json` | decided | Required with `extends` / `replace`, omitted for `api` only. Closed tag string. Warns, does not block. [`mod.json`](#modjson) |
 
 ## Context
 
@@ -66,7 +67,7 @@ flowchart LR
     host["modding host"]
     hxscript["one shared Environment"]
     cppia["compile cppia or interp"]
-    api["public API"]
+    core["modding core"]
     gameCore["GameMaster timelines UI"]
   end
   author -->|"PR per version"| index
@@ -76,12 +77,12 @@ flowchart LR
   enabled -->|"--mods-dir + enabled.json"| host
   host --> hxscript
   hxscript --> cppia
-  cppia --> api
+  cppia -->|"api mod"| core
   cppia -->|"extends / replace"| gameCore
-  api --> gameCore
+  core --> gameCore
 ```
 
-The launcher does not compile. It discovers mods, keeps the enabled set and load order, and passes `--mods-dir`. The game loads every enabled mod into **one** hxScript `Environment` (`mods.<id>`), compiles that world in one batch, and interprets what the emitter skips. Recommended path: `modding.*`. `extends` / `replace` are explicit, costlier kinds.
+The launcher does not compile. It discovers mods, keeps the enabled set and load order, and passes `--mods-dir`. The game loads every enabled mod into **one** hxScript `Environment` (`mods.<id>`), compiles that world in one batch, and interprets what the emitter skips. Every mod builds on the official `api` mod. `extends` / `replace` are explicit, costlier kinds on top.
 
 "Compiled" means `Compiler.compile(env)` inside the game process at load — not a rebuild of the DRH binary, and not a Haxe compile in the launcher.
 
@@ -95,7 +96,7 @@ The launcher does not compile. It discovers mods, keeps the enabled set and load
 
 DR is PvE, not a ladder. The official client is already leaky; DRH itself is a modified client. v1 does **not** reject mods for in-game advantage (exact HP, FOV, stacked-chest UI, chat macros, damage meters, client bugfixes).
 
-How you hook is `uses` (`api` / `extends` / `replace`). A `layers` field (client / data / gameplay) was dropped: FOV is “client” and a large advantage; a mana-check patch sits in a weapon controller; it reopened the fairness debate.
+How you hook is `uses` (`extends` / `replace`, or nothing). A `layers` field (client / data / gameplay) was dropped: FOV is “client” and a large advantage; a mana-check patch sits in a weapon controller; it reopened the fairness debate.
 
 **Official tables and `sCode`.** `Resources/Levels/DB_GameMaster.json`, `Resources/Combat/AttackTimeline.json`, and `Resources/Levels/library_server.json` feed `mSecurityGM` / `mSecurityTL` / `mSecuritySL`. The fold only counts runtime `"int"` fields; AttackTimeline is **shallow** (top-level keys of each attack: name, flags, `totalFrames`, the `frames` array object — not nested actions). `{ "type": "helloMod" }` does not change `mSecurityTL`. Timeline/library values are then `% 1097`. `blockCheater()` is only `Hero.BaseMove > 250` in the loaded GameMaster. `sCode` is sent on `ClientRequestEntry`; server use is **unknown**. A mismatch would at most fail dungeon entry (`ResponceCode != 0`). It is not an automatic ban in the client.
 
@@ -107,7 +108,7 @@ DRHL shows this **once** (launcher config) the first time the user would actuall
 
 1. **Code in-process.** Haxe/cppia inside the game, not a skin pack. Index review is human, not a proof. Sideload is weaker.
 2. **Official servers.** Same as vanilla DRH. No promise about bans either way.
-3. **Updates.** `api` mods follow `api: N`. `extends` / `replace` can break on a DRH update with no `api` bump. A modded session is not supported like vanilla.
+3. **Updates.** Mods follow the `api` mod's major version. `extends` / `replace` can also break on any DRH update. A modded session is not supported like vanilla.
 4. **Several mods.** `replace` on the same rewritten surface can clash. Load order is in the launcher.
 5. **Back to vanilla.** Disable all mods / Play with an empty list. Nothing is written into `current/`.
 6. **EULA / blessing.** Like DRH, this is not the official Steam client; rights holders do not endorse it.
@@ -116,10 +117,11 @@ DRHL shows this **once** (launcher config) the first time the user would actuall
 
 hxScript is ordinary Haxe in-process, not a JS-style "patch any function" runtime. `private` / `inline` / `final` methods, and a comparison buried inside a compiled function, stay out of reach.
 
-**v1 is facade + host types.** The facade is the recommended path. `extends` / `replace` exist so a mod can still reach what wrappers do not cover. That power is a v1 foundation. Both land in the **hxScript fork**. The `submodules/hxscript` commit is the pin, rebased on upstream, PR'd once it works for DRH. The build finds it through `haxelib dev`. hxScript's compiler is BETA; `replace` touches bridge generation and the emitter, so rebases will conflict more than on lime/openfl. Accepted: the goal is a clean `replace`, not the smallest diff.
+**Core + `api` mod + host types.** Every mod builds on the `api` mod. `extends` / `replace` exist so a mod can still reach what it does not cover. The `submodules/hxscript` fork commit is the pin, rebased on upstream, PR'd once it works for DRH. hxScript's compiler is BETA; `replace` touches bridge generation and the emitter, so rebases will conflict more than on lime/openfl. Accepted: the goal is a clean `replace`, not the smallest diff.
 
-- **Facade (`modding.*`).** Boot lifecycle (`onInit` / `onReady` / `onDispose`), gameplay events (`heroSpawned` / `heroDespawned` / `floorEnter` / `floorExit`), overlay/HUD root, input, and a window on live state through wrappers (`ModHero`, floor, inventory, camera, chat — names TBD). Not raw `HeroGameObject`. Wrappers that need a hero or floor stay empty until the matching event. What `api: N` freezes is in [Versioning](#versioning).
-- **Host types (fork).** Two features, both required for v1:
+- **Core (`modding.*`, in the host).** What must exist before any mod or touches `src/`: loading, compile, [Lifecycle](#lifecycle), isolation, overlay layers, key routing, and the [game events](#game-events) that hand game objects. Small, and changes only with a release. The foundation of `api`, not meant for mods: a host type like any other, so using it directly is `extends`.
+- **`api` mod (`mods.api.*`).** The official mod that turns game objects into stable wrappers (players, heroes, weapons, floor, account, art) and re-emits [its own events](#the-api-mod). Not raw `HeroGameObject`. A fix or an addition is a new `api` version, not a game release. What its version promises is in [Versioning](#versioning).
+- **Host types.** Two features:
 
 ### Bridges
 
@@ -173,29 +175,30 @@ Disjoint-method merge lives in hxScript; DRH calls `replace` and gets one class 
 
 ### Versioning
 
-- Only `modding.*` wrappers are the **stable** API. `facade.DBFacade`, `actor.*`, `combat.*`, `uI.*` are host types: usable via `extends` / `replace`, not covered by `api` compatibility.
-- `api: N` freezes the written contract of that facade: when an event fires, what a wrapper represents, and the empty-until-event rules. Adding a wrapper without changing an existing one stays `api: N`. Changing that text bumps `api`. Game content behind a stable reading, and OpenFL/Lime used to draw on the overlay, are outside it. The number is a host constant and the same field on the release manifest. The launcher compares `mod.json` to the installed release and warns either way on a mismatch. It does not ask the running game. A release that omits the field has no facade.
-- Official examples for all three kinds live in [`mods/`](../mods/) (`api` so far) and are recompiled against the host on every tag. A signature break fails that compile. Whether a call site still matches the written when/what is review.
+- The **stable** API is `mods.api.*`, nothing else. The core (`modding.*`), `facade.DBFacade`, `actor.*`, `combat.*`, `uI.*` are host types: usable via `extends` / `replace`, not covered.
+- The `api` mod's version is semver over its written contract: when an event fires, what a wrapper represents, the empty-until-event rules. A fix is a patch, an addition a minor, a change to that text a major. A core change is absorbed by `api` where it can be; its major moves only when its own contract does. Game content behind a stable reading, and OpenFL/Lime used to draw on the overlay, are outside it.
+- The `api` mod is `extends`: its `drh` lists the tags it was verified on. Every tag's CI recompiles it against the release and publishes a version whose `drh` contains that tag (a patch when the code did not change), so every release has a working `api`. The launcher installs the highest `api` version whose `drh` contains the installed tag and that satisfies every enabled mod ([`mod.json`](#modjson)). The game does not check versions.
+- Official examples for all three kinds live in [`mods/`](../mods/) (stable only so far) and are recompiled with `api` on every tag. A signature break fails that compile. Whether a call site still matches the written when/what is review.
 
 ## Mod kinds
 
-Recommend **`api`**. The other two exist because the facade will not cover everything at first.
+Every mod depends on `api` (`mod.json` `api` field). `uses` says what it touches beyond it. Recommend stable only; the other two exist because the `api` mod will not cover everything.
 
 | Kind | What it means | DRH versions | Other mods |
 | --- | --- | --- | --- |
-| `api` | Uses only `modding.*` (wrappers, events, overlay root). OpenFL/Lime for drawing on that root is OK; `actor.*` / `combat.*` / `facade.*` are not. | Tied to `api`. [Versioning](#versioning). | Best. No `replace` occupancy. |
+| stable only (`uses` empty) | Uses only `mods.api.*`. OpenFL/Lime for drawing on the overlay is OK; the core, `actor.*` / `combat.*` / `facade.*` are not. | Tied to the `api` major. [Versioning](#versioning). | Best. No `replace` occupancy. |
 | `extends` | Subclasses or calls **host** types but does **not** `replace` vanilla `new`. Helpers, `new MyRepeater()`, reading public internals. | Tied to those class/method names. Starling / conversions can break it even if `api` is unchanged. | Usually fine with others. Still shares live objects with a `replace` on the same type (`is RepeaterWeaponController` remains true). |
 | `replace` | Explicit `replace(HostClass, Sub)` at `onInit`. Host `new HostClass(...)` becomes the subclass (merge if rewritten methods/fields/`new` are disjoint). | Same host-type fragility as `extends`, plus construction. | Conflicts when rewritten surfaces overlap. One occupancy per method/field/`new`. |
 
-A mod may list several kinds (`uses: ["api", "replace"]`). Catalog / index show the **strongest** present: `replace` > `extends` > `api`. Index review checks the declare matches the code (honor + grep). Sideload can lie; label it.
+A mod may list both (`uses: ["extends", "replace"]`). Catalog / index show the **strongest** present: `replace` > `extends` > stable only (labelled `api`). Index review checks the declare matches the code (honor + grep). Sideload can lie; label it.
 
 Players see a short warning on `extends` / `replace` (may break on game updates; `replace` may clash), not a fairness lecture.
 
 ## Lifecycle
 
-Part of the `api` contract. The three methods are **boot** hooks; names are frozen. Two anchors: `onInit` = nothing of the game exists yet; `onReady` = every singleton exists (tables, account, inventory, clock, network) and the loop is about to start. Neither means "a hero is on screen": live moments are **events**.
+Core. `mods.api.Mod` mirrors the three methods with its own context, at the same moments, and its major covers that. They are **boot** hooks; names are frozen. Two anchors: `onInit` = nothing of the game exists yet; `onReady` = every singleton exists (tables, account, inventory, clock, network) and the loop is about to start. Neither means "a hero is on screen": live moments are **events**.
 
-`mod.json` `entry` extends `modding.Mod`. All three methods are optional (empty defaults).
+`mod.json` `entry` extends `mods.api.Mod` (only the `api` mod's own extends `modding.Mod`); otherwise the host fails the mod (`entry must extend mods.api.Mod`). All three methods are optional (empty defaults).
 
 | Method | When | Typical use |
 | --- | --- | --- |
@@ -205,7 +208,7 @@ Part of the `api` contract. The three methods are **boot** hooks; names are froz
 
 `onInit` is before `new DBFacade()` because that is the only placement where **`replace` covers every host `new`**. HUD, sound, Steam Input and `MainStateMachine` are built later (`stagetwo_init`, `buildEngines`, `createHUD`); an `onInit` at the end of `onInvoke` would already see them. What it would miss is field initialisers and `Facade.init`: **`FRESteamWorks`** (`mSteamworks = new FRESteamWorks()` runs inside `new DBFacade()`, before `init()`), both `GameClock`s, `EventManager`, `Camera`, work managers, letterbox, loading clip. A second early hook would be a second "what exists here" list, and that list moves with Starling. Steam identity and the auth ticket are readable from `onReady`; feature flags are only complete after `LoadingState.configReady`. `AssetRepository`, the loading clip and the skip button go through `ASCompat.createInstance` (same `replace` table).
 
-`onReady` is `LoadingFinishedEvent`, not `ManagersLoadedEvent`, because the facade promises an **inventory** wrapper and inventory is account data. At `ManagersLoaded` the tables are in and the account / matchmaker / `initTime()` are not. Mutating GameMaster before the account is parsed against it is the additive `tablesLoaded` event, not a fourth method.
+`onReady` is `LoadingFinishedEvent`, not `ManagersLoadedEvent`, because the `api` mod promises an **inventory** wrapper and inventory is account data. At `ManagersLoaded` the tables are in and the account / matchmaker / `initTime()` are not. Mutating GameMaster before the account is parsed against it is the additive `tablesLoaded` event, not a fourth method.
 
 **Order:** `onInit` → (`tablesLoaded`) → `onReady` → any gameplay event. Town / tutorial dungeon is entered by the `mainStateMachine.start()` that follows `onReady`, so no `heroSpawned` / `floorEnter` can precede it. In a dungeon, a hero's `heroSpawned` follows its floor's `floorEnter` (the host holds the hero back until then).
 
@@ -217,35 +220,32 @@ Host obligations:
 
 - **Overlay root stays on top.** Root z-order is `Facade.addRootDisplayObject(child, layer)` (letterbox at 1000, loading clip at 0), not `stage.addChild`. A child added during `onInit` is unknown to `mChildLayer` and counts as layer 0, so the letterbox lands above it. After `DBFacade.init` the host re-registers the overlay above the letterbox. Inside it, each mod has its own layer (`ctx.overlay`), in load order. Authors do not manage z-order against vanilla.
 - **No `Logger` during `onInit`.** `Logger.init` runs inside `Facade.init`. The host buffers compile / `onInit` logs and flushes them, or uses `trace`.
-- **Throw isolation.** Move the game's `uncaughtError` listener to the **top** of the constructor (null-guard `mDBFacade`) so compile, `onInit` and `new DBFacade()` are inside it. That listener catches event-dispatch errors, not a synchronous throw in the constructor chain: the host still wraps each mod's compile and `onInit` in try/catch. Isolation is the `modding.*` contour (`onInit` / `onReady` / facade event handlers). The build sets `HXCPP_CHECK_POINTER`, so a null dereference in mod or game code throws `Null Object Reference` and follows these rules rather than killing the process. A throw in `onDispose` is logged and ignored. A throw from a **replaced host method** is a host throw. A `replace` subclass whose **constructor throws while `new DBFacade()` or `init()` constructs it** kills the boot. Accepted. `last-run.json` is written right after `onInit` (`ready: false`); the launcher's "process exited + `ready: false`" reading covers it.
-- **A failed mod goes quiet.** A throw in `onInit` or `onReady` cancels all its subscriptions and removes its overlay layer; `last-run` is `failed`. After a failed `onInit`: no `onReady`, a `replace` from that call is dropped, later mods still start, its types stay. A failed `onReady` does not undo a `replace`. `onDispose` still runs at exit. Files, threads, and statics are not rolled back. A throw in an event handler is only logged.
+- **Throw isolation.** Move the game's `uncaughtError` listener to the **top** of the constructor (null-guard `mDBFacade`) so compile, `onInit` and `new DBFacade()` are inside it. That listener catches event-dispatch errors, not a synchronous throw in the constructor chain: the host still wraps each mod's compile and `onInit` in try/catch. Isolation is the `modding.*` contour (`onInit` / `onReady` / event handlers). The build sets `HXCPP_CHECK_POINTER`, so a null dereference in mod or game code throws `Null Object Reference` and follows these rules rather than killing the process. A throw in `onDispose` is logged and ignored. A throw from a **replaced host method** is a host throw. A `replace` subclass whose **constructor throws while `new DBFacade()` or `init()` constructs it** kills the boot. Accepted. `last-run.json` is written right after `onInit` (`ready: false`); the launcher's "process exited + `ready: false`" reading covers it.
+- **A failed mod goes quiet.** A throw in `onInit` or `onReady` cancels all its subscriptions (those to [`api` events](#the-api-mod) included) and removes its overlay layer; `last-run` is `failed`. After a failed `onInit`: no `onReady`, a `replace` from that call is dropped, later mods still start, its types stay. A failed `onReady` does not undo a `replace`. `onDispose` still runs at exit. Files, threads, and statics are not rolled back. A throw in an event handler is only logged.
+- **A failed dependency fails its dependents.** When a mod fails (load, `onInit`, `onReady`), every enabled mod that depends on it (`api` or `dependencies`), directly or through another, fails too (`dependency <id> failed`) and goes quiet the same way, whatever the load order. A dependency that is skipped or not enabled fails the mod before it loads (`dependency <id> missing`). Versions are the launcher's check, not the game's.
 - **Startup cost.** Parse + compile of every enabled mod happens before the first frame (hxScript: ≈10 ms per module). Measure with real mods. If it becomes a visible black window, the fix is a splash **before `new DBFacade()`** (OpenFL preloader, or a Lime-level clip), not a split of `init()`: `new DBFacade()` already constructs `FRESteamWorks`. A bytecode cache is the later lever.
 
-### Gameplay events (`api: 1`)
+### Game events
 
-Subscribe from `onInit` or `onReady` with `ModContext.on<Event>(handler)` (`onHeroSpawned(f:ModHero->Void)`, `onTownEnter(f:Void->Void)`, …), which returns a `ModSubscription` (`cancel()`). Host-emitted; not existing game `Event` class names. These four are frozen so facade mods can hook the live dungeon (local + other players, floor-scoped teardown) without `extends`. Adding an event later is not a bump; changing one of these is.
+Subscribe from `onInit` or `onReady` with `ModContext.on<Event>(handler)` (`onHeroSpawned(f:HeroGameObject->Void)`, `onTownEnter(f:Void->Void)`, …), which returns a `ModSubscription` (`cancel()`). Host-emitted; not existing game `Event` class names. They are what the `api` mod is built on; an event is added in a release when it needs a hook it cannot reach otherwise.
 
-| Event | When | Typical use |
+| Event | Hands | When |
 | --- | --- | --- |
-| `heroSpawned` / `heroDespawned` | A hero (local **or** other players) is initialised on a dungeon floor / is destroyed. Dungeon only. | Per-hero overlay or roster. |
-| `floorEnter` / `floorExit` | A dungeon floor starts (grid built, map node set) / is destroyed. | Floor-scoped UI or counters; teardown on exit. |
+| `heroSpawned` / `heroDespawned` | `HeroGameObject` | A hero (local **or** other players) is initialised on a dungeon floor / is destroyed. Dungeon only. |
+| `floorEnter` / `floorExit` | `DistributedDungeonFloor` | A dungeon floor starts (grid built, map node set) / is destroyed. |
+| `tablesLoaded` | — | `ManagersLoadedEvent`: tables in, account not yet parsed against them. Window to mutate tables (`extends` use). |
+| `townEnter` / `townExit` | — | `TownState` entered / left, including `ReloadTownState`. |
+| `keyDown` | key code | A key goes down: once per press, not while a text field (chat) has focus. A handler returning `true` keeps the key: its default action does not run. |
 
-Pattern: subscribe in `onInit`, read tables and account in `onReady`, react to spawn/floor for anything with a hero in it. Do not assume a hero exists in `onReady`.
+`ModContext`: overlay layer and view size, log, `replace`, these subscriptions, `facade` (from `onReady`, a host type), and a way for another mod to bind a subscription to it (so it is cancelled with the rest when the mod fails).
 
-Town has no heroes: the selected avatar is `state.account` (read live); friends' avatars will be an account-level wrapper.
+### The `api` mod
 
-Additive (not frozen):
+`mods.api.*`, loaded before every other mod. `mods.api.Mod` hands its own context: overlay layer, view size, log, `tablesLoaded`, `townEnter` / `townExit`, `keyDown`, the hero and floor events with wrappers, and the raw core `ModContext` (`core`, an `extends` use). Its subscriptions are bound to the subscriber's `ModContext`: a failed mod goes quiet there too, and a handler's throw is logged under that mod.
 
-| Event | When |
-| --- | --- |
-| `tablesLoaded` | `ManagersLoadedEvent`: tables in, account not yet parsed against them. Window to mutate tables (`extends` use). |
-| `townEnter` / `townExit` | `TownState` entered / left, including `ReloadTownState`. |
-| `keyDown` | A key goes down: once per press, not while a text field (chat) has focus. A handler returning `true` keeps the key: its default action does not run. |
-| `hudReady`, inventory, chat, … | As the facade grows. |
+Pattern: subscribe in `onInit`, read tables and account in `onReady`, react to spawn/floor for anything with a hero in it. Do not assume a hero exists in `onReady`. Wrappers that need a hero or floor stay empty until the matching event. Town has no heroes: the selected avatar is the account (read live); friends' avatars will be an account-level wrapper.
 
-`ModContext`: overlay layer and view size, log, `replace`, event subscriptions, state window (account-level wrappers filled from `onReady`; hero/floor wrappers after the matching event; `state.heroes` is a copy).
-
-A hero and its player are two wrappers. `ModHero` is what a player plays on one floor (class, level, `weapons` as `ModWeapon` copies); each floor gives a new one, and its fields go empty at `heroDespawned`. `ModPlayer` is the account behind it (`hero.player`): one instance from its first hero to the return to town, listed in `state.players` with those who left, with `hero` null while it has none. It holds the screen name, `isFriend`, and the end screen's `addFriend`, `block` and `report` (the game's own popups for the last two). Game art comes as plain sprites that load themselves and are released when removed from their parent: `ModPlayer.createPortrait` (the skin icon, as on the end screen) and `ModWeapon.createIcon` (icon on its rarity background, with the game's tooltip on hover, drawn above the overlay).
+`Account` reads the live account from `onReady`. `Party` holds the live window: the floor in progress, the heroes on it (a copy), and the players met in the dungeon in progress. A hero and its player are two wrappers. `Hero` is what a player plays on one floor (class, level, `weapons` as `Weapon` copies); each floor gives a new one, and its fields go empty at `heroDespawned`. `Player` is the account behind it (`hero.player`): one instance from its first hero to the return to town, listed in `Party.players` with those who left, with `hero` null while it has none. It holds the screen name, `isFriend`, and the end screen's `addFriend`, `block` and `report` (the game's own popups for the last two). Game art comes as plain sprites that load themselves and are released when removed from their parent: `Player.createPortrait` (the skin icon, as on the end screen) and `Weapon.createIcon` (icon on its rarity background, with the game's tooltip on hover, drawn above the overlay).
 
 Load order follows `enabled.json`. Outcomes land in [last-run.json](#last-run-report). `modding.Host` is not API: its hooks are private, `@:allow`ed to their game callers.
 
@@ -289,7 +289,7 @@ The launcher writes `<install-dir>/mods/enabled.json`:
 }
 ```
 
-Array order is load order. The launcher writes it so every mod comes **after** its `dependencies`; the user's order is kept where the graph leaves it free. Disabled mods are omitted. If an enabled mod's dependency is not enabled, the launcher warns and still writes the file; the game loads the mod and missing types surface as that mod's compile / parse failure.
+Array order is load order. The launcher writes it so every mod comes **after** its dependencies (`api` included); the user's order is kept where the graph leaves it free. Disabled mods are omitted. Enabling a mod installs and enables its missing dependencies ([`mod.json`](#modjson)). If one cannot be (absent from the index, disabled by the user), the launcher warns and still writes the file; the game fails the mod (`dependency <id> missing`).
 
 **Cycles** are not an error. Sort on strongly connected components: a cycle is one block against the rest, user order **inside** it, warning naming the members (`a ↔ b: load order between them is yours`). Enabling is never refused. In one shared batch, mutual imports compile; the only undefined thing is which `onInit` runs first. The host never sorts; it follows `enabled.json` as written.
 
@@ -334,7 +334,7 @@ Draft, not frozen:
 | --- | --- |
 | `drh` / `started` | Tag-number string of the game that wrote the file (`"20"`, no `V` — same space as `mod.json`) and UTC start time. The launcher compares `started` with the Play time **it** recorded; `started` alone cannot reveal a crash before the first write (the previous run's file is still there). |
 | `ready` | `false` until `onReady` has run; stays `false` when boot never gets there (`SocketErrorState`, `blockCheater()`). A mod `ok` with `ready: false` only got `onInit`. While the game is still loading the file also says `false`; the launcher disambiguates with process state (alive → loading, exited → boot stopped before `LoadingFinished`). No active avatar still reports `true`. |
-| `status` | `ok` / `failed` / `skipped` (id in `enabled.json` but folder, `mod.json`, or valid `id` missing) |
+| `status` | `ok` / `failed` (its own error or a dependency's) / `skipped` (id in `enabled.json` but folder, `mod.json`, or valid `id` missing) |
 | `mode` | `compiled` if every module of the mod compiled, `interpreted` if none did, `mixed` otherwise. |
 | `error` | Present on `failed`, `mixed`, an interpreted skip, or a `replace` overlap. One line (`2 modules left interpreted`). Per-module reasons stay in the session log. |
 
@@ -348,19 +348,19 @@ Out of v1: in-session toasts, a pipe back to a running launcher.
 
 ## `mod.json`
 
-Draft. Shared launcher/game contract, not frozen.
+Shared launcher/game contract.
 
 ```json
 {
   "id": "some_mod",
   "name": "Some Mod",
+  "description": "Short summary for the catalog.",
   "version": "0.1.0",
   "author": "example",
-  "api": 1,
-  "drh": "20",
+  "api": "1.2",
   "entry": "Main",
-  "uses": ["api"],
-  "dependencies": []
+  "uses": [],
+  "dependencies": { "cool_lib": "0.3" }
 }
 ```
 
@@ -368,13 +368,16 @@ Draft. Shared launcher/game contract, not frozen.
 | --- | --- |
 | `id` | Stable identifier, install folder, and the mod's **package**: every source file is in `mods.<id>` or a sub-package. Must match `^[a-z][a-z0-9_]{1,62}[a-z0-9]$` (3–64, snake_case, letter start, no trailing underscore) and must **not** be a Haxe keyword or a Windows reserved device name. Index CI, launcher install, and host skip all apply the same regex + lists. Display name stays in `name`. |
 | `name` | Display name |
-| `version` | Mod version |
+| `description` | One line for the catalog. |
+| `version` | `MAJOR.MINOR.PATCH`, digits only. Semver over what other mods may rely on. |
 | `author` | Author |
-| `api` | `modding.*` version. **Required** if `uses` contains `api`; omit otherwise. [Versioning](#versioning). |
-| `drh` | **Always required.** Tags this artifact was built for (no `V`, no `>=`). `"20"`, `"20,21"`, or `"20-22"` (closed, inclusive). Never blocks. Untagged local builds (`"0"`) skip it. `extends` / `replace`: warn when the installed tag is not in the set. `api` only: warn only when it is older than the minimum, which the author sets to the tag that added the wrappers the mod uses. |
-| `entry` | Short class name, resolved as `mods.<id>.<entry>` (e.g. `Main` → `mods.some_mod.Main`, extends `modding.Mod`). Cannot name anything outside the mod's package. |
-| `uses` | One or more of `api`, `extends`, `replace` |
-| `dependencies` | Ids whose script types this one imports. **Ids only, no versions.** Launcher orders `enabled.json` and warns when one is not enabled. No auto-install, no version solving. May be empty or absent. A cycle is not an error ([Passing the list](#passing-the-list)). |
+| `api` | Version of the [`api` mod](#versioning) this one needs. **Required**, except in the `api` mod itself. Same syntax as a dependency. |
+| `drh` | Tags this artifact was built for (no `V`, no `>=`). `"20"`, `"20,21"`, or `"20-22"` (closed, inclusive). **Required** if `uses` contains `extends` or `replace`; omit otherwise. Never blocks: the launcher warns when the installed tag is not in the set. Untagged local builds (`"0"`) skip it. |
+| `entry` | Short class name, resolved as `mods.<id>.<entry>` (e.g. `Main` → `mods.some_mod.Main`, extends `mods.api.Mod`). Cannot name anything outside the mod's package. |
+| `uses` | `extends` and/or `replace`. Empty: stable only. |
+| `dependencies` | Other mods whose types this one imports, as `{ "id": "version" }`. Not `api`, which has its own field. May be empty or absent. A cycle is not an error ([Passing the list](#passing-the-list)). |
+
+**Versions.** `api` and each dependency take `"x.y"` or `"x.y.z"`: the same major, and not older (`"1.2"` accepts `1.2.0` up to anything below `2.0.0`). With major `0`, the minor is the major (`"0.3"` accepts `0.3.x` only). The launcher installs and enables, from the index, the highest version that satisfies every enabled mod naming it (and, for `extends` / `replace`, whose `drh` contains the installed tag). One version per id; when no version satisfies everyone, it keeps the installed one and warns. No backtracking across dependencies' own constraints. The game only checks that dependencies loaded ([Lifecycle](#lifecycle)).
 
 Haxe keywords (the regex alone lets `package mods.new;` through): `abstract`, `break`, `case`, `cast`, `catch`, `class`, `continue`, `default`, `dynamic`, `else`, `enum`, `extends`, `extern`, `false`, `final`, `for`, `function`, `implements`, `import`, `inline`, `interface`, `macro`, `new`, `null`, `operator`, `overload`, `override`, `package`, `private`, `public`, `return`, `static`, `switch`, `this`, `throw`, `true`, `try`, `typedef`, `untyped`, `using`, `var`, `while`.
 
@@ -384,7 +387,7 @@ Windows reserved device names (the folder cannot be created): `con`, `prn`, `aux
 
 **`import.hx` is not supported (v1).** The host skips it with a warning attributed to the mod (`import.hx ignored`); other files still load. hxScript's prelude (`ImportModule`) is host-wired and interpreter-only; the cppia emitter reads a module's own `import`s only, so honouring it would silently interpret every file of that mod. Fed as a normal module it would fail the package rule (no `package` line). Each file lists its imports. Lifting this later is additive if hxScript teaches the emitter about preludes.
 
-**Using another mod's types is `extends`-fragile.** `import mods.cool_lib.Api` breaks when `cool_lib` changes it. v1 does not pin versions between mods; authors coordinate. The facade remains the stable surface.
+**Using another mod's types** holds as long as its author follows semver on `version`. Nothing checks that but review.
 
 The launcher refuses to install (index or local zip) if `id` fails the regex / lists, and extracts to `mods/<id>/` with the same path rules as game releases (`enclosed_name` / `safe_relative_path`: no `..`, no absolute paths, files and directories only). No uncompressed size cap: index artifacts already have size + SHA-256; sideload is a file the user picked. A hand-copied folder whose directory name differs from `id` can still be scanned via `mod.json`; a bad `id` is skipped (game) or not a mod (launcher).
 
@@ -403,7 +406,7 @@ Three roles, kept separate so a nicer front can land later without moving mods:
 
 The index **points**. It does not contain community mods. Official example mods may live in the DRH tree; third-party mods do not.
 
-A listing is an **artifact**, not a repo: `id + version + sha256 + download URL + api + drh + uses`. Trusting `github.com/alice/cool-hud` forever would auto-approve the next Release. Reviewing "the repo" once does not review v1.2. A new version is not visible until it is a new index entry (PR). CI can check that the zip opens, `mod.json` matches, and the hash is correct; a human still diffs against the last indexed version. **Auto-ingest of GitHub Releases without the index is out.**
+A listing is an **artifact**, not a repo: `id + version + sha256 + download URL` plus its `mod.json` fields. Trusting `github.com/alice/cool-hud` forever would auto-approve the next Release. Reviewing "the repo" once does not review v1.2. A new version is not visible until it is a new index entry (PR). CI can check that the zip opens, `mod.json` matches, and the hash is correct; a human still diffs against the last indexed version. **Auto-ingest of GitHub Releases without the index is out.**
 
 Sideload (Open mods folder / install from zip) stays, labeled unreviewed.
 
@@ -422,10 +425,9 @@ Not frozen. Enough to implement a launcher list:
   "version": "0.1.0",
   "author": "example",
   "description": "Short summary for the catalog.",
-  "api": 1,
-  "drh": "20",
-  "uses": ["api"],
-  "dependencies": [],
+  "api": "1.2",
+  "uses": [],
+  "dependencies": { "cool_lib": "0.3" },
   "url": "https://github.com/example/some-mod/releases/download/0.1.0/some-mod-0.1.0.zip",
   "sha256": "...",
   "source": "https://github.com/example/some-mod"
@@ -434,7 +436,7 @@ Not frozen. Enough to implement a launcher list:
 
 `source` is documentation (issues, code), not a download pipe. Yanking a version is an index change (tombstone or removal).
 
-Out of v1, same index: ratings, galleries, collections, dependency *solving* (versions / auto-install), in-launcher publishing, a separate website.
+Out of v1, same index: ratings, galleries, collections, dependency solving beyond [one version per id](#modjson), in-launcher publishing, a separate website.
 
 ## Compilation
 
@@ -508,17 +510,18 @@ Vanilla code will follow DR.
 
 Needed before a real host; not a restatement of the rules above.
 
-1. **Done**. Patch hxScript. Except `replace` which is still missing. Further generator fixes may still show up on the first cppia build.
+1. **Done**. Patch hxScript. Except `replace` which is still missing.
 2. **Done.** hxcpp cppia patch.
 3. **Done.** The flags above are in `project.xml`.
-4. **Done**, except `replace`. `src-modding/` loads `--mods-dir` into one world, runs the lifecycle, re-registers the overlay, and bakes the release tag (no `V`) plus `api` into the host ([Versioning](#versioning)). `uncaughtError` and the mod `exiting` listener sit at the top of the constructor. Still later: `ASCompat.createInstance` consulting the `replace` table, once the fork has `replace`.
+4. **Done**, except `replace`. `src-modding/` loads `--mods-dir` into one world, runs the lifecycle, re-registers the overlay, and bakes the release tag (no `V`) into the host. `uncaughtError` and the mod `exiting` listener sit at the top of the constructor. Still later: `ASCompat.createInstance` consulting the `replace` table, once the fork has `replace`.
 5. Launcher: index fetch, catalog install, `enabled.json`, `--mods-dir`, `last-run.json` display — no destructive overlay.
 6. Index repository (separate from DRH / DRHL), PR + CI for new versions.
+7. Move the wrappers from the host into `mods/api/` (core events hand game objects, `Version.API` goes), dependency failure propagation, and the tag CI that publishes `api` ([Versioning](#versioning)).
 
 ## Out of scope for this document
 
 - User guide, polished store UX, or Steam Workshop.
-- Final JSON schema for `mod.json` or the index.
+- Final JSON schema for the index.
 - Host code or hxcpp patch.
 - Private servers, offline solo, or bypassing official checksums.
 - Making Thunderstore, Nexus, or Discord the source of truth.
