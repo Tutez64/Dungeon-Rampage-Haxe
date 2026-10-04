@@ -1,11 +1,11 @@
 package mods.dep_failed;
 
-import modding.Mod;
-import modding.ModContext;
+import mods.api.Mod;
+import mods.api.Context;
 
-/** Depends on a mod whose `onInit` throws: the host must fail it before its own `onInit`. */
+/** Depends on a mod whose `init` throws: the host must fail it before its own `init`. */
 class Main extends Mod {
-	override public function onInit(ctx:ModContext):Void {
-		ctx.log("FAIL onInit reached a mod whose dependency failed");
+	override public function init(ctx:Context):Void {
+		ctx.log("FAIL init reached a mod whose dependency failed");
 	}
 }

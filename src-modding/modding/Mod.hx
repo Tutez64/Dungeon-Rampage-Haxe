@@ -1,7 +1,7 @@
 package modding;
 
 /**
- * Base class of a mod entry (`mod.json` `entry`, package `mods.<id>`).
+ * Base class of the `api` mod's entry, and of `mods.api.Mod`, which every other mod's entry extends.
  *
  * All three methods are optional. `onInit` runs before any of the game exists,
  * `onReady` once the account and clocks exist and before the loop, `onDispose`

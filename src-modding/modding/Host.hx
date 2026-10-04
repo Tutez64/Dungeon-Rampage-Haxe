@@ -11,7 +11,7 @@ import haxe.Json;
  * Loads every enabled mod into one hxScript world. No `--mods-dir` means no mods
  * and nothing written. `replace` is intentionally absent until the fork has it.
  *
- * Nothing here is for mods: the game calls the hooks, mods go through `ModContext`.
+ * Nothing here is for mods: the game calls the hooks, the `api` mod goes through `ModContext`.
  *
  * Contract: docs/modding.md (lifecycle, passing the list, last-run report).
  */
@@ -22,9 +22,6 @@ import haxe.Json;
 @:allow(distributedObjects.HeroGameObjectOwner)
 @:allow(distributedObjects.DistributedDungeonFloor)
 @:allow(modding.ModContext)
-@:allow(modding.ModHero)
-@:allow(modding.ModPlayer)
-@:allow(modding.ModArt)
 @:allow(modding.ModSubscription)
 class Host {
 	static inline final HERO_SPAWNED = "heroSpawned";
@@ -48,9 +45,16 @@ class Host {
 
 	static inline final MODS_DIR_ARGUMENT = "--mods-dir";
 
+	/** The official mod every other one builds on. Its entry is the only one extending `modding.Mod` directly. */
+	static inline final API_ID = "api";
+
+	static inline final API_MOD = "mods.api.Mod";
+
 	static var ID = ~/^[a-z][a-z0-9_]{1,62}[a-z0-9]$/;
 
 	static var ENTRY = ~/^[A-Za-z_][A-Za-z0-9_]*$/;
+
+	static var API_VERSION = ~/^[0-9]+\.[0-9]+(\.[0-9]+)?$/;
 
 	static var booted:Bool = false;
 
@@ -66,7 +70,7 @@ class Host {
 
 	static var stage:Stage;
 
-	/** Set at `onReady`, for the wrappers that talk to the game. */
+	/** Set at `onReady`, handed to mods as `ModContext.facade`. */
 	static var facade:Null<DBFacade>;
 
 	static var keysHooked:Bool = false;
@@ -76,20 +80,17 @@ class Host {
 
 	static var overlay:Sprite;
 
-	static var state:ModState;
-
 	static var records:Array<ModRecord> = [];
 
 	static var pending:Array<LogLine> = [];
 
 	static var listeners:Map<String, Array<ModSubscription>> = new Map();
 
-	static var heroes:Map<UInt, ModHero> = new Map();
+	/** Heroes announced and not yet gone, by object id. */
+	static var heroes:Map<UInt, Bool> = new Map();
 
-	/** Players met in the dungeon in progress, by account. Emptied on the return to town. */
-	static var players:Map<UInt, ModPlayer> = new Map();
-
-	static var floors:Map<UInt, ModFloor> = new Map();
+	/** Floors announced and not yet gone, by object id. */
+	static var floors:Map<UInt, Bool> = new Map();
 
 	/** Heroes initialised on a floor that has not been announced yet, released by its `floorEnter`. */
 	static var waiting:Array<WaitingHero> = [];
@@ -112,7 +113,6 @@ class Host {
 		Host.stage = stage;
 		started = utcNow();
 		modsRoot = directory;
-		state = new ModState();
 		try {
 			hxscript.error.Sink.listen(onDiagnostic);
 			hxscript.macro.Expose.apply();
@@ -156,8 +156,6 @@ class Host {
 		if (!booted || reportReady)
 			return;
 		Host.facade = facade;
-		if (state != null)
-			state.setAccount(ModAccount.from(facade));
 		var wasOk = [for (record in records) record.status == "ok"];
 		for (record in records) {
 			if (record.status != "ok" || record.instance == null || record.context == null)
@@ -198,9 +196,6 @@ class Host {
 	}
 
 	static function townEnter():Void {
-		players = new Map();
-		if (state != null)
-			state.clearPlayers();
 		emit(TOWN_ENTER, null);
 	}
 
@@ -209,7 +204,7 @@ class Host {
 	}
 
 	static function heroSpawned(hero:HeroGameObject, local:Bool):Void {
-		if (!booted || state == null || hero == null || heroes.exists(hero.id))
+		if (!booted || hero == null || heroes.exists(hero.id))
 			return;
 		var floor = hero.distributedDungeonFloor;
 		if (floor != null && !floors.exists(floor.id)) {
@@ -219,44 +214,26 @@ class Host {
 			waiting.push({hero: hero, local: local, floor: floor});
 			return;
 		}
-		var account:UInt = hero.playerID;
-		var player:Null<ModPlayer> = null;
-		if (account != 0) {
-			player = players.get(account);
-			if (player == null) {
-				player = new ModPlayer(account, local);
-				players.set(account, player);
-				state.addPlayer(player);
-			}
-		}
-		var wrap = new ModHero(hero, local, player);
-		if (player != null)
-			player.setHero(wrap);
-		heroes.set(hero.id, wrap);
-		state.addHero(wrap);
-		emit(HERO_SPAWNED, wrap);
+		heroes.set(hero.id, true);
+		emit(HERO_SPAWNED, hero);
 	}
 
+	/** While the hero is still whole. */
 	static function heroDespawned(hero:HeroGameObject):Void {
-		if (!booted || state == null || hero == null)
+		if (!booted || hero == null)
 			return;
 		waiting = waiting.filter(entry -> entry.hero != hero);
-		var wrap = heroes.get(hero.id);
-		if (wrap == null)
+		if (!heroes.exists(hero.id))
 			return;
-		wrap.detach();
 		heroes.remove(hero.id);
-		state.removeHero(wrap);
-		emit(HERO_DESPAWNED, wrap);
+		emit(HERO_DESPAWNED, hero);
 	}
 
 	static function floorEnter(floor:DistributedDungeonFloor):Void {
-		if (!booted || state == null || floor == null || floors.exists(floor.id))
+		if (!booted || floor == null || floors.exists(floor.id))
 			return;
-		var wrap = new ModFloor(floor);
-		floors.set(floor.id, wrap);
-		state.setFloor(wrap);
-		emit(FLOOR_ENTER, wrap);
+		floors.set(floor.id, true);
+		emit(FLOOR_ENTER, floor);
 		var released = waiting.filter(entry -> entry.floor == floor);
 		waiting = waiting.filter(entry -> entry.floor != floor);
 		for (entry in released)
@@ -265,20 +242,13 @@ class Host {
 	}
 
 	static function floorExit(floor:DistributedDungeonFloor):Void {
-		if (!booted || state == null || floor == null)
+		if (!booted || floor == null)
 			return;
 		waiting = waiting.filter(entry -> entry.floor != floor);
-		var wrap = floors.get(floor.id);
-		if (wrap == null)
+		if (!floors.exists(floor.id))
 			return;
 		floors.remove(floor.id);
-		if (state.floor == wrap) {
-			var next:Null<ModFloor> = null;
-			for (other in floors)
-				next = other;
-			state.setFloor(next);
-		}
-		emit(FLOOR_EXIT, wrap);
+		emit(FLOOR_EXIT, floor);
 	}
 
 	static function modLog(id:String, message:String):Void {
@@ -304,19 +274,10 @@ class Host {
 			list.remove(subscription);
 	}
 
-	static function knownPlayers():Array<ModPlayer> {
-		return state == null ? [] : state.players;
-	}
-
-	/** Runs a mod's callback from game code, which must not see its error. */
-	static function callback(handler:Null<Void->Void>):Void {
-		if (handler == null)
-			return;
-		try {
-			handler();
-		} catch (e:Dynamic) {
-			logNow("warn", "modding: callback: " + errorText(e));
-		}
+	/** Whether a mod is still running: loaded, and not failed or silenced since. */
+	static function alive(id:String):Bool {
+		var record = recordById(id);
+		return record != null && record.status == "ok";
 	}
 
 	static function hookKeys():Void {
@@ -479,6 +440,8 @@ class Host {
 			record.version = version;
 		if (!readUses(Reflect.field(manifest, "uses"), record))
 			return record;
+		if (!readApi(Reflect.field(manifest, "api"), record))
+			return record;
 		var entry:Dynamic = Reflect.field(manifest, "entry");
 		if (!Std.isOfType(entry, String) || !ENTRY.match(entry)) {
 			record.status = "failed";
@@ -488,10 +451,8 @@ class Host {
 		record.entry = entry;
 		if (!readDependencies(Reflect.field(manifest, "dependencies"), record))
 			return record;
-		var api:Dynamic = Reflect.field(manifest, "api");
-		if (record.uses.indexOf("api") >= 0 && !Std.isOfType(api, Int))
-			note("warn", "mod " + id + ": api is required when uses contains api");
-		warnDrh(record, Reflect.field(manifest, "drh"));
+		if (record.uses.length > 0)
+			warnDrh(record, Reflect.field(manifest, "drh"));
 		if (record.status == "ok")
 			loadSources(record);
 		return record;
@@ -735,9 +696,13 @@ class Host {
 				fail(record, "entry " + path + " was not found or does not extend modding.Mod");
 				continue;
 			}
+			if (record.id != API_ID && !extendsPath(path, API_MOD)) {
+				fail(record, "entry must extend " + API_MOD);
+				continue;
+			}
 			record.instance = instance;
 			record.layer = createLayer(record.id);
-			record.context = new ModContext(record.id, record.layer, state);
+			record.context = new ModContext(record.id, record.layer);
 			try {
 				instance.onInit(record.context);
 			} catch (e:Dynamic) {
@@ -798,6 +763,27 @@ class Host {
 		for (record in records)
 			if (record.status == "failed")
 				failDependents(record);
+	}
+
+	/** Whether the class at `path`, compiled or interpreted, is `base` or extends it. */
+	static function extendsPath(path:String, base:String):Bool {
+		if (world == null)
+			return false;
+		var current:Dynamic = world.compiled.exists(path) ? world.compiled.get(path) : world.resolve(path);
+		var depth = 0;
+		while (current != null && depth++ < 64) {
+			if (Std.isOfType(current, hxscript.types.ScriptedClass)) {
+				var scripted:hxscript.types.ScriptedClass = current;
+				if (scripted.path == base)
+					return true;
+				current = scripted.extending;
+			} else {
+				if (Type.getClassName(current) == base)
+					return true;
+				current = Type.getSuperClass(current);
+			}
+		}
+		return false;
 	}
 
 	static function createEntry(path:String):Null<Mod> {
@@ -884,19 +870,16 @@ class Host {
 		return parts.join(" ");
 	}
 
+	/** `extends` and / or `replace`; empty or absent for a mod that only uses the `api` mod. */
 	static function readUses(value:Dynamic, record:ModRecord):Bool {
+		if (value == null)
+			return true;
 		if (!Std.isOfType(value, Array)) {
 			record.status = "failed";
-			record.error = "uses must list api, extends, or replace";
+			record.error = "uses must list extends or replace";
 			return false;
 		}
 		var list:Array<Dynamic> = value;
-		if (list.length == 0) {
-			record.status = "failed";
-			record.error = "uses must list api, extends, or replace";
-			return false;
-		}
-		var seen = new Map<String, Bool>();
 		for (item in list) {
 			if (!Std.isOfType(item, String)) {
 				record.status = "failed";
@@ -904,16 +887,27 @@ class Host {
 				return false;
 			}
 			var kind:String = item;
-			if (kind != "api" && kind != "extends" && kind != "replace") {
+			if (kind != "extends" && kind != "replace") {
 				record.status = "failed";
 				record.error = "invalid uses value: " + kind;
 				return false;
 			}
-			if (!seen.exists(kind)) {
-				seen.set(kind, true);
+			if (record.uses.indexOf(kind) < 0)
 				record.uses.push(kind);
-			}
 		}
+		return true;
+	}
+
+	/** The `api` mod version a mod needs: a dependency like any other, required everywhere but in `api` itself. */
+	static function readApi(value:Dynamic, record:ModRecord):Bool {
+		if (record.id == API_ID)
+			return true;
+		if (!Std.isOfType(value, String) || !API_VERSION.match(value)) {
+			record.status = "failed";
+			record.error = "api must be a version, such as \"1.0\"";
+			return false;
+		}
+		record.dependencies.push(API_ID);
 		return true;
 	}
 
@@ -939,7 +933,7 @@ class Host {
 
 	static function warnDrh(record:ModRecord, spec:Dynamic):Void {
 		if (!Std.isOfType(spec, String) || spec == "") {
-			note("warn", "mod " + record.id + ": drh is required");
+			note("warn", "mod " + record.id + ": drh is required with extends or replace");
 			return;
 		}
 		var text:String = spec;
@@ -951,18 +945,8 @@ class Host {
 		var installed = Std.parseInt(Version.TAG);
 		if (installed == null || installed == 0)
 			return;
-		var extendsOrReplace = record.uses.indexOf("extends") >= 0 || record.uses.indexOf("replace") >= 0;
-		if (extendsOrReplace) {
-			if (parsed.indexOf(installed) < 0)
-				note("warn", 'mod ${record.id}: drh $text does not include this build (${Version.TAG})');
-		} else if (record.uses.indexOf("api") >= 0) {
-			var min = parsed[0];
-			for (value in parsed)
-				if (value < min)
-					min = value;
-			if (installed < min)
-				note("warn", 'mod ${record.id}: drh minimum is $min; this build is ${Version.TAG}');
-		}
+		if (parsed.indexOf(installed) < 0)
+			note("warn", 'mod ${record.id}: drh $text does not include this build (${Version.TAG})');
 	}
 
 	static function parseDrh(spec:String):Null<Array<Int>> {

@@ -1,5 +1,6 @@
 {
   "mods": [
+    { "id": "api" },
     { "id": "api_tour" },
     { "id": "broken_init" },
     { "id": "dep_ready" },
@@ -8,6 +9,7 @@
     { "id": "not_installed" },
     { "id": "dep_missing" },
     { "id": "dep_failed" },
-    { "id": "dep_chain" }
+    { "id": "dep_chain" },
+    { "id": "wrong_base" }
   ]
 }

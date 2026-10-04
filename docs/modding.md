@@ -196,7 +196,7 @@ Players see a short warning on `extends` / `replace` (may break on game updates;
 
 ## Lifecycle
 
-Core. `mods.api.Mod` mirrors the three methods with its own context, at the same moments, and its major covers that. They are **boot** hooks; names are frozen. Two anchors: `onInit` = nothing of the game exists yet; `onReady` = every singleton exists (tables, account, inventory, clock, network) and the loop is about to start. Neither means "a hero is on screen": live moments are **events**.
+Core. `mods.api.Mod` mirrors them as `init(context)`, `ready(context)` and `dispose()`, with its own `Context`, at the same moments, and its major covers that. They are **boot** hooks; names are frozen. Two anchors: `onInit` = nothing of the game exists yet; `onReady` = every singleton exists (tables, account, inventory, clock, network) and the loop is about to start. Neither means "a hero is on screen": live moments are **events**.
 
 `mod.json` `entry` extends `mods.api.Mod` (only the `api` mod's own extends `modding.Mod`); otherwise the host fails the mod (`entry must extend mods.api.Mod`). All three methods are optional (empty defaults).
 
@@ -237,15 +237,15 @@ Subscribe from `onInit` or `onReady` with `ModContext.on<Event>(handler)` (`onHe
 | `townEnter` / `townExit` | — | `TownState` entered / left, including `ReloadTownState`. |
 | `keyDown` | key code | A key goes down: once per press, not while a text field (chat) has focus. A handler returning `true` keeps the key: its default action does not run. |
 
-`ModContext`: overlay layer and view size, log, `replace`, these subscriptions, `facade` (from `onReady`, a host type), and a way for another mod to bind a subscription to it (so it is cancelled with the rest when the mod fails).
+`ModContext`: overlay layer and view size, log, `replace`, these subscriptions, `facade` (from `onReady`, a host type), and `alive`, false once the mod failed, so another mod holding handlers for it stops calling them.
 
 ### The `api` mod
 
-`mods.api.*`, loaded before every other mod. `mods.api.Mod` hands its own context: overlay layer, view size, log, `tablesLoaded`, `townEnter` / `townExit`, `keyDown`, the hero and floor events with wrappers, and the raw core `ModContext` (`core`, an `extends` use). Its subscriptions are bound to the subscriber's `ModContext`: a failed mod goes quiet there too, and a handler's throw is logged under that mod.
+`mods.api.*`, loaded before every other mod. `mods.api.Mod` hands its own context: overlay layer, view size, log, `tablesLoaded`, `townEnter` / `townExit`, `keyDown`, the hero and floor events with wrappers, and the raw core `ModContext` (`core`, an `extends` use). Its subscriptions hold the subscriber's `ModContext`: a handler of a failed mod is no longer called (`alive`), and a handler's throw is logged under that mod.
 
-Pattern: subscribe in `onInit`, read tables and account in `onReady`, react to spawn/floor for anything with a hero in it. Do not assume a hero exists in `onReady`. Wrappers that need a hero or floor stay empty until the matching event. Town has no heroes: the selected avatar is the account (read live); friends' avatars will be an account-level wrapper.
+Pattern: subscribe in `init`, read tables and account in `ready`, react to spawn/floor for anything with a hero in it. Do not assume a hero exists in `ready`. Wrappers that need a hero or floor stay empty until the matching event. Town has no heroes: the selected avatar is the account (read live); friends' avatars will be an account-level wrapper.
 
-`Account` reads the live account from `onReady`. `Party` holds the live window: the floor in progress, the heroes on it (a copy), and the players met in the dungeon in progress. A hero and its player are two wrappers. `Hero` is what a player plays on one floor (class, level, `weapons` as `Weapon` copies); each floor gives a new one, and its fields go empty at `heroDespawned`. `Player` is the account behind it (`hero.player`): one instance from its first hero to the return to town, listed in `Party.players` with those who left, with `hero` null while it has none. It holds the screen name, `isFriend`, and the end screen's `addFriend`, `block` and `report` (the game's own popups for the last two). Game art comes as plain sprites that load themselves and are released when removed from their parent: `Player.createPortrait` (the skin icon, as on the end screen) and `Weapon.createIcon` (icon on its rarity background, with the game's tooltip on hover, drawn above the overlay).
+`context.state` holds the live window, shared by every mod: the account (read live, from `ready`), the floor in progress, the heroes on it (a copy), and the players met in the dungeon in progress (a copy). A hero and its player are two wrappers. `Hero` is what a player plays on one floor (class, level, `weapons` as `Weapon` copies); each floor gives a new one, and its fields go empty at `heroDespawned`. `Player` is the account behind it (`hero.player`): one instance from its first hero to the return to town, listed in `state.players` with those who left, with `hero` null while it has none. It holds the screen name, `isFriend`, and the end screen's `addFriend`, `block` and `report` (the game's own popups for the last two). Game art comes as plain sprites that load themselves and are released when removed from their parent: `Player.createPortrait` (the skin icon, as on the end screen) and `Weapon.createIcon` (icon on its rarity background, with the game's tooltip on hover, drawn above the overlay).
 
 Load order follows `enabled.json`. Outcomes land in [last-run.json](#last-run-report). `modding.Host` is not API: its hooks are private, `@:allow`ed to their game callers.
 
@@ -516,7 +516,7 @@ Needed before a real host; not a restatement of the rules above.
 4. **Done**, except `replace`. `src-modding/` loads `--mods-dir` into one world, runs the lifecycle, re-registers the overlay, and bakes the release tag (no `V`) into the host. `uncaughtError` and the mod `exiting` listener sit at the top of the constructor. Still later: `ASCompat.createInstance` consulting the `replace` table, once the fork has `replace`.
 5. Launcher: index fetch, catalog install, `enabled.json`, `--mods-dir`, `last-run.json` display — no destructive overlay.
 6. Index repository (separate from DRH / DRHL), PR + CI for new versions.
-7. Move the wrappers from the host into `mods/api/` (core events hand game objects, `Version.API` goes), dependency failure propagation, and the tag CI that publishes `api` ([Versioning](#versioning)).
+7. **Done**, except the tag CI that publishes `api` ([Versioning](#versioning)) and the `api` mod's place in the repository. The wrappers live in `mods/api/`, core events hand game objects, dependency failures propagate.
 
 ## Out of scope for this document
 

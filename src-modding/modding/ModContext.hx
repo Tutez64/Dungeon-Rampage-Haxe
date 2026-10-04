@@ -1,32 +1,42 @@
 package modding;
 
+import distributedObjects.DistributedDungeonFloor;
+import distributedObjects.HeroGameObject;
 import flash.display.Sprite;
 
 /**
- * What a mod receives in `onInit` and `onReady`.
+ * What a mod's entry receives in `onInit` and `onReady`: the core, which the `api` mod is built on.
+ * Not a stable surface. A mod other than `api` reaches it through `mods.api.Context.core`, as an
+ * `extends` use.
  *
- * Subscribe from `onInit` for `onTablesLoaded` (it fires before `onReady`) and for
- * anything that can happen as the world appears. Each `on*` returns the subscription
- * to cancel. `replace` is not part of this build.
+ * Subscribe from `onInit` for `onTablesLoaded` (it fires before `onReady`) and for anything that can
+ * happen as the world appears. Each `on*` returns the subscription to cancel. `replace` is not part of
+ * this build.
  */
 class ModContext {
 	/** This mod's layer of the overlay, above the letterbox and stacked in load order. Removed if the mod fails. */
 	public var overlay(default, null):Sprite;
-
-	public var state(default, null):ModState;
 
 	/** Size of the game's view in overlay coordinates. 0 before `onReady`. */
 	public var viewWidth(get, never):Float;
 
 	public var viewHeight(get, never):Float;
 
+	/** The game's facade, null before `onReady`. */
+	public var facade(get, never):Null<facade.DBFacade>;
+
+	/**
+	 * Whether this mod still runs. False once it failed or a dependency did: its own subscriptions are
+	 * cancelled then, and another mod holding handlers for it stops calling them.
+	 */
+	public var alive(get, never):Bool;
+
 	var id:String;
 
 	@:allow(modding.Host)
-	function new(id:String, overlay:Sprite, state:ModState) {
+	function new(id:String, overlay:Sprite) {
 		this.id = id;
 		this.overlay = overlay;
-		this.state = state;
 	}
 
 	function get_viewWidth():Float {
@@ -37,26 +47,37 @@ class ModContext {
 		return Host.facade == null ? 0 : Host.facade.viewHeight;
 	}
 
+	function get_facade():Null<facade.DBFacade> {
+		return Host.facade;
+	}
+
+	function get_alive():Bool {
+		return Host.alive(id);
+	}
+
 	public function log(message:String):Void {
 		Host.modLog(id, message);
 	}
 
-	/** A hero, local or remote, is on a dungeon floor and initialised. Not town. Always after that floor's `onFloorEnter`. */
-	public function onHeroSpawned(handler:ModHero->Void):ModSubscription {
+	/**
+	 * A hero, local (a `HeroGameObjectOwner`) or remote, is on a dungeon floor and initialised. Not
+	 * town. Always after that floor's `onFloorEnter`.
+	 */
+	public function onHeroSpawned(handler:HeroGameObject->Void):ModSubscription {
 		return listen(Host.HERO_SPAWNED, handler);
 	}
 
-	/** A hero leaves the floor. Its wrapper reads empty afterwards. */
-	public function onHeroDespawned(handler:ModHero->Void):ModSubscription {
+	/** A hero leaves the floor; it is still whole while the handlers run. */
+	public function onHeroDespawned(handler:HeroGameObject->Void):ModSubscription {
 		return listen(Host.HERO_DESPAWNED, handler);
 	}
 
 	/** A dungeon floor starts: its grid is built and its map node set. Art may still be loading. */
-	public function onFloorEnter(handler:ModFloor->Void):ModSubscription {
+	public function onFloorEnter(handler:DistributedDungeonFloor->Void):ModSubscription {
 		return listen(Host.FLOOR_ENTER, handler);
 	}
 
-	public function onFloorExit(handler:ModFloor->Void):ModSubscription {
+	public function onFloorExit(handler:DistributedDungeonFloor->Void):ModSubscription {
 		return listen(Host.FLOOR_EXIT, handler);
 	}
 

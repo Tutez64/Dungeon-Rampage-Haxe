@@ -4,7 +4,7 @@ import openfl.display.Sprite;
 import openfl.text.TextField;
 import openfl.text.TextFormat;
 
-/** Top-left readout. Composes OpenFL display objects rather than extending them, so the mod stays `api`. */
+/** Top-left readout. Composes OpenFL display objects rather than extending them, so the mod needs no `extends`. */
 class Panel {
 	public var root(default, null):Sprite;
 

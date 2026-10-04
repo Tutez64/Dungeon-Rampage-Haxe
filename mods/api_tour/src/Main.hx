@@ -1,11 +1,10 @@
 package mods.api_tour;
 
-import modding.Mod;
-import modding.ModContext;
-import modding.ModFloor;
-import modding.ModHero;
-import modding.ModSubscription;
-import modding.Version;
+import mods.api.Mod;
+import mods.api.Context;
+import mods.api.Floor;
+import mods.api.Hero;
+import mods.api.Subscription;
 import mods.api_tour.ui.Panel;
 
 /**
@@ -13,7 +12,7 @@ import mods.api_tour.ui.Panel;
  * Each check logs `ok` or `FAIL`; the panel shows the totals and the last check.
  */
 class Main extends Mod {
-	var ctx:ModContext;
+	var ctx:Context;
 
 	var panel:Panel;
 
@@ -35,17 +34,16 @@ class Main extends Mod {
 
 	var keySeen:Bool = false;
 
-	override public function onInit(ctx:ModContext):Void {
+	override public function init(ctx:Context):Void {
 		this.ctx = ctx;
 		panel = new Panel();
 		ctx.overlay.addChild(panel.root);
-		ctx.log("modding api " + Version.API + ", drh " + Version.TAG);
 
-		check("onInit: account empty", ctx.state.account == null);
-		check("onInit: no floor", ctx.state.floor == null);
-		check("onInit: no heroes", ctx.state.heroes.length == 0);
+		check("init: account empty", ctx.state.account == null);
+		check("init: no floor", ctx.state.floor == null);
+		check("init: no heroes", ctx.state.heroes.length == 0);
 
-		var cancelled:ModSubscription = ctx.onTownEnter(function() cancelledCalls++);
+		var cancelled:Subscription = ctx.onTownEnter(function() cancelledCalls++);
 		check("subscription starts active", cancelled.active);
 		cancelled.cancel();
 		cancelled.cancel();
@@ -61,16 +59,16 @@ class Main extends Mod {
 
 		ctx.onTablesLoaded(function() {
 			tablesSeen = true;
-			check("tablesLoaded before onReady", !readySeen);
+			check("tablesLoaded before ready", !readySeen);
 		});
 		ctx.onTownEnter(function() {
-			check("townEnter after onReady", readySeen);
+			check("townEnter after ready", readySeen);
 			check("cancelled handler never ran", cancelledCalls == 0);
 			check("town: no floor", ctx.state.floor == null);
 			check("town: no players", ctx.state.players.length == 0);
 		});
 		ctx.onTownExit(function() {
-			check("townExit after onReady", readySeen);
+			check("townExit after ready", readySeen);
 		});
 		// A closure run long after it was made, once per return to town. One made the same way logged
 		// a native handle instead of its message after a minute of play: its captures or its literal
@@ -94,29 +92,29 @@ class Main extends Mod {
 		});
 	}
 
-	override public function onReady(ctx:ModContext):Void {
+	override public function ready(ctx:Context):Void {
 		readySeen = true;
-		check("onReady: tablesLoaded came first", tablesSeen);
+		check("ready: tablesLoaded came first", tablesSeen);
 		var account = ctx.state.account;
-		check("onReady: account filled", account != null);
+		check("ready: account filled", account != null);
 		if (account != null) {
-			check("onReady: account id set", account.id != 0);
+			check("ready: account id set", account.id != 0);
 			check("activeAvatarId matches hasActiveAvatar", account.hasActiveAvatar == (account.activeAvatarId != 0));
 			ctx.log("account " + account.id + ", active avatar " + account.activeAvatarId);
 		}
-		check("onReady: no floor", ctx.state.floor == null);
-		check("onReady: view size set", ctx.viewWidth > 0 && ctx.viewHeight > 0);
+		check("ready: no floor", ctx.state.floor == null);
+		check("ready: view size set", ctx.viewWidth > 0 && ctx.viewHeight > 0);
 		var copy = ctx.state.heroes;
 		copy.push(null);
 		check("state.heroes is a copy", ctx.state.heroes.length == copy.length - 1);
 	}
 
-	override public function onDispose():Void {
+	override public function dispose():Void {
 		if (ctx != null)
-			ctx.log("onDispose: " + passed + " ok, " + failed + " failed");
+			ctx.log("dispose: " + passed + " ok, " + failed + " failed");
 	}
 
-	function onFloorEnter(floor:ModFloor):Void {
+	function onFloorEnter(floor:Floor):Void {
 		floorsEntered.set(Std.string(floor.id), true);
 		check("floorEnter: state.floor is this floor", ctx.state.floor == floor);
 		check("floorEnter: number >= 1", floor.number >= 1);
@@ -124,12 +122,12 @@ class Main extends Mod {
 		ctx.log("floor " + floor.id + " #" + floor.number + " " + floor.map);
 	}
 
-	function onFloorExit(floor:ModFloor):Void {
+	function onFloorExit(floor:Floor):Void {
 		check("floorExit: floor was entered", floorsEntered.exists(Std.string(floor.id)));
 		check("floorExit: state.floor moved off it", ctx.state.floor != floor);
 	}
 
-	function onHeroSpawned(hero:ModHero):Void {
+	function onHeroSpawned(hero:Hero):Void {
 		heroesSpawned++;
 		check("heroSpawned: after its floorEnter", ctx.state.floor != null);
 		check("heroSpawned: in state.heroes", ctx.state.heroes.indexOf(hero) >= 0);
@@ -161,7 +159,7 @@ class Main extends Mod {
 			+ " lv " + hero.level + ", friend " + player.isFriend);
 	}
 
-	function onHeroDespawned(hero:ModHero):Void {
+	function onHeroDespawned(hero:Hero):Void {
 		check("heroDespawned: out of state.heroes", ctx.state.heroes.indexOf(hero) < 0);
 		check("heroDespawned: live fields read empty", hero.classId == 0 && hero.level == 0 && hero.weapons.length == 0);
 		var player = hero.player;

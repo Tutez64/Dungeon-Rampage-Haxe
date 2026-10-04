@@ -3,9 +3,7 @@
   "name": "Dependency fails later",
   "version": "1.0.0",
   "author": "DRH",
-  "api": 1,
-  "drh": "14",
+  "api": "1.0",
   "entry": "Main",
-  "uses": ["api"],
   "dependencies": { "null_ready": "1.0" }
 }
