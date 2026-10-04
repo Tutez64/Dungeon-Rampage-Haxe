@@ -158,6 +158,7 @@ class Host {
 		Host.facade = facade;
 		if (state != null)
 			state.setAccount(ModAccount.from(facade));
+		var wasOk = [for (record in records) record.status == "ok"];
 		for (record in records) {
 			if (record.status != "ok" || record.instance == null || record.context == null)
 				continue;
@@ -165,9 +166,11 @@ class Host {
 				record.instance.onReady(record.context);
 			} catch (e:Dynamic) {
 				silence(record, errorText(e));
-				logNow("warn", summary(record));
 			}
 		}
+		for (index in 0...records.length)
+			if (wasOk[index] && records[index].status == "failed")
+				logNow("warn", summary(records[index]));
 		reportReady = true;
 		writeReport();
 	}
@@ -428,6 +431,7 @@ class Host {
 			seen.set(name, true);
 			records.push(resolve(name));
 		}
+		checkDependencies();
 		dropFailedModules();
 		startWorld();
 		compileWorld();
@@ -482,6 +486,8 @@ class Host {
 			return record;
 		}
 		record.entry = entry;
+		if (!readDependencies(Reflect.field(manifest, "dependencies"), record))
+			return record;
 		var api:Dynamic = Reflect.field(manifest, "api");
 		if (record.uses.indexOf("api") >= 0 && !Std.isOfType(api, Int))
 			note("warn", "mod " + id + ": api is required when uses contains api");
@@ -763,6 +769,35 @@ class Host {
 					subscription.cancel();
 		if (record.layer != null && record.layer.parent != null)
 			record.layer.parent.removeChild(record.layer);
+		failDependents(record);
+	}
+
+	/** Every mod still running that depends on this one, directly or through another, fails with it. */
+	static function failDependents(record:ModRecord):Void {
+		for (other in records)
+			if (other.status == "ok" && other.dependencies.indexOf(record.id) >= 0)
+				silence(other, "dependency " + record.id + " failed");
+	}
+
+	/**
+	 * Once every enabled mod is resolved, whatever their order: a dependency that is not enabled or was
+	 * skipped fails the mod before it loads, and one that already failed takes its dependents with it.
+	 */
+	static function checkDependencies():Void {
+		for (record in records) {
+			if (record.status != "ok")
+				continue;
+			for (id in record.dependencies) {
+				var dependency = recordById(id);
+				if (dependency == null || dependency.status == "skipped") {
+					fail(record, "dependency " + id + " missing");
+					break;
+				}
+			}
+		}
+		for (record in records)
+			if (record.status == "failed")
+				failDependents(record);
 	}
 
 	static function createEntry(path:String):Null<Mod> {
@@ -792,6 +827,7 @@ class Host {
 			return;
 		record.status = "failed";
 		record.error = message;
+		failDependents(record);
 	}
 
 	static function recordById(id:String):Null<ModRecord> {
@@ -877,6 +913,26 @@ class Host {
 				seen.set(kind, true);
 				record.uses.push(kind);
 			}
+		}
+		return true;
+	}
+
+	/** `{ "id": "version" }`. The game only needs the ids; versions are the launcher's. */
+	static function readDependencies(value:Dynamic, record:ModRecord):Bool {
+		if (value == null)
+			return true;
+		if (!Reflect.isObject(value) || Std.isOfType(value, String) || Std.isOfType(value, Array)) {
+			record.status = "failed";
+			record.error = "dependencies must map ids to versions";
+			return false;
+		}
+		for (id in Reflect.fields(value)) {
+			if (!Std.isOfType(Reflect.field(value, id), String)) {
+				record.status = "failed";
+				record.error = "dependencies must map ids to versions";
+				return false;
+			}
+			record.dependencies.push(id);
 		}
 		return true;
 	}
@@ -1096,6 +1152,8 @@ private class ModRecord {
 	public var version:String = "";
 
 	public var uses:Array<String> = [];
+
+	public var dependencies:Array<String> = [];
 
 	public var status:String;
 

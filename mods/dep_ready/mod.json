@@ -1,11 +1,11 @@
 {
-  "id": "null_ready",
-  "name": "Null in onReady",
+  "id": "dep_ready",
+  "name": "Dependency fails later",
   "version": "1.0.0",
   "author": "DRH",
   "api": 1,
   "drh": "14",
   "entry": "Main",
   "uses": ["api"],
-  "dependencies": {}
+  "dependencies": { "null_ready": "1.0" }
 }

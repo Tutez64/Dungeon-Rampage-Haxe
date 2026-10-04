@@ -7,5 +7,5 @@
   "drh": "14",
   "entry": "Main",
   "uses": ["api"],
-  "dependencies": []
+  "dependencies": {}
 }
