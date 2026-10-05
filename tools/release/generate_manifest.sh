@@ -38,8 +38,6 @@ src/brain/utils/FeatureFlags.hx:
 steam_buildid is copied from edits/conversion/stamp (the official Steam
 BuildID this src/ was converted from). DRH Launcher compares it to the
 live public branch so it can warn when official Dungeon Rampage has moved on.
-
-api is modding.Version.API. The launcher compares it to mod.json.
 EOF
 }
 
@@ -268,19 +266,6 @@ def read_steam_buildid(path: Path) -> int:
 
 steam_buildid = read_steam_buildid(stamp_file)
 
-
-def read_mod_api(project: Path) -> int:
-    path = project.parent / "src-modding" / "modding" / "Version.hx"
-    if not path.is_file():
-        raise SystemExit(f"Could not read the modding API from {path}")
-    match = re.search(r"static inline final API:Int = (\d+);", path.read_text(encoding="utf-8"))
-    if match is None:
-        raise SystemExit(f"Could not read modding.Version.API from {path}")
-    return int(match.group(1))
-
-
-mod_api = read_mod_api(project_file)
-
 archive_names = {
     "linux-x64": f"Dungeon.Rampage.Haxe.{version}.Linux.tar.gz",
     "windows-x64": f"Dungeon.Rampage.Haxe.{version}.Windows.zip",
@@ -387,7 +372,6 @@ if project_default != str(auto_fallback):
 
 manifest = {
     "version": version,
-    "api": mod_api,
     "steam_buildid": steam_buildid,
     "platforms": platforms,
     "launch_options": {
