@@ -1,6 +1,6 @@
 # Example mods
 
-Run DRH with `--mods-dir <absolute path to this folder>`. `enabled.json` loads all of them; the game writes `last-run.json` here. Every one builds on the `api` mod, which is not in the repository yet: without it, each fails with `dependency api missing`.
+Run DRH with `--mods-dir <absolute path to this folder>`. `enabled.json` loads all of them; the game writes `last-run.json` here. Every one builds on the `api` mod, which has its own repository (not published yet): without it, each fails with `dependency api missing`.
 
 | Id | Role | Expected in `last-run.json` |
 | --- | --- | --- |

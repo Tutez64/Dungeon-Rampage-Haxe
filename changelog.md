@@ -4,14 +4,16 @@ At tag time, copy these sections into the GitHub release notes under `Changelog`
 ### Added
 
 - Mods can load through hxScript when the launcher passes `--mods-dir`. The
-  game reads `enabled.json`, compiles every enabled mod in one world, and
-  runs `onInit` / `onReady` / `onDispose`. Gameplay hooks cover hero spawn,
-  dungeon floors, town, and key presses. Mods can read the players in a
-  dungeon (hero, level, weapons), show the game's portraits, weapon icons and
-  weapon tooltips, and add a player as a friend, block or report them. The
-  session writes `mods/last-run.json`. `replace` is not available yet.
-- `mods/` holds an example mod that uses the whole modding API and
-  checks it as it runs, plus test mods for load and runtime failures. Run the
+  game reads `enabled.json`, compiles every enabled mod in one world, and runs
+  their startup and shutdown hooks. A mod that fails, or whose dependency
+  fails, is silenced without stopping the others. The session writes
+  `mods/last-run.json`. `replace` is not available yet.
+- Mods build on the official `api` mod, released on its own: players in a
+  dungeon (hero, level, weapons), the game's portraits, weapon icons and
+  tooltips, adding a player as a friend, blocking or reporting them, and
+  events for heroes, floors, town and key presses.
+- `mods/` holds an example mod that uses the whole `api` mod and checks it as
+  it runs, plus test mods for load, runtime and dependency failures. Run the
   game with `--mods-dir` pointing at it.
 - Release manifests now include the official Steam BuildID this version was
   converted from, so DRH Launcher can warn when official Dungeon Rampage has

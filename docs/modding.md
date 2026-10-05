@@ -177,8 +177,8 @@ Disjoint-method merge lives in hxScript; DRH calls `replace` and gets one class 
 
 - The **stable** API is `mods.api.*`, nothing else. The core (`modding.*`), `facade.DBFacade`, `actor.*`, `combat.*`, `uI.*` are host types: usable via `extends` / `replace`, not covered.
 - The `api` mod's version is semver over its written contract: when an event fires, what a wrapper represents, the empty-until-event rules. A fix is a patch, an addition a minor, a change to that text a major. A core change is absorbed by `api` where it can be; its major moves only when its own contract does. Game content behind a stable reading, and OpenFL/Lime used to draw on the overlay, are outside it.
-- The `api` mod is `extends`: its `drh` lists the tags it was verified on. Every tag's CI recompiles it against the release and publishes a version whose `drh` contains that tag (a patch when the code did not change), so every release has a working `api`. The launcher installs the highest `api` version whose `drh` contains the installed tag and that satisfies every enabled mod ([`mod.json`](#modjson)). The game does not check versions.
-- Official examples for all three kinds live in [`mods/`](../mods/) (stable only so far) and are recompiled with `api` on every tag. A signature break fails that compile. Whether a call site still matches the written when/what is review.
+- The `api` mod is `extends`: its `drh` lists the tags it was verified on. It lives in its own repository, published and indexed like any mod; DRH pins it as the `mods/api` submodule, the version its examples and test mods run against. On every DRH tag, that repository's CI runs the release with `--mods-dir` until `last-run.json` reports `api` loaded and compiled: `onInit` precedes any connection, so this needs no Steam account. It then drafts a version whose `drh` adds the tag (a patch when the code did not change). Everything past `onReady` needs an account and stays manual: the draft is published after a dungeon run with `api_tour` when the core or what the wrappers read changed. Social actions are never exercised. The launcher installs the highest `api` version whose `drh` contains the installed tag and that satisfies every enabled mod ([`mod.json`](#modjson)). The game does not check versions.
+- Official examples for all three kinds live in [`mods/`](../mods/) (stable only so far) and load with the pinned `api` on every tag. A signature break fails that load. Whether a call site still matches the written when/what is review.
 
 ## Mod kinds
 
@@ -404,7 +404,7 @@ Three roles, kept separate so a nicer front can land later without moving mods:
 | Files | Author-hosted zip (e.g. GitHub Release) | same, plus optional mirrors |
 | Human catalog | **Minimal list in DRHL** | polish in DRHL and/or a website reading the same index |
 
-The index **points**. It does not contain community mods. Official example mods may live in the DRH tree; third-party mods do not.
+The index **points**. It does not contain community mods. Official example mods may live in the DRH tree; third-party mods do not, nor does `api`, which has its own repository ([Versioning](#versioning)).
 
 A listing is an **artifact**, not a repo: `id + version + sha256 + download URL` plus its `mod.json` fields. Trusting `github.com/alice/cool-hud` forever would auto-approve the next Release. Reviewing "the repo" once does not review v1.2. A new version is not visible until it is a new index entry (PR). CI can check that the zip opens, `mod.json` matches, and the hash is correct; a human still diffs against the last indexed version. **Auto-ingest of GitHub Releases without the index is out.**
 
@@ -516,7 +516,7 @@ Needed before a real host; not a restatement of the rules above.
 4. **Done**, except `replace`. `src-modding/` loads `--mods-dir` into one world, runs the lifecycle, re-registers the overlay, and bakes the release tag (no `V`) into the host. `uncaughtError` and the mod `exiting` listener sit at the top of the constructor. Still later: `ASCompat.createInstance` consulting the `replace` table, once the fork has `replace`.
 5. Launcher: index fetch, catalog install, `enabled.json`, `--mods-dir`, `last-run.json` display — no destructive overlay.
 6. Index repository (separate from DRH / DRHL), PR + CI for new versions.
-7. **Done**, except the tag CI that publishes `api` ([Versioning](#versioning)) and the `api` mod's place in the repository. The wrappers live in `mods/api/`, core events hand game objects, dependency failures propagate.
+7. **Done**, except the `api` repository, its submodule in DRH, and the tag CI that drafts its versions ([Versioning](#versioning)). The wrappers live in the `api` mod, core events hand game objects, dependency failures propagate.
 
 ## Out of scope for this document
 
