@@ -29,6 +29,8 @@ The game owns the runtime. The launcher owns the folder, enablement, and launch.
 | Trust for updates | decided | Trust artifacts (`id` + version + SHA-256), not author repos. |
 | v1 discovery UI | decided | Minimal catalog in DRHL, same index a later site can reuse. |
 | Index schema / repo URL | open | Draft shape in [Distribution](#distribution). |
+| Mod repository and publishing | decided | Repo = mod folder, tools from `DRH-Mod-Template`, `vX.Y.Z` tags, flat zip, PR to the index with git. [Mod repository](#mod-repository) |
+| Mod checks: who implements them | open | DRH Launcher commands (one implementation, also run by the index CI) or the template's scripts. [Mod repository](#mod-repository) |
 | Thunderstore / Nexus / itch as mirrors | open | Optional later; must not replace `mod.json` or the index. |
 | Resource overlay rules | open | `Resources/` is composited at runtime; precedence, SWF vs JSON, and `Locale/` merge are unspecified. No separate `locale/` tree. |
 | Type blacklist | decided | None. Interpreted and compiled see the same types. [Compilation](#compilation) |
@@ -408,15 +410,30 @@ The index **points**. It does not contain community mods. Official example mods 
 
 A listing is an **artifact**, not a repo: `id + version + sha256 + download URL` plus its `mod.json` fields. Trusting `github.com/alice/cool-hud` forever would auto-approve the next Release. Reviewing "the repo" once does not review v1.2. A new version is not visible until it is a new index entry (PR). CI can check that the zip opens, `mod.json` matches, and the hash is correct; a human still diffs against the last indexed version. **Auto-ingest of GitHub Releases without the index is out.**
 
-Sideload (Open mods folder / install from zip) stays, labeled unreviewed.
+Sideload (Open mods folder / install from zip / a GitHub repository link) stays, labeled unreviewed. A repository link installs the zip of its latest published release, never a branch.
 
 Thunderstore, Nexus, itch.io are **not** the identity of a DRH mod. They may become mirrors of the same zip with a generated extra manifest. Nexus is the weakest legal fit for a fan port. Steam Workshop is out of scope (DRH is not a Steam app).
 
 The Mods page (fetch, install, enable, order, `last-run` display) is specified in the launcher architecture. This document owns the shared files and `--mods-dir`.
 
+### Mod repository
+
+A mod's repository **is** its folder: `mod.json`, `src/`, `Resources/` at the root, plus `README.md`, `LICENSE` and `.github/`. Cloning it into a mods folder runs it as is, and DRH can pin one as a submodule (`mods/api`). Its name is free; `DRH-Mod-<Name>` is the suggestion. The GitHub topic `drh-mod` is required, so mods can be found.
+
+`DRH-Mod-Template` is a GitHub template repository holding tools, not a mod: modder documentation, `.github/`, and what creates the mod's skeleton, checks it, and publishes it. A mod starts from it with "Use this template" (no history, no fork link). Its workflows are reusable ones pinned to a moving major tag (`@v1`): fixes reach every mod, only a breaking change needs a new major. A modder can edit the tools; it gains nothing, since the index runs the same checks again.
+
+Checks that need no game: the `mod.json` schema (`id` rules, `version`, `api` and dependency syntax, `drh` present exactly when `uses` names `extends` or `replace`), the package rule for every file under `src/`, no `import.hx`. Loading and behaviour are the author's own run of the game.
+
+Publishing:
+
+1. Tag `vX.Y.Z`, equal to `mod.json` `version`, or nothing is built.
+2. The workflow checks, builds the zip from a fixed list (`mod.json`, `src/`, `Resources/`, `LICENSE`, flat at its root, extracted as is into `mods/<id>/`), and drafts a GitHub release with the zip and its index entry.
+3. The author tests that zip, then publishes the release.
+4. The tools add the entry on a branch of the author's fork of the index (forked once, in the browser), push it with git, and open the pre-filled compare page: one click opens the PR. Git and a GitHub account are required; nothing else is installed and no token is handed out.
+
 ### Index entry (draft)
 
-Not frozen. Enough to implement a launcher list:
+Not frozen. One file per version (`mods/<id>/<version>.json`), so concurrent PRs do not conflict; the index CI checks each one and generates the static file the launcher reads (served as a file, not through the GitHub API, whose unauthenticated rate limit would throttle the catalog):
 
 ```json
 {
@@ -428,7 +445,7 @@ Not frozen. Enough to implement a launcher list:
   "api": "1.2",
   "uses": [],
   "dependencies": { "cool_lib": "0.3" },
-  "url": "https://github.com/example/some-mod/releases/download/0.1.0/some-mod-0.1.0.zip",
+  "url": "https://github.com/example/some-mod/releases/download/v0.1.0/some_mod-0.1.0.zip",
   "sha256": "...",
   "source": "https://github.com/example/some-mod"
 }
