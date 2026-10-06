@@ -98,7 +98,8 @@ class ModContext {
 	/**
 	 * A key goes down, with its key code: once per press, not for a held key's repeats, and not while a
 	 * text field such as the chat has focus.
-	 * Return true to keep the key: its default action (Tab moving the focus to the chat) does not run.
+	 * Return true to keep the key: the game never sees that press, neither its own shortcuts (Enter
+	 * opening the chat) nor OpenFL's (Tab moving the focus), nor its repeats and release.
 	 */
 	public function onKeyDown(handler:UInt->Bool):ModSubscription {
 		return listen(Host.KEY_DOWN, handler);

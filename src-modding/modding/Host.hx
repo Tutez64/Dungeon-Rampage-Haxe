@@ -43,6 +43,9 @@ class Host {
 	/** Above the letterbox (1000), the side backgrounds (1001) and the session id (1002). */
 	static inline final OVERLAY_LAYER:Float = 1003;
 
+	/** Above every stage key listener of the game (all at 0), so mods see a key first and can keep it. */
+	static inline final KEY_PRIORITY = 1000;
+
 	static inline final MODS_DIR_ARGUMENT = "--mods-dir";
 
 	/** The official mod every other one builds on. Its entry is the only one extending `modding.Mod` directly. */
@@ -284,22 +287,22 @@ class Host {
 		if (keysHooked || stage == null)
 			return;
 		keysHooked = true;
-		stage.addEventListener("keyDown", onStageKey);
-		stage.addEventListener("keyUp", function(event:flash.events.KeyboardEvent) keysDown.remove(event.keyCode));
+		stage.addEventListener("keyDown", onStageKey, false, KEY_PRIORITY);
+		stage.addEventListener("keyUp", onStageKeyUp, false, KEY_PRIORITY);
 		// A key released while the window is in the background never sends its keyUp.
 		stage.addEventListener("deactivate", function(_) keysDown.clear());
 	}
 
 	/**
 	 * Keys typed into a text field (chat, search) are not for mods, and neither are a held key's
-	 * repeats. A handler that returns true keeps the key: its default action, such as Tab moving the
-	 * focus to the chat, does not run.
+	 * repeats. A handler that returns true keeps the key: the game never sees that press, neither its
+	 * own shortcuts (Enter opening the chat) nor OpenFL's (Tab moving the focus), nor its repeats.
 	 */
 	static function onStageKey(event:flash.events.KeyboardEvent):Void {
 		if (keysDown.exists(event.keyCode)) {
 			// A kept key stays kept while held.
 			if (keysDown.get(event.keyCode))
-				event.preventDefault();
+				keep(event);
 			return;
 		}
 		keysDown.set(event.keyCode, false);
@@ -323,8 +326,21 @@ class Host {
 		}
 		if (kept) {
 			keysDown.set(event.keyCode, true);
-			event.preventDefault();
+			keep(event);
 		}
+	}
+
+	/** The release of a kept key is hidden too: the game never saw it go down. */
+	static function onStageKeyUp(event:flash.events.KeyboardEvent):Void {
+		if (keysDown.get(event.keyCode) == true)
+			keep(event);
+		keysDown.remove(event.keyCode);
+	}
+
+	/** Stops the game's stage listeners, which run after the host's, and OpenFL's default action. */
+	static function keep(event:flash.events.KeyboardEvent):Void {
+		event.stopImmediatePropagation();
+		event.preventDefault();
 	}
 
 	static function emit(event:String, payload:Dynamic):Void {

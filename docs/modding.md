@@ -236,7 +236,7 @@ Subscribe from `onInit` or `onReady` with `ModContext.on<Event>(handler)` (`onHe
 | `floorEnter` / `floorExit` | `DistributedDungeonFloor` | A dungeon floor starts (grid built, map node set) / is destroyed. |
 | `tablesLoaded` | — | `ManagersLoadedEvent`: tables in, account not yet parsed against them. Window to mutate tables (`extends` use). |
 | `townEnter` / `townExit` | — | `TownState` entered / left, including `ReloadTownState`. |
-| `keyDown` | key code | A key goes down: once per press, not while a text field (chat) has focus. A handler returning `true` keeps the key: its default action does not run. |
+| `keyDown` | key code | A key goes down: once per press, not while a text field (chat) has focus. A handler returning `true` keeps the key: the game never sees that press (its shortcuts, OpenFL's Tab focus, repeats, release). |
 
 `ModContext`: overlay layer and view size, log, `replace`, these subscriptions, `facade` (from `onReady`, a host type), and `alive`, false once the mod failed, so another mod holding handlers for it stops calling them.
 
