@@ -9,7 +9,7 @@ Run DRH with `--mods-dir <absolute path to this folder>`. `enabled.json` loads a
 | `null_ready` | Calls a method on `null` in `ready`. The game keeps running; the mod goes quiet. | `failed`, `Null Object Reference` |
 | `null_field` | Reads `state.floor.number` in `init`, before any floor exists. | `failed`, `Null access to field number` |
 | `not_installed` | Listed in `enabled.json`, no folder. | `skipped` |
-| `dep_ready` | Depends on `null_ready` but loads before it. Goes quiet when `null_ready` fails in `ready`. | `failed`, `dependency null_ready failed` |
+| `dep_ready` | Depends on `null_ready` but is listed before it: the host starts it after. Goes quiet when `null_ready` fails in `ready`, before its own `ready`. | `failed`, `dependency null_ready failed` |
 | `dep_missing` | Depends on `not_installed`. Never loads. | `failed`, `dependency not_installed missing` |
 | `dep_failed` | Depends on `broken_init`. Never reaches `init`. | `failed`, `dependency broken_init failed` |
 | `dep_chain` | Depends on `dep_failed` only. | `failed`, `dependency dep_failed failed` |

@@ -35,7 +35,7 @@ The game owns the runtime. The launcher owns the folder, enablement, and launch.
 | Type blacklist | decided | None. Interpreted and compiled see the same types. [Compilation](#compilation) |
 | Host build (cppia) | decided | `-dce no`, force-include std, patch hxcpp, JIT on, verbose log, `HXCPP_CHECK_POINTER`. [Compilation](#compilation) |
 | Mod `id` and zip extract | decided | `id` = folder = package `mods.<id>`. Regex + keyword/reserved-name lists. No zip-slip, no size cap. [`mod.json`](#modjson) |
-| `dependencies` cycles | decided | Not an error. Launcher warns, keeps user order inside the cycle. [Passing the list](#passing-the-list) |
+| `dependencies` cycles | decided | Not an error. Order inside a cycle is not defined. [Passing the list](#passing-the-list) |
 | `import.hx` in a mod | decided | Skipped with a warning. [`mod.json`](#modjson) |
 | `drh` in `mod.json` | decided | Required with `extends` / `replace`, omitted for `api` only. Closed tag string. Warns, does not block. [`mod.json`](#modjson) |
 
@@ -248,7 +248,7 @@ Pattern: subscribe in `init`, read tables and account in `ready`, react to spawn
 
 `context.state` holds the live window, shared by every mod: the account (read live, from `ready`), the floor in progress, the heroes on it (a copy), and the players met in the dungeon in progress (a copy). A hero and its player are two wrappers. `Hero` is what a player plays on one floor (class, level, `weapons` as `Weapon` copies); each floor gives a new one, and its fields go empty at `heroDespawned`. `Player` is the account behind it (`hero.player`): one instance from its first hero to the return to town, listed in `state.players` with those who left, with `hero` null while it has none. It holds the screen name, `isFriend`, and the end screen's `addFriend`, `block` and `report` (the game's own popups for the last two). Game art comes as plain sprites that load themselves and are released when removed from their parent: `Player.createPortrait` (the skin icon, as on the end screen) and `Weapon.createIcon` (icon on its rarity background, with the game's tooltip on hover, drawn above the overlay).
 
-Load order follows `enabled.json`. Outcomes land in [last-run.json](#last-run-report). `modding.Host` is not API: its hooks are private, `@:allow`ed to their game callers.
+Load order is `enabled.json`'s, dependencies first ([Passing the list](#passing-the-list)). Outcomes land in [last-run.json](#last-run-report). `modding.Host` is not API: its hooks are private, `@:allow`ed to their game callers.
 
 ## Disk layout
 
@@ -261,7 +261,7 @@ Mods live outside `Dungeon Rampage Haxe/current/`, so they survive updates and r
     current/          # game, replaced on every update
     previous/         # launcher rollback
   mods/
-    enabled.json      # launcher-owned: enabled ids, load order (dependencies first)
+    enabled.json      # launcher-owned: enabled ids, the user's load order
     last-run.json     # game-owned: last session outcome per mod
     some_mod/         # folder name = id
       mod.json
@@ -290,9 +290,9 @@ The launcher writes `<install-dir>/mods/enabled.json`:
 }
 ```
 
-Array order is load order. The launcher writes it so every mod comes **after** its dependencies (`api` included); the user's order is kept where the graph leaves it free. Disabled mods are omitted. Enabling a mod installs and enables its missing dependencies ([`mod.json`](#modjson)). If one cannot be (absent from the index, disabled by the user), the launcher warns and still writes the file; the game fails the mod (`dependency <id> missing`).
+Array order is the user's load order. The host starts every mod **after** its dependencies (`api` included), whatever their place in the file, and keeps that order otherwise; `last-run.json` lists mods in the order they started. Disabled mods are omitted. Enabling a mod installs and enables its missing dependencies ([`mod.json`](#modjson)). If one cannot be (absent from the index, disabled by the user), the launcher warns and still writes the file; the game fails the mod (`dependency <id> missing`).
 
-**Cycles** are not an error. Sort on strongly connected components: a cycle is one block against the rest, user order **inside** it, warning naming the members (`a ↔ b: load order between them is yours`). Enabling is never refused. In one shared batch, mutual imports compile; the only undefined thing is which `onInit` runs first. The host never sorts; it follows `enabled.json` as written.
+**Cycles** are not an error, and enabling is never refused. In one shared batch, mutual imports compile; the only undefined thing is which `onInit` of the cycle runs first.
 
 If an id in `enabled.json` has no folder / no `mod.json`, the game **skips** it, logs, and records `skipped` in `last-run.json`. It does not abort boot. On the Mods page scan (not during `--play`), the launcher drops those ids and rewrites the file.
 

@@ -408,6 +408,7 @@ class Host {
 			seen.set(name, true);
 			records.push(resolve(name));
 		}
+		dependenciesFirst();
 		checkDependencies();
 		dropFailedModules();
 		startWorld();
@@ -758,6 +759,29 @@ class Host {
 		for (other in records)
 			if (other.status == "ok" && other.dependencies.indexOf(record.id) >= 0)
 				silence(other, "dependency " + record.id + " failed");
+	}
+
+	/**
+	 * Puts every mod after the mods it depends on (`api` included), in `enabled.json` order otherwise,
+	 * so a dependency's `onInit` and `onReady` always run first. Inside a cycle the order is not defined.
+	 */
+	static function dependenciesFirst():Void {
+		var ordered:Array<ModRecord> = [];
+		var visited = new Map<ModRecord, Bool>();
+		function visit(record:ModRecord):Void {
+			if (visited.exists(record))
+				return;
+			visited.set(record, true);
+			for (id in record.dependencies) {
+				var dependency = recordById(id);
+				if (dependency != null)
+					visit(dependency);
+			}
+			ordered.push(record);
+		}
+		for (record in records)
+			visit(record);
+		records = ordered;
 	}
 
 	/**
