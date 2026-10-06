@@ -333,13 +333,15 @@ Draft, not frozen:
 
 | Field | Role |
 | --- | --- |
-| `drh` / `started` | Tag-number string of the game that wrote the file (`"20"`, no `V` — same space as `mod.json`) and UTC start time. The launcher compares `started` with the Play time **it** recorded; `started` alone cannot reveal a crash before the first write (the previous run's file is still there). |
+| `drh` / `started` | Tag-number string of the game that wrote the file (`"20"`, no `V` — same space as `mod.json`) and UTC start time, for display. |
 | `ready` | `false` until `onReady` has run; stays `false` when boot never gets there (`SocketErrorState`, `blockCheater()`). A mod `ok` with `ready: false` only got `onInit`. While the game is still loading the file also says `false`; the launcher disambiguates with process state (alive → loading, exited → boot stopped before `LoadingFinished`). No active avatar still reports `true`. |
 | `status` | `ok` / `failed` (its own error or a dependency's) / `skipped` (id in `enabled.json` but folder, `mod.json`, or valid `id` missing) |
 | `mode` | `compiled` if every module of the mod compiled, `interpreted` if none did, `mixed` otherwise. |
 | `error` | Present on `failed`, `mixed`, an interpreted skip, or a `replace` overlap. One line (`2 modules left interpreted`). Per-module reasons stay in the session log. |
 
-Write after compile + `onInit` (`ready: false`). Rewrite after `onReady` (`ready: true`, plus any `onReady` failure). Update the same file if a later `replace` conflict happens. A crash before the write leaves the previous file; treat it as stale, not live IPC. A missing file (first launch, or crash before the first write) is the same as a stale `started`.
+Write after compile + `onInit` (`ready: false`). Rewrite after `onReady` (`ready: true`, plus any `onReady` failure). Update the same file if a later `replace` conflict happens. Not live IPC.
+
+The launcher deletes the file before each Play with `--mods-dir`, so a file present is this session's. Missing: still booting while the process is alive, a crash before the first write once it has exited. A file that does not parse (read during a write, or cut by a crash) is read again once shortly after, then counts as missing.
 
 The launcher reads it when the Mods page is shown. That is where replace overlap becomes visible for **that** mod.
 
