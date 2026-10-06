@@ -29,8 +29,7 @@ The game owns the runtime. The launcher owns the folder, enablement, and launch.
 | Trust for updates | decided | Trust artifacts (`id` + version + SHA-256), not author repos. |
 | v1 discovery UI | decided | Minimal catalog in DRHL, same index a later site can reuse. |
 | Index schema / repo URL | open | Draft shape in [Distribution](#distribution). |
-| Mod repository and publishing | decided | Repo = mod folder, tools from `DRH-Mod-Template`, `vX.Y.Z` tags, flat zip, PR to the index with git. [Mod repository](#mod-repository) |
-| Mod checks: who implements them | open | DRH Launcher commands (one implementation, also run by the index CI) or the template's scripts. [Mod repository](#mod-repository) |
+| Mod repository and publishing | decided | Repo = mod folder from `DRH-Mod-Template`, DRH Launcher commands for every step (checks implemented once, also run by the index CI), `vX.Y.Z` tags, flat zip, PR to the index with git. [Mod repository](#mod-repository) |
 | Thunderstore / Nexus / itch as mirrors | open | Optional later; must not replace `mod.json` or the index. |
 | Resource overlay rules | open | `Resources/` is composited at runtime; precedence, SWF vs JSON, and `Locale/` merge are unspecified. No separate `locale/` tree. |
 | Type blacklist | decided | None. Interpreted and compiled see the same types. [Compilation](#compilation) |
@@ -420,16 +419,24 @@ The Mods page (fetch, install, enable, order, `last-run` display) is specified i
 
 A mod's repository **is** its folder: `mod.json`, `src/`, `Resources/` at the root, plus `README.md`, `LICENSE` and `.github/`. Cloning it into a mods folder runs it as is, and DRH can pin one as a submodule (`mods/api`). Its name is free; `DRH-Mod-<Name>` is the suggestion. The GitHub topic `drh-mod` is required, so mods can be found.
 
-`DRH-Mod-Template` is a GitHub template repository holding tools, not a mod: modder documentation, `.github/`, and what creates the mod's skeleton, checks it, and publishes it. A mod starts from it with "Use this template" (no history, no fork link). Its workflows are reusable ones pinned to a moving major tag (`@v1`): fixes reach every mod, only a breaking change needs a new major. A modder can edit the tools; it gains nothing, since the index runs the same checks again.
+`DRH-Mod-Template` is the skeleton: `mod.json`, `src/Main.hx` (`class Main extends mods.api.Mod`), an empty `Resources/`, `README.md` (pointing to the modder documentation online), `LICENSE`, and `.github/workflows/release.yml`, which only calls a reusable workflow pinned to a moving major tag (`@v1`): fixes reach every mod, only a breaking change needs a new major. Nothing else is copied into a mod, so nothing there needs updating.
 
-Checks that need no game: the `mod.json` schema (`id` rules, `version`, `api` and dependency syntax, `drh` present exactly when `uses` names `extends` or `replace`), the package rule for every file under `src/`, no `import.hx`. Loading and behaviour are the author's own run of the game.
+Every step is a DRH Launcher command. The checks exist once, in the launcher; the release workflow and the index CI run its Linux binary, and a modder editing them gains nothing.
+
+| Command | Does |
+| --- | --- |
+| `--new-mod <dir>` | Copies the template with git into a fresh history, asks for `id`, `name` and `author` and writes them, then opens `github.com/new` pre-filled. The repository is created there, with the topic `drh-mod`; the first push is plain git. |
+| `--check-mod <dir>` | Checks what needs no game: the `mod.json` schema (`id` rules, `version`, `api` and dependency syntax, `drh` present exactly when `uses` names `extends` or `replace`), values left from the template, the package rule for every file under `src/`, no `import.hx`. |
+| `--run-mod <dir>` | Installs the mod's dependencies (`api` included) from the index into a cache, composes a temporary mods folder with them and `<dir>`, and launches DRH on it. Loading and behaviour are the author's own run. |
+| `--pack-mod <dir>` | Checks, then builds the zip from a fixed list (`mod.json`, `src/`, `Resources/`, `LICENSE`, flat at its root, extracted as is into `mods/<id>/`) and its index entry. |
+| `--submit-mod <dir>` | Adds the index entry of the published release on a branch of the author's fork of the index (forked once, in the browser), pushes it with git, and opens the pre-filled compare page: one click opens the PR. |
 
 Publishing:
 
 1. Tag `vX.Y.Z`, equal to `mod.json` `version`, or nothing is built.
-2. The workflow checks, builds the zip from a fixed list (`mod.json`, `src/`, `Resources/`, `LICENSE`, flat at its root, extracted as is into `mods/<id>/`), and drafts a GitHub release with the zip and its index entry.
+2. The release workflow packs and drafts a GitHub release with the zip and its index entry.
 3. The author tests that zip, then publishes the release.
-4. The tools add the entry on a branch of the author's fork of the index (forked once, in the browser), push it with git, and open the pre-filled compare page: one click opens the PR. Git and a GitHub account are required; nothing else is installed and no token is handed out.
+4. `--submit-mod`. Git and a GitHub account are required; nothing else is installed and no token is handed out.
 
 ### Index entry (draft)
 
@@ -453,7 +460,7 @@ Not frozen. One file per version (`mods/<id>/<version>.json`), so concurrent PRs
 
 `source` is documentation (issues, code), not a download pipe. Yanking a version is an index change (tombstone or removal).
 
-Out of v1, same index: ratings, galleries, collections, dependency solving beyond [one version per id](#modjson), in-launcher publishing, a separate website.
+Out of v1, same index: ratings, galleries, collections, dependency solving beyond [one version per id](#modjson), a publishing UI in the launcher (its [commands](#mod-repository) cover it), a separate website.
 
 ## Compilation
 
