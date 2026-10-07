@@ -479,6 +479,7 @@ Intended game build flags (`hxscript` = **our fork**):
 -D hxscript_bridge_classpath=src,src-steam,compat,src-modding   # classpath entries walked with an empty package
 -D hxscript_bridge_exclude=DungeonBustersProject,...        # value in project.xml, explained below
 -D hxscript_bridge_packages=openfl,lime,swf,steamwrap       # stock; whole trees until measured
+-D hxscript_bridge_eager                                     # type each bridge before the next: hundreds of bases overflow the compiler otherwise
 -dce no                                                     # hxScript's own cppia setting
 --macro include('haxe', true, ['haxe.macro', 'haxe.atomic.AtomicObject'])   # force-type the std; AtomicObject is #error on hxcpp
 --macro include('sys', true, ['sys.db'])                    # sys.db is @:cffi over hxcpp sqlite/mysql
