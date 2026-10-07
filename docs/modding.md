@@ -191,7 +191,7 @@ Every mod depends on `api` (`mod.json` `api` field). `uses` says what it touches
 | `extends` | Subclasses or calls **host** types but does **not** `replace` vanilla `new`. Helpers, `new MyRepeater()`, reading public internals. | Tied to those class/method names. Starling / conversions can break it even if `api` is unchanged. | Usually fine with others. Still shares live objects with a `replace` on the same type (`is RepeaterWeaponController` remains true). |
 | `replace` | Explicit `replace(HostClass, Sub)` at `onInit`. Host `new HostClass(...)` becomes the subclass (merge if rewritten methods/fields/`new` are disjoint). | Same host-type fragility as `extends`, plus construction. | Conflicts when rewritten surfaces overlap. One occupancy per method/field/`new`. |
 
-A mod may list both (`uses: ["extends", "replace"]`). Catalog / index show the **strongest** present: `replace` > `extends` > stable only (labelled `api`). Index review checks the declare matches the code (honor + grep). Sideload can lie; label it.
+A mod may list both (`uses: ["extends", "replace"]`). Catalog / index show the **strongest** present: `replace` > `extends` > stable only (labelled `api`). Index review checks the declare matches the code (honor + grep). Sideload can lie; label it. The `api` mod is shown as official, without that label or its warning; its `extends` and `drh` still drive which version is installed.
 
 Players see a short warning on `extends` / `replace` (may break on game updates; `replace` may clash), not a fairness lecture.
 
