@@ -623,6 +623,22 @@ class Host {
 			guard(module, function() {
 				module.startTypes(world);
 			});
+		// A static whose initialiser needed a type not initialised yet was deferred to here, as in `Environment.start`.
+		var types = new Map<String, hxscript.types.IScriptedType>();
+		for (module in modules)
+			for (name => type in module.types)
+				types.set(name, type);
+		var index = world.onInitialized.length;
+		while (--index >= 0) {
+			var callback = world.onInitialized[index];
+			try {
+				if (!callback(types))
+					world.onInitialized.remove(callback);
+			} catch (e:Dynamic) {
+				world.onInitialized.remove(callback);
+				note("warn", "modding: deferred static initialiser: " + errorText(e));
+			}
+		}
 		// hxScript catches a static initialiser's throw and keeps it on the class (`staticFailure`).
 		for (module in modules)
 			for (type in module.types)
