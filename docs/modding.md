@@ -370,15 +370,17 @@ Shared launcher/game contract.
 | Field | Role |
 | --- | --- |
 | `id` | Stable identifier, install folder, and the mod's **package**: every source file is in `mods.<id>` or a sub-package. Must match `^[a-z][a-z0-9_]{1,62}[a-z0-9]$` (3–64, snake_case, letter start, no trailing underscore) and must **not** be a Haxe keyword or a Windows reserved device name. Index CI, launcher install, and host skip all apply the same regex + lists. Display name stays in `name`. |
-| `name` | Display name |
-| `description` | One line for the catalog. |
+| `name` | Display name, at most 40 characters. |
+| `description` | One line for the catalog, at most 120 characters. |
 | `version` | `MAJOR.MINOR.PATCH`, digits only. Semver over what other mods may rely on. |
-| `author` | Author |
+| `author` | Display name of the author or team, at most 40 characters. Free text, not an account. |
 | `api` | Version of the [`api` mod](#versioning) this one needs. **Required**, except in the `api` mod itself. Same syntax as a dependency. |
 | `drh` | Tags this artifact was built for (no `V`, no `>=`). `"20"`, `"20,21"`, or `"20-22"` (closed, inclusive). **Required** if `uses` contains `extends` or `replace`; omit otherwise. Never blocks: the launcher warns when the installed tag is not in the set. Untagged local builds (`"0"`) skip it. |
 | `entry` | Short class name, resolved as `mods.<id>.<entry>` (e.g. `Main` → `mods.some_mod.Main`, extends `mods.api.Mod`). Cannot name anything outside the mod's package. |
 | `uses` | `extends` and/or `replace`. Empty: stable only. |
 | `dependencies` | Other mods whose types this one imports, as `{ "id": "version" }`. Not `api`, which has its own field. May be empty or absent. A cycle is not an error ([Passing the list](#passing-the-list)). |
+
+Lengths count characters. `--check-mod` and the index CI refuse a longer value.
 
 **Versions.** `api` and each dependency take `"x.y"` or `"x.y.z"`: the same major, and not older (`"1.2"` accepts `1.2.0` up to anything below `2.0.0`). With major `0`, the minor is the major (`"0.3"` accepts `0.3.x` only). The launcher installs and enables, from the index, the highest version that satisfies every enabled mod naming it. For `extends` / `replace` (`api` included), one whose `drh` contains the installed tag comes first; when none does, the highest satisfying version is installed anyway, with the `drh` warning. One version per id; when no version satisfies everyone, it keeps the installed one and warns. No backtracking across dependencies' own constraints. The game only checks that dependencies loaded ([Lifecycle](#lifecycle)).
 
@@ -428,7 +430,7 @@ Every step is a DRH Launcher command. The checks exist once, in the launcher; th
 | Command | Does |
 | --- | --- |
 | `--new-mod <dir>` | Copies the template with git into a fresh history, asks for `id`, `name` and `author` and writes them, then opens `github.com/new` pre-filled. The repository is created there, with the topic `drh-mod`; the first push is plain git. |
-| `--check-mod <dir>` | Checks what needs no game: the `mod.json` schema (`id` rules, `version`, `api` and dependency syntax, `drh` present exactly when `uses` names `extends` or `replace`), values left from the template, the package rule for every file under `src/`, no `import.hx`. |
+| `--check-mod <dir>` | Checks what needs no game: the `mod.json` schema (`id` rules, `version`, `api` and dependency syntax, `drh` present exactly when `uses` names `extends` or `replace`), values left from the template, the lengths, the package rule for every file under `src/`, no `import.hx`. |
 | `--run-mod <dir>` | Installs the mod's dependencies (`api` included) from the index into a cache, composes a temporary mods folder with them and `<dir>`, and launches DRH on it. Loading and behaviour are the author's own run. |
 | `--pack-mod <dir>` | Checks, then builds the zip from a fixed list (`mod.json`, `src/`, `Resources/`, `LICENSE`, flat at its root, extracted as is into `mods/<id>/`) and its index entry. |
 | `--submit-mod <dir>` | Adds the index entry of the published release on a branch of the author's fork of the index (forked once, in the browser), pushes it with git, and opens the pre-filled compare page: one click opens the PR. |
@@ -460,7 +462,7 @@ Not frozen. One file per version (`mods/<id>/<version>.json`), so concurrent PRs
 }
 ```
 
-`source` is documentation (issues, code), not a download pipe. Yanking a version is an index change (tombstone or removal).
+`source` is documentation (issues, code), not a download pipe. `--pack-mod` fills it from the repository the release workflow runs in. An `id` belongs to the `source` of its first entry: the index CI refuses a version from another one, unless a reviewer accepts a takeover. Yanking a version is an index change (tombstone or removal).
 
 Out of v1, same index: ratings, galleries, collections, dependency solving beyond [one version per id](#modjson), a publishing UI in the launcher (its [commands](#mod-repository) cover it), a separate website.
 
