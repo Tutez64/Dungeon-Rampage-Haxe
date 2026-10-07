@@ -2,13 +2,15 @@
 
 Run DRH with `--mods-dir <absolute path to this folder>`. `enabled.json` loads all of them; the game writes `last-run.json` here. Every one builds on the `api` mod, which has its own repository (not published yet): without it, each fails with `dependency api missing`.
 
+They test what DRH does: the host, the lifecycle, dependencies, the `api` mod, the build's flags. What hxScript does on its own is tested in hxScript's suites, not here.
+
 | Id | Role | Expected in `last-run.json` |
 | --- | --- | --- |
 | `api_tour` | Uses every `mods.api` member and checks the contract. Each check logs `ok` or `FAIL`; the panel top-left shows the totals. | `ok` |
 | `broken_init` | Subscribes, draws a red square, then throws in `init`. Nothing of it may show or fire afterwards. | `failed` |
 | `broken_static` | A static initialiser throws while the world starts. Never compiles, never reaches `init`; the other mods still compile. | `failed`, `static Main.value: thrown on purpose`, no `mode` |
-| `null_ready` | Calls a method on `null` in `ready`. The game keeps running; the mod goes quiet. | `failed`, `Null Object Reference` |
-| `null_field` | Reads `state.floor.number` in `init`, before any floor exists. | `failed`, `Null access to field number` |
+| `null_ready` | Calls a method on `null` in `ready`. `HXCPP_CHECK_POINTER` makes it a throw: the game keeps running; the mod goes quiet. | `failed`, `Null Object Reference` |
+| `null_field` | Reads `state.floor.number` in `init`, before any floor exists. Checks that the host turns hxScript's `strictNullAccess` on. | `failed`, `Null access to field number` |
 | `not_installed` | Listed in `enabled.json`, no folder. | `skipped` |
 | `dep_ready` | Depends on `null_ready` but is listed before it: the host starts it after. Goes quiet when `null_ready` fails in `ready`, before its own `ready`. | `failed`, `dependency null_ready failed` |
 | `dep_missing` | Depends on `not_installed`. Never loads. | `failed`, `dependency not_installed missing` |
