@@ -412,6 +412,7 @@ class Host {
 		checkDependencies();
 		dropFailedModules();
 		startWorld();
+		dropFailedModules();
 		compileWorld();
 		assignModes();
 		runInits();
@@ -580,7 +581,10 @@ class Host {
 		}
 	}
 
-	/** A mod that failed while loading declares nothing, so its other files do not start or compile. */
+	/**
+	 * A failed mod's files leave the world: after loading, so they do not start, and after the start,
+	 * so they do not compile. Its dependents' go with them.
+	 */
 	static function dropFailedModules():Void {
 		if (world == null)
 			return;
@@ -619,6 +623,14 @@ class Host {
 			guard(module, function() {
 				module.startTypes(world);
 			});
+		// hxScript catches a static initialiser's throw and keeps it on the class (`staticFailure`).
+		for (module in modules)
+			for (type in module.types)
+				if (type is hxscript.types.ScriptedClass) {
+					var scripted:hxscript.types.ScriptedClass = cast type;
+					if (scripted.staticFailure != null)
+						fail(recordById(moduleOwner.get(module.path)), "static " + scripted.name + "." + scripted.staticFailure);
+				}
 	}
 
 	/**

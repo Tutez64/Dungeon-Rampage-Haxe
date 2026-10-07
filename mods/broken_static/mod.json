@@ -1,0 +1,9 @@
+{
+  "id": "broken_static",
+  "name": "Broken static",
+  "version": "1.0.0",
+  "author": "DRH",
+  "api": "1.0",
+  "entry": "Main",
+  "dependencies": {}
+}

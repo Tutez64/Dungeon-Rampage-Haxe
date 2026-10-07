@@ -3,6 +3,7 @@
     { "id": "api" },
     { "id": "api_tour" },
     { "id": "broken_init" },
+    { "id": "broken_static" },
     { "id": "dep_ready" },
     { "id": "null_ready" },
     { "id": "null_field" },

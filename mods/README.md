@@ -6,6 +6,7 @@ Run DRH with `--mods-dir <absolute path to this folder>`. `enabled.json` loads a
 | --- | --- | --- |
 | `api_tour` | Uses every `mods.api` member and checks the contract. Each check logs `ok` or `FAIL`; the panel top-left shows the totals. | `ok` |
 | `broken_init` | Subscribes, draws a red square, then throws in `init`. Nothing of it may show or fire afterwards. | `failed` |
+| `broken_static` | A static initialiser throws while the world starts. Never compiles, never reaches `init`; the other mods still compile. | `failed`, `static Main.value: thrown on purpose`, no `mode` |
 | `null_ready` | Calls a method on `null` in `ready`. The game keeps running; the mod goes quiet. | `failed`, `Null Object Reference` |
 | `null_field` | Reads `state.floor.number` in `init`, before any floor exists. | `failed`, `Null access to field number` |
 | `not_installed` | Listed in `enabled.json`, no folder. | `skipped` |
