@@ -377,7 +377,7 @@ Shared launcher/game contract.
 | `name` | Display name, at most 64 characters. |
 | `description` | One line for the catalog, at most 120 characters. |
 | `version` | `MAJOR.MINOR.PATCH`, digits only. Semver over what other mods may rely on. |
-| `author` | Display name of the author or team, at most 32 characters. Free text, not an account. |
+| `author` | Display name of the author or team, at most 32 characters. Free text, not an account: the launcher shows the GitHub owner of the mod's repository next to it, and searches and sorts by that owner. |
 | `api` | Version of the [`api` mod](#versioning) this one needs. **Required**, except in the `api` mod itself. Same syntax as a dependency. |
 | `drh` | Tags this artifact was built for (no `V`, no `>=`). `"20"`, `"20,21"`, or `"20-22"` (closed, inclusive). **Required** if `uses` contains `extends` or `replace`; omit otherwise. Never blocks: the launcher warns when the installed tag is not in the set. Untagged local builds (`"0"`) skip it. |
 | `entry` | Short class name, resolved as `mods.<id>.<entry>` (e.g. `Main` → `mods.some_mod.Main`, extends `mods.api.Mod`). Cannot name anything outside the mod's package. |
@@ -501,7 +501,7 @@ A launcher refuses a `format` it does not know and asks to be updated. Each vers
 - `source` is the one the `id` belongs to, or a reviewer labels the takeover;
 - every dependency, `api` included, has an indexed version that satisfies it.
 
-It writes in the job summary the diff of the sources against the zip of the last indexed version: what the reviewer reads. A pull request only brings JSON; the CI downloads and inspects a zip, never runs it. Merging needs the CI and the owner's approval (`CODEOWNERS`, branch protection). On the main branch, the CI generates `index.json` and deploys it to Pages.
+It writes in the job summary the diff of the sources against the zip of the last indexed version, what the reviewer reads, and flags an `author` that changed since that version. A pull request only brings JSON; the CI downloads and inspects a zip, never runs it. Merging needs the CI and the owner's approval (`CODEOWNERS`, branch protection). On the main branch, the CI generates `index.json` and deploys it to Pages.
 
 The entries and `index.json` are under CC BY 4.0 (credit the index, and each entry's `author` for its texts), so a website or a tool may reuse them. Submitting an entry publishes it so, its texts included; a reviewer makes sure someone else than the author has their consent. The CI's code is GPLv3.
 
