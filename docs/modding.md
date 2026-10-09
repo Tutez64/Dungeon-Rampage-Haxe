@@ -29,7 +29,7 @@ The game owns the runtime. The launcher owns the folder, enablement, and launch.
 | Trust for updates | decided | Trust artifacts (`id` + version + SHA-256), not author repos. |
 | v1 discovery UI | decided | Minimal catalog in DRHL, same index a later site can reuse. |
 | Index schema / repo URL | open | Draft shape in [Distribution](#distribution). |
-| Mod page in the launcher | open | What it shows is undecided. The long description (`README.md` and its markers) is a draft: [Mod repository](#mod-repository). |
+| Mod page in the launcher | open | What it shows is undecided, beyond `description` above the long description. The long description (`README.md` and its markers) is a draft: [Mod repository](#mod-repository). |
 | Mod repository and publishing | decided | Repo = mod folder from `DRH-Mod-Template`, DRH Launcher commands for every step (checks implemented once, also run by the index CI), `vX.Y.Z` tags, flat zip, PR to the index with git. [Mod repository](#mod-repository) |
 | Thunderstore / Nexus / itch as mirrors | open | Optional later; must not replace `mod.json` or the index. |
 | Resource overlay rules | open | `Resources/` is composited at runtime; precedence, SWF vs JSON, and `Locale/` merge are unspecified. No separate `locale/` tree. |
@@ -427,7 +427,7 @@ The Mods page (fetch, install, enable, order, `last-run` display) is specified i
 
 A mod's repository **is** its folder: `mod.json`, `src/`, `Resources/` (when the mod has any) at the root, plus `README.md`, `LICENSE` and `.github/`. Cloning it into a mods folder runs it as is, and DRH can pin one as a submodule (`mods/api`). Its name is free; `DRH-Mod-<Name>` is the suggestion. The GitHub topic `drh-mod` is required, so mods can be found.
 
-`README.md` is also the long description, shown on the mod's page in the launcher. HTML comments, invisible on GitHub, pick what the launcher shows: `<!-- drh:show -->` … `<!-- /drh:show -->` keeps only those zones (several allowed, joined in order), and `<!-- drh:hide -->` … `<!-- /drh:hide -->` drops one, inside a shown zone too. Without a shown zone, the whole file is shown, minus its hidden zones. Zones do not nest, except a hidden one inside a shown one; an unclosed or misplaced marker fails `--check-mod`. What is shown is Markdown, at most 4000 characters. It need not say it is a DRH mod: the catalog says so, and GitHub shows the repository's name and topic.
+`README.md` is also the long description, shown on the mod's page in the launcher. HTML comments, invisible on GitHub, pick what the launcher shows: `<!-- drh:show -->` … `<!-- /drh:show -->` keeps only those zones (several allowed, joined in order), and `<!-- drh:hide -->` … `<!-- /drh:hide -->` drops one, inside a shown zone too. Without a shown zone, the whole file is shown, minus its hidden zones. The page always shows `description` above it, so an empty shown zone (`<!-- drh:show --><!-- /drh:show -->`) leaves just that. Zones do not nest, except a hidden one inside a shown one; an unclosed or misplaced marker fails `--check-mod`. What is shown is Markdown, at most 4000 characters. It need not say it is a DRH mod: the catalog says so, and GitHub shows the repository's name and topic.
 
 A mod runs combined with DRH and `api` (GPLv3), so its license must be GPL-compatible (GPL, LGPL, MIT, BSD, Apache 2.0, MPL 2.0, …). A reviewer checks it at an `id`'s first entry and whenever `LICENSE` changes.
 
