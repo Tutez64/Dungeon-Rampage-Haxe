@@ -28,7 +28,7 @@ The game owns the runtime. The launcher owns the folder, enablement, and launch.
 | Distribution | decided | Pointer index we control; not a monorepo; not Thunderstore/Nexus as identity. [Distribution](#distribution) |
 | Trust for updates | decided | Trust artifacts (`id` + version + SHA-256), not author repos. |
 | v1 discovery UI | decided | Minimal catalog in DRHL, same index a later site can reuse. |
-| Index schema / repo URL | open | Draft shape in [Distribution](#distribution). |
+| Index schema | open | Repository and URL decided; entry shape is a draft. [Index entry](#index-entry-draft) |
 | Mod page in the launcher | open | What it shows is undecided, beyond `description` above the long description. The long description (`README.md` and its markers) is a draft: [Mod repository](#mod-repository). |
 | Mod repository and publishing | decided | Repo = mod folder from `DRH-Mod-Template`, DRH Launcher commands for every step (checks implemented once, also run by the index CI), `vX.Y.Z` tags, flat zip, PR to the index with git. [Mod repository](#mod-repository) |
 | Thunderstore / Nexus / itch as mirrors | open | Optional later; must not replace `mod.json` or the index. |
@@ -452,7 +452,7 @@ Publishing:
 
 ### Index entry (draft)
 
-Not frozen. One file per version (`mods/<id>/<version>.json`), so concurrent PRs do not conflict; the index CI checks each one and generates the static file the launcher reads (served as a file, not through the GitHub API, whose unauthenticated rate limit would throttle the catalog):
+The index is `Tutez64/DRH-Mod-Index`. The entry shape is not frozen. One file per version (`mods/<id>/<version>.json`), so concurrent PRs do not conflict; the index CI checks each one and generates the static file the launcher reads, `https://tutez64.github.io/DRH-Mod-Index/index.json`, served by GitHub Pages, not through the GitHub API, whose unauthenticated rate limit would throttle the catalog. A later website can live on the same Pages site. A move to another owner keeps that URL with a custom domain or a redirect left behind:
 
 ```json
 {
