@@ -424,16 +424,16 @@ The Mods page (fetch, install, enable, order, `last-run` display) is specified i
 
 A mod's repository **is** its folder: `mod.json`, `src/`, `Resources/` at the root, plus `README.md`, `LICENSE` and `.github/`. Cloning it into a mods folder runs it as is, and DRH can pin one as a submodule (`mods/api`). Its name is free; `DRH-Mod-<Name>` is the suggestion. The GitHub topic `drh-mod` is required, so mods can be found.
 
-`README.md` is the long description: Markdown, at most 4000 characters, shown on the mod's page in the launcher as on GitHub. It need not say it is a DRH mod: the catalog says so, and GitHub shows the repository's name and topic.
+`README.md` is also the long description, shown on the mod's page in the launcher. HTML comments, invisible on GitHub, pick what the launcher shows: `<!-- drh:show -->` … `<!-- /drh:show -->` keeps only those zones (several allowed, joined in order), and `<!-- drh:hide -->` … `<!-- /drh:hide -->` drops one, inside a shown zone too. Without a shown zone, the whole file is shown, minus its hidden zones. Zones do not nest, except a hidden one inside a shown one; an unclosed or misplaced marker fails `--check-mod`. What is shown is Markdown, at most 4000 characters. It need not say it is a DRH mod: the catalog says so, and GitHub shows the repository's name and topic.
 
-`DRH-Mod-Template` is the skeleton: `mod.json`, `src/Main.hx` (`class Main extends mods.api.Mod`), an empty `Resources/`, `README.md` (a placeholder pointing to the modder documentation online, which `--check-mod` refuses unchanged), `LICENSE`, and `.github/workflows/release.yml`, which only calls a reusable workflow pinned to a moving major tag (`@v1`): fixes reach every mod, only a breaking change needs a new major. Nothing else is copied into a mod, so nothing there needs updating.
+`DRH-Mod-Template` is the skeleton: `mod.json`, `src/Main.hx` (`class Main extends mods.api.Mod`), an empty `Resources/`, `README.md` (a placeholder: a shown zone to fill, and a pointer to the modder documentation online; `--check-mod` refuses it unchanged), `LICENSE`, and `.github/workflows/release.yml`, which only calls a reusable workflow pinned to a moving major tag (`@v1`): fixes reach every mod, only a breaking change needs a new major. Nothing else is copied into a mod, so nothing there needs updating.
 
 Every step is a DRH Launcher command. The checks exist once, in the launcher; the release workflow and the index CI run its Linux binary, and a modder editing them gains nothing.
 
 | Command | Does |
 | --- | --- |
 | `--new-mod <dir>` | Copies the template with git into a fresh history, asks for `id`, `name` and `author` and writes them, then opens `github.com/new` pre-filled. The repository is created there, with the topic `drh-mod`; the first push is plain git. |
-| `--check-mod <dir>` | Checks what needs no game: the `mod.json` schema (`id` rules, `version`, `api` and dependency syntax, `drh` present exactly when `uses` names `extends` or `replace`), values left from the template, the lengths (`README.md` included), the package rule for every file under `src/`, no `import.hx`. |
+| `--check-mod <dir>` | Checks what needs no game: the `mod.json` schema (`id` rules, `version`, `api` and dependency syntax, `drh` present exactly when `uses` names `extends` or `replace`), values left from the template, the lengths (what `README.md` shows included) and its markers, the package rule for every file under `src/`, no `import.hx`. |
 | `--run-mod <dir>` | Installs the mod's dependencies (`api` included) from the index into a cache, composes a temporary mods folder with them and `<dir>`, and launches DRH on it. Loading and behaviour are the author's own run. |
 | `--pack-mod <dir>` | Checks, then builds the zip from a fixed list (`mod.json`, `src/`, `Resources/`, `LICENSE`, `README.md`, flat at its root, extracted as is into `mods/<id>/`) and its index entry. |
 | `--submit-mod <dir>` | Adds the index entry of the published release on a branch of the author's fork of the index (forked once, in the browser), pushes it with git, and opens the pre-filled compare page: one click opens the PR. |
@@ -456,7 +456,7 @@ Not frozen. One file per version (`mods/<id>/<version>.json`), so concurrent PRs
   "version": "0.1.0",
   "author": "example",
   "description": "Short summary for the catalog.",
-  "longDescription": "# Some Mod\n\nThe mod's README.md.",
+  "longDescription": "What the mod's README.md shows.",
   "api": "1.2",
   "uses": [],
   "dependencies": { "cool_lib": "0.3" },
@@ -466,7 +466,7 @@ Not frozen. One file per version (`mods/<id>/<version>.json`), so concurrent PRs
 }
 ```
 
-`longDescription` is `README.md`, so the catalog shows it before install. `source` is documentation (issues, code), not a download pipe. `--pack-mod` fills it from the repository the release workflow runs in. An `id` belongs to the `source` of its first entry: the index CI refuses a version from another one, unless a reviewer accepts a takeover. Yanking a version is an index change (tombstone or removal).
+`longDescription` is what `README.md` shows ([Mod repository](#mod-repository)), so the catalog shows it before install. `source` is documentation (issues, code), not a download pipe. `--pack-mod` fills it from the repository the release workflow runs in. An `id` belongs to the `source` of its first entry: the index CI refuses a version from another one, unless a reviewer accepts a takeover. Yanking a version is an index change (tombstone or removal).
 
 Out of v1, same index: ratings, galleries, collections, dependency solving beyond [one version per id](#modjson), a publishing UI in the launcher (its [commands](#mod-repository) cover it), a separate website.
 
