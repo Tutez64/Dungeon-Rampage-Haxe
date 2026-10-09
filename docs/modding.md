@@ -29,6 +29,7 @@ The game owns the runtime. The launcher owns the folder, enablement, and launch.
 | Trust for updates | decided | Trust artifacts (`id` + version + SHA-256), not author repos. |
 | v1 discovery UI | decided | Minimal catalog in DRHL, same index a later site can reuse. |
 | Index schema / repo URL | open | Draft shape in [Distribution](#distribution). |
+| Mod page in the launcher | open | What it shows is undecided. The long description (`README.md` and its markers) is a draft: [Mod repository](#mod-repository). |
 | Mod repository and publishing | decided | Repo = mod folder from `DRH-Mod-Template`, DRH Launcher commands for every step (checks implemented once, also run by the index CI), `vX.Y.Z` tags, flat zip, PR to the index with git. [Mod repository](#mod-repository) |
 | Thunderstore / Nexus / itch as mirrors | open | Optional later; must not replace `mod.json` or the index. |
 | Resource overlay rules | open | `Resources/` is composited at runtime; precedence, SWF vs JSON, and `Locale/` merge are unspecified. No separate `locale/` tree. |
