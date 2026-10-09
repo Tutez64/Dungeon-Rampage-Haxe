@@ -2,9 +2,11 @@ package mods.api_tour;
 
 import mods.api.Mod;
 import mods.api.Context;
-import mods.api.Floor;
-import mods.api.Hero;
 import mods.api.Subscription;
+import mods.api.account.Account;
+import mods.api.account.OwnedHero;
+import mods.api.dungeon.Floor;
+import mods.api.dungeon.Hero;
 import mods.api_tour.ui.Panel;
 
 /**
@@ -101,12 +103,40 @@ class Main extends Mod {
 			check("ready: account id set", account.id != 0);
 			check("activeAvatarId matches hasActiveAvatar", account.hasActiveAvatar == (account.activeAvatarId != 0));
 			ctx.log("account " + account.id + ", active avatar " + account.activeAvatarId);
+			checkInventory(account);
 		}
 		check("ready: no floor", ctx.state.floor == null);
 		check("ready: view size set", ctx.viewWidth > 0 && ctx.viewHeight > 0);
 		var copy = ctx.state.heroes;
 		copy.push(null);
 		check("state.heroes is a copy", ctx.state.heroes.length == copy.length - 1);
+	}
+
+	function checkInventory(account:Account):Void {
+		var inventory = account.inventory;
+		var heroes = inventory.heroes;
+		var active = activeHero(account);
+		check("inventory: active hero listed", !account.hasActiveAvatar || active != null);
+		check("inventory: heroes have class and level", Lambda.foreach(heroes, hero -> hero.classId != 0 && hero.className != "" && hero.level > 0));
+		check("inventory: equipped weapons in slots 0-2",
+			Lambda.foreach(heroes, hero -> Lambda.foreach(hero.weapons, weapon -> weapon.slot >= 0 && weapon.slot <= 2)));
+		var stored = inventory.weapons;
+		check("inventory: stored weapons have slot -1 and a name", Lambda.foreach(stored, weapon -> weapon.slot == -1 && weapon.name != ""));
+		check("inventory: weapon limit set", inventory.weaponLimit > 0);
+		check("inventory: consumables have a name and a count", Lambda.foreach(inventory.consumables, stack -> stack.name != "" && stack.count > 0));
+		check("inventory: pets have a name", Lambda.foreach(inventory.pets, pet -> pet.name != ""));
+		stored.push(null);
+		check("inventory.weapons is a copy", inventory.weapons.length == stored.length - 1);
+		ctx.log("coins " + account.coins + ", gems " + account.gems + ", trophies " + account.trophies + ", " + heroes.length + " heroes, "
+			+ (stored.length - 1) + "/" + inventory.weaponLimit + " weapons stored, " + inventory.pets.length + " pets, "
+			+ inventory.consumables.length + " consumables");
+	}
+
+	function activeHero(account:Account):Null<OwnedHero> {
+		for (hero in account.inventory.heroes)
+			if (hero.id == account.activeAvatarId)
+				return hero;
+		return null;
 	}
 
 	override public function dispose():Void {
@@ -144,6 +174,13 @@ class Main extends Mod {
 		check("heroSpawned: at least one weapon", weapons.length > 0);
 		weapons.push(null);
 		check("hero.weapons is a copy", hero.weapons.length == weapons.length - 1);
+		var account = ctx.state.account;
+		var owned = hero.local && account != null ? activeHero(account) : null;
+		if (owned != null) {
+			check("local hero: class of the active owned hero", hero.classId == owned.classId);
+			check("local hero: weapons of the active owned hero",
+				owned.weapons.map(weapon -> weapon.slot + ":" + weapon.id).join(",") == hero.weapons.map(weapon -> weapon.slot + ":" + weapon.id).join(","));
+		}
 		// Social actions are left out on purpose: a test must not send a friend request, a block or a report.
 		check("local player is no one to act on", !player.local || !player.addFriend());
 		// Art is loaded and released by the sprites themselves; building and dropping them must not throw.
