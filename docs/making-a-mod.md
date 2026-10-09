@@ -14,7 +14,7 @@ The entry is `src/Main.hx`, a `mods.api.Mod` ([Lifecycle](modding.md#lifecycle))
 
 ## Test
 
-1. Make a mods folder and clone into it your repository under its `id`, and DRH-Mod-API as `api`:
+1. Make a mods folder and clone into it your repository under its `id`, and DRH-Mod-API as `api`. Work in that clone: a mod's repository is its folder.
 
    ```sh
    git clone <your repository> "$HOME/drh-mods/<id>"
@@ -27,15 +27,9 @@ The entry is `src/Main.hx`, a `mods.api.Mod` ([Lifecycle](modding.md#lifecycle))
    { "mods": [{ "id": "api" }, { "id": "<id>" }] }
    ```
 
-3. From the game's folder, `<install-dir>/Dungeon Rampage Haxe/current/` ([Disk layout](modding.md#disk-layout)), run it on that folder, with an absolute path:
+3. In [DRH Launcher](https://github.com/Tutez64/DRH-Launcher), add the folder's absolute path to *Options*, *Extra arguments*: `--mods-dir "/home/me/drh-mods"`. Then *Play*. From a terminal, the same flag works in the game's folder ([Disk layout](modding.md#disk-layout)): `./"Dungeon Rampage Haxe" --mods-dir "$HOME/drh-mods"`.
 
-   ```sh
-   ./"Dungeon Rampage Haxe" --mods-dir "$HOME/drh-mods"
-   ```
-
-   On Windows, the program is `Dungeon Rampage Haxe.exe`.
-
-4. Mods compile when the game starts. `last-run.json`, written in the mods folder, gives each mod's outcome ([Last-run report](modding.md#last-run-report)). The game's output shows what a mod logs (`context.log`) as `mod <id>: …`, and why a module failed.
+4. Mods compile when the game starts. `last-run.json`, written in the mods folder, gives each mod's outcome ([Last-run report](modding.md#last-run-report)). The game's session log, in the launcher, shows what a mod logs (`context.log`) as `mod <id>: …`, and why a module failed.
 
 The sources are read at each start: edit, quit, run again.
 
