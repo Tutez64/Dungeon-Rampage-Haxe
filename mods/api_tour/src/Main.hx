@@ -34,6 +34,9 @@ class Main extends Mod {
 
 	var heroesSpawned:Int = 0;
 
+	/** Heroes gone since the last check: they must read empty once their handlers are over. */
+	var despawned:Array<Hero> = [];
+
 	var keySeen:Bool = false;
 
 	override public function init(ctx:Context):Void {
@@ -68,6 +71,7 @@ class Main extends Mod {
 			check("cancelled handler never ran", cancelledCalls == 0);
 			check("town: no floor", ctx.state.floor == null);
 			check("town: no players", ctx.state.players.length == 0);
+			checkDespawned();
 		});
 		ctx.onTownExit(function() {
 			check("townExit after ready", readySeen);
@@ -159,6 +163,7 @@ class Main extends Mod {
 
 	function onHeroSpawned(hero:Hero):Void {
 		heroesSpawned++;
+		checkDespawned();
 		check("heroSpawned: after its floorEnter", ctx.state.floor != null);
 		check("heroSpawned: in state.heroes", ctx.state.heroes.indexOf(hero) >= 0);
 		check("heroSpawned: class and level set", hero.classId != 0 && hero.className != "" && hero.level > 0);
@@ -198,12 +203,21 @@ class Main extends Mod {
 
 	function onHeroDespawned(hero:Hero):Void {
 		check("heroDespawned: out of state.heroes", ctx.state.heroes.indexOf(hero) < 0);
-		check("heroDespawned: live fields read empty", hero.classId == 0 && hero.level == 0 && hero.weapons.length == 0);
+		check("heroDespawned: still read in its handlers", hero.classId != 0 && hero.className != "" && hero.level > 0);
+		despawned.push(hero);
 		var player = hero.player;
 		if (player != null) {
 			check("heroDespawned: player no longer on it", player.hero != hero);
 			check("heroDespawned: player kept, name too", ctx.state.players.indexOf(player) >= 0 && player.name != "");
 		}
+	}
+
+	function checkDespawned():Void {
+		if (despawned.length == 0)
+			return;
+		check("heroDespawned: read empty after its handlers",
+			Lambda.foreach(despawned, hero -> hero.classId == 0 && hero.className == "" && hero.level == 0 && hero.weapons.length == 0));
+		despawned = [];
 	}
 
 	function check(label:String, ok:Bool):Void {
