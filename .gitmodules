@@ -16,3 +16,6 @@
 [submodule "submodules/hxscript"]
 	path = submodules/hxscript
 	url = https://github.com/Tutez64/hxscript
+[submodule "mods/api"]
+	path = mods/api
+	url = https://github.com/Tutez64/DRH-Mod-API

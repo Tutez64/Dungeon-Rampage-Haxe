@@ -1,6 +1,6 @@
 # Example mods
 
-Run DRH with `--mods-dir <absolute path to this folder>`. `enabled.json` loads all of them; the game writes `last-run.json` here. Every one builds on the `api` mod, which has its own repository (not published yet): without it, each fails with `dependency api missing`.
+Run DRH with `--mods-dir <absolute path to this folder>`. `enabled.json` loads all of them; the game writes `last-run.json` here. Every one builds on the `api` mod, the `mods/api` submodule ([DRH-Mod-API](https://github.com/Tutez64/DRH-Mod-API)): without it, each fails with `dependency api missing`.
 
 They test what DRH does: the host, the lifecycle, dependencies, the `api` mod, the build's flags. What hxScript does on its own is tested in hxScript's suites, not here.
 
