@@ -493,6 +493,16 @@ The generated file lists every entry, same shape, sorted by `id` then version:
 
 A launcher refuses a `format` it does not know and asks to be updated. Each version keeps its `longDescription`; if the file grows too heavy, a later format moves them to one file per mod.
 
+**Index CI.** On a pull request (`pull_request`: a read-only token, no secret; never `pull_request_target`), for each entry it adds or yanks:
+
+- the pull request only adds `mods/<id>/<version>.json` files that match their content, for versions not indexed yet, or adds `yanked` to one;
+- the zip downloads from `url` without an account (the release is published) and matches `size` and `sha256`;
+- the launcher's checks (`--check-mod`) pass on the extracted zip, and its `mod.json` and shown README match the entry;
+- `source` is the one the `id` belongs to, or a reviewer labels the takeover;
+- every dependency, `api` included, has an indexed version that satisfies it.
+
+It writes in the job summary the diff of the sources against the zip of the last indexed version: what the reviewer reads. A pull request only brings JSON; the CI downloads and inspects a zip, never runs it. Merging needs the CI and the owner's approval (`CODEOWNERS`, branch protection). On the main branch, the CI generates `index.json` and deploys it to Pages.
+
 Out of v1, same index: ratings, galleries, collections, dependency solving beyond [one version per id](#modjson), a publishing UI in the launcher (its [commands](#mod-repository) cover it), a separate website.
 
 ## Compilation
