@@ -441,7 +441,7 @@ Every step is a DRH Launcher command. The checks exist once, in the launcher; th
 | `--check-mod <dir>` | Checks what needs no game: the `mod.json` schema (`id` rules, `version`, `api` and dependency syntax, `drh` present exactly when `uses` names `extends` or `replace`), values left from the template (`id` `my_mod`, `name`, `description`, an empty `author`, `README.md`), the lengths (what `README.md` shows included) and its markers, the package rule for every file under `src/`, no `import.hx`, a non-empty `LICENSE`. |
 | `--run-mod <dir>` | Installs the mod's dependencies (`api` included) from the index into a cache, composes a temporary mods folder with them and `<dir>`, and launches DRH on it. Loading and behaviour are the author's own run. |
 | `--pack-mod <dir>` | Checks, then builds the zip from a fixed list (`mod.json`, `src/`, `Resources/` when present, `LICENSE`, `README.md`, flat at its root, extracted as is into `mods/<id>/`) and its index entry. |
-| `--submit-mod <dir>` | Adds the index entry of the published release on a branch of the author's fork of the index (forked once, in the browser), pushes it with git, and opens the pre-filled compare page: one click opens the PR. |
+| `--submit-mod <dir>` | Adds the index entry of the published release on a branch of the author's fork of the index (forked once, in the browser), pushes it with git, and opens the pre-filled compare page: one click opens the PR, whose template says the entry is published under CC BY 4.0. |
 
 Publishing:
 
@@ -502,6 +502,8 @@ A launcher refuses a `format` it does not know and asks to be updated. Each vers
 - every dependency, `api` included, has an indexed version that satisfies it.
 
 It writes in the job summary the diff of the sources against the zip of the last indexed version: what the reviewer reads. A pull request only brings JSON; the CI downloads and inspects a zip, never runs it. Merging needs the CI and the owner's approval (`CODEOWNERS`, branch protection). On the main branch, the CI generates `index.json` and deploys it to Pages.
+
+The entries and `index.json` are under CC BY 4.0 (credit the index, and each entry's `author` for its texts), so a website or a tool may reuse them. Submitting an entry publishes it so, its texts included; a reviewer makes sure someone else than the author has their consent. The CI's code is GPLv3.
 
 Out of v1, same index: ratings, galleries, collections, dependency solving beyond [one version per id](#modjson), a publishing UI in the launcher (its [commands](#mod-repository) cover it), a separate website.
 
