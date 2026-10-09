@@ -584,9 +584,10 @@ Needed before a real host; not a restatement of the rules above.
 2. **Done.** hxcpp cppia patch.
 3. **Done.** The flags above are in `project.xml`.
 4. **Done**, except `replace`. `src-modding/` loads `--mods-dir` into one world, runs the lifecycle, re-registers the overlay, and bakes the release tag (no `V`) into the host. `uncaughtError` and the mod `exiting` listener sit at the top of the constructor. Still later: `ASCompat.createInstance` consulting the `replace` table, once the fork has `replace`.
-5. Launcher: index fetch, catalog install, `enabled.json`, `--mods-dir`, `last-run.json` display — no destructive overlay.
-6. Index repository (separate from DRH / DRHL), PR + CI for new versions.
-7. **Done**, except the `api` repository and its submodule in DRH ([Versioning](#versioning)). The wrappers live in the `api` mod, core events hand game objects, dependency failures propagate.
+5. Launcher: index fetch, catalog install, `enabled.json`, `--mods-dir`, `last-run.json` display — no destructive overlay. The modders' commands, `--new-mod` to `--submit-mod`.
+6. Repository created (`Tutez64/DRH-Mod-Index`: README, license, owner). Its CI comes with the launcher's commands.
+7. **Done.** The `api` mod has its repository, pinned as `mods/api` ([Versioning](#versioning)). The wrappers live in the `api` mod, core events hand game objects, dependency failures propagate.
+8. **Done.** `DRH-Mod-Template`. `DRH-Mod-Workflows` comes with `--pack-mod`.
 
 ## Out of scope for this document
 
