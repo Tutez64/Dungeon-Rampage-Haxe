@@ -20,8 +20,8 @@ class ShortRotationPlugin extends TweenPlugin {
 			for (_tmp_ in value.___keys()) {
 				_loc4_ = _tmp_;
 				initRotation(target, _loc4_, ASCompat.toNumber(target[_loc4_]),
-					ASCompat.toNumber(ASCompat.typeof(value[_loc4_]) == "number" ? ASCompat.toNumber(value[_loc4_]) : ASCompat.toNumber(target[_loc4_]
-						+ ASCompat.toNumber(value[_loc4_]))));
+					ASCompat.typeof(value[_loc4_]) == "number" ? ASCompat.toNumber(value[_loc4_]) : ASCompat.toNumber(target[_loc4_]
+						+ ASCompat.toNumber(value[_loc4_])));
 			}
 		return true;
 	}

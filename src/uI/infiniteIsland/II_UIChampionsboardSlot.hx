@@ -45,9 +45,9 @@ class II_UIChampionsboardSlot {
 		var _loc2_ = swfAsset.getClass("leaderboard_slot");
 		mRoot = ASCompat.dynamicAs(ASCompat.createInstance(_loc2_, []), MovieClip);
 		mRoot.x = 10;
-		mWeaponSlotA = new UIObject(mDBFacade, ASCompat.dynamicAs((mRoot : ASAny).loot_slot_A1, flash.display.MovieClip));
-		mWeaponSlotB = new UIObject(mDBFacade, ASCompat.dynamicAs((mRoot : ASAny).loot_slot_A2, flash.display.MovieClip));
-		mWeaponSlotC = new UIObject(mDBFacade, ASCompat.dynamicAs((mRoot : ASAny).loot_slot_A3, flash.display.MovieClip));
+		mWeaponSlotA = new UIObject(mDBFacade, ASCompat.coerce((mRoot : ASAny).loot_slot_A1, flash.display.MovieClip));
+		mWeaponSlotB = new UIObject(mDBFacade, ASCompat.coerce((mRoot : ASAny).loot_slot_A2, flash.display.MovieClip));
+		mWeaponSlotC = new UIObject(mDBFacade, ASCompat.coerce((mRoot : ASAny).loot_slot_A3, flash.display.MovieClip));
 		mRoot.y = mNum * mRoot.height;
 		if (mNum % 2 != 0) {
 			ASCompat.setProperty((mRoot : ASAny).dark_row_2, "visible", false);
@@ -105,15 +105,15 @@ class II_UIChampionsboardSlot {
 
 	function weaponTooltipHelper(weaponJson:ASObject, weaponToolTip:UIWeaponTooltip, weaponSlot:UIObject) {
 		var _loc7_ = (ASCompat.toInt(weaponJson.type) : UInt);
-		var _loc4_ = ASCompat.dynamicAs(mDBFacade.gameMaster.weaponItemById.itemFor(weaponJson.type), gameMasterDictionary.GMWeaponItem);
+		var _loc4_ = ASCompat.coerce(mDBFacade.gameMaster.weaponItemById.itemFor(weaponJson.type), gameMasterDictionary.GMWeaponItem);
 		if (_loc4_ == null) {
 			Logger.warn("Unable to determine gmWeapon from type: " + Std.string(weaponJson.type));
 			return;
 		}
-		var _loc6_ = ASCompat.dynamicAs(mDBFacade.gameMaster.rarityById.itemFor(weaponJson.rarity), gameMasterDictionary.GMRarity);
+		var _loc6_ = ASCompat.coerce(mDBFacade.gameMaster.rarityById.itemFor(weaponJson.rarity), gameMasterDictionary.GMRarity);
 		var _loc5_ = _loc4_.getWeaponAesthetic((ASCompat.toInt(weaponJson.requiredLevel) : UInt), ASCompat.toNumberField(weaponJson, "rarity") == 4);
-		ItemInfo.loadItemIcon(_loc5_.IconSwf, _loc5_.IconName, weaponSlot.root, mDBFacade, (Std.int(weaponSlot.root.width * 2) : UInt), (0 : UInt),
-			mAssetLoadingComponent);
+		ItemInfo.loadItemIcon(_loc5_.IconSwf, _loc5_.IconName, weaponSlot.root, mDBFacade, (ASCompat.floatToInt(weaponSlot.root.width * 2) : UInt),
+			(0 : UInt), mAssetLoadingComponent);
 		weaponToolTip.setWeaponItemFromData(_loc5_.Name, (ASCompat.toInt(weaponJson.power) : UInt), _loc4_.TapIcon, _loc4_.HoldIcon,
 			(ASCompat.toInt(weaponJson.modifier1) : UInt), (ASCompat.toInt(weaponJson.modifier2) : UInt),
 			(ASCompat.toInt(weaponJson.legendaryModifier) : UInt), (ASCompat.toInt(weaponJson.rarity) : UInt),

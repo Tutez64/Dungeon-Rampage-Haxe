@@ -115,7 +115,7 @@ class StoreServicesController {
 		}
 		var _loc4_ = gmOffer.Details[0];
 		if (_loc4_.WeaponId != 0) {
-			_loc3_ = ASCompat.dynamicAs(dbFacade.gameMaster.weaponItemById.itemFor(_loc4_.WeaponId), gameMasterDictionary.GMWeaponItem);
+			_loc3_ = ASCompat.coerce(dbFacade.gameMaster.weaponItemById.itemFor(_loc4_.WeaponId), gameMasterDictionary.GMWeaponItem);
 			return _loc3_.MasterType;
 		}
 		return null;
@@ -214,8 +214,8 @@ class StoreServicesController {
 				if (ASCompat.toBool(_loc4_)) {
 					_loc5_ = (dbFacade.dbAccountInfo.inventoryInfo.getStackCount((ASCompat.toInt(_loc4_) : UInt)) : Int);
 					_loc3_ = ASCompat.toInt(_loc7_.itemFor(_loc4_));
-					_loc6_ = ASCompat.dynamicAs(dbFacade.gameMaster.stackableById.itemFor(_loc4_), gameMasterDictionary.GMStackable);
-					if (ASCompat.toNumber(_loc5_ + _loc3_) > _loc6_.StackLimit) {
+					_loc6_ = ASCompat.coerce(dbFacade.gameMaster.stackableById.itemFor(_loc4_), gameMasterDictionary.GMStackable);
+					if ((_loc5_ + _loc3_ : UInt) > _loc6_.StackLimit) {
 						return true;
 					}
 				}
@@ -367,7 +367,7 @@ class StoreServicesController {
 			popup.destroy();
 			if (dbFacade.steamAchievementsManager != null) {
 				if (gmOffer.CurrencyType == "BASIC") {
-					dbFacade.steamAchievementsManager.addToStatInt("SPEND_COINS_INT", Std.int(gmOffer.Price));
+					dbFacade.steamAchievementsManager.addToStatInt("SPEND_COINS_INT", ASCompat.floatToInt(gmOffer.Price));
 				}
 				if (gmOffer.Tab == "WEAPON") {
 					dbFacade.steamAchievementsManager.setAchievement("PURCHASE_WEAPON_FIRST_TIME");

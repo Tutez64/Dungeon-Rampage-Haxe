@@ -154,9 +154,9 @@ class UITavern {
 	}
 
 	function loadTavernInfo() {
-		mHeroPic = ASCompat.dynamicAs((mRootMovieClip : ASAny).UI_town_tavern_body.UI_town_tavern_avatar_pic, flash.display.MovieClip);
-		var noSkinsMovieClip = ASCompat.dynamicAs((mRootMovieClip : ASAny).UI_town_tavern_body.UI_town_tavern_avatar_info, flash.display.MovieClip);
-		var skinsMovieClip = ASCompat.dynamicAs((mRootMovieClip : ASAny).UI_town_tavern_body.UI_town_tavern_avatar_info_skin, flash.display.MovieClip);
+		mHeroPic = ASCompat.coerce((mRootMovieClip : ASAny).UI_town_tavern_body.UI_town_tavern_avatar_pic, flash.display.MovieClip);
+		var noSkinsMovieClip = ASCompat.coerce((mRootMovieClip : ASAny).UI_town_tavern_body.UI_town_tavern_avatar_info, flash.display.MovieClip);
+		var skinsMovieClip = ASCompat.coerce((mRootMovieClip : ASAny).UI_town_tavern_body.UI_town_tavern_avatar_info_skin, flash.display.MovieClip);
 		if (mWantSkins) {
 			mTavernInfoClip = skinsMovieClip;
 			noSkinsMovieClip.visible = false;
@@ -168,31 +168,31 @@ class UITavern {
 			ASCompat.setProperty((mRootMovieClip : ASAny).UI_town_tavern_body.skin_frame, "visible", false);
 		}
 		mWeaponIcons3.push(new UIObject(mDBFacade,
-			ASCompat.dynamicAs((mTavernInfoClip : ASAny).character_info.weapons_3.weapon_icon_slot_0, flash.display.MovieClip)));
+			ASCompat.coerce((mTavernInfoClip : ASAny).character_info.weapons_3.weapon_icon_slot_0, flash.display.MovieClip)));
 		mWeaponIcons3.push(new UIObject(mDBFacade,
-			ASCompat.dynamicAs((mTavernInfoClip : ASAny).character_info.weapons_3.weapon_icon_slot_1, flash.display.MovieClip)));
+			ASCompat.coerce((mTavernInfoClip : ASAny).character_info.weapons_3.weapon_icon_slot_1, flash.display.MovieClip)));
 		mWeaponIcons3.push(new UIObject(mDBFacade,
-			ASCompat.dynamicAs((mTavernInfoClip : ASAny).character_info.weapons_3.weapon_icon_slot_2, flash.display.MovieClip)));
+			ASCompat.coerce((mTavernInfoClip : ASAny).character_info.weapons_3.weapon_icon_slot_2, flash.display.MovieClip)));
 		mWeaponIcons4.push(new UIObject(mDBFacade,
-			ASCompat.dynamicAs((mTavernInfoClip : ASAny).character_info.weapons_4.weapon_icon_slot_0, flash.display.MovieClip)));
+			ASCompat.coerce((mTavernInfoClip : ASAny).character_info.weapons_4.weapon_icon_slot_0, flash.display.MovieClip)));
 		mWeaponIcons4.push(new UIObject(mDBFacade,
-			ASCompat.dynamicAs((mTavernInfoClip : ASAny).character_info.weapons_4.weapon_icon_slot_1, flash.display.MovieClip)));
+			ASCompat.coerce((mTavernInfoClip : ASAny).character_info.weapons_4.weapon_icon_slot_1, flash.display.MovieClip)));
 		mWeaponIcons4.push(new UIObject(mDBFacade,
-			ASCompat.dynamicAs((mTavernInfoClip : ASAny).character_info.weapons_4.weapon_icon_slot_2, flash.display.MovieClip)));
+			ASCompat.coerce((mTavernInfoClip : ASAny).character_info.weapons_4.weapon_icon_slot_2, flash.display.MovieClip)));
 		mWeaponIcons4.push(new UIObject(mDBFacade,
-			ASCompat.dynamicAs((mTavernInfoClip : ASAny).character_info.weapons_4.weapon_icon_slot_3, flash.display.MovieClip)));
-		mStoryInfoClip = ASCompat.dynamicAs((mTavernInfoClip : ASAny).story_info, flash.display.MovieClip);
+			ASCompat.coerce((mTavernInfoClip : ASAny).character_info.weapons_4.weapon_icon_slot_3, flash.display.MovieClip)));
+		mStoryInfoClip = ASCompat.coerce((mTavernInfoClip : ASAny).story_info, flash.display.MovieClip);
 		mStoryInfoClip.visible = true;
 		mAttackStars = new Vector<MovieClip>();
-		ASCompat.ASArray.pushMultiple(mAttackStars, ASCompat.dynamicAs((mStoryInfoClip : ASAny).attack_star_0, flash.display.MovieClip),
+		ASCompat.ASArray.pushMultiple(mAttackStars, ASCompat.coerce((mStoryInfoClip : ASAny).attack_star_0, flash.display.MovieClip),
 			(mStoryInfoClip : ASAny).attack_star_1, (mStoryInfoClip : ASAny).attack_star_2, (mStoryInfoClip : ASAny).attack_star_3,
 			(mStoryInfoClip : ASAny).attack_star_4);
 		mDefenseStars = new Vector<MovieClip>();
-		ASCompat.ASArray.pushMultiple(mDefenseStars, ASCompat.dynamicAs((mStoryInfoClip : ASAny).defense_star_0, flash.display.MovieClip),
+		ASCompat.ASArray.pushMultiple(mDefenseStars, ASCompat.coerce((mStoryInfoClip : ASAny).defense_star_0, flash.display.MovieClip),
 			(mStoryInfoClip : ASAny).defense_star_1, (mStoryInfoClip : ASAny).defense_star_2, (mStoryInfoClip : ASAny).defense_star_3,
 			(mStoryInfoClip : ASAny).defense_star_4);
 		mSpeedStars = new Vector<MovieClip>();
-		ASCompat.ASArray.pushMultiple(mSpeedStars, ASCompat.dynamicAs((mStoryInfoClip : ASAny).speed_star_0, flash.display.MovieClip),
+		ASCompat.ASArray.pushMultiple(mSpeedStars, ASCompat.coerce((mStoryInfoClip : ASAny).speed_star_0, flash.display.MovieClip),
 			(mStoryInfoClip : ASAny).speed_star_1, (mStoryInfoClip : ASAny).speed_star_2, (mStoryInfoClip : ASAny).speed_star_3,
 			(mStoryInfoClip : ASAny).speed_star_4);
 		ASCompat.setProperty((mStoryInfoClip : ASAny).likes_text, "text", Locale.getString("TAVERN_LIKES_LABEL"));
@@ -200,61 +200,61 @@ class UITavern {
 		ASCompat.setProperty((mStoryInfoClip : ASAny).attack_label, "text", Locale.getString("TAVERN_ATTACK_LABEL"));
 		ASCompat.setProperty((mStoryInfoClip : ASAny).defense_label, "text", Locale.getString("TAVERN_DEFENSE_LABEL"));
 		ASCompat.setProperty((mStoryInfoClip : ASAny).speed_label, "text", Locale.getString("TAVERN_SPEED_LABEL"));
-		mCharacterInfoClip = ASCompat.dynamicAs((mTavernInfoClip : ASAny).character_info, flash.display.MovieClip);
+		mCharacterInfoClip = ASCompat.coerce((mTavernInfoClip : ASAny).character_info, flash.display.MovieClip);
 		mCharacterInfoClip.visible = true;
 		ASCompat.setProperty((mCharacterInfoClip : ASAny).weapon_types_text, "text", Locale.getString("TAVERN_USABLE_WEAPON_TYPES_LABEL"));
-		mSkinInfoClip = ASCompat.dynamicAs((mRootMovieClip : ASAny).UI_town_tavern_body.UI_town_tavern_skin, flash.display.MovieClip);
-		mSkinNameLabel = ASCompat.dynamicAs((mSkinInfoClip : ASAny).skin_name_text, flash.text.TextField);
-		mSkinNotAvailableLabel = ASCompat.dynamicAs((mSkinInfoClip : ASAny).label_not_available, flash.text.TextField);
+		mSkinInfoClip = ASCompat.coerce((mRootMovieClip : ASAny).UI_town_tavern_body.UI_town_tavern_skin, flash.display.MovieClip);
+		mSkinNameLabel = ASCompat.coerce((mSkinInfoClip : ASAny).skin_name_text, flash.text.TextField);
+		mSkinNotAvailableLabel = ASCompat.coerce((mSkinInfoClip : ASAny).label_not_available, flash.text.TextField);
 		mSkinNotAvailableLabel.text = Locale.getString("TAVERN_SKIN_NOT_AVAILABLE");
 		mSkinNotAvailableLabel.mouseEnabled = false;
 		mSkinNotAvailableLabel.visible = false;
 		mSkinVector = new Vector<UITavernSkinButton>();
-		mSkinVector.push(new UITavernSkinButton(mDBFacade, ASCompat.dynamicAs((mSkinInfoClip : ASAny).skin_slot_0, flash.display.MovieClip), skinSelected));
-		mSkinVector.push(new UITavernSkinButton(mDBFacade, ASCompat.dynamicAs((mSkinInfoClip : ASAny).skin_slot_1, flash.display.MovieClip), skinSelected));
-		mSkinVector.push(new UITavernSkinButton(mDBFacade, ASCompat.dynamicAs((mSkinInfoClip : ASAny).skin_slot_2, flash.display.MovieClip), skinSelected));
-		mScrollSkinsLeftButton = new UIButton(mDBFacade, ASCompat.dynamicAs((mSkinInfoClip : ASAny).moveLeft, flash.display.MovieClip));
+		mSkinVector.push(new UITavernSkinButton(mDBFacade, ASCompat.coerce((mSkinInfoClip : ASAny).skin_slot_0, flash.display.MovieClip), skinSelected));
+		mSkinVector.push(new UITavernSkinButton(mDBFacade, ASCompat.coerce((mSkinInfoClip : ASAny).skin_slot_1, flash.display.MovieClip), skinSelected));
+		mSkinVector.push(new UITavernSkinButton(mDBFacade, ASCompat.coerce((mSkinInfoClip : ASAny).skin_slot_2, flash.display.MovieClip), skinSelected));
+		mScrollSkinsLeftButton = new UIButton(mDBFacade, ASCompat.coerce((mSkinInfoClip : ASAny).moveLeft, flash.display.MovieClip));
 		mScrollSkinsLeftButton.releaseCallback = function() {
 			scrollSkins(-1);
 		};
-		mScrollSkinsRightButton = new UIButton(mDBFacade, ASCompat.dynamicAs((mSkinInfoClip : ASAny).moveRight, flash.display.MovieClip));
+		mScrollSkinsRightButton = new UIButton(mDBFacade, ASCompat.coerce((mSkinInfoClip : ASAny).moveRight, flash.display.MovieClip));
 		mScrollSkinsRightButton.releaseCallback = function() {
 			scrollSkins(1);
 		};
-		mBuyButton = new UIButton(mDBFacade, ASCompat.dynamicAs((mSkinInfoClip : ASAny).skin_buy_button, flash.display.MovieClip));
+		mBuyButton = new UIButton(mDBFacade, ASCompat.coerce((mSkinInfoClip : ASAny).skin_buy_button, flash.display.MovieClip));
 		mBuyButton.rolloverFilter = DBGlobal.UI_ROLLOVER_FILTER;
-		mBuyButtonCoin = new UIButton(mDBFacade, ASCompat.dynamicAs((mSkinInfoClip : ASAny).buy_button_coins, flash.display.MovieClip));
+		mBuyButtonCoin = new UIButton(mDBFacade, ASCompat.coerce((mSkinInfoClip : ASAny).buy_button_coins, flash.display.MovieClip));
 		mBuyButtonCoin.rolloverFilter = DBGlobal.UI_ROLLOVER_FILTER;
 		ASCompat.setProperty((mBuyButtonCoin.root : ASAny).icons_bundle.cash, "visible", false);
 		ASCompat.setProperty((mBuyButtonCoin.root : ASAny).icons_bundle.gift_icon, "visible", false);
 		ASCompat.setProperty((mBuyButtonCoin.root : ASAny).original_price, "visible", false);
 		ASCompat.setProperty((mBuyButtonCoin.root : ASAny).strike, "visible", false);
-		mBuyButtonCash = new UIButton(mDBFacade, ASCompat.dynamicAs((mSkinInfoClip : ASAny).buy_button_gems, flash.display.MovieClip));
+		mBuyButtonCash = new UIButton(mDBFacade, ASCompat.coerce((mSkinInfoClip : ASAny).buy_button_gems, flash.display.MovieClip));
 		mBuyButtonCash.rolloverFilter = DBGlobal.UI_ROLLOVER_FILTER;
 		ASCompat.setProperty((mBuyButtonCash.root : ASAny).icons_bundle.coin, "visible", false);
 		ASCompat.setProperty((mBuyButtonCash.root : ASAny).icons_bundle.gift_icon, "visible", false);
 		ASCompat.setProperty((mBuyButtonCash.root : ASAny).original_price, "visible", false);
 		ASCompat.setProperty((mBuyButtonCash.root : ASAny).strike, "visible", false);
-		mRecruitButton = new UIButton(mDBFacade, ASCompat.dynamicAs((mSkinInfoClip : ASAny).exclusive_offer, flash.display.MovieClip));
+		mRecruitButton = new UIButton(mDBFacade, ASCompat.coerce((mSkinInfoClip : ASAny).exclusive_offer, flash.display.MovieClip));
 		mRecruitButton.releaseCallback = function() {
 			StoreServicesController.showCashPage(mDBFacade, "tavernBuyButtonExclusiveOfferDragonKnight");
 		};
 		mRecruitButton.rolloverFilter = DBGlobal.UI_ROLLOVER_FILTER;
 		mRecruitButton.visible = false;
-		mHeroRequiredForSkinPurchase = ASCompat.dynamicAs((mSkinInfoClip : ASAny).hero_required_label, flash.display.MovieClip);
+		mHeroRequiredForSkinPurchase = ASCompat.coerce((mSkinInfoClip : ASAny).hero_required_label, flash.display.MovieClip);
 		ASCompat.setProperty((mHeroRequiredForSkinPurchase : ASAny).hero_label, "text", Locale.getString("PURCHASE_HERO_BEFORE_BUYING_SYTLE_TAVERN_LABEL"));
-		mSaleLabel = ASCompat.dynamicAs((mTavernInfoClip : ASAny).sale_label, flash.text.TextField);
+		mSaleLabel = ASCompat.coerce((mTavernInfoClip : ASAny).sale_label, flash.text.TextField);
 		mSaleLabel.visible = false;
-		mXPParentObject = new UIObject(mDBFacade, ASCompat.dynamicAs((mTavernInfoClip : ASAny).character_info.UI_XP, flash.display.MovieClip));
-		mXPBar = new UIProgressBar(mDBFacade, ASCompat.dynamicAs((mTavernInfoClip : ASAny).character_info.UI_XP.xp_bar, flash.display.MovieClip));
-		mXPText = ASCompat.dynamicAs((mTavernInfoClip : ASAny).character_info.UI_XP.xp_points, flash.text.TextField);
+		mXPParentObject = new UIObject(mDBFacade, ASCompat.coerce((mTavernInfoClip : ASAny).character_info.UI_XP, flash.display.MovieClip));
+		mXPBar = new UIProgressBar(mDBFacade, ASCompat.coerce((mTavernInfoClip : ASAny).character_info.UI_XP.xp_bar, flash.display.MovieClip));
+		mXPText = ASCompat.coerce((mTavernInfoClip : ASAny).character_info.UI_XP.xp_points, flash.text.TextField);
 		mXPText.scaleY = mXPText.scaleX = 1.8;
 		mXPText.x = 80;
 		mXPText.y = 25;
 		mXPParentObject.setTooltip(mXPText);
 		mXPParentObject.tooltipDelay = 0;
 		mXPBar.value = 0;
-		mXPLevelText = ASCompat.dynamicAs((mTavernInfoClip : ASAny).character_info.UI_XP.xp_level, flash.text.TextField);
+		mXPLevelText = ASCompat.coerce((mTavernInfoClip : ASAny).character_info.UI_XP.xp_level, flash.text.TextField);
 		mAssetLoadingComponent.getSwfAsset(DBFacade.buildFullDownloadPath("Resources/Art2D/UI/db_UI_town.swf"),
 			function(param1:brain.assetRepository.SwfAsset) {
 				var _loc2_ = param1.getClass("weapon_tavern_tooltip");
@@ -264,14 +264,14 @@ class UITavern {
 				if (checkNullIteratee(__ax4_iter_206))
 					for (_tmp_ in __ax4_iter_206) {
 						_loc4_ = _tmp_;
-						_loc4_.tooltip = ASCompat.dynamicAs(ASCompat.createInstance(_loc2_, []), flash.display.MovieClip);
+						_loc4_.tooltip = ASCompat.coerce(ASCompat.createInstance(_loc2_, []), flash.display.MovieClip);
 						_loc4_.tooltipPos = new Point(0, 0);
 					}
 				final __ax4_iter_207 = mWeaponIcons4;
 				if (checkNullIteratee(__ax4_iter_207))
 					for (_tmp_ in __ax4_iter_207) {
 						_loc4_ = _tmp_;
-						_loc4_.tooltip = ASCompat.dynamicAs(ASCompat.createInstance(_loc2_, []), flash.display.MovieClip);
+						_loc4_.tooltip = ASCompat.coerce(ASCompat.createInstance(_loc2_, []), flash.display.MovieClip);
 						_loc4_.tooltipPos = new Point(0, 0);
 					}
 			});
@@ -282,15 +282,15 @@ class UITavern {
 		var makeCallbackFunc:ASFunction;
 		var keys:Array<ASAny>;
 		var avatarStartIndex:UInt;
-		mAvatarSelector = ASCompat.dynamicAs((mRootMovieClip : ASAny).UI_town_tavern_body.UI_town_tavern_avatar_selector, flash.display.MovieClip);
-		mHeroSlots.push(new UIButton(mDBFacade, ASCompat.dynamicAs((mAvatarSelector : ASAny).slot_0, flash.display.MovieClip)));
-		mHeroSlots.push(new UIButton(mDBFacade, ASCompat.dynamicAs((mAvatarSelector : ASAny).slot_1, flash.display.MovieClip)));
-		mHeroSlots.push(new UIButton(mDBFacade, ASCompat.dynamicAs((mAvatarSelector : ASAny).slot_2, flash.display.MovieClip)));
-		mHeroSlots.push(new UIButton(mDBFacade, ASCompat.dynamicAs((mAvatarSelector : ASAny).slot_3, flash.display.MovieClip)));
-		mHeroSlots.push(new UIButton(mDBFacade, ASCompat.dynamicAs((mAvatarSelector : ASAny).slot_4, flash.display.MovieClip)));
-		mHeroSlots.push(new UIButton(mDBFacade, ASCompat.dynamicAs((mAvatarSelector : ASAny).slot_5, flash.display.MovieClip)));
-		mHeroSlots.push(new UIButton(mDBFacade, ASCompat.dynamicAs((mAvatarSelector : ASAny).slot_6, flash.display.MovieClip)));
-		mHeroSlots.push(new UIButton(mDBFacade, ASCompat.dynamicAs((mAvatarSelector : ASAny).slot_7, flash.display.MovieClip)));
+		mAvatarSelector = ASCompat.coerce((mRootMovieClip : ASAny).UI_town_tavern_body.UI_town_tavern_avatar_selector, flash.display.MovieClip);
+		mHeroSlots.push(new UIButton(mDBFacade, ASCompat.coerce((mAvatarSelector : ASAny).slot_0, flash.display.MovieClip)));
+		mHeroSlots.push(new UIButton(mDBFacade, ASCompat.coerce((mAvatarSelector : ASAny).slot_1, flash.display.MovieClip)));
+		mHeroSlots.push(new UIButton(mDBFacade, ASCompat.coerce((mAvatarSelector : ASAny).slot_2, flash.display.MovieClip)));
+		mHeroSlots.push(new UIButton(mDBFacade, ASCompat.coerce((mAvatarSelector : ASAny).slot_3, flash.display.MovieClip)));
+		mHeroSlots.push(new UIButton(mDBFacade, ASCompat.coerce((mAvatarSelector : ASAny).slot_4, flash.display.MovieClip)));
+		mHeroSlots.push(new UIButton(mDBFacade, ASCompat.coerce((mAvatarSelector : ASAny).slot_5, flash.display.MovieClip)));
+		mHeroSlots.push(new UIButton(mDBFacade, ASCompat.coerce((mAvatarSelector : ASAny).slot_6, flash.display.MovieClip)));
+		mHeroSlots.push(new UIButton(mDBFacade, ASCompat.coerce((mAvatarSelector : ASAny).slot_7, flash.display.MovieClip)));
 		i = 0;
 		while (i < mHeroSlots.length) {
 			if (ASCompat.toBool((mHeroSlots[i].root : ASAny).chosen)) {
@@ -303,17 +303,17 @@ class UITavern {
 					populateAvatarInfo(value);
 				};
 			};
-			mHeroSlots[i].releaseCallback = ASCompat.asFunction(makeCallbackFunc(i));
+			mHeroSlots[i].releaseCallback = ASCompat.coerceFunction(makeCallbackFunc(i));
 			i = i + 1;
 		}
-		mSelectorLeftScroll = new UIButton(mDBFacade, ASCompat.dynamicAs((mAvatarSelector : ASAny).moveLeft, flash.display.MovieClip));
-		mSelectorRightScroll = new UIButton(mDBFacade, ASCompat.dynamicAs((mAvatarSelector : ASAny).moveRight, flash.display.MovieClip));
+		mSelectorLeftScroll = new UIButton(mDBFacade, ASCompat.coerce((mAvatarSelector : ASAny).moveLeft, flash.display.MovieClip));
+		mSelectorRightScroll = new UIButton(mDBFacade, ASCompat.coerce((mAvatarSelector : ASAny).moveRight, flash.display.MovieClip));
 		mSelectorLeftScroll.releaseCallback = scrollLeft;
 		mSelectorRightScroll.releaseCallback = scrollRight;
 		mActiveAvatar = mDBFacade.dbAccountInfo.activeAvatarInfo;
 		if (mActiveAvatar == null && mDBFacade.dbAccountInfo.inventoryInfo.avatars.size > 0) {
 			keys = mDBFacade.dbAccountInfo.inventoryInfo.avatars.keysToArray();
-			mActiveAvatar = ASCompat.dynamicAs(mDBFacade.dbAccountInfo.inventoryInfo.avatars.itemFor(keys[0]), account.AvatarInfo);
+			mActiveAvatar = ASCompat.coerce(mDBFacade.dbAccountInfo.inventoryInfo.avatars.itemFor(keys[0]), account.AvatarInfo);
 		}
 		avatarStartIndex = getActiveAvatarIndex();
 		if (mHeroIds.length <= mHeroSlots.length) {
@@ -468,7 +468,7 @@ class UITavern {
 		var gmSkin:GMSkin;
 		var iconName:String;
 		var swfFilePath:String;
-		var gmHero = ASCompat.dynamicAs(mDBFacade.gameMaster.heroById.itemFor(mHeroIds[heroIndex]), gameMasterDictionary.GMHero);
+		var gmHero = ASCompat.coerce(mDBFacade.gameMaster.heroById.itemFor(mHeroIds[heroIndex]), gameMasterDictionary.GMHero);
 		var avatarID = gmHero.Id;
 		var avatarInfo = mDBFacade.dbAccountInfo.inventoryInfo.getAvatarInfoForHeroType(gmHero.Id);
 		if (avatarInfo == null) {
@@ -488,7 +488,7 @@ class UITavern {
 			if (_loc4_ == null) {
 				return;
 			}
-			var _loc2_ = ASCompat.dynamicAs(ASCompat.createInstance(_loc4_, []), flash.display.MovieClip);
+			var _loc2_ = ASCompat.coerce(ASCompat.createInstance(_loc4_, []), flash.display.MovieClip);
 			_loc2_.scaleX *= 0.86;
 			_loc2_.scaleY *= 0.86;
 			if (ASCompat.toNumberField((mHeroSlots[vectorIndex].root : ASAny).avatar_icon, "numChildren") > 0) {
@@ -521,7 +521,7 @@ class UITavern {
 	}
 
 	function scrollSkins(scrollAmount:Int) {
-		var _loc3_ = ASCompat.dynamicAs(mDBFacade.gameMaster.heroById.itemFor(mHeroIds[mCurrentChosenIndex]), gameMasterDictionary.GMHero);
+		var _loc3_ = ASCompat.coerce(mDBFacade.gameMaster.heroById.itemFor(mHeroIds[mCurrentChosenIndex]), gameMasterDictionary.GMHero);
 		var _loc2_ = this.getSkinsToDisplay(_loc3_);
 		var _loc4_ = mSkinStartIndex + scrollAmount;
 		if (_loc4_ >= 0 && _loc4_ + mSkinVector.length <= (_loc2_.length : UInt)) {
@@ -549,7 +549,7 @@ class UITavern {
 		if (index >= mHeroIds.length) {
 			return;
 		}
-		var _loc3_ = ASCompat.dynamicAs(mDBFacade.gameMaster.heroById.itemFor(mHeroIds[index]), gameMasterDictionary.GMHero);
+		var _loc3_ = ASCompat.coerce(mDBFacade.gameMaster.heroById.itemFor(mHeroIds[index]), gameMasterDictionary.GMHero);
 		chooseThisHero(_loc3_.Id, index - mAvatarSelectorStartIndex);
 		ASCompat.setProperty((mTavernInfoClip : ASAny).avatar_name_text, "text",
 			GameMasterLocale.getGameMasterSubString("SKIN_NAME", _loc3_.Constant).toUpperCase());
@@ -573,7 +573,7 @@ class UITavern {
 			mAttackStars[_loc2_].visible = gmHero.AttackRating - 1 >= _loc2_;
 			mDefenseStars[_loc2_].visible = gmHero.DefenseRating - 1 >= _loc2_;
 			mSpeedStars[_loc2_].visible = gmHero.SpeedRating - 1 >= _loc2_;
-			_loc2_ = ASCompat.toInt(_loc2_) + 1;
+			_loc2_++;
 		}
 	}
 
@@ -585,7 +585,7 @@ class UITavern {
 		mSkinNotAvailableLabel.visible = false;
 		mAssetLoadingComponent.getSwfAsset(DBFacade.buildFullDownloadPath(gmSkin.PortraitName), function(param1:brain.assetRepository.SwfAsset) {
 			var _loc3_ = param1.getClass(gmSkin.CardName);
-			var _loc4_ = ASCompat.dynamicAs(ASCompat.createInstance(_loc3_, []), flash.display.MovieClip);
+			var _loc4_ = ASCompat.coerce(ASCompat.createInstance(_loc3_, []), flash.display.MovieClip);
 			var _loc2_ = new MovieClipRenderController(mDBFacade, _loc4_);
 			_loc2_.play();
 			if (mHeroPic.numChildren > 0) {
@@ -599,7 +599,7 @@ class UITavern {
 		if (playerOwnsAvatar) {
 			setupBuyButtonWithSkin(gmSkin, true);
 		} else {
-			gmHero = ASCompat.dynamicAs(mDBFacade.gameMaster.heroByConstant.itemFor(gmSkin.ForHero), gameMasterDictionary.GMHero);
+			gmHero = ASCompat.coerce(mDBFacade.gameMaster.heroByConstant.itemFor(gmSkin.ForHero), gameMasterDictionary.GMHero);
 			if (gmHero.DefaultSkin == gmSkin.Constant) {
 				setupBuyButtonForHero(gmHero);
 			} else {
@@ -630,7 +630,7 @@ class UITavern {
 			return;
 		}
 		nowTime = GameClock.date.getTime();
-		offer = ASCompat.dynamicAs(mSkinOffers.itemFor(gmSkin.Id), gameMasterDictionary.GMOffer);
+		offer = ASCompat.coerce(mSkinOffers.itemFor(gmSkin.Id), gameMasterDictionary.GMOffer);
 		if (offer != null) {
 			if (offer.StartDate != null && offer.StartDate.getTime() >= nowTime) {
 				mBuyButton.visible = false;
@@ -721,10 +721,10 @@ class UITavern {
 		mBuyButton.visible = true;
 		mBuyButton.enabled = true;
 		mBuyButton.label.text = Locale.getString("TAVERN_BUY_HERO_BUTTON_TEXT");
-		offer = ASCompat.dynamicAs(mHeroOffers.itemFor(gmHero.Id), gameMasterDictionary.GMOffer);
+		offer = ASCompat.coerce(mHeroOffers.itemFor(gmHero.Id), gameMasterDictionary.GMOffer);
 		saleOffer = offer.isOnSaleNow;
 		coinOffer = offer.CoinOffer;
-		coinSaleOffer = ASCompat.dynamicAs(coinOffer != null ? coinOffer.isOnSaleNow : null, gameMasterDictionary.GMOffer);
+		coinSaleOffer = ASCompat.coerce(coinOffer != null ? coinOffer.isOnSaleNow : null, gameMasterDictionary.GMOffer);
 		currentOffer = saleOffer != null ? saleOffer : offer;
 		currentCoinOffer = coinSaleOffer != null ? coinSaleOffer : coinOffer;
 		mHeroRequiredForSkinPurchase.visible = false;
@@ -788,7 +788,7 @@ class UITavern {
 
 	function determineSkinSelectorStartIndex(gmSkin:GMSkin) {
 		var _loc4_ = 0;
-		var _loc3_ = ASCompat.dynamicAs(mDBFacade.gameMaster.heroById.itemFor(mHeroIds[mCurrentChosenIndex]), gameMasterDictionary.GMHero);
+		var _loc3_ = ASCompat.coerce(mDBFacade.gameMaster.heroById.itemFor(mHeroIds[mCurrentChosenIndex]), gameMasterDictionary.GMHero);
 		var _loc2_ = this.getSkinsToDisplay(_loc3_);
 		_loc4_ = 0;
 		while (_loc4_ < _loc2_.length) {
@@ -796,11 +796,11 @@ class UITavern {
 				if (_loc4_ < mSkinVector.length) {
 					mSkinStartIndex = (0 : UInt);
 				} else {
-					mSkinStartIndex = (ASCompat.toInt(_loc4_ - mSkinVector.length + 1) : UInt);
+					mSkinStartIndex = (_loc4_ - mSkinVector.length + 1 : UInt);
 				}
 				return;
 			}
-			_loc4_ = ASCompat.toInt(_loc4_) + 1;
+			_loc4_++;
 		}
 		mSkinStartIndex = (0 : UInt);
 	}
@@ -880,25 +880,25 @@ class UITavern {
 
 	function setUpSkinSelector() {
 		var _loc3_ = 0;
-		var _loc2_ = ASCompat.dynamicAs(mDBFacade.gameMaster.heroById.itemFor(mHeroIds[mCurrentChosenIndex]), gameMasterDictionary.GMHero);
+		var _loc2_ = ASCompat.coerce(mDBFacade.gameMaster.heroById.itemFor(mHeroIds[mCurrentChosenIndex]), gameMasterDictionary.GMHero);
 		var _loc1_ = this.getSkinsToDisplay(_loc2_);
 		_loc3_ = 0;
 		while (_loc3_ < mSkinVector.length) {
-			if (_loc1_.length > ASCompat.toNumber(_loc3_ + mSkinStartIndex)) {
+			if ((_loc1_.length : UInt) > _loc3_ + mSkinStartIndex) {
 				mSkinVector[_loc3_].selected = false;
-				if (mSelectedSkin != null && mSelectedSkin.Id == _loc1_[ASCompat.toInt(_loc3_ + mSkinStartIndex)].Id) {
+				if (mSelectedSkin != null && mSelectedSkin.Id == _loc1_[(_loc3_ + mSkinStartIndex : Int)].Id) {
 					mSkinVector[_loc3_].selected = true;
 				}
 				mSkinVector[_loc3_].chosen = false;
-				if (mChosenSkin != null && mChosenSkin.Id == _loc1_[ASCompat.toInt(_loc3_ + mSkinStartIndex)].Id) {
+				if (mChosenSkin != null && mChosenSkin.Id == _loc1_[(_loc3_ + mSkinStartIndex : Int)].Id) {
 					mSkinVector[_loc3_].chosen = true;
 				}
-				mSkinVector[_loc3_].gmSkin = _loc1_[ASCompat.toInt(_loc3_ + mSkinStartIndex)];
+				mSkinVector[_loc3_].gmSkin = _loc1_[(_loc3_ + mSkinStartIndex : Int)];
 				mSkinVector[_loc3_].visible = true;
 			} else {
 				mSkinVector[_loc3_].visible = false;
 			}
-			_loc3_ = ASCompat.toInt(_loc3_) + 1;
+			_loc3_++;
 		}
 		mScrollSkinsLeftButton.enabled = false;
 		mScrollSkinsRightButton.enabled = false;
@@ -922,7 +922,7 @@ class UITavern {
 			} else {
 				deselect(mHeroSlots[_loc2_].root);
 			}
-			_loc2_ = ASCompat.toInt(_loc2_) + 1;
+			_loc2_++;
 		}
 	}
 
@@ -960,11 +960,11 @@ class UITavern {
 			}
 			return function(param1:brain.assetRepository.SwfAsset) {
 				var _loc5_ = param1.getClass(subType.Icon);
-				var _loc4_ = ASCompat.dynamicAs(ASCompat.createInstance(_loc5_, []), flash.display.MovieClip);
-				var _loc6_ = ASCompat.dynamicAs((mWeaponIconsVector[index].root : ASAny).bg_slot, flash.display.MovieClip);
-				var _loc3_ = (Std.int(_loc6_.width <= _loc6_.height ? (Std.int(_loc6_.width * (1 / _loc6_.scaleX)) : UInt) : (Std.int(_loc6_.height * (1 / _loc6_.scaleY)) : UInt)) : UInt);
+				var _loc4_ = ASCompat.coerce(ASCompat.createInstance(_loc5_, []), flash.display.MovieClip);
+				var _loc6_ = ASCompat.coerce((mWeaponIconsVector[index].root : ASAny).bg_slot, flash.display.MovieClip);
+				var _loc3_ = (ASCompat.floatToInt(_loc6_.width <= _loc6_.height ? (ASCompat.floatToInt(_loc6_.width * (1 / _loc6_.scaleX)) : UInt) : (ASCompat.floatToInt(_loc6_.height * (1 / _loc6_.scaleY)) : UInt)) : UInt);
 				UIObject.scaleToFit(_loc4_, _loc3_);
-				var _loc2_ = ASCompat.dynamicAs(cast((mWeaponIconsVector[index].root : ASAny).bg_slot, flash.display.DisplayObjectContainer)
+				var _loc2_ = ASCompat.coerce(cast((mWeaponIconsVector[index].root : ASAny).bg_slot, flash.display.DisplayObjectContainer)
 					.getChildByName("weaponIcon"),
 					flash.display.MovieClip);
 				if (ASCompat.toNumberField((mWeaponIconsVector[index].root : ASAny).bg_slot, "numChildren") > 0 && _loc2_ != null) {
@@ -982,8 +982,7 @@ class UITavern {
 		if (checkNullIteratee(allowedWeaponSubTypes))
 			for (_tmp_ in allowedWeaponSubTypes) {
 				masterTypeString = _tmp_;
-				masterType = ASCompat.dynamicAs(mDBFacade.gameMaster.weaponSubtypeByConstant.itemFor(masterTypeString),
-					gameMasterDictionary.GMWeaponMastertype);
+				masterType = ASCompat.coerce(mDBFacade.gameMaster.weaponSubtypeByConstant.itemFor(masterTypeString), gameMasterDictionary.GMWeaponMastertype);
 				if (masterType != null) {
 					if (!masterType.DontShowInTavern) {
 						masterTypeVector.push(masterType);
@@ -1015,7 +1014,7 @@ class UITavern {
 			for (_tmp_ in masterTypeVector) {
 				masterType = _tmp_;
 				mAssetLoadingComponent.getSwfAsset(DBFacade.buildFullDownloadPath(masterType.UISwfFilepath),
-					ASCompat.asFunction(weaponIconCallback(weaponIconIndex, masterType)));
+					ASCompat.coerceFunction(weaponIconCallback(weaponIconIndex, masterType)));
 				weaponIconIndex = weaponIconIndex + 1;
 				if (weaponIconIndex == (mWeaponIconsVector.length : UInt)) {
 					break;
@@ -1041,7 +1040,7 @@ class UITavern {
 				if (ASCompat.toBool((mHeroSlots[_loc4_].root : ASAny).chosen)) {
 					ASCompat.setProperty((mHeroSlots[_loc4_].root : ASAny).chosen, "visible", false);
 				}
-				_loc4_ = ASCompat.toInt(_loc4_) + 1;
+				_loc4_++;
 			}
 			mAvatarIdToMakeActiveAvatar = _loc3_.gmHero.Id;
 			if (ASCompat.toBool((mHeroSlots[index].root : ASAny).chosen)) {
@@ -1055,7 +1054,7 @@ class UITavern {
 	function buyThisHero(offer:GMOffer, index:UInt) {
 		StoreServicesController.tryBuyOffer(mDBFacade, offer, function(param1:ASAny) {
 			var _loc2_ = offer.Details[0].HeroId;
-			DBFacebookBragFeedPost.buyHeroSuccess(mTownHeader, ASCompat.dynamicAs(mDBFacade.gameMaster.heroById.itemFor(_loc2_), gameMasterDictionary.GMHero),
+			DBFacebookBragFeedPost.buyHeroSuccess(mTownHeader, ASCompat.coerce(mDBFacade.gameMaster.heroById.itemFor(_loc2_), gameMasterDictionary.GMHero),
 				mDBFacade, mAssetLoadingComponent);
 			populateAvatarInfo((index : Int));
 			populateAvatarSelector();
@@ -1063,13 +1062,13 @@ class UITavern {
 	}
 
 	function buySkin(skinId:UInt) {
-		var offer = ASCompat.dynamicAs(mSkinOffers.itemFor(skinId), gameMasterDictionary.GMOffer);
+		var offer = ASCompat.coerce(mSkinOffers.itemFor(skinId), gameMasterDictionary.GMOffer);
 		var saleOffer = offer.isOnSaleNow;
 		var currentOffer = saleOffer != null ? saleOffer : offer;
 		StoreServicesController.tryBuyOffer(mDBFacade, currentOffer, function(param1:ASAny) {
 			var _loc3_ = mDBFacade.gameMaster.getSkinByType(skinId);
 			DBFacebookBragFeedPost.buySkinSuccess(_loc3_, mDBFacade, mAssetLoadingComponent);
-			var _loc2_ = ASCompat.dynamicAs(mDBFacade.gameMaster.heroByConstant.itemFor(_loc3_.ForHero), gameMasterDictionary.GMHero);
+			var _loc2_ = ASCompat.coerce(mDBFacade.gameMaster.heroByConstant.itemFor(_loc3_.ForHero), gameMasterDictionary.GMHero);
 			if (_loc2_ == null) {
 				Logger.error("Unable to find gmHero by constant: " + _loc3_.ForHero);
 			}

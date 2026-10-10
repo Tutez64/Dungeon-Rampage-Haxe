@@ -63,16 +63,16 @@ class UIStatHelper {
 		mStatBars = new Vector<UIStatProgressBar>();
 		_loc2_ = 0;
 		while (_loc2_ < 3) {
-			mStatBars.push(new UIStatProgressBar(mDBFacade, ASCompat.dynamicAs(_loc4_[_loc2_], flash.display.MovieClip),
-				ASCompat.dynamicAs(_loc3_[_loc2_], flash.display.MovieClip)));
+			mStatBars.push(new UIStatProgressBar(mDBFacade, ASCompat.coerce(_loc4_[_loc2_], flash.display.MovieClip),
+				ASCompat.coerce(_loc3_[_loc2_], flash.display.MovieClip)));
 			_loc2_++;
 		}
-		mStatIconTooltipBar = new UIObject(mDBFacade, ASCompat.dynamicAs((mUIRoot : ASAny).hit, flash.display.MovieClip));
+		mStatIconTooltipBar = new UIObject(mDBFacade, ASCompat.coerce((mUIRoot : ASAny).hit, flash.display.MovieClip));
 		mStatIconTooltip = new UIStatTooltip(mDBFacade, tooltipClass);
 		mStatIconTooltipBar.tooltip = mStatIconTooltip;
-		mStatIconTooltipBar.tooltipPos = new Point(-75, ASCompat.toNumber(ASCompat.toNumberField((mUIRoot : ASAny).hit, "height") * -0.5 + 25));
-		mStatNameText = ASCompat.dynamicAs((mUIRoot : ASAny).training_meter_text, flash.text.TextField);
-		mTooltipBar = new UIObject(mDBFacade, ASCompat.dynamicAs((mUIRoot : ASAny).barTooltip_hit, flash.display.MovieClip));
+		mStatIconTooltipBar.tooltipPos = new Point(-75, ASCompat.toNumberField((mUIRoot : ASAny).hit, "height") * -0.5 + 25);
+		mStatNameText = ASCompat.coerce((mUIRoot : ASAny).training_meter_text, flash.text.TextField);
+		mTooltipBar = new UIObject(mDBFacade, ASCompat.coerce((mUIRoot : ASAny).barTooltip_hit, flash.display.MovieClip));
 		ASCompat.setProperty((mUIRoot : ASAny).barTooltip, "text", "0/75");
 	}
 
@@ -121,12 +121,12 @@ class UIStatHelper {
 			mStatNameText.text = GameMasterLocale.getGameMasterSubString("STATS_NAME", mDBFacade.gameMaster.statByConstant.itemFor(mStatName).Constant)
 				.toUpperCase();
 			mStatIconName = mDBFacade.gameMaster.statByConstant.itemFor(mStatName).IconName;
-			mStatIconTooltip.statItem = ASCompat.dynamicAs(mDBFacade.gameMaster.statByConstant.itemFor(mStatName), gameMasterDictionary.GMStat);
+			mStatIconTooltip.statItem = ASCompat.coerce(mDBFacade.gameMaster.statByConstant.itemFor(mStatName), gameMasterDictionary.GMStat);
 		} else {
 			mStatNameText.text = GameMasterLocale.getGameMasterSubString("STATS_NAME", mDBFacade.gameMaster.superStatByConstant.itemFor(mStatName).Constant)
 				.toUpperCase();
 			mStatIconName = mDBFacade.gameMaster.superStatByConstant.itemFor(mStatName).IconName;
-			mStatIconTooltip.superStatItem = ASCompat.dynamicAs(mDBFacade.gameMaster.superStatByConstant.itemFor(mStatName), gameMasterDictionary.GMSuperStat);
+			mStatIconTooltip.superStatItem = ASCompat.coerce(mDBFacade.gameMaster.superStatByConstant.itemFor(mStatName), gameMasterDictionary.GMSuperStat);
 		}
 		if (mStatIcon != null) {
 			(mUIRoot : ASAny).icon.removeChild(mStatIcon);
@@ -134,7 +134,7 @@ class UIStatHelper {
 		}
 		_loc2_ = swfAsset.getClass(mStatIconName);
 		if (_loc2_ != null) {
-			mStatIcon = ASCompat.dynamicAs(ASCompat.createInstance(_loc2_, []), flash.display.MovieClip);
+			mStatIcon = ASCompat.coerce(ASCompat.createInstance(_loc2_, []), flash.display.MovieClip);
 			mStatIconRenderer = new MovieClipRenderController(mDBFacade, mStatIcon);
 			mStatIconRenderer.play((0 : UInt), true);
 			(mUIRoot : ASAny).icon.addChild(mStatIcon);

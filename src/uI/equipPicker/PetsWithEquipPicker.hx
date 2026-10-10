@@ -54,28 +54,28 @@ class PetsWithEquipPicker extends UIObject {
 		mGetSelectedHeroCallback = getSelectedHeroIndexCallback;
 		ASCompat.setProperty((mRoot : ASAny).label, "text", Locale.getString("PET_PICKER_LABEL"));
 		mEquipElements = new Vector<AvatarEquipElement>();
-		mEquipElements.push(new AvatarEquipElement(mDBFacade, "", ASCompat.dynamicAs((mRoot : ASAny).UI_pet.equip_slot_1, flash.display.MovieClip),
+		mEquipElements.push(new AvatarEquipElement(mDBFacade, "", ASCompat.coerce((mRoot : ASAny).UI_pet.equip_slot_1, flash.display.MovieClip),
 			weaponTooltipClass, unequipPet, handleItemDrop, (0 : UInt), equippedPetClicked, equipResponseFinishedCallback, allowEquipmentSwapping));
 		ASCompat.setProperty((mRoot : ASAny).UI_pet.equip_slot_0, "visible", false);
 		ASCompat.setProperty((mRoot : ASAny).UI_pet.equip_slot_2, "visible", false);
 		ASCompat.setProperty((mRoot : ASAny).empty_z, "visible", false);
 		ASCompat.setProperty((mRoot : ASAny).empty_c, "visible", false);
 		mEquipSlots = new Vector<EquipSlot>();
-		mEquipSlots.push(new EquipSlot(mDBFacade, ASCompat.dynamicAs((mRoot : ASAny).empty_z, flash.display.MovieClip), this.handleItemDrop, (0 : UInt)));
-		mEquipSlots.push(new EquipSlot(mDBFacade, ASCompat.dynamicAs((mRoot : ASAny).empty_x, flash.display.MovieClip), this.handleItemDrop, (1 : UInt)));
-		mEquipSlots.push(new EquipSlot(mDBFacade, ASCompat.dynamicAs((mRoot : ASAny).empty_c, flash.display.MovieClip), this.handleItemDrop, (2 : UInt)));
+		mEquipSlots.push(new EquipSlot(mDBFacade, ASCompat.coerce((mRoot : ASAny).empty_z, flash.display.MovieClip), this.handleItemDrop, (0 : UInt)));
+		mEquipSlots.push(new EquipSlot(mDBFacade, ASCompat.coerce((mRoot : ASAny).empty_x, flash.display.MovieClip), this.handleItemDrop, (1 : UInt)));
+		mEquipSlots.push(new EquipSlot(mDBFacade, ASCompat.coerce((mRoot : ASAny).empty_c, flash.display.MovieClip), this.handleItemDrop, (2 : UInt)));
 		mHeroSlots = new Vector<HeroElement>();
-		mHeroSlots.push(new HeroElement(mDBFacade, ASCompat.dynamicAs((mRoot : ASAny).hero_slot_0, flash.display.MovieClip), heroTooltipClass, heroClicked));
-		mHeroSlots.push(new HeroElement(mDBFacade, ASCompat.dynamicAs((mRoot : ASAny).hero_slot_1, flash.display.MovieClip), heroTooltipClass, heroClicked));
-		mHeroSlots.push(new HeroElement(mDBFacade, ASCompat.dynamicAs((mRoot : ASAny).hero_slot_2, flash.display.MovieClip), heroTooltipClass, heroClicked));
-		mHeroSlots.push(new HeroElement(mDBFacade, ASCompat.dynamicAs((mRoot : ASAny).hero_slot_3, flash.display.MovieClip), heroTooltipClass, heroClicked));
-		mHeroSlots.push(new HeroElement(mDBFacade, ASCompat.dynamicAs((mRoot : ASAny).hero_slot_4, flash.display.MovieClip), heroTooltipClass, heroClicked));
-		mHeroSlots.push(new HeroElement(mDBFacade, ASCompat.dynamicAs((mRoot : ASAny).hero_slot_5, flash.display.MovieClip), heroTooltipClass, heroClicked));
-		mHeroSlots.push(new HeroElement(mDBFacade, ASCompat.dynamicAs((mRoot : ASAny).hero_slot_6, flash.display.MovieClip), heroTooltipClass, heroClicked));
-		mHeroSlots.push(new HeroElement(mDBFacade, ASCompat.dynamicAs((mRoot : ASAny).hero_slot_7, flash.display.MovieClip), heroTooltipClass, heroClicked));
-		mShiftLeft = new UIButton(mDBFacade, ASCompat.dynamicAs((mRoot : ASAny).shift_left, flash.display.MovieClip));
+		mHeroSlots.push(new HeroElement(mDBFacade, ASCompat.coerce((mRoot : ASAny).hero_slot_0, flash.display.MovieClip), heroTooltipClass, heroClicked));
+		mHeroSlots.push(new HeroElement(mDBFacade, ASCompat.coerce((mRoot : ASAny).hero_slot_1, flash.display.MovieClip), heroTooltipClass, heroClicked));
+		mHeroSlots.push(new HeroElement(mDBFacade, ASCompat.coerce((mRoot : ASAny).hero_slot_2, flash.display.MovieClip), heroTooltipClass, heroClicked));
+		mHeroSlots.push(new HeroElement(mDBFacade, ASCompat.coerce((mRoot : ASAny).hero_slot_3, flash.display.MovieClip), heroTooltipClass, heroClicked));
+		mHeroSlots.push(new HeroElement(mDBFacade, ASCompat.coerce((mRoot : ASAny).hero_slot_4, flash.display.MovieClip), heroTooltipClass, heroClicked));
+		mHeroSlots.push(new HeroElement(mDBFacade, ASCompat.coerce((mRoot : ASAny).hero_slot_5, flash.display.MovieClip), heroTooltipClass, heroClicked));
+		mHeroSlots.push(new HeroElement(mDBFacade, ASCompat.coerce((mRoot : ASAny).hero_slot_6, flash.display.MovieClip), heroTooltipClass, heroClicked));
+		mHeroSlots.push(new HeroElement(mDBFacade, ASCompat.coerce((mRoot : ASAny).hero_slot_7, flash.display.MovieClip), heroTooltipClass, heroClicked));
+		mShiftLeft = new UIButton(mDBFacade, ASCompat.coerce((mRoot : ASAny).shift_left, flash.display.MovieClip));
 		mShiftLeft.releaseCallback = shiftLeft;
-		mShiftRight = new UIButton(mDBFacade, ASCompat.dynamicAs((mRoot : ASAny).shift_right, flash.display.MovieClip));
+		mShiftRight = new UIButton(mDBFacade, ASCompat.coerce((mRoot : ASAny).shift_right, flash.display.MovieClip));
 		mShiftRight.releaseCallback = shiftRight;
 		mShiftLeft.visible = false;
 		mShiftRight.visible = false;
@@ -99,7 +99,7 @@ class PetsWithEquipPicker extends UIObject {
 				mHeroSlots[_loc2_].enabled = false;
 			}
 			_loc1_++;
-			_loc2_ = ASCompat.toInt(_loc2_) + 1;
+			_loc2_++;
 		}
 		updateShiftButtons();
 		determineSelectedElement();
@@ -136,12 +136,12 @@ class PetsWithEquipPicker extends UIObject {
 		var _loc1_ = 0;
 		_loc1_ = 0;
 		while (_loc1_ < mHeroSlots.length) {
-			if (ASCompat.toNumber(_loc1_ + mCurrentStartIndex) == selectedHeroIndex) {
+			if (_loc1_ + mCurrentStartIndex == (selectedHeroIndex : UInt)) {
 				mHeroSlots[_loc1_].select();
 			} else {
 				mHeroSlots[_loc1_].deselect();
 			}
-			_loc1_ = ASCompat.toInt(_loc1_) + 1;
+			_loc1_++;
 		}
 	}
 
@@ -224,7 +224,7 @@ class PetsWithEquipPicker extends UIObject {
 			if (avatarId == _loc3_[_loc2_].Id) {
 				return (_loc2_ : UInt);
 			}
-			_loc2_ = ASCompat.toInt(_loc2_) + 1;
+			_loc2_++;
 		}
 		Logger.error("Unable to find gmHero for active avatar Id: " + avatarId);
 		return (0 : UInt);
@@ -235,7 +235,7 @@ class PetsWithEquipPicker extends UIObject {
 		_loc3_ = 0;
 		while (_loc3_ < mEquipElements.length) {
 			mEquipElements[_loc3_].clear();
-			_loc3_ = ASCompat.toInt(_loc3_) + 1;
+			_loc3_++;
 		}
 		var _loc1_ = mDBFacade.dbAccountInfo.inventoryInfo.getAvatarInfoForHeroType(mDBFacade.gameMaster.Heroes[selectedHeroIndex].Id);
 		if (_loc1_ == null) {
@@ -258,7 +258,7 @@ class PetsWithEquipPicker extends UIObject {
 					mEquipElements[_loc3_].itemInfo = _loc2_[_loc3_];
 				}
 			}
-			_loc3_ = ASCompat.toInt(_loc3_) + 1;
+			_loc3_++;
 		}
 	}
 
@@ -309,7 +309,7 @@ class PetsWithEquipPicker extends UIObject {
 		_loc1_ = 0;
 		while (_loc1_ < mEquipElements.length) {
 			mEquipElements[_loc1_].deselect();
-			_loc1_ = ASCompat.toInt(_loc1_) + 1;
+			_loc1_++;
 		}
 	}
 

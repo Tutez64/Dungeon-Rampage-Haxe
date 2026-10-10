@@ -38,7 +38,7 @@ class DBUIOneButtonPopup extends DBUIPopup {
 		super.setupUI(swfAsset, titleText, content, allowClose, closeCallback);
 		if (ASCompat.stringAsBool(mCenterText)) {
 			ASCompat.setProperty((mPopup : ASAny).center_button, "visible", true);
-			mCenterButton = new UIButton(mDBFacade, ASCompat.dynamicAs((mPopup : ASAny).center_button, flash.display.MovieClip));
+			mCenterButton = new UIButton(mDBFacade, ASCompat.coerce((mPopup : ASAny).center_button, flash.display.MovieClip));
 			mCenterButton.label.text = mCenterText;
 			mCenterButton.releaseCallback = this.centerButtonCallback;
 			mCenterButton.rolloverFilter = DBGlobal.UI_ROLLOVER_FILTER;

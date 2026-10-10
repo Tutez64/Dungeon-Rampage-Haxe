@@ -65,7 +65,7 @@ class LetterboxEffect {
 		mFramesElapsed = 0;
 		mRectSprite = new Sprite();
 		MemoryTracker.track(mRectSprite, "Sprite - letterbox rect created in LetterboxEffect.execute()", "brain");
-		mRectSprite.graphics.beginFill((Std.int(mColor.x) << 16 | Std.int(mColor.y) << 8 | Std.int(mColor.z):UInt), 1);
+		mRectSprite.graphics.beginFill((ASCompat.floatToInt(mColor.x) << 16 | ASCompat.floatToInt(mColor.y) << 8 | ASCompat.floatToInt(mColor.z):UInt), 1);
 		mRectSprite.graphics.drawRect(0, 0, mFacade.stageRef.fullScreenWidth + 512, 75);
 		mRectSprite.graphics.drawRect(0, mFacade.stageRef.fullScreenHeight - 550, mFacade.stageRef.fullScreenWidth + 512, 375);
 		mRectSprite.graphics.endFill();

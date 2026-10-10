@@ -186,7 +186,7 @@ class ActorView extends FloorView {
 			mRoot.addChild(mNametag);
 			mNametag.AFK = this.mParentActorObject.AFK;
 			mNametag.screenName = this.mParentActorObject.screenName;
-			mNametag.setHp(mParentActorObject.hitPoints, (Std.int(mParentActorObject.maxHitPoints) : UInt));
+			mNametag.setHp(mParentActorObject.hitPoints, (ASCompat.floatToInt(mParentActorObject.maxHitPoints) : UInt));
 		}
 	}
 
@@ -597,7 +597,7 @@ class ActorView extends FloorView {
 			return;
 		}
 		if (_loc3_.isOwner) {
-			_loc2_ = ASCompat.dynamicAs(mDBFacade.gameMaster.attackById.itemFor(combatResult.attack.attackType), gameMasterDictionary.GMAttack);
+			_loc2_ = ASCompat.coerce(mDBFacade.gameMaster.attackById.itemFor(combatResult.attack.attackType), gameMasterDictionary.GMAttack);
 			playHitEffect(_loc2_, _loc3_.isHeroType);
 			playHitEffectToLerpToAttacker(_loc2_, _loc3_);
 			playHitEffectToLerpFromAttacker(_loc2_, _loc3_);

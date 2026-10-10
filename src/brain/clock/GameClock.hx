@@ -102,7 +102,7 @@ class GameClock {
 			_loc21_ = (cast _loc14_.split(":"));
 			_loc18_ = ASCompat.toNumber(_loc21_.shift());
 			_loc13_ = ASCompat.toNumber(_loc21_.shift());
-			_loc16_ = ASCompat.dynamicAs(_loc21_.length > 0 ? (cast ASCompat.toString(_loc21_.shift()).split(".")) : null, Array);
+			_loc16_ = ASCompat.coerce(_loc21_.length > 0 ? (cast ASCompat.toString(_loc21_.shift()).split(".")) : null, Array);
 			_loc15_ = _loc16_ != null && _loc16_.length > 0 ? ASCompat.toNumber(_loc16_.shift()) : 0;
 			_loc5_ = _loc16_ != null && _loc16_.length > 0 ? 1000 * Std.parseFloat("0." + Std.string(_loc16_.shift())) : 0;
 			_loc11_ = ASCompat.ASDate.UTC(_loc10_, _loc17_ - 1, _loc3_, _loc18_, _loc13_, _loc15_, _loc5_);
@@ -191,7 +191,7 @@ class GameClock {
 
 	public static function computeServerTimeOffset(serverDate:Date) {
 		var _loc2_ = Date.now();
-		var _loc3_ = Std.int(serverDate.getTime() - _loc2_.getTime());
+		var _loc3_ = ASCompat.floatToInt(serverDate.getTime() - _loc2_.getTime());
 		mServerTimeOffset = _loc3_;
 	}
 
@@ -209,11 +209,11 @@ class GameClock {
 	public static function getEpoch():Float {
 		var _loc1_ = Math.floor(getWebServerTime() / 1000);
 		var _loc2_ = 0;
-		return Std.int((_loc1_ + mEpochOffset) / mEpochDuration);
+		return ASCompat.floatToInt((_loc1_ + mEpochOffset) / mEpochDuration);
 	}
 
 	public static function getTimeToEpoch():Float {
-		var _loc3_ = Std.int(getEpoch() + 1);
+		var _loc3_ = ASCompat.floatToInt(getEpoch() + 1);
 		var _loc4_ = _loc3_ * mEpochDuration - mEpochOffset;
 		var _loc1_ = Math.floor(getWebServerTime() / 1000);
 		return _loc4_ - _loc1_;
@@ -229,7 +229,7 @@ class GameClock {
 		_loc2_ -= _loc3_ * mTimeHours;
 		var _loc4_ = Math.floor(_loc2_ / mTimeMinutes);
 		_loc2_ -= _loc4_ * mTimeMinutes;
-		var _loc6_ = Std.int(_loc2_);
+		var _loc6_ = ASCompat.floatToInt(_loc2_);
 		return [_loc6_, _loc4_, _loc3_, _loc5_, _loc1_];
 	}
 

@@ -65,7 +65,7 @@ class PetPortraitUI extends UIObject {
 	}
 
 	function setupPetUI() {
-		mHpBar = new UIProgressBar(mDBFacade, ASCompat.dynamicAs((root : ASAny).hp.hpBar, flash.display.MovieClip));
+		mHpBar = new UIProgressBar(mDBFacade, ASCompat.coerce((root : ASAny).hp.hpBar, flash.display.MovieClip));
 		ASCompat.setProperty((mRoot : ASAny).hp_death, "visible", false);
 		if (mNoPetUI != null) {
 			mNoPetUI.visible = false;
@@ -78,9 +78,9 @@ class PetPortraitUI extends UIObject {
 			mEventComponent.addListener(GameObjectEvent.uniqueEvent("HpEvent_HP_UPDATE", mPetNPCGameObject.id), function(param1:events.HpEvent) {
 				setHp(param1.hp, param1.maxHp);
 			});
-			setHp(mPetNPCGameObject.hitPoints, (Std.int(mPetNPCGameObject.maxHitPoints) : UInt));
+			setHp(mPetNPCGameObject.hitPoints, (ASCompat.floatToInt(mPetNPCGameObject.maxHitPoints) : UInt));
 			ItemInfo.loadItemIcon(mPetNPCGameObject.actorData.gMActor.IconSwfFilepath, mPetNPCGameObject.actorData.gMActor.IconName,
-				ASCompat.dynamicAs((root : ASAny).graphic, flash.display.DisplayObjectContainer), mDBFacade, (80 : UInt), (68 : UInt));
+				ASCompat.coerce((root : ASAny).graphic, flash.display.DisplayObjectContainer), mDBFacade, (80 : UInt), (68 : UInt));
 			if (mNoPetUI != null) {
 				mNoPetUI.visible = false;
 			}
@@ -94,10 +94,9 @@ class PetPortraitUI extends UIObject {
 			this.visible = false;
 			this.hideTooltip();
 		}
-		mCoolDownRenderer = new MovieClipRenderer(mDBFacade, ASCompat.dynamicAs((root : ASAny).cooldown, flash.display.MovieClip));
+		mCoolDownRenderer = new MovieClipRenderer(mDBFacade, ASCompat.coerce((root : ASAny).cooldown, flash.display.MovieClip));
 		mCoolDownRenderer.clip.visible = false;
-		mCoolDownClipLength = ASCompat.toNumber(ASCompat.toNumberField((root : ASAny).cooldown,
-			"totalFrames") * brain.clock.GameClock.ANIMATION_FRAME_DURATION);
+		mCoolDownClipLength = ASCompat.toNumberField((root : ASAny).cooldown, "totalFrames") * brain.clock.GameClock.ANIMATION_FRAME_DURATION;
 	}
 
 	function setHp(current:UInt, max:UInt) {
@@ -119,7 +118,7 @@ class PetPortraitUI extends UIObject {
 
 	function handleRespawningPetDeath(respawnTimer:Float) {
 		ItemInfo.loadItemIcon(mPetNPCGameObject.actorData.gMActor.IconSwfFilepath, mPetNPCGameObject.actorData.gMActor.IconName,
-			ASCompat.dynamicAs((root : ASAny).graphic, flash.display.DisplayObjectContainer), mDBFacade, (80 : UInt), (68 : UInt));
+			ASCompat.coerce((root : ASAny).graphic, flash.display.DisplayObjectContainer), mDBFacade, (80 : UInt), (68 : UInt));
 		ASCompat.setProperty((mRoot : ASAny).hp_death, "visible", true);
 		ASCompat.setProperty((root : ASAny).tooltip.title_label, "text",
 			GameMasterLocale.getGameMasterSubString("PET_NAME", mPetNPCGameObject.gmNpc.Constant).toUpperCase());

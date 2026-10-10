@@ -120,9 +120,9 @@ class OwnerAttackTimeline extends AttackTimeline {
 		}
 		var _loc2_ = new Attack();
 		_loc2_.attackType = mCurrentAttackType;
-		_loc2_.weaponSlot = Std.int(_loc4_);
+		_loc2_.weaponSlot = ASCompat.floatToInt(_loc4_);
 		_loc2_.isConsumableWeapon = (_loc5_ ? (1 : UInt) : (0 : UInt) : UInt);
-		_loc2_.targetActorDoid = (ASCompat.toInt(mTargetActor != null ? mTargetActor.id : (0 : UInt)) : UInt);
+		_loc2_.targetActorDoid = mTargetActor != null ? mTargetActor.id : (0 : UInt);
 		var _loc3_ = new AttackChoreography();
 		_loc3_.attack = _loc2_;
 		var _loc1_ = (mLoop ? (1 : UInt) : (0 : UInt) : UInt);

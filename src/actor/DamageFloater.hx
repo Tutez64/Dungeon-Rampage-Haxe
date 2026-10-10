@@ -63,7 +63,7 @@ class DamageFloater extends FloatingMessage {
 		mDBFacade = dbFacade;
 		mType = type;
 		setup(isCriticalHit, delta, attackerIsOwner, attackeeIsOwner, blit, effectiveness);
-		var _loc16_ = ASCompat.dynamicAs(blit ? mBmp : mFloaterText, flash.display.DisplayObject);
+		var _loc16_ = ASCompat.coerce(blit ? mBmp : mFloaterText, flash.display.DisplayObject);
 		super(_loc16_, dbFacade, holdDuration, totalDuration, scaleDampening, floatSpeed, mFloatDirection, finishedCallback, movementType);
 		mDBFacade.sceneGraphManager.addChild(mRoot, 30);
 	}
@@ -155,7 +155,7 @@ class DamageFloater extends FloatingMessage {
 				_loc9_ = ASCompat.toInt(isCriticalHit ? 16750848 : getEffectivenessTextColor(effectiveness));
 			}
 			if (mType > 10) {
-				_loc14_ = ASCompat.dynamicAs(mDBFacade.gameMaster.buffColorTypeById.itemFor(mType), gameMasterDictionary.GMBuffColorType);
+				_loc14_ = ASCompat.coerce(mDBFacade.gameMaster.buffColorTypeById.itemFor(mType), gameMasterDictionary.GMBuffColorType);
 				_loc9_ = (_loc14_.ColorHex : Int);
 			}
 			_loc10_ = new Vector3D((Math.random() - 0.5) * 0.5, -1, 0);
@@ -184,7 +184,7 @@ class DamageFloater extends FloatingMessage {
 			mFloaterText.filters = cast([CRIT_FILTER]);
 		}
 		if (blit) {
-			mBmpData = new BitmapData(Std.int(mFloaterText.width), Std.int(mFloaterText.height), true, (0 : UInt));
+			mBmpData = new BitmapData(ASCompat.floatToInt(mFloaterText.width), ASCompat.floatToInt(mFloaterText.height), true, (0 : UInt));
 			_loc13_ = mFloaterText.getBounds(mFloaterText);
 			_loc7_ = new Matrix();
 			_loc7_.translate(-_loc13_.x, -_loc13_.y);

@@ -65,7 +65,7 @@ class ScalingWeaponController extends WeaponController {
 
 	public function buildControllerAttacks() {
 		mScalingLogicalWorkComponent = new LogicalWorkComponent(mDBFacade, "ScalingWeaponController");
-		mHoldingAttack = ASCompat.dynamicAs(mDBFacade.gameMaster.attackByConstant.itemFor(mWeapon.weaponData.HoldingAttack), gameMasterDictionary.GMAttack);
+		mHoldingAttack = ASCompat.coerce(mDBFacade.gameMaster.attackByConstant.itemFor(mWeapon.weaponData.HoldingAttack), gameMasterDictionary.GMAttack);
 		if (mHoldingAttack != null) {
 			mHoldingAttackTimeline = mWeapon.getAttackTimeline(mHoldingAttack.Id);
 		}
@@ -85,7 +85,7 @@ class ScalingWeaponController extends WeaponController {
 		mDistanceScalingForProjectilesMin = mWeapon.weaponData.ScalingProjectileMinDistance;
 		mDistanceScalingForProjectilesMax = mWeapon.weaponData.ScalingProjectileMaxDistance;
 		var _loc2_ = mWeapon.weaponData.ChargeAttack;
-		mChargeReleaseGMAttack = ASCompat.dynamicAs(mDBFacade.gameMaster.attackByConstant.itemFor(_loc2_), gameMasterDictionary.GMAttack);
+		mChargeReleaseGMAttack = ASCompat.coerce(mDBFacade.gameMaster.attackByConstant.itemFor(_loc2_), gameMasterDictionary.GMAttack);
 		var _loc1_:GMModifier;
 		final __ax4_iter_0 = mWeapon.modifierList;
 		if (checkNullIteratee(__ax4_iter_0))
@@ -178,7 +178,7 @@ class ScalingWeaponController extends WeaponController {
 				_loc11_ = mPowerMultiplier > 1 ? 1 + _loc6_ * mPowerMultiplier : 1;
 				_loc7_ = 1;
 				if (_loc6_ > 0 && (mProjectileMinMultiplier > 1 || mProjectileMaxMultiplier > 1)) {
-					_loc7_ = Std.int(Math.fceil(mProjectileMinMultiplier + _loc6_ * (mProjectileMaxMultiplier - mProjectileMinMultiplier)));
+					_loc7_ = ASCompat.floatToInt(Math.fceil(mProjectileMinMultiplier + _loc6_ * (mProjectileMaxMultiplier - mProjectileMinMultiplier)));
 				}
 				_loc4_ = 0;
 				if (_loc7_ > 1) {
@@ -218,8 +218,8 @@ class ScalingWeaponController extends WeaponController {
 				if (_loc7_ < 1) {
 					_loc7_ = 1;
 				}
-				_loc10_.projectileMultiplier = (Std.int(_loc7_) : UInt);
-				_loc10_.projectileScalingAngle = (Std.int(ASCompat.toNumber(_loc4_ + _loc2_) / _loc7_) : UInt);
+				_loc10_.projectileMultiplier = (ASCompat.floatToInt(_loc7_) : UInt);
+				_loc10_.projectileScalingAngle = (ASCompat.floatToInt((_loc4_ + _loc2_) / _loc7_) : UInt);
 				_loc10_.distanceScalingTime = mDistanceScalingTime;
 				_loc10_.distanceScalingHero = mDistanceScalingForHeroMin + _loc6_ * (mDistanceScalingForHeroMax - mDistanceScalingForHeroMin);
 				_loc10_.distanceScalingProjectile = mDistanceScalingForProjectilesMin

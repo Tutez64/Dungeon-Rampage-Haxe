@@ -92,20 +92,20 @@ class UIHeroTraining {
 		mTownHeader = townHeader;
 		var _loc6_ = swfAsset.getClass("DR_weapon_tooltip");
 		var _loc7_ = swfAsset.getClass("avatar_tooltip");
-		mHeroWithEquipPicker = new HeroWithEquipPicker(mDBFacade, ASCompat.dynamicAs((rootClip : ASAny).hero_picker, flash.display.MovieClip), _loc6_, _loc7_,
+		mHeroWithEquipPicker = new HeroWithEquipPicker(mDBFacade, ASCompat.coerce((rootClip : ASAny).hero_picker, flash.display.MovieClip), _loc6_, _loc7_,
 			heroSelected);
 		var _loc5_:ASObject = {"avatar_id": 103};
 		mFakeHeroInfo = new AvatarInfo(mDBFacade, _loc5_, null);
 		this.setupUI(rootClip, swfAsset.getClass("stat_tooltip"));
 		mAssetLoadingComponent.getSwfAsset(DBFacade.buildFullDownloadPath("Resources/Art2D/Icons/Stats/db_icon_stats.swf"), setupIcons);
-		mGMOffer = ASCompat.dynamicAs(mDBFacade.gameMaster.offerById.itemFor(RESPEC_OFFER_ID), gameMasterDictionary.GMOffer);
+		mGMOffer = ASCompat.coerce(mDBFacade.gameMaster.offerById.itemFor(RESPEC_OFFER_ID), gameMasterDictionary.GMOffer);
 	}
 
 	function setupUI(rootClip:MovieClip, tooltipClass:Dynamic) {
 		var i = 0;
-		mUIRoot = ASCompat.dynamicAs((rootClip : ASAny).training_main, flash.display.MovieClip);
-		mHeroPortrait = ASCompat.dynamicAs((rootClip : ASAny).training_avatar, flash.display.MovieClip);
-		mHeroPortraitText = ASCompat.dynamicAs((mUIRoot : ASAny).hero_text, flash.text.TextField);
+		mUIRoot = ASCompat.coerce((rootClip : ASAny).training_main, flash.display.MovieClip);
+		mHeroPortrait = ASCompat.coerce((rootClip : ASAny).training_avatar, flash.display.MovieClip);
+		mHeroPortraitText = ASCompat.coerce((mUIRoot : ASAny).hero_text, flash.text.TextField);
 		mStatHelpers = new Vector<UIStatHelper>();
 		mStatLevelPlusButtons = new Vector<UIButton>();
 		var createFunc:ASFunction = function(param1:Int):ASFunction {
@@ -136,15 +136,15 @@ class UIHeroTraining {
 		];
 		i = 0;
 		while (i < 4) {
-			mStatHelpers.push(new UIStatHelper(mDBFacade, tooltipClass, ASCompat.dynamicAs(listOfStatUpgrades[i], flash.display.MovieClip)));
-			mStatLevelPlusButtons.push(new UIButton(mDBFacade, ASCompat.dynamicAs(listOfStatPlusButtons[i], flash.display.MovieClip)));
-			mStatLevelPlusButtons[i].releaseCallback = ASCompat.asFunction(createFunc(i));
+			mStatHelpers.push(new UIStatHelper(mDBFacade, tooltipClass, ASCompat.coerce(listOfStatUpgrades[i], flash.display.MovieClip)));
+			mStatLevelPlusButtons.push(new UIButton(mDBFacade, ASCompat.coerce(listOfStatPlusButtons[i], flash.display.MovieClip)));
+			mStatLevelPlusButtons[i].releaseCallback = ASCompat.coerceFunction(createFunc(i));
 			i = i + 1;
 		}
-		mSpendButton = new UIButton(mDBFacade, ASCompat.dynamicAs((mUIRoot : ASAny).spend_button, flash.display.MovieClip));
+		mSpendButton = new UIButton(mDBFacade, ASCompat.coerce((mUIRoot : ASAny).spend_button, flash.display.MovieClip));
 		mSpendButton.enabled = false;
 		ASCompat.setProperty((mSpendButton.root : ASAny).button_text, "text", Locale.getString("TRAINING_POINTS"));
-		mResetButton = new UIButton(mDBFacade, ASCompat.dynamicAs((mUIRoot : ASAny).reset_button, flash.display.MovieClip));
+		mResetButton = new UIButton(mDBFacade, ASCompat.coerce((mUIRoot : ASAny).reset_button, flash.display.MovieClip));
 		mResetButton.label.text = Locale.getString("RETRAIN");
 		mResetButton.releaseCallback = function() {
 			resetReleased();
@@ -203,7 +203,7 @@ class UIHeroTraining {
 		mEventComponent.addListener("DB_ACCOUNT_INFO_RESPONSE", dbAccountInfoUpdate);
 		mHeroWithEquipPicker.refresh(true);
 		mHeroInfo = mDBFacade.dbAccountInfo.activeAvatarInfo;
-		mSelectedHero = ASCompat.dynamicAs(mDBFacade.gameMaster.heroById.itemFor(mHeroInfo.avatarType), gameMasterDictionary.GMHero);
+		mSelectedHero = ASCompat.coerce(mDBFacade.gameMaster.heroById.itemFor(mHeroInfo.avatarType), gameMasterDictionary.GMHero);
 		var _loc1_ = mDBFacade.dbAccountInfo.inventoryInfo.ownsItem(mSelectedHero.Id);
 		this.heroSelected(mSelectedHero, _loc1_);
 		mUIRoot.visible = true;
@@ -267,7 +267,7 @@ class UIHeroTraining {
 				if (_loc3_ == null) {
 					return;
 				}
-				var _loc4_ = ASCompat.dynamicAs(ASCompat.createInstance(_loc3_, []), flash.display.MovieClip);
+				var _loc4_ = ASCompat.coerce(ASCompat.createInstance(_loc3_, []), flash.display.MovieClip);
 				_loc4_.scaleX = _loc4_.scaleY = 0.7;
 				_loc4_.x = 15;
 				var _loc2_ = new MovieClipRenderController(mDBFacade, _loc4_);
@@ -304,7 +304,7 @@ class UIHeroTraining {
 		if (mHeroInfo == mFakeHeroInfo) {
 			return 0;
 		}
-		return Std.int(Math.max(mHeroInfo.skillPointsEarned
+		return ASCompat.floatToInt(Math.max(mHeroInfo.skillPointsEarned
 			- (mStatHelpers[0].amount + mStatHelpers[1].amount + mStatHelpers[2].amount + mStatHelpers[3].amount), 0));
 	}
 
@@ -454,7 +454,7 @@ class UIHeroTraining {
 					}
 					updateUIClient();
 				});
-			}, (Std.int(mGMOffer.Price) : UInt));
+			}, (ASCompat.floatToInt(mGMOffer.Price) : UInt));
 			MemoryTracker.track(popup, "UIRetrainPopup - created in UIHeroTraining.resetReleased()");
 		}
 	}

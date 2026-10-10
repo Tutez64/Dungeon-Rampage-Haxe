@@ -42,8 +42,8 @@ class ConsumableWeaponGameObject extends WeaponGameObject {
 		mDefaultWeaponDetails.modifier2 = (0 : UInt);
 		mDefaultWeaponDetails.legendarymodifier = (0 : UInt);
 		super(mDefaultWeaponDetails, actorGameObject, actorView, dbFacade, distributedDungeonFloor, slot);
-		mGMStackable = ASCompat.dynamicAs(mDBFacade.gameMaster.stackableById.itemFor(mConsumableDetails.type), gameMasterDictionary.GMStackable);
-		mConsumableAttack = ASCompat.dynamicAs(mDBFacade.gameMaster.attackByConstant.itemFor(mGMStackable.UsageAttack), gameMasterDictionary.GMAttack);
+		mGMStackable = ASCompat.coerce(mDBFacade.gameMaster.stackableById.itemFor(mConsumableDetails.type), gameMasterDictionary.GMStackable);
+		mConsumableAttack = ASCompat.coerce(mDBFacade.gameMaster.attackByConstant.itemFor(mGMStackable.UsageAttack), gameMasterDictionary.GMAttack);
 	}
 
 	override public function destroy() {

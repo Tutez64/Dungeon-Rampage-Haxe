@@ -47,7 +47,7 @@ class Graphing extends ConsoleCore {
 			report("ERROR: Graph [" + n + "] received a null object to graph property [" + prop + "].", 10);
 			return;
 		}
-		group = ASCompat.dynamicAs(this._map[n], com.junkbyte.console.vos.GraphGroup);
+		group = ASCompat.coerce(this._map[n], com.junkbyte.console.vos.GraphGroup);
 		if (group == null) {
 			newGroup = true;
 			group = new GraphGroup(n);
@@ -65,7 +65,7 @@ class Graphing extends ConsoleCore {
 		}
 		if (checkNullIteratee(interests))
 			for (_tmp_ in interests) {
-				i = ASCompat.dynamicAs(_tmp_, com.junkbyte.console.vos.GraphInterest);
+				i = ASCompat.coerce(_tmp_, com.junkbyte.console.vos.GraphInterest);
 				if (i.key == key) {
 					report("Graph with key [" + key + "] already exists in [" + n + "]", 10);
 					return;
@@ -101,7 +101,7 @@ class Graphing extends ConsoleCore {
 			low = Math.NaN;
 		if (high == null)
 			high = Math.NaN;
-		var _loc4_ = ASCompat.dynamicAs(this._map[n], com.junkbyte.console.vos.GraphGroup);
+		var _loc4_ = ASCompat.coerce(this._map[n], com.junkbyte.console.vos.GraphGroup);
 		if (_loc4_ == null) {
 			return;
 		}
@@ -117,14 +117,14 @@ class Graphing extends ConsoleCore {
 		if (obj == null && prop == null) {
 			this.removeGroup(n);
 		} else if (ASCompat.toBool(this._map[n])) {
-			_loc4_ = ASCompat.dynamicAs(this._map[n].interests, Array);
+			_loc4_ = ASCompat.coerce(this._map[n].interests, Array);
 			_loc5_ = _loc4_.length - 1;
 			while (_loc5_ >= 0) {
-				_loc6_ = ASCompat.dynamicAs(_loc4_[_loc5_], com.junkbyte.console.vos.GraphInterest);
+				_loc6_ = ASCompat.coerce(_loc4_[_loc5_], com.junkbyte.console.vos.GraphInterest);
 				if ((obj == null || _loc6_.obj == obj) && (prop == null || _loc6_.prop == prop)) {
 					_loc4_.splice(_loc5_, (1 : UInt));
 				}
-				_loc5_ = ASCompat.toInt(_loc5_) - 1;
+				_loc5_--;
 			}
 			if (_loc4_.length == 0) {
 				this.removeGroup(n);
@@ -141,7 +141,7 @@ class Graphing extends ConsoleCore {
 			_loc2_.writeUTF(n);
 			remoter.send("removeGroup", _loc2_);
 		} else {
-			_loc3_ = ASCompat.dynamicAs(this._map[n], com.junkbyte.console.vos.GraphGroup);
+			_loc3_ = ASCompat.coerce(this._map[n], com.junkbyte.console.vos.GraphGroup);
 			_loc4_ = this._groups.indexOf(_loc3_);
 			if (_loc4_ >= 0) {
 				this._groups.splice(_loc4_, (1 : UInt));
@@ -247,7 +247,7 @@ class Graphing extends ConsoleCore {
 		final __ax4_iter_118 = this._groups;
 		if (checkNullIteratee(__ax4_iter_118))
 			for (_tmp_ in __ax4_iter_118) {
-				_loc4_ = ASCompat.dynamicAs(_tmp_, com.junkbyte.console.vos.GraphGroup);
+				_loc4_ = ASCompat.coerce(_tmp_, com.junkbyte.console.vos.GraphGroup);
 				_loc5_ = true;
 				if (_loc4_.freq > 1) {
 					++_loc4_.idle;
@@ -263,7 +263,7 @@ class Graphing extends ConsoleCore {
 					_loc8_ = _loc4_.interests;
 					if (_loc6_ == GraphGroup.FPS) {
 						_loc4_.hi = fps;
-						_loc2_ = ASCompat.dynamicAs(_loc8_[0], com.junkbyte.console.vos.GraphInterest);
+						_loc2_ = ASCompat.coerce(_loc8_[0], com.junkbyte.console.vos.GraphInterest);
 						_loc9_ = flash.Lib.getTimer();
 						if (this._previousTime >= 0) {
 							_loc10_ = _loc9_ - this._previousTime;
@@ -272,7 +272,7 @@ class Graphing extends ConsoleCore {
 						}
 						this._previousTime = _loc9_;
 					} else if (_loc6_ == GraphGroup.MEM) {
-						_loc2_ = ASCompat.dynamicAs(_loc8_[0], com.junkbyte.console.vos.GraphInterest);
+						_loc2_ = ASCompat.coerce(_loc8_[0], com.junkbyte.console.vos.GraphInterest);
 						_loc3_ = Math.fround(System.totalMemory / 10485.76) / 100;
 						_loc4_.updateMinMax(_loc3_);
 						_loc2_.setValue(_loc3_, _loc7_);
@@ -301,7 +301,7 @@ class Graphing extends ConsoleCore {
 		final __ax4_iter_119 = group.interests;
 		if (checkNullIteratee(__ax4_iter_119))
 			for (_tmp_ in __ax4_iter_119) {
-				i = ASCompat.dynamicAs(_tmp_, com.junkbyte.console.vos.GraphInterest);
+				i = ASCompat.coerce(_tmp_, com.junkbyte.console.vos.GraphInterest);
 				try {
 					v = i.getCurrentValue();
 					i.setValue(v, group.averaging);

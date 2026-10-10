@@ -32,7 +32,7 @@ class ArrayUtils {
 			return false;
 		}
 		while (ASCompat.floatAsBool(_loc3_--)) {
-			if (array1[Std.int(_loc3_)] != array2[Std.int(_loc3_)]) {
+			if (array1[ASCompat.floatToInt(_loc3_)] != array2[ASCompat.floatToInt(_loc3_)]) {
 				return false;
 			}
 		}
@@ -49,21 +49,21 @@ class ArrayUtils {
 		}
 		var _loc4_:IMap = new Map();
 		while (ASCompat.floatAsBool(_loc3_--)) {
-			if (_loc4_.hasKey(array1[Std.int(_loc3_)])) {
-				_loc4_.replaceFor(array1[Std.int(_loc3_)], _loc4_.itemFor(array1[Std.int(_loc3_)]) + 1);
+			if (_loc4_.hasKey(array1[ASCompat.floatToInt(_loc3_)])) {
+				_loc4_.replaceFor(array1[ASCompat.floatToInt(_loc3_)], _loc4_.itemFor(array1[ASCompat.floatToInt(_loc3_)]) + 1);
 			} else {
-				_loc4_.add(array1[Std.int(_loc3_)], 1);
+				_loc4_.add(array1[ASCompat.floatToInt(_loc3_)], 1);
 			}
 		}
 		_loc3_ = array2.length;
 		while (ASCompat.floatAsBool(_loc3_--)) {
-			if (!_loc4_.hasKey(array2[Std.int(_loc3_)])) {
+			if (!_loc4_.hasKey(array2[ASCompat.floatToInt(_loc3_)])) {
 				return false;
 			}
-			if (ASCompat.toNumber(_loc4_.itemFor(array2[Std.int(_loc3_)])) == 1) {
-				_loc4_.removeKey(array2[Std.int(_loc3_)]);
+			if (ASCompat.toNumber(_loc4_.itemFor(array2[ASCompat.floatToInt(_loc3_)])) == 1) {
+				_loc4_.removeKey(array2[ASCompat.floatToInt(_loc3_)]);
 			} else {
-				_loc4_.replaceFor(array2[Std.int(_loc3_)], ASCompat.toNumber(_loc4_.itemFor(array2[Std.int(_loc3_)])) - 1);
+				_loc4_.replaceFor(array2[ASCompat.floatToInt(_loc3_)], ASCompat.toNumber(_loc4_.itemFor(array2[ASCompat.floatToInt(_loc3_)])) - 1);
 			}
 		}
 		return _loc4_.size == 0;

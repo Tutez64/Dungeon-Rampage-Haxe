@@ -16,8 +16,8 @@ class BoosterInfo extends InventoryBaseInfo {
 
 	public function new(dbFacade:DBFacade, json:ASObject) {
 		super(dbFacade, json);
-		mGMStackable = ASCompat.dynamicAs(mDBFacade.gameMaster.stackableById.itemFor(mGMId), gameMasterDictionary.GMStackable);
-		mBuff = ASCompat.dynamicAs(mDBFacade.gameMaster.buffByConstant.itemFor(mGMStackable.Buff), gameMasterDictionary.GMBuff);
+		mGMStackable = ASCompat.coerce(mDBFacade.gameMaster.stackableById.itemFor(mGMId), gameMasterDictionary.GMStackable);
+		mBuff = ASCompat.coerce(mDBFacade.gameMaster.buffByConstant.itemFor(mGMStackable.Buff), gameMasterDictionary.GMBuff);
 	}
 
 	public function timeStamp():String {

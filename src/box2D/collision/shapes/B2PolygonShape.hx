@@ -77,7 +77,7 @@ import box2D.dynamics.*;
 		var _loc8_ = 0;
 		while ((_loc8_ : UInt) < count) {
 			_loc9_ = vs[_loc8_];
-			_loc10_ = ASCompat.toNumber(_loc8_ + 1) < count ? vs[ASCompat.toInt(_loc8_ + 1)] : vs[0];
+			_loc10_ = (_loc8_ + 1 : UInt) < count ? vs[_loc8_ + 1] : vs[0];
 			_loc11_ = _loc9_.x - _loc5_;
 			_loc12_ = _loc9_.y - _loc6_;
 			_loc13_ = _loc10_.x - _loc5_;
@@ -87,7 +87,7 @@ import box2D.dynamics.*;
 			_loc4_ += _loc16_;
 			_loc3_.x += _loc16_ * _loc7_ * (_loc5_ + _loc9_.x + _loc10_.x);
 			_loc3_.y += _loc16_ * _loc7_ * (_loc6_ + _loc9_.y + _loc10_.y);
-			_loc8_ = ASCompat.toInt(_loc8_) + 1;
+			_loc8_++;
 		}
 		_loc3_.x *= 1 / _loc4_;
 		_loc3_.y *= 1 / _loc4_;
@@ -120,13 +120,13 @@ import box2D.dynamics.*;
 		_loc4_ = 0;
 		while (_loc4_ < count) {
 			_loc5_[_loc4_] = vs[_loc4_];
-			_loc4_ = ASCompat.toInt(_loc4_) + 1;
+			_loc4_++;
 		}
 		_loc5_[count] = _loc5_[0];
 		var _loc6_:Float = ASCompat.MAX_FLOAT;
 		_loc4_ = 1;
 		while (_loc4_ <= count) {
-			_loc7_ = _loc5_[ASCompat.toInt(_loc4_ - 1)];
+			_loc7_ = _loc5_[_loc4_ - 1];
 			_loc8_ = _loc5_[_loc4_].x - _loc7_.x;
 			_loc9_ = _loc5_[_loc4_].y - _loc7_.y;
 			_loc10_ = Math.sqrt(_loc8_ * _loc8_ + _loc9_ * _loc9_);
@@ -156,7 +156,7 @@ import box2D.dynamics.*;
 				if (_loc22_ > _loc16_) {
 					_loc16_ = _loc22_;
 				}
-				_loc17_ = ASCompat.toInt(_loc17_) + 1;
+				_loc17_++;
 			}
 			_loc18_ = (_loc15_ - _loc13_) * (_loc16_ - _loc14_);
 			if (_loc18_ < 0.95 * _loc6_) {
@@ -173,7 +173,7 @@ import box2D.dynamics.*;
 				obb.extents.x = 0.5 * (_loc15_ - _loc13_);
 				obb.extents.y = 0.5 * (_loc16_ - _loc14_);
 			}
-			_loc4_ = ASCompat.toInt(_loc4_) + 1;
+			_loc4_++;
 		}
 	}
 
@@ -196,7 +196,7 @@ import box2D.dynamics.*;
 			while (_loc3_ < this.m_vertexCount) {
 				this.m_vertices[_loc3_].SetV(_loc2_.m_vertices[_loc3_]);
 				this.m_normals[_loc3_].SetV(_loc2_.m_normals[_loc3_]);
-				_loc3_ = ASCompat.toInt(_loc3_) + 1;
+				_loc3_++;
 			}
 		}
 	}
@@ -206,7 +206,7 @@ import box2D.dynamics.*;
 		var _loc3_ = new Vector<B2Vec2>();
 		if (checkNullIteratee(vertices))
 			for (_tmp_ in vertices) {
-				_loc4_ = ASCompat.dynamicAs(_tmp_, box2D.common.math.B2Vec2);
+				_loc4_ = ASCompat.coerce(_tmp_, box2D.common.math.B2Vec2);
 				_loc3_.push(_loc4_);
 			}
 		this.SetAsVector(_loc3_, vertexCount);
@@ -221,22 +221,22 @@ import box2D.dynamics.*;
 			vertexCount = vertices.length;
 		}
 		B2Settings.b2Assert(2 <= vertexCount);
-		this.m_vertexCount = Std.int(vertexCount);
-		this.Reserve(Std.int(vertexCount));
+		this.m_vertexCount = ASCompat.floatToInt(vertexCount);
+		this.Reserve(ASCompat.floatToInt(vertexCount));
 		_loc3_ = 0;
 		while (_loc3_ < this.m_vertexCount) {
 			this.m_vertices[_loc3_].SetV(vertices[_loc3_]);
-			_loc3_ = ASCompat.toInt(_loc3_) + 1;
+			_loc3_++;
 		}
 		_loc3_ = 0;
 		while (_loc3_ < this.m_vertexCount) {
 			_loc4_ = _loc3_;
-			_loc5_ = ASCompat.toNumber(_loc3_ + 1) < this.m_vertexCount ? ASCompat.toInt(_loc3_ + 1) : 0;
+			_loc5_ = _loc3_ + 1 < this.m_vertexCount ? _loc3_ + 1 : 0;
 			_loc6_ = B2Math.SubtractVV(this.m_vertices[_loc5_], this.m_vertices[_loc4_]);
 			B2Settings.b2Assert(_loc6_.LengthSquared() > ASCompat.MIN_FLOAT);
 			this.m_normals[_loc3_].SetV(B2Math.CrossVF(_loc6_, 1));
 			this.m_normals[_loc3_].Normalize();
-			_loc3_ = ASCompat.toInt(_loc3_) + 1;
+			_loc3_++;
 		}
 		this.m_centroid = ComputeCentroid(this.m_vertices, (this.m_vertexCount : UInt));
 	}
@@ -274,7 +274,7 @@ import box2D.dynamics.*;
 		while (_loc6_ < this.m_vertexCount) {
 			this.m_vertices[_loc6_] = B2Math.MulX(_loc5_, this.m_vertices[_loc6_]);
 			this.m_normals[_loc6_] = B2Math.MulMV(_loc5_.R, this.m_normals[_loc6_]);
-			_loc6_ = ASCompat.toInt(_loc6_) + 1;
+			_loc6_++;
 		}
 	}
 
@@ -309,7 +309,7 @@ import box2D.dynamics.*;
 			if (_loc10_ > 0) {
 				return false;
 			}
-			_loc9_ = ASCompat.toInt(_loc9_) + 1;
+			_loc9_++;
 		}
 		return true;
 	}
@@ -357,7 +357,7 @@ import box2D.dynamics.*;
 			if (_loc5_ < _loc4_ - ASCompat.MIN_FLOAT) {
 				return false;
 			}
-			_loc17_ = ASCompat.toInt(_loc17_) + 1;
+			_loc17_++;
 		}
 		if (_loc16_ >= 0) {
 			output.fraction = _loc4_;
@@ -388,7 +388,7 @@ import box2D.dynamics.*;
 			_loc6_ = _loc6_ < _loc11_ ? _loc6_ : _loc11_;
 			_loc7_ = _loc7_ > _loc10_ ? _loc7_ : _loc10_;
 			_loc8_ = _loc8_ > _loc11_ ? _loc8_ : _loc11_;
-			_loc9_ = ASCompat.toInt(_loc9_) + 1;
+			_loc9_++;
 		}
 		aabb.lowerBound.x = _loc5_ - m_radius;
 		aabb.lowerBound.y = _loc6_ - m_radius;
@@ -430,7 +430,7 @@ import box2D.dynamics.*;
 		var _loc10_ = 0;
 		while (_loc10_ < this.m_vertexCount) {
 			_loc11_ = this.m_vertices[_loc10_];
-			_loc12_ = ASCompat.toNumber(_loc10_ + 1) < this.m_vertexCount ? this.m_vertices[ASCompat.toInt(_loc10_ + 1)] : this.m_vertices[0];
+			_loc12_ = _loc10_ + 1 < this.m_vertexCount ? this.m_vertices[_loc10_ + 1] : this.m_vertices[0];
 			_loc13_ = _loc11_.x - _loc7_;
 			_loc14_ = _loc11_.y - _loc8_;
 			_loc15_ = _loc12_.x - _loc7_;
@@ -451,7 +451,7 @@ import box2D.dynamics.*;
 			_loc26_ = _loc9_ * (0.25 * (_loc22_ * _loc22_ + _loc24_ * _loc22_ + _loc24_ * _loc24_) + (_loc20_ * _loc22_ + _loc20_ * _loc24_))
 				+ 0.5 * _loc20_ * _loc20_;
 			_loc6_ += _loc17_ * (_loc25_ + _loc26_);
-			_loc10_ = ASCompat.toInt(_loc10_) + 1;
+			_loc10_++;
 		}
 		massData.mass = density * _loc5_;
 		_loc3_ *= 1 / _loc5_;
@@ -480,16 +480,16 @@ import box2D.dynamics.*;
 			if (_loc12_ > 0) {
 				if (_loc23_) {
 					if (!_loc11_) {
-						_loc9_ = ASCompat.toInt(_loc12_ - 1);
-						_loc8_ = ASCompat.toInt(_loc8_) + 1;
+						_loc9_ = _loc12_ - 1;
+						_loc8_++;
 					}
 				} else if (_loc11_) {
-					_loc10_ = ASCompat.toInt(_loc12_ - 1);
-					_loc8_ = ASCompat.toInt(_loc8_) + 1;
+					_loc10_ = _loc12_ - 1;
+					_loc8_++;
 				}
 			}
 			_loc11_ = _loc23_;
-			_loc12_ = ASCompat.toInt(_loc12_) + 1;
+			_loc12_++;
 		}
 		switch (_loc8_) {
 			case 0:
@@ -521,7 +521,7 @@ import box2D.dynamics.*;
 		var _loc21_ = this.m_vertices[_loc13_];
 		_loc12_ = _loc13_;
 		while (_loc12_ != _loc14_) {
-			_loc12_ = ASCompat.toInt(ASCompat.toNumber(_loc12_ + 1) % this.m_vertexCount);
+			_loc12_ = (_loc12_ + 1) % this.m_vertexCount;
 			if (_loc12_ == _loc14_) {
 				_loc22_ = _loc18_;
 			} else {
@@ -561,7 +561,7 @@ import box2D.dynamics.*;
 				_loc2_ = _loc4_;
 				_loc3_ = _loc5_;
 			}
-			_loc4_ = ASCompat.toInt(_loc4_) + 1;
+			_loc4_++;
 		}
 		return _loc2_;
 	}
@@ -577,7 +577,7 @@ import box2D.dynamics.*;
 				_loc2_ = _loc4_;
 				_loc3_ = _loc5_;
 			}
-			_loc4_ = ASCompat.toInt(_loc4_) + 1;
+			_loc4_++;
 		}
 		return this.m_vertices[_loc2_];
 	}
@@ -591,7 +591,7 @@ import box2D.dynamics.*;
 		while (_loc2_ < count) {
 			this.m_vertices[_loc2_] = new B2Vec2();
 			this.m_normals[_loc2_] = new B2Vec2();
-			_loc2_ = ASCompat.toInt(_loc2_) + 1;
+			_loc2_++;
 		}
 	}
 }

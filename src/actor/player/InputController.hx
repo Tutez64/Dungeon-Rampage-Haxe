@@ -147,7 +147,7 @@ class InputController {
 				mHeroGameObject.PlayerAttack.addToPotentialWeaponInputQueue((_loc3_ : UInt), false, true);
 				_loc7_ = true;
 			}
-			_loc4_ = ASCompat.toInt(_loc4_) + 1;
+			_loc4_++;
 		}
 		var _loc8_ = mGamepadController.pressedCombatButtonsThisFrame;
 		var _loc9_ = mGamepadController.releasedCombatButtonsThisFrame;
@@ -169,10 +169,10 @@ class InputController {
 			_loc6_ = mMouseController.potentialAttacksThisFrame;
 			_loc4_ = 0;
 			while (_loc4_ < _loc6_.length) {
-				_loc2_ = ASCompat.dynamicAs(_loc6_[_loc4_], brain.utils.Tuple);
+				_loc2_ = ASCompat.coerce(_loc6_[_loc4_], brain.utils.Tuple);
 				mHeroGameObject.PlayerAttack.addToPotentialWeaponInputQueue((ASCompat.toInt(_loc2_.first) : UInt), ASCompat.toBool(_loc2_.second), false);
 				_loc7_ = true;
-				_loc4_ = ASCompat.toInt(_loc4_) + 1;
+				_loc4_++;
 			}
 		}
 	}
@@ -190,7 +190,7 @@ class InputController {
 				mHeroGameObject.tryToUseConsumable((_loc2_ : UInt));
 				_loc1_ = true;
 			}
-			_loc3_ = ASCompat.toInt(_loc3_) + 1;
+			_loc3_++;
 		}
 		var _loc5_ = mGamepadController.releasedConsumableButtonsThisFrame;
 		_loc4_ = 0;
@@ -198,7 +198,7 @@ class InputController {
 			_loc2_ = _loc5_[_loc4_];
 			mHeroGameObject.tryToUseConsumable((_loc2_ : UInt));
 			_loc1_ = true;
-			_loc4_ = ASCompat.toInt(_loc4_) + 1;
+			_loc4_++;
 		}
 	}
 

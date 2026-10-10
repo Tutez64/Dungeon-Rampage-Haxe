@@ -314,7 +314,7 @@ class UIHud {
 		mSceneGraphComponent = new SceneGraphComponent(mDBFacade, "UIHud");
 		mAssetLoadingComponent = new AssetLoadingComponent(mDBFacade);
 		mLogicalWorkComponent = new LogicalWorkComponent(mDBFacade, "UIHud");
-		mMaxBusterPoints = (Std.int(4294967295) : UInt);
+		mMaxBusterPoints = (ASCompat.floatToInt(4294967295) : UInt);
 		mOptionsPanel = new OptionsPanel(mDBFacade);
 		MemoryTracker.track(mOptionsPanel, "OptionsPanel - created in UIHud.UIHud()");
 		mStacksHud = new UIStacksHud(mDBFacade);
@@ -342,7 +342,7 @@ class UIHud {
 	@:isVar public var chatLogContainer(get, never):MovieClip;
 
 	public function get_chatLogContainer():MovieClip {
-		return ASCompat.dynamicAs((mUIRoot : ASAny).chatLogContainer, flash.display.MovieClip);
+		return ASCompat.coerce((mUIRoot : ASAny).chatLogContainer, flash.display.MovieClip);
 	}
 
 	@:isVar public var ownedHero(get, never):HeroGameObjectOwner;
@@ -433,18 +433,17 @@ class UIHud {
 		mDBFacade.camera.yCilppingFromBottom = mVerticalYClipping;
 		mDBFacade.camera.forceRedraw();
 		hudClass = swfAsset.getClass(hudClassName);
-		mUIRoot = ASCompat.dynamicAs(ASCompat.createInstance(hudClass, []), flash.display.MovieClip);
+		mUIRoot = ASCompat.coerce(ASCompat.createInstance(hudClass, []), flash.display.MovieClip);
 		mRoot.addChild(mUIRoot);
 		mFloaterTextClass = swfAsset.getClass("floater_text");
 		mStacksHud.initializeHud(swfAsset.getClass("stacks_hud"));
 		if (mUIChatLog != null) {
 			mUIChatLog.destroy();
 		}
-		mUIChatLog = new UIChatLog(mDBFacade, ASCompat.dynamicAs((mUIRoot : ASAny).chatLogContainer, flash.display.MovieClip),
-			ASCompat.dynamicAs((mUIRoot : ASAny).UI_chat, flash.display.MovieClip),
-			ASCompat.dynamicAs((mUIRoot : ASAny).UI_chat.log_btn, flash.display.MovieClip),
-			ASCompat.dynamicAs((mUIRoot : ASAny).UI_chat.chat_btn, flash.display.MovieClip));
-		mCloseButton = new UIButton(mDBFacade, ASCompat.dynamicAs((mUIRoot : ASAny).close, flash.display.MovieClip));
+		mUIChatLog = new UIChatLog(mDBFacade, ASCompat.coerce((mUIRoot : ASAny).chatLogContainer, flash.display.MovieClip),
+			ASCompat.coerce((mUIRoot : ASAny).UI_chat, flash.display.MovieClip), ASCompat.coerce((mUIRoot : ASAny).UI_chat.log_btn, flash.display.MovieClip),
+			ASCompat.coerce((mUIRoot : ASAny).UI_chat.chat_btn, flash.display.MovieClip));
+		mCloseButton = new UIButton(mDBFacade, ASCompat.coerce((mUIRoot : ASAny).close, flash.display.MovieClip));
 		mCloseButton.releaseCallback = function() {
 			var exitPopup:II_UIExitDungeonPopUp;
 			var xpLoss:UInt;
@@ -469,50 +468,50 @@ class UIHud {
 		if (mDBFacade.dbConfigManager.getConfigBoolean("want_pets", true)) {
 			mWantPets = true;
 		}
-		mProfileBox = ASCompat.dynamicAs((mUIRoot : ASAny).UI_profile, flash.display.MovieClip);
+		mProfileBox = ASCompat.coerce((mUIRoot : ASAny).UI_profile, flash.display.MovieClip);
 		mProfileRestScale = mProfileBox.scaleX;
-		mHpBar = new UIProgressBar(mDBFacade, ASCompat.dynamicAs((mUIRoot : ASAny).UI_profile.HP_bar, flash.display.MovieClip),
-			ASCompat.dynamicAs((mUIRoot : ASAny).UI_profile.HP_bar_delta, flash.display.MovieClip));
-		mHpText = ASCompat.dynamicAs((mUIRoot : ASAny).UI_profile.HP_text, flash.text.TextField);
+		mHpBar = new UIProgressBar(mDBFacade, ASCompat.coerce((mUIRoot : ASAny).UI_profile.HP_bar, flash.display.MovieClip),
+			ASCompat.coerce((mUIRoot : ASAny).UI_profile.HP_bar_delta, flash.display.MovieClip));
+		mHpText = ASCompat.coerce((mUIRoot : ASAny).UI_profile.HP_text, flash.text.TextField);
 		mHpText.visible = false;
-		mFlashingHpBar = new UIProgressBar(mDBFacade, ASCompat.dynamicAs((mUIRoot : ASAny).UI_profile.HP_bar_invincible, flash.display.MovieClip));
+		mFlashingHpBar = new UIProgressBar(mDBFacade, ASCompat.coerce((mUIRoot : ASAny).UI_profile.HP_bar_invincible, flash.display.MovieClip));
 		mFlashingHpBar.visible = false;
 		mFlashingHpBar.root.mouseEnabled = false;
-		mManaBar = new UIProgressBar(mDBFacade, ASCompat.dynamicAs((mUIRoot : ASAny).UI_profile.mana_bar, flash.display.MovieClip),
-			ASCompat.dynamicAs((mUIRoot : ASAny).UI_profile.mana_bar_delta, flash.display.MovieClip));
-		mManaText = ASCompat.dynamicAs((mUIRoot : ASAny).UI_profile.mana_text, flash.text.TextField);
+		mManaBar = new UIProgressBar(mDBFacade, ASCompat.coerce((mUIRoot : ASAny).UI_profile.mana_bar, flash.display.MovieClip),
+			ASCompat.coerce((mUIRoot : ASAny).UI_profile.mana_bar_delta, flash.display.MovieClip));
+		mManaText = ASCompat.coerce((mUIRoot : ASAny).UI_profile.mana_text, flash.text.TextField);
 		mManaText.visible = false;
-		mHealthFullClip = ASCompat.dynamicAs((mUIRoot : ASAny).UI_profile.HP_full_text, flash.text.TextField);
-		mManaFullClip = ASCompat.dynamicAs((mUIRoot : ASAny).UI_profile.mana_full_text, flash.text.TextField);
+		mHealthFullClip = ASCompat.coerce((mUIRoot : ASAny).UI_profile.HP_full_text, flash.text.TextField);
+		mManaFullClip = ASCompat.coerce((mUIRoot : ASAny).UI_profile.mana_full_text, flash.text.TextField);
 		mHealthFullClip.mouseEnabled = false;
 		mManaFullClip.mouseEnabled = false;
 		mHealthFullClip.visible = false;
 		mManaFullClip.visible = false;
-		mBusterRoot = ASCompat.dynamicAs((mUIRoot : ASAny).UI_buster, flash.display.MovieClip);
-		mBusterBar = new UIProgressBar(mDBFacade, ASCompat.dynamicAs((mUIRoot : ASAny).UI_buster.buster_bar, flash.display.MovieClip));
+		mBusterRoot = ASCompat.coerce((mUIRoot : ASAny).UI_buster, flash.display.MovieClip);
+		mBusterBar = new UIProgressBar(mDBFacade, ASCompat.coerce((mUIRoot : ASAny).UI_buster.buster_bar, flash.display.MovieClip));
 		hideBustSign();
-		mBasicCurrencyUI = new UIObject(mDBFacade, ASCompat.dynamicAs((mUIRoot : ASAny).UI_currency_coin, flash.display.MovieClip));
+		mBasicCurrencyUI = new UIObject(mDBFacade, ASCompat.coerce((mUIRoot : ASAny).UI_currency_coin, flash.display.MovieClip));
 		mBasicCurrencyUI.setRootMovieClipAsBitMap();
 		mBasicCurrencyUI.tooltipDelay = 0.4;
 		ASCompat.setProperty((mBasicCurrencyUI.tooltip : ASAny).title_label, "text", Locale.getString("COIN_TOOLTIP_TITLE"));
 		ASCompat.setProperty((mBasicCurrencyUI.tooltip : ASAny).description_label, "text", Locale.getString("COIN_TOOLTIP_DESCRIPTION"));
-		mPremiumCurrencyUI = new UIObject(mDBFacade, ASCompat.dynamicAs((mUIRoot : ASAny).UI_currency_cash, flash.display.MovieClip));
+		mPremiumCurrencyUI = new UIObject(mDBFacade, ASCompat.coerce((mUIRoot : ASAny).UI_currency_cash, flash.display.MovieClip));
 		mPremiumCurrencyUI.setRootMovieClipAsBitMap();
 		mPremiumCurrencyUI.tooltipDelay = 0.4;
 		ASCompat.setProperty((mPremiumCurrencyUI.tooltip : ASAny).title_label, "text", Locale.getString("CASH_TOOLTIP_TITLE"));
 		ASCompat.setProperty((mPremiumCurrencyUI.tooltip : ASAny).description_label, "text", Locale.getString("CASH_TOOLTIP_DESCRIPTION"));
-		mSaleLabel = ASCompat.dynamicAs((mPremiumCurrencyUI.root : ASAny).label_sale, flash.text.TextField);
+		mSaleLabel = ASCompat.coerce((mPremiumCurrencyUI.root : ASAny).label_sale, flash.text.TextField);
 		mSaleLabel.visible = false;
-		mBasicCurrencyText = ASCompat.dynamicAs((mUIRoot : ASAny).UI_currency_coin.game_currency_text, flash.text.TextField);
+		mBasicCurrencyText = ASCompat.coerce((mUIRoot : ASAny).UI_currency_coin.game_currency_text, flash.text.TextField);
 		mBasicCurrencyText.mouseEnabled = false;
-		mPremiumCurrencyText = ASCompat.dynamicAs((mUIRoot : ASAny).UI_currency_cash.cash_text, flash.text.TextField);
+		mPremiumCurrencyText = ASCompat.coerce((mUIRoot : ASAny).UI_currency_cash.cash_text, flash.text.TextField);
 		mPremiumCurrencyText.mouseEnabled = false;
-		mAddCoinButton = new UIButton(mDBFacade, ASCompat.dynamicAs((mUIRoot : ASAny).UI_currency_coin.coin.add_coin_button, flash.display.MovieClip));
+		mAddCoinButton = new UIButton(mDBFacade, ASCompat.coerce((mUIRoot : ASAny).UI_currency_coin.coin.add_coin_button, flash.display.MovieClip));
 		mAddCoinButton.releaseCallback = function() {
 			StoreServicesController.showCoinPage(mDBFacade);
 		};
 		mAddCoinButton.visible = false;
-		mAddCashButton = new UIButton(mDBFacade, ASCompat.dynamicAs((mUIRoot : ASAny).UI_currency_cash.cash.add_cash_button, flash.display.MovieClip));
+		mAddCashButton = new UIButton(mDBFacade, ASCompat.coerce((mUIRoot : ASAny).UI_currency_cash.cash.add_cash_button, flash.display.MovieClip));
 		mAddCashButton.releaseCallback = function() {
 			mDBFacade.metrics.log("UIHudAddCash");
 			StoreServicesController.showCashPage(mDBFacade, "inDungeonUIHudAddCash");
@@ -521,21 +520,21 @@ class UIHud {
 		if (mDBFacade.dbAccountInfo != null) {
 			setCurrency((mDBFacade.dbAccountInfo.basicCurrency : Int), (mDBFacade.dbAccountInfo.premiumCurrency : Int));
 		}
-		mLevelText = ASCompat.dynamicAs((mUIRoot : ASAny).UI_XP.xp_level, flash.text.TextField);
-		mXpObject = new UIObject(mDBFacade, ASCompat.dynamicAs((mUIRoot : ASAny).UI_XP, flash.display.MovieClip));
+		mLevelText = ASCompat.coerce((mUIRoot : ASAny).UI_XP.xp_level, flash.text.TextField);
+		mXpObject = new UIObject(mDBFacade, ASCompat.coerce((mUIRoot : ASAny).UI_XP, flash.display.MovieClip));
 		mXpRestScale = mXpObject.root.scaleX;
-		mXpBar = new UIProgressBar(mDBFacade, ASCompat.dynamicAs((mUIRoot : ASAny).UI_XP.xp_bar, flash.display.MovieClip),
-			ASCompat.dynamicAs((mUIRoot : ASAny).UI_XP.xp_bar_delta, flash.display.MovieClip));
+		mXpBar = new UIProgressBar(mDBFacade, ASCompat.coerce((mUIRoot : ASAny).UI_XP.xp_bar, flash.display.MovieClip),
+			ASCompat.coerce((mUIRoot : ASAny).UI_XP.xp_bar_delta, flash.display.MovieClip));
 		ASCompat.setProperty((mUIRoot : ASAny).UI_XP.xp_bar_delta, "alpha", 0.3);
-		mXpText = ASCompat.dynamicAs((mUIRoot : ASAny).UI_XP.xp_points, flash.text.TextField);
+		mXpText = ASCompat.coerce((mUIRoot : ASAny).UI_XP.xp_points, flash.text.TextField);
 		mXpText.visible = false;
 		ASCompat.setProperty((mUIRoot : ASAny).UI_XP.xp_level_title, "visible", false);
-		mXPBonusText = ASCompat.dynamicAs((mUIRoot : ASAny).UI_XP.doublexp_text, flash.text.TextField);
-		mCoinBonusText = ASCompat.dynamicAs((mUIRoot : ASAny).UI_currency_coin.doublecoin_text, flash.text.TextField);
+		mXPBonusText = ASCompat.coerce((mUIRoot : ASAny).UI_XP.doublexp_text, flash.text.TextField);
+		mCoinBonusText = ASCompat.coerce((mUIRoot : ASAny).UI_currency_coin.doublecoin_text, flash.text.TextField);
 		mCoinBonusText.visible = false;
-		mWeaponZButton = new UIButton(mDBFacade, ASCompat.dynamicAs((mUIRoot : ASAny).UI_weapons.weapon_z, flash.display.MovieClip));
-		mWeaponXButton = new UIButton(mDBFacade, ASCompat.dynamicAs((mUIRoot : ASAny).UI_weapons.weapon_x, flash.display.MovieClip));
-		mWeaponCButton = new UIButton(mDBFacade, ASCompat.dynamicAs((mUIRoot : ASAny).UI_weapons.weapon_c, flash.display.MovieClip));
+		mWeaponZButton = new UIButton(mDBFacade, ASCompat.coerce((mUIRoot : ASAny).UI_weapons.weapon_z, flash.display.MovieClip));
+		mWeaponXButton = new UIButton(mDBFacade, ASCompat.coerce((mUIRoot : ASAny).UI_weapons.weapon_x, flash.display.MovieClip));
+		mWeaponCButton = new UIButton(mDBFacade, ASCompat.coerce((mUIRoot : ASAny).UI_weapons.weapon_c, flash.display.MovieClip));
 		mWeaponButtons = Vector.ofArray([mWeaponZButton, mWeaponXButton, mWeaponCButton]);
 		if (!mDBFacade.featureFlags.getFlagValue("want-dynamic-rarity-backgrounds")) {
 			mWeaponZButton.setRootMovieClipAsBitMap();
@@ -548,42 +547,42 @@ class UIHud {
 			i = i + 1;
 		}
 		mCooldowns = new Vector<MovieClipRenderer>();
-		mCooldowns.push(new MovieClipRenderer(mDBFacade, ASCompat.dynamicAs((mUIRoot : ASAny).UI_weapons.weapon_z.cooldown, flash.display.MovieClip)));
+		mCooldowns.push(new MovieClipRenderer(mDBFacade, ASCompat.coerce((mUIRoot : ASAny).UI_weapons.weapon_z.cooldown, flash.display.MovieClip)));
 		ASCompat.setProperty((mUIRoot : ASAny).UI_weapons.weapon_z.cooldown, "visible", false);
-		mCooldowns.push(new MovieClipRenderer(mDBFacade, ASCompat.dynamicAs((mUIRoot : ASAny).UI_weapons.weapon_x.cooldown, flash.display.MovieClip)));
+		mCooldowns.push(new MovieClipRenderer(mDBFacade, ASCompat.coerce((mUIRoot : ASAny).UI_weapons.weapon_x.cooldown, flash.display.MovieClip)));
 		ASCompat.setProperty((mUIRoot : ASAny).UI_weapons.weapon_x.cooldown, "visible", false);
-		mCooldowns.push(new MovieClipRenderer(mDBFacade, ASCompat.dynamicAs((mUIRoot : ASAny).UI_weapons.weapon_c.cooldown, flash.display.MovieClip)));
+		mCooldowns.push(new MovieClipRenderer(mDBFacade, ASCompat.coerce((mUIRoot : ASAny).UI_weapons.weapon_c.cooldown, flash.display.MovieClip)));
 		ASCompat.setProperty((mUIRoot : ASAny).UI_weapons.weapon_c.cooldown, "visible", false);
-		mConsumable1Button = new UIButton(mDBFacade, ASCompat.dynamicAs((mUIRoot : ASAny).consumables_01, flash.display.MovieClip));
-		mConsumable2Button = new UIButton(mDBFacade, ASCompat.dynamicAs((mUIRoot : ASAny).consumables_02, flash.display.MovieClip));
+		mConsumable1Button = new UIButton(mDBFacade, ASCompat.coerce((mUIRoot : ASAny).consumables_01, flash.display.MovieClip));
+		mConsumable2Button = new UIButton(mDBFacade, ASCompat.coerce((mUIRoot : ASAny).consumables_02, flash.display.MovieClip));
 		mConsumableWeaponButtons = Vector.ofArray([mConsumable1Button, mConsumable2Button]);
 		mConsumable1Button.setRootMovieClipAsBitMap();
 		mConsumable2Button.setRootMovieClipAsBitMap();
 		mConsumableCooldowns = new Vector<MovieClipRenderer>();
-		mConsumableCooldowns.push(new MovieClipRenderer(mDBFacade, ASCompat.dynamicAs((mUIRoot : ASAny).consumables_01.cooldown, flash.display.MovieClip)));
+		mConsumableCooldowns.push(new MovieClipRenderer(mDBFacade, ASCompat.coerce((mUIRoot : ASAny).consumables_01.cooldown, flash.display.MovieClip)));
 		ASCompat.setProperty((mUIRoot : ASAny).consumables_01.cooldown, "visible", false);
-		mConsumableCooldowns.push(new MovieClipRenderer(mDBFacade, ASCompat.dynamicAs((mUIRoot : ASAny).consumables_02.cooldown, flash.display.MovieClip)));
+		mConsumableCooldowns.push(new MovieClipRenderer(mDBFacade, ASCompat.coerce((mUIRoot : ASAny).consumables_02.cooldown, flash.display.MovieClip)));
 		ASCompat.setProperty((mUIRoot : ASAny).consumables_02.cooldown, "visible", false);
 		ASCompat.setProperty((mUIRoot : ASAny).UI_center_message, "visible", false);
-		mPetPortraitRoot = ASCompat.dynamicAs((mUIRoot : ASAny).pet, flash.display.MovieClip);
+		mPetPortraitRoot = ASCompat.coerce((mUIRoot : ASAny).pet, flash.display.MovieClip);
 		if (ASCompat.toBool((mUIRoot : ASAny).pet_none)) {
-			mPetPortraitNoneRoot = ASCompat.dynamicAs((mUIRoot : ASAny).pet_none, flash.display.MovieClip);
+			mPetPortraitNoneRoot = ASCompat.coerce((mUIRoot : ASAny).pet_none, flash.display.MovieClip);
 		}
 		mAssetsLoaded = true;
-		mFloorLabel = ASCompat.dynamicAs((mUIRoot : ASAny).label_floor, flash.text.TextField);
+		mFloorLabel = ASCompat.coerce((mUIRoot : ASAny).label_floor, flash.text.TextField);
 		mFloorLabel.cacheAsBitmap = true;
 		tooltipOffsset = new Point(0, -15);
-		mDungeonModifer1 = new UIButton(mDBFacade, ASCompat.dynamicAs((mUIRoot : ASAny).floor_modifier01, flash.display.MovieClip));
-		mDungeonModifer1.tooltip = ASCompat.dynamicAs((mUIRoot : ASAny).tooltip_modifier01, flash.display.MovieClip);
+		mDungeonModifer1 = new UIButton(mDBFacade, ASCompat.coerce((mUIRoot : ASAny).floor_modifier01, flash.display.MovieClip));
+		mDungeonModifer1.tooltip = ASCompat.coerce((mUIRoot : ASAny).tooltip_modifier01, flash.display.MovieClip);
 		mDungeonModifer1.tooltipPos = tooltipOffsset;
-		mDungeonModifer2 = new UIButton(mDBFacade, ASCompat.dynamicAs((mUIRoot : ASAny).floor_modifier02, flash.display.MovieClip));
-		mDungeonModifer2.tooltip = ASCompat.dynamicAs((mUIRoot : ASAny).tooltip_modifier02, flash.display.MovieClip);
+		mDungeonModifer2 = new UIButton(mDBFacade, ASCompat.coerce((mUIRoot : ASAny).floor_modifier02, flash.display.MovieClip));
+		mDungeonModifer2.tooltip = ASCompat.coerce((mUIRoot : ASAny).tooltip_modifier02, flash.display.MovieClip);
 		mDungeonModifer2.tooltipPos = tooltipOffsset;
-		mDungeonModifer3 = new UIButton(mDBFacade, ASCompat.dynamicAs((mUIRoot : ASAny).floor_modifier03, flash.display.MovieClip));
-		mDungeonModifer3.tooltip = ASCompat.dynamicAs((mUIRoot : ASAny).tooltip_modifier03, flash.display.MovieClip);
+		mDungeonModifer3 = new UIButton(mDBFacade, ASCompat.coerce((mUIRoot : ASAny).floor_modifier03, flash.display.MovieClip));
+		mDungeonModifer3.tooltip = ASCompat.coerce((mUIRoot : ASAny).tooltip_modifier03, flash.display.MovieClip);
 		mDungeonModifer3.tooltipPos = tooltipOffsset;
-		mDungeonModifer4 = new UIButton(mDBFacade, ASCompat.dynamicAs((mUIRoot : ASAny).floor_modifier04, flash.display.MovieClip));
-		mDungeonModifer4.tooltip = ASCompat.dynamicAs((mUIRoot : ASAny).tooltip_modifier04, flash.display.MovieClip);
+		mDungeonModifer4 = new UIButton(mDBFacade, ASCompat.coerce((mUIRoot : ASAny).floor_modifier04, flash.display.MovieClip));
+		mDungeonModifer4.tooltip = ASCompat.coerce((mUIRoot : ASAny).tooltip_modifier04, flash.display.MovieClip);
 		mDungeonModifer4.tooltipPos = tooltipOffsset;
 		if (mHeroOwner != null) {
 			this.initializeHud(mHeroOwner);
@@ -828,8 +827,8 @@ class UIHud {
 			mUIChatLog.heroOwner = mHeroOwner;
 			mUIChatLog.enable();
 			hideInvulnerable();
-			setHp(mHeroOwner.hitPoints, (Std.int(mHeroOwner.maxHitPoints) : UInt));
-			setMana(mHeroOwner.manaPoints, (Std.int(mHeroOwner.maxManaPoints) : UInt));
+			setHp(mHeroOwner.hitPoints, (ASCompat.floatToInt(mHeroOwner.maxHitPoints) : UInt));
+			setMana(mHeroOwner.manaPoints, (ASCompat.floatToInt(mHeroOwner.maxManaPoints) : UInt));
 			setXp(mHeroOwner.experiencePoints);
 			bulgeXpBar();
 			bulgeProfileBox();
@@ -845,7 +844,7 @@ class UIHud {
 			equippedWeapons = new Vector<WeaponGameObject>();
 			i = 0;
 			while (i < mHeroOwner.weaponControllers.length) {
-				equippedWeapons.push(ASCompat.dynamicAs(mHeroOwner.weaponControllers[i] != null ? mHeroOwner.weaponControllers[i].weapon : null,
+				equippedWeapons.push(ASCompat.coerce(mHeroOwner.weaponControllers[i] != null ? mHeroOwner.weaponControllers[i].weapon : null,
 					combat.weapon.WeaponGameObject));
 				i = i + 1;
 			}
@@ -853,7 +852,7 @@ class UIHud {
 			equippedConsumableWeapons = new Vector<ConsumableWeaponGameObject>();
 			j = 0;
 			while (j < 2) {
-				equippedConsumableWeapons.push(ASCompat.dynamicAs(mHeroOwner.consumables[j] != null ? mHeroOwner.consumables[j] : null,
+				equippedConsumableWeapons.push(ASCompat.coerce(mHeroOwner.consumables[j] != null ? mHeroOwner.consumables[j] : null,
 					combat.weapon.ConsumableWeaponGameObject));
 				j = j + 1;
 			}
@@ -864,7 +863,7 @@ class UIHud {
 			} else {
 				mAssetLoadingComponent.getSwfAsset(DBFacade.buildFullDownloadPath(gmSkin.UISwfFilepath), function(param1:SwfAsset) {
 					var _loc3_ = param1.getClass(gmSkin.IconName);
-					var _loc2_ = ASCompat.dynamicAs(ASCompat.createInstance(_loc3_, []), flash.display.MovieClip);
+					var _loc2_ = ASCompat.coerce(ASCompat.createInstance(_loc3_, []), flash.display.MovieClip);
 					if (ASCompat.toBool((mUIRoot : ASAny).UI_profile.avatar)) {
 						(mUIRoot : ASAny).UI_profile.avatar.addChild(_loc2_);
 					}
@@ -874,15 +873,15 @@ class UIHud {
 				});
 			}
 			mStacksHud.setupStacksUI();
-			mDungeonBusterButton = new UIButton(mDBFacade, ASCompat.dynamicAs((mUIRoot : ASAny).UI_buster_active.buster_activated, flash.display.MovieClip));
+			mDungeonBusterButton = new UIButton(mDBFacade, ASCompat.coerce((mUIRoot : ASAny).UI_buster_active.buster_activated, flash.display.MovieClip));
 			mDungeonBusterButton.releaseCallback = handleBusterBarClickEvent;
-			mBusterLabel = ASCompat.dynamicAs((mUIRoot : ASAny).UI_buster_active.buster_activated.up.name_mc.name_label, flash.text.TextField);
-			mBusterLabelOver = ASCompat.dynamicAs((mUIRoot : ASAny).UI_buster_active.buster_activated.over.mc.name_label, flash.text.TextField);
+			mBusterLabel = ASCompat.coerce((mUIRoot : ASAny).UI_buster_active.buster_activated.up.name_mc.name_label, flash.text.TextField);
+			mBusterLabelOver = ASCompat.coerce((mUIRoot : ASAny).UI_buster_active.buster_activated.over.mc.name_label, flash.text.TextField);
 			busterConstant = mHeroOwner.gMHero.DBuster1;
-			busterAttack = ASCompat.dynamicAs(mDBFacade.gameMaster.attackByConstant.itemFor(busterConstant), gameMasterDictionary.GMAttack);
+			busterAttack = ASCompat.coerce(mDBFacade.gameMaster.attackByConstant.itemFor(busterConstant), gameMasterDictionary.GMAttack);
 			busterName = busterAttack != null ? GameMasterLocale.getGameMasterSubString("ATTACK_BUSTER_NAME", busterAttack.Constant) : "BUSTER!";
 			mBusterLabel.text = mBusterLabelOver.text = busterName.toUpperCase();
-			mBusterGlowMc = new MovieClipRenderController(mDBFacade, ASCompat.dynamicAs((mUIRoot : ASAny).UI_buster_glow, flash.display.MovieClip));
+			mBusterGlowMc = new MovieClipRenderController(mDBFacade, ASCompat.coerce((mUIRoot : ASAny).UI_buster_glow, flash.display.MovieClip));
 			ASCompat.setProperty((mUIRoot : ASAny).UI_buster_glow.buster_text.buster_text_label.name_label, "text", busterName.toUpperCase());
 			if (mDBFacade.dbAccountInfo != null) {
 				setCurrency((mDBFacade.dbAccountInfo.basicCurrency : Int), (mDBFacade.dbAccountInfo.premiumCurrency : Int));
@@ -925,7 +924,7 @@ class UIHud {
 					_loc1_ = mDungeonModifer4;
 			}
 			setupModifiers(_loc1_, mHeroOwner.distributedDungeonFloor.activeGMDungeonModifiers[_loc2_]);
-			_loc2_ = ASCompat.toInt(_loc2_) + 1;
+			_loc2_++;
 		}
 	}
 
@@ -939,7 +938,7 @@ class UIHud {
 			if (_loc2_ == null) {
 				return;
 			}
-			var _loc3_ = ASCompat.dynamicAs(ASCompat.createInstance(_loc2_, []), flash.display.MovieClip);
+			var _loc3_ = ASCompat.coerce(ASCompat.createInstance(_loc2_, []), flash.display.MovieClip);
 			UIObject.scaleToFit(_loc3_, dungeonModButton.root.width);
 			_loc3_.x += 10;
 			_loc3_.y += 10;
@@ -1064,7 +1063,7 @@ class UIHud {
 						if (weaponClass == null) {
 							return;
 						}
-						weapon = ASCompat.dynamicAs(ASCompat.createInstance(weaponClass, []), flash.display.MovieClip);
+						weapon = ASCompat.coerce(ASCompat.createInstance(weaponClass, []), flash.display.MovieClip);
 						weapon.name = "weaponIcon";
 						weapon.scaleX = weapon.scaleY = 60 / 100;
 						(weaponButton.root : ASAny).graphic.addChildAt(weapon, 0);
@@ -1087,7 +1086,7 @@ class UIHud {
 					};
 				};
 				mAssetLoadingComponent.getSwfAsset(DBFacade.buildFullDownloadPath(gmWeaponAesthetic.IconSwf),
-					ASCompat.asFunction(makeCallback(button, gmWeaponAesthetic, weaponGameObject.gmRarity)));
+					ASCompat.coerceFunction(makeCallback(button, gmWeaponAesthetic, weaponGameObject.gmRarity)));
 			}
 			i = i + 1;
 		}
@@ -1120,10 +1119,10 @@ class UIHud {
 				ASCompat.setProperty((button.root : ASAny).quantity, "text", Std.string(consumableWeaponGameObject.getConsumableCount()));
 				switch (i) {
 					case 0:
-						tooltip = ASCompat.dynamicAs((mUIRoot : ASAny).consumable_tooltip01, flash.display.MovieClip);
+						tooltip = ASCompat.coerce((mUIRoot : ASAny).consumable_tooltip01, flash.display.MovieClip);
 
 					case 1:
-						tooltip = ASCompat.dynamicAs((mUIRoot : ASAny).consumable_tooltip02, flash.display.MovieClip);
+						tooltip = ASCompat.coerce((mUIRoot : ASAny).consumable_tooltip02, flash.display.MovieClip);
 				}
 				button.tooltip = tooltip;
 				ASCompat.setProperty((button.tooltip : ASAny).description_label, "text",
@@ -1142,14 +1141,14 @@ class UIHud {
 						if (_loc2_ == null) {
 							return;
 						}
-						weapon = ASCompat.dynamicAs(ASCompat.createInstance(_loc2_, []), flash.display.MovieClip);
+						weapon = ASCompat.coerce(ASCompat.createInstance(_loc2_, []), flash.display.MovieClip);
 						weapon.name = "weaponIcon";
 						weapon.scaleX = weapon.scaleY = 60 / 100;
 						(weaponButton.root : ASAny).graphic.addChildAt(weapon, 0);
 					};
 				};
 				mAssetLoadingComponent.getSwfAsset(DBFacade.buildFullDownloadPath(consumableWeaponGameObject.getGMStackable().UISwfFilepath),
-					ASCompat.asFunction(makeCallback(button, consumableWeaponGameObject.getGMStackable())));
+					ASCompat.coerceFunction(makeCallback(button, consumableWeaponGameObject.getGMStackable())));
 			}
 			i = i + 1;
 		}
@@ -1759,13 +1758,13 @@ class UIHud {
 			var _loc5_ = ASCompat.dynamicAs(ASCompat.createInstance(_loc6_, []), MovieClip);
 			var _loc2_ = mSwfAsset.getClass("buff_cooldown_icon");
 			var _loc4_ = ASCompat.dynamicAs(ASCompat.createInstance(_loc2_, []), MovieClip);
-			var _loc7_ = new MovieClipRenderer(mDBFacade, ASCompat.dynamicAs((_loc4_ : ASAny).cooldown, flash.display.MovieClip));
+			var _loc7_ = new MovieClipRenderer(mDBFacade, ASCompat.coerce((_loc4_ : ASAny).cooldown, flash.display.MovieClip));
 			_loc5_.alpha = 0.75;
 			_loc5_.scaleX = _loc5_.scaleY = 0.75;
 			(_loc4_ : ASAny).graphic.addChild(_loc5_);
 			mRoot.addChild(_loc4_);
 			var _loc3_ = new UIButton(mDBFacade, _loc4_);
-			_loc3_.tooltip = ASCompat.dynamicAs((_loc4_ : ASAny).tooltip, flash.display.MovieClip);
+			_loc3_.tooltip = ASCompat.coerce((_loc4_ : ASAny).tooltip, flash.display.MovieClip);
 			ASCompat.setProperty((_loc4_ : ASAny).tooltip.title_label, "text", GameMasterLocale.getGameMasterSubString("BUFF_NAME", buffGO.buffData.Constant));
 			ASCompat.setProperty((_loc4_ : ASAny).tooltip.description_label, "text",
 				GameMasterLocale.getGameMasterSubString("BUFF_DESCRIPTION",

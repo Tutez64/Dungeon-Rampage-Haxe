@@ -48,17 +48,17 @@ class UIInventoryItem extends UIButton {
 	var mRenderer:MovieClipRenderer;
 
 	public function new(dbFacade:DBFacade, parentSlot:MovieClip, templateClass:Dynamic, tooltipClass:Dynamic, clickedCallback:ASFunction) {
-		super(dbFacade, ASCompat.dynamicAs(ASCompat.createInstance(templateClass, []), flash.display.MovieClip));
+		super(dbFacade, ASCompat.coerce(ASCompat.createInstance(templateClass, []), flash.display.MovieClip));
 		mDBFacade = dbFacade;
 		mParentSlot = parentSlot;
 		mClickedCallback = clickedCallback;
 		mAssetLoadingComponent = new AssetLoadingComponent(mDBFacade);
 		mParentSlot.addChild(mRoot);
-		mIcon = ASCompat.dynamicAs((mRoot : ASAny).icon, flash.display.MovieClip);
-		mNewLabel = ASCompat.dynamicAs((mRoot : ASAny).new_label, flash.text.TextField);
-		mStackCountLabel = ASCompat.dynamicAs((mRoot : ASAny).number_label, flash.text.TextField);
+		mIcon = ASCompat.coerce((mRoot : ASAny).icon, flash.display.MovieClip);
+		mNewLabel = ASCompat.coerce((mRoot : ASAny).new_label, flash.text.TextField);
+		mStackCountLabel = ASCompat.coerce((mRoot : ASAny).number_label, flash.text.TextField);
 		mStackCountLabel.visible = false;
-		mSelectedEffect = ASCompat.dynamicAs((mRoot : ASAny).selected_effect, flash.display.MovieClip);
+		mSelectedEffect = ASCompat.coerce((mRoot : ASAny).selected_effect, flash.display.MovieClip);
 		mSelectedEffect.visible = false;
 		mWeaponTooltip = new UIWeaponTooltip(mDBFacade, tooltipClass);
 		this.tooltip = mWeaponTooltip;
@@ -158,7 +158,7 @@ class UIInventoryItem extends UIButton {
 				var _loc2_:MovieClip = null;
 				var _loc3_ = param1.getClass(iconName);
 				if (_loc3_ != null) {
-					_loc2_ = ASCompat.dynamicAs(ASCompat.createInstance(_loc3_, []), flash.display.MovieClip);
+					_loc2_ = ASCompat.coerce(ASCompat.createInstance(_loc3_, []), flash.display.MovieClip);
 					_loc2_.scaleX = _loc2_.scaleY = 72 / mInfo.iconScale;
 					mIcon.addChild(_loc2_);
 					if (needsRenderer) {

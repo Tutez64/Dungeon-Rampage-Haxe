@@ -193,9 +193,9 @@ class ColorMatrixFilterPlugin extends FilterPlugin {
 		if (Math.isNaN(amount)) {
 			amount = 1;
 		}
-		var _loc4_ = (Std.int(color) >> 16 & 0xFF) / 255;
-		var _loc5_ = (Std.int(color) >> 8 & 0xFF) / 255;
-		var _loc6_ = (Std.int(color) & 0xFF) / 255;
+		var _loc4_ = (ASCompat.floatToInt(color) >> 16 & 0xFF) / 255;
+		var _loc5_ = (ASCompat.floatToInt(color) >> 8 & 0xFF) / 255;
+		var _loc6_ = (ASCompat.floatToInt(color) & 0xFF) / 255;
 		var _loc7_ = 1 - amount;
 		var _loc8_:Array<ASAny> = [
 			_loc7_ + amount * _loc4_ * _lumR,
@@ -242,7 +242,7 @@ class ColorMatrixFilterPlugin extends FilterPlugin {
 		_matrix = cast(_filter, ColorMatrixFilter).matrix;
 		var _loc5_:Array<ASAny> = [];
 		if (_loc4_.matrix != null && Std.isOfType(_loc4_.matrix, Array)) {
-			_loc5_ = ASCompat.dynamicAs(_loc4_.matrix, Array);
+			_loc5_ = ASCompat.coerce(_loc4_.matrix, Array);
 		} else {
 			if (_loc4_.relative == true) {
 				_loc5_ = _matrix.slice(0);

@@ -172,30 +172,30 @@ class TownHeader {
 		mRoot.x = mDBFacade.viewWidth * 0.5;
 		mRoot.y = 0;
 		(mRoot : ASAny).currency.cash;
-		mCashUI = new UIObject(mDBFacade, ASCompat.dynamicAs((mRoot : ASAny).currency.cash, flash.display.MovieClip));
+		mCashUI = new UIObject(mDBFacade, ASCompat.coerce((mRoot : ASAny).currency.cash, flash.display.MovieClip));
 		ASCompat.setProperty((mCashUI.tooltip : ASAny).title_label, "text", Locale.getString("CASH_TOOLTIP_TITLE"));
 		ASCompat.setProperty((mCashUI.tooltip : ASAny).description_label, "text", Locale.getString("CASH_TOOLTIP_DESCRIPTION"));
-		mCoinUI = new UIObject(mDBFacade, ASCompat.dynamicAs((mRoot : ASAny).currency.coin, flash.display.MovieClip));
+		mCoinUI = new UIObject(mDBFacade, ASCompat.coerce((mRoot : ASAny).currency.coin, flash.display.MovieClip));
 		ASCompat.setProperty((mCoinUI.tooltip : ASAny).title_label, "text", Locale.getString("COIN_TOOLTIP_TITLE"));
 		ASCompat.setProperty((mCoinUI.tooltip : ASAny).description_label, "text", Locale.getString("COIN_TOOLTIP_DESCRIPTION"));
-		mTeamBonusUI = new UIObject(mDBFacade, ASCompat.dynamicAs((mRoot : ASAny).currency.crewbonus, flash.display.MovieClip));
+		mTeamBonusUI = new UIObject(mDBFacade, ASCompat.coerce((mRoot : ASAny).currency.crewbonus, flash.display.MovieClip));
 		ASCompat.setProperty((mTeamBonusUI.tooltip : ASAny).title_label, "text", Locale.getString("TEAM_BONUS_TOOLTIP_TITLE"));
 		ASCompat.setProperty((mTeamBonusUI.tooltip : ASAny).description_label, "text", Locale.getString("TEAM_BONUS_TOOLTIP_DESCRIPTION"));
 		ASCompat.setProperty((mTeamBonusUI.root : ASAny).header_crew_bonus_txt1, "text", Locale.getString("TEAM_BONUS_TITLE_CREW"));
 		ASCompat.setProperty((mTeamBonusUI.root : ASAny).header_crew_bonus_txt2, "text", Locale.getString("TEAM_BONUS_TITLE_BONUS"));
 		ASCompat.setProperty((mTeamBonusUI.root : ASAny).header_crew_bonus_number, "text", mDBFacade.dbAccountInfo.inventoryInfo.getTotalHeroesOwned() - 1);
 		(mTeamBonusUI.root : ASAny).header_crew_bonus_anim.stop();
-		mCoinBoosterUI = new UIObject(mDBFacade, ASCompat.dynamicAs((mRoot : ASAny).currency.boosterCoin, flash.display.MovieClip));
-		mXPBoosterUI = new UIObject(mDBFacade, ASCompat.dynamicAs((mRoot : ASAny).currency.boosterXP, flash.display.MovieClip));
-		mAddCashButton = new UIButton(mDBFacade, ASCompat.dynamicAs((mCashUI.root : ASAny).add_cash, flash.display.MovieClip));
+		mCoinBoosterUI = new UIObject(mDBFacade, ASCompat.coerce((mRoot : ASAny).currency.boosterCoin, flash.display.MovieClip));
+		mXPBoosterUI = new UIObject(mDBFacade, ASCompat.coerce((mRoot : ASAny).currency.boosterXP, flash.display.MovieClip));
+		mAddCashButton = new UIButton(mDBFacade, ASCompat.coerce((mCashUI.root : ASAny).add_cash, flash.display.MovieClip));
 		mAddCashButton.label.text = Locale.getString("HOW");
-		mGemIcon = ASCompat.dynamicAs((mCashUI.root : ASAny).gem_icon, flash.display.MovieClip);
-		mSaleEfx = ASCompat.dynamicAs((mCashUI.root : ASAny).lable_sale_efx, flash.display.MovieClip);
+		mGemIcon = ASCompat.coerce((mCashUI.root : ASAny).gem_icon, flash.display.MovieClip);
+		mSaleEfx = ASCompat.coerce((mCashUI.root : ASAny).lable_sale_efx, flash.display.MovieClip);
 		mSaleEfx.visible = false;
-		mAddCashSaleButton = new UIButton(mDBFacade, ASCompat.dynamicAs((mCashUI.root : ASAny).add_cash_sale, flash.display.MovieClip));
+		mAddCashSaleButton = new UIButton(mDBFacade, ASCompat.coerce((mCashUI.root : ASAny).add_cash_sale, flash.display.MovieClip));
 		mAddCashSaleButton.visible = false;
 		mAddCashSaleButton.label.text = Locale.getString("HOW");
-		mSaleLabel = ASCompat.dynamicAs((mCashUI.root : ASAny).label_sale, flash.text.TextField);
+		mSaleLabel = ASCompat.coerce((mCashUI.root : ASAny).label_sale, flash.text.TextField);
 		mSaleLabel.visible = false;
 		mAddCashSaleButton.rolloverFilter = mAddCashButton.rolloverFilter = DBGlobal.UI_ROLLOVER_FILTER;
 		mAddCashSaleButton.releaseCallback = mAddCashButton.releaseCallback = function() {
@@ -203,7 +203,7 @@ class TownHeader {
 			StoreServicesController.showCashPage(mDBFacade, "TownHeaderAddCash");
 		};
 		mGemIcon.filters = cast([]);
-		mAddCoinButton = new UIButton(mDBFacade, ASCompat.dynamicAs((mCoinUI.root : ASAny).add_coin, flash.display.MovieClip));
+		mAddCoinButton = new UIButton(mDBFacade, ASCompat.coerce((mCoinUI.root : ASAny).add_coin, flash.display.MovieClip));
 		mAddCoinButton.rolloverFilter = DBGlobal.UI_ROLLOVER_FILTER;
 		mAddCoinButton.releaseCallback = function() {
 			StoreServicesController.showCoinPage(mDBFacade);
@@ -213,7 +213,7 @@ class TownHeader {
 		mCoinLabel.mouseEnabled = false;
 		mCashLabel = ASCompat.dynamicAs((mCashUI.root : ASAny).cash, TextField);
 		mCashLabel.mouseEnabled = false;
-		mCloseButton = new UIButton(mDBFacade, ASCompat.dynamicAs((mRoot : ASAny).UI_town_home_button_instance, flash.display.MovieClip));
+		mCloseButton = new UIButton(mDBFacade, ASCompat.coerce((mRoot : ASAny).UI_town_home_button_instance, flash.display.MovieClip));
 		mCloseButton.rolloverFilter = DBGlobal.UI_ROLLOVER_FILTER;
 		mCloseButton.releaseCallback = determineCallback;
 		title = mTitle;
@@ -372,7 +372,7 @@ class TownHeader {
 			ASCompat.setProperty((mRoot : ASAny).currency.boosterXP.label, "text", mBoosterXP.BuffInfo.Exp + "X");
 			ASCompat.setProperty((mXPBoosterUI.tooltip : ASAny).title_label, "text", mBoosterXP.StackInfo.Name);
 			mXPBoosterUI.visible = true;
-			mCountDownTextXP = new CountdownTextTimer(ASCompat.dynamicAs((mXPBoosterUI.tooltip : ASAny).time_label, flash.text.TextField),
+			mCountDownTextXP = new CountdownTextTimer(ASCompat.coerce((mXPBoosterUI.tooltip : ASAny).time_label, flash.text.TextField),
 				mBoosterXP.getEndDate(), GameClock.getWebServerDate, setBoosters, Locale.getString("BOOSTER_REMAINING"), "", Locale.getString("EXPIRED"));
 			mCountDownTextXP.start();
 		}
@@ -381,7 +381,7 @@ class TownHeader {
 			ASCompat.setProperty((mCoinBoosterUI.tooltip : ASAny).title_label, "text",
 				GameMasterLocale.getGameMasterSubString("STACKABLE_NAME", mBoosterGold.StackInfo.Constant));
 			mCoinBoosterUI.visible = true;
-			mCountDownTextGold = new CountdownTextTimer(ASCompat.dynamicAs((mCoinBoosterUI.tooltip : ASAny).time_label, flash.text.TextField),
+			mCountDownTextGold = new CountdownTextTimer(ASCompat.coerce((mCoinBoosterUI.tooltip : ASAny).time_label, flash.text.TextField),
 				mBoosterGold.getEndDate(), GameClock.getWebServerDate, setBoosters, Locale.getString("BOOSTER_REMAINING"), "", Locale.getString("EXPIRED"));
 			mCountDownTextGold.start();
 		}

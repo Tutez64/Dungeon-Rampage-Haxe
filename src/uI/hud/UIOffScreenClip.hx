@@ -89,8 +89,8 @@ class UIOffScreenClip {
 		var hero:HeroGameObject;
 		var chatIsTypingClass:Dynamic;
 		var nametagClass = mNametagSwfAsset.getClass("UI_nametag");
-		var nametag = ASCompat.dynamicAs(ASCompat.createInstance(nametagClass, []), flash.display.MovieClip);
-		mHpBar = new UIProgressBar(mDBFacade, ASCompat.dynamicAs((nametag : ASAny).hp.hpBar, flash.display.MovieClip));
+		var nametag = ASCompat.coerce(ASCompat.createInstance(nametagClass, []), flash.display.MovieClip);
+		mHpBar = new UIProgressBar(mDBFacade, ASCompat.coerce((nametag : ASAny).hp.hpBar, flash.display.MovieClip));
 		mHpBar.value = 100;
 		mEventComponent.addListener(GameObjectEvent.uniqueEvent("HpEvent_HP_UPDATE", mPlayer.id), function(param1:events.HpEvent) {
 			if (!mPlayer.isDestroyed) {
@@ -102,7 +102,7 @@ class UIOffScreenClip {
 		balloonClass = mNametagSwfAsset.getClass("UI_speechbubble");
 		mChatBalloon = new ChatBalloon();
 		mChatBalloon.visible = false;
-		balloon = ASCompat.dynamicAs(ASCompat.createInstance(balloonClass, []), flash.display.MovieClip);
+		balloon = ASCompat.coerce(ASCompat.createInstance(balloonClass, []), flash.display.MovieClip);
 		mChatBalloon.initializeChatBalloon(mNametagSwfAsset);
 		mChatBalloon.y = -40;
 		mOffScreenPlayerClip.addChild(mChatBalloon);
@@ -114,7 +114,7 @@ class UIOffScreenClip {
 				}
 			});
 			chatIsTypingClass = mNametagSwfAsset.getClass("UI_speechbubble_typing");
-			mPlayerIsTypingNotification = ASCompat.dynamicAs(ASCompat.createInstance(chatIsTypingClass, []), flash.display.MovieClip);
+			mPlayerIsTypingNotification = ASCompat.coerce(ASCompat.createInstance(chatIsTypingClass, []), flash.display.MovieClip);
 			mPlayerIsTypingNotification.y = -40;
 			mOffScreenPlayerClip.addChild(mPlayerIsTypingNotification);
 			showPlayerIsTypingNotification(false);
@@ -145,10 +145,10 @@ class UIOffScreenClip {
 		}
 		var _loc5_ = mAvatarSwfAsset.getClass(_loc3_);
 		var _loc6_ = mAvatarSwfAsset.getClass("death_icon");
-		mAvatarPic = ASCompat.dynamicAs(ASCompat.createInstance(_loc5_, []), flash.display.MovieClip);
+		mAvatarPic = ASCompat.coerce(ASCompat.createInstance(_loc5_, []), flash.display.MovieClip);
 		(mOffScreenPlayerClip : ASAny).UI_avatar.addChild(mAvatarPic);
 		if (_loc6_ != null) {
-			mDeathPic = ASCompat.dynamicAs(ASCompat.createInstance(_loc6_, []), flash.display.MovieClip);
+			mDeathPic = ASCompat.coerce(ASCompat.createInstance(_loc6_, []), flash.display.MovieClip);
 		}
 	}
 

@@ -106,13 +106,13 @@ class UIFriendManager {
 		mRoot = rootClip;
 		mTabButtons = new Map();
 		var group = "UIFriendsTabGroup";
-		mTabButtons.add(1, new UIRadioButton(mDBFacade, ASCompat.dynamicAs((mRoot : ASAny).tab_friends, flash.display.MovieClip), group));
-		mTabButtons.add(4, new UIRadioButton(mDBFacade, ASCompat.dynamicAs((mRoot : ASAny).tab_invite, flash.display.MovieClip), group));
-		mTabButtons.add(2, new UIRadioButton(mDBFacade, ASCompat.dynamicAs((mRoot : ASAny).tab_pending, flash.display.MovieClip), group));
-		mTabButtons.add(3, new UIRadioButton(mDBFacade, ASCompat.dynamicAs((mRoot : ASAny).tab_blocked, flash.display.MovieClip), group));
+		mTabButtons.add(1, new UIRadioButton(mDBFacade, ASCompat.coerce((mRoot : ASAny).tab_friends, flash.display.MovieClip), group));
+		mTabButtons.add(4, new UIRadioButton(mDBFacade, ASCompat.coerce((mRoot : ASAny).tab_invite, flash.display.MovieClip), group));
+		mTabButtons.add(2, new UIRadioButton(mDBFacade, ASCompat.coerce((mRoot : ASAny).tab_pending, flash.display.MovieClip), group));
+		mTabButtons.add(3, new UIRadioButton(mDBFacade, ASCompat.coerce((mRoot : ASAny).tab_blocked, flash.display.MovieClip), group));
 		iter = ASCompat.reinterpretAs(mTabButtons.iterator(), IMapIterator);
 		while (iter.hasNext()) {
-			tabButton = ASCompat.dynamicAs(iter.next(), brain.uI.UIRadioButton);
+			tabButton = ASCompat.coerce(iter.next(), brain.uI.UIRadioButton);
 			tabInt = (ASCompat.toInt(iter.key) : UInt);
 			tabButton.label.text = Locale.getString("FRIEND_MANAGEMENT_TAB_" + Std.string(tabInt));
 			ASCompat.setProperty(tabButton.root, "category", tabInt);
@@ -125,20 +125,20 @@ class UIFriendManager {
 		}
 		mStateLayer = new MovieClip();
 		mRoot.addChild(mStateLayer);
-		mAlert = ASCompat.dynamicAs((mRoot : ASAny).tab_pending.alert_icon, flash.display.MovieClip);
+		mAlert = ASCompat.coerce((mRoot : ASAny).tab_pending.alert_icon, flash.display.MovieClip);
 		mAlertRenderer = new MovieClipRenderController(mDBFacade, mAlert);
 		mAlertRenderer.play((0 : UInt), true);
 		mAlert.visible = false;
 	}
 
 	public function enableTabButton(state:UInt) {
-		var _loc2_ = ASCompat.dynamicAs(mTabButtons.itemFor(state), brain.uI.UIRadioButton);
+		var _loc2_ = ASCompat.coerce(mTabButtons.itemFor(state), brain.uI.UIRadioButton);
 		_loc2_.root.filters = cast([new ColorMatrixFilter()]);
 		if (state == 2) {}
 	}
 
 	public function disableTabButton(state:UInt) {
-		var _loc2_ = ASCompat.dynamicAs(mTabButtons.itemFor(state), brain.uI.UIRadioButton);
+		var _loc2_ = ASCompat.coerce(mTabButtons.itemFor(state), brain.uI.UIRadioButton);
 		var _loc3_:Float = 0.212671;
 		var _loc5_:Float = 0.71516;
 		var _loc4_:Float = 0.072169;
@@ -235,7 +235,7 @@ class UIFriendManager {
 		var _loc2_:UIRadioButton = null;
 		var _loc1_ = ASCompat.reinterpretAs(mTabButtons.iterator(), IMapIterator);
 		while (_loc1_.hasNext()) {
-			_loc2_ = ASCompat.dynamicAs(_loc1_.next(), brain.uI.UIRadioButton);
+			_loc2_ = ASCompat.coerce(_loc1_.next(), brain.uI.UIRadioButton);
 			_loc2_.destroy();
 		}
 		mTabButtons.clear();

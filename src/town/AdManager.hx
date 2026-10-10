@@ -56,7 +56,7 @@ class AdManager {
 		_loc1_ = 0;
 		while (_loc1_ < mAdProviders.length) {
 			mProviderResponses.push(-1);
-			_loc1_ = ASCompat.toInt(_loc1_) + 1;
+			_loc1_++;
 		}
 	}
 
@@ -99,7 +99,7 @@ class AdManager {
 		_loc1_ = 0;
 		while (_loc1_ < mAdProviders.length) {
 			mProviderResponses[_loc1_] = -1;
-			_loc1_ = ASCompat.toInt(_loc1_) + 1;
+			_loc1_++;
 		}
 	}
 
@@ -137,7 +137,7 @@ class AdManager {
 	}
 
 	public function ShouldShowAdButton():Bool {
-		var _loc1_ = Std.int(mDBFacade.dbConfigManager.getConfigNumber("min_avlevel_for_ad", 0));
+		var _loc1_ = ASCompat.floatToInt(mDBFacade.dbConfigManager.getConfigNumber("min_avlevel_for_ad", 0));
 		Logger.debug("minAvLevForAd= " + _loc1_);
 		return _loc1_ >= 0 && !mDBFacade.isKongregatePlayer && mDBFacade.dbAccountInfo.inventoryInfo.highestAvatarLevel >= (_loc1_ : UInt);
 	}
@@ -175,11 +175,11 @@ class AdManager {
 		mAssetLoadingComponent.getSwfAsset(DBFacade.buildFullDownloadPath("Resources/Art2D/UI/db_UI_town.swf"),
 			function(param1:brain.assetRepository.SwfAsset) {
 				var _loc2_ = param1.getClass("UI_icon_wild_tangent");
-				mAdButtonClip = ASCompat.dynamicAs(ASCompat.createInstance(_loc2_, []), flash.display.MovieClip);
+				mAdButtonClip = ASCompat.coerce(ASCompat.createInstance(_loc2_, []), flash.display.MovieClip);
 				mAdButtonClip.x = 612;
 				mAdButtonClip.y = 276;
 				mTownClip.addChild(mAdButtonClip);
-				mAdButton = new UIButton(mDBFacade, ASCompat.dynamicAs((mAdButtonClip : ASAny).button, flash.display.MovieClip));
+				mAdButton = new UIButton(mDBFacade, ASCompat.coerce((mAdButtonClip : ASAny).button, flash.display.MovieClip));
 				mAdButton.releaseCallback = mAdProviders[(adProvider : Int)].ShowAdPlayer;
 				mAdProviders[(adProvider : Int)].ShowingAdButton();
 			});

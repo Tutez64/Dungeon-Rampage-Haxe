@@ -85,7 +85,7 @@ class WeaponController {
 		var buffMult:Float;
 		var baseAttackSpeed:Float;
 		var stopCallback:ASFunction;
-		var gmAttack = ASCompat.dynamicAs(mDBFacade.gameMaster.attackById.itemFor(attackType), gameMasterDictionary.GMAttack);
+		var gmAttack = ASCompat.coerce(mDBFacade.gameMaster.attackById.itemFor(attackType), gameMasterDictionary.GMAttack);
 		var attackSpeedMultiplier:Float = 1;
 		var trueManaCosts = gmAttack.ManaCost;
 		if (gmAttack.StatOffsets != null) {
@@ -96,11 +96,11 @@ class WeaponController {
 			return false;
 		}
 		if (gmAttack.StatOffsets != null) {
-			speedIndex = (Std.int(gmAttack.StatOffsets.speed) : UInt);
+			speedIndex = (ASCompat.floatToInt(gmAttack.StatOffsets.speed) : UInt);
 			actorAttackSpeed = mHero.stats.values[(speedIndex : Int)];
 			buffMult = mHero.buffHandler.multiplier.values[(speedIndex : Int)];
 			baseAttackSpeed = gmAttack.AttackSpdF;
-			attackSpeedMultiplier = baseAttackSpeed * actorAttackSpeed * buffMult * mWeapon.finalWeaponSpeedWithModifiers(Std.int(gmAttack.StatOffsets.type));
+			attackSpeedMultiplier = baseAttackSpeed * actorAttackSpeed * buffMult * mWeapon.finalWeaponSpeedWithModifiers(ASCompat.floatToInt(gmAttack.StatOffsets.type));
 			attackSpeedMultiplier *= attackSpeedModifier;
 		}
 		stopCurrentTimeline();
@@ -114,7 +114,7 @@ class WeaponController {
 			mCurrentAttackTimeline = null;
 		};
 		mHero.attack(attackType, null, attackSpeedMultiplier, mCurrentAttackTimeline, function() {
-			finishedAttack(autoAim, (Std.int(attackSpeedModifier) : UInt));
+			finishedAttack(autoAim, (ASCompat.floatToInt(attackSpeedModifier) : UInt));
 		}, stopCallback, false, autoAim);
 
 		var attackStarted = (mCurrentAttackTimeline == null || mCurrentAttackTimeline.isPlaying);
@@ -188,7 +188,7 @@ class WeaponController {
 	function buildAttackArray() {
 		var _loc3_:GMAttack = null;
 		mAttackArray = [];
-		var _loc1_:Array<ASAny> = ASCompat.dynamicAs(mDBFacade.gameMaster.weaponItemByConstant.itemFor(mWeapon.weaponData.Constant).AttackArray, Array);
+		var _loc1_:Array<ASAny> = ASCompat.coerce(mDBFacade.gameMaster.weaponItemByConstant.itemFor(mWeapon.weaponData.Constant).AttackArray, Array);
 		var _loc2_:String;
 		if (checkNullIteratee(_loc1_))
 			for (_tmp_ in _loc1_) {
@@ -213,8 +213,8 @@ class WeaponController {
 	}
 
 	function getAttackFromComboArray():GMAttack {
-		var _loc1_ = (Std.int(!mWeapon.weaponData.ChooseRandomAttack ? mNextAttackComboIndex : mAttackArray.length * Math.random() - 1) : UInt);
-		var _loc2_ = ASCompat.dynamicAs(mAttackArray[(_loc1_ : Int)], gameMasterDictionary.GMAttack);
+		var _loc1_ = (ASCompat.floatToInt(!mWeapon.weaponData.ChooseRandomAttack ? mNextAttackComboIndex : mAttackArray.length * Math.random() - 1) : UInt);
+		var _loc2_ = ASCompat.coerce(mAttackArray[(_loc1_ : Int)], gameMasterDictionary.GMAttack);
 		if (_loc2_ == null) {
 			Logger.error("Attack in attack array is null for attack index: " + mNextAttackComboIndex + " on weapon id: " + mWeapon.weaponData.Id
 				+ " Array Size: " + mAttackArray.length);
@@ -268,7 +268,7 @@ class WeaponController {
 	}
 
 	function overrideAttacksWithRampage() {
-		var _loc1_ = ASCompat.dynamicAs(mDBFacade.gameMaster.attackByConstant.itemFor("RAMPAGE"), gameMasterDictionary.GMAttack);
+		var _loc1_ = ASCompat.coerce(mDBFacade.gameMaster.attackByConstant.itemFor("RAMPAGE"), gameMasterDictionary.GMAttack);
 		if (_loc1_ == null) {
 			Logger.error("Could not find rampage attack by constant for constant: RAMPAGE. Will not override attacks.");
 			return;
@@ -315,7 +315,7 @@ class WeaponController {
 	}
 
 	public function queueAttack(attackName:String) {
-		mQueueAttack = ASCompat.dynamicAs(mDBFacade.gameMaster.attackByConstant.itemFor(attackName), gameMasterDictionary.GMAttack);
+		mQueueAttack = ASCompat.coerce(mDBFacade.gameMaster.attackByConstant.itemFor(attackName), gameMasterDictionary.GMAttack);
 		if (mQueueAttack == null) {
 			Logger.error("Queue Attack doesn\'t exist!");
 		}

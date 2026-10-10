@@ -44,25 +44,25 @@ class RectangleColliderTimelineAction extends ColliderTimelineAction {
 		var _loc19_ = 0;
 		if (actorGameObject.isOwner) {
 			_loc17_ = weapon != null ? weapon.collisionScale() : 1;
-			_loc10_ = ASCompat.toNumber(ASCompat.toNumberField(actionObj, "halfHeight") * _loc17_);
-			_loc16_ = ASCompat.toNumber(ASCompat.toNumberField(actionObj, "halfWidth") * _loc17_);
+			_loc10_ = ASCompat.toNumberField(actionObj, "halfHeight") * _loc17_;
+			_loc16_ = ASCompat.toNumberField(actionObj, "halfWidth") * _loc17_;
 			_loc11_ = ASCompat.toNumber(actionObj.rotation);
 			_loc9_ = 0;
 			if (actionObj.xOffset != null) {
-				_loc9_ = ASCompat.toNumber(ASCompat.toNumberField(actionObj, "xOffset") * _loc17_);
+				_loc9_ = ASCompat.toNumberField(actionObj, "xOffset") * _loc17_;
 			}
 			_loc8_ = 0;
 			if (actionObj.yOffset != null) {
-				_loc8_ = ASCompat.toNumber(ASCompat.toNumberField(actionObj, "yOffset") * _loc17_);
+				_loc8_ = ASCompat.toNumberField(actionObj, "yOffset") * _loc17_;
 			}
 			_loc14_ = new Vector3D(_loc9_, _loc8_);
 			_loc13_ = 0;
 			if (actionObj.xGlobalOffset != null) {
-				_loc13_ = ASCompat.toNumber(ASCompat.toNumberField(actionObj, "xGlobalOffset") * _loc17_);
+				_loc13_ = ASCompat.toNumberField(actionObj, "xGlobalOffset") * _loc17_;
 			}
 			_loc12_ = 0;
 			if (actionObj.yGlobalOffset != null) {
-				_loc12_ = ASCompat.toNumber(ASCompat.toNumberField(actionObj, "yGlobalOffset") * _loc17_);
+				_loc12_ = ASCompat.toNumberField(actionObj, "yGlobalOffset") * _loc17_;
 			}
 			_loc15_ = new Vector3D(_loc13_, _loc12_);
 			_loc18_ = 1;

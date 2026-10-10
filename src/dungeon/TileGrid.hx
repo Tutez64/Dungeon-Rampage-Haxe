@@ -33,9 +33,9 @@ class TileGrid {
 			while ((_loc3_ : UInt) < mGridWidth) {
 				mTiles.push(null);
 				mEmptyTileColiders.push(null);
-				_loc3_ = ASCompat.toInt(_loc3_) + 1;
+				_loc3_++;
 			}
-			_loc4_ = ASCompat.toInt(_loc4_) + 1;
+			_loc4_++;
 		}
 	}
 
@@ -91,8 +91,8 @@ class TileGrid {
 			Logger.error("setTileAtPosition: position must be positive: " + pos.toString());
 			return;
 		}
-		var _loc3_ = (Std.int((pos.x + 900) / 900) : UInt);
-		var _loc4_ = (Std.int((pos.y + 900) / 900) : UInt);
+		var _loc3_ = (ASCompat.floatToInt((pos.x + 900) / 900) : UInt);
+		var _loc4_ = (ASCompat.floatToInt((pos.y + 900) / 900) : UInt);
 		setTileAtIndex(_loc3_, _loc4_, tile);
 	}
 
@@ -107,8 +107,8 @@ class TileGrid {
 		if (pos.x < -900 || pos.y < -900) {
 			return null;
 		}
-		var _loc2_ = (Std.int((pos.x + 900) / 900) : UInt);
-		var _loc3_ = (Std.int((pos.y + 900) / 900) : UInt);
+		var _loc2_ = (ASCompat.floatToInt((pos.x + 900) / 900) : UInt);
+		var _loc3_ = (ASCompat.floatToInt((pos.y + 900) / 900) : UInt);
 		return getTileAtIndex(_loc2_, _loc3_);
 	}
 
@@ -116,8 +116,8 @@ class TileGrid {
 		if (pos.x < -900 || pos.y < -900) {
 			return -1;
 		}
-		var _loc2_ = (Std.int((pos.x + 900) / 900) : UInt);
-		var _loc3_ = (Std.int((pos.y + 900) / 900) : UInt);
+		var _loc2_ = (ASCompat.floatToInt((pos.x + 900) / 900) : UInt);
+		var _loc3_ = (ASCompat.floatToInt((pos.y + 900) / 900) : UInt);
 		if (_loc2_ >= mGridWidth || _loc3_ >= mGridHeight) {
 			return -1;
 		}
@@ -163,11 +163,11 @@ class TileGrid {
 	public function removeTileAtPosition(pos:Vector3D) {
 		var _loc2_:Float = getTileIndexAtPosition(pos);
 		if (_loc2_ >= 0) {
-			if (mTiles[Std.int(_loc2_)] != null) {
-				mTiles[Std.int(_loc2_)].removeFromStage();
-				mTiles[Std.int(_loc2_)].destroy();
+			if (mTiles[ASCompat.floatToInt(_loc2_)] != null) {
+				mTiles[ASCompat.floatToInt(_loc2_)].removeFromStage();
+				mTiles[ASCompat.floatToInt(_loc2_)].destroy();
 			}
-			mTiles[Std.int(_loc2_)] = null;
+			mTiles[ASCompat.floatToInt(_loc2_)] = null;
 		}
 	}
 
@@ -183,7 +183,7 @@ class TileGrid {
 					_loc1_.destroy();
 					_loc1_ = null;
 				}
-				_loc2_ = ASCompat.toInt(_loc2_) + 1;
+				_loc2_++;
 			}
 			mEmptyTileColiders.length = 0;
 			mEmptyTileColiders = null;

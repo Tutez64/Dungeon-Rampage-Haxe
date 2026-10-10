@@ -37,7 +37,7 @@ class FloorMessageView {
 
 	function assetLoaded(swfAsset:SwfAsset) {
 		var textClass = swfAsset.getClass("floor_message");
-		mMessageClip = ASCompat.dynamicAs(ASCompat.createInstance(textClass, []), flash.display.MovieClip);
+		mMessageClip = ASCompat.coerce(ASCompat.createInstance(textClass, []), flash.display.MovieClip);
 		ASCompat.setProperty((mMessageClip : ASAny).message_text_01, "autoSize", "center");
 		ASCompat.setProperty((mMessageClip : ASAny).message_text_01, "multiline", true);
 		if (mMessageString != "") {

@@ -10,35 +10,35 @@ class B2Color {
 	var _b:UInt = (0 : UInt);
 
 	public function new(rr:Float, gg:Float, bb:Float) {
-		this._r = (Std.int(255 * B2Math.Clamp(rr, 0, 1)) : UInt);
-		this._g = (Std.int(255 * B2Math.Clamp(gg, 0, 1)) : UInt);
-		this._b = (Std.int(255 * B2Math.Clamp(bb, 0, 1)) : UInt);
+		this._r = (ASCompat.floatToInt(255 * B2Math.Clamp(rr, 0, 1)) : UInt);
+		this._g = (ASCompat.floatToInt(255 * B2Math.Clamp(gg, 0, 1)) : UInt);
+		this._b = (ASCompat.floatToInt(255 * B2Math.Clamp(bb, 0, 1)) : UInt);
 	}
 
 	public function Set(rr:Float, gg:Float, bb:Float) {
-		this._r = (Std.int(255 * B2Math.Clamp(rr, 0, 1)) : UInt);
-		this._g = (Std.int(255 * B2Math.Clamp(gg, 0, 1)) : UInt);
-		this._b = (Std.int(255 * B2Math.Clamp(bb, 0, 1)) : UInt);
+		this._r = (ASCompat.floatToInt(255 * B2Math.Clamp(rr, 0, 1)) : UInt);
+		this._g = (ASCompat.floatToInt(255 * B2Math.Clamp(gg, 0, 1)) : UInt);
+		this._b = (ASCompat.floatToInt(255 * B2Math.Clamp(bb, 0, 1)) : UInt);
 	}
 
 	@:isVar public var r(never, set):Float;
 
 	public function set_r(rr:Float):Float {
-		this._r = (Std.int(255 * B2Math.Clamp(rr, 0, 1)) : UInt);
+		this._r = (ASCompat.floatToInt(255 * B2Math.Clamp(rr, 0, 1)) : UInt);
 		return rr;
 	}
 
 	@:isVar public var g(never, set):Float;
 
 	public function set_g(gg:Float):Float {
-		this._g = (Std.int(255 * B2Math.Clamp(gg, 0, 1)) : UInt);
+		this._g = (ASCompat.floatToInt(255 * B2Math.Clamp(gg, 0, 1)) : UInt);
 		return gg;
 	}
 
 	@:isVar public var b(never, set):Float;
 
 	public function set_b(bb:Float):Float {
-		this._b = (Std.int(255 * B2Math.Clamp(bb, 0, 1)) : UInt);
+		this._b = (ASCompat.floatToInt(255 * B2Math.Clamp(bb, 0, 1)) : UInt);
 		return bb;
 	}
 

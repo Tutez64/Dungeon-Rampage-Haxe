@@ -195,7 +195,7 @@ class SteamIdConverter {
 		var _loc8_ = 0;
 		_loc9_ = _loc6_ - 1;
 		while (_loc9_ >= 0) {
-			_loc4_ = Std.int(ASCompat.toNumber(str1.charAt(_loc9_ + _loc10_)) - ASCompat.toNumber(str2.charAt(_loc9_)) - _loc8_);
+			_loc4_ = ASCompat.floatToInt(ASCompat.toNumber(str1.charAt(_loc9_ + _loc10_)) - ASCompat.toNumber(str2.charAt(_loc9_)) - _loc8_);
 			if (_loc4_ < 0) {
 				_loc4_ += 10;
 				_loc8_ = 1;
@@ -210,7 +210,7 @@ class SteamIdConverter {
 			if (str1.charAt(_loc9_) == "0" && _loc8_ > 0) {
 				_loc3_ = "9" + _loc3_;
 			} else {
-				_loc4_ = Std.int(ASCompat.toNumber(str1.charAt(_loc9_)) - _loc8_);
+				_loc4_ = ASCompat.floatToInt(ASCompat.toNumber(str1.charAt(_loc9_)) - _loc8_);
 				if (_loc9_ > 0 || _loc4_ > 0) {
 					_loc3_ = Std.string(_loc4_) + _loc3_;
 				}

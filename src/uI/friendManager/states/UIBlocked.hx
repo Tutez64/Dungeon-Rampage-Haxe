@@ -57,7 +57,7 @@ class UIBlocked extends UIFMState {
 						mListOfBlockedFriends.splice(_loc3_, (1 : UInt));
 						break;
 					}
-					_loc3_ = ASCompat.toInt(_loc3_) + 1;
+					_loc3_++;
 				}
 			}
 		exit();

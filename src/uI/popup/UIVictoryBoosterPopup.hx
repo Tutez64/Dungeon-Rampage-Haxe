@@ -27,7 +27,7 @@ class UIVictoryBoosterPopup extends DBUIPopup {
 		var _loc7_:GMStackable = null;
 		var _loc8_ = ASCompat.reinterpretAs(dbFacade.dbAccountInfo.inventoryInfo.stackables.iterator(), IMapIterator);
 		while (_loc8_.hasNext()) {
-			_loc6_ = ASCompat.dynamicAs(_loc8_.next(), account.StackableInfo);
+			_loc6_ = ASCompat.coerce(_loc8_.next(), account.StackableInfo);
 			if (_loc6_.isEquipped) {
 				_loc7_ = _loc6_.gmStackable;
 				if (_loc7_.ExpMult > 0) {
@@ -71,9 +71,9 @@ class UIVictoryBoosterPopup extends DBUIPopup {
 		var _loc3_:Dynamic = null;
 		var _loc2_:MovieClip = null;
 		if (expStack != null) {
-			mExpObject = new UIObject(mDBFacade, ASCompat.dynamicAs((mPopup : ASAny).potion_slot_A, flash.display.MovieClip), 105);
+			mExpObject = new UIObject(mDBFacade, ASCompat.coerce((mPopup : ASAny).potion_slot_A, flash.display.MovieClip), 105);
 			_loc3_ = swfAsset.getClass(expStack.IconName);
-			_loc2_ = ASCompat.dynamicAs(ASCompat.createInstance(_loc3_, []), flash.display.MovieClip);
+			_loc2_ = ASCompat.coerce(ASCompat.createInstance(_loc3_, []), flash.display.MovieClip);
 			_loc2_.scaleX = _loc2_.scaleY = 72 / 100;
 			_loc2_.y -= 8;
 			mExpObject.root.addChild(_loc2_);
@@ -87,9 +87,9 @@ class UIVictoryBoosterPopup extends DBUIPopup {
 			ASCompat.setProperty((mPopup : ASAny).text_value_slot_A, "visible", true);
 		}
 		if (goldStack != null) {
-			mGoldObject = new UIObject(mDBFacade, ASCompat.dynamicAs((mPopup : ASAny).potion_slot_B, flash.display.MovieClip));
+			mGoldObject = new UIObject(mDBFacade, ASCompat.coerce((mPopup : ASAny).potion_slot_B, flash.display.MovieClip));
 			_loc3_ = swfAsset.getClass(goldStack.IconName);
-			_loc2_ = ASCompat.dynamicAs(ASCompat.createInstance(_loc3_, []), flash.display.MovieClip);
+			_loc2_ = ASCompat.coerce(ASCompat.createInstance(_loc3_, []), flash.display.MovieClip);
 			_loc2_.scaleX = _loc2_.scaleY = 72 / 100;
 			_loc2_.y -= 8;
 			mGoldObject.root.addChild(_loc2_);

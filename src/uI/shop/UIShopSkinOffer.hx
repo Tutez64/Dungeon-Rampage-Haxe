@@ -65,7 +65,7 @@ class UIShopSkinOffer extends UIShopOffer {
 	}
 
 	function ownsRequiredHero():Bool {
-		var _loc2_ = ASCompat.dynamicAs(mDBFacade.gameMaster.heroByConstant.itemFor(mGMOfferSkin.ForHero), gameMasterDictionary.GMHero);
+		var _loc2_ = ASCompat.coerce(mDBFacade.gameMaster.heroByConstant.itemFor(mGMOfferSkin.ForHero), gameMasterDictionary.GMHero);
 		var _loc1_ = mDBFacade.dbAccountInfo.inventoryInfo.getAvatarInfoForHeroType(_loc2_.Id);
 		return _loc1_ != null;
 	}

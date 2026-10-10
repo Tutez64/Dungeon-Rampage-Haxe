@@ -18,7 +18,7 @@ class GMItem {
 			for (_tmp_ in iterateDynamicValues(jsonAsset)) {
 				_loc2_ = _tmp_;
 				if (ASCompat.getQualifiedClassName(_loc2_) == "int") {
-					mSecurityValue += Std.int(Math.abs(ASCompat.toInt(_loc2_)) % 17 + Math.abs(ASCompat.toInt(_loc2_)) / 19);
+					mSecurityValue += ASCompat.floatToInt(Math.abs(ASCompat.toInt(_loc2_)) % 17 + Math.abs(ASCompat.toInt(_loc2_)) / 19);
 				}
 			}
 		mSecurityValue %= 541;

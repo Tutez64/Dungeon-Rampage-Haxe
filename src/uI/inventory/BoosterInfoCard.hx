@@ -105,11 +105,11 @@ class BoosterInfoCard extends UIObject {
 			ASCompat.setProperty((mRoot : ASAny).button_activate.label, "text", Locale.getString("BOOSTER_CARD_ACTIVATE"));
 			ASCompat.setProperty((mRoot : ASAny).booster_activated, "visible", false);
 			ASCompat.setProperty((mRoot : ASAny).booster_activated.label_time, "text", "00:00:00");
-			mActivateButton = new UIButton(mDBFacade, ASCompat.dynamicAs((mRoot : ASAny).button_activate, flash.display.MovieClip));
+			mActivateButton = new UIButton(mDBFacade, ASCompat.coerce((mRoot : ASAny).button_activate, flash.display.MovieClip));
 			mActivateButton.releaseCallback = function() {
 				activateBooster();
 			};
-			mActivateAnotherButton = new UIButton(mDBFacade, ASCompat.dynamicAs((mRoot : ASAny).booster_activated.activate_another, flash.display.MovieClip));
+			mActivateAnotherButton = new UIButton(mDBFacade, ASCompat.coerce((mRoot : ASAny).booster_activated.activate_another, flash.display.MovieClip));
 			mActivateAnotherButton.releaseCallback = function() {
 				activateBooster();
 			};
@@ -132,7 +132,7 @@ class BoosterInfoCard extends UIObject {
 		if (_loc1_ == null) {
 			timeUp();
 		} else {
-			mCountdownTextTimer = new CountdownTextTimer(ASCompat.dynamicAs((mRoot : ASAny).booster_activated.label_time, flash.text.TextField), _loc1_,
+			mCountdownTextTimer = new CountdownTextTimer(ASCompat.coerce((mRoot : ASAny).booster_activated.label_time, flash.text.TextField), _loc1_,
 				GameClock.getWebServerDate, timeUp, Locale.getString("BOOSTER_REMAINING"), "", Locale.getString("EXPIRED"));
 			mCountdownTextTimer.start();
 		}
@@ -169,7 +169,7 @@ class BoosterInfoCard extends UIObject {
 			return;
 		}
 		var _loc2_ = swfAsset.getClass(mInfo.iconName);
-		mIcon = ASCompat.dynamicAs(ASCompat.createInstance(_loc2_, []), flash.display.MovieClip);
+		mIcon = ASCompat.coerce(ASCompat.createInstance(_loc2_, []), flash.display.MovieClip);
 		(mRoot : ASAny).booster_icon.addChild(mIcon);
 		mFlagIcon = true;
 		if (mFlagIcon && mFlagBooster) {
@@ -182,7 +182,7 @@ class BoosterInfoCard extends UIObject {
 		if (mDBFacade == null) {
 			return;
 		}
-		var _loc3_ = ASCompat.dynamicAs(mDBFacade.gameMaster.buffByConstant.itemFor(mInfo.gmStackable.Buff), gameMasterDictionary.GMBuff);
+		var _loc3_ = ASCompat.coerce(mDBFacade.gameMaster.buffByConstant.itemFor(mInfo.gmStackable.Buff), gameMasterDictionary.GMBuff);
 		var _loc4_ = "inv_itemCard_boosterXP";
 		var _loc2_ = _loc3_.Exp + "X";
 		if (_loc3_.Exp < _loc3_.Gold) {
@@ -190,11 +190,11 @@ class BoosterInfoCard extends UIObject {
 			_loc2_ = _loc3_.Gold + "X";
 		}
 		var _loc5_ = swfAsset.getClass(_loc4_);
-		mBoostIcon = ASCompat.dynamicAs(ASCompat.createInstance(_loc5_, []), flash.display.MovieClip);
-		var _loc6_ = ASCompat.dynamicAs((mRoot : ASAny).booster_activated.booster_icon_text, flash.text.TextField);
+		mBoostIcon = ASCompat.coerce(ASCompat.createInstance(_loc5_, []), flash.display.MovieClip);
+		var _loc6_ = ASCompat.coerce((mRoot : ASAny).booster_activated.booster_icon_text, flash.text.TextField);
 		if (mSparkleController == null) {
 			mSparkleController = new MovieClipRenderController(mDBFacade,
-				ASCompat.dynamicAs((mRoot : ASAny).booster_activated.booster_icon_anim, flash.display.MovieClip));
+				ASCompat.coerce((mRoot : ASAny).booster_activated.booster_icon_anim, flash.display.MovieClip));
 			mSparkleController.play();
 			mSparkleController.loop = true;
 		}

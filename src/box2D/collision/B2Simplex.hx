@@ -42,7 +42,7 @@ class B2Simplex {
 			_loc10_.wB = B2Math.MulX(transformB, _loc7_);
 			_loc10_.w = B2Math.SubtractVV(_loc10_.wB, _loc10_.wA);
 			_loc10_.a = 0;
-			_loc9_ = ASCompat.toInt(_loc9_) + 1;
+			_loc9_++;
 		}
 		if (this.m_count > 1) {
 			_loc11_ = cache.metric;
@@ -72,7 +72,7 @@ class B2Simplex {
 		while (_loc3_ < this.m_count) {
 			cache.indexA[_loc3_] = _loc2_[_loc3_].indexA;
 			cache.indexB[_loc3_] = _loc2_[_loc3_].indexB;
-			_loc3_ = ASCompat.toInt(_loc3_) + 1;
+			_loc3_++;
 		}
 	}
 

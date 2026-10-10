@@ -125,53 +125,53 @@ class UIShopOffer extends UIObject {
 	public function new(dbFacade:DBFacade, templateClass:Dynamic, buySuccessCallback:ASFunction = null, useIconScaling:Bool = true,
 			wantNewRollOverScale:Bool = true) {
 		mDBFacade = dbFacade;
-		super(dbFacade, ASCompat.dynamicAs(ASCompat.createInstance(templateClass, []), flash.display.MovieClip));
+		super(dbFacade, ASCompat.coerce(ASCompat.createInstance(templateClass, []), flash.display.MovieClip));
 		mWantNewRollOverScale = wantNewRollOverScale;
 		mAssetLoadingComponent = new AssetLoadingComponent(mDBFacade);
-		mTitle = ASCompat.dynamicAs((mRoot : ASAny).offer_title, flash.text.TextField);
+		mTitle = ASCompat.coerce((mRoot : ASAny).offer_title, flash.text.TextField);
 		mTitleY = mTitle.y;
-		mRibbon = ASCompat.dynamicAs((mRoot : ASAny).ribbon, flash.display.MovieClip);
-		mLevelStarLabel = ASCompat.dynamicAs((mRoot : ASAny).level_star_label, flash.text.TextField);
-		mOriginalPrice = ASCompat.dynamicAs((mRoot : ASAny).buy_button.original_price, flash.text.TextField);
-		mStrikePrice = ASCompat.dynamicAs((mRoot : ASAny).buy_button.strike, flash.display.Sprite);
-		mCashIcon = ASCompat.dynamicAs((mRoot : ASAny).buy_button.icons_bundle.cash, flash.display.MovieClip);
-		mCoinIcon = ASCompat.dynamicAs((mRoot : ASAny).buy_button.icons_bundle.coin, flash.display.MovieClip);
-		mGiftIcon = ASCompat.dynamicAs((mRoot : ASAny).buy_button.icons_bundle.gift_icon, flash.display.MovieClip);
-		mStar = ASCompat.dynamicAs((mRoot : ASAny).star, flash.display.MovieClip);
-		mBg = ASCompat.dynamicAs((mRoot : ASAny).bg, flash.display.MovieClip);
-		mBgGrey = ASCompat.dynamicAs((mRoot : ASAny).bg_grey, flash.display.MovieClip);
-		mDescriptionLabel = ASCompat.dynamicAs((mRoot : ASAny).description_label, flash.text.TextField);
-		mLimitLabel = ASCompat.dynamicAs((mRoot : ASAny).limit_label, flash.text.TextField);
-		mSaleLabel = ASCompat.dynamicAs((mRoot : ASAny).sale_label, flash.text.TextField);
-		mRequiresLabel = ASCompat.dynamicAs((mRoot : ASAny).requires_title, flash.text.TextField);
+		mRibbon = ASCompat.coerce((mRoot : ASAny).ribbon, flash.display.MovieClip);
+		mLevelStarLabel = ASCompat.coerce((mRoot : ASAny).level_star_label, flash.text.TextField);
+		mOriginalPrice = ASCompat.coerce((mRoot : ASAny).buy_button.original_price, flash.text.TextField);
+		mStrikePrice = ASCompat.coerce((mRoot : ASAny).buy_button.strike, flash.display.Sprite);
+		mCashIcon = ASCompat.coerce((mRoot : ASAny).buy_button.icons_bundle.cash, flash.display.MovieClip);
+		mCoinIcon = ASCompat.coerce((mRoot : ASAny).buy_button.icons_bundle.coin, flash.display.MovieClip);
+		mGiftIcon = ASCompat.coerce((mRoot : ASAny).buy_button.icons_bundle.gift_icon, flash.display.MovieClip);
+		mStar = ASCompat.coerce((mRoot : ASAny).star, flash.display.MovieClip);
+		mBg = ASCompat.coerce((mRoot : ASAny).bg, flash.display.MovieClip);
+		mBgGrey = ASCompat.coerce((mRoot : ASAny).bg_grey, flash.display.MovieClip);
+		mDescriptionLabel = ASCompat.coerce((mRoot : ASAny).description_label, flash.text.TextField);
+		mLimitLabel = ASCompat.coerce((mRoot : ASAny).limit_label, flash.text.TextField);
+		mSaleLabel = ASCompat.coerce((mRoot : ASAny).sale_label, flash.text.TextField);
+		mRequiresLabel = ASCompat.coerce((mRoot : ASAny).requires_title, flash.text.TextField);
 		mUseIconScaling = useIconScaling;
-		mStackCountTF = ASCompat.dynamicAs((mRoot : ASAny).number_label, flash.text.TextField);
+		mStackCountTF = ASCompat.coerce((mRoot : ASAny).number_label, flash.text.TextField);
 		if (mStackCountTF != null) {
 			mStackCountTF.visible = false;
 		}
-		mAlreadyOwnedLabel = ASCompat.dynamicAs((mRoot : ASAny).already_owned_label, flash.text.TextField);
+		mAlreadyOwnedLabel = ASCompat.coerce((mRoot : ASAny).already_owned_label, flash.text.TextField);
 		mAlreadyOwnedLabel.visible = false;
-		mHeroRequiredLabel = ASCompat.dynamicAs((mRoot : ASAny).shop_herorequired, flash.display.MovieClip);
+		mHeroRequiredLabel = ASCompat.coerce((mRoot : ASAny).shop_herorequired, flash.display.MovieClip);
 		ASCompat.setProperty((mHeroRequiredLabel : ASAny).hero_label, "text", Locale.getString("PURCHASE_HERO_BEFORE_BUYING_SYTLE_TAVERN_LABEL"));
 		mHeroRequiredLabel.visible = false;
 		if (ASCompat.toBool((mRoot : ASAny).timer)) {
 			ASCompat.setProperty((mRoot : ASAny).timer, "visible", false);
 		}
-		mBuyButtonCoin = new UIButton(mDBFacade, ASCompat.dynamicAs((mRoot : ASAny).buy_button_coins, flash.display.MovieClip));
+		mBuyButtonCoin = new UIButton(mDBFacade, ASCompat.coerce((mRoot : ASAny).buy_button_coins, flash.display.MovieClip));
 		mBuyButtonCoin.rolloverFilter = DBGlobal.UI_ROLLOVER_FILTER;
 		mBuyButtonCoin.releaseCallback = this.buyButtonCoinCallback;
 		ASCompat.setProperty((mBuyButtonCoin.root : ASAny).icons_bundle.cash, "visible", false);
 		ASCompat.setProperty((mBuyButtonCoin.root : ASAny).icons_bundle.gift_icon, "visible", false);
 		ASCompat.setProperty((mBuyButtonCoin.root : ASAny).original_price, "visible", false);
 		ASCompat.setProperty((mBuyButtonCoin.root : ASAny).strike, "visible", false);
-		mBuyButtonCash = new UIButton(mDBFacade, ASCompat.dynamicAs((mRoot : ASAny).buy_button_gems, flash.display.MovieClip));
+		mBuyButtonCash = new UIButton(mDBFacade, ASCompat.coerce((mRoot : ASAny).buy_button_gems, flash.display.MovieClip));
 		mBuyButtonCash.rolloverFilter = DBGlobal.UI_ROLLOVER_FILTER;
 		mBuyButtonCash.releaseCallback = this.buyButtonCallback;
 		ASCompat.setProperty((mBuyButtonCash.root : ASAny).icons_bundle.coin, "visible", false);
 		ASCompat.setProperty((mBuyButtonCash.root : ASAny).icons_bundle.gift_icon, "visible", false);
 		ASCompat.setProperty((mBuyButtonCash.root : ASAny).original_price, "visible", false);
 		ASCompat.setProperty((mBuyButtonCash.root : ASAny).strike, "visible", false);
-		mBuyButtonTimerBasedSale = new UIButton(mDBFacade, ASCompat.dynamicAs((mRoot : ASAny).buy_button_sale, flash.display.MovieClip));
+		mBuyButtonTimerBasedSale = new UIButton(mDBFacade, ASCompat.coerce((mRoot : ASAny).buy_button_sale, flash.display.MovieClip));
 		mBuyButtonTimerBasedSale.rolloverFilter = DBGlobal.UI_ROLLOVER_FILTER;
 		mBuyButtonTimerBasedSale.releaseCallback = this.buyButtonCallback;
 		ASCompat.setProperty((mBuyButtonTimerBasedSale.root : ASAny).icons_bundle.coin, "visible", false);
@@ -180,13 +180,13 @@ class UIShopOffer extends UIObject {
 		ASCompat.setProperty((mBuyButtonTimerBasedSale.root : ASAny).strike, "visible", false);
 		ASCompat.setProperty((mBuyButtonTimerBasedSale.root : ASAny).original_price, "mouseEnabled", false);
 		ASCompat.setProperty((mBuyButtonTimerBasedSale.root : ASAny).strike, "mouseEnabled", false);
-		mBuyButton = new UIButton(mDBFacade, ASCompat.dynamicAs((mRoot : ASAny).buy_button, flash.display.MovieClip));
+		mBuyButton = new UIButton(mDBFacade, ASCompat.coerce((mRoot : ASAny).buy_button, flash.display.MovieClip));
 		mBuyButton.rolloverFilter = DBGlobal.UI_ROLLOVER_FILTER;
 		mBuySuccessCallback = buySuccessCallback;
 		mBuyButton.releaseCallback = this.buyButtonCallback;
-		mExclusiveOfferButton = new UIButton(mDBFacade, ASCompat.dynamicAs((mRoot : ASAny).exclusive_offer, flash.display.MovieClip));
+		mExclusiveOfferButton = new UIButton(mDBFacade, ASCompat.coerce((mRoot : ASAny).exclusive_offer, flash.display.MovieClip));
 		mExclusiveOfferButton.releaseCallback = buyButtonCallback;
-		mIconParent = new UIObject(mDBFacade, ASCompat.dynamicAs((mRoot : ASAny).icon, flash.display.MovieClip));
+		mIconParent = new UIObject(mDBFacade, ASCompat.coerce((mRoot : ASAny).icon, flash.display.MovieClip));
 		mBuyButtonTimerBasedSale.visible = false;
 		if (!mDBFacade.dbConfigManager.getConfigBoolean("want_skins", true)) {
 			ASCompat.setProperty((mRoot : ASAny).required_text, "visible", false);
@@ -357,35 +357,35 @@ class UIShopOffer extends UIObject {
 	}
 
 	function getTextRarityColor():UInt {
-		var _loc1_ = ASCompat.dynamicAs(mDBFacade.gameMaster.rarityByConstant.itemFor(offer.Rarity), gameMasterDictionary.GMRarity);
-		return (ASCompat.toInt(_loc1_ != null && _loc1_.TextColor != 0 ? _loc1_.TextColor : (15463921 : UInt)) : UInt);
+		var _loc1_ = ASCompat.coerce(mDBFacade.gameMaster.rarityByConstant.itemFor(offer.Rarity), gameMasterDictionary.GMRarity);
+		return _loc1_ != null && _loc1_.TextColor != 0 ? _loc1_.TextColor : (15463921 : UInt);
 	}
 
 	@:isVar var hasColoredBackground(get, never):Bool;
 
 	function get_hasColoredBackground():Bool {
-		var _loc1_ = ASCompat.dynamicAs(mDBFacade.gameMaster.rarityByConstant.itemFor(offer.Rarity), gameMasterDictionary.GMRarity);
+		var _loc1_ = ASCompat.coerce(mDBFacade.gameMaster.rarityByConstant.itemFor(offer.Rarity), gameMasterDictionary.GMRarity);
 		return _loc1_ != null ? _loc1_.HasColoredBackground : false;
 	}
 
 	@:isVar var backgroundIconName(get, never):String;
 
 	function get_backgroundIconName():String {
-		var _loc1_ = ASCompat.dynamicAs(mDBFacade.gameMaster.rarityByConstant.itemFor(offer.Rarity), gameMasterDictionary.GMRarity);
+		var _loc1_ = ASCompat.coerce(mDBFacade.gameMaster.rarityByConstant.itemFor(offer.Rarity), gameMasterDictionary.GMRarity);
 		return _loc1_ != null ? _loc1_.BackgroundIcon : "";
 	}
 
 	@:isVar var backgroundIconBorderName(get, never):String;
 
 	function get_backgroundIconBorderName():String {
-		var _loc1_ = ASCompat.dynamicAs(mDBFacade.gameMaster.rarityByConstant.itemFor(offer.Rarity), gameMasterDictionary.GMRarity);
+		var _loc1_ = ASCompat.coerce(mDBFacade.gameMaster.rarityByConstant.itemFor(offer.Rarity), gameMasterDictionary.GMRarity);
 		return _loc1_ != null ? _loc1_.BackgroundIconBorder : "";
 	}
 
 	@:isVar var backgroundSwfPath(get, never):String;
 
 	function get_backgroundSwfPath():String {
-		var _loc1_ = ASCompat.dynamicAs(mDBFacade.gameMaster.rarityByConstant.itemFor(offer.Rarity), gameMasterDictionary.GMRarity);
+		var _loc1_ = ASCompat.coerce(mDBFacade.gameMaster.rarityByConstant.itemFor(offer.Rarity), gameMasterDictionary.GMRarity);
 		return _loc1_ != null ? _loc1_.BackgroundSwf : "";
 	}
 
@@ -423,12 +423,12 @@ class UIShopOffer extends UIObject {
 				mAssetLoadingComponent.getSwfAsset(DBFacade.buildFullDownloadPath(bgSwfPath), function(param1:brain.assetRepository.SwfAsset) {
 					var _loc3_ = param1.getClass(bgIconBorderName);
 					if (_loc3_ != null) {
-						mBgIconBorder = ASCompat.dynamicAs(ASCompat.createInstance(_loc3_, []), flash.display.MovieClip);
+						mBgIconBorder = ASCompat.coerce(ASCompat.createInstance(_loc3_, []), flash.display.MovieClip);
 						mIconParent.root.addChild(mBgIconBorder);
 					}
 					var _loc2_ = param1.getClass(bgIconName);
 					if (_loc2_ != null) {
-						mBgIcon = ASCompat.dynamicAs(ASCompat.createInstance(_loc2_, []), flash.display.MovieClip);
+						mBgIcon = ASCompat.coerce(ASCompat.createInstance(_loc2_, []), flash.display.MovieClip);
 						mRenderer = new MovieClipRenderController(mDBFacade, mBgIcon);
 						mRenderer.play((0 : UInt), true);
 						if (mBgIconBorder != null) {
@@ -442,7 +442,7 @@ class UIShopOffer extends UIObject {
 			mAssetLoadingComponent.getSwfAsset(DBFacade.buildFullDownloadPath(swfPath), function(param1:brain.assetRepository.SwfAsset) {
 				var _loc2_ = param1.getClass(iconName);
 				if (_loc2_ != null) {
-					mIcon = ASCompat.dynamicAs(ASCompat.createInstance(_loc2_, []), flash.display.MovieClip);
+					mIcon = ASCompat.coerce(ASCompat.createInstance(_loc2_, []), flash.display.MovieClip);
 					mRenderer = new MovieClipRenderController(mDBFacade, mIcon);
 					mRenderer.play((0 : UInt), true);
 					if (mUseIconScaling) {
@@ -545,7 +545,7 @@ class UIShopOffer extends UIObject {
 		mGMOffer = value;
 		mSaleOffer = mGMOffer.isOnSaleNow;
 		mCoinOffer = mGMOffer.CoinOffer;
-		mCoinSaleOffer = ASCompat.dynamicAs(mCoinOffer != null ? mCoinOffer.isOnSaleNow : null, gameMasterDictionary.GMOffer);
+		mCoinSaleOffer = ASCompat.coerce(mCoinOffer != null ? mCoinOffer.isOnSaleNow : null, gameMasterDictionary.GMOffer);
 		return value;
 	}
 
@@ -608,7 +608,7 @@ class UIShopOffer extends UIObject {
 			mBuyButtonCash.visible = false;
 			ASCompat.setProperty((mRoot : ASAny).label_or, "visible", false);
 			mExclusiveOfferButton.visible = false;
-			mDLCBuyButton = new UIButton(mDBFacade, ASCompat.dynamicAs((mRoot : ASAny).dlc_button, flash.display.MovieClip));
+			mDLCBuyButton = new UIButton(mDBFacade, ASCompat.coerce((mRoot : ASAny).dlc_button, flash.display.MovieClip));
 			mDLCBuyButton.rolloverFilter = DBGlobal.UI_ROLLOVER_FILTER;
 			mDLCBuyButton.releaseCallback = function() {
 				mDBFacade.overlaySteamBasedOnAppId(gmOffer.SteamAppId);

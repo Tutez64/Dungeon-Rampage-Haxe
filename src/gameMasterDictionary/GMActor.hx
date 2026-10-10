@@ -166,7 +166,7 @@ class GMActor extends GMItem {
 		TeleportOutTimeline = jsonAsset.TeleportOutTimeline;
 		RespawnT = ASCompat.toNumberField(jsonAsset, "RespawnT");
 		ProjEmitOffset = ASCompat.toNumberField(jsonAsset, "ProjEmitOffset");
-		scaled_ProjEmitOffset = ASCompat.toNumber(ASCompat.toNumberField(jsonAsset, "ProjEmitOffset") * Scale);
+		scaled_ProjEmitOffset = ASCompat.toNumberField(jsonAsset, "ProjEmitOffset") * Scale;
 		DefaultDestruct = jsonAsset.DefaultDestruct;
 		CanShakeCamera = ASCompat.toBool(jsonAsset.CanShakeCamera);
 	}

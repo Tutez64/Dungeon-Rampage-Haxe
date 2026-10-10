@@ -72,7 +72,7 @@ class FriendInfo {
 		mIcon = new MovieClip();
 		mAssetLoadingComponent.getSwfAsset(DBFacade.buildFullDownloadPath(swfPath), function(param1:brain.assetRepository.SwfAsset) {
 			var _loc4_ = param1.getClass(iconName);
-			var _loc3_ = ASCompat.dynamicAs(ASCompat.createInstance(_loc4_, []), flash.display.MovieClip);
+			var _loc3_ = ASCompat.coerce(ASCompat.createInstance(_loc4_, []), flash.display.MovieClip);
 			var _loc2_ = (50 : UInt);
 			UIObject.scaleToFit(_loc3_, _loc2_);
 			_loc3_.x = 25;
@@ -104,7 +104,7 @@ class FriendInfo {
 			mIsDRFriend = ASCompat.asBool(friendJson.is_ingame_friend);
 		}
 		if (ASCompat.toBool(friendJson.identifier)) {
-			identifier = ASCompat.dynamicAs(Std.string(friendJson.identifier).split("_"), Array);
+			identifier = ASCompat.coerce(Std.string(friendJson.identifier).split("_"), Array);
 			if (identifier.length > 1) {
 				network = identifier[0];
 				key = identifier[1];
@@ -306,7 +306,7 @@ class FriendInfo {
 		if (mIIAvatarScoresInfo == null) {
 			return 0;
 		}
-		var _loc4_ = ASCompat.dynamicAs(mIIAvatarScoresInfo.avatarIdToAvatarScore.itemFor(avatarId), account.iI.II_AvatarMapnodeScore);
+		var _loc4_ = ASCompat.coerce(mIIAvatarScoresInfo.avatarIdToAvatarScore.itemFor(avatarId), account.iI.II_AvatarMapnodeScore);
 		if (_loc4_ != null) {
 			_loc3_ = ASCompat.toInt(_loc4_.nodeIdToScore.itemFor(nodeId));
 			if (_loc3_ != 0) {

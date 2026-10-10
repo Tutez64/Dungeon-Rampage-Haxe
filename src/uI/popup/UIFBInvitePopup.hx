@@ -49,14 +49,14 @@ class UIFBInvitePopup extends DBUIOneButtonPopup {
 			ASCompat.setProperty((mPopup : ASAny).nametag_1, "visible", true);
 			ASCompat.setProperty((mPopup : ASAny).nametag_2, "visible", true);
 			ASCompat.setProperty((mPopup : ASAny).nametag_3, "visible", true);
-			_loc2_ = Std.int(Math.ffloor(Math.random() * friends.length));
-			_loc4_ = Std.int(Math.ffloor(Math.random() * friends.length));
+			_loc2_ = ASCompat.floatToInt(Math.ffloor(Math.random() * friends.length));
+			_loc4_ = ASCompat.floatToInt(Math.ffloor(Math.random() * friends.length));
 			while (_loc4_ == _loc2_) {
-				_loc4_ = Std.int(Math.ffloor(Math.random() * friends.length));
+				_loc4_ = ASCompat.floatToInt(Math.ffloor(Math.random() * friends.length));
 			}
-			_loc3_ = Std.int(Math.ffloor(Math.random() * friends.length));
+			_loc3_ = ASCompat.floatToInt(Math.ffloor(Math.random() * friends.length));
 			while (_loc3_ == _loc4_ || _loc3_ == _loc2_) {
-				_loc3_ = Std.int(Math.ffloor(Math.random() * friends.length));
+				_loc3_ = ASCompat.floatToInt(Math.ffloor(Math.random() * friends.length));
 			}
 			ASCompat.setProperty((mPopup : ASAny).nametag_1.name_label, "text", friends[_loc2_].name);
 			ASCompat.setProperty((mPopup : ASAny).nametag_2.name_label, "text", friends[_loc4_].name);

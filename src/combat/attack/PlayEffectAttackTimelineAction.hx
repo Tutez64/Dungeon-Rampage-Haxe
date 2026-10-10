@@ -84,7 +84,7 @@ class PlayEffectAttackTimelineAction extends PlayEffectTimelineAction {
 			if (_loc5_ != null && ASCompat.stringAsBool(_loc5_.SwordTrailOverride)) {
 				_loc10_ = StringTools.replace(_loc10_, "db_fx_attack", _loc5_.SwordTrailOverride);
 			}
-			_loc6_ = convertAngleForEffectName(Std.int(_loc7_));
+			_loc6_ = convertAngleForEffectName(ASCompat.floatToInt(_loc7_));
 			_loc10_ += _loc6_.string;
 			if (_loc10_.indexOf("swing_angle") >= 0) {
 				if (mActorGameObject.actorView.currentAnim == "attack_swingRight") {
@@ -101,7 +101,7 @@ class PlayEffectAttackTimelineAction extends PlayEffectTimelineAction {
 		_loc10_ = mDBFacade.customSkinVisualsOverrideHandler.customSkinBusterVisualOverrider(_loc10_, mActorGameObject);
 		_loc8_ = mActorGameObject.distributedDungeonFloor.effectManager.playEffect(DBFacade.buildFullDownloadPath(mEffectPath), _loc10_, _loc4_, _loc3_,
 			mBehindAvatar, mScale, 0, 0, _loc9_, _loc2_, mLoop, mLayer, mManaged, mPlayRate,
-			ASCompat.asFunction(mDoIconInsert ? assetLoadedCallback(this) : null));
+			ASCompat.coerceFunction(mDoIconInsert ? assetLoadedCallback(this) : null));
 		if (mManaged) {
 			timeline.mManagedEffects.add(_loc8_);
 		}

@@ -53,10 +53,10 @@ import box2D.common.math.*;
 		_loc9_ = normal.x * _loc7_.x + normal.y * _loc7_.y - offset;
 		var _loc10_ = normal.x * _loc8_.x + normal.y * _loc8_.y - offset;
 		if (_loc9_ <= 0) {
-			vOut[ASCompat.toInt(_loc6_++)].Set(vIn[0]);
+			vOut[_loc6_++].Set(vIn[0]);
 		}
 		if (_loc10_ <= 0) {
-			vOut[ASCompat.toInt(_loc6_++)].Set(vIn[1]);
+			vOut[_loc6_++].Set(vIn[1]);
 		}
 		if (_loc9_ * _loc10_ < 0) {
 			_loc11_ = _loc9_ / (_loc9_ - _loc10_);
@@ -72,7 +72,7 @@ import box2D.common.math.*;
 				_loc13_ = vIn[1];
 				_loc5_.id = _loc13_.id;
 			}
-			_loc6_ = ASCompat.toInt(_loc6_) + 1;
+			_loc6_++;
 		}
 		return _loc6_;
 	}
@@ -103,7 +103,7 @@ import box2D.common.math.*;
 				_loc18_ = _loc25_;
 				_loc17_ = _loc19_;
 			}
-			_loc19_ = ASCompat.toInt(_loc19_) + 1;
+			_loc19_++;
 		}
 		_loc12_ = _loc7_[edge1];
 		_loc11_ = xf1.R;
@@ -147,7 +147,7 @@ import box2D.common.math.*;
 				_loc15_ = _loc25_;
 				_loc14_ = _loc16_;
 			}
-			_loc16_ = ASCompat.toInt(_loc16_) + 1;
+			_loc16_++;
 		}
 		var _loc17_ = EdgeSeparation(poly1, xf1, _loc14_, poly2, xf2);
 		var _loc18_ = _loc14_ - 1 >= 0 ? _loc14_ - 1 : _loc6_ - 1;
@@ -212,7 +212,7 @@ import box2D.common.math.*;
 				_loc18_ = _loc23_;
 				_loc17_ = _loc19_;
 			}
-			_loc19_ = ASCompat.toInt(_loc19_) + 1;
+			_loc19_++;
 		}
 		var _loc21_ = _loc17_;
 		var _loc22_ = _loc21_ + 1 < _loc9_ ? _loc21_ + 1 : 0;
@@ -354,9 +354,9 @@ import box2D.common.math.*;
 				_loc43_.m_localPoint.y = _loc44_ * _loc20_.col2.x + _loc45_ * _loc20_.col2.y;
 				_loc43_.m_id.Set(_loc6_.id);
 				_loc43_.m_id.features.flip = (_loc17_ : Int);
-				_loc40_ = ASCompat.toInt(_loc40_) + 1;
+				_loc40_++;
 			}
-			_loc41_ = ASCompat.toInt(_loc41_) + 1;
+			_loc41_++;
 		}
 		manifold.m_pointCount = _loc40_;
 	}
@@ -430,7 +430,7 @@ import box2D.common.math.*;
 				_loc19_ = _loc31_;
 				_loc18_ = _loc24_;
 			}
-			_loc24_ = ASCompat.toInt(_loc24_) + 1;
+			_loc24_++;
 		}
 		var _loc25_ = _loc18_;
 		var _loc26_ = _loc25_ + 1 < _loc21_ ? _loc25_ + 1 : 0;

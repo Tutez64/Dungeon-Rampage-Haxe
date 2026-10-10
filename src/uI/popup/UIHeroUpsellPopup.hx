@@ -63,9 +63,9 @@ class UIHeroUpsellPopup extends DBUIPopup {
 		mGMOffer = gmOffer;
 		mSaleOffer = mGMOffer.isOnSaleNow;
 		mCoinOffer = mGMOffer.CoinOffer;
-		mCoinSaleOffer = ASCompat.dynamicAs(mCoinOffer != null ? mCoinOffer.isOnSaleNow : null, gameMasterDictionary.GMOffer);
+		mCoinSaleOffer = ASCompat.coerce(mCoinOffer != null ? mCoinOffer.isOnSaleNow : null, gameMasterDictionary.GMOffer);
 		var _loc5_ = mGMOffer.Details[0].HeroId;
-		mGMHero = ASCompat.dynamicAs(dbFacade.gameMaster.heroById.itemFor(_loc5_), gameMasterDictionary.GMHero);
+		mGMHero = ASCompat.coerce(dbFacade.gameMaster.heroById.itemFor(_loc5_), gameMasterDictionary.GMHero);
 		if (_loc5_ == 0 || mGMHero == null) {
 			Logger.error("Invalid GMOffer: " + gmOffer.Id);
 		}
@@ -111,11 +111,11 @@ class UIHeroUpsellPopup extends DBUIPopup {
 		ASCompat.setProperty((mPopup : ASAny).caption_1_label, "text", Locale.getSubString("HERO_UPSELL_CAPTION_1", mGMHero.Constant));
 		ASCompat.setProperty((mPopup : ASAny).buster_title_label, "text", Locale.getSubString("HERO_UPSELL_BUSTER_TITLE", mGMHero.Constant));
 		ASCompat.setProperty((mPopup : ASAny).buster_message_label, "text", Locale.getSubString("HERO_UPSELL_BUSTER_MESSAGE", mGMHero.Constant));
-		ASCompat.ASArray.pushMultiple(mAttackStars, ASCompat.dynamicAs((mPopup : ASAny).attack_star_0, flash.display.MovieClip),
-			(mPopup : ASAny).attack_star_1, (mPopup : ASAny).attack_star_2, (mPopup : ASAny).attack_star_3, (mPopup : ASAny).attack_star_4);
-		ASCompat.ASArray.pushMultiple(mDefenseStars, ASCompat.dynamicAs((mPopup : ASAny).defense_star_0, flash.display.MovieClip),
+		ASCompat.ASArray.pushMultiple(mAttackStars, ASCompat.coerce((mPopup : ASAny).attack_star_0, flash.display.MovieClip), (mPopup : ASAny).attack_star_1,
+			(mPopup : ASAny).attack_star_2, (mPopup : ASAny).attack_star_3, (mPopup : ASAny).attack_star_4);
+		ASCompat.ASArray.pushMultiple(mDefenseStars, ASCompat.coerce((mPopup : ASAny).defense_star_0, flash.display.MovieClip),
 			(mPopup : ASAny).defense_star_1, (mPopup : ASAny).defense_star_2, (mPopup : ASAny).defense_star_3, (mPopup : ASAny).defense_star_4);
-		ASCompat.ASArray.pushMultiple(mSpeedStars, ASCompat.dynamicAs((mPopup : ASAny).speed_star_0, flash.display.MovieClip), (mPopup : ASAny).speed_star_1,
+		ASCompat.ASArray.pushMultiple(mSpeedStars, ASCompat.coerce((mPopup : ASAny).speed_star_0, flash.display.MovieClip), (mPopup : ASAny).speed_star_1,
 			(mPopup : ASAny).speed_star_2, (mPopup : ASAny).speed_star_3, (mPopup : ASAny).speed_star_4);
 		i = (0 : UInt);
 		while (i < (mAttackStars.length:UInt)) {
@@ -129,17 +129,17 @@ class UIHeroUpsellPopup extends DBUIPopup {
 		ASCompat.setProperty((mPopup : ASAny).label_or, "visible", false);
 		ASCompat.setProperty((mPopup : ASAny).purchase_label, "text", Locale.getString("HERO_UPSELL_PURCHASE"));
 		ASCompat.setProperty((mPopup : ASAny).hero_name_label, "text", GameMasterLocale.getGameMasterSubString("SKIN_NAME", mGMHero.Constant).toUpperCase());
-		mBuyButton = new UIButton(mDBFacade, ASCompat.dynamicAs((mPopup : ASAny).buy_button, flash.display.MovieClip));
+		mBuyButton = new UIButton(mDBFacade, ASCompat.coerce((mPopup : ASAny).buy_button, flash.display.MovieClip));
 		mBuyButton.rolloverFilter = DBGlobal.UI_ROLLOVER_FILTER;
 		mBuyButton.releaseCallback = this.buyButtonCallback;
-		mBuyButtonCoin = new UIButton(mDBFacade, ASCompat.dynamicAs((mPopup : ASAny).buy_button_coins, flash.display.MovieClip));
+		mBuyButtonCoin = new UIButton(mDBFacade, ASCompat.coerce((mPopup : ASAny).buy_button_coins, flash.display.MovieClip));
 		mBuyButtonCoin.rolloverFilter = DBGlobal.UI_ROLLOVER_FILTER;
 		mBuyButtonCoin.releaseCallback = this.buyButtonCoinCallback;
 		ASCompat.setProperty((mBuyButtonCoin.root : ASAny).icons_bundle.cash, "visible", false);
 		ASCompat.setProperty((mBuyButtonCoin.root : ASAny).icons_bundle.gift_icon, "visible", false);
 		ASCompat.setProperty((mBuyButtonCoin.root : ASAny).original_price, "visible", false);
 		ASCompat.setProperty((mBuyButtonCoin.root : ASAny).strike, "visible", false);
-		mBuyButtonCash = new UIButton(mDBFacade, ASCompat.dynamicAs((mPopup : ASAny).buy_button_gems, flash.display.MovieClip));
+		mBuyButtonCash = new UIButton(mDBFacade, ASCompat.coerce((mPopup : ASAny).buy_button_gems, flash.display.MovieClip));
 		mBuyButtonCash.rolloverFilter = DBGlobal.UI_ROLLOVER_FILTER;
 		mBuyButtonCash.releaseCallback = this.buyButtonCallback;
 		ASCompat.setProperty((mBuyButtonCash.root : ASAny).icons_bundle.coin, "visible", false);
@@ -193,11 +193,11 @@ class UIHeroUpsellPopup extends DBUIPopup {
 		}
 		mAssetLoadingComponent.getSwfAsset(DBFacade.buildFullDownloadPath(mGMHero.PortraitName), function(param1:SwfAsset) {
 			var _loc3_ = param1.getClass(mGMHero.IconName);
-			var _loc4_ = ASCompat.dynamicAs(ASCompat.createInstance(_loc3_, []), flash.display.MovieClip);
+			var _loc4_ = ASCompat.coerce(ASCompat.createInstance(_loc3_, []), flash.display.MovieClip);
 			_loc4_.scaleX = _loc4_.scaleY = 0.82;
 			var _loc2_ = new MovieClipRenderController(mDBFacade, _loc4_);
 			_loc2_.play();
-			var _loc5_ = ASCompat.dynamicAs((mPopup : ASAny).hero_origin, flash.display.DisplayObjectContainer);
+			var _loc5_ = ASCompat.coerce((mPopup : ASAny).hero_origin, flash.display.DisplayObjectContainer);
 			if (_loc5_.numChildren > 0) {
 				_loc5_.removeChildAt(0);
 			}
@@ -225,7 +225,7 @@ class UIHeroUpsellPopup extends DBUIPopup {
 		mDBFacade.metrics.log("HeroUpsellPopupPurchaseTry", {"heroId": StoreServicesController.getOfferMetrics(mDBFacade, buyOffer)});
 		StoreServicesController.tryBuyOffer(mDBFacade, buyOffer, function(param1:ASAny) {
 			mDBFacade.metrics.log("HeroUpsellPopupPurchase", {"heroId": StoreServicesController.getOfferMetrics(mDBFacade, buyOffer)});
-			var _loc2_ = ASCompat.dynamicAs(mDBFacade.gameMaster.heroById.itemFor(buyOffer.Details[0].HeroId), gameMasterDictionary.GMHero);
+			var _loc2_ = ASCompat.coerce(mDBFacade.gameMaster.heroById.itemFor(buyOffer.Details[0].HeroId), gameMasterDictionary.GMHero);
 			if (_loc2_ == null) {
 				return;
 			}

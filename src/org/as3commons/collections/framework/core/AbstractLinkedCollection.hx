@@ -62,36 +62,36 @@ import org.as3commons.collections.framework.IIterator;
 			_loc2_ = _loc6_ = null;
 			_loc8_ = 0;
 			while (_loc3_ != null) {
-				_loc8_ = ASCompat.toInt(_loc8_) + 1;
+				_loc8_++;
 				_loc11_ = 0;
 				_loc9_ = 0;
 				_loc4_ = _loc3_;
 				while (_loc11_ < _loc7_) {
-					_loc9_ = ASCompat.toInt(_loc9_) + 1;
+					_loc9_++;
 					_loc4_ = _loc4_.right;
 					if (_loc4_ == null) {
 						break;
 					}
-					_loc11_ = ASCompat.toInt(_loc11_) + 1;
+					_loc11_++;
 				}
 				_loc10_ = _loc7_;
 				while (_loc9_ > 0 || _loc10_ > 0 && _loc4_ != null) {
 					if (_loc9_ == 0) {
 						_loc5_ = _loc4_;
 						_loc4_ = _loc4_.right;
-						_loc10_ = ASCompat.toInt(_loc10_) - 1;
+						_loc10_--;
 					} else if (_loc10_ == 0 || _loc4_ == null) {
 						_loc5_ = _loc3_;
 						_loc3_ = _loc3_.right;
-						_loc9_ = ASCompat.toInt(_loc9_) - 1;
+						_loc9_--;
 					} else if (comparator.compare(_loc3_.item, _loc4_.item) <= 0) {
 						_loc5_ = _loc3_;
 						_loc3_ = _loc3_.right;
-						_loc9_ = ASCompat.toInt(_loc9_) - 1;
+						_loc9_--;
 					} else {
 						_loc5_ = _loc4_;
 						_loc4_ = _loc4_.right;
-						_loc10_ = ASCompat.toInt(_loc10_) - 1;
+						_loc10_--;
 					}
 					if (_loc6_ != null) {
 						_loc6_.right = _loc5_;

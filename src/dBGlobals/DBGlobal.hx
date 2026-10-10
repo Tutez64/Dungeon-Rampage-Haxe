@@ -196,7 +196,7 @@ class DBGlobal {
 			if (StatNames[_loc2_] == name) {
 				return _loc2_;
 			}
-			_loc2_ = ASCompat.toInt(_loc2_) + 1;
+			_loc2_++;
 		}
 		return -1;
 	}
@@ -282,7 +282,7 @@ class DBGlobal {
 		while (_loc2_ < clipToTrace.numChildren) {
 			trace("\t|\t " + _loc2_ + ".\t name:" + clipToTrace.getChildAt(_loc2_).name + "\t type:" + ASCompat.typeof(clipToTrace.getChildAt(_loc2_))
 				+ "\t" + clipToTrace.getChildAt(_loc2_));
-			_loc2_ = ASCompat.toInt(_loc2_) + 1;
+			_loc2_++;
 		}
 		trace("\t+ --------------------------------------------------------------------------------------");
 	}

@@ -30,8 +30,8 @@ class UILootLossPopup extends DBUITwoButtonPopup {
 		treasure_icons = [(mPopup : ASAny).treasure_icon_01, (mPopup : ASAny).treasure_icon_02];
 		i = (0 : UInt);
 		while (i < (treasure.length:UInt)) {
-			gmDoober = ASCompat.dynamicAs(mDBFacade.gameMaster.dooberById.itemFor(treasure[(i : Int)]), gameMasterDictionary.GMDoober);
-			gmChestItem = ASCompat.dynamicAs(mDBFacade.gameMaster.chestsById.itemFor(gmDoober.ChestId), gameMasterDictionary.GMChest);
+			gmDoober = ASCompat.coerce(mDBFacade.gameMaster.dooberById.itemFor(treasure[(i : Int)]), gameMasterDictionary.GMDoober);
+			gmChestItem = ASCompat.coerce(mDBFacade.gameMaster.chestsById.itemFor(gmDoober.ChestId), gameMasterDictionary.GMChest);
 			if (gmChestItem != null && ASCompat.stringAsBool(gmChestItem.IconName)) {
 				mAssetLoadingComponent.getSwfAsset(DBFacade.buildFullDownloadPath(gmChestItem.IconSwf), function(param1:brain.assetRepository.SwfAsset) {
 					var _loc3_ = param1.getClass(gmChestItem.IconName);
@@ -58,7 +58,7 @@ class UILootLossPopup extends DBUITwoButtonPopup {
 		_loc1_ = 0;
 		while (_loc1_ < movieClipRenderers.length) {
 			movieClipRenderers[_loc1_].destroy();
-			_loc1_ = ASCompat.toInt(_loc1_) + 1;
+			_loc1_++;
 		}
 		movieClipRenderers = null;
 		super.destroy();

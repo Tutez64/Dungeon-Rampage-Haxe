@@ -117,7 +117,7 @@ class PanelsManager {
 		this._graphPlaced = (0 : UInt);
 		if (checkNullIteratee(graphs))
 			for (_tmp_ in graphs) {
-				_loc5_ = ASCompat.dynamicAs(_tmp_, com.junkbyte.console.vos.GraphGroup);
+				_loc5_ = ASCompat.coerce(_tmp_, com.junkbyte.console.vos.GraphGroup);
 				if (_loc5_.type == GraphGroup.FPS) {
 					_loc3_ = _loc5_;
 				} else if (_loc5_.type == GraphGroup.MEM) {
@@ -139,7 +139,7 @@ class PanelsManager {
 							if (_loc11_ <= 1) {
 								_loc11_ = 2;
 							}
-							_loc12_ = Std.int(this._graphPlaced % _loc11_);
+							_loc12_ = ASCompat.floatToInt(this._graphPlaced % _loc11_);
 							_loc13_ = Math.floor(this._graphPlaced / _loc11_);
 							_loc9_.x = this._mainPanel.x + _loc10_ + _loc12_ * _loc10_;
 							_loc9_.y = this._mainPanel.y + _loc10_ * 0.6 + _loc13_ * _loc10_;
@@ -151,7 +151,7 @@ class PanelsManager {
 						if (_loc9_.height <= 0 || Math.isNaN(_loc9_.height)) {
 							_loc9_.height = _loc10_;
 						}
-						_loc8_ = new GraphingPanel(this.console, Std.int(_loc9_.width), Std.int(_loc9_.height));
+						_loc8_ = new GraphingPanel(this.console, ASCompat.floatToInt(_loc9_.width), ASCompat.floatToInt(_loc9_.height));
 						_loc8_.x = _loc9_.x;
 						_loc8_.y = _loc9_.y;
 						_loc8_.name = "graph_" + _loc7_;
@@ -214,7 +214,7 @@ class PanelsManager {
 			this._memPanel.close();
 			this._memPanel = null;
 		} else {
-			_loc2_ = ASCompat.dynamicAs(this._graphsMap[group.name], com.junkbyte.console.view.GraphingPanel);
+			_loc2_ = ASCompat.coerce(this._graphsMap[group.name], com.junkbyte.console.view.GraphingPanel);
 			if (_loc2_ != null) {
 				_loc2_.close();
 				ASCompat.deleteProperty(this._graphsMap, group.name);
@@ -377,7 +377,7 @@ class PanelsManager {
 					ASCompat.ASArray.pushMultiple(_loc3_, _loc7_.x, _loc7_.x + _loc7_.width);
 					ASCompat.ASArray.pushMultiple(_loc4_, _loc7_.y, _loc7_.y + _loc7_.height);
 				}
-				_loc6_ = ASCompat.toInt(_loc6_) + 1;
+				_loc6_++;
 			}
 			_loc2_.registerSnaps(_loc3_, _loc4_);
 		}

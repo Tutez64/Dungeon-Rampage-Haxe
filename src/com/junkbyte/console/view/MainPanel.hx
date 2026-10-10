@@ -188,17 +188,17 @@ class MainPanel extends ConsolePanel {
 		init(640, 100, true);
 		registerDragger(txtField);
 		if (Std.isOfType(console.so[CL_HISTORY], Array)) {
-			this._cmdsHistory = ASCompat.dynamicAs(console.so[CL_HISTORY], Array);
+			this._cmdsHistory = ASCompat.coerce(console.so[CL_HISTORY], Array);
 		} else {
 			console.so[CL_HISTORY] = this._cmdsHistory = new Array<ASAny>();
 		}
 		if (config.rememberFilterSettings && Std.isOfType(console.so[VIEWING_CH_HISTORY], Array)) {
-			this._viewingChannels = ASCompat.dynamicAs(console.so[VIEWING_CH_HISTORY], Array);
+			this._viewingChannels = ASCompat.coerce(console.so[VIEWING_CH_HISTORY], Array);
 		} else {
 			console.so[VIEWING_CH_HISTORY] = this._viewingChannels = new Array<ASAny>();
 		}
 		if (config.rememberFilterSettings && Std.isOfType(console.so[IGNORED_CH_HISTORY], Array)) {
-			this._ignoredChannels = ASCompat.dynamicAs(console.so[IGNORED_CH_HISTORY], Array);
+			this._ignoredChannels = ASCompat.coerce(console.so[IGNORED_CH_HISTORY], Array);
 		}
 		if (this._viewingChannels.length > 0 || this._ignoredChannels == null) {
 			console.so[IGNORED_CH_HISTORY] = this._ignoredChannels = new Array<ASAny>();
@@ -406,7 +406,7 @@ class MainPanel extends ConsolePanel {
 				_loc6_ = Math.ceil(_loc4_.text.length / _loc3_);
 				if (!(_loc4_.html || _loc2_ >= _loc6_)) {
 					_loc4_ = _loc4_.clone();
-					_loc4_.text = _loc4_.text.substring(Std.int(Math.max(0, _loc4_.text.length - _loc3_ * _loc2_)));
+					_loc4_.text = _loc4_.text.substring(ASCompat.floatToInt(Math.max(0, _loc4_.text.length - _loc3_ * _loc2_)));
 					_loc1_ = this.makeLine(_loc4_, _loc5_) + _loc1_;
 					break;
 				}
@@ -743,8 +743,7 @@ class MainPanel extends ConsolePanel {
 		this._bottomLine.y = this._cmdField.visible ? _loc5_ : n;
 		this._scroll.y = _loc4_ ? 6 : _loc2_ + 4;
 		var _loc6_ = style.controlSize;
-		this._scrollHeight = ASCompat.toNumber(ASCompat.toNumber(this._bottomLine.y - ASCompat.toNumber(this._cmdField.visible ? 0 : _loc6_ * 2))
-			- this._scroll.y);
+		this._scrollHeight = this._bottomLine.y - ASCompat.toNumber(this._cmdField.visible ? 0 : _loc6_ * 2) - this._scroll.y;
 		this._scroller.visible = this._scrollHeight > 40;
 		this._scroll.graphics.clear();
 		if (this._scrollHeight >= 10) {
@@ -841,7 +840,7 @@ class MainPanel extends ConsolePanel {
 				&& _loc6_ != 0
 				&& this.chShouldShow(_loc7_) ? "<ch><b>" + _loc7_ + "</b></ch>" : _loc7_;
 			_loc2_ += "<a href=\"event:channel_" + _loc7_ + "\">[" + _loc8_ + "]</a> ";
-			_loc6_ = ASCompat.toInt(_loc6_) + 1;
+			_loc6_++;
 		}
 		if (limited) {
 			_loc2_ += "<ch><a href=\"event:channels\"><b>" + (_loc3_.length > _loc4_ ? "..." : "") + "</b>^^ </a></ch>";
@@ -885,7 +884,7 @@ class MainPanel extends ConsolePanel {
 		} else if (_loc3_ == "close" && src == this) {
 			_loc3_ = "Close::Type password to show again";
 		} else if (_loc3_.indexOf("external_") == 0) {
-			_loc4_ = ASCompat.dynamicAs(this._extraMenus[_loc3_.substring(9)], Array);
+			_loc4_ = ASCompat.coerce(this._extraMenus[_loc3_.substring(9)], Array);
 			if (_loc4_ != null) {
 				_loc3_ = _loc4_[2];
 			}
@@ -955,7 +954,7 @@ class MainPanel extends ConsolePanel {
 		} else if (t == "command") {
 			this.commandLine = !this.commandLine;
 		} else if (t == "copy") {
-			str = console.logs.getLogsAsString("\r\n", !this._shift, ASCompat.asFunction(this._ctrl ? this.lineShouldShow : null));
+			str = console.logs.getLogsAsString("\r\n", !this._shift, ASCompat.coerceFunction(this._ctrl ? this.lineShouldShow : null));
 			if (this._alt) {
 				file = new FileReference();
 				try {
@@ -985,7 +984,7 @@ class MainPanel extends ConsolePanel {
 				this._cmdField.text = t.substring(ind + 1);
 			}
 		} else if (t.indexOf("external_") == 0) {
-			menu = ASCompat.dynamicAs(this._extraMenus[t.substring(9)], Array);
+			menu = ASCompat.coerce(this._extraMenus[t.substring(9)], Array);
 			if (menu != null) {
 				ASCompatMacro.applyClosure(menu[0], menu[1]);
 			}
@@ -1193,13 +1192,13 @@ class MainPanel extends ConsolePanel {
 						break;
 					}
 					_loc6_ = true;
-					_loc7_ = ASCompat.toInt(_loc7_) + 1;
+					_loc7_++;
 				}
 			}
 			_loc2_ = new Array<ASAny>();
 			if (checkNullIteratee(hints))
 				for (_tmp_ in hints) {
-					_loc3_ = ASCompat.dynamicAs(_tmp_, Array);
+					_loc3_ = ASCompat.coerce(_tmp_, Array);
 					_loc2_.push("<p3>" + Std.string(_loc3_[0]) + "</p3> <p0>" + Std.string((ASCompat.toBool(_loc3_[1]) ? _loc3_[1] : "")) + "</p0>");
 				}
 			this._hintField.htmlText = "<p>" + Std.string(ASCompat.dynJoin(ASCompat.ASArray.reverse(_loc2_), "\n")) + "</p>";

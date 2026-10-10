@@ -118,14 +118,14 @@ class ScriptTimeline {
 		var _loc8_ = 0;
 		var _loc9_ = 0;
 		var _loc2_:ASObject = null;
-		var _loc12_:Array<ASAny> = ASCompat.dynamicAs(jsonObj.frames, Array);
+		var _loc12_:Array<ASAny> = ASCompat.coerce(jsonObj.frames, Array);
 		mTotalFrames = (ASCompat.toInt(jsonObj.totalFrames) : UInt);
 		var _loc4_ = (_loc12_.length : UInt);
 		_loc7_ = 0;
 		while ((_loc7_ : UInt) < _loc4_) {
 			_loc5_ = _loc12_[_loc7_];
 			_loc3_ = ASCompat.toInt(_loc5_.frame);
-			_loc10_ = ASCompat.dynamicAs(_loc5_.actions, Array);
+			_loc10_ = ASCompat.coerce(_loc5_.actions, Array);
 			_loc8_ = _loc10_.length;
 			_loc11_ = new LinkedList();
 			_loc9_ = 0;
@@ -134,14 +134,8 @@ class ScriptTimeline {
 				_loc6_ = parseAction(_loc2_);
 				if (_loc6_ != null) {
 					if (_loc3_ >= ASCompat.toNumberField(jsonObj, "totalFrames")) {
-						Logger.error("ScriptTimeline.as "
-							+ Std.string(jsonObj.attackName)
-							+ " action:"
-							+ _loc6_
-							+ " at frame:"
-							+ _loc3_
-							+ " after last frame:"
-							+ Std.string((ASCompat.toNumberField(jsonObj, "totalFrames") - 1)));
+						Logger.error("ScriptTimeline.as " + Std.string(jsonObj.attackName) + " action:" + _loc6_ + " at frame:" + _loc3_
+							+ " after last frame:" + (ASCompat.toNumberField(jsonObj, "totalFrames") - 1));
 					}
 					_loc11_.add(_loc6_);
 				}
@@ -231,7 +225,7 @@ class ScriptTimeline {
 
 	public function set_currentAttackType(attackType:UInt):UInt {
 		mCurrentAttackType = attackType;
-		mCurrentGMAttack = ASCompat.dynamicAs(mDBFacade.gameMaster.attackById.itemFor(attackType), gameMasterDictionary.GMAttack);
+		mCurrentGMAttack = ASCompat.coerce(mDBFacade.gameMaster.attackById.itemFor(attackType), gameMasterDictionary.GMAttack);
 		if (mCurrentGMAttack == null) {
 			Logger.error("Could not find GMAttack for id: " + attackType);
 		}
@@ -371,7 +365,7 @@ class ScriptTimeline {
 			}
 		}
 		while (_loc2_.length > 0) {
-			_loc6_ = ASCompat.dynamicAs(_loc2_.pop(), combat.attack.AttackTimelineAction);
+			_loc6_ = ASCompat.coerce(_loc2_.pop(), combat.attack.AttackTimelineAction);
 			_loc6_.stop();
 		}
 	}
@@ -389,7 +383,7 @@ class ScriptTimeline {
 			return;
 		}
 		if (timelineActionMap.hasKey(currentFrame)) {
-			_loc5_ = ASCompat.dynamicAs(timelineActionMap.itemFor(currentFrame), org.as3commons.collections.LinkedList);
+			_loc5_ = ASCompat.coerce(timelineActionMap.itemFor(currentFrame), org.as3commons.collections.LinkedList);
 			_loc6_ = ASCompat.reinterpretAs(_loc5_.iterator(), ILinkedListIterator);
 			while (_loc6_.hasNext()) {
 				_loc4_ = ASCompat.dynamicAs(_loc6_.next(), AttackTimelineAction);
@@ -406,13 +400,13 @@ class ScriptTimeline {
 		}
 		var _loc2_ = (mLastExecutedFrame + 1 : UInt);
 		if (mPlayHeadTime < mLastExecutedFrame) {
-			_loc2_ = (Std.int(mPlayHeadTime - 1) : UInt);
+			_loc2_ = (ASCompat.floatToInt(mPlayHeadTime - 1) : UInt);
 		}
 		_loc3_ = (_loc2_ : Int);
 		while (_loc3_ <= mPlayHeadTime) {
 			processTimelineActions(_loc3_, gameClock);
 			mLastExecutedFrame = _loc3_;
-			_loc3_ = ASCompat.toInt(_loc3_) + 1;
+			_loc3_++;
 		}
 		updatePlayHead(gameClock);
 	}
@@ -444,10 +438,10 @@ class ScriptTimeline {
 		mDistributedDungeonFloor = null;
 		var _loc3_ = ASCompat.reinterpretAs(mTimelineActions.iterator(), IMapIterator);
 		while (_loc3_.hasNext()) {
-			_loc4_ = ASCompat.dynamicAs(_loc3_.next(), org.as3commons.collections.LinkedList);
+			_loc4_ = ASCompat.coerce(_loc3_.next(), org.as3commons.collections.LinkedList);
 			_loc1_ = ASCompat.reinterpretAs(_loc4_.iterator(), ILinkedListIterator);
 			while (_loc1_.hasNext()) {
-				_loc2_ = ASCompat.dynamicAs(_loc1_.next(), combat.attack.AttackTimelineAction);
+				_loc2_ = ASCompat.coerce(_loc1_.next(), combat.attack.AttackTimelineAction);
 				_loc2_.destroy();
 			}
 			_loc4_.clear();

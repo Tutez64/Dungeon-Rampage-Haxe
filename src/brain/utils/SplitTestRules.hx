@@ -114,7 +114,7 @@ class SplitTestRules {
 			_loc1_ = toArray(_loc5_[_loc4_]);
 			_loc3_ = hash(_loc1_);
 			trace("SHA256 Test " + _loc4_, fromArray(_loc3_) == Std.string(_loc2_[_loc4_]).toLowerCase());
-			_loc4_ = ASCompat.toInt(_loc4_) + 1;
+			_loc4_++;
 		}
 	}
 
@@ -151,11 +151,11 @@ class SplitTestRules {
 		}
 		var _loc4_ = SHA256(_loc2_, _loc3_);
 		var _loc9_ = new ByteArray();
-		var _loc5_ = (Std.int(getHashSize() / 4) : UInt);
+		var _loc5_ = (ASCompat.floatToInt(getHashSize() / 4) : UInt);
 		_loc7_ = 0;
 		while ((_loc7_ : UInt) < _loc5_) {
 			_loc9_.writeUnsignedInt((ASCompat.toInt(_loc4_[_loc7_]) : UInt));
-			_loc7_ = ASCompat.toInt(_loc7_) + 1;
+			_loc7_++;
 		}
 		src.length = _loc6_;
 		src.endian = _loc8_;
@@ -204,15 +204,15 @@ class SplitTestRules {
 			_loc19_ = 0;
 			while (_loc19_ < 64) {
 				if (_loc19_ < 16) {
-					_loc23_[_loc19_] = ASCompat.thisOrDefault(x[ASCompat.toInt(_loc16_ + _loc19_)], 0);
+					_loc23_[_loc19_] = ASCompat.thisOrDefault(x[_loc16_ + _loc19_], 0);
 				} else {
-					_loc5_ = (rrol((ASCompat.toInt(_loc23_[ASCompat.toInt(_loc19_ - 15)]) : UInt),
-						(7 : UInt)) : Int) ^ (rrol((ASCompat.toInt(_loc23_[ASCompat.toInt(_loc19_ - 15)]) : UInt),
-							(18 : UInt)) : Int) ^ ASCompat.toInt(_loc23_[ASCompat.toInt(_loc19_ - 15)]) >>> 3;
-					_loc6_ = (rrol((ASCompat.toInt(_loc23_[ASCompat.toInt(_loc19_ - 2)]) : UInt),
-						(17 : UInt)) : Int) ^ (rrol((ASCompat.toInt(_loc23_[ASCompat.toInt(_loc19_ - 2)]) : UInt),
-							(19 : UInt)) : Int) ^ ASCompat.toInt(_loc23_[ASCompat.toInt(_loc19_ - 2)]) >>> 10;
-					_loc23_[_loc19_] = _loc23_[ASCompat.toInt(_loc19_ - 16)] + _loc5_ + _loc23_[ASCompat.toInt(_loc19_ - 7)] + _loc6_;
+					_loc5_ = (rrol((ASCompat.toInt(_loc23_[_loc19_ - 15]) : UInt),
+						(7 : UInt)) : Int) ^ (rrol((ASCompat.toInt(_loc23_[_loc19_ - 15]) : UInt),
+							(18 : UInt)) : Int) ^ ASCompat.toInt(_loc23_[_loc19_ - 15]) >>> 3;
+					_loc6_ = (rrol((ASCompat.toInt(_loc23_[_loc19_ - 2]) : UInt),
+						(17 : UInt)) : Int) ^ (rrol((ASCompat.toInt(_loc23_[_loc19_ - 2]) : UInt),
+							(19 : UInt)) : Int) ^ ASCompat.toInt(_loc23_[_loc19_ - 2]) >>> 10;
+					_loc23_[_loc19_] = _loc23_[_loc19_ - 16] + _loc5_ + _loc23_[_loc19_ - 7] + _loc6_;
 				}
 				_loc25_ = ((rrol(_loc7_, (2 : UInt)) : Int) ^ (rrol(_loc7_, (13 : UInt)) : Int) ^ (rrol(_loc7_, (22 : UInt)) : Int))
 					+ ((_loc7_ : Int) & (_loc8_ : Int) ^ (_loc7_ : Int) & (_loc9_ : Int) ^ (_loc8_ : Int) & (_loc9_ : Int));
@@ -224,12 +224,12 @@ class SplitTestRules {
 				_loc14_ = (_loc13_ : Int);
 				_loc13_ = _loc12_;
 				_loc12_ = _loc11_;
-				_loc11_ = (ASCompat.toInt(_loc10_ + _loc24_) : UInt);
+				_loc11_ = _loc10_ + _loc24_;
 				_loc10_ = _loc9_;
 				_loc9_ = _loc8_;
 				_loc8_ = _loc7_;
-				_loc7_ = (ASCompat.toInt(_loc24_ + _loc25_) : UInt);
-				_loc19_ = ASCompat.toInt(_loc19_) + 1;
+				_loc7_ = (_loc24_ + _loc25_ : UInt);
+				_loc19_++;
 			}
 			_loc7_ += (_loc21_ : UInt);
 			_loc8_ += (_loc22_ : UInt);
@@ -257,7 +257,7 @@ class SplitTestRules {
 		}
 		_loc3_ = 0;
 		while (_loc3_ < hex.length) {
-			_loc2_[Std.int(_loc3_ / 2)] = ASCompat.parseInt(hex.substr(_loc3_, 2), 16);
+			_loc2_[ASCompat.floatToInt(_loc3_ / 2)] = ASCompat.parseInt(hex.substr(_loc3_, 2), 16);
 			_loc3_ += 2;
 		}
 		return _loc2_;
@@ -274,7 +274,7 @@ class SplitTestRules {
 					_loc3_ += ":";
 				}
 			}
-			_loc4_ = ASCompat.toInt(_loc4_) + 1;
+			_loc4_++;
 		}
 		return _loc3_;
 	}

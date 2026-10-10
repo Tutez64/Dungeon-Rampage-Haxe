@@ -76,7 +76,7 @@ class GraphGroup {
 		final __ax4_iter_47 = this.interests;
 		if (checkNullIteratee(__ax4_iter_47))
 			for (_tmp_ in __ax4_iter_47) {
-				_loc2_ = ASCompat.dynamicAs(_tmp_, com.junkbyte.console.vos.GraphInterest);
+				_loc2_ = ASCompat.coerce(_tmp_, com.junkbyte.console.vos.GraphInterest);
 				_loc2_.toBytes(bytes);
 			}
 	}

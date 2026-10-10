@@ -89,7 +89,7 @@ class DcSocket extends Socket {
 					_loc3_ += ":";
 				}
 			}
-			_loc4_ = ASCompat.toInt(_loc4_) + 1;
+			_loc4_++;
 		}
 		return _loc3_;
 	}
@@ -262,7 +262,7 @@ class DcSocket extends Socket {
 	function Process_CLIENT_OBJECT_UPDATE_FIELD(game_packet:DcNetworkPacket) {
 		var _loc3_ = game_packet.readUnsignedInt();
 		var _loc2_ = game_packet.readUnsignedShort();
-		var _loc4_ = ASCompat.dynamicAs(Doid_NetInterfaces[Std.string(_loc3_)], networkCode.DcNetworkInterface);
+		var _loc4_ = ASCompat.coerce(Doid_NetInterfaces[Std.string(_loc3_)], networkCode.DcNetworkInterface);
 		if (_loc4_ == null) {
 			Logger.warn("Process_CLIENT_OBJECT_UPDATE_FIELD DcNetworkInterface is null " + _loc4_ + " " + _loc3_ + " " + _loc2_);
 		} else {
@@ -332,7 +332,7 @@ class DcSocket extends Socket {
 
 	function Process_CLIENT_OBJECT_DISABLE_RESP(game_packet:DcNetworkPacket) {
 		var _loc2_ = game_packet.readUnsignedInt();
-		var _loc3_ = ASCompat.dynamicAs(Doid_NetInterfaces[Std.string(_loc2_)], networkCode.DcNetworkInterface);
+		var _loc3_ = ASCompat.coerce(Doid_NetInterfaces[Std.string(_loc2_)], networkCode.DcNetworkInterface);
 		if (_loc3_ == null) {
 			Logger.warn("Process_CLIENT_OBJECT_DISABLE_RESP: Received Remove ID for object not in memory " + _loc2_);
 		} else {
@@ -351,13 +351,13 @@ class DcSocket extends Socket {
 			_loc4_ = ASCompat.toNumber(_loc2_);
 			_loc5_ = Date.now();
 			_loc3_ = _loc5_.getTime();
-			mDBFacade.dbAccountInfo.SocketPingMilsecs = Std.int(_loc3_ - _loc4_);
+			mDBFacade.dbAccountInfo.SocketPingMilsecs = ASCompat.floatToInt(_loc3_ - _loc4_);
 		}
 	}
 
 	function Process_CLIENT_OBJECT_DISABLE_OWNER_RESP(game_packet:DcNetworkPacket) {
 		var _loc2_ = game_packet.readUnsignedInt();
-		var _loc3_ = ASCompat.dynamicAs(Doid_NetInterfaces[Std.string(_loc2_)], networkCode.DcNetworkInterface);
+		var _loc3_ = ASCompat.coerce(Doid_NetInterfaces[Std.string(_loc2_)], networkCode.DcNetworkInterface);
 		if (_loc3_ == null) {
 			Logger.warn("Process_CLIENT_OBJECT_DISABLE_OWNER_RESP: Received Remove ID for object not in memory " + _loc2_);
 		} else {
@@ -368,7 +368,7 @@ class DcSocket extends Socket {
 
 	function Process_CLIENT_OBJECT_DELETE_RESP(game_packet:DcNetworkPacket) {
 		var _loc2_ = game_packet.readUnsignedInt();
-		var _loc3_ = ASCompat.dynamicAs(Doid_NetInterfaces[Std.string(_loc2_)], networkCode.DcNetworkInterface);
+		var _loc3_ = ASCompat.coerce(Doid_NetInterfaces[Std.string(_loc2_)], networkCode.DcNetworkInterface);
 		if (_loc3_ == null) {
 			Logger.warn("Process_CLIENT_OBJECT_DISABLE_OWNER_RESP: Received Remove ID for object not in memory " + _loc2_);
 		} else {
@@ -424,7 +424,7 @@ class DcSocket extends Socket {
 				_loc3_ = _tmp_;
 				_loc1_ = Doid_NetInterfaces[_loc3_];
 				if (Std.isOfType(_loc1_, DcNetworkClass)) {
-					_loc4_.push(ASCompat.dynamicAs(Doid_NetInterfaces[_loc3_], networkCode.DcNetworkClass));
+					_loc4_.push(ASCompat.coerce(Doid_NetInterfaces[_loc3_], networkCode.DcNetworkClass));
 				} else {
 					_loc1_.destroy();
 				}
@@ -433,7 +433,7 @@ class DcSocket extends Socket {
 		_loc2_ = 0;
 		while (_loc2_ < _loc4_.length) {
 			_loc4_[_loc2_].destroy();
-			_loc2_ = ASCompat.toInt(_loc2_) + 1;
+			_loc2_++;
 		}
 		Doid_NetInterfaces = null;
 		unconfigureListeners();
@@ -445,6 +445,6 @@ class DcSocket extends Socket {
 	function Process_CLIENT_LOGIN_DUNGEONBUSTER(game_packet:DcNetworkPacket) {}
 
 	public function getDcHash():UInt {
-		return (Std.int(4294967295) : UInt);
+		return (ASCompat.floatToInt(4294967295) : UInt);
 	}
 }

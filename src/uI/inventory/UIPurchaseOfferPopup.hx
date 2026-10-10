@@ -56,7 +56,7 @@ class UIPurchaseOfferPopup extends DBUITwoButtonPopup {
 		} else {
 			offerDetail = mGMOffer.Details[0];
 			if (offerDetail.WeaponId != 0) {
-				weaponItem = ASCompat.dynamicAs(mDBFacade.gameMaster.weaponItemById.itemFor(offerDetail.WeaponId), gameMasterDictionary.GMWeaponItem);
+				weaponItem = ASCompat.coerce(mDBFacade.gameMaster.weaponItemById.itemFor(offerDetail.WeaponId), gameMasterDictionary.GMWeaponItem);
 				weaponAesthetic = weaponItem.getWeaponAesthetic(offerDetail.Level);
 				offerName = GameMasterLocale.getGameMasterSubString("WEAPON_AESTHETIC_NAME", weaponAesthetic.Constant);
 				swfPath = weaponAesthetic.IconSwf;
@@ -65,7 +65,7 @@ class UIPurchaseOfferPopup extends DBUITwoButtonPopup {
 				ASCompat.setProperty((mPopup : ASAny).power.label, "text", offerDetail.WeaponPower);
 				ASCompat.setProperty((mPopup : ASAny).power.attack_label, "text", Locale.getString("POWER"));
 			} else if (offerDetail.HeroId != 0) {
-				hero = ASCompat.dynamicAs(mDBFacade.gameMaster.heroById.itemFor(offerDetail.HeroId), gameMasterDictionary.GMHero);
+				hero = ASCompat.coerce(mDBFacade.gameMaster.heroById.itemFor(offerDetail.HeroId), gameMasterDictionary.GMHero);
 				defaultSkin = mDBFacade.gameMaster.getSkinByConstant(hero.DefaultSkin);
 				if (defaultSkin != null) {
 					offerName = GameMasterLocale.getGameMasterSubString("SKIN_NAME", defaultSkin.Constant);
@@ -73,7 +73,7 @@ class UIPurchaseOfferPopup extends DBUITwoButtonPopup {
 					iconName = defaultSkin.IconName;
 				}
 			} else if (offerDetail.PetId != 0) {
-				pet = ASCompat.dynamicAs(mDBFacade.gameMaster.npcById.itemFor(offerDetail.PetId), gameMasterDictionary.GMNpc);
+				pet = ASCompat.coerce(mDBFacade.gameMaster.npcById.itemFor(offerDetail.PetId), gameMasterDictionary.GMNpc);
 				offerName = GameMasterLocale.getGameMasterSubString("PET_NAME", pet.Constant);
 				swfPath = pet.IconSwfFilepath;
 				iconName = pet.IconName;
@@ -91,7 +91,7 @@ class UIPurchaseOfferPopup extends DBUITwoButtonPopup {
 					Logger.error("Unable to get iconClass for iconName: " + iconName);
 					return;
 				}
-				var _loc2_ = ASCompat.dynamicAs(ASCompat.createInstance(_loc3_, []), flash.display.MovieClip);
+				var _loc2_ = ASCompat.coerce(ASCompat.createInstance(_loc3_, []), flash.display.MovieClip);
 				_loc2_.scaleX = _loc2_.scaleY = 70 / 100;
 				(mPopup : ASAny).item_icon.addChild(_loc2_);
 			});

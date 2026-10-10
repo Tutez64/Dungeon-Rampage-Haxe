@@ -39,9 +39,9 @@ class AssetRepository {
 		if (tryCache(assetLoaderInfo, loadedCallback)) {
 			return true;
 		}
-		var _loc6_ = ASCompat.dynamicAs(mPendingLoads.itemFor(_loc7_), brain.assetRepository.ActiveLoadBase);
+		var _loc6_ = ASCompat.coerce(mPendingLoads.itemFor(_loc7_), brain.assetRepository.ActiveLoadBase);
 		if (_loc6_ == null) {
-			_loc5_ = ASCompat.dynamicAs(ASCompat.createInstance(assetLoaderClass, [
+			_loc5_ = ASCompat.coerce(ASCompat.createInstance(assetLoaderClass, [
 				mFacade,
 				assetLoaderInfo,
 				this.executeSuccessCallbacks,
@@ -58,27 +58,27 @@ class AssetRepository {
 
 	public function getJsonAsset(assetLoaderInfo:AssetLoaderInfo, loadedCallback:ASFunction, errorCallback:ASFunction = null):AssetLoaderInfo {
 		var _loc4_ = getAsset(assetLoaderInfo, loadedCallback, errorCallback, JsonAssetLoader);
-		return ASCompat.dynamicAs(_loc4_ ? null : assetLoaderInfo, brain.assetRepository.AssetLoaderInfo);
+		return ASCompat.coerce(_loc4_ ? null : assetLoaderInfo, brain.assetRepository.AssetLoaderInfo);
 	}
 
 	public function getXMLAsset(assetLoaderInfo:AssetLoaderInfo, loadedCallback:ASFunction, errorCallback:ASFunction = null):AssetLoaderInfo {
 		var _loc4_ = getAsset(assetLoaderInfo, loadedCallback, errorCallback, XMLAssetLoader);
-		return ASCompat.dynamicAs(_loc4_ ? null : assetLoaderInfo, brain.assetRepository.AssetLoaderInfo);
+		return ASCompat.coerce(_loc4_ ? null : assetLoaderInfo, brain.assetRepository.AssetLoaderInfo);
 	}
 
 	public function getByteArrayAsset(assetLoaderInfo:AssetLoaderInfo, loadedCallback:ASFunction, errorCallback:ASFunction = null):AssetLoaderInfo {
 		var _loc4_ = getAsset(assetLoaderInfo, loadedCallback, errorCallback, ByteArrayAssetLoader);
-		return ASCompat.dynamicAs(_loc4_ ? null : assetLoaderInfo, brain.assetRepository.AssetLoaderInfo);
+		return ASCompat.coerce(_loc4_ ? null : assetLoaderInfo, brain.assetRepository.AssetLoaderInfo);
 	}
 
 	public function getSwfAsset(assetLoaderInfo:AssetLoaderInfo, loadedCallback:ASFunction, errorCallback:ASFunction = null):AssetLoaderInfo {
 		var _loc4_ = getAsset(assetLoaderInfo, loadedCallback, errorCallback, SwfAssetLoader);
-		return ASCompat.dynamicAs(_loc4_ ? null : assetLoaderInfo, brain.assetRepository.AssetLoaderInfo);
+		return ASCompat.coerce(_loc4_ ? null : assetLoaderInfo, brain.assetRepository.AssetLoaderInfo);
 	}
 
 	public function getImageAsset(assetLoaderInfo:AssetLoaderInfo, loadedCallback:ASFunction, errorCallback:ASFunction = null):AssetLoaderInfo {
 		var _loc4_ = getAsset(assetLoaderInfo, loadedCallback, errorCallback, ImageAssetLoader);
-		return ASCompat.dynamicAs(_loc4_ ? null : assetLoaderInfo, brain.assetRepository.AssetLoaderInfo);
+		return ASCompat.coerce(_loc4_ ? null : assetLoaderInfo, brain.assetRepository.AssetLoaderInfo);
 	}
 
 	public function getSpriteSheetAsset(facade:Facade, sheetLoaderInfo:SpriteSheetAssetLoaderInfo, bitmapDataName:String, loadedCallback:ASFunction,
@@ -91,7 +91,7 @@ class AssetRepository {
 		if (tryCache(sheetLoaderInfo, loadedCallback)) {
 			return;
 		}
-		activeLoad = ASCompat.dynamicAs(mPendingLoads.itemFor(sheetLoaderInfo.getKey()), brain.assetRepository.ActiveLoadBase);
+		activeLoad = ASCompat.coerce(mPendingLoads.itemFor(sheetLoaderInfo.getKey()), brain.assetRepository.ActiveLoadBase);
 		if (activeLoad != null) {
 			activeLoad.AddCallback(loadedCallback, errorCallback);
 			return;
@@ -144,7 +144,7 @@ class AssetRepository {
 		if (tryCache(assetLoaderInfo, loadedCallback)) {
 			return;
 		}
-		activeLoad = ASCompat.dynamicAs(mPendingLoads.itemFor(cacheKey), brain.assetRepository.ActiveLoadBase);
+		activeLoad = ASCompat.coerce(mPendingLoads.itemFor(cacheKey), brain.assetRepository.ActiveLoadBase);
 		if (activeLoad != null) {
 			activeLoad.AddCallback(loadedCallback, errorCallback);
 			return;
@@ -190,12 +190,12 @@ class AssetRepository {
 
 	public function getURLSoundAsset(assetLoaderInfo:SoundAssetLoaderInfo, loadedCallback:ASFunction, errorCallback:ASFunction = null):AssetLoaderInfo {
 		var _loc4_ = getAsset(assetLoaderInfo, loadedCallback, errorCallback, URLSoundAssetLoader);
-		return ASCompat.dynamicAs(_loc4_ ? null : assetLoaderInfo, brain.assetRepository.AssetLoaderInfo);
+		return ASCompat.coerce(_loc4_ ? null : assetLoaderInfo, brain.assetRepository.AssetLoaderInfo);
 	}
 
 	public function removeCallbackFromPendingDownload(assetKey:String, loadedCallback:ASFunction):Bool {
 		var _loc3_ = false;
-		var _loc4_ = ASCompat.dynamicAs(mPendingLoads.itemFor(assetKey), brain.assetRepository.ActiveLoadBase);
+		var _loc4_ = ASCompat.coerce(mPendingLoads.itemFor(assetKey), brain.assetRepository.ActiveLoadBase);
 		if (_loc4_ != null) {
 			_loc3_ = _loc4_.removeCallback(loadedCallback, null);
 			if (_loc4_.hasNoCallbacks()) {
@@ -208,7 +208,7 @@ class AssetRepository {
 
 	public function removeErrorCallbackFromPendingDownload(assetKey:String, errorCallback:ASFunction):Bool {
 		var _loc3_ = false;
-		var _loc4_ = ASCompat.dynamicAs(mPendingLoads.itemFor(assetKey), brain.assetRepository.ActiveLoadBase);
+		var _loc4_ = ASCompat.coerce(mPendingLoads.itemFor(assetKey), brain.assetRepository.ActiveLoadBase);
 		if (_loc4_ != null) {
 			_loc3_ = _loc4_.removeCallback(null, errorCallback);
 			if (_loc4_.hasNoCallbacks()) {
@@ -222,7 +222,7 @@ class AssetRepository {
 	function executeSuccessCallbacks(assetLoaderInfo:AssetLoaderInfo, asset:Asset) {
 		var _loc4_ = assetLoaderInfo.getKey();
 		mAssetCache.add(assetLoaderInfo, asset);
-		var _loc3_ = ASCompat.dynamicAs(mPendingLoads.removeKey(_loc4_), brain.assetRepository.ActiveLoadBase);
+		var _loc3_ = ASCompat.coerce(mPendingLoads.removeKey(_loc4_), brain.assetRepository.ActiveLoadBase);
 		if (_loc3_ != null) {
 			_loc3_.executeSucessCallbacks(assetLoaderInfo, asset);
 			_loc3_.destroy();
@@ -233,7 +233,7 @@ class AssetRepository {
 		var _loc2_:ActiveLoadBase = null;
 		var _loc3_ = assetLoaderInfo.getKey();
 		if (mPendingLoads.hasKey(_loc3_)) {
-			_loc2_ = ASCompat.dynamicAs(mPendingLoads.removeKey(_loc3_), brain.assetRepository.ActiveLoadBase);
+			_loc2_ = ASCompat.coerce(mPendingLoads.removeKey(_loc3_), brain.assetRepository.ActiveLoadBase);
 			if (_loc2_ != null) {
 				_loc2_.executeErrorCallbacks(assetLoaderInfo);
 				_loc2_.destroy();

@@ -10,7 +10,7 @@ class DungeonModifierHelper {
 	public var NewThisFloor:Bool = false;
 
 	public function new(dungeonModId:UInt, newThisFloor:Bool, dbFacade:DBFacade) {
-		GMDungeonMod = ASCompat.dynamicAs(dbFacade.gameMaster.dungeonModifierById.itemFor(dungeonModId), gameMasterDictionary.GMDungeonModifier);
+		GMDungeonMod = ASCompat.coerce(dbFacade.gameMaster.dungeonModifierById.itemFor(dungeonModId), gameMasterDictionary.GMDungeonModifier);
 		if (GMDungeonMod == null) {
 			Logger.error("Unable to find GMDungeonModifier with ID: " + dungeonModId);
 		}

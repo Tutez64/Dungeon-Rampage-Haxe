@@ -13,7 +13,7 @@ class UIStatProgressBar {
 
 	public function new(dbFacade:DBFacade, progressClip:MovieClip, completedClip:MovieClip) {
 		mDBFacade = dbFacade;
-		mProgressBar = new UIProgressBar(mDBFacade, ASCompat.dynamicAs((progressClip : ASAny).training_bar, flash.display.MovieClip));
+		mProgressBar = new UIProgressBar(mDBFacade, ASCompat.coerce((progressClip : ASAny).training_bar, flash.display.MovieClip));
 		mProgressBar.enabled = false;
 		mCompletedClip = completedClip;
 		completed = false;

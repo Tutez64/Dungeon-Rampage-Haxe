@@ -148,7 +148,7 @@ class LoadingScreenState extends State {
 		var _loc2_:GMMapNode = null;
 		var _loc1_ = mDBFacade.getSplitTestNumber("SkipVideo", 0);
 		if (mMapNodeID != 0 && _loc1_ != 1) {
-			_loc2_ = ASCompat.dynamicAs(mDBFacade.gameMaster.mapNodeById.itemFor(mMapNodeID), gameMasterDictionary.GMMapNode);
+			_loc2_ = ASCompat.coerce(mDBFacade.gameMaster.mapNodeById.itemFor(mMapNodeID), gameMasterDictionary.GMMapNode);
 			if (_loc2_ != null && ASCompat.stringAsBool(_loc2_.StorySwfPath)) {
 				mVideoPlayer = new VideoPlayer(mDBFacade, mSceneGraphComponent, enterLoadingState);
 				mVideoPlayer.process(_loc2_.StorySwfPath);
@@ -229,16 +229,16 @@ class LoadingScreenState extends State {
 			_loc2_ = swfAsset.getClass("loading_gateboss_random");
 			_loc3_ = Locale.getString("LOADING_SCREEN_CHALLENGE_LABEL");
 		}
-		mLoadingScreenRoot = ASCompat.dynamicAs(ASCompat.createInstance(_loc2_, []), flash.display.MovieClip);
-		mLoadingScreenLabel = ASCompat.dynamicAs((mLoadingScreenRoot : ASAny).loading_gate_text_hint.label, flash.text.TextField);
+		mLoadingScreenRoot = ASCompat.coerce(ASCompat.createInstance(_loc2_, []), flash.display.MovieClip);
+		mLoadingScreenLabel = ASCompat.coerce((mLoadingScreenRoot : ASAny).loading_gate_text_hint.label, flash.text.TextField);
 		mLoadingScreenLabel.text = _loc3_;
-		mLoadingBarClip = ASCompat.dynamicAs((mLoadingScreenRoot : ASAny).loading_gate_text_hint.UI_loadingBar, flash.display.MovieClip);
+		mLoadingBarClip = ASCompat.coerce((mLoadingScreenRoot : ASAny).loading_gate_text_hint.UI_loadingBar, flash.display.MovieClip);
 		mLoadingBarClip.visible = true;
 		mLoadingBarClip.scaleX = mLoadingBarClip.scaleY = 1.8;
 		mLoadingBarClip.x = 548.7;
 		mLoadingBarClip.y = 1000;
-		mHint = new UIHints(mDBFacade, ASCompat.dynamicAs((mLoadingScreenRoot : ASAny).loading_gate_text_hint.hint, flash.display.MovieClip));
-		mLoadingBar = new UIProgressBar(mDBFacade, ASCompat.dynamicAs((mLoadingBarClip : ASAny).loadingBar, flash.display.MovieClip));
+		mHint = new UIHints(mDBFacade, ASCompat.coerce((mLoadingScreenRoot : ASAny).loading_gate_text_hint.hint, flash.display.MovieClip));
+		mLoadingBar = new UIProgressBar(mDBFacade, ASCompat.coerce((mLoadingBarClip : ASAny).loadingBar, flash.display.MovieClip));
 		mProgressTarget = 0;
 		mLoadingBar.value = 0;
 		mScreenLoaded = true;
@@ -271,7 +271,7 @@ class LoadingScreenState extends State {
 		_loc2_ = 0;
 		while (_loc2_ < event.tilelibraryname.length) {
 			TrickleCacheLoader.tilelibrary(event.tilelibraryname[_loc2_], mDBFacade);
-			_loc2_ = ASCompat.toInt(_loc2_) + 1;
+			_loc2_++;
 		}
 		TrickleCacheLoader.swfAsset(DBFacade.buildFullDownloadPath("Resources/Art2D/UI/db_UI_HUD.swf"), mDBFacade);
 		TrickleCacheLoader.swfAsset(DBFacade.buildFullDownloadPath("Resources/Art2D/FX/db_fx_library.swf"), mDBFacade);
@@ -497,7 +497,7 @@ private class VideoPlayer {
 		var tempmovie:MovieClip;
 		var cuePointHandler = function(param1:ASObject) {};
 		var metaDataHandler = function(param1:ASObject) {
-			mCutVideo.y = ASCompat.toNumber(600 - ASCompat.toNumberField(param1, "height")) / 2;
+			mCutVideo.y = (600 - ASCompat.toNumberField(param1, "height")) / 2;
 			mCutVideo.x = 0;
 			mCutVideo.width = 1920;
 			mCutVideo.height = 1080;

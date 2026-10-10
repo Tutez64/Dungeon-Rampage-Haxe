@@ -61,7 +61,7 @@ class EffectView extends FloorView {
 			Logger.error("Unable to find class: " + mEffectClassName);
 			return;
 		}
-		mEffect = ASCompat.dynamicAs(ASCompat.createInstance(_loc2_, []), flash.display.MovieClip);
+		mEffect = ASCompat.coerce(ASCompat.createInstance(_loc2_, []), flash.display.MovieClip);
 		mMovieClipRenderer = new MovieClipRenderController(mFacade, mEffect);
 		if (mShouldBePlaying != null) {
 			mMovieClipRenderer.play((0 : UInt), mShouldBePlaying.loop, mShouldBePlaying.finishedCallback);

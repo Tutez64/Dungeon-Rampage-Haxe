@@ -37,7 +37,7 @@ class BuffGameObject extends FloorObject {
 		mActorGameObject = actorGameObject;
 		mParentView = actorView;
 		buffId = id;
-		mData = ASCompat.dynamicAs(facade.gameMaster.buffById.itemFor(buffId), gameMasterDictionary.GMBuff);
+		mData = ASCompat.coerce(facade.gameMaster.buffById.itemFor(buffId), gameMasterDictionary.GMBuff);
 		this.swfPath = DBFacade.buildFullDownloadPath(mData.VFXFilepath);
 		this.className = mData.VFX;
 		if (ASCompat.stringAsBool(this.className)) {
@@ -108,7 +108,7 @@ class BuffGameObject extends FloorObject {
 		this.view = mBuffView;
 		if (mActorGameObject.isOwner) {
 			if (mData.ShakeLocalCamera) {
-				mCameraTweenMax = this.mDBFacade.camera.shakeX(mData.Duration, 10, (Std.int(mData.Duration * 2) : UInt));
+				mCameraTweenMax = this.mDBFacade.camera.shakeX(mData.Duration, 10, (ASCompat.floatToInt(mData.Duration * 2) : UInt));
 			}
 			if (mData.ShowInHUD) {
 				mBuffView.showInHUD();

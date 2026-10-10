@@ -38,9 +38,9 @@ import box2D.dynamics.*;
 			_loc2_ = 0;
 			while (_loc2_ < B2Shape.e_shapeTypeCount) {
 				this.m_registers[_loc1_][_loc2_] = new B2ContactRegister();
-				_loc2_ = ASCompat.toInt(_loc2_) + 1;
+				_loc2_++;
 			}
-			_loc1_ = ASCompat.toInt(_loc1_) + 1;
+			_loc1_++;
 		}
 		this.AddType(B2CircleContact.Create, B2CircleContact.Destroy, B2Shape.e_circleShape, B2Shape.e_circleShape);
 		this.AddType(B2PolyAndCircleContact.Create, B2PolyAndCircleContact.Destroy, B2Shape.e_polygonShape, B2Shape.e_circleShape);
@@ -64,11 +64,11 @@ import box2D.dynamics.*;
 		var _loc7_ = _loc5_.createFcn;
 		if (_loc7_ != null) {
 			if (_loc5_.primary) {
-				_loc6_ = ASCompat.dynamicAs(_loc7_(this.m_allocator), box2D.dynamics.contacts.B2Contact);
+				_loc6_ = ASCompat.coerce(_loc7_(this.m_allocator), box2D.dynamics.contacts.B2Contact);
 				_loc6_.Reset(fixtureA, fixtureB);
 				return _loc6_;
 			}
-			_loc6_ = ASCompat.dynamicAs(_loc7_(this.m_allocator), box2D.dynamics.contacts.B2Contact);
+			_loc6_ = ASCompat.coerce(_loc7_(this.m_allocator), box2D.dynamics.contacts.B2Contact);
 			_loc6_.Reset(fixtureB, fixtureA);
 			return _loc6_;
 		}

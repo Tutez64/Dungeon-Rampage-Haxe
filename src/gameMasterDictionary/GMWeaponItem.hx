@@ -137,27 +137,21 @@ class GMWeaponItem extends GMInventoryBase {
 		ControllerTimeTillEnd = ASCompat.toNumberField(jsonAsset, "ControllerTimeTillEnd");
 		HoldingAttack = jsonAsset.HoldingAttack;
 		ChargeAttack = jsonAsset.ChargeAttack != null ? jsonAsset.ChargeAttack : "";
-		ScalingMaxPowerMultiplier = ASCompat.toNumber(jsonAsset.ScalingMaxPowerMultiplier != null ? ASCompat.toNumberField(jsonAsset,
-			"ScalingMaxPowerMultiplier") : 1);
+		ScalingMaxPowerMultiplier = jsonAsset.ScalingMaxPowerMultiplier != null ? ASCompat.toNumberField(jsonAsset, "ScalingMaxPowerMultiplier") : 1;
 		ScaleTapAttack = ASCompat.toBool(jsonAsset.ScaleTapAttack);
-		ScalingMinProjectiles = (ASCompat.toInt(jsonAsset.ScalingMinProjectileMultiplier != null ? (ASCompat.toInt(jsonAsset.ScalingMinProjectileMultiplier) : UInt) : (1 : UInt)) : UInt);
-		ScalingMaxProjectiles = (ASCompat.toInt(jsonAsset.ScalingMaxProjectileMultiplier != null ? (ASCompat.toInt(jsonAsset.ScalingMaxProjectileMultiplier) : UInt) : (1 : UInt)) : UInt);
-		ScalingProjectileStartAngle = ASCompat.toNumber(jsonAsset.ScalingProjectileStartAngle != null ? ASCompat.toNumberField(jsonAsset,
-			"ScalingProjectileStartAngle") : 0);
-		ScalingProjectileEndAngle = ASCompat.toNumber(jsonAsset.ScalingProjectileEndAngle != null ? ASCompat.toNumberField(jsonAsset,
-			"ScalingProjectileEndAngle") : 0);
-		ScalingDistanceTime = ASCompat.toNumber(jsonAsset.ScalingDistanceTime != null ? ASCompat.toNumberField(jsonAsset, "ScalingDistanceTime") : 0);
-		ScalingHeroMinDistance = ASCompat.toNumber(jsonAsset.ScalingHeroMinDistance != null ? ASCompat.toNumberField(jsonAsset, "ScalingHeroMinDistance") : 0);
-		ScalingHeroMaxDistance = ASCompat.toNumber(jsonAsset.ScalingHeroMaxDistance != null ? ASCompat.toNumberField(jsonAsset, "ScalingHeroMaxDistance") : 0);
-		ScalingProjectileMinDistance = ASCompat.toNumber(jsonAsset.ScalingProjectileMinDistance != null ? ASCompat.toNumberField(jsonAsset,
-			"ScalingProjectileMinDistance") : 0);
-		ScalingProjectileMaxDistance = ASCompat.toNumber(jsonAsset.ScalingProjectileMaxDistance != null ? ASCompat.toNumberField(jsonAsset,
-			"ScalingProjectileMaxDistance") : 0);
+		ScalingMinProjectiles = jsonAsset.ScalingMinProjectileMultiplier != null ? (ASCompat.toInt(jsonAsset.ScalingMinProjectileMultiplier) : UInt) : (1 : UInt);
+		ScalingMaxProjectiles = jsonAsset.ScalingMaxProjectileMultiplier != null ? (ASCompat.toInt(jsonAsset.ScalingMaxProjectileMultiplier) : UInt) : (1 : UInt);
+		ScalingProjectileStartAngle = jsonAsset.ScalingProjectileStartAngle != null ? ASCompat.toNumberField(jsonAsset, "ScalingProjectileStartAngle") : 0;
+		ScalingProjectileEndAngle = jsonAsset.ScalingProjectileEndAngle != null ? ASCompat.toNumberField(jsonAsset, "ScalingProjectileEndAngle") : 0;
+		ScalingDistanceTime = jsonAsset.ScalingDistanceTime != null ? ASCompat.toNumberField(jsonAsset, "ScalingDistanceTime") : 0;
+		ScalingHeroMinDistance = jsonAsset.ScalingHeroMinDistance != null ? ASCompat.toNumberField(jsonAsset, "ScalingHeroMinDistance") : 0;
+		ScalingHeroMaxDistance = jsonAsset.ScalingHeroMaxDistance != null ? ASCompat.toNumberField(jsonAsset, "ScalingHeroMaxDistance") : 0;
+		ScalingProjectileMinDistance = jsonAsset.ScalingProjectileMinDistance != null ? ASCompat.toNumberField(jsonAsset, "ScalingProjectileMinDistance") : 0;
+		ScalingProjectileMaxDistance = jsonAsset.ScalingProjectileMaxDistance != null ? ASCompat.toNumberField(jsonAsset, "ScalingProjectileMaxDistance") : 0;
 		RepeaterOnlyChargeRepeated = ASCompat.toBool(jsonAsset.RepeaterOnlyChargeRepeated);
-		RepeaterIncrementSpeedPercent = ASCompat.toNumber(jsonAsset.RepeaterIncrementSpeedPercent != null ? ASCompat.toNumberField(jsonAsset,
-			"RepeaterIncrementSpeedPercent") : 0.5);
-		RepeaterMaxSpeedPercent = ASCompat.toNumber(jsonAsset.RepeaterMaxSpeedPercent != null ? ASCompat.toNumberField(jsonAsset,
-			"RepeaterMaxSpeedPercent") : 3);
+		RepeaterIncrementSpeedPercent = jsonAsset.RepeaterIncrementSpeedPercent != null ? ASCompat.toNumberField(jsonAsset,
+			"RepeaterIncrementSpeedPercent") : 0.5;
+		RepeaterMaxSpeedPercent = jsonAsset.RepeaterMaxSpeedPercent != null ? ASCompat.toNumberField(jsonAsset, "RepeaterMaxSpeedPercent") : 3;
 		TapIcon = jsonAsset.TapIcon;
 		TapTitle = ASCompat.toBool(jsonAsset.TapTitle) ? jsonAsset.TapTitle : "";
 		TapDescription = ASCompat.toBool(jsonAsset.TapDescription) ? jsonAsset.TapDescription : "";

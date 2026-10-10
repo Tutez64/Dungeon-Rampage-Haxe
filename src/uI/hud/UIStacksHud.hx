@@ -53,7 +53,7 @@ class UIStacksHud {
 
 	public function initializeHud(rootClass:Dynamic) {
 		mUIRootClass = rootClass;
-		mUIRoot = ASCompat.dynamicAs(ASCompat.createInstance(mUIRootClass, []), flash.display.MovieClip);
+		mUIRoot = ASCompat.coerce(ASCompat.createInstance(mUIRootClass, []), flash.display.MovieClip);
 		mUIRoot.x = 480;
 		mUIRoot.y = 55;
 		mTooltipAPos = new Point(ASCompat.toNumberField((mUIRoot : ASAny).potion_slot_A.tooltip, "x"),
@@ -73,9 +73,9 @@ class UIStacksHud {
 	function createStacks() {
 		var _loc1_:UIObject = null;
 		mStacksUI = Vector.ofArray([
-			new UIObject(mDBFacade, ASCompat.dynamicAs((mUIRoot : ASAny).potion_slot_A, flash.display.MovieClip)),
-			new UIObject(mDBFacade, ASCompat.dynamicAs((mUIRoot : ASAny).potion_slot_B, flash.display.MovieClip)),
-			new UIObject(mDBFacade, ASCompat.dynamicAs((mUIRoot : ASAny).potion_slot_C, flash.display.MovieClip))
+			new UIObject(mDBFacade, ASCompat.coerce((mUIRoot : ASAny).potion_slot_A, flash.display.MovieClip)),
+			new UIObject(mDBFacade, ASCompat.coerce((mUIRoot : ASAny).potion_slot_B, flash.display.MovieClip)),
+			new UIObject(mDBFacade, ASCompat.coerce((mUIRoot : ASAny).potion_slot_C, flash.display.MovieClip))
 		]);
 		mStackTimersUI = Vector.ofArray(([null, null, null] : Array<CountdownTextTimer>));
 		final __ax4_iter_85 = mStacksUI;
@@ -123,7 +123,7 @@ class UIStacksHud {
 			ASCompat.setProperty((xpStack.tooltip : ASAny).title_label, "text",
 				GameMasterLocale.getGameMasterSubString("STACKABLE_NAME", boosterInfo.StackInfo.Constant).toUpperCase());
 			ASCompat.setProperty((xpStack.tooltip : ASAny).description_label, "text", Locale.getString("TIME_REMAINING") + boosterInfo.getDisplayTimeLeft());
-			mStackTimersUI[(slot : Int)] = new CountdownTextTimer(ASCompat.dynamicAs((xpStack.tooltip : ASAny).description_label, flash.text.TextField),
+			mStackTimersUI[(slot : Int)] = new CountdownTextTimer(ASCompat.coerce((xpStack.tooltip : ASAny).description_label, flash.text.TextField),
 				boosterInfo.getEndDate(), GameClock.getWebServerDate, checkBoosters, Locale.getString("BOOSTER_REMAINING"), "", Locale.getString("EXPIRED"));
 			mStackTimersUI[(slot : Int)].start();
 			mAssetLoadingComponent.getSwfAsset(DBFacade.buildFullDownloadPath(boosterInfo.StackInfo.UISwfFilepath),
@@ -132,7 +132,7 @@ class UIStacksHud {
 					if (_loc2_ == null) {
 						return;
 					}
-					var _loc3_ = ASCompat.dynamicAs(ASCompat.createInstance(_loc2_, []), flash.display.MovieClip);
+					var _loc3_ = ASCompat.coerce(ASCompat.createInstance(_loc2_, []), flash.display.MovieClip);
 					_loc3_.scaleX = _loc3_.scaleY = 80 / 100;
 					(mStacksUI[(slot : Int)].root : ASAny).graphic.addChildAt(_loc3_, 0);
 				});

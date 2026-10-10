@@ -87,7 +87,7 @@ class SocialSubState extends TownSubState {
 				} else {
 					Logger.debug("leaderboard not set or not initialized yet: use an event listener");
 					if (mEventComponent != null) {
-						mEventComponent.addListener("LEADERBOARD_INITIALIZED_EVENT", ASCompat.asFunction((function():ASAny {
+						mEventComponent.addListener("LEADERBOARD_INITIALIZED_EVENT", ASCompat.coerceFunction((function():ASAny {
 							var setPending:ASFunction;
 							return setPending = function() {
 								mTownStateMachine.leaderboard.alert = mPendingFriendRequest && !mAcknowledgedPendingFriendRequest;

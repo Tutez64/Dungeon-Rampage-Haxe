@@ -69,7 +69,7 @@ class KeyPanel {
 			mChestKeySlots.push(new ChestKeySlot(mDBFacade, slotMC, mDBFacade.dbAccountInfo.inventoryInfo.keys[i], mAssetLoadingComponent, true));
 			i = i + 1;
 		}
-		mBuyButton = new UIButton(mDBFacade, ASCompat.dynamicAs((mRoot : ASAny).buy, flash.display.MovieClip));
+		mBuyButton = new UIButton(mDBFacade, ASCompat.coerce((mRoot : ASAny).buy, flash.display.MovieClip));
 		mBuyButton.label.text = Locale.getString("ADD");
 		mBuyButton.releaseCallback = function() {
 			var _loc1_:ASObject = {};
@@ -77,7 +77,7 @@ class KeyPanel {
 			mDBFacade.metrics.log("KeyPanelAddButtonClicked", _loc1_);
 			mBuyKeysCallback();
 		};
-		mCloseButton = new UIButton(mDBFacade, ASCompat.dynamicAs((mRoot : ASAny).close, flash.display.MovieClip));
+		mCloseButton = new UIButton(mDBFacade, ASCompat.coerce((mRoot : ASAny).close, flash.display.MovieClip));
 		mCloseButton.releaseCallback = mCloseCallBack;
 	}
 

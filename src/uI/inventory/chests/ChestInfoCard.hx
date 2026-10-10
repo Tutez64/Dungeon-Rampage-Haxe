@@ -111,42 +111,42 @@ class ChestInfoCard extends UIObject {
 	}
 
 	function setupChestCardUI() {
-		mChestCardMC = ASCompat.dynamicAs((root : ASAny).chest_card, flash.display.MovieClip);
+		mChestCardMC = ASCompat.coerce((root : ASAny).chest_card, flash.display.MovieClip);
 		ASCompat.setProperty((mChestCardMC : ASAny).selection_01, "visible", true);
 		ASCompat.setProperty((mChestCardMC : ASAny).selection_02, "visible", false);
-		mChestCardAbandonButton = new UIButton(mDBFacade, ASCompat.dynamicAs((mChestCardMC : ASAny).selection_01.abandon, flash.display.MovieClip));
+		mChestCardAbandonButton = new UIButton(mDBFacade, ASCompat.coerce((mChestCardMC : ASAny).selection_01.abandon, flash.display.MovieClip));
 		mChestCardAbandonButton.label.text = Locale.getString("ABANDON");
 		mChestCardAbandonButton.releaseCallback = function() {
 			mAbandonChestCallback(mChestInfo);
 		};
-		mChestCardOpenButton = new UIButton(mDBFacade, ASCompat.dynamicAs((mChestCardMC : ASAny).selection_01.open, flash.display.MovieClip));
+		mChestCardOpenButton = new UIButton(mDBFacade, ASCompat.coerce((mChestCardMC : ASAny).selection_01.open, flash.display.MovieClip));
 		mChestCardOpenButton.label.text = Locale.getString("UNLOCK");
 		mChestCardOpenButton.releaseCallback = function() {
 			mOpenChestCallback(mChestInfo);
 		};
-		mChestCardAbandonButtonDS = new UIButton(mDBFacade, ASCompat.dynamicAs((mChestCardMC : ASAny).selection_02.abandon, flash.display.MovieClip));
+		mChestCardAbandonButtonDS = new UIButton(mDBFacade, ASCompat.coerce((mChestCardMC : ASAny).selection_02.abandon, flash.display.MovieClip));
 		mChestCardAbandonButtonDS.label.text = Locale.getString("ABANDON");
 		mChestCardAbandonButtonDS.releaseCallback = function() {
 			mAbandonChestCallbackDS(mChestInfo);
 		};
-		mChestCardOpenButtonDS = new UIButton(mDBFacade, ASCompat.dynamicAs((mChestCardMC : ASAny).selection_02.open, flash.display.MovieClip));
+		mChestCardOpenButtonDS = new UIButton(mDBFacade, ASCompat.coerce((mChestCardMC : ASAny).selection_02.open, flash.display.MovieClip));
 		mChestCardOpenButtonDS.label.text = Locale.getString("UNLOCK");
 		mChestCardOpenButtonDS.releaseCallback = function() {
 			mOpenChestCallbackDS(mChestInfo);
 		};
-		mChestCardKeepButtonDS = new UIButton(mDBFacade, ASCompat.dynamicAs((mChestCardMC : ASAny).selection_02.keep, flash.display.MovieClip));
+		mChestCardKeepButtonDS = new UIButton(mDBFacade, ASCompat.coerce((mChestCardMC : ASAny).selection_02.keep, flash.display.MovieClip));
 		mChestCardKeepButtonDS.label.text = Locale.getString("KEEP");
 		mChestCardKeepButtonDS.releaseCallback = function() {
 			mKeepChestCallbackDS(mChestInfo);
 		};
-		mChestIconHolder = ASCompat.dynamicAs((mChestCardMC : ASAny).item_icon, flash.display.MovieClip);
-		mChestIconUnequippable = ASCompat.dynamicAs((mChestCardMC : ASAny).unequippable, flash.display.MovieClip);
+		mChestIconHolder = ASCompat.coerce((mChestCardMC : ASAny).item_icon, flash.display.MovieClip);
+		mChestIconUnequippable = ASCompat.coerce((mChestCardMC : ASAny).unequippable, flash.display.MovieClip);
 		mChestIconUnequippable.visible = false;
 	}
 
 	function setupKeyCardUI() {
 		if (ASCompat.toBool((root : ASAny).chest_card_keys)) {
-			mChestKeysMC = ASCompat.dynamicAs((root : ASAny).chest_card_keys, flash.display.MovieClip);
+			mChestKeysMC = ASCompat.coerce((root : ASAny).chest_card_keys, flash.display.MovieClip);
 			ASCompat.setProperty((mChestKeysMC : ASAny).label, "text", Locale.getString("KEYS_OWNED"));
 			mChestKeySlots = new Vector<ChestKeySlot>();
 		}
@@ -252,7 +252,7 @@ class ChestInfoCard extends UIObject {
 				if (_loc3_ == null) {
 					return;
 				}
-				var _loc4_ = ASCompat.dynamicAs(ASCompat.createInstance(_loc3_, []), flash.display.MovieClip);
+				var _loc4_ = ASCompat.coerce(ASCompat.createInstance(_loc3_, []), flash.display.MovieClip);
 				var _loc2_ = new MovieClipRenderController(mDBFacade, _loc4_);
 				_loc2_.play();
 				if (ASCompat.toNumberField((mc : ASAny).avatar, "numChildren") > 0) {
@@ -294,7 +294,8 @@ class ChestInfoCard extends UIObject {
 		while (mChestIconHolder.numChildren > 1) {
 			mChestIconHolder.removeChildAt(1);
 		}
-		ChestInfo.loadItemIcon(swfPath, iconName, mChestIconHolder, mDBFacade, (70 : UInt), (Std.int(mChestInfo.iconScale) : UInt), mAssetLoadingComponent);
+		ChestInfo.loadItemIcon(swfPath, iconName, mChestIconHolder, mDBFacade, (70 : UInt), (ASCompat.floatToInt(mChestInfo.iconScale) : UInt),
+			mAssetLoadingComponent);
 		mChestRenderer = new MovieClipRenderer(mDBFacade, mChestIconHolder);
 		mChestRenderer.play((0 : UInt), true);
 		bgColoredExists = mChestInfo.hasColoredBackground;

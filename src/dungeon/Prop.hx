@@ -25,7 +25,7 @@ class Prop extends FloorObject {
 		if (propJsonObj.constant == null) {
 			return false;
 		}
-		var _loc3_ = ASCompat.dynamicAs(dbFacade.gameMaster.propByConstant.itemFor(propJsonObj.constant), gameMasterDictionary.GMProp);
+		var _loc3_ = ASCompat.coerce(dbFacade.gameMaster.propByConstant.itemFor(propJsonObj.constant), gameMasterDictionary.GMProp);
 		return _loc3_ != null;
 	}
 
@@ -37,7 +37,7 @@ class Prop extends FloorObject {
 		_loc5_.tile = tile;
 		tile.addOwnedFloorObject(_loc5_);
 		_loc5_.constant = propJsonObj.constant;
-		var _loc4_ = ASCompat.dynamicAs(dbFacade.gameMaster.propByConstant.itemFor(_loc5_.constant), gameMasterDictionary.GMProp);
+		var _loc4_ = ASCompat.coerce(dbFacade.gameMaster.propByConstant.itemFor(_loc5_.constant), gameMasterDictionary.GMProp);
 		_loc5_.assetClassName = _loc4_.AssetClassName;
 		_loc5_.position = _loc8_;
 		_loc5_.mArchwayAlpha = _loc4_.ArchwayAlpha;

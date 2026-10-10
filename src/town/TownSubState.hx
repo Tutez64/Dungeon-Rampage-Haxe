@@ -73,7 +73,7 @@ class TownSubState extends State {
 
 	override public function exitState() {
 		mDBFacade.mouseCursorManager.popMouseCursor();
-		var _loc1_ = (Std.int((mDBFacade.gameClock.realTime - mTimeEnter) / 1000) : UInt);
+		var _loc1_ = (ASCompat.floatToInt((mDBFacade.gameClock.realTime - mTimeEnter) / 1000) : UInt);
 		mDBFacade.metrics.log("AreaExit", {
 			"areaType": this.name,
 			"timeSpentSeconds": _loc1_

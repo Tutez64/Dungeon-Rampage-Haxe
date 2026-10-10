@@ -109,7 +109,7 @@ class DBFacebookLevelUpPostController {
 	function setlevelUpPost(event:FacebookLevelUpPostEvent) {
 		checkIfMapIsLoaded();
 		if (mLevelUpFeedPostsMap.hasKey(event.level)) {
-			mSelectedLevelUpPost = ASCompat.dynamicAs(mLevelUpFeedPostsMap.itemFor(event.level), gameMasterDictionary.GMFeedPosts);
+			mSelectedLevelUpPost = ASCompat.coerce(mLevelUpFeedPostsMap.itemFor(event.level), gameMasterDictionary.GMFeedPosts);
 		}
 	}
 

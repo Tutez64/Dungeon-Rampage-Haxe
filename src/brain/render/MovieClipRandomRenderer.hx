@@ -49,7 +49,7 @@ class MovieClipRandomRenderer extends MovieClipRenderer {
 	function playNewRandomLabel() {
 		var _loc2_ = mRandomLabels.keysToArray();
 		var _loc1_ = Math.ffloor(Math.random() * _loc2_.length);
-		mCurrentRandomLabel = ASCompat.dynamicAs(mRandomLabels.itemFor(_loc2_[Std.int(_loc1_)]), RandomLabelObject);
+		mCurrentRandomLabel = ASCompat.coerce(mRandomLabels.itemFor(_loc2_[ASCompat.floatToInt(_loc1_)]), RandomLabelObject);
 		mPlayHead = mCurrentRandomLabel.startFrameNumber;
 	}
 
@@ -62,17 +62,17 @@ class MovieClipRandomRenderer extends MovieClipRenderer {
 				clip.gotoAndStop(_loc3_);
 				if (ASCompat.stringAsBool(clip.currentFrameLabel) && clip.currentFrameLabel.indexOf("random") >= 0) {
 					if (_loc2_ != null && _loc2_.endFrameNumber == 0) {
-						_loc2_.endFrameNumber = (ASCompat.toInt(_loc3_ - 1) : UInt);
+						_loc2_.endFrameNumber = (_loc3_ - 1 : UInt);
 					}
 					_loc2_ = new RandomLabelObject();
 					_loc2_.startFrameNumber = (_loc3_ : UInt);
 					_loc2_.labelName = clip.currentFrameLabel;
 					mRandomLabels.add(clip.currentFrameLabel, _loc2_);
 				}
-				_loc3_ = ASCompat.toInt(_loc3_) + 1;
+				_loc3_++;
 			}
 			if (_loc2_ != null && _loc2_.endFrameNumber == 0) {
-				_loc2_.endFrameNumber = (ASCompat.toInt(_loc3_ - 1) : UInt);
+				_loc2_.endFrameNumber = (_loc3_ - 1 : UInt);
 			}
 		}
 		playNewRandomLabel();

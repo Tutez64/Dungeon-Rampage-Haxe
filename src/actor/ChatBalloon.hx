@@ -27,13 +27,13 @@ class ChatBalloon extends Sprite {
 	public function initializeChatBalloon(swfAsset:SwfAsset, typingClip:MovieClip = null) {
 		mTypingClip = typingClip;
 		var _loc3_ = swfAsset.getClass("UI_speechbubble");
-		mBubbleSmall = ASCompat.dynamicAs(ASCompat.createInstance(_loc3_, []), flash.display.MovieClip);
+		mBubbleSmall = ASCompat.coerce(ASCompat.createInstance(_loc3_, []), flash.display.MovieClip);
 		_loc3_ = swfAsset.getClass("UI_speechbubble_02");
-		mBubbleMedium = ASCompat.dynamicAs(ASCompat.createInstance(_loc3_, []), flash.display.MovieClip);
+		mBubbleMedium = ASCompat.coerce(ASCompat.createInstance(_loc3_, []), flash.display.MovieClip);
 		_loc3_ = swfAsset.getClass("UI_speechbubble_03");
-		mBubbleMediumScaledDown = ASCompat.dynamicAs(ASCompat.createInstance(_loc3_, []), flash.display.MovieClip);
+		mBubbleMediumScaledDown = ASCompat.coerce(ASCompat.createInstance(_loc3_, []), flash.display.MovieClip);
 		_loc3_ = swfAsset.getClass("UI_speechbubble_04");
-		mBubbleLargeScaledDown = ASCompat.dynamicAs(ASCompat.createInstance(_loc3_, []), flash.display.MovieClip);
+		mBubbleLargeScaledDown = ASCompat.coerce(ASCompat.createInstance(_loc3_, []), flash.display.MovieClip);
 		if (mTypingClip != null) {
 			addChild(mTypingClip);
 			hidePlayerTyping();
@@ -66,22 +66,22 @@ class ChatBalloon extends Sprite {
 				mText.parent.parent.removeChild(mText.parent);
 			}
 			_loc2_ = mBubbleSmall;
-			mText = ASCompat.dynamicAs((_loc2_ : ASAny).chatMessage, flash.text.TextField);
+			mText = ASCompat.coerce((_loc2_ : ASAny).chatMessage, flash.text.TextField);
 			mText.text = value;
 			if (mText.numLines > 3) {
 				_loc2_ = mBubbleMedium;
 			}
-			mText = ASCompat.dynamicAs((_loc2_ : ASAny).chatMessage, flash.text.TextField);
+			mText = ASCompat.coerce((_loc2_ : ASAny).chatMessage, flash.text.TextField);
 			mText.text = value;
 			if (mText.numLines > 4) {
 				_loc2_ = mBubbleMediumScaledDown;
 			}
-			mText = ASCompat.dynamicAs((_loc2_ : ASAny).chatMessage, flash.text.TextField);
+			mText = ASCompat.coerce((_loc2_ : ASAny).chatMessage, flash.text.TextField);
 			mText.text = value;
 			if (mText.numLines > 6) {
 				_loc2_ = mBubbleLargeScaledDown;
 			}
-			mText = ASCompat.dynamicAs((_loc2_ : ASAny).chatMessage, flash.text.TextField);
+			mText = ASCompat.coerce((_loc2_ : ASAny).chatMessage, flash.text.TextField);
 			mText.text = value;
 			addChild(_loc2_);
 			_loc2_.addChild(mText);

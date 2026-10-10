@@ -226,9 +226,9 @@ class FloorObject extends GameObject {
 				_loc6_.appendTranslation(ASCompat.toNumberField(_loc7_, "x"), ASCompat.toNumberField(_loc7_, "y"), 0);
 				_loc6_.append(_loc10_);
 				_loc4_ = _loc6_.decompose();
-				_loc3_ = ASCompat.dynamicAs(_loc4_[0], flash.geom.Vector3D);
-				_loc9_ = ASCompat.dynamicAs(_loc4_[1], flash.geom.Vector3D);
-				_loc8_ = ASCompat.dynamicAs(_loc4_[2], flash.geom.Vector3D);
+				_loc3_ = ASCompat.coerce(_loc4_[0], flash.geom.Vector3D);
+				_loc9_ = ASCompat.coerce(_loc4_[1], flash.geom.Vector3D);
+				_loc8_ = ASCompat.coerce(_loc4_[2], flash.geom.Vector3D);
 				_loc5_ = NavCollider.buildNavColliderFromJson(mDBFacade, _loc7_, this, _loc3_, _loc9_.z, _loc8_, this.mDistributedDungeonFloor.box2DWorld,
 					mFilter);
 				if (_loc5_ != null) {

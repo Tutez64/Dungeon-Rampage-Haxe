@@ -47,7 +47,7 @@ class UISellItemPopup extends DBUITwoButtonPopup {
 				Logger.error("Unable to get iconClass for iconName: " + iconName);
 				return;
 			}
-			var _loc2_ = ASCompat.dynamicAs(ASCompat.createInstance(_loc3_, []), flash.display.MovieClip);
+			var _loc2_ = ASCompat.coerce(ASCompat.createInstance(_loc3_, []), flash.display.MovieClip);
 			_loc2_.scaleX = _loc2_.scaleY = 70 / mInfo.iconScale;
 			(mPopup : ASAny).item_icon.addChild(_loc2_);
 		});

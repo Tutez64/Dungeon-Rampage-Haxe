@@ -83,7 +83,7 @@ class DBInventoryInfo {
 	}
 
 	public function getStackableByStackId(stackIndex:Int):StackableInfo {
-		return ASCompat.dynamicAs(mStackablesByStackableId.itemFor(stackIndex), account.StackableInfo);
+		return ASCompat.coerce(mStackablesByStackableId.itemFor(stackIndex), account.StackableInfo);
 	}
 
 	public function findHighestBoosterXP():BoosterInfo {
@@ -97,7 +97,7 @@ class DBInventoryInfo {
 			for (_tmp_ in 0..._loc2_.length) {
 				_loc3_ = Std.string(_tmp_);
 				_loc5_ = ASCompat.toInt((_loc2_ : ASAny)[ASCompat.toInt(_loc3_)]);
-				_loc1_ = ASCompat.dynamicAs(mBoostersByStackableId.itemFor(_loc5_), account.BoosterInfo);
+				_loc1_ = ASCompat.coerce(mBoostersByStackableId.itemFor(_loc5_), account.BoosterInfo);
 				_loc6_ = timeTillBoosterExpire(_loc5_);
 				if (_loc1_ != null && _loc1_.BuffInfo.Exp > 1 && _loc6_ > 0) {
 					if (_loc4_ == null || _loc1_.BuffInfo.Exp > _loc4_.BuffInfo.Exp) {
@@ -119,7 +119,7 @@ class DBInventoryInfo {
 			for (_tmp_ in 0..._loc2_.length) {
 				_loc3_ = Std.string(_tmp_);
 				_loc5_ = ASCompat.toInt((_loc2_ : ASAny)[ASCompat.toInt(_loc3_)]);
-				_loc1_ = ASCompat.dynamicAs(mBoostersByStackableId.itemFor(_loc5_), account.BoosterInfo);
+				_loc1_ = ASCompat.coerce(mBoostersByStackableId.itemFor(_loc5_), account.BoosterInfo);
 				_loc6_ = timeTillBoosterExpire(_loc5_);
 				if (_loc1_ != null && _loc1_.BuffInfo.Gold > 1 && _loc6_ > 0) {
 					if (_loc4_ == null || _loc1_.BuffInfo.Gold > _loc4_.BuffInfo.Gold) {
@@ -133,7 +133,7 @@ class DBInventoryInfo {
 	public function timestampBooster(stackId:Int):String {
 		var _loc2_:BoosterInfo = null;
 		if (mBoostersByStackableId.hasKey(stackId)) {
-			_loc2_ = ASCompat.dynamicAs(mBoostersByStackableId.itemFor(stackId), account.BoosterInfo);
+			_loc2_ = ASCompat.coerce(mBoostersByStackableId.itemFor(stackId), account.BoosterInfo);
 			if (_loc2_ != null) {
 				return _loc2_.timeStamp();
 			}
@@ -142,9 +142,9 @@ class DBInventoryInfo {
 	}
 
 	public function timeTillBoosterExpire(stackId:Int):Int {
-		var _loc3_ = ASCompat.dynamicAs(mBoostersByStackableId.itemFor(stackId), account.BoosterInfo);
+		var _loc3_ = ASCompat.coerce(mBoostersByStackableId.itemFor(stackId), account.BoosterInfo);
 		var _loc2_ = dateBooster((_loc3_.gmId : Int));
-		return Std.int(_loc2_.getTime() - GameClock.getWebServerTime());
+		return ASCompat.floatToInt(_loc2_.getTime() - GameClock.getWebServerTime());
 	}
 
 	public function timeTillNextBoosterExpire():Int {
@@ -158,7 +158,7 @@ class DBInventoryInfo {
 			for (_tmp_ in 0..._loc3_.length) {
 				_loc4_ = Std.string(_tmp_);
 				_loc6_ = ASCompat.toInt((_loc3_ : ASAny)[ASCompat.toInt(_loc4_)]);
-				_loc2_ = ASCompat.dynamicAs(mBoostersByStackableId.itemFor(_loc6_), account.BoosterInfo);
+				_loc2_ = ASCompat.coerce(mBoostersByStackableId.itemFor(_loc6_), account.BoosterInfo);
 				_loc5_ = timeTillBoosterExpire((_loc2_.gmId : Int));
 				if (_loc5_ > 0) {
 					if (_loc1_ == -1 || _loc5_ < _loc1_) {
@@ -186,7 +186,7 @@ class DBInventoryInfo {
 		var _loc1_ = (0 : UInt);
 		_loc2_ = ASCompat.reinterpretAs(mItems.iterator(), IMapIterator);
 		while (_loc2_.hasNext()) {
-			_loc3_ = ASCompat.dynamicAs(_loc2_.next(), account.ItemInfo);
+			_loc3_ = ASCompat.coerce(_loc2_.next(), account.ItemInfo);
 			if (!_loc3_.isEquipped) {
 				_loc1_++;
 			}
@@ -201,12 +201,12 @@ class DBInventoryInfo {
 	}
 
 	public function getStackCount(stackableId:UInt):UInt {
-		var _loc2_ = ASCompat.dynamicAs(mStackablesByStackableId.itemFor(stackableId), account.StackableInfo);
-		return (ASCompat.toInt(_loc2_ != null ? _loc2_.count : (0 : UInt)) : UInt);
+		var _loc2_ = ASCompat.coerce(mStackablesByStackableId.itemFor(stackableId), account.StackableInfo);
+		return _loc2_ != null ? _loc2_.count : (0 : UInt);
 	}
 
 	public function getAvatarInfoForAvatarInstanceId(instanceId:UInt):AvatarInfo {
-		return ASCompat.dynamicAs(mAvatars.itemFor(instanceId), account.AvatarInfo);
+		return ASCompat.coerce(mAvatars.itemFor(instanceId), account.AvatarInfo);
 	}
 
 	public function getAvatarInfoForHeroType(heroType:UInt):AvatarInfo {
@@ -214,7 +214,7 @@ class DBInventoryInfo {
 		var _loc2_:AvatarInfo = null;
 		_loc3_ = ASCompat.reinterpretAs(mAvatars.iterator(), IMapIterator);
 		while (_loc3_.hasNext()) {
-			_loc2_ = ASCompat.dynamicAs(_loc3_.next(), account.AvatarInfo);
+			_loc2_ = ASCompat.coerce(_loc3_.next(), account.AvatarInfo);
 			if (heroType == _loc2_.avatarType) {
 				return _loc2_;
 			}
@@ -253,7 +253,7 @@ class DBInventoryInfo {
 		var _loc3_:ItemInfo = null;
 		_loc2_ = ASCompat.reinterpretAs(mItems.iterator(), IMapIterator);
 		while (_loc2_.hasNext()) {
-			_loc3_ = ASCompat.dynamicAs(_loc2_.next(), account.ItemInfo);
+			_loc3_ = ASCompat.coerce(_loc2_.next(), account.ItemInfo);
 			if (details.WeaponId == _loc3_.gmId && details.WeaponPower == _loc3_.power && this.modifiersMatch(details, _loc3_)) {
 				return true;
 			}
@@ -270,32 +270,32 @@ class DBInventoryInfo {
 		var _loc3_:SkinInfo = null;
 		_loc5_ = ASCompat.reinterpretAs(mItems.iterator(), IMapIterator);
 		while (_loc5_.hasNext()) {
-			_loc6_ = ASCompat.dynamicAs(_loc5_.next(), account.ItemInfo);
+			_loc6_ = ASCompat.coerce(_loc5_.next(), account.ItemInfo);
 			if (infoId == _loc6_.gmId) {
 				return true;
 			}
 		}
-		_loc7_ = ASCompat.dynamicAs(mStackablesByStackableId.itemFor(infoId), account.StackableInfo);
+		_loc7_ = ASCompat.coerce(mStackablesByStackableId.itemFor(infoId), account.StackableInfo);
 		if (_loc7_ != null && _loc7_.count > 0) {
 			return true;
 		}
 		_loc5_ = ASCompat.reinterpretAs(mAvatars.iterator(), IMapIterator);
 		while (_loc5_.hasNext()) {
-			_loc2_ = ASCompat.dynamicAs(_loc5_.next(), account.AvatarInfo);
+			_loc2_ = ASCompat.coerce(_loc5_.next(), account.AvatarInfo);
 			if (infoId == _loc2_.avatarType) {
 				return true;
 			}
 		}
 		_loc5_ = ASCompat.reinterpretAs(mPets.iterator(), IMapIterator);
 		while (_loc5_.hasNext()) {
-			_loc4_ = ASCompat.dynamicAs(_loc5_.next(), account.PetInfo);
+			_loc4_ = ASCompat.coerce(_loc5_.next(), account.PetInfo);
 			if (infoId == _loc4_.PetType) {
 				return true;
 			}
 		}
 		_loc5_ = ASCompat.reinterpretAs(mSkins.iterator(), IMapIterator);
 		while (_loc5_.hasNext()) {
-			_loc3_ = ASCompat.dynamicAs(_loc5_.next(), actor.player.SkinInfo);
+			_loc3_ = ASCompat.coerce(_loc5_.next(), actor.player.SkinInfo);
 			if (infoId == _loc3_.skinType) {
 				return true;
 			}
@@ -340,15 +340,15 @@ class DBInventoryInfo {
 		var _loc2_:GMStackable = null;
 		var _loc3_ = new Vector<StackableInfo>();
 		if (avatarInfo.consumable1Id > 0 && avatarInfo.consumable1Count > 0) {
-			_loc2_ = ASCompat.dynamicAs(mDBFacade.gameMaster.stackableById.itemFor(avatarInfo.consumable1Id), gameMasterDictionary.GMStackable);
+			_loc2_ = ASCompat.coerce(mDBFacade.gameMaster.stackableById.itemFor(avatarInfo.consumable1Id), gameMasterDictionary.GMStackable);
 			_loc5_ = new StackableInfo(mDBFacade, null, _loc2_);
 			_loc5_.setPropertiesAsConsumable(_loc2_.Id, (0 : UInt), avatarInfo.consumable1Count);
 			_loc3_.push(_loc5_);
 		}
 		if (avatarInfo.consumable2Id > 0 && avatarInfo.consumable2Count > 0) {
-			_loc2_ = ASCompat.dynamicAs(mDBFacade.gameMaster.stackableById.itemFor(avatarInfo.consumable2Id), gameMasterDictionary.GMStackable);
+			_loc2_ = ASCompat.coerce(mDBFacade.gameMaster.stackableById.itemFor(avatarInfo.consumable2Id), gameMasterDictionary.GMStackable);
 			_loc5_ = new StackableInfo(mDBFacade, null,
-				ASCompat.dynamicAs(mDBFacade.gameMaster.stackableById.itemFor(avatarInfo.consumable2Id), gameMasterDictionary.GMStackable));
+				ASCompat.coerce(mDBFacade.gameMaster.stackableById.itemFor(avatarInfo.consumable2Id), gameMasterDictionary.GMStackable));
 			_loc5_.setPropertiesAsConsumable(_loc2_.Id, (1 : UInt), avatarInfo.consumable2Count);
 			_loc3_.push(_loc5_);
 		}
@@ -362,8 +362,8 @@ class DBInventoryInfo {
 		var _loc2_ = (0 : UInt);
 		var _loc3_ = ASCompat.reinterpretAs(mAvatars.iterator(), IMapIterator);
 		while (_loc3_.hasNext()) {
-			_loc1_ = ASCompat.dynamicAs(_loc3_.next(), account.AvatarInfo);
-			_loc2_ = (Std.int(Math.max(_loc2_, _loc1_.level)) : UInt);
+			_loc1_ = ASCompat.coerce(_loc3_.next(), account.AvatarInfo);
+			_loc2_ = (ASCompat.floatToInt(Math.max(_loc2_, _loc1_.level)) : UInt);
 		}
 		return _loc2_;
 	}
@@ -429,7 +429,7 @@ class DBInventoryInfo {
 				_loc1_.init((_loc12_ : UInt), (3 : UInt));
 			}
 			_loc4_.add(_loc12_, _loc1_);
-			_loc5_ = ASCompat.toInt(_loc5_) + 1;
+			_loc5_++;
 		}
 		_loc5_ = 0;
 		while (_loc5_ < mDBFacade.gameMaster.MapNodes.length) {
@@ -448,9 +448,9 @@ class DBInventoryInfo {
 							if (ASCompat.toNumberField(_loc2_.ParentNodes[_loc11_], "Id") == _loc3_.mapNodes[_loc10_].node_id) {
 								_loc9_ = true;
 							}
-							_loc11_ = ASCompat.toInt(_loc11_) + 1;
+							_loc11_++;
 						}
-						_loc10_ = ASCompat.toInt(_loc10_) + 1;
+						_loc10_++;
 					}
 					if (_loc9_) {
 						_loc1_ = new MapnodeInfo();
@@ -459,7 +459,7 @@ class DBInventoryInfo {
 					}
 				}
 			}
-			_loc5_ = ASCompat.toInt(_loc5_) + 1;
+			_loc5_++;
 		}
 		return _loc4_;
 	}
@@ -518,7 +518,7 @@ class DBInventoryInfo {
 		while (_loc4_ < _loc3_.length) {
 			_loc2_ = new AvatarInfo(mDBFacade, _loc3_[_loc4_], mResponseCallback);
 			mAvatars.add(_loc2_.id, _loc2_);
-			_loc4_ = ASCompat.toInt(_loc4_) + 1;
+			_loc4_++;
 		}
 	}
 
@@ -535,7 +535,7 @@ class DBInventoryInfo {
 				_loc4_.isNew = true;
 			}
 			mItems.add(_loc4_.databaseId, _loc4_);
-			_loc2_ = ASCompat.toInt(_loc2_) + 1;
+			_loc2_++;
 		}
 	}
 
@@ -567,7 +567,7 @@ class DBInventoryInfo {
 				_loc6_.isNew = true;
 			}
 			mChests.push(_loc6_);
-			_loc7_ = ASCompat.toInt(_loc7_) + 1;
+			_loc7_++;
 		}
 	}
 
@@ -595,10 +595,10 @@ class DBInventoryInfo {
 				case 3:
 					_loc2_ = ASCompat.toInt(accountsJson.legendary_keys);
 			}
-			_loc6_ = new KeyInfo(ASCompat.dynamicAs(mDBFacade.gameMaster.keysByOfferId.itemFor(_loc5_), gameMasterDictionary.GMKey),
-				ASCompat.dynamicAs(mDBFacade.gameMaster.offerById.itemFor(_loc5_), gameMasterDictionary.GMOffer), (_loc2_ : UInt));
+			_loc6_ = new KeyInfo(ASCompat.coerce(mDBFacade.gameMaster.keysByOfferId.itemFor(_loc5_), gameMasterDictionary.GMKey),
+				ASCompat.coerce(mDBFacade.gameMaster.offerById.itemFor(_loc5_), gameMasterDictionary.GMOffer), (_loc2_ : UInt));
 			mKeys.push(_loc6_);
-			_loc4_ = ASCompat.toInt(_loc4_) + 1;
+			_loc4_++;
 		}
 	}
 
@@ -617,7 +617,7 @@ class DBInventoryInfo {
 			}
 			mStackablesByDatabaseId.add(_loc5_.databaseId, _loc5_);
 			mStackablesByStackableId.add(_loc5_.gmId, _loc5_);
-			_loc4_ = ASCompat.toInt(_loc4_) + 1;
+			_loc4_++;
 		}
 	}
 
@@ -636,7 +636,7 @@ class DBInventoryInfo {
 			}
 			mBoostersByDatabaseId.add(_loc2_.databaseId, _loc2_);
 			mBoostersByStackableId.add(_loc2_.gmId, _loc2_);
-			_loc3_ = ASCompat.toInt(_loc3_) + 1;
+			_loc3_++;
 		}
 		mDBFacade.eventManager.dispatchEvent(new BoostersParsedEvent("BoostersParsedEvent_BOOSTERS_PARSED_UPDATE"));
 	}
@@ -654,7 +654,7 @@ class DBInventoryInfo {
 				_loc3_.isNew = true;
 			}
 			mPets.add(_loc3_.databaseId, _loc3_);
-			_loc4_ = ASCompat.toInt(_loc4_) + 1;
+			_loc4_++;
 		}
 	}
 
@@ -667,7 +667,7 @@ class DBInventoryInfo {
 		while (_loc4_ < _loc2_.length) {
 			_loc3_ = new SkinInfo(mDBFacade, _loc2_[_loc4_]);
 			mSkins.add(_loc3_.skinType, _loc3_);
-			_loc4_ = ASCompat.toInt(_loc4_) + 1;
+			_loc4_++;
 		}
 	}
 
@@ -731,7 +731,7 @@ class DBInventoryInfo {
 		var iter = ASCompat.reinterpretAs(mItems.iterator(), IMapIterator);
 		var itemIds:Array<ASAny> = [];
 		while (iter.hasNext()) {
-			itemInfo = ASCompat.dynamicAs(iter.next(), account.ItemInfo);
+			itemInfo = ASCompat.coerce(iter.next(), account.ItemInfo);
 			itemIds.push(itemInfo.databaseId);
 		}
 		rpcFunc = JSONRPCService.getFunction("RecalculateWeaponPowers", mDBFacade.rpcRoot + "inventorymanager");
@@ -880,7 +880,7 @@ class DBInventoryInfo {
 		var _loc2_:AvatarInfo = null;
 		_loc3_ = ASCompat.reinterpretAs(mAvatars.iterator(), IMapIterator);
 		while (_loc3_.hasNext()) {
-			_loc2_ = ASCompat.dynamicAs(_loc3_.next(), account.AvatarInfo);
+			_loc2_ = ASCompat.coerce(_loc3_.next(), account.AvatarInfo);
 			if (this.canThisAvatarEquipThisItem(_loc2_, itemInfo)) {
 				return true;
 			}
@@ -897,21 +897,21 @@ class DBInventoryInfo {
 		var _loc1_:PetInfo = null;
 		_loc3_ = ASCompat.reinterpretAs(mItems.iterator(), IMapIterator);
 		while (_loc3_.hasNext()) {
-			_loc4_ = ASCompat.dynamicAs(_loc3_.next(), account.ItemInfo);
+			_loc4_ = ASCompat.coerce(_loc3_.next(), account.ItemInfo);
 			if (_loc4_.isNew && this.isEquippableByAnyOwnedAvatar(_loc4_)) {
 				return true;
 			}
 		}
 		_loc3_ = ASCompat.reinterpretAs(mStackablesByStackableId.iterator(), IMapIterator);
 		while (_loc3_.hasNext()) {
-			_loc5_ = ASCompat.dynamicAs(_loc3_.next(), account.StackableInfo);
+			_loc5_ = ASCompat.coerce(_loc3_.next(), account.StackableInfo);
 			if (_loc5_.isNew) {
 				return true;
 			}
 		}
 		_loc3_ = ASCompat.reinterpretAs(mPets.iterator(), IMapIterator);
 		while (_loc3_.hasNext()) {
-			_loc1_ = ASCompat.dynamicAs(_loc3_.next(), account.PetInfo);
+			_loc1_ = ASCompat.coerce(_loc3_.next(), account.PetInfo);
 			if (_loc1_.isNew) {
 				return true;
 			}
@@ -935,17 +935,17 @@ class DBInventoryInfo {
 		var _loc1_:PetInfo = null;
 		_loc3_ = ASCompat.reinterpretAs(mItems.iterator(), IMapIterator);
 		while (_loc3_.hasNext()) {
-			_loc4_ = ASCompat.dynamicAs(_loc3_.next(), account.ItemInfo);
+			_loc4_ = ASCompat.coerce(_loc3_.next(), account.ItemInfo);
 			_loc4_.isNew = false;
 		}
 		_loc3_ = ASCompat.reinterpretAs(mStackablesByStackableId.iterator(), IMapIterator);
 		while (_loc3_.hasNext()) {
-			_loc5_ = ASCompat.dynamicAs(_loc3_.next(), account.StackableInfo);
+			_loc5_ = ASCompat.coerce(_loc3_.next(), account.StackableInfo);
 			_loc5_.isNew = false;
 		}
 		_loc3_ = ASCompat.reinterpretAs(mPets.iterator(), IMapIterator);
 		while (_loc3_.hasNext()) {
-			_loc1_ = ASCompat.dynamicAs(_loc3_.next(), account.PetInfo);
+			_loc1_ = ASCompat.coerce(_loc3_.next(), account.PetInfo);
 			_loc1_.isNew = false;
 		}
 		var _loc2_:ChestInfo;
@@ -966,7 +966,7 @@ class DBInventoryInfo {
 			for (_tmp_ in __ax4_iter_12) {
 				skin = _tmp_;
 				if (skin.ForHero == gmHero.Constant) {
-					offer = ASCompat.dynamicAs(offerBySkinId.itemFor(skin.Id), gameMasterDictionary.GMOffer);
+					offer = ASCompat.coerce(offerBySkinId.itemFor(skin.Id), gameMasterDictionary.GMOffer);
 					if (!isSkinExpired(skin, offer)) {
 						result.push(skin);
 					}
@@ -1006,7 +1006,7 @@ class DBInventoryInfo {
 
 	public function getSkinInfo(skinId:UInt):SkinInfo {
 		if (mSkins.hasKey(skinId)) {
-			return ASCompat.dynamicAs(mSkins.itemFor(skinId), actor.player.SkinInfo);
+			return ASCompat.coerce(mSkins.itemFor(skinId), actor.player.SkinInfo);
 		}
 		return null;
 	}
@@ -1020,7 +1020,7 @@ class DBInventoryInfo {
 	}
 
 	public function canShowInfiniteIsland():Bool {
-		var _loc1_ = ASCompat.dynamicAs(mapnodes1.itemFor(50150), account.MapnodeInfo);
+		var _loc1_ = ASCompat.coerce(mapnodes1.itemFor(50150), account.MapnodeInfo);
 		return _loc1_ != null;
 	}
 }

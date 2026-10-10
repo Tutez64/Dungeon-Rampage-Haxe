@@ -163,7 +163,7 @@ class UIShop {
 		mSwfAsset = null;
 		var _loc1_ = ASCompat.reinterpretAs(mTabButtons.iterator(), IMapIterator);
 		while (_loc1_.hasNext()) {
-			_loc2_ = ASCompat.dynamicAs(_loc1_.next(), brain.uI.UIRadioButton);
+			_loc2_ = ASCompat.coerce(_loc1_.next(), brain.uI.UIRadioButton);
 			_loc2_.destroy();
 		}
 		mTabButtons.clear();
@@ -202,7 +202,7 @@ class UIShop {
 			startAtCategoryTab = "";
 		}
 		mHeroWithEquipPicker.refresh(true);
-		mSelectedHero = ASCompat.dynamicAs(mDBFacade.gameMaster.heroById.itemFor(mDBFacade.dbAccountInfo.activeAvatarInfo.avatarType),
+		mSelectedHero = ASCompat.coerce(mDBFacade.gameMaster.heroById.itemFor(mDBFacade.dbAccountInfo.activeAvatarInfo.avatarType),
 			gameMasterDictionary.GMHero);
 		owned = mDBFacade.dbAccountInfo.inventoryInfo.ownsItem(mSelectedHero.Id);
 		this.heroSelected(mSelectedHero, owned);
@@ -256,7 +256,7 @@ class UIShop {
 					}
 				}
 			}
-			_loc5_ = ASCompat.toInt(_loc5_) + 1;
+			_loc5_++;
 		}
 	}
 
@@ -282,7 +282,7 @@ class UIShop {
 	}
 
 	function potionSortComparator(gmOfferA:GMOffer, gmOfferB:GMOffer):Int {
-		return Std.int(gmOfferA.Price - gmOfferB.Price);
+		return ASCompat.floatToInt(gmOfferA.Price - gmOfferB.Price);
 	}
 
 	function keySortComparator(gmOfferA:GMOffer, gmOfferB:GMOffer):Int {
@@ -299,14 +299,14 @@ class UIShop {
 			return 1;
 		}
 		if (_loc7_ == _loc8_) {
-			return Std.int(gmOfferA.Price - gmOfferB.Price);
+			return ASCompat.floatToInt(gmOfferA.Price - gmOfferB.Price);
 		}
 		return (_loc7_ - _loc8_ : Int);
 	}
 
 	function weaponSortComparator(gmOfferA:GMOffer, gmOfferB:GMOffer):Int {
 		if (gmOfferA.IsBundle && gmOfferB.IsBundle) {
-			return Std.int(gmOfferA.Price - gmOfferB.Price);
+			return ASCompat.floatToInt(gmOfferA.Price - gmOfferB.Price);
 		}
 		if (gmOfferA.IsBundle && !gmOfferB.IsBundle) {
 			return -1;
@@ -316,8 +316,8 @@ class UIShop {
 		}
 		var _loc4_ = gmOfferA.Details[0];
 		var _loc3_ = gmOfferB.Details[0];
-		var _loc6_ = ASCompat.dynamicAs(mDBFacade.gameMaster.weaponItemById.itemFor(_loc4_.WeaponId), gameMasterDictionary.GMWeaponItem);
-		var _loc7_ = ASCompat.dynamicAs(mDBFacade.gameMaster.weaponItemById.itemFor(_loc3_.WeaponId), gameMasterDictionary.GMWeaponItem);
+		var _loc6_ = ASCompat.coerce(mDBFacade.gameMaster.weaponItemById.itemFor(_loc4_.WeaponId), gameMasterDictionary.GMWeaponItem);
+		var _loc7_ = ASCompat.coerce(mDBFacade.gameMaster.weaponItemById.itemFor(_loc3_.WeaponId), gameMasterDictionary.GMWeaponItem);
 		var _loc5_ = GMWeaponItem.ALL_WEAPON_SORT.indexOf(_loc6_.MasterType);
 		var _loc8_ = GMWeaponItem.ALL_WEAPON_SORT.indexOf(_loc7_.MasterType);
 		if (_loc5_ == -1) {
@@ -350,22 +350,22 @@ class UIShop {
 		var weaponTooltipClass:Dynamic;
 		var heroTooltipClass:Dynamic;
 		mRoot = rootClip;
-		mPagination = new UIPagingPanel(mDBFacade, (0 : UInt), ASCompat.dynamicAs((mRoot : ASAny).pagination, flash.display.MovieClip),
+		mPagination = new UIPagingPanel(mDBFacade, (0 : UInt), ASCompat.coerce((mRoot : ASAny).pagination, flash.display.MovieClip),
 			mSwfAsset.getClass("pagination_button"), this.setCurrentPage);
 		MemoryTracker.track(mPagination, "UIPagingPanel - created in UIShop.setupUI()");
 		ASCompat.setProperty((mRoot : ASAny).UI_town_shop_timer, "visible", false);
 		group = "UIShopTabGroup";
-		mTabButtons.add("SPECIAL", new UIRadioButton(mDBFacade, ASCompat.dynamicAs((mRoot : ASAny).tab_special, flash.display.MovieClip), group));
-		mTabButtons.add("CHEST", new UIRadioButton(mDBFacade, ASCompat.dynamicAs((mRoot : ASAny).tab_chests, flash.display.MovieClip), group));
-		mTabButtons.add("KEY", new UIRadioButton(mDBFacade, ASCompat.dynamicAs((mRoot : ASAny).tab_keys, flash.display.MovieClip), group));
-		mTabButtons.add("HERO", new UIRadioButton(mDBFacade, ASCompat.dynamicAs((mRoot : ASAny).tab_heroes, flash.display.MovieClip), group));
-		mTabButtons.add("SKIN", new UIRadioButton(mDBFacade, ASCompat.dynamicAs((mRoot : ASAny).tab_skins, flash.display.MovieClip), group));
-		mTabButtons.add("STUFF", new UIRadioButton(mDBFacade, ASCompat.dynamicAs((mRoot : ASAny).tab_stuff, flash.display.MovieClip), group));
-		mTabButtons.add("WEAPON", new UIRadioButton(mDBFacade, ASCompat.dynamicAs((mRoot : ASAny).tab_melee, flash.display.MovieClip), group));
-		mTabButtons.add("PET", new UIRadioButton(mDBFacade, ASCompat.dynamicAs((mRoot : ASAny).tab_pets, flash.display.MovieClip), group));
+		mTabButtons.add("SPECIAL", new UIRadioButton(mDBFacade, ASCompat.coerce((mRoot : ASAny).tab_special, flash.display.MovieClip), group));
+		mTabButtons.add("CHEST", new UIRadioButton(mDBFacade, ASCompat.coerce((mRoot : ASAny).tab_chests, flash.display.MovieClip), group));
+		mTabButtons.add("KEY", new UIRadioButton(mDBFacade, ASCompat.coerce((mRoot : ASAny).tab_keys, flash.display.MovieClip), group));
+		mTabButtons.add("HERO", new UIRadioButton(mDBFacade, ASCompat.coerce((mRoot : ASAny).tab_heroes, flash.display.MovieClip), group));
+		mTabButtons.add("SKIN", new UIRadioButton(mDBFacade, ASCompat.coerce((mRoot : ASAny).tab_skins, flash.display.MovieClip), group));
+		mTabButtons.add("STUFF", new UIRadioButton(mDBFacade, ASCompat.coerce((mRoot : ASAny).tab_stuff, flash.display.MovieClip), group));
+		mTabButtons.add("WEAPON", new UIRadioButton(mDBFacade, ASCompat.coerce((mRoot : ASAny).tab_melee, flash.display.MovieClip), group));
+		mTabButtons.add("PET", new UIRadioButton(mDBFacade, ASCompat.coerce((mRoot : ASAny).tab_pets, flash.display.MovieClip), group));
 		iter = ASCompat.reinterpretAs(mTabButtons.iterator(), IMapIterator);
 		while (iter.hasNext()) {
-			tabButton = ASCompat.dynamicAs(iter.next(), brain.uI.UIRadioButton);
+			tabButton = ASCompat.coerce(iter.next(), brain.uI.UIRadioButton);
 			ASCompat.setProperty((tabButton.root : ASAny).new_label, "text", Locale.getString("SHOP_NEW"));
 			ASCompat.setProperty((tabButton.root : ASAny).new_label, "visible", this.categoryHasAnyNewOffers(iter.key));
 			ASCompat.setProperty(tabButton.root, "category", iter.key);
@@ -375,12 +375,12 @@ class UIShop {
 			tabButton.rolloverFilter = DBGlobal.UI_ROLLOVER_FILTER;
 			tabButton.selectedFilter = DBGlobal.UI_SELECTED_FILTER;
 		}
-		mEmptyOffers.push(ASCompat.dynamicAs((mRoot : ASAny).shop_empty_slot_0, flash.display.MovieClip));
-		mEmptyOffers.push(ASCompat.dynamicAs((mRoot : ASAny).shop_empty_slot_1, flash.display.MovieClip));
-		mEmptyOffers.push(ASCompat.dynamicAs((mRoot : ASAny).shop_empty_slot_2, flash.display.MovieClip));
-		mEmptyOffers.push(ASCompat.dynamicAs((mRoot : ASAny).shop_empty_slot_3, flash.display.MovieClip));
-		mEmptyOffers.push(ASCompat.dynamicAs((mRoot : ASAny).shop_empty_slot_4, flash.display.MovieClip));
-		mEmptyOffers.push(ASCompat.dynamicAs((mRoot : ASAny).shop_empty_slot_5, flash.display.MovieClip));
+		mEmptyOffers.push(ASCompat.coerce((mRoot : ASAny).shop_empty_slot_0, flash.display.MovieClip));
+		mEmptyOffers.push(ASCompat.coerce((mRoot : ASAny).shop_empty_slot_1, flash.display.MovieClip));
+		mEmptyOffers.push(ASCompat.coerce((mRoot : ASAny).shop_empty_slot_2, flash.display.MovieClip));
+		mEmptyOffers.push(ASCompat.coerce((mRoot : ASAny).shop_empty_slot_3, flash.display.MovieClip));
+		mEmptyOffers.push(ASCompat.coerce((mRoot : ASAny).shop_empty_slot_4, flash.display.MovieClip));
+		mEmptyOffers.push(ASCompat.coerce((mRoot : ASAny).shop_empty_slot_5, flash.display.MovieClip));
 		mOfferTemplateClass = mSwfAsset.getClass("shop_offer_template");
 		mKeyOfferTemplateClass = mSwfAsset.getClass("shop_offer_key_template");
 		mPremiumOfferTemplateClass = mSwfAsset.getClass("shop_offer_premium_template");
@@ -388,8 +388,8 @@ class UIShop {
 		mWeaponOfferTemplateClass = mSwfAsset.getClass("shop_offer_weapon_template");
 		weaponTooltipClass = mSwfAsset.getClass("DR_weapon_tooltip");
 		heroTooltipClass = mSwfAsset.getClass("avatar_tooltip");
-		mHeroWithEquipPicker = new HeroWithEquipPicker(mDBFacade, ASCompat.dynamicAs((mRoot : ASAny).hero_picker, flash.display.MovieClip),
-			weaponTooltipClass, heroTooltipClass, heroSelected);
+		mHeroWithEquipPicker = new HeroWithEquipPicker(mDBFacade, ASCompat.coerce((mRoot : ASAny).hero_picker, flash.display.MovieClip), weaponTooltipClass,
+			heroTooltipClass, heroSelected);
 		mEventComponent.addListener("DB_ACCOUNT_INFO_RESPONSE", accountInfoUpdated);
 	}
 
@@ -501,14 +501,14 @@ class UIShop {
 						if (mDBFacade == null) {
 							return;
 						}
-						var _loc1_ = ASCompat.dynamicAs(mDBFacade.gameMaster.heroById.itemFor(heroId), gameMasterDictionary.GMHero);
+						var _loc1_ = ASCompat.coerce(mDBFacade.gameMaster.heroById.itemFor(heroId), gameMasterDictionary.GMHero);
 						if (_loc1_ == null) {
 							return;
 						}
 						DBFacebookBragFeedPost.buyHeroSuccess(mTownHeader, _loc1_, mDBFacade, mAssetLoadingComponent);
 					};
 				};
-				uiShopOffer = new UIShopHeroOffer(mTownHeader, mDBFacade, templateClass, ASCompat.asFunction(successCallback(gmOffer.Details[0].HeroId)));
+				uiShopOffer = new UIShopHeroOffer(mTownHeader, mDBFacade, templateClass, ASCompat.coerceFunction(successCallback(gmOffer.Details[0].HeroId)));
 			} else if (gmOffer.Details[0].PetId != 0) {
 				successCallback = function(param1:UInt):ASFunction {
 					var petId = param1;
@@ -516,14 +516,14 @@ class UIShop {
 						if (mDBFacade == null) {
 							return;
 						}
-						var _loc1_ = ASCompat.dynamicAs(mDBFacade.gameMaster.npcById.itemFor(petId), gameMasterDictionary.GMNpc);
+						var _loc1_ = ASCompat.coerce(mDBFacade.gameMaster.npcById.itemFor(petId), gameMasterDictionary.GMNpc);
 						if (_loc1_ == null) {
 							return;
 						}
 						DBFacebookBragFeedPost.buyPetSuccess(_loc1_, mDBFacade, mAssetLoadingComponent);
 					};
 				};
-				uiShopOffer = new UIShopPetOffer(mDBFacade, templateClass, ASCompat.asFunction(successCallback(gmOffer.Details[0].PetId)));
+				uiShopOffer = new UIShopPetOffer(mDBFacade, templateClass, ASCompat.coerceFunction(successCallback(gmOffer.Details[0].PetId)));
 			} else if (gmOffer.Details[0].SkinId != 0) {
 				successCallback = function(param1:UInt):ASFunction {
 					var skinId = param1;
@@ -538,7 +538,7 @@ class UIShop {
 						DBFacebookBragFeedPost.buySkinSuccess(_loc1_, mDBFacade, mAssetLoadingComponent);
 					};
 				};
-				uiShopOffer = new UIShopSkinOffer(mDBFacade, templateClass, ASCompat.asFunction(successCallback(gmOffer.Details[0].SkinId)));
+				uiShopOffer = new UIShopSkinOffer(mDBFacade, templateClass, ASCompat.coerceFunction(successCallback(gmOffer.Details[0].SkinId)));
 			} else {
 				uiShopOffer = new UIShopOffer(mDBFacade, templateClass);
 			}
@@ -697,10 +697,10 @@ class UIShop {
 		mCurrentTab = category;
 		var _loc4_ = ASCompat.reinterpretAs(mTabButtons.iterator(), IMapIterator);
 		while (_loc4_.hasNext()) {
-			_loc3_ = ASCompat.dynamicAs(_loc4_.next(), brain.uI.UIRadioButton);
+			_loc3_ = ASCompat.coerce(_loc4_.next(), brain.uI.UIRadioButton);
 			_loc3_.enabled = true;
 		}
-		_loc3_ = ASCompat.dynamicAs(mTabButtons.itemFor(mCurrentTab), brain.uI.UIRadioButton);
+		_loc3_ = ASCompat.coerce(mTabButtons.itemFor(mCurrentTab), brain.uI.UIRadioButton);
 		_loc3_.selected = true;
 		_loc3_.enabled = false;
 		_loc3_.label.visible = true;
@@ -723,7 +723,7 @@ class UIShop {
 		var _loc8_:GMOffer = null;
 		var _loc2_:GMWeaponItem = null;
 		var _loc7_ = (0 : UInt);
-		var _loc4_ = ASCompat.dynamicAs(mSelectedHero != null ? mDBFacade.dbAccountInfo.inventoryInfo.getAvatarInfoForHeroType(mSelectedHero.Id) : null,
+		var _loc4_ = ASCompat.coerce(mSelectedHero != null ? mDBFacade.dbAccountInfo.inventoryInfo.getAvatarInfoForHeroType(mSelectedHero.Id) : null,
 			account.AvatarInfo);
 		if (_loc4_ != null) {
 			_loc1_ = (_loc4_.level : Int);
@@ -731,16 +731,16 @@ class UIShop {
 			_loc3_ = mCurrentTab == "WEAPON" ? 3 : 6;
 			_loc6_ = 0;
 			while (_loc6_ < ASCompat.toNumberField(_loc5_, "length")) {
-				_loc8_ = ASCompat.dynamicAs(_loc5_[_loc6_], gameMasterDictionary.GMOffer);
+				_loc8_ = ASCompat.coerce(_loc5_[_loc6_], gameMasterDictionary.GMOffer);
 				if (_loc8_.Details[0].WeaponId != 0) {
-					_loc2_ = ASCompat.dynamicAs(mDBFacade.gameMaster.weaponItemById.itemFor(_loc8_.Details[0].WeaponId), gameMasterDictionary.GMWeaponItem);
+					_loc2_ = ASCompat.coerce(mDBFacade.gameMaster.weaponItemById.itemFor(_loc8_.Details[0].WeaponId), gameMasterDictionary.GMWeaponItem);
 					_loc7_ = (Math.floor(_loc6_ / _loc3_) : UInt);
 					if (_loc8_.Details[0].Level >= (_loc1_ : UInt)) {
 						return _loc7_;
 					}
 					return (0 : UInt);
 				}
-				_loc6_ = ASCompat.toInt(_loc6_) + 1;
+				_loc6_++;
 			}
 		}
 		return _loc7_;
@@ -748,7 +748,8 @@ class UIShop {
 
 	function refreshPagination(page:UInt) {
 		var _loc2_ = this.numPagesInCurrentCategory();
-		mPagination.currentPage = mCurrentPage = (Std.int(_loc2_ != 0 ? (Std.int(Math.min(_loc2_ - 1, page)) : UInt) : (0 : UInt)) : UInt);
+		mPagination.currentPage = mCurrentPage = (ASCompat.floatToInt(_loc2_ != 0 ? (ASCompat.floatToInt(Math.min(_loc2_ - 1,
+			page)) : UInt) : (0 : UInt)) : UInt);
 		mPagination.numPages = _loc2_;
 		mPagination.visible = _loc2_ > 1;
 	}
@@ -763,7 +764,7 @@ class UIShop {
 	}
 
 	public function jumpToOffer(offerId:UInt):Bool {
-		var _loc6_ = ASCompat.dynamicAs(mDBFacade.gameMaster.offerById.itemFor(offerId), gameMasterDictionary.GMOffer);
+		var _loc6_ = ASCompat.coerce(mDBFacade.gameMaster.offerById.itemFor(offerId), gameMasterDictionary.GMOffer);
 		if (_loc6_ == null) {
 			return false;
 		}
@@ -807,7 +808,7 @@ class UIShop {
 		var _loc3_ = 0;
 		var _loc6_:GMHero = null;
 		trace("UIShop:filterOffers");
-		var _loc5_ = ASCompat.dynamicAs(mSelectedHero != null ? mDBFacade.dbAccountInfo.inventoryInfo.getAvatarInfoForHeroType(mSelectedHero.Id) : null,
+		var _loc5_ = ASCompat.coerce(mSelectedHero != null ? mDBFacade.dbAccountInfo.inventoryInfo.getAvatarInfoForHeroType(mSelectedHero.Id) : null,
 			account.AvatarInfo);
 		mFilteredGMOffers.clear();
 		final __ax4_iter_130 = CATEGORIES;
@@ -837,7 +838,7 @@ class UIShop {
 											}
 										}
 										_loc8_ = (StoreServicesController.getHeroId(mDBFacade, _loc2_) : Int);
-										_loc6_ = ASCompat.dynamicAs(mDBFacade.gameMaster.heroById.itemFor(_loc8_), gameMasterDictionary.GMHero);
+										_loc6_ = ASCompat.coerce(mDBFacade.gameMaster.heroById.itemFor(_loc8_), gameMasterDictionary.GMHero);
 										if (!(_loc6_ != null
 											&& _loc6_.Hidden
 											&& !mDBFacade.dbConfigManager.getConfigBoolean("want_hidden_heroes", false))) {

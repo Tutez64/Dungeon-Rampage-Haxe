@@ -72,7 +72,7 @@ class BuffView extends FloorView {
 			return;
 		}
 		if (_loc2_ != null) {
-			mBuff = ASCompat.dynamicAs(ASCompat.createInstance(_loc2_, []), flash.display.MovieClip);
+			mBuff = ASCompat.coerce(ASCompat.createInstance(_loc2_, []), flash.display.MovieClip);
 			mMovieClipRenderer = new MovieClipRenderController(mFacade, mBuff, finishedCallback);
 			mMovieClipRenderer.play((0 : UInt), true);
 			mParentView.buildBuff(mBuff, mSortLayer);

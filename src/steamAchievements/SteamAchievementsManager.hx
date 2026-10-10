@@ -150,7 +150,7 @@ class SteamAchievementsManager {
 			while (_loc3_ < mAchievements.length) {
 				_loc5_ = mDBFacade.mSteamworks.isAchievement(mAchievements[_loc3_].APIName);
 				mAchievements[_loc3_].setIsAchieved(_loc5_);
-				_loc3_ = ASCompat.toInt(_loc3_) + 1;
+				_loc3_++;
 			}
 			_loc2_ = ASCompat.reinterpretAs(mStats.iterator(), IMapIterator);
 			while (ASCompat.toBool(_loc2_.next())) {
@@ -172,7 +172,7 @@ class SteamAchievementsManager {
 			while (_loc2_ < mAchievements.length) {
 				_loc3_ = mDBFacade.mSteamworks.isAchievement(mAchievements[_loc2_].APIName);
 				mAchievements[_loc2_].setIsAchieved(_loc3_);
-				_loc2_ = ASCompat.toInt(_loc2_) + 1;
+				_loc2_++;
 			}
 		}
 	}
@@ -189,8 +189,8 @@ class SteamAchievementsManager {
 	}
 
 	function storeStatsIfThresholdPassed(oldClientValue:Int, newClientValue:Int, inThreshold:Int) {
-		var _loc5_ = Std.int(oldClientValue / inThreshold);
-		var _loc4_ = Std.int(newClientValue / inThreshold);
+		var _loc5_ = ASCompat.floatToInt(oldClientValue / inThreshold);
+		var _loc4_ = ASCompat.floatToInt(newClientValue / inThreshold);
 		if (_loc5_ != _loc4_) {
 			storeSteamStats();
 		}
@@ -304,7 +304,7 @@ class SteamAchievementsManager {
 	public function setMaxStorageStat(previousBucketsWeapon:Int, currentBucketsWeapon:Int) {
 		var _loc4_ = 15;
 		var _loc3_ = 30;
-		var _loc5_ = Std.int(Math.abs(currentBucketsWeapon - _loc3_) / _loc4_);
+		var _loc5_ = ASCompat.floatToInt(Math.abs(currentBucketsWeapon - _loc3_) / _loc4_);
 		setValueToStatInt("STORAGE_MAX_STAT", _loc5_);
 	}
 

@@ -97,9 +97,9 @@ class MenuNavigationController {
 			return;
 		}
 		if (ASCompat.dictionaryLookupNeNull(mSelectedUIObjs, mUILayerConstants[(mTopLayer : Int)])) {
-			setFocusedUiObject(ASCompat.dynamicAs(mSelectedUIObjs[mUILayerConstants[(mTopLayer : Int)]], brain.uI.UIObject));
+			setFocusedUiObject(ASCompat.coerce(mSelectedUIObjs[mUILayerConstants[(mTopLayer : Int)]], brain.uI.UIObject));
 		} else {
-			setFocusedUiObject(ASCompat.dynamicAs(mDefaultUIObjs[mUILayerConstants[(mTopLayer : Int)]], brain.uI.UIObject));
+			setFocusedUiObject(ASCompat.coerce(mDefaultUIObjs[mUILayerConstants[(mTopLayer : Int)]], brain.uI.UIObject));
 		}
 	}
 
@@ -149,7 +149,7 @@ class MenuNavigationController {
 	@:isVar var mFocusedUiObject(get, set):UIObject;
 
 	function get_mFocusedUiObject():UIObject {
-		return ASCompat.dynamicAs(mSelectedUIObjs[mUILayerConstants[(mTopLayer : Int)]], brain.uI.UIObject);
+		return ASCompat.coerce(mSelectedUIObjs[mUILayerConstants[(mTopLayer : Int)]], brain.uI.UIObject);
 	}
 
 	function set_mFocusedUiObject(uiObject:UIObject):UIObject {

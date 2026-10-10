@@ -75,7 +75,7 @@ class B2DynamicTree {
 			++this.m_path;
 			this.RemoveLeaf(_loc3_);
 			this.InsertLeaf(_loc3_);
-			_loc2_ = ASCompat.toInt(_loc2_) + 1;
+			_loc2_++;
 		}
 	}
 
@@ -98,9 +98,9 @@ class B2DynamicTree {
 		var _loc3_ = new Vector<B2DynamicTreeNode>();
 		var _loc4_ = 0;
 		var _loc7_:Float;
-		_loc3_[Std.int(_loc7_ = ASCompat.toNumber(_loc4_++))] = this.m_root;
+		_loc3_[ASCompat.floatToInt(_loc7_ = _loc4_++)] = this.m_root;
 		while (_loc4_ > 0) {
-			_loc5_ = _loc3_[Std.int(--_loc4_)];
+			_loc5_ = _loc3_[ASCompat.floatToInt(--_loc4_)];
 			if (_loc5_.aabb.TestOverlap(aabb)) {
 				if (_loc5_.IsLeaf()) {
 					_loc6_ = ASCompat.toBool(callback(_loc5_));
@@ -108,8 +108,8 @@ class B2DynamicTree {
 						return;
 					}
 				} else {
-					_loc3_[Std.int(_loc8_ = ASCompat.toNumber(_loc4_++))] = _loc5_.child1;
-					_loc3_[Std.int(_loc9_ = ASCompat.toNumber(_loc4_++))] = _loc5_.child2;
+					_loc3_[ASCompat.floatToInt(_loc8_ = _loc4_++)] = _loc5_.child1;
+					_loc3_[ASCompat.floatToInt(_loc9_ = _loc4_++)] = _loc5_.child2;
 				}
 			}
 		}
@@ -147,9 +147,9 @@ class B2DynamicTree {
 		var _loc12_ = new Vector<B2DynamicTreeNode>();
 		var _loc13_ = 0;
 		var _loc19_:Float;
-		_loc12_[Std.int(_loc19_ = ASCompat.toNumber(_loc13_++))] = this.m_root;
+		_loc12_[ASCompat.floatToInt(_loc19_ = _loc13_++)] = this.m_root;
 		while (_loc13_ > 0) {
-			_loc14_ = _loc12_[Std.int(--_loc13_)];
+			_loc14_ = _loc12_[ASCompat.floatToInt(--_loc13_)];
 			if (_loc14_.aabb.TestOverlap(_loc9_) != false) {
 				_loc15_ = _loc14_.aabb.GetCenter();
 				_loc16_ = _loc14_.aabb.GetExtents();
@@ -171,8 +171,8 @@ class B2DynamicTree {
 						_loc9_.upperBound.x = Math.max(_loc3_.x, _loc10_);
 						_loc9_.upperBound.y = Math.max(_loc3_.y, _loc11_);
 					} else {
-						_loc12_[Std.int(_loc20_ = ASCompat.toNumber(_loc13_++))] = _loc14_.child1;
-						_loc12_[Std.int(_loc21_ = ASCompat.toNumber(_loc13_++))] = _loc14_.child2;
+						_loc12_[ASCompat.floatToInt(_loc20_ = _loc13_++)] = _loc14_.child1;
+						_loc12_[ASCompat.floatToInt(_loc21_ = _loc13_++)] = _loc14_.child2;
 					}
 				}
 			}

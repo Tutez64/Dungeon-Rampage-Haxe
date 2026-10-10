@@ -90,10 +90,10 @@ class GMProjectile extends GMItem {
 		ChainDist = ASCompat.toNumberField(jsonAsset, "ChainDist");
 		CyclicChains = ASCompat.toBool(jsonAsset.CyclicChains);
 		NumBranches = (ASCompat.toInt(jsonAsset.NumBranches) : UInt);
-		HomingDistWeight = ASCompat.toNumber(jsonAsset.hasOwnProperty("HomingDistWeight") ? ASCompat.toNumberField(jsonAsset, "HomingDistWeight") : 1);
-		HomingAngleWeight = ASCompat.toNumber(jsonAsset.hasOwnProperty("HomingAngleWeight") ? ASCompat.toNumberField(jsonAsset, "HomingAngleWeight") : 1);
-		SteeringRate = ASCompat.toNumber(jsonAsset.hasOwnProperty("SteeringRate") ? ASCompat.toNumberField(jsonAsset, "SteeringRate") : 1);
-		Lifetime = (Std.int(jsonAsset.hasOwnProperty("Lifetime") ? (Std.int(ASCompat.toNumber(jsonAsset.Lifetime) * 1000) : UInt) : (1000 : UInt)) : UInt);
+		HomingDistWeight = jsonAsset.hasOwnProperty("HomingDistWeight") ? ASCompat.toNumberField(jsonAsset, "HomingDistWeight") : 1;
+		HomingAngleWeight = jsonAsset.hasOwnProperty("HomingAngleWeight") ? ASCompat.toNumberField(jsonAsset, "HomingAngleWeight") : 1;
+		SteeringRate = jsonAsset.hasOwnProperty("SteeringRate") ? ASCompat.toNumberField(jsonAsset, "SteeringRate") : 1;
+		Lifetime = (ASCompat.floatToInt(jsonAsset.hasOwnProperty("Lifetime") ? (ASCompat.floatToInt(ASCompat.toNumber(jsonAsset.Lifetime) * 1000) : UInt) : (1000 : UInt)) : UInt);
 		NoFade = jsonAsset.hasOwnProperty("NoFade") ? ASCompat.toBool(jsonAsset.NoFade) : false;
 		IgnoreWalls = jsonAsset.hasOwnProperty("IgnoreWalls") ? true : false;
 		Tint = ASCompat.toNumberField(jsonAsset, "Tint");

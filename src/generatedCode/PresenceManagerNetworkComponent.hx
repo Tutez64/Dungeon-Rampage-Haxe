@@ -63,7 +63,7 @@ class PresenceManagerNetworkComponent extends DcNetworkClass implements DcNetwor
 			_loc2_ = 0;
 			while ((_loc2_ : UInt) < _loc3_) {
 				outpacket.writeUnsignedInt(who[_loc2_]);
-				_loc2_ = ASCompat.toInt(_loc2_) + 1;
+				_loc2_++;
 			}
 			_loc1_.writeShort((outpacket.length : Int));
 			_loc1_.writeBytes(outpacket);

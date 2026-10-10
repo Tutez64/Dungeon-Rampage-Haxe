@@ -21,7 +21,7 @@ class VolumePlugin extends TweenPlugin {
 			return false;
 		}
 		_target = target;
-		_st = ASCompat.dynamicAs(_target.soundTransform, flash.media.SoundTransform);
+		_st = ASCompat.coerce(_target.soundTransform, flash.media.SoundTransform);
 		addTween(_st, "volume", _st.volume, value, "volume");
 		return true;
 	}

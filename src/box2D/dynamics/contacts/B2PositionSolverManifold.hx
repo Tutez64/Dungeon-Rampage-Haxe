@@ -24,7 +24,7 @@ class B2PositionSolverManifold {
 		var _loc1_ = 0;
 		while (_loc1_ < B2Settings.b2_maxManifoldPoints) {
 			this.m_points[_loc1_] = new B2Vec2();
-			_loc1_ = ASCompat.toInt(_loc1_) + 1;
+			_loc1_++;
 		}
 	}
 
@@ -88,7 +88,7 @@ class B2PositionSolverManifold {
 					this.m_separations[_loc2_] = (_loc3_ - _loc7_) * this.m_normal.x + (_loc4_ - _loc8_) * this.m_normal.y - cc.radius;
 					this.m_points[_loc2_].x = _loc3_;
 					this.m_points[_loc2_].y = _loc4_;
-					_loc2_ = ASCompat.toInt(_loc2_) + 1;
+					_loc2_++;
 				}
 
 			case B2Manifold.e_faceB:
@@ -108,7 +108,7 @@ class B2PositionSolverManifold {
 					_loc4_ = cc.bodyA.m_xf.position.y + (_loc5_.col1.y * _loc6_.x + _loc5_.col2.y * _loc6_.y);
 					this.m_separations[_loc2_] = (_loc3_ - _loc7_) * this.m_normal.x + (_loc4_ - _loc8_) * this.m_normal.y - cc.radius;
 					this.m_points[_loc2_].Set(_loc3_, _loc4_);
-					_loc2_ = ASCompat.toInt(_loc2_) + 1;
+					_loc2_++;
 				}
 				this.m_normal.x *= -1;
 				this.m_normal.y *= -1;

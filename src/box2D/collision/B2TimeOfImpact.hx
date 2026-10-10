@@ -117,18 +117,18 @@ class B2TimeOfImpact {
 					_loc15_ = _loc19_;
 					_loc17_ = _loc20_;
 				}
-				_loc18_ = ASCompat.toInt(_loc18_) + 1;
+				_loc18_++;
 				++b2_toiRootIters;
 			} while (_loc18_ != 50);
-			b2_toiMaxRootIters = Std.int(B2Math.Max(b2_toiMaxRootIters, _loc18_));
+			b2_toiMaxRootIters = ASCompat.floatToInt(B2Math.Max(b2_toiMaxRootIters, _loc18_));
 			if (_loc13_ < (1 + 100 * ASCompat.MIN_FLOAT) * _loc8_) {
 				break;
 			}
 			_loc8_ = _loc13_;
-			_loc10_ = ASCompat.toInt(_loc10_) + 1;
+			_loc10_++;
 			++b2_toiIters;
 		} while (_loc10_ != _loc9_);
-		b2_toiMaxIters = Std.int(B2Math.Max(b2_toiMaxIters, _loc10_));
+		b2_toiMaxIters = ASCompat.floatToInt(B2Math.Max(b2_toiMaxIters, _loc10_));
 		return _loc8_;
 	}
 }

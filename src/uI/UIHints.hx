@@ -19,8 +19,8 @@ class UIHints {
 	public function new(dbFacade:DBFacade, hintBox:MovieClip) {
 		mDBFacade = dbFacade;
 		mHintBox = hintBox;
-		mHintText = ASCompat.dynamicAs((hintBox : ASAny).hint_text, flash.text.TextField);
-		mHintTitle = ASCompat.dynamicAs((hintBox : ASAny).hint_title, flash.text.TextField);
+		mHintText = ASCompat.coerce((hintBox : ASAny).hint_text, flash.text.TextField);
+		mHintTitle = ASCompat.coerce((hintBox : ASAny).hint_title, flash.text.TextField);
 		mHintTitle.text = Locale.getString("HINT_TITLE");
 		getNewHint();
 	}

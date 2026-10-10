@@ -38,20 +38,20 @@ class ItemInfo extends InventoryBaseInfo {
 
 	public function new(dbFacade:DBFacade, json:ASObject) {
 		super(dbFacade, json);
-		mGMWeapon = ASCompat.dynamicAs(mDBFacade.gameMaster.weaponItemById.itemFor(mGMId), gameMasterDictionary.GMWeaponItem);
+		mGMWeapon = ASCompat.coerce(mDBFacade.gameMaster.weaponItemById.itemFor(mGMId), gameMasterDictionary.GMWeaponItem);
 		if (mGMWeapon == null) {
 			Logger.error("GMWeapon is null cannot find item for ID: " + mGMId);
 		}
 		mGMInventoryBase = mGMWeapon;
-		mGMRarity = ASCompat.dynamicAs(mDBFacade.gameMaster.rarityById.itemFor(mRarity), gameMasterDictionary.GMRarity);
+		mGMRarity = ASCompat.coerce(mDBFacade.gameMaster.rarityById.itemFor(mRarity), gameMasterDictionary.GMRarity);
 	}
 
 	public static function loadItemIconFromId(itemId:UInt, container:DisplayObjectContainer, dbFacade:DBFacade, desiredSize:UInt, iconsNativeSize:UInt,
 			assetLoadingComponent:AssetLoadingComponent = null) {
 		var _loc7_:GMNpc = null;
-		var _loc8_ = ASCompat.dynamicAs(dbFacade.gameMaster.stackableById.itemFor(itemId), gameMasterDictionary.GMInventoryBase);
+		var _loc8_ = ASCompat.coerce(dbFacade.gameMaster.stackableById.itemFor(itemId), gameMasterDictionary.GMInventoryBase);
 		if (_loc8_ == null) {
-			_loc7_ = ASCompat.dynamicAs(dbFacade.gameMaster.npcById.itemFor(itemId), gameMasterDictionary.GMNpc);
+			_loc7_ = ASCompat.coerce(dbFacade.gameMaster.npcById.itemFor(itemId), gameMasterDictionary.GMNpc);
 			if (_loc7_ == null) {
 				Logger.error("Unable to find gmItem for item id: " + itemId);
 				return;
@@ -100,9 +100,9 @@ class ItemInfo extends InventoryBaseInfo {
 				Logger.error("Unable to get iconClass for iconName: " + iconName);
 				return;
 			}
-			var _loc2_ = ASCompat.dynamicAs(ASCompat.createInstance(_loc3_, []), flash.display.MovieClip);
+			var _loc2_ = ASCompat.coerce(ASCompat.createInstance(_loc3_, []), flash.display.MovieClip);
 			if (iconsNativeSize == 0) {
-				iconsNativeSize = (Std.int(_loc2_.width) : UInt);
+				iconsNativeSize = (ASCompat.floatToInt(_loc2_.width) : UInt);
 			}
 			_loc2_.scaleX = _loc2_.scaleY = desiredSize / iconsNativeSize;
 			container.addChild(_loc2_);
@@ -145,7 +145,7 @@ class ItemInfo extends InventoryBaseInfo {
 	@:isVar public var requiredLevel(get, never):UInt;
 
 	public function get_requiredLevel():UInt {
-		return (Std.int(mRequiredLevel) : UInt);
+		return (ASCompat.floatToInt(mRequiredLevel) : UInt);
 	}
 
 	@:isVar public var rarity(get, never):GMRarity;
@@ -206,7 +206,7 @@ class ItemInfo extends InventoryBaseInfo {
 		mRarity = ASCompat.toNumberField(json, "rarity");
 		mRequiredLevel = ASCompat.toNumberField(json, "requiredlevel");
 		if (ASCompat.toNumberField(json, "modifier1") > 0) {
-			_loc4_ = ASCompat.dynamicAs(mDBFacade.gameMaster.modifiersById.itemFor(json.modifier1), gameMasterDictionary.GMModifier);
+			_loc4_ = ASCompat.coerce(mDBFacade.gameMaster.modifiersById.itemFor(json.modifier1), gameMasterDictionary.GMModifier);
 			if (_loc4_ != null) {
 				mModifiers.push(_loc4_);
 			} else {
@@ -214,7 +214,7 @@ class ItemInfo extends InventoryBaseInfo {
 			}
 		}
 		if (ASCompat.toNumberField(json, "modifier2") > 0) {
-			_loc2_ = ASCompat.dynamicAs(mDBFacade.gameMaster.modifiersById.itemFor(json.modifier2), gameMasterDictionary.GMModifier);
+			_loc2_ = ASCompat.coerce(mDBFacade.gameMaster.modifiersById.itemFor(json.modifier2), gameMasterDictionary.GMModifier);
 			if (_loc2_ != null) {
 				mModifiers.push(_loc2_);
 			} else {
@@ -222,7 +222,7 @@ class ItemInfo extends InventoryBaseInfo {
 			}
 		}
 		if (ASCompat.toNumberField(json, "legendarymodifier") > 0) {
-			_loc3_ = ASCompat.dynamicAs(mDBFacade.gameMaster.legendaryModifiersById.itemFor(json.legendarymodifier), gameMasterDictionary.GMLegendaryModifier);
+			_loc3_ = ASCompat.coerce(mDBFacade.gameMaster.legendaryModifiersById.itemFor(json.legendarymodifier), gameMasterDictionary.GMLegendaryModifier);
 			if (_loc3_ != null) {
 				mLegendaryModifier = _loc3_.Id;
 			} else {
@@ -237,7 +237,7 @@ class ItemInfo extends InventoryBaseInfo {
 		var _loc1_ = Math.NaN;
 		var _loc7_ = mGMWeapon;
 		var _loc3_ = mGMRarity;
-		var _loc8_ = ASCompat.dynamicAs(mDBFacade.gameMaster.offerById.itemFor(_loc3_.KeyOfferId), gameMasterDictionary.GMOffer);
+		var _loc8_ = ASCompat.coerce(mDBFacade.gameMaster.offerById.itemFor(_loc3_.KeyOfferId), gameMasterDictionary.GMOffer);
 		if (_loc8_ != null) {
 			if (_loc8_.CoinOffer != null) {
 				_loc8_ = _loc8_.CoinOffer;
@@ -287,27 +287,27 @@ class ItemInfo extends InventoryBaseInfo {
 	}
 
 	override public function getTextColor():UInt {
-		var _loc1_ = ASCompat.dynamicAs(mDBFacade.gameMaster.rarityById.itemFor(mRarity), gameMasterDictionary.GMRarity);
-		return (ASCompat.toInt(_loc1_ != null && _loc1_.TextColor != 0 ? _loc1_.TextColor : (15463921 : UInt)) : UInt);
+		var _loc1_ = ASCompat.coerce(mDBFacade.gameMaster.rarityById.itemFor(mRarity), gameMasterDictionary.GMRarity);
+		return _loc1_ != null && _loc1_.TextColor != 0 ? _loc1_.TextColor : (15463921 : UInt);
 	}
 
 	override public function get_hasColoredBackground():Bool {
-		var _loc1_ = ASCompat.dynamicAs(mDBFacade.gameMaster.rarityById.itemFor(mRarity), gameMasterDictionary.GMRarity);
+		var _loc1_ = ASCompat.coerce(mDBFacade.gameMaster.rarityById.itemFor(mRarity), gameMasterDictionary.GMRarity);
 		return _loc1_ != null ? _loc1_.HasColoredBackground : false;
 	}
 
 	override public function get_backgroundIconName():String {
-		var _loc1_ = ASCompat.dynamicAs(mDBFacade.gameMaster.rarityById.itemFor(mRarity), gameMasterDictionary.GMRarity);
+		var _loc1_ = ASCompat.coerce(mDBFacade.gameMaster.rarityById.itemFor(mRarity), gameMasterDictionary.GMRarity);
 		return _loc1_ != null ? _loc1_.BackgroundIcon : "";
 	}
 
 	override public function get_backgroundSwfPath():String {
-		var _loc1_ = ASCompat.dynamicAs(mDBFacade.gameMaster.rarityById.itemFor(mRarity), gameMasterDictionary.GMRarity);
+		var _loc1_ = ASCompat.coerce(mDBFacade.gameMaster.rarityById.itemFor(mRarity), gameMasterDictionary.GMRarity);
 		return _loc1_ != null ? _loc1_.BackgroundSwf : "";
 	}
 
 	override public function get_backgroundIconBorderName():String {
-		var _loc1_ = ASCompat.dynamicAs(mDBFacade.gameMaster.rarityById.itemFor(mRarity), gameMasterDictionary.GMRarity);
+		var _loc1_ = ASCompat.coerce(mDBFacade.gameMaster.rarityById.itemFor(mRarity), gameMasterDictionary.GMRarity);
 		return _loc1_ != null ? _loc1_.BackgroundIconBorder : "";
 	}
 

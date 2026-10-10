@@ -49,7 +49,7 @@ class RepeaterWeaponController extends ScalingWeaponController {
 		resetData();
 		mScalingLogicalWorkComponent.doLater(0.1, function(param1:GameClock) {
 			if (mChargeReleaseGMAttack != null) {
-				mChargeAttack = ASCompat.dynamicAs(mDBFacade.gameMaster.attackById.itemFor(mChargeReleaseGMAttack.Id), gameMasterDictionary.GMAttack);
+				mChargeAttack = ASCompat.coerce(mDBFacade.gameMaster.attackById.itemFor(mChargeReleaseGMAttack.Id), gameMasterDictionary.GMAttack);
 				if (mChargeAttack == null) {
 					Logger.error("Invalid Charge for Repeater : " + mChargeReleaseGMAttack.Constant);
 				}
@@ -81,7 +81,7 @@ class RepeaterWeaponController extends ScalingWeaponController {
 				}
 				attackId = getNextAttackId();
 			}
-			gmAttack = ASCompat.dynamicAs(mDBFacade.gameMaster.attackById.itemFor(attackId), gameMasterDictionary.GMAttack);
+			gmAttack = ASCompat.coerce(mDBFacade.gameMaster.attackById.itemFor(attackId), gameMasterDictionary.GMAttack);
 			if (!mMaxSpeedReached) {
 				mAttackSpeed = 1 + ++mCount * mWeapon.weaponData.RepeaterIncrementSpeedPercent;
 				if (mAttackSpeed >= mWeapon.weaponData.RepeaterMaxSpeedPercent) {

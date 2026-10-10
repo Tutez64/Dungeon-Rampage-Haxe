@@ -431,7 +431,7 @@ class DBAccountInfo {
 				if (!mGiftsInfo.has(_loc2_.requestId)) {
 					mGiftsInfo.add(_loc2_.requestId, _loc2_);
 				}
-				_loc4_ = ASCompat.toInt(_loc4_) + 1;
+				_loc4_++;
 			}
 		}
 	}
@@ -450,10 +450,10 @@ class DBAccountInfo {
 					_loc5_ = new FriendInfo(mDBFacade, _loc2_[_loc4_]);
 					mFriendsInfo.add(_loc5_.id, _loc5_);
 				} else {
-					_loc5_ = ASCompat.dynamicAs(mFriendsInfo.itemFor(_loc3_), account.FriendInfo);
+					_loc5_ = ASCompat.coerce(mFriendsInfo.itemFor(_loc3_), account.FriendInfo);
 					_loc5_.parseFriendJson(_loc2_[_loc4_]);
 				}
-				_loc4_ = ASCompat.toInt(_loc4_) + 1;
+				_loc4_++;
 			}
 		}
 		mEventComponent.dispatchEvent(new Event("REFRESH_FRIENDS_EVENT"));
@@ -472,7 +472,7 @@ class DBAccountInfo {
 				if (mFriendsInfo.hasKey(_loc3_)) {
 					mFriendsInfo.removeKey(_loc3_);
 				}
-				_loc4_ = ASCompat.toInt(_loc4_) + 1;
+				_loc4_++;
 			}
 		}
 		mEventComponent.dispatchEvent(new Event("REFRESH_FRIENDS_EVENT"));
@@ -533,7 +533,7 @@ class DBAccountInfo {
 					_loc5_ = mIgnoredFriendsInfo[_loc4_];
 					_loc5_.parseFriendJson(_loc2_[_loc4_]);
 				}
-				_loc4_ = ASCompat.toInt(_loc4_) + 1;
+				_loc4_++;
 			}
 		}
 	}
@@ -571,11 +571,11 @@ class DBAccountInfo {
 			myself = new FriendInfo(mDBFacade, myObject);
 			mFriendsInfo.add(myself.id, myself);
 		} else {
-			myself = ASCompat.dynamicAs(mFriendsInfo.itemFor(this.mId), account.FriendInfo);
+			myself = ASCompat.coerce(mFriendsInfo.itemFor(this.mId), account.FriendInfo);
 			myself.parseFriendJson(myObject);
 		}
 		mEventComponent.addListener("TrophiesUpdatedAccountEvent", function(param1:TrophiesUpdatedAccountEvent) {
-			myself = ASCompat.dynamicAs(mFriendsInfo.itemFor(mId), account.FriendInfo);
+			myself = ASCompat.coerce(mFriendsInfo.itemFor(mId), account.FriendInfo);
 			myself.trophies = param1.trophyCount;
 		});
 		mLocalFriendInfo = myself;
@@ -592,7 +592,7 @@ class DBAccountInfo {
 					friendInfo = new FriendInfo(mDBFacade, friendsArray[(i : Int)]);
 					mFriendsInfo.add(friendInfo.id, friendInfo);
 				} else {
-					friendInfo = ASCompat.dynamicAs(mFriendsInfo.itemFor(friendId), account.FriendInfo);
+					friendInfo = ASCompat.coerce(mFriendsInfo.itemFor(friendId), account.FriendInfo);
 					friendInfo.parseFriendJson(friendsArray[(i : Int)]);
 				}
 				i = i + 1;
@@ -626,7 +626,7 @@ class DBAccountInfo {
 		var _loc6_ = (gameClock.realTime : UInt);
 		var _loc4_ = gameClock.frame;
 		var _loc2_ = (_loc6_ - mLastFPSTime) / 1000;
-		var _loc5_ = Std.int(_loc2_ > 0 ? Math.round((_loc4_ - mLastFPSFrame) / _loc2_) : -1);
+		var _loc5_ = ASCompat.floatToInt(_loc2_ > 0 ? Math.round((_loc4_ - mLastFPSFrame) / _loc2_) : -1);
 		mLastFPSTime = _loc6_;
 		mLastFPSFrame = _loc4_;
 		var _loc3_:ASObject = {};
@@ -842,7 +842,7 @@ class DBAccountInfo {
 		mEventComponent.dispatchEvent(new Event("ACTIVE_AVATAR_CHANGED_EVENT"));
 		parseCurrency(details);
 		if (ASCompat.toBool(details.account_attributes)) {
-			parseAttributes(ASCompat.dynamicAs(details.account_attributes, Array));
+			parseAttributes(ASCompat.coerce(details.account_attributes, Array));
 		}
 		mId = (ASCompat.toInt(details.id) : UInt);
 		mName = details.name;

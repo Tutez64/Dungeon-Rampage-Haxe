@@ -49,16 +49,16 @@ class ChestKeySlot {
 
 	public function setupUI() {
 		setSelected(false);
-		mIconMC = ASCompat.dynamicAs((mSlotMC : ASAny).icon, flash.display.MovieClip);
-		mUnequippableMC = ASCompat.dynamicAs((mSlotMC : ASAny).unequippable, flash.display.MovieClip);
-		mUnusableMC = ASCompat.dynamicAs((mSlotMC : ASAny).unusable, flash.display.MovieClip);
-		mIconExistsMC = ASCompat.dynamicAs((mSlotMC : ASAny).icon_exists, flash.display.MovieClip);
-		mNumberLabel = ASCompat.dynamicAs((mSlotMC : ASAny).number_label, flash.text.TextField);
+		mIconMC = ASCompat.coerce((mSlotMC : ASAny).icon, flash.display.MovieClip);
+		mUnequippableMC = ASCompat.coerce((mSlotMC : ASAny).unequippable, flash.display.MovieClip);
+		mUnusableMC = ASCompat.coerce((mSlotMC : ASAny).unusable, flash.display.MovieClip);
+		mIconExistsMC = ASCompat.coerce((mSlotMC : ASAny).icon_exists, flash.display.MovieClip);
+		mNumberLabel = ASCompat.coerce((mSlotMC : ASAny).number_label, flash.text.TextField);
 		mNumberLabel.text = Std.string(mKeyInfo.count);
 		mAssetLoadingComponent.getSwfAsset(DBFacade.buildFullDownloadPath(mKeyInfo.gmKeyOffer.BundleSwfFilepath),
 			function(param1:brain.assetRepository.SwfAsset) {
 				var _loc2_ = param1.getClass(mKeyInfo.gmKeyOffer.BundleIcon);
-				mKeyMC = ASCompat.dynamicAs(ASCompat.createInstance(_loc2_, []), flash.display.MovieClip);
+				mKeyMC = ASCompat.coerce(ASCompat.createInstance(_loc2_, []), flash.display.MovieClip);
 				mKeyMC.scaleX = mKeyMC.scaleY = 1;
 				if (mFromHeader) {
 					if (mKeyInfo.count == 0) {

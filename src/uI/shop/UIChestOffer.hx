@@ -26,7 +26,7 @@ class UIChestOffer extends UIShopBundleOffer {
 	}
 
 	override function buyButtonCallback() {
-		mGMChest = ASCompat.dynamicAs(mDBFacade.gameMaster.chestsById.itemFor(this.offer.Details[0].ChestId), gameMasterDictionary.GMChest);
+		mGMChest = ASCompat.coerce(mDBFacade.gameMaster.chestsById.itemFor(this.offer.Details[0].ChestId), gameMasterDictionary.GMChest);
 		if (mGMChest == null) {
 			Logger.error("Unable to find GMChest for chestId: " + this.offer.Details[0].ChestId);
 		}
@@ -38,7 +38,7 @@ class UIChestOffer extends UIShopBundleOffer {
 					return;
 				}
 				mConfirmPurchaseChestPopup = new DBUIConfirmChestPurchasePopup(mDBFacade,
-					ASCompat.dynamicAs(ASCompat.createInstance(_loc2_, []), flash.display.MovieClip), purchaseChest, close, offer, mSelectedAvatarInfo.skinId,
+					ASCompat.coerce(ASCompat.createInstance(_loc2_, []), flash.display.MovieClip), purchaseChest, close, offer, mSelectedAvatarInfo.skinId,
 					true, null);
 				MemoryTracker.track(mConfirmPurchaseChestPopup, "DBUIConfirmChestPurchasePopup - created in UIChestOffer.buyButtonCallback()");
 			});

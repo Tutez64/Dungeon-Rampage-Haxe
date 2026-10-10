@@ -68,7 +68,7 @@ class GraphInterest {
 
 	public function toBytes(bytes:ByteArray) {
 		bytes.writeUTF(this.key);
-		bytes.writeUnsignedInt((Std.int(this.col) : UInt));
+		bytes.writeUnsignedInt((ASCompat.floatToInt(this.col) : UInt));
 		bytes.writeDouble(this.v);
 		bytes.writeDouble(this.avg);
 	}

@@ -279,7 +279,7 @@ class DungeonTutorial {
 				if (_loc3_ == null) {
 					return;
 				}
-				mMovementPopup = ASCompat.dynamicAs(ASCompat.createInstance(_loc3_, []), flash.display.MovieClip);
+				mMovementPopup = ASCompat.coerce(ASCompat.createInstance(_loc3_, []), flash.display.MovieClip);
 				ASCompat.setProperty((mMovementPopup : ASAny).title, "text", Locale.getString("TUTORIAL_MOVEMENT_TITLE"));
 				ASCompat.setProperty((mMovementPopup : ASAny).check, "visible", false);
 				mSceneGraphComponent.addChild(mMovementPopup, (105 : UInt));
@@ -353,7 +353,7 @@ class DungeonTutorial {
 				if (_loc3_ == null) {
 					return;
 				}
-				mAttackPopup = ASCompat.dynamicAs(ASCompat.createInstance(_loc3_, []), flash.display.MovieClip);
+				mAttackPopup = ASCompat.coerce(ASCompat.createInstance(_loc3_, []), flash.display.MovieClip);
 				ASCompat.setProperty((mAttackPopup : ASAny).title, "text", Locale.getString("TUTORIAL_ATTACK_TITLE"));
 				ASCompat.setProperty((mAttackPopup : ASAny).check, "visible", false);
 				mSceneGraphComponent.addChild(mAttackPopup, (105 : UInt));
@@ -436,11 +436,11 @@ class DungeonTutorial {
 				if (_loc4_ == null) {
 					return;
 				}
-				mRevivePopup = ASCompat.dynamicAs(ASCompat.createInstance(_loc4_, []), flash.display.MovieClip);
+				mRevivePopup = ASCompat.coerce(ASCompat.createInstance(_loc4_, []), flash.display.MovieClip);
 				ASCompat.setProperty((mRevivePopup : ASAny).title, "text", Locale.getString("TUTORIAL_REVIVE_TITLE"));
 				ASCompat.setProperty((mRevivePopup : ASAny).description, "text", Locale.getString("TUTORIAL_REVIVE_DESCRIPTION"));
 				ASCompat.setProperty((mRevivePopup : ASAny).check, "visible", false);
-				mReviveCloseButton = new UIButton(mDBFacade, ASCompat.dynamicAs((mRevivePopup : ASAny).close, flash.display.MovieClip));
+				mReviveCloseButton = new UIButton(mDBFacade, ASCompat.coerce((mRevivePopup : ASAny).close, flash.display.MovieClip));
 				mReviveCloseButton.releaseCallback = finishReviveTutorial;
 				mSceneGraphComponent.addChild(mRevivePopup, (105 : UInt));
 				mRevivePopup.scaleX = mRevivePopup.scaleY = 0.85;
@@ -563,12 +563,12 @@ class DungeonTutorial {
 				if (popupClass == null) {
 					return;
 				}
-				mLootSharingPopup = ASCompat.dynamicAs(ASCompat.createInstance(popupClass, []), flash.display.MovieClip);
+				mLootSharingPopup = ASCompat.coerce(ASCompat.createInstance(popupClass, []), flash.display.MovieClip);
 				ASCompat.setProperty((mLootSharingPopup : ASAny).title, "text", Locale.getString("TUTORIAL_LOOT_TITLE"));
 				ASCompat.setProperty((mLootSharingPopup : ASAny).shared_text, "text", Locale.getString("TUTORIAL_LOOT_SHARED"));
 				ASCompat.setProperty((mLootSharingPopup : ASAny).not_shared_text, "text", Locale.getString("TUTORIAL_LOOT_NOT_SHARED"));
 				ASCompat.setProperty((mLootSharingPopup : ASAny).check, "visible", false);
-				mLootSharingCloseButton = new UIButton(mDBFacade, ASCompat.dynamicAs((mLootSharingPopup : ASAny).close, flash.display.MovieClip));
+				mLootSharingCloseButton = new UIButton(mDBFacade, ASCompat.coerce((mLootSharingPopup : ASAny).close, flash.display.MovieClip));
 				mLootSharingCloseButton.releaseCallback = finishLootSharingTutorial;
 				mAssetLoadingComponent.getSwfAsset(DBFacade.buildFullDownloadPath("Resources/Art2D/Doobers/db_items_doobers.swf"),
 					function(param1:brain.assetRepository.SwfAsset) {
@@ -584,19 +584,19 @@ class DungeonTutorial {
 						var db = swfAsset2.getClass("doober_db_star");
 						var treasure = swfAsset2.getClass("db_doobers_treasure_chest_basic_static");
 						var foodClass = swfAsset2.getClass("doober_health_burger");
-						var gold = ASCompat.dynamicAs(ASCompat.createInstance(gold3, []), flash.display.MovieClip);
+						var gold = ASCompat.coerce(ASCompat.createInstance(gold3, []), flash.display.MovieClip);
 						gold.scaleX = gold.scaleY = 0.75;
-						xpStar = ASCompat.dynamicAs(ASCompat.createInstance(xp, []), flash.display.MovieClip);
+						xpStar = ASCompat.coerce(ASCompat.createInstance(xp, []), flash.display.MovieClip);
 						xpStar.scaleX = xpStar.scaleY = 1;
 						xpStar.x += 10;
 						xpStar.y -= 10;
-						dbStar = ASCompat.dynamicAs(ASCompat.createInstance(db, []), flash.display.MovieClip);
+						dbStar = ASCompat.coerce(ASCompat.createInstance(db, []), flash.display.MovieClip);
 						dbStar.scaleX = dbStar.scaleY = 1.75;
 						dbStar.x += 10;
 						dbStar.y -= 10;
-						food = ASCompat.dynamicAs(ASCompat.createInstance(foodClass, []), flash.display.MovieClip);
+						food = ASCompat.coerce(ASCompat.createInstance(foodClass, []), flash.display.MovieClip);
 						food.scaleX = food.scaleY = 0.9;
-						treasureMC = ASCompat.dynamicAs(ASCompat.createInstance(treasure, []), flash.display.MovieClip);
+						treasureMC = ASCompat.coerce(ASCompat.createInstance(treasure, []), flash.display.MovieClip);
 						treasureMC.scaleX = treasureMC.scaleY = 0.65;
 						treasureMC.x += 10;
 						treasureMC.y += 5;
@@ -643,10 +643,10 @@ class DungeonTutorial {
 				if (popupClass == null) {
 					return;
 				}
-				mSuperWeakPopup = ASCompat.dynamicAs(ASCompat.createInstance(popupClass, []), flash.display.MovieClip);
+				mSuperWeakPopup = ASCompat.coerce(ASCompat.createInstance(popupClass, []), flash.display.MovieClip);
 				ASCompat.setProperty((mSuperWeakPopup : ASAny).title, "text", Locale.getString("TUTORIAL_SUPER_WEAK_TITLE"));
 				ASCompat.setProperty((mSuperWeakPopup : ASAny).check, "visible", false);
-				mSuperWeakCloseButton = new UIButton(mDBFacade, ASCompat.dynamicAs((mSuperWeakPopup : ASAny).close, flash.display.MovieClip));
+				mSuperWeakCloseButton = new UIButton(mDBFacade, ASCompat.coerce((mSuperWeakPopup : ASAny).close, flash.display.MovieClip));
 				mSuperWeakCloseButton.releaseCallback = function() {
 					mLogicalWorkComponent.clear();
 					finishSuperWeakTutorial(className, isRight);
@@ -889,11 +889,11 @@ class DungeonTutorial {
 				if (_loc3_ == null) {
 					return;
 				}
-				mChestPopup = ASCompat.dynamicAs(ASCompat.createInstance(_loc3_, []), flash.display.MovieClip);
+				mChestPopup = ASCompat.coerce(ASCompat.createInstance(_loc3_, []), flash.display.MovieClip);
 				ASCompat.setProperty((mChestPopup : ASAny).title, "text", Locale.getString("TUTORIAL_CHEST_TITLE"));
 				ASCompat.setProperty((mChestPopup : ASAny).title1, "text", Locale.getString("TUTORIAL_CHEST_DESC").toUpperCase());
 				ASCompat.setProperty((mChestPopup : ASAny).check, "visible", false);
-				mChestCloseButton = new UIButton(mDBFacade, ASCompat.dynamicAs((mChestPopup : ASAny).close, flash.display.MovieClip));
+				mChestCloseButton = new UIButton(mDBFacade, ASCompat.coerce((mChestPopup : ASAny).close, flash.display.MovieClip));
 				mChestCloseButton.releaseCallback = finishChestTutorial;
 				mSceneGraphComponent.addChild(mChestPopup, (105 : UInt));
 				mChestPopup.scaleX = mChestPopup.scaleY = 0.85;
@@ -928,11 +928,11 @@ class DungeonTutorial {
 				if (popupClass == null) {
 					return;
 				}
-				mChestPopup = ASCompat.dynamicAs(ASCompat.createInstance(popupClass, []), flash.display.MovieClip);
+				mChestPopup = ASCompat.coerce(ASCompat.createInstance(popupClass, []), flash.display.MovieClip);
 				ASCompat.setProperty((mChestPopup : ASAny).title, "text", Locale.getString("TUTORIAL_COOLDOWN_TITLE"));
 				ASCompat.setProperty((mChestPopup : ASAny).description, "text", Locale.getString("TUTORIAL_COOLDOWN_DESC").toUpperCase());
 				ASCompat.setProperty((mChestPopup : ASAny).check, "visible", false);
-				mChestCloseButton = new UIButton(mDBFacade, ASCompat.dynamicAs((mChestPopup : ASAny).close, flash.display.MovieClip));
+				mChestCloseButton = new UIButton(mDBFacade, ASCompat.coerce((mChestPopup : ASAny).close, flash.display.MovieClip));
 				mChestCloseButton.releaseCallback = finishCooldownTutorial;
 				mSceneGraphComponent.addChild(mChestPopup, (105 : UInt));
 				mChestPopup.scaleX = mChestPopup.scaleY = 0.85;
@@ -961,7 +961,7 @@ class DungeonTutorial {
 						finishCooldownTutorial();
 					}
 				});
-				mCooldownRenderer = new MovieClipRenderer(mDBFacade, ASCompat.dynamicAs((mChestPopup : ASAny).icon, flash.display.MovieClip));
+				mCooldownRenderer = new MovieClipRenderer(mDBFacade, ASCompat.coerce((mChestPopup : ASAny).icon, flash.display.MovieClip));
 				mCooldownRenderer.play();
 			});
 	}
@@ -977,11 +977,11 @@ class DungeonTutorial {
 				if (popupClass == null) {
 					return;
 				}
-				mChestPopup = ASCompat.dynamicAs(ASCompat.createInstance(popupClass, []), flash.display.MovieClip);
+				mChestPopup = ASCompat.coerce(ASCompat.createInstance(popupClass, []), flash.display.MovieClip);
 				ASCompat.setProperty((mChestPopup : ASAny).title, "text", Locale.getString("TUTORIAL_SCALING_TITLE"));
 				ASCompat.setProperty((mChestPopup : ASAny).description, "text", Locale.getString("TUTORIAL_SCALING_DESC").toUpperCase());
 				ASCompat.setProperty((mChestPopup : ASAny).check, "visible", false);
-				mChestCloseButton = new UIButton(mDBFacade, ASCompat.dynamicAs((mChestPopup : ASAny).close, flash.display.MovieClip));
+				mChestCloseButton = new UIButton(mDBFacade, ASCompat.coerce((mChestPopup : ASAny).close, flash.display.MovieClip));
 				mChestCloseButton.releaseCallback = finishScalingTutorial;
 				mSceneGraphComponent.addChild(mChestPopup, (105 : UInt));
 				mChestPopup.scaleX = mChestPopup.scaleY = 0.85;
@@ -1024,11 +1024,11 @@ class DungeonTutorial {
 				if (popupClass == null) {
 					return;
 				}
-				mChestPopup = ASCompat.dynamicAs(ASCompat.createInstance(popupClass, []), flash.display.MovieClip);
+				mChestPopup = ASCompat.coerce(ASCompat.createInstance(popupClass, []), flash.display.MovieClip);
 				ASCompat.setProperty((mChestPopup : ASAny).title, "text", Locale.getString("TUTORIAL_REPEATER_TITLE"));
 				ASCompat.setProperty((mChestPopup : ASAny).description, "text", Locale.getString("TUTORIAL_REPEATER_DESC").toUpperCase());
 				ASCompat.setProperty((mChestPopup : ASAny).check, "visible", false);
-				mChestCloseButton = new UIButton(mDBFacade, ASCompat.dynamicAs((mChestPopup : ASAny).close, flash.display.MovieClip));
+				mChestCloseButton = new UIButton(mDBFacade, ASCompat.coerce((mChestPopup : ASAny).close, flash.display.MovieClip));
 				mChestCloseButton.releaseCallback = finishRepeaterTutorial;
 				mSceneGraphComponent.addChild(mChestPopup, (105 : UInt));
 				mChestPopup.scaleX = mChestPopup.scaleY = 0.85;
@@ -1067,10 +1067,10 @@ class DungeonTutorial {
 				if (_loc3_ == null) {
 					return;
 				}
-				mBusterPopup = ASCompat.dynamicAs(ASCompat.createInstance(_loc3_, []), flash.display.MovieClip);
+				mBusterPopup = ASCompat.coerce(ASCompat.createInstance(_loc3_, []), flash.display.MovieClip);
 				ASCompat.setProperty((mBusterPopup : ASAny).title, "text", Locale.getString("TUTORIAL_BUSTER_TITLE"));
 				ASCompat.setProperty((mBusterPopup : ASAny).check, "visible", false);
-				mBusterCloseButton = new UIButton(mDBFacade, ASCompat.dynamicAs((mBusterPopup : ASAny).close, flash.display.MovieClip));
+				mBusterCloseButton = new UIButton(mDBFacade, ASCompat.coerce((mBusterPopup : ASAny).close, flash.display.MovieClip));
 				mBusterCloseButton.releaseCallback = finishBusterTutorial;
 				mSceneGraphComponent.addChild(mBusterPopup, (105 : UInt));
 				mBusterPopup.scaleX = mBusterPopup.scaleY = 0.85;
@@ -1149,10 +1149,10 @@ class DungeonTutorial {
 				if (popupClass == null) {
 					return;
 				}
-				mChargePopup = ASCompat.dynamicAs(ASCompat.createInstance(popupClass, []), flash.display.MovieClip);
+				mChargePopup = ASCompat.coerce(ASCompat.createInstance(popupClass, []), flash.display.MovieClip);
 				ASCompat.setProperty((mChargePopup : ASAny).title, "text", Locale.getString("TUTORIAL_CHARGE_TITLE"));
 				ASCompat.setProperty((mChargePopup : ASAny).check, "visible", false);
-				mChargeCloseButton = new UIButton(mDBFacade, ASCompat.dynamicAs((mChargePopup : ASAny).close, flash.display.MovieClip));
+				mChargeCloseButton = new UIButton(mDBFacade, ASCompat.coerce((mChargePopup : ASAny).close, flash.display.MovieClip));
 				mChargeCloseButton.releaseCallback = finishChargeTutorial;
 				mSceneGraphComponent.addChild(mChargePopup, (105 : UInt));
 				mChargePopup.scaleX = mChargePopup.scaleY = 0.85;

@@ -161,7 +161,7 @@ class TileFactory {
 		var triggerableEvent:TriggerableEvent;
 		var triggerableId = (ASCompat.toInt(mDBFacade.gameMaster.triggerToTriggerable.itemFor(propJsonObj.id)) : UInt);
 		if (triggerableId != 0) {
-			triggerableEvent = ASCompat.dynamicAs(mDBFacade.gameMaster.TriggerableIdToTriggerableEvent.itemFor(triggerableId), dungeon.TriggerableEvent);
+			triggerableEvent = ASCompat.coerce(mDBFacade.gameMaster.TriggerableIdToTriggerableEvent.itemFor(triggerableId), dungeon.TriggerableEvent);
 			if (triggerableEvent != null) {
 				tile.createLocalEventCollision(distributedDungeonFloor, (ASCompat.toInt(propJsonObj.x) : UInt), (ASCompat.toInt(propJsonObj.y) : UInt),
 					(ASCompat.toInt(propJsonObj.radius) : UInt), ASCompat.toBool(propJsonObj.triggerOnce), function() {

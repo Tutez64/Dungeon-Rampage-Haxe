@@ -112,20 +112,20 @@ class UIMapBattlePopup extends DBUIPopup {
 		}
 		ASCompat.setProperty((mPopup : ASAny).private_dungeon_label, "text", Locale.getString("PRIVATE_DUNGEON_LABEL"));
 		ASCompat.setProperty((mPopup : ASAny).population_label, "text", Locale.getString("PLAYER_ACTIVITY_POPULATION"));
-		mPrivateButton = new UIButton(mDBFacade, ASCompat.dynamicAs((mPopup : ASAny).radio_button, flash.display.MovieClip));
+		mPrivateButton = new UIButton(mDBFacade, ASCompat.coerce((mPopup : ASAny).radio_button, flash.display.MovieClip));
 		mPrivateButton.releaseCallback = togglePrivate;
 		mPrivateButton.selected = IsPrivate;
 		activeHeroSkin = mDBFacade.gameMaster.getSkinByType(mDBFacade.dbAccountInfo.activeAvatarInfo.skinId);
-		gmHero = ASCompat.dynamicAs(mDBFacade.gameMaster.heroByConstant.itemFor(activeHeroSkin.ForHero), gameMasterDictionary.GMHero);
+		gmHero = ASCompat.coerce(mDBFacade.gameMaster.heroByConstant.itemFor(activeHeroSkin.ForHero), gameMasterDictionary.GMHero);
 		ASCompat.setProperty((mPopup : ASAny).txt_avatar, "text", GameMasterLocale.getGameMasterSubString("SKIN_NAME", gmHero.Constant).toUpperCase());
-		mActiveHeroPortrait = ASCompat.dynamicAs((mPopup : ASAny).avatarContainer.avatar, flash.display.MovieClip);
+		mActiveHeroPortrait = ASCompat.coerce((mPopup : ASAny).avatarContainer.avatar, flash.display.MovieClip);
 		currentXp = mDBFacade.dbAccountInfo.activeAvatarInfo.experience;
 		level = gmHero.getLevelFromExp((currentXp : UInt));
 		levelIndex = (gmHero.getLevelIndex(currentXp) : UInt);
 		lastLevelExp = (ASCompat.toInt(levelIndex > 0 ? gmHero.getExpFromIndex(levelIndex - 1) : 0) : UInt);
 		max = gmHero.getExpFromIndex(levelIndex);
 		if ((currentXp : UInt) < max) {
-			xpBar = new UIProgressBar(mFacade, ASCompat.dynamicAs((mPopup : ASAny).UI_XP.xp_bar, flash.display.MovieClip));
+			xpBar = new UIProgressBar(mFacade, ASCompat.coerce((mPopup : ASAny).UI_XP.xp_bar, flash.display.MovieClip));
 			ASCompat.setProperty((mPopup : ASAny).UI_XP.xp_bar_delta, "visible", false);
 			ASCompat.setProperty((mPopup : ASAny).UI_XP.xp_points, "text", currentXp + "/" + max);
 			xpBar.maximum = max;
@@ -140,7 +140,7 @@ class UIMapBattlePopup extends DBUIPopup {
 			if (_loc3_ == null) {
 				return;
 			}
-			var _loc4_ = ASCompat.dynamicAs(ASCompat.createInstance(_loc3_, []), flash.display.MovieClip);
+			var _loc4_ = ASCompat.coerce(ASCompat.createInstance(_loc3_, []), flash.display.MovieClip);
 			var _loc2_ = new MovieClipRenderController(mDBFacade, _loc4_);
 			_loc2_.play();
 			if (mActiveHeroPortrait.numChildren > 0) {
@@ -148,7 +148,7 @@ class UIMapBattlePopup extends DBUIPopup {
 			}
 			mActiveHeroPortrait.addChildAt(_loc4_, 0);
 		});
-		mChangeHeroButton = new UIButton(mDBFacade, ASCompat.dynamicAs((mPopup : ASAny).button_swapAvatar, flash.display.MovieClip));
+		mChangeHeroButton = new UIButton(mDBFacade, ASCompat.coerce((mPopup : ASAny).button_swapAvatar, flash.display.MovieClip));
 		mChangeHeroButton.dontKillMyChildren = true;
 		mChangeHeroButton.releaseCallback = function() {
 			mDBFacade.menuNavigationController.popLayer("UI_MAP_BATTLE_POPUP");
@@ -158,7 +158,7 @@ class UIMapBattlePopup extends DBUIPopup {
 		ASCompat.setProperty((mChangeHeroButton.root : ASAny).swap, "text", Locale.getString("WORLD_MAP_CHANGE_HERO_BUTTON"));
 		ASCompat.setProperty((mPopup : ASAny).button_battle.battle_text, "mouseChildren", false);
 		ASCompat.setProperty((mPopup : ASAny).button_battle.battle_text, "mouseEnabled", false);
-		mBattleButton = new UIButton(mDBFacade, ASCompat.dynamicAs((mPopup : ASAny).button_battle, flash.display.MovieClip));
+		mBattleButton = new UIButton(mDBFacade, ASCompat.coerce((mPopup : ASAny).button_battle, flash.display.MovieClip));
 		mBattleButton.dontKillMyChildren = true;
 		if (mDBFacade.dbAccountInfo.inventoryInfo.getEquipedItemsOnAvatar(mDBFacade.dbAccountInfo.activeAvatarInfo.id).length == 0) {
 			mBattleButton.releaseCallback = function() {
@@ -181,7 +181,7 @@ class UIMapBattlePopup extends DBUIPopup {
 			mCloseButton.rollOverCursor = "POINT";
 		}
 		if (ASCompat.toBool((mPopup : ASAny).crewbonus)) {
-			mTeamBonusUI = new UIObject(mDBFacade, ASCompat.dynamicAs((mPopup : ASAny).crewbonus, flash.display.MovieClip));
+			mTeamBonusUI = new UIObject(mDBFacade, ASCompat.coerce((mPopup : ASAny).crewbonus, flash.display.MovieClip));
 			ASCompat.setProperty((mTeamBonusUI.tooltip : ASAny).title_label, "text", Locale.getString("TEAM_BONUS_TOOLTIP_TITLE"));
 			ASCompat.setProperty((mTeamBonusUI.tooltip : ASAny).description_label, "text", Locale.getString("TEAM_BONUS_TOOLTIP_DESCRIPTION"));
 			ASCompat.setProperty((mTeamBonusUI.root : ASAny).header_crew_bonus_txt1, "text", Locale.getString("TEAM_BONUS_TITLE_CREW"));
@@ -261,7 +261,7 @@ class UIMapBattlePopup extends DBUIPopup {
 			return;
 		}
 		if (mDBFacade != null && mDBFacade.gameMaster != null && mDBFacade.gameMaster.coliseumTierByConstant != null) {
-			_loc4_ = ASCompat.dynamicAs(mDBFacade.gameMaster.coliseumTierByConstant.itemFor(mCurrentDungeon.TierRank), gameMasterDictionary.GMColiseumTier);
+			_loc4_ = ASCompat.coerce(mDBFacade.gameMaster.coliseumTierByConstant.itemFor(mCurrentDungeon.TierRank), gameMasterDictionary.GMColiseumTier);
 		}
 		if (_loc4_ != null && ASCompat.toBool((mPopup : ASAny).dungeonXp_label)) {
 			ASCompat.setProperty((mPopup : ASAny).dungeonXp_label, "text",
@@ -291,7 +291,7 @@ class UIMapBattlePopup extends DBUIPopup {
 
 	public function get_keyCostClip():MovieClip {
 		if (mPopup != null) {
-			return ASCompat.dynamicAs((mPopup : ASAny).basic_key_icon, flash.display.MovieClip);
+			return ASCompat.coerce((mPopup : ASAny).basic_key_icon, flash.display.MovieClip);
 		}
 		return null;
 	}

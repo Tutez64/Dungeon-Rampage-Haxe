@@ -61,7 +61,7 @@ class MovieClipRenderer {
 	@:isVar public var currentFrame(get, never):UInt;
 
 	public function get_currentFrame():UInt {
-		return (Std.int(Math.fround(mPlayHead % mMaxFrames) + 1) : UInt);
+		return (ASCompat.floatToInt(Math.fround(mPlayHead % mMaxFrames) + 1) : UInt);
 	}
 
 	public function play(startingFrame:UInt = (0 : UInt), loop:Bool = false, finishedCallback:ASFunction = null) {
@@ -240,19 +240,17 @@ class MovieClipRenderer {
 		if (_loc5_ != null && _loc5_.totalFrames > 1) {
 			if (ASCompat.toNumberField((_loc5_ : ASAny), "MCR_firstLoopFrame") > 0) {
 				if (ASCompat.toBool((_loc5_ : ASAny).MCR_playedIntro)) {
-					_loc3_ = ASCompat.toInt(_loc5_.totalFrames - ASCompat.toNumberField((_loc5_ : ASAny), "MCR_firstLoopFrame") + 1);
-					_loc6_ = ASCompat.toInt(Math.fround(ASCompat.toNumber(ASCompat.toNumber(ASCompat.toNumber(mPlayHead
-						- ASCompat.toNumberField((_loc5_ : ASAny), "MCR_firstLoopFrame"))
-						- 1) % _loc3_))
+					_loc3_ = ASCompat.floatToInt(_loc5_.totalFrames - ASCompat.toNumberField((_loc5_ : ASAny), "MCR_firstLoopFrame") + 1);
+					_loc6_ = ASCompat.toInt(Math.fround((mPlayHead - ASCompat.toNumberField((_loc5_ : ASAny), "MCR_firstLoopFrame") - 1) % _loc3_)
 						+ (_loc5_ : ASAny).MCR_firstLoopFrame);
 				} else {
-					_loc6_ = Std.int(Math.fround(mPlayHead % _loc5_.totalFrames) + 1);
+					_loc6_ = ASCompat.floatToInt(Math.fround(mPlayHead % _loc5_.totalFrames) + 1);
 					if (mPlayHead >= _loc5_.totalFrames) {
 						ASCompat.setProperty(_loc5_, "MCR_playedIntro", true);
 					}
 				}
 			} else {
-				_loc6_ = Std.int(Math.fround(mPlayHead % _loc5_.totalFrames) + 1);
+				_loc6_ = ASCompat.floatToInt(Math.fround(mPlayHead % _loc5_.totalFrames) + 1);
 			}
 			_loc5_.gotoAndStop(_loc6_);
 		}
@@ -300,7 +298,7 @@ class MovieClipRenderer {
 		var _loc6_ = 0;
 		_loc4_ = ASCompat.reinterpretAs(parent, MovieClip);
 		if (_loc4_ != null) {
-			currentMax = (Std.int(Math.max(currentMax, _loc4_.totalFrames)) : UInt);
+			currentMax = (ASCompat.floatToInt(Math.max(currentMax, _loc4_.totalFrames)) : UInt);
 			this.determineFrames(_loc4_);
 		}
 		_loc6_ = 0;
@@ -309,9 +307,9 @@ class MovieClipRenderer {
 				_loc7_ = parent.getChildAt(_loc6_);
 				_loc5_ = ASCompat.reinterpretAs(_loc7_, DisplayObjectContainer);
 				if (_loc5_ != null && _loc5_.numChildren != 0) {
-					currentMax = (Std.int(Math.max(currentMax, initialize(_loc5_, currentMax, indent + "    "))) : UInt);
+					currentMax = (ASCompat.floatToInt(Math.max(currentMax, initialize(_loc5_, currentMax, indent + "    "))) : UInt);
 				} else if (Std.isOfType(_loc7_, MovieClip)) {
-					currentMax = (Std.int(Math.max(currentMax, cast(_loc7_, MovieClip).totalFrames)) : UInt);
+					currentMax = (ASCompat.floatToInt(Math.max(currentMax, cast(_loc7_, MovieClip).totalFrames)) : UInt);
 				}
 			} catch (error:Dynamic) {}
 			_loc6_++;

@@ -78,7 +78,7 @@ import org.as3commons.collections.framework.IList;
 			if (this._array[_loc4_] == item) {
 				_loc2_++;
 			}
-			_loc4_ = ASCompat.toInt(_loc4_) + 1;
+			_loc4_++;
 		}
 		return _loc2_;
 	}
@@ -94,7 +94,7 @@ import org.as3commons.collections.framework.IList;
 			if (item == this._array[_loc2_]) {
 				return _loc2_;
 			}
-			_loc2_ = ASCompat.toInt(_loc2_) - 1;
+			_loc2_--;
 		}
 		return -1;
 	}
@@ -135,9 +135,9 @@ import org.as3commons.collections.framework.IList;
 			if (this._array[_loc3_] == item) {
 				this._array.splice(_loc3_, (1 : UInt));
 				this.itemRemoved((_loc3_ : UInt), item);
-				_loc3_ = ASCompat.toInt(_loc3_) - 1;
+				_loc3_--;
 			}
-			_loc3_ = ASCompat.toInt(_loc3_) + 1;
+			_loc3_++;
 		}
 		return _loc2_ - this._array.length;
 	}

@@ -23,7 +23,7 @@ class UIShopHeroOffer extends UIShopOffer {
 
 	public function new(townHeader:TownHeader, dbFacade:DBFacade, templateClass:Dynamic, buyCallback:ASFunction = null) {
 		super(dbFacade, templateClass, buyCallback);
-		mInfoButton = new UIButton(mDBFacade, ASCompat.dynamicAs((mRoot : ASAny).icon, flash.display.MovieClip));
+		mInfoButton = new UIButton(mDBFacade, ASCompat.coerce((mRoot : ASAny).icon, flash.display.MovieClip));
 		mInfoButton.releaseCallback = this.showInfo;
 		mTownHeader = townHeader;
 	}
@@ -46,7 +46,7 @@ class UIShopHeroOffer extends UIShopOffer {
 	override public function showOffer(gmOffer:GMOffer, gmHero:GMHero) {
 		this.offer = gmOffer;
 		mGMOfferDetail = this.offer.Details[0];
-		mGMOfferHero = ASCompat.dynamicAs(mDBFacade.gameMaster.heroById.itemFor(mGMOfferDetail.HeroId), gameMasterDictionary.GMHero);
+		mGMOfferHero = ASCompat.coerce(mDBFacade.gameMaster.heroById.itemFor(mGMOfferDetail.HeroId), gameMasterDictionary.GMHero);
 		super.showOffer(gmOffer, gmHero);
 	}
 

@@ -229,11 +229,11 @@ class UIMapWorldMap {
 		var setReturnNode:ASFunction;
 		mWorkComponent = new LogicalWorkComponent(mDBFacade, "UIMapWorldMap");
 		mWorkComponent.doEverySeconds(59, mDBFacade.playerActivityCount.fetchPublicDungeonActivityLevel);
-		finalLeagueBounds = ASCompat.dynamicAs((mRootMovieClip : ASAny).worldmap.infinite_island_league.getRect((mRootMovieClip : ASAny)
+		finalLeagueBounds = ASCompat.coerce((mRootMovieClip : ASAny).worldmap.infinite_island_league.getRect((mRootMovieClip : ASAny)
 			.worldmap.infinite_island_league), flash.geom.Rectangle);
-		globalBottomRight = ASCompat.dynamicAs((mRootMovieClip : ASAny).worldmap.infinite_island_league.localToGlobal(finalLeagueBounds.bottomRight),
+		globalBottomRight = ASCompat.coerce((mRootMovieClip : ASAny).worldmap.infinite_island_league.localToGlobal(finalLeagueBounds.bottomRight),
 			flash.geom.Point);
-		mMapWidth = ASCompat.toNumber(globalBottomRight.x - ASCompat.toNumberField((mRootMovieClip : ASAny).worldmap, "x") + 390);
+		mMapWidth = globalBottomRight.x - ASCompat.toNumberField((mRootMovieClip : ASAny).worldmap, "x") + 390;
 		mMapHeight = ASCompat.toNumberField((mRootMovieClip : ASAny).worldmap, "height");
 		mCurrentNode = null;
 		mReturnToTownCallback = townCallback;
@@ -244,13 +244,13 @@ class UIMapWorldMap {
 				mReturnToMapNode = mCurrentNode;
 			};
 		};
-		mIIBattlePopup = new II_UIMapBattlePopup(mDBFacade, ASCompat.asFunction(setReturnNode(tavernCallback)),
-			ASCompat.asFunction(setReturnNode(inventoryCallback)), ASCompat.asFunction(setReturnNode(shopCallback)), this.battleButtonCallback,
+		mIIBattlePopup = new II_UIMapBattlePopup(mDBFacade, ASCompat.coerceFunction(setReturnNode(tavernCallback)),
+			ASCompat.coerceFunction(setReturnNode(inventoryCallback)), ASCompat.coerceFunction(setReturnNode(shopCallback)), this.battleButtonCallback,
 			"MapBattlePopup");
 		MemoryTracker.track(mIIBattlePopup, "II_UIMapBattlePopup - created in UIMapWorldMap.UIMapWorldMap()");
 		mIIBattlePopup.animatePopupOut();
-		mRegularBattlePopup = new UIMapBattlePopup(mDBFacade, ASCompat.asFunction(setReturnNode(tavernCallback)),
-			ASCompat.asFunction(setReturnNode(inventoryCallback)), ASCompat.asFunction(setReturnNode(shopCallback)), this.battleButtonCallback,
+		mRegularBattlePopup = new UIMapBattlePopup(mDBFacade, ASCompat.coerceFunction(setReturnNode(tavernCallback)),
+			ASCompat.coerceFunction(setReturnNode(inventoryCallback)), ASCompat.coerceFunction(setReturnNode(shopCallback)), this.battleButtonCallback,
 			"MapBattlePopup");
 		MemoryTracker.track(mRegularBattlePopup, "UIMapBattlePopup - created in UIMapWorldMap.UIMapWorldMap()");
 		mRegularBattlePopup.animatePopupOut();
@@ -264,7 +264,7 @@ class UIMapWorldMap {
 		mCurrentLeague = (0 : UInt);
 		mMapNodeClass = ((cast((mRootMovieClip : ASAny).worldmap.rookie_league, flash.display.DisplayObjectContainer).getChildByName("TUTORIAL") : ASAny)
 			.constructor : Dynamic);
-		mXPBar = new UIProgressBar(mDBFacade, ASCompat.dynamicAs((mRootMovieClip : ASAny).ui_league.UI_XP.xp_bar, flash.display.MovieClip));
+		mXPBar = new UIProgressBar(mDBFacade, ASCompat.coerce((mRootMovieClip : ASAny).ui_league.UI_XP.xp_bar, flash.display.MovieClip));
 		mXPBar.dontKillMyChildren = true;
 		setXP(mDBFacade.dbAccountInfo.activeAvatarInfo.experience, mDBFacade.dbAccountInfo.activeAvatarInfo.gmHero);
 		ASCompat.setProperty((mRootMovieClip : ASAny).ui_league.league_01.label, "text", Locale.getString("MAP_PAGE_ROOKIE_LEAGUE_LABEL"));
@@ -272,15 +272,15 @@ class UIMapWorldMap {
 		ASCompat.setProperty((mRootMovieClip : ASAny).ui_league.league_04.label, "text", Locale.getString("MAP_PAGE_CHAMPION_LEAGUE_LABEL"));
 		ASCompat.setProperty((mRootMovieClip : ASAny).ui_league.league_03.label, "text", Locale.getString("MAP_PAGE_GRINDER_LEAGUE_LABEL"));
 		ASCompat.setProperty((mRootMovieClip : ASAny).ui_league.league_05.label, "text", Locale.getString("MAP_PAGE_INFINITE_LEAGUE_LABEL"));
-		mLeftLeagueButton = new UIButton(mDBFacade, ASCompat.dynamicAs((mRootMovieClip : ASAny).ui_league.shift_left, flash.display.MovieClip));
+		mLeftLeagueButton = new UIButton(mDBFacade, ASCompat.coerce((mRootMovieClip : ASAny).ui_league.shift_left, flash.display.MovieClip));
 		mLeftLeagueButton.releaseCallback = function() {
 			var _loc1_ = mCurrentLeague;
-			mCurrentLeague = (ASCompat.toInt(mCurrentLeague > 0 ? mCurrentLeague - 1 : (0 : UInt)) : UInt);
+			mCurrentLeague = mCurrentLeague > 0 ? mCurrentLeague - 1 : (0 : UInt);
 			if (_loc1_ != mCurrentLeague) {
 				updateCurrentLeague();
 			}
 		};
-		mRightLeagueButton = new UIButton(mDBFacade, ASCompat.dynamicAs((mRootMovieClip : ASAny).ui_league.shift_right, flash.display.MovieClip));
+		mRightLeagueButton = new UIButton(mDBFacade, ASCompat.coerce((mRootMovieClip : ASAny).ui_league.shift_right, flash.display.MovieClip));
 		mRightLeagueButton.releaseCallback = function() {
 			var _loc1_ = mCurrentLeague;
 			mCurrentLeague = determineNextLeague();
@@ -358,21 +358,21 @@ class UIMapWorldMap {
 		while (_loc8_ < _loc1_.length) {
 			_loc9_ = ASCompat.toInt(_loc1_[_loc8_]);
 			if (mDBFacade.dbAccountInfo.inventoryInfo.mapnodes1.hasKey(_loc9_)) {
-				_loc4_ = ASCompat.dynamicAs(mDBFacade.gameMaster.mapNodeById.itemFor(_loc9_), gameMasterDictionary.GMMapNode);
+				_loc4_ = ASCompat.coerce(mDBFacade.gameMaster.mapNodeById.itemFor(_loc9_), gameMasterDictionary.GMMapNode);
 				if (_loc4_.IsInfiniteDungeon) {
 					break;
 				}
-				_loc7_ = ASCompat.dynamicAs(mOpenNodeButtons.itemFor(_loc9_), brain.uI.UIButton);
+				_loc7_ = ASCompat.coerce(mOpenNodeButtons.itemFor(_loc9_), brain.uI.UIButton);
 				_loc5_ = ASCompat.toInt(_loc8_ > 0 ? _loc1_[_loc8_ - 1] : 0);
 				if (_loc5_ > 0) {
-					_loc6_ = ASCompat.dynamicAs(mOpenNodeButtons.itemFor(_loc5_), brain.uI.UIButton);
+					_loc6_ = ASCompat.coerce(mOpenNodeButtons.itemFor(_loc5_), brain.uI.UIButton);
 					if (_loc6_ != null && mDBFacade.dbAccountInfo.inventoryInfo.mapnodes1.hasKey(_loc5_)) {
 						_loc7_.leftNavigation = _loc6_;
 					}
 				}
 				_loc2_ = ASCompat.toInt(_loc8_ < _loc1_.length - 1 ? _loc1_[_loc8_ + 1] : 0);
 				if (_loc2_ > 0) {
-					_loc3_ = ASCompat.dynamicAs(mOpenNodeButtons.itemFor(_loc2_), brain.uI.UIButton);
+					_loc3_ = ASCompat.coerce(mOpenNodeButtons.itemFor(_loc2_), brain.uI.UIButton);
 					if (_loc3_ != null && mDBFacade.dbAccountInfo.inventoryInfo.mapnodes1.hasKey(_loc2_) && _loc2_ != 50150) {
 						_loc7_.rightNavigation = _loc3_;
 					}
@@ -415,14 +415,14 @@ class UIMapWorldMap {
 	}
 
 	function setupMapNodeNavigationGladiatorLeaguePrisonPath() {
-		var _loc8_ = ASCompat.dynamicAs(mOpenNodeButtons.itemFor(50026), brain.uI.UIButton);
-		var _loc6_ = ASCompat.dynamicAs(mOpenNodeButtons.itemFor(50027), brain.uI.UIButton);
-		var _loc7_ = ASCompat.dynamicAs(mOpenNodeButtons.itemFor(50028), brain.uI.UIButton);
-		var _loc4_ = ASCompat.dynamicAs(mOpenNodeButtons.itemFor(50029), brain.uI.UIButton);
-		var _loc5_ = ASCompat.dynamicAs(mOpenNodeButtons.itemFor(50030), brain.uI.UIButton);
-		var _loc2_ = ASCompat.dynamicAs(mOpenNodeButtons.itemFor(50031), brain.uI.UIButton);
-		var _loc3_ = ASCompat.dynamicAs(mOpenNodeButtons.itemFor(50032), brain.uI.UIButton);
-		var _loc1_ = ASCompat.dynamicAs(mOpenNodeButtons.itemFor(50033), brain.uI.UIButton);
+		var _loc8_ = ASCompat.coerce(mOpenNodeButtons.itemFor(50026), brain.uI.UIButton);
+		var _loc6_ = ASCompat.coerce(mOpenNodeButtons.itemFor(50027), brain.uI.UIButton);
+		var _loc7_ = ASCompat.coerce(mOpenNodeButtons.itemFor(50028), brain.uI.UIButton);
+		var _loc4_ = ASCompat.coerce(mOpenNodeButtons.itemFor(50029), brain.uI.UIButton);
+		var _loc5_ = ASCompat.coerce(mOpenNodeButtons.itemFor(50030), brain.uI.UIButton);
+		var _loc2_ = ASCompat.coerce(mOpenNodeButtons.itemFor(50031), brain.uI.UIButton);
+		var _loc3_ = ASCompat.coerce(mOpenNodeButtons.itemFor(50032), brain.uI.UIButton);
+		var _loc1_ = ASCompat.coerce(mOpenNodeButtons.itemFor(50033), brain.uI.UIButton);
 		_loc8_.clearNavigationAndInteractions();
 		_loc6_.clearNavigationAndInteractions();
 		_loc7_.clearNavigationAndInteractions();
@@ -431,7 +431,7 @@ class UIMapWorldMap {
 		_loc2_.clearNavigationAndInteractions();
 		_loc3_.clearNavigationAndInteractions();
 		_loc1_.clearLeftNavigation();
-		_loc8_.leftNavigation = ASCompat.dynamicAs(mOpenNodeButtons.itemFor(50025), brain.uI.UIObject);
+		_loc8_.leftNavigation = ASCompat.coerce(mOpenNodeButtons.itemFor(50025), brain.uI.UIObject);
 		_loc5_.isAbove(_loc8_);
 		_loc5_.leftNavigation = _loc8_;
 		_loc3_.isToTheLeftOf(_loc1_);
@@ -447,14 +447,14 @@ class UIMapWorldMap {
 	}
 
 	function setupMapNodeNavigationGladiatorLeagueCretaceousPath() {
-		var _loc8_ = ASCompat.dynamicAs(mOpenNodeButtons.itemFor(50036), brain.uI.UIButton);
-		var _loc4_ = ASCompat.dynamicAs(mOpenNodeButtons.itemFor(50037), brain.uI.UIButton);
-		var _loc3_ = ASCompat.dynamicAs(mOpenNodeButtons.itemFor(50038), brain.uI.UIButton);
-		var _loc6_ = ASCompat.dynamicAs(mOpenNodeButtons.itemFor(50039), brain.uI.UIButton);
-		var _loc5_ = ASCompat.dynamicAs(mOpenNodeButtons.itemFor(50040), brain.uI.UIButton);
-		var _loc2_ = ASCompat.dynamicAs(mOpenNodeButtons.itemFor(50041), brain.uI.UIButton);
-		var _loc1_ = ASCompat.dynamicAs(mOpenNodeButtons.itemFor(50042), brain.uI.UIButton);
-		var _loc7_ = ASCompat.dynamicAs(mOpenNodeButtons.itemFor(50043), brain.uI.UIButton);
+		var _loc8_ = ASCompat.coerce(mOpenNodeButtons.itemFor(50036), brain.uI.UIButton);
+		var _loc4_ = ASCompat.coerce(mOpenNodeButtons.itemFor(50037), brain.uI.UIButton);
+		var _loc3_ = ASCompat.coerce(mOpenNodeButtons.itemFor(50038), brain.uI.UIButton);
+		var _loc6_ = ASCompat.coerce(mOpenNodeButtons.itemFor(50039), brain.uI.UIButton);
+		var _loc5_ = ASCompat.coerce(mOpenNodeButtons.itemFor(50040), brain.uI.UIButton);
+		var _loc2_ = ASCompat.coerce(mOpenNodeButtons.itemFor(50041), brain.uI.UIButton);
+		var _loc1_ = ASCompat.coerce(mOpenNodeButtons.itemFor(50042), brain.uI.UIButton);
+		var _loc7_ = ASCompat.coerce(mOpenNodeButtons.itemFor(50043), brain.uI.UIButton);
 		_loc4_.clearNavigationAndInteractions();
 		_loc6_.clearNavigationAndInteractions();
 		_loc3_.clearNavigationAndInteractions();
@@ -478,14 +478,14 @@ class UIMapWorldMap {
 	}
 
 	function setupMapNodeNavigationGladiatorLeagueFrostguardPath() {
-		var _loc9_ = ASCompat.dynamicAs(mOpenNodeButtons.itemFor(50044), brain.uI.UIButton);
-		var _loc10_ = ASCompat.dynamicAs(mOpenNodeButtons.itemFor(50045), brain.uI.UIButton);
-		var _loc1_ = ASCompat.dynamicAs(mOpenNodeButtons.itemFor(50046), brain.uI.UIButton);
-		var _loc2_ = ASCompat.dynamicAs(mOpenNodeButtons.itemFor(50047), brain.uI.UIButton);
-		var _loc3_ = ASCompat.dynamicAs(mOpenNodeButtons.itemFor(50048), brain.uI.UIButton);
-		var _loc4_ = ASCompat.dynamicAs(mOpenNodeButtons.itemFor(50049), brain.uI.UIButton);
-		var _loc5_ = ASCompat.dynamicAs(mOpenNodeButtons.itemFor(50050), brain.uI.UIButton);
-		var _loc6_ = ASCompat.dynamicAs(mOpenNodeButtons.itemFor(50051), brain.uI.UIButton);
+		var _loc9_ = ASCompat.coerce(mOpenNodeButtons.itemFor(50044), brain.uI.UIButton);
+		var _loc10_ = ASCompat.coerce(mOpenNodeButtons.itemFor(50045), brain.uI.UIButton);
+		var _loc1_ = ASCompat.coerce(mOpenNodeButtons.itemFor(50046), brain.uI.UIButton);
+		var _loc2_ = ASCompat.coerce(mOpenNodeButtons.itemFor(50047), brain.uI.UIButton);
+		var _loc3_ = ASCompat.coerce(mOpenNodeButtons.itemFor(50048), brain.uI.UIButton);
+		var _loc4_ = ASCompat.coerce(mOpenNodeButtons.itemFor(50049), brain.uI.UIButton);
+		var _loc5_ = ASCompat.coerce(mOpenNodeButtons.itemFor(50050), brain.uI.UIButton);
+		var _loc6_ = ASCompat.coerce(mOpenNodeButtons.itemFor(50051), brain.uI.UIButton);
 		_loc9_.clearNavigationAndInteractions();
 		_loc10_.clearNavigationAndInteractions();
 		_loc1_.clearNavigationAndInteractions();
@@ -494,8 +494,8 @@ class UIMapWorldMap {
 		_loc4_.clearNavigationAndInteractions();
 		_loc5_.clearNavigationAndInteractions();
 		_loc6_.clearLeftNavigation();
-		var _loc7_ = ASCompat.dynamicAs(mOpenNodeButtons.itemFor(50040), brain.uI.UIButton);
-		var _loc8_ = ASCompat.dynamicAs(mOpenNodeButtons.itemFor(50043), brain.uI.UIButton);
+		var _loc7_ = ASCompat.coerce(mOpenNodeButtons.itemFor(50040), brain.uI.UIButton);
+		var _loc8_ = ASCompat.coerce(mOpenNodeButtons.itemFor(50043), brain.uI.UIButton);
 		_loc8_.isToTheLeftOf(_loc9_);
 		_loc7_.isToTheLeftOf(_loc3_);
 		_loc9_.isToTheLeftOf(_loc10_);
@@ -514,16 +514,16 @@ class UIMapWorldMap {
 	}
 
 	function setupMapNodeNavigationChampionLeagueKnightFortressPath() {
-		var _loc19_ = ASCompat.dynamicAs(mOpenNodeButtons.itemFor(50064), brain.uI.UIButton);
-		var _loc20_ = ASCompat.dynamicAs(mOpenNodeButtons.itemFor(50065), brain.uI.UIButton);
-		var _loc22_ = ASCompat.dynamicAs(mOpenNodeButtons.itemFor(50066), brain.uI.UIButton);
-		var _loc16_ = ASCompat.dynamicAs(mOpenNodeButtons.itemFor(50067), brain.uI.UIButton);
-		var _loc17_ = ASCompat.dynamicAs(mOpenNodeButtons.itemFor(50068), brain.uI.UIButton);
-		var _loc24_ = ASCompat.dynamicAs(mOpenNodeButtons.itemFor(50069), brain.uI.UIButton);
-		var _loc5_ = ASCompat.dynamicAs(mOpenNodeButtons.itemFor(50070), brain.uI.UIButton);
-		var _loc2_ = ASCompat.dynamicAs(mOpenNodeButtons.itemFor(50071), brain.uI.UIButton);
-		var _loc3_ = ASCompat.dynamicAs(mOpenNodeButtons.itemFor(50072), brain.uI.UIButton);
-		var _loc1_ = ASCompat.dynamicAs(mOpenNodeButtons.itemFor(50073), brain.uI.UIButton);
+		var _loc19_ = ASCompat.coerce(mOpenNodeButtons.itemFor(50064), brain.uI.UIButton);
+		var _loc20_ = ASCompat.coerce(mOpenNodeButtons.itemFor(50065), brain.uI.UIButton);
+		var _loc22_ = ASCompat.coerce(mOpenNodeButtons.itemFor(50066), brain.uI.UIButton);
+		var _loc16_ = ASCompat.coerce(mOpenNodeButtons.itemFor(50067), brain.uI.UIButton);
+		var _loc17_ = ASCompat.coerce(mOpenNodeButtons.itemFor(50068), brain.uI.UIButton);
+		var _loc24_ = ASCompat.coerce(mOpenNodeButtons.itemFor(50069), brain.uI.UIButton);
+		var _loc5_ = ASCompat.coerce(mOpenNodeButtons.itemFor(50070), brain.uI.UIButton);
+		var _loc2_ = ASCompat.coerce(mOpenNodeButtons.itemFor(50071), brain.uI.UIButton);
+		var _loc3_ = ASCompat.coerce(mOpenNodeButtons.itemFor(50072), brain.uI.UIButton);
+		var _loc1_ = ASCompat.coerce(mOpenNodeButtons.itemFor(50073), brain.uI.UIButton);
 		_loc19_.clearNavigationAndInteractions();
 		_loc20_.clearNavigationAndInteractions();
 		_loc22_.clearNavigationAndInteractions();
@@ -543,16 +543,16 @@ class UIMapWorldMap {
 		_loc5_.isToTheLeftOf(_loc2_);
 		_loc2_.isToTheLeftOf(_loc3_);
 		_loc3_.isToTheLeftOf(_loc1_);
-		var _loc10_ = ASCompat.dynamicAs(mOpenNodeButtons.itemFor(50057), brain.uI.UIButton);
-		var _loc11_ = ASCompat.dynamicAs(mOpenNodeButtons.itemFor(50058), brain.uI.UIButton);
-		var _loc7_ = ASCompat.dynamicAs(mOpenNodeButtons.itemFor(50059), brain.uI.UIButton);
-		var _loc9_ = ASCompat.dynamicAs(mOpenNodeButtons.itemFor(50060), brain.uI.UIButton);
-		var _loc4_ = ASCompat.dynamicAs(mOpenNodeButtons.itemFor(50061), brain.uI.UIButton);
-		var _loc6_ = ASCompat.dynamicAs(mOpenNodeButtons.itemFor(50062), brain.uI.UIButton);
-		var _loc28_ = ASCompat.dynamicAs(mOpenNodeButtons.itemFor(50063), brain.uI.UIButton);
-		var _loc27_ = ASCompat.dynamicAs(mOpenNodeButtons.itemFor(50074), brain.uI.UIButton);
-		var _loc26_ = ASCompat.dynamicAs(mOpenNodeButtons.itemFor(50075), brain.uI.UIButton);
-		var _loc25_ = ASCompat.dynamicAs(mOpenNodeButtons.itemFor(50076), brain.uI.UIButton);
+		var _loc10_ = ASCompat.coerce(mOpenNodeButtons.itemFor(50057), brain.uI.UIButton);
+		var _loc11_ = ASCompat.coerce(mOpenNodeButtons.itemFor(50058), brain.uI.UIButton);
+		var _loc7_ = ASCompat.coerce(mOpenNodeButtons.itemFor(50059), brain.uI.UIButton);
+		var _loc9_ = ASCompat.coerce(mOpenNodeButtons.itemFor(50060), brain.uI.UIButton);
+		var _loc4_ = ASCompat.coerce(mOpenNodeButtons.itemFor(50061), brain.uI.UIButton);
+		var _loc6_ = ASCompat.coerce(mOpenNodeButtons.itemFor(50062), brain.uI.UIButton);
+		var _loc28_ = ASCompat.coerce(mOpenNodeButtons.itemFor(50063), brain.uI.UIButton);
+		var _loc27_ = ASCompat.coerce(mOpenNodeButtons.itemFor(50074), brain.uI.UIButton);
+		var _loc26_ = ASCompat.coerce(mOpenNodeButtons.itemFor(50075), brain.uI.UIButton);
+		var _loc25_ = ASCompat.coerce(mOpenNodeButtons.itemFor(50076), brain.uI.UIButton);
 		_loc10_.clearNavigationAndInteractions();
 		_loc11_.clearNavigationAndInteractions();
 		_loc7_.clearNavigationAndInteractions();
@@ -572,13 +572,13 @@ class UIMapWorldMap {
 		_loc28_.isToTheLeftOf(_loc27_);
 		_loc27_.isToTheLeftOf(_loc26_);
 		_loc26_.isToTheLeftOf(_loc25_);
-		var _loc8_ = ASCompat.dynamicAs(mOpenNodeButtons.itemFor(50077), brain.uI.UIButton);
-		var _loc15_ = ASCompat.dynamicAs(mOpenNodeButtons.itemFor(50078), brain.uI.UIButton);
-		var _loc14_ = ASCompat.dynamicAs(mOpenNodeButtons.itemFor(50079), brain.uI.UIButton);
-		var _loc13_ = ASCompat.dynamicAs(mOpenNodeButtons.itemFor(50080), brain.uI.UIButton);
-		var _loc12_ = ASCompat.dynamicAs(mOpenNodeButtons.itemFor(50081), brain.uI.UIButton);
-		var _loc18_ = ASCompat.dynamicAs(mOpenNodeButtons.itemFor(50082), brain.uI.UIButton);
-		var _loc21_ = ASCompat.dynamicAs(mOpenNodeButtons.itemFor(50083), brain.uI.UIButton);
+		var _loc8_ = ASCompat.coerce(mOpenNodeButtons.itemFor(50077), brain.uI.UIButton);
+		var _loc15_ = ASCompat.coerce(mOpenNodeButtons.itemFor(50078), brain.uI.UIButton);
+		var _loc14_ = ASCompat.coerce(mOpenNodeButtons.itemFor(50079), brain.uI.UIButton);
+		var _loc13_ = ASCompat.coerce(mOpenNodeButtons.itemFor(50080), brain.uI.UIButton);
+		var _loc12_ = ASCompat.coerce(mOpenNodeButtons.itemFor(50081), brain.uI.UIButton);
+		var _loc18_ = ASCompat.coerce(mOpenNodeButtons.itemFor(50082), brain.uI.UIButton);
+		var _loc21_ = ASCompat.coerce(mOpenNodeButtons.itemFor(50083), brain.uI.UIButton);
 		_loc8_.clearNavigationAndInteractions();
 		_loc15_.clearNavigationAndInteractions();
 		_loc14_.clearNavigationAndInteractions();
@@ -597,24 +597,24 @@ class UIMapWorldMap {
 		_loc12_.isToTheLeftOf(_loc18_);
 		_loc18_.isToTheLeftOf(_loc21_);
 		_loc1_.isToTheLeftOf(_loc8_);
-		var _loc23_ = ASCompat.dynamicAs(mOpenNodeButtons.itemFor(50056), brain.uI.UIButton);
+		var _loc23_ = ASCompat.coerce(mOpenNodeButtons.itemFor(50056), brain.uI.UIButton);
 		_loc23_.clearRightNavigation();
 		_loc19_.isAbove(_loc23_);
 		_loc23_.isToTheLeftOf(_loc10_);
-		_loc23_.isAbove(ASCompat.dynamicAs(mOpenNodeButtons.itemFor(50055), brain.uI.UIObject));
+		_loc23_.isAbove(ASCompat.coerce(mOpenNodeButtons.itemFor(50055), brain.uI.UIObject));
 	}
 
 	function setupMapNodeNavigationUltimateRampage() {
-		var _loc6_ = ASCompat.dynamicAs(mOpenNodeButtons.itemFor(50150), brain.uI.UIButton);
-		var _loc8_ = ASCompat.dynamicAs(mOpenNodeButtons.itemFor(50151), brain.uI.UIButton);
-		var _loc9_ = ASCompat.dynamicAs(mOpenNodeButtons.itemFor(50153), brain.uI.UIButton);
-		var _loc4_ = ASCompat.dynamicAs(mOpenNodeButtons.itemFor(50155), brain.uI.UIButton);
-		var _loc2_ = ASCompat.dynamicAs(mOpenNodeButtons.itemFor(50156), brain.uI.UIButton);
-		var _loc5_ = ASCompat.dynamicAs(mOpenNodeButtons.itemFor(50158), brain.uI.UIButton);
-		var _loc10_ = ASCompat.dynamicAs(mOpenNodeButtons.itemFor(50159), brain.uI.UIButton);
-		var _loc7_ = ASCompat.dynamicAs(mOpenNodeButtons.itemFor(50161), brain.uI.UIButton);
-		var _loc3_ = ASCompat.dynamicAs(mOpenNodeButtons.itemFor(50162), brain.uI.UIButton);
-		var _loc1_ = ASCompat.dynamicAs(mOpenNodeButtons.itemFor(50099), brain.uI.UIButton);
+		var _loc6_ = ASCompat.coerce(mOpenNodeButtons.itemFor(50150), brain.uI.UIButton);
+		var _loc8_ = ASCompat.coerce(mOpenNodeButtons.itemFor(50151), brain.uI.UIButton);
+		var _loc9_ = ASCompat.coerce(mOpenNodeButtons.itemFor(50153), brain.uI.UIButton);
+		var _loc4_ = ASCompat.coerce(mOpenNodeButtons.itemFor(50155), brain.uI.UIButton);
+		var _loc2_ = ASCompat.coerce(mOpenNodeButtons.itemFor(50156), brain.uI.UIButton);
+		var _loc5_ = ASCompat.coerce(mOpenNodeButtons.itemFor(50158), brain.uI.UIButton);
+		var _loc10_ = ASCompat.coerce(mOpenNodeButtons.itemFor(50159), brain.uI.UIButton);
+		var _loc7_ = ASCompat.coerce(mOpenNodeButtons.itemFor(50161), brain.uI.UIButton);
+		var _loc3_ = ASCompat.coerce(mOpenNodeButtons.itemFor(50162), brain.uI.UIButton);
+		var _loc1_ = ASCompat.coerce(mOpenNodeButtons.itemFor(50099), brain.uI.UIButton);
 		_loc3_.isAbove(_loc2_);
 		_loc3_.isToTheLeftOf(_loc8_);
 		_loc8_.isToTheLeftOf(_loc4_);
@@ -628,7 +628,7 @@ class UIMapWorldMap {
 	}
 
 	public function getCurrentNodeButton():UIButton {
-		return ASCompat.dynamicAs(mOpenNodeButtons.itemFor(mCurrentNode.Id), brain.uI.UIButton);
+		return ASCompat.coerce(mOpenNodeButtons.itemFor(mCurrentNode.Id), brain.uI.UIButton);
 	}
 
 	public function getCurrentNodeLeagueValue():UInt {
@@ -644,9 +644,9 @@ class UIMapWorldMap {
 		_loc5_ = 0;
 		while (_loc5_ < _loc4_.length) {
 			_loc6_ = ASCompat.toInt(_loc4_[_loc5_]);
-			_loc2_ = ASCompat.dynamicAs(mOpenNodeButtons.itemFor(_loc6_), brain.uI.UIButton);
+			_loc2_ = ASCompat.coerce(mOpenNodeButtons.itemFor(_loc6_), brain.uI.UIButton);
 			if (_loc2_ == uiObject) {
-				_loc3_ = ASCompat.dynamicAs(mDBFacade.gameMaster.mapNodeById.itemFor(_loc6_), gameMasterDictionary.GMMapNode);
+				_loc3_ = ASCompat.coerce(mDBFacade.gameMaster.mapNodeById.itemFor(_loc6_), gameMasterDictionary.GMMapNode);
 				return getNodeLeagueValue(_loc3_);
 			}
 			_loc5_++;
@@ -673,15 +673,15 @@ class UIMapWorldMap {
 	function getLeagueClip(leagueIdx:UInt):MovieClip {
 		switch (leagueIdx) {
 			case 0:
-				return ASCompat.dynamicAs((mRootMovieClip : ASAny).worldmap.rookie_league, flash.display.MovieClip);
+				return ASCompat.coerce((mRootMovieClip : ASAny).worldmap.rookie_league, flash.display.MovieClip);
 			case 1:
-				return ASCompat.dynamicAs((mRootMovieClip : ASAny).worldmap.gladiator_league, flash.display.MovieClip);
+				return ASCompat.coerce((mRootMovieClip : ASAny).worldmap.gladiator_league, flash.display.MovieClip);
 			case 2:
-				return ASCompat.dynamicAs((mRootMovieClip : ASAny).worldmap.heroic_league, flash.display.MovieClip);
+				return ASCompat.coerce((mRootMovieClip : ASAny).worldmap.heroic_league, flash.display.MovieClip);
 			case 3:
-				return ASCompat.dynamicAs((mRootMovieClip : ASAny).worldmap.grinder_league, flash.display.MovieClip);
+				return ASCompat.coerce((mRootMovieClip : ASAny).worldmap.grinder_league, flash.display.MovieClip);
 			case 4:
-				return ASCompat.dynamicAs((mRootMovieClip : ASAny).worldmap.infinite_island_league, flash.display.MovieClip);
+				return ASCompat.coerce((mRootMovieClip : ASAny).worldmap.infinite_island_league, flash.display.MovieClip);
 			default:
 				return null;
 		}
@@ -708,7 +708,7 @@ class UIMapWorldMap {
 	}
 
 	function determineNextLeague():UInt {
-		return (ASCompat.toInt(mCurrentLeague < 4 ? mCurrentLeague + 1 : (4 : UInt)) : UInt);
+		return mCurrentLeague < 4 ? mCurrentLeague + 1 : (4 : UInt);
 	}
 
 	function keyboardCheck(gameClock:GameClock) {}
@@ -742,8 +742,8 @@ class UIMapWorldMap {
 				ASCompat.setProperty((mRootMovieClip : ASAny).ui_league.league_03, "visible", false);
 				ASCompat.setProperty((mRootMovieClip : ASAny).ui_league.league_04, "visible", false);
 				ASCompat.setProperty((mRootMovieClip : ASAny).ui_league.league_05, "visible", false);
-				centerMapOnClip(ASCompat.dynamicAs((mRootMovieClip : ASAny).worldmap.rookie_league, flash.display.MovieClip), "ROOKIE");
-				_loc3_ = ASCompat.dynamicAs((mRootMovieClip : ASAny).ui_league.league_01, flash.display.MovieClip);
+				centerMapOnClip(ASCompat.coerce((mRootMovieClip : ASAny).worldmap.rookie_league, flash.display.MovieClip), "ROOKIE");
+				_loc3_ = ASCompat.coerce((mRootMovieClip : ASAny).ui_league.league_01, flash.display.MovieClip);
 
 			case 1:
 				mLeftLeagueButton.enabled = true;
@@ -753,8 +753,8 @@ class UIMapWorldMap {
 				ASCompat.setProperty((mRootMovieClip : ASAny).ui_league.league_03, "visible", false);
 				ASCompat.setProperty((mRootMovieClip : ASAny).ui_league.league_04, "visible", false);
 				ASCompat.setProperty((mRootMovieClip : ASAny).ui_league.league_05, "visible", false);
-				centerMapOnClip(ASCompat.dynamicAs((mRootMovieClip : ASAny).worldmap.gladiator_league, flash.display.MovieClip), "GLADIATOR");
-				_loc3_ = ASCompat.dynamicAs((mRootMovieClip : ASAny).ui_league.league_02, flash.display.MovieClip);
+				centerMapOnClip(ASCompat.coerce((mRootMovieClip : ASAny).worldmap.gladiator_league, flash.display.MovieClip), "GLADIATOR");
+				_loc3_ = ASCompat.coerce((mRootMovieClip : ASAny).ui_league.league_02, flash.display.MovieClip);
 
 			case 2:
 				mLeftLeagueButton.enabled = true;
@@ -764,8 +764,8 @@ class UIMapWorldMap {
 				ASCompat.setProperty((mRootMovieClip : ASAny).ui_league.league_03, "visible", false);
 				ASCompat.setProperty((mRootMovieClip : ASAny).ui_league.league_04, "visible", true);
 				ASCompat.setProperty((mRootMovieClip : ASAny).ui_league.league_05, "visible", false);
-				centerMapOnClip(ASCompat.dynamicAs((mRootMovieClip : ASAny).worldmap.heroic_league, flash.display.MovieClip), "CHAMPION");
-				_loc3_ = ASCompat.dynamicAs((mRootMovieClip : ASAny).ui_league.league_04, flash.display.MovieClip);
+				centerMapOnClip(ASCompat.coerce((mRootMovieClip : ASAny).worldmap.heroic_league, flash.display.MovieClip), "CHAMPION");
+				_loc3_ = ASCompat.coerce((mRootMovieClip : ASAny).ui_league.league_04, flash.display.MovieClip);
 
 			case 3:
 				mLeftLeagueButton.enabled = true;
@@ -775,8 +775,8 @@ class UIMapWorldMap {
 				ASCompat.setProperty((mRootMovieClip : ASAny).ui_league.league_03, "visible", true);
 				ASCompat.setProperty((mRootMovieClip : ASAny).ui_league.league_04, "visible", false);
 				ASCompat.setProperty((mRootMovieClip : ASAny).ui_league.league_05, "visible", false);
-				centerMapOnClip(ASCompat.dynamicAs((mRootMovieClip : ASAny).worldmap.grinder_league, flash.display.MovieClip), "GRINDHOUSE");
-				_loc3_ = ASCompat.dynamicAs((mRootMovieClip : ASAny).ui_league.league_03, flash.display.MovieClip);
+				centerMapOnClip(ASCompat.coerce((mRootMovieClip : ASAny).worldmap.grinder_league, flash.display.MovieClip), "GRINDHOUSE");
+				_loc3_ = ASCompat.coerce((mRootMovieClip : ASAny).ui_league.league_03, flash.display.MovieClip);
 
 			case 4:
 				if (mInfiniteIslandUnlocked && !mDBFacade.dbAccountInfo.hasAttribute("seenUltimatePopup")) {
@@ -799,7 +799,7 @@ class UIMapWorldMap {
 				ASCompat.setProperty((mRootMovieClip : ASAny).ui_league.label_timer, "visible", true);
 				ASCompat.setProperty((mRootMovieClip : ASAny).ui_league.label_timer, "text", "");
 				startEpochCountdown();
-				centerMapOnClip(ASCompat.dynamicAs((mRootMovieClip : ASAny).worldmap.infinite_island_league, flash.display.MovieClip), "INFINITEISLAND");
+				centerMapOnClip(ASCompat.coerce((mRootMovieClip : ASAny).worldmap.infinite_island_league, flash.display.MovieClip), "INFINITEISLAND");
 				_loc3_ = null;
 
 			default:
@@ -931,14 +931,14 @@ class UIMapWorldMap {
 			mMapDragTask = null;
 		}
 		if (mMapAvatar != null) {
-			mMapAvatar.destroy(ASCompat.dynamicAs((mRootMovieClip : ASAny).worldmap, flash.display.MovieClip));
+			mMapAvatar.destroy(ASCompat.coerce((mRootMovieClip : ASAny).worldmap, flash.display.MovieClip));
 			mMapAvatar = null;
 		}
 		if (mOpenNodeButtons != null) {
 			__ax4_iter_166 = mOpenNodeButtons.toArray();
 			if (checkNullIteratee(__ax4_iter_166))
 				for (_tmp_ in __ax4_iter_166) {
-					_loc1_ = ASCompat.dynamicAs(_tmp_, brain.uI.UIButton);
+					_loc1_ = ASCompat.coerce(_tmp_, brain.uI.UIButton);
 					_loc1_.enabled = false;
 					_loc1_.destroy();
 				}
@@ -985,7 +985,7 @@ class UIMapWorldMap {
 		var avatarDropShadow = ASCompat.dynamicAs(ASCompat.createInstance(avatarDropShadowClass, []), MovieClip);
 		(mRootMovieClip : ASAny).worldmap.addChild(avatar);
 		(mRootMovieClip : ASAny).worldmap.addChild(avatarDropShadow);
-		node = ASCompat.dynamicAs(cast((mRootMovieClip : ASAny).worldmap.rookie_league, flash.display.DisplayObjectContainer)
+		node = ASCompat.coerce(cast((mRootMovieClip : ASAny).worldmap.rookie_league, flash.display.DisplayObjectContainer)
 			.getChildByName(mCurrentNode.Constant),
 			flash.display.DisplayObject);
 		if (node != null) {
@@ -1029,7 +1029,7 @@ class UIMapWorldMap {
 			__ax4_iter_167 = mAvatarList;
 			if (checkNullIteratee(__ax4_iter_167))
 				for (_tmp_ in __ax4_iter_167) {
-					_loc2_ = ASCompat.dynamicAs(_tmp_, flash.display.DisplayObject);
+					_loc2_ = ASCompat.coerce(_tmp_, flash.display.DisplayObject);
 					(mRootMovieClip : ASAny).worldmap.removeChild(_loc2_);
 				}
 		}
@@ -1037,7 +1037,7 @@ class UIMapWorldMap {
 			__ax4_iter_168 = mAvatarDropShadowList;
 			if (checkNullIteratee(__ax4_iter_168))
 				for (_tmp_ in __ax4_iter_168) {
-					_loc1_ = ASCompat.dynamicAs(_tmp_, flash.display.DisplayObject);
+					_loc1_ = ASCompat.coerce(_tmp_, flash.display.DisplayObject);
 					(mRootMovieClip : ASAny).worldmap.removeChild(_loc1_);
 				}
 		}
@@ -1060,8 +1060,8 @@ class UIMapWorldMap {
 		ASCompat.ASArray.sort(mAvatarDropShadowList, ysort);
 		i = (0 : UInt);
 		while (i < (mAvatarList.length:UInt)) {
-			avatar_clip = ASCompat.dynamicAs(mAvatarList[(i : Int)], flash.display.MovieClip);
-			shadow_clip = ASCompat.dynamicAs(mAvatarDropShadowList[(i : Int)], flash.display.MovieClip);
+			avatar_clip = ASCompat.coerce(mAvatarList[(i : Int)], flash.display.MovieClip);
+			shadow_clip = ASCompat.coerce(mAvatarDropShadowList[(i : Int)], flash.display.MovieClip);
 			(mRootMovieClip : ASAny).worldmap.addChild(shadow_clip);
 			(mRootMovieClip : ASAny).worldmap.addChild(avatar_clip);
 			i = i + 1;
@@ -1103,7 +1103,7 @@ class UIMapWorldMap {
 	function centerMapOnClip(clip:MovieClip, islandName:String = null) {
 		var _loc6_ = clip.getRect(clip);
 		var _loc3_ = clip.localToGlobal(new Point(_loc6_.left + clip.width * 0.5, 0));
-		var _loc4_ = ASCompat.dynamicAs((mRootMovieClip : ASAny).worldmap.localToGlobal(new Point(0, 0)), flash.geom.Point);
+		var _loc4_ = ASCompat.coerce((mRootMovieClip : ASAny).worldmap.localToGlobal(new Point(0, 0)), flash.geom.Point);
 		var _loc5_ = _loc3_.x - _loc4_.x;
 		if (islandName == "ROOKIE") {
 			mCameraTargetX = mRootMovieClip.stage.stageWidth * 0.9 - _loc5_;
@@ -1126,8 +1126,8 @@ class UIMapWorldMap {
 	}
 
 	function centerCamera(clock:GameClock) {
-		var _loc3_ = ASCompat.toNumber(mCameraTargetX - ASCompat.toNumberField((mRootMovieClip : ASAny).worldmap, "x"));
-		var _loc4_ = ASCompat.toNumber(mCameraTargetY - ASCompat.toNumberField((mRootMovieClip : ASAny).worldmap, "y"));
+		var _loc3_ = mCameraTargetX - ASCompat.toNumberField((mRootMovieClip : ASAny).worldmap, "x");
+		var _loc4_ = mCameraTargetY - ASCompat.toNumberField((mRootMovieClip : ASAny).worldmap, "y");
 		var _loc2_ = _loc3_ * _loc3_ + _loc4_ * _loc4_;
 		var _loc5_ = 1 - Math.pow(1 - 0.2916666666666667, clock.tickLength / GameClock.ANIMATION_FRAME_DURATION);
 		mCameraVelocityX = _loc3_ * _loc5_;
@@ -1175,15 +1175,15 @@ class UIMapWorldMap {
 					mCurrentLeague = determineNextLeague();
 					updateCurrentLeague((_loc2_ : UInt) != mCurrentLeague);
 				} else {
-					mCurrentLeague = (ASCompat.toInt(mCurrentLeague > 0 ? mCurrentLeague - 1 : (0 : UInt)) : UInt);
+					mCurrentLeague = mCurrentLeague > 0 ? mCurrentLeague - 1 : (0 : UInt);
 					updateCurrentLeague((_loc2_ : UInt) != mCurrentLeague);
 				}
 			} else {
-				_loc7_ = ASCompat.dynamicAs((mRootMovieClip : ASAny).worldmap.gladiator_league.localToGlobal(new Point(0, 0)), flash.geom.Point);
-				_loc3_ = ASCompat.dynamicAs((mRootMovieClip : ASAny).worldmap.rookie_league.localToGlobal(new Point(0, 0)), flash.geom.Point);
-				_loc5_ = ASCompat.dynamicAs((mRootMovieClip : ASAny).worldmap.grinder_league.localToGlobal(new Point(0, 0)), flash.geom.Point);
-				_loc6_ = ASCompat.dynamicAs((mRootMovieClip : ASAny).worldmap.heroic_league.localToGlobal(new Point(0, 0)), flash.geom.Point);
-				_loc4_ = ASCompat.dynamicAs((mRootMovieClip : ASAny).worldmap.infinite_island_league.localToGlobal(new Point(0, 0)), flash.geom.Point);
+				_loc7_ = ASCompat.coerce((mRootMovieClip : ASAny).worldmap.gladiator_league.localToGlobal(new Point(0, 0)), flash.geom.Point);
+				_loc3_ = ASCompat.coerce((mRootMovieClip : ASAny).worldmap.rookie_league.localToGlobal(new Point(0, 0)), flash.geom.Point);
+				_loc5_ = ASCompat.coerce((mRootMovieClip : ASAny).worldmap.grinder_league.localToGlobal(new Point(0, 0)), flash.geom.Point);
+				_loc6_ = ASCompat.coerce((mRootMovieClip : ASAny).worldmap.heroic_league.localToGlobal(new Point(0, 0)), flash.geom.Point);
+				_loc4_ = ASCompat.coerce((mRootMovieClip : ASAny).worldmap.infinite_island_league.localToGlobal(new Point(0, 0)), flash.geom.Point);
 				if (Math.abs(_loc7_.x) < Math.abs(_loc3_.x)
 					&& Math.abs(_loc7_.x) < Math.abs(_loc5_.x)
 					&& Math.abs(_loc7_.x) < Math.abs(_loc6_.x)
@@ -1309,7 +1309,7 @@ class UIMapWorldMap {
 				_loc2_.mouseChildren = false;
 				_loc2_.mouseEnabled = false;
 			}
-			_loc1_ = ASCompat.toInt(_loc1_) + 1;
+			_loc1_++;
 		}
 	}
 
@@ -1326,7 +1326,7 @@ class UIMapWorldMap {
 	}
 
 	function getMapnodeFromCurrentNode1():MapnodeInfo {
-		return ASCompat.dynamicAs(mDBFacade.dbAccountInfo.inventoryInfo.mapnodes1.itemFor(mCurrentNode.Id), account.MapnodeInfo);
+		return ASCompat.coerce(mDBFacade.dbAccountInfo.inventoryInfo.mapnodes1.itemFor(mCurrentNode.Id), account.MapnodeInfo);
 	}
 
 	function mapNodesOpen(mapNodes:Array<ASAny>, andDefeated:Bool = false):Bool {
@@ -1337,11 +1337,11 @@ class UIMapWorldMap {
 		}
 		_loc4_ = 0;
 		while (_loc4_ < mapNodes.length) {
-			_loc3_ = ASCompat.dynamicAs(mapNodes[_loc4_], gameMasterDictionary.GMMapNode);
+			_loc3_ = ASCompat.coerce(mapNodes[_loc4_], gameMasterDictionary.GMMapNode);
 			if (mapNodeOpen(_loc3_, andDefeated)) {
 				return true;
 			}
-			_loc4_ = ASCompat.toInt(_loc4_) + 1;
+			_loc4_++;
 		}
 		return false;
 	}
@@ -1350,7 +1350,7 @@ class UIMapWorldMap {
 		if (mapNode == null || mDBFacade.dbAccountInfo == null || mDBFacade.dbAccountInfo.inventoryInfo == null) {
 			return false;
 		}
-		var _loc3_ = ASCompat.dynamicAs(mDBFacade.dbAccountInfo.inventoryInfo.mapnodes1.itemFor(mapNode.Id), account.MapnodeInfo);
+		var _loc3_ = ASCompat.coerce(mDBFacade.dbAccountInfo.inventoryInfo.mapnodes1.itemFor(mapNode.Id), account.MapnodeInfo);
 		return _loc3_ != null && (!andDefeated || _loc3_.MapnodeState == 1 || _loc3_.MapnodeState == 3);
 	}
 
@@ -1358,7 +1358,7 @@ class UIMapWorldMap {
 		if (mapNode == null || mDBFacade.dbAccountInfo == null || mDBFacade.dbAccountInfo.inventoryInfo == null) {
 			return false;
 		}
-		var _loc2_ = ASCompat.dynamicAs(mDBFacade.dbAccountInfo.inventoryInfo.mapnodes1.itemFor(mapNode.Id), account.MapnodeInfo);
+		var _loc2_ = ASCompat.coerce(mDBFacade.dbAccountInfo.inventoryInfo.mapnodes1.itemFor(mapNode.Id), account.MapnodeInfo);
 		return _loc2_ != null && _loc2_.MapnodeState == 3;
 	}
 
@@ -1366,7 +1366,7 @@ class UIMapWorldMap {
 		if (mapNode == null || mDBFacade.dbAccountInfo == null || mDBFacade.dbAccountInfo.inventoryInfo == null) {
 			return false;
 		}
-		var _loc2_ = ASCompat.dynamicAs(mDBFacade.dbAccountInfo.inventoryInfo.mapnodes1.itemFor(mapNode.Id), account.MapnodeInfo);
+		var _loc2_ = ASCompat.coerce(mDBFacade.dbAccountInfo.inventoryInfo.mapnodes1.itemFor(mapNode.Id), account.MapnodeInfo);
 		return _loc2_ == null;
 	}
 
@@ -1379,7 +1379,7 @@ class UIMapWorldMap {
 		final __ax4_iter_169 = node.ChildNodes;
 		if (checkNullIteratee(__ax4_iter_169))
 			for (_tmp_ in __ax4_iter_169) {
-				_loc2_ = ASCompat.dynamicAs(_tmp_, gameMasterDictionary.GMMapNode);
+				_loc2_ = ASCompat.coerce(_tmp_, gameMasterDictionary.GMMapNode);
 				if (_loc2_ != null) {
 					if (mapNodeLocked(_loc2_)) {
 						return true;
@@ -1397,7 +1397,7 @@ class UIMapWorldMap {
 			for (_tmp_ in __ax4_iter_170) {
 				_loc3_ = _tmp_;
 				if (ASCompat.stringAsBool(_loc3_)) {
-					_loc2_ = ASCompat.dynamicAs(mDBFacade.gameMaster.mapNodeByConstant.itemFor(_loc3_), gameMasterDictionary.GMMapNode);
+					_loc2_ = ASCompat.coerce(mDBFacade.gameMaster.mapNodeByConstant.itemFor(_loc3_), gameMasterDictionary.GMMapNode);
 					if (_loc2_ != null && mapNodeOpen(_loc2_, true)) {
 						return true;
 					}
@@ -1411,7 +1411,7 @@ class UIMapWorldMap {
 		final __ax4_iter_171 = node.ChildNodes;
 		if (checkNullIteratee(__ax4_iter_171))
 			for (_tmp_ in __ax4_iter_171) {
-				_loc3_ = ASCompat.dynamicAs(_tmp_, gameMasterDictionary.GMMapNode);
+				_loc3_ = ASCompat.coerce(_tmp_, gameMasterDictionary.GMMapNode);
 				if (_loc3_ != null && _loc3_.Constant == childConstant) {
 					return true;
 				}
@@ -1462,7 +1462,7 @@ class UIMapWorldMap {
 			for (_tmp_ in __ax4_iter_172) {
 				_loc8_ = _tmp_;
 				if (ASCompat.stringAsBool(_loc8_)) {
-					_loc3_ = ASCompat.dynamicAs(mDBFacade.gameMaster.mapNodeByConstant.itemFor(_loc8_), gameMasterDictionary.GMMapNode);
+					_loc3_ = ASCompat.coerce(mDBFacade.gameMaster.mapNodeByConstant.itemFor(_loc8_), gameMasterDictionary.GMMapNode);
 					if (!(_loc3_ != null && mapNodeOpen(_loc3_, true))) {
 						_loc2_ = getClipFromConstant(_loc8_);
 						if (_loc4_) {
@@ -1470,7 +1470,7 @@ class UIMapWorldMap {
 								_loc2_.visible = true;
 							}
 						} else if (_loc2_ != null) {
-							_loc5_ = ASCompat.dynamicAs(mDBFacade.gameMaster.mapNodeByConstant.itemFor(_loc2_.name), gameMasterDictionary.GMMapNode);
+							_loc5_ = ASCompat.coerce(mDBFacade.gameMaster.mapNodeByConstant.itemFor(_loc2_.name), gameMasterDictionary.GMMapNode);
 							if (_loc5_ != null && !_loc5_.AlwaysVisible) {
 								mWorkComponent.doLater(_loc7_, revealCallback(_loc2_));
 								_loc7_ += 0.15;
@@ -1510,14 +1510,14 @@ class UIMapWorldMap {
 				if (ASCompat.toBool((_loc3_ : ASAny).label)) {
 					ASCompat.setProperty((_loc3_ : ASAny).label, "text", "");
 				}
-				_loc4_ = ASCompat.dynamicAs(mDBFacade.gameMaster.mapNodeByConstant.itemFor(_loc3_.name), gameMasterDictionary.GMMapNode);
+				_loc4_ = ASCompat.coerce(mDBFacade.gameMaster.mapNodeByConstant.itemFor(_loc3_.name), gameMasterDictionary.GMMapNode);
 				if (_loc4_ == null) {
 					Logger.warn("Can\'t find gmMapNode for: " + _loc3_.name);
 				} else if (!_loc4_.AlwaysVisible) {
 					_loc3_.visible = false;
 				}
 			}
-			_loc5_ = ASCompat.toInt(_loc5_) + 1;
+			_loc5_++;
 		}
 	}
 
@@ -1530,13 +1530,13 @@ class UIMapWorldMap {
 			if (_loc1_ != null && _loc1_.name.indexOf("_unlocked") != -1) {
 				_loc1_.visible = false;
 			}
-			_loc2_ = ASCompat.toInt(_loc2_) + 1;
+			_loc2_++;
 		}
-		initializeLeagueMapNodes(ASCompat.dynamicAs((mRootMovieClip : ASAny).worldmap.rookie_league, flash.display.MovieClip));
-		initializeLeagueMapNodes(ASCompat.dynamicAs((mRootMovieClip : ASAny).worldmap.gladiator_league, flash.display.MovieClip));
-		initializeLeagueMapNodes(ASCompat.dynamicAs((mRootMovieClip : ASAny).worldmap.grinder_league, flash.display.MovieClip));
-		initializeLeagueMapNodes(ASCompat.dynamicAs((mRootMovieClip : ASAny).worldmap.heroic_league, flash.display.MovieClip));
-		initializeLeagueMapNodes(ASCompat.dynamicAs((mRootMovieClip : ASAny).worldmap.infinite_island_league, flash.display.MovieClip), true);
+		initializeLeagueMapNodes(ASCompat.coerce((mRootMovieClip : ASAny).worldmap.rookie_league, flash.display.MovieClip));
+		initializeLeagueMapNodes(ASCompat.coerce((mRootMovieClip : ASAny).worldmap.gladiator_league, flash.display.MovieClip));
+		initializeLeagueMapNodes(ASCompat.coerce((mRootMovieClip : ASAny).worldmap.grinder_league, flash.display.MovieClip));
+		initializeLeagueMapNodes(ASCompat.coerce((mRootMovieClip : ASAny).worldmap.heroic_league, flash.display.MovieClip));
+		initializeLeagueMapNodes(ASCompat.coerce((mRootMovieClip : ASAny).worldmap.infinite_island_league, flash.display.MovieClip), true);
 	}
 
 	function initializeOpenMapNodes() {
@@ -1557,32 +1557,31 @@ class UIMapWorldMap {
 		_loc6_ = (0 : UInt);
 		while (_loc6_ < (_loc4_.length:UInt)) {
 			_loc8_ = ASCompat.dynamicAs(_loc4_[(_loc6_ : Int)], MapnodeInfo);
-			_loc5_ = ASCompat.dynamicAs(mDBFacade.gameMaster.mapNodeById.itemFor(_loc8_.nodeId), gameMasterDictionary.GMMapNode);
+			_loc5_ = ASCompat.coerce(mDBFacade.gameMaster.mapNodeById.itemFor(_loc8_.nodeId), gameMasterDictionary.GMMapNode);
 			if (_loc5_ != null) {
-				_loc2_ = ASCompat.dynamicAs(cast((mRootMovieClip : ASAny).worldmap.rookie_league, flash.display.DisplayObjectContainer)
+				_loc2_ = ASCompat.coerce(cast((mRootMovieClip : ASAny).worldmap.rookie_league, flash.display.DisplayObjectContainer)
 					.getChildByName(_loc5_.Constant),
 					flash.display.MovieClip);
 				if (_loc2_ == null) {
-					_loc2_ = ASCompat.dynamicAs(cast((mRootMovieClip : ASAny).worldmap.gladiator_league, flash.display.DisplayObjectContainer)
+					_loc2_ = ASCompat.coerce(cast((mRootMovieClip : ASAny).worldmap.gladiator_league, flash.display.DisplayObjectContainer)
 						.getChildByName(_loc5_.Constant),
 						flash.display.MovieClip);
-					mCurrentLeague = (ASCompat.toInt(_loc2_ != null && mCurrentLeague < 1 ? (1 : UInt) : mCurrentLeague) : UInt);
+					mCurrentLeague = _loc2_ != null && mCurrentLeague < 1 ? (1 : UInt) : mCurrentLeague;
 					if (_loc2_ == null) {
-						_loc2_ = ASCompat.dynamicAs(cast((mRootMovieClip : ASAny).worldmap.grinder_league, flash.display.DisplayObjectContainer)
+						_loc2_ = ASCompat.coerce(cast((mRootMovieClip : ASAny).worldmap.grinder_league, flash.display.DisplayObjectContainer)
 							.getChildByName(_loc5_.Constant),
 							flash.display.MovieClip);
-						mCurrentLeague = (ASCompat.toInt(_loc2_ != null && mCurrentLeague < 3 ? (3 : UInt) : mCurrentLeague) : UInt);
+						mCurrentLeague = _loc2_ != null && mCurrentLeague < 3 ? (3 : UInt) : mCurrentLeague;
 						if (_loc2_ == null) {
-							_loc2_ = ASCompat.dynamicAs(cast((mRootMovieClip : ASAny).worldmap.heroic_league, flash.display.DisplayObjectContainer)
+							_loc2_ = ASCompat.coerce(cast((mRootMovieClip : ASAny).worldmap.heroic_league, flash.display.DisplayObjectContainer)
 								.getChildByName(_loc5_.Constant),
 								flash.display.MovieClip);
-							mCurrentLeague = (ASCompat.toInt(_loc2_ != null && mCurrentLeague < 2 ? (2 : UInt) : mCurrentLeague) : UInt);
+							mCurrentLeague = _loc2_ != null && mCurrentLeague < 2 ? (2 : UInt) : mCurrentLeague;
 							if (_loc2_ == null) {
-								_loc2_ = ASCompat.dynamicAs(cast((mRootMovieClip : ASAny).worldmap.infinite_island_league,
-									flash.display.DisplayObjectContainer).getChildByName(_loc5_.Constant),
+								_loc2_ = ASCompat.coerce(cast((mRootMovieClip : ASAny).worldmap.infinite_island_league, flash.display.DisplayObjectContainer)
+									.getChildByName(_loc5_.Constant),
 									flash.display.MovieClip);
-								mCurrentLeague = (ASCompat.toInt(_loc2_ != null
-									&& mCurrentLeague < 4 ? (4 : UInt) : mCurrentLeague) : UInt);
+								mCurrentLeague = _loc2_ != null && mCurrentLeague < 4 ? (4 : UInt) : mCurrentLeague;
 								if (_loc2_ == null) {
 									Logger.warn("Can\'t find movie clip node for gmMapNode Constant: " + _loc5_.Constant);
 								}
@@ -1599,7 +1598,7 @@ class UIMapWorldMap {
 						ASCompat.setProperty((_loc2_ : ASAny).text_popup, "visible", true);
 						ASCompat.setProperty((_loc2_ : ASAny).text_popup.title_label, "text",
 							GameMasterLocale.getGameMasterSubString("DUNGEON_NAME", _loc5_.Constant).toUpperCase());
-						_loc11_ = ASCompat.dynamicAs(mDBFacade.gameMaster.coliseumTierByConstant.itemFor(_loc5_.TierRank), gameMasterDictionary.GMColiseumTier);
+						_loc11_ = ASCompat.coerce(mDBFacade.gameMaster.coliseumTierByConstant.itemFor(_loc5_.TierRank), gameMasterDictionary.GMColiseumTier);
 						if (_loc11_.TotalFloors > 0 && _loc5_.NodeType != "BOSS") {
 							_loc9_ = _loc11_.TotalFloors > 1 ? Locale.getString("FLOORS") : Locale.getString("FLOOR");
 							if (_loc11_.TotalFloors >= 50) {
@@ -1641,7 +1640,7 @@ class UIMapWorldMap {
 						}
 						_loc3_ = mDBFacade.dbAccountInfo.localFriendInfo.getIIAvatarScoreForNode((mDBFacade.dbAccountInfo.activeAvatarId : Int),
 							(_loc5_.Id : Int));
-						_loc10_ = ASCompat.dynamicAs(mDBFacade.gameMaster.infiniteDungeonsByConstant.itemFor(_loc5_.InfiniteDungeon),
+						_loc10_ = ASCompat.coerce(mDBFacade.gameMaster.infiniteDungeonsByConstant.itemFor(_loc5_.InfiniteDungeon),
 							gameMasterDictionary.GMInfiniteDungeon);
 						_loc1_ = [
 							(_loc2_ : ASAny)
@@ -1702,7 +1701,7 @@ class UIMapWorldMap {
 			if (_loc10_ != null) {
 				_loc13_ = false;
 				_loc11_ = false;
-				_loc3_ = ASCompat.dynamicAs(mDBFacade.gameMaster.mapNodeByConstant.itemFor(_loc10_.name), gameMasterDictionary.GMMapNode);
+				_loc3_ = ASCompat.coerce(mDBFacade.gameMaster.mapNodeByConstant.itemFor(_loc10_.name), gameMasterDictionary.GMMapNode);
 				if (_loc3_ != null) {
 					if (mapNodesOpen(_loc3_.ParentNodes, false)) {
 						if (_loc3_.LevelRequirement <= mDBFacade.dbAccountInfo.activeAvatarInfo.level) {
@@ -1758,22 +1757,22 @@ class UIMapWorldMap {
 						ASCompat.setProperty((_loc10_ : ASAny).trophy_req, "visible", false);
 					}
 					if ((_loc10_ : ASAny).unlocked.visible == true) {
-						_loc9_ = ASCompat.dynamicAs((_loc10_ : ASAny).unlocked, flash.display.MovieClip);
+						_loc9_ = ASCompat.coerce((_loc10_ : ASAny).unlocked, flash.display.MovieClip);
 						_loc4_ = new MovieClipRenderController(mDBFacade, _loc9_);
 						_loc4_.play((0 : UInt), true);
 					} else if ((_loc10_ : ASAny).defeated.visible == true) {
-						_loc9_ = ASCompat.dynamicAs((_loc10_ : ASAny).defeated, flash.display.MovieClip);
+						_loc9_ = ASCompat.coerce((_loc10_ : ASAny).defeated, flash.display.MovieClip);
 					} else {
 						_loc13_ = true;
-						_loc9_ = ASCompat.dynamicAs((_loc10_ : ASAny).locked, flash.display.MovieClip);
+						_loc9_ = ASCompat.coerce((_loc10_ : ASAny).locked, flash.display.MovieClip);
 					}
 					if (!_loc13_) {
 						_loc2_ = true;
 						_loc7_ = 0;
 						while (_loc7_ < _loc3_.ParentNodes.length) {
-							_loc6_ = ASCompat.dynamicAs(_loc3_.ParentNodes[_loc7_], gameMasterDictionary.GMMapNode);
+							_loc6_ = ASCompat.coerce(_loc3_.ParentNodes[_loc7_], gameMasterDictionary.GMMapNode);
 							if (_loc6_ != null && mapNodeOpen(_loc6_, true)) {
-								_loc14_ = ASCompat.dynamicAs(cast((mRootMovieClip : ASAny).worldmap, flash.display.DisplayObjectContainer)
+								_loc14_ = ASCompat.coerce(cast((mRootMovieClip : ASAny).worldmap, flash.display.DisplayObjectContainer)
 									.getChildByName(_loc6_.Constant
 									+ "_" + _loc3_.Constant + "_unlocked"),
 									flash.display.MovieClip);
@@ -1787,7 +1786,7 @@ class UIMapWorldMap {
 									}
 								}
 							}
-							_loc7_ = ASCompat.toInt(_loc7_) + 1;
+							_loc7_++;
 						}
 						_loc8_ = new UIButton(mDBFacade, _loc9_);
 						_loc8_.rolloverFilter = DBGlobal.UI_ROLLOVER_FILTER;
@@ -1796,7 +1795,7 @@ class UIMapWorldMap {
 						_loc8_.dontKillMyChildren = true;
 						ASCompat.setProperty((_loc10_ : ASAny).text_popup, "x", 0);
 						ASCompat.setProperty((_loc10_ : ASAny).text_popup, "y", 0);
-						_loc8_.tooltip = ASCompat.dynamicAs((_loc10_ : ASAny).text_popup, flash.display.MovieClip);
+						_loc8_.tooltip = ASCompat.coerce((_loc10_ : ASAny).text_popup, flash.display.MovieClip);
 						mOpenNodeButtons.add(_loc3_.Id, _loc8_);
 					} else {
 						_loc12_ = new UIButton(mDBFacade, _loc9_);
@@ -1808,7 +1807,7 @@ class UIMapWorldMap {
 							ASCompat.setProperty((_loc10_ : ASAny).text_popup, "x", 0);
 							ASCompat.setProperty((_loc10_ : ASAny).text_popup, "y", 0);
 							ASCompat.setProperty((_loc10_ : ASAny).text_popup, "visible", true);
-							_loc12_.tooltip = ASCompat.dynamicAs((_loc10_ : ASAny).text_popup, flash.display.MovieClip);
+							_loc12_.tooltip = ASCompat.coerce((_loc10_ : ASAny).text_popup, flash.display.MovieClip);
 						}
 						_loc12_.rolloverFilter = DBGlobal.UI_DISABLED_FILTER;
 						_loc12_.releaseCallback = null;
@@ -1820,7 +1819,7 @@ class UIMapWorldMap {
 					Logger.warn("Badly named map node in worldmap: " + _loc10_.name + " for node: " + _loc3_);
 				}
 			}
-			_loc5_ = ASCompat.toInt(_loc5_) + 1;
+			_loc5_++;
 		}
 		return _loc2_;
 	}
@@ -1830,11 +1829,11 @@ class UIMapWorldMap {
 		mLockedNodeButtons = new Map();
 		initializeAllMapNodes();
 		initializeOpenMapNodes();
-		createNodeButtonsForLeague(ASCompat.dynamicAs((mRootMovieClip : ASAny).worldmap.rookie_league, flash.display.MovieClip));
-		createNodeButtonsForLeague(ASCompat.dynamicAs((mRootMovieClip : ASAny).worldmap.gladiator_league, flash.display.MovieClip));
-		createNodeButtonsForLeague(ASCompat.dynamicAs((mRootMovieClip : ASAny).worldmap.grinder_league, flash.display.MovieClip));
-		createNodeButtonsForLeague(ASCompat.dynamicAs((mRootMovieClip : ASAny).worldmap.heroic_league, flash.display.MovieClip));
-		mInfiniteIslandUnlocked = createNodeButtonsForLeague(ASCompat.dynamicAs((mRootMovieClip : ASAny).worldmap.infinite_island_league,
+		createNodeButtonsForLeague(ASCompat.coerce((mRootMovieClip : ASAny).worldmap.rookie_league, flash.display.MovieClip));
+		createNodeButtonsForLeague(ASCompat.coerce((mRootMovieClip : ASAny).worldmap.gladiator_league, flash.display.MovieClip));
+		createNodeButtonsForLeague(ASCompat.coerce((mRootMovieClip : ASAny).worldmap.grinder_league, flash.display.MovieClip));
+		createNodeButtonsForLeague(ASCompat.coerce((mRootMovieClip : ASAny).worldmap.heroic_league, flash.display.MovieClip));
+		mInfiniteIslandUnlocked = createNodeButtonsForLeague(ASCompat.coerce((mRootMovieClip : ASAny).worldmap.infinite_island_league,
 			flash.display.MovieClip));
 		setCurrentNode(mCurrentNode);
 	}
@@ -1855,7 +1854,7 @@ class UIMapWorldMap {
 				__ax4_iter_173 = mAvatarList;
 				if (checkNullIteratee(__ax4_iter_173))
 					for (_tmp_ in __ax4_iter_173) {
-						_loc1_ = ASCompat.dynamicAs(_tmp_, flash.display.DisplayObject);
+						_loc1_ = ASCompat.coerce(_tmp_, flash.display.DisplayObject);
 						_loc1_.alpha = 1;
 						ASCompat.setProperty((cast(_loc1_, MovieClip) : ASAny).join, "alpha", 1);
 					}
@@ -1872,9 +1871,9 @@ class UIMapWorldMap {
 			__ax4_iter_174 = mAvatarList;
 			if (checkNullIteratee(__ax4_iter_174))
 				for (_tmp_ in __ax4_iter_174) {
-					_loc4_ = ASCompat.dynamicAs(_tmp_, flash.display.DisplayObject);
-					_loc2_ = Math.abs(ASCompat.toNumber(_loc4_.x - ASCompat.toNumberField((mRootMovieClip : ASAny).worldmap, "mouseX")));
-					_loc3_ = Math.abs(ASCompat.toNumber(_loc4_.y - ASCompat.toNumberField((mRootMovieClip : ASAny).worldmap, "mouseY")));
+					_loc4_ = ASCompat.coerce(_tmp_, flash.display.DisplayObject);
+					_loc2_ = Math.abs(_loc4_.x - ASCompat.toNumberField((mRootMovieClip : ASAny).worldmap, "mouseX"));
+					_loc3_ = Math.abs(_loc4_.y - ASCompat.toNumberField((mRootMovieClip : ASAny).worldmap, "mouseY"));
 					if (_loc2_ < 60 && _loc3_ < 60) {
 						_loc2_ /= 60;
 						_loc3_ /= 60;
@@ -1888,7 +1887,7 @@ class UIMapWorldMap {
 	}
 
 	function clipFromNodeId(nodeId:UInt):MovieClip {
-		var _loc2_ = ASCompat.dynamicAs(mDBFacade.gameMaster.mapNodeById.itemFor(nodeId), gameMasterDictionary.GMMapNode);
+		var _loc2_ = ASCompat.coerce(mDBFacade.gameMaster.mapNodeById.itemFor(nodeId), gameMasterDictionary.GMMapNode);
 		if (_loc2_ != null) {
 			return getClipFromConstant(_loc2_.Constant);
 		}
@@ -2081,7 +2080,7 @@ class UIMapWorldMap {
 		var _loc3_ = new SearchNode(mCurrentNode, null);
 		mNodeQueue.push(_loc3_);
 		while (mNodeQueue.length != 0) {
-			_loc2_ = ASCompat.dynamicAs(mNodeQueue.shift(), SearchNode);
+			_loc2_ = ASCompat.coerce(mNodeQueue.shift(), SearchNode);
 			mClosedNodeList.add(_loc2_.Node);
 			if (_loc2_.Node == goal) {
 				buildPathFromSearchNode(_loc2_);
@@ -2097,11 +2096,11 @@ class UIMapWorldMap {
 		var _loc3_:GMMapNode = null;
 		_loc2_ = 0;
 		while (_loc2_ < mapNode.Node.ChildNodes.length) {
-			_loc3_ = ASCompat.dynamicAs(mapNode.Node.ChildNodes[_loc2_], gameMasterDictionary.GMMapNode);
+			_loc3_ = ASCompat.coerce(mapNode.Node.ChildNodes[_loc2_], gameMasterDictionary.GMMapNode);
 			if (_loc3_ != null && !mClosedNodeList.has(_loc3_)) {
 				mNodeQueue.push(new SearchNode(_loc3_, mapNode));
 			}
-			_loc2_ = ASCompat.toInt(_loc2_) + 1;
+			_loc2_++;
 		}
 	}
 

@@ -34,23 +34,23 @@ class UIModifier {
 		mAssetLoadingComponent = new AssetLoadingComponent(mDBFacade);
 		if (!isLegendaryModifier) {
 			if (constant != "") {
-				mGMModifier = ASCompat.dynamicAs(mDBFacade.gameMaster.modifiersByConstant.itemFor(constant), gameMasterDictionary.GMModifier);
+				mGMModifier = ASCompat.coerce(mDBFacade.gameMaster.modifiersByConstant.itemFor(constant), gameMasterDictionary.GMModifier);
 			} else {
 				if (id <= 0) {
 					Logger.error("Creating UIModifierRegular with invalid data");
 					return;
 				}
-				mGMModifier = ASCompat.dynamicAs(mDBFacade.gameMaster.modifiersById.itemFor(id), gameMasterDictionary.GMModifier);
+				mGMModifier = ASCompat.coerce(mDBFacade.gameMaster.modifiersById.itemFor(id), gameMasterDictionary.GMModifier);
 			}
 		} else if (legendaryModifierNum > 0) {
-			mGMLegendaryModifier = ASCompat.dynamicAs(mDBFacade.gameMaster.legendaryModifiersById.itemFor(legendaryModifierNum),
+			mGMLegendaryModifier = ASCompat.coerce(mDBFacade.gameMaster.legendaryModifiersById.itemFor(legendaryModifierNum),
 				gameMasterDictionary.GMLegendaryModifier);
 		} else {
 			if (!ASCompat.stringAsBool(constant)) {
 				Logger.error("Creating UIModifierLegendary with invalid data");
 				return;
 			}
-			mGMLegendaryModifier = ASCompat.dynamicAs(mDBFacade.gameMaster.legendaryModifiersByConstant.itemFor(constant),
+			mGMLegendaryModifier = ASCompat.coerce(mDBFacade.gameMaster.legendaryModifiersByConstant.itemFor(constant),
 				gameMasterDictionary.GMLegendaryModifier);
 		}
 		mParentMC = parentMC;
@@ -89,7 +89,7 @@ class UIModifier {
 					_loc3_ = 5;
 					_loc6_ = 0;
 					while (_loc6_ < _loc3_) {
-						_loc4_ = ASCompat.dynamicAs(cast((mRoot : ASAny).modifier_icon_slot, flash.display.DisplayObjectContainer).getChildByName("star"
+						_loc4_ = ASCompat.coerce(cast((mRoot : ASAny).modifier_icon_slot, flash.display.DisplayObjectContainer).getChildByName("star"
 							+ Std.string((_loc6_ + 1))),
 							flash.display.MovieClip);
 						_loc4_.visible = false;
@@ -97,7 +97,7 @@ class UIModifier {
 					}
 					_loc6_ = 0;
 					while ((_loc6_ : UInt) < mGMModifier.Level) {
-						_loc4_ = ASCompat.dynamicAs(cast((mRoot : ASAny).modifier_icon_slot, flash.display.DisplayObjectContainer).getChildByName("star"
+						_loc4_ = ASCompat.coerce(cast((mRoot : ASAny).modifier_icon_slot, flash.display.DisplayObjectContainer).getChildByName("star"
 							+ Std.string((_loc6_ + 1))),
 							flash.display.MovieClip);
 						_loc4_.visible = true;

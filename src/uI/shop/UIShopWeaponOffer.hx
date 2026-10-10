@@ -52,20 +52,20 @@ class UIShopWeaponOffer extends UIShopOffer {
 
 	public function new(dbFacade:DBFacade, templateClass:Dynamic, descTooltipClass:Dynamic, chargeTooltipClass:Dynamic, buyCallback:ASFunction = null) {
 		super(dbFacade, templateClass, buyCallback);
-		mRibbonA = ASCompat.dynamicAs((mRoot : ASAny).ribbon_A, flash.display.MovieClip);
-		mRibbonB = ASCompat.dynamicAs((mRoot : ASAny).ribbon_B, flash.display.MovieClip);
+		mRibbonA = ASCompat.coerce((mRoot : ASAny).ribbon_A, flash.display.MovieClip);
+		mRibbonB = ASCompat.coerce((mRoot : ASAny).ribbon_B, flash.display.MovieClip);
 		mRibbonA.visible = false;
 		mRibbonB.visible = false;
-		mPower = ASCompat.dynamicAs((mRoot : ASAny).power, flash.display.MovieClip);
+		mPower = ASCompat.coerce((mRoot : ASAny).power, flash.display.MovieClip);
 		if (mPower != null) {
-			mPowerLabel = ASCompat.dynamicAs((mPower : ASAny).label, flash.text.TextField);
+			mPowerLabel = ASCompat.coerce((mPower : ASAny).label, flash.text.TextField);
 			ASCompat.setProperty((mPower : ASAny).attack_label, "text", Locale.getString("POWER"));
 		}
-		mTapIcon = new UIObject(mDBFacade, ASCompat.dynamicAs((mRoot : ASAny).tap_icon, flash.display.MovieClip));
+		mTapIcon = new UIObject(mDBFacade, ASCompat.coerce((mRoot : ASAny).tap_icon, flash.display.MovieClip));
 		mTapTooltip = new UITapHoldTooltip(mDBFacade, chargeTooltipClass);
 		mTapIcon.tooltip = mTapTooltip;
 		mTapTooltip.visible = false;
-		mHoldIcon = new UIObject(mDBFacade, ASCompat.dynamicAs((mRoot : ASAny).hit_icon, flash.display.MovieClip));
+		mHoldIcon = new UIObject(mDBFacade, ASCompat.coerce((mRoot : ASAny).hit_icon, flash.display.MovieClip));
 		mHoldTooltip = new UITapHoldTooltip(mDBFacade, chargeTooltipClass);
 		mHoldIcon.tooltip = mHoldTooltip;
 		mHoldTooltip.visible = false;
@@ -145,7 +145,7 @@ class UIShopWeaponOffer extends UIShopOffer {
 		var rarity:GMRarity;
 		this.offer = gmOffer;
 		mGMOfferDetail = this.offer.Details[0];
-		mGMWeaponItem = ASCompat.dynamicAs(mDBFacade.gameMaster.weaponItemById.itemFor(mGMOfferDetail.WeaponId), gameMasterDictionary.GMWeaponItem);
+		mGMWeaponItem = ASCompat.coerce(mDBFacade.gameMaster.weaponItemById.itemFor(mGMOfferDetail.WeaponId), gameMasterDictionary.GMWeaponItem);
 		super.showOffer(gmOffer, gmHero);
 		weaponName = "";
 		weaponName = GameMasterLocale.getGameMasterSubString("WEAPON_AESTHETIC_NAME", gmOffer.getOfferItemConstant(mDBFacade.gameMaster));
@@ -166,7 +166,7 @@ class UIShopWeaponOffer extends UIShopOffer {
 					var _loc2_:MovieClip = null;
 					var _loc3_ = param1.getClass(iconName);
 					if (_loc3_ != null) {
-						_loc2_ = ASCompat.dynamicAs(ASCompat.createInstance(_loc3_, []), flash.display.MovieClip);
+						_loc2_ = ASCompat.coerce(ASCompat.createInstance(_loc3_, []), flash.display.MovieClip);
 						_loc2_.scaleX = _loc2_.scaleY = 0.5;
 						mTapIcon.root.addChild(_loc2_);
 						mTapTooltip.setValues(GameMasterLocale.getGameMasterSubString("WEAPON_ITEM_TAP_TITLE", mGMWeaponItem.Constant),
@@ -189,7 +189,7 @@ class UIShopWeaponOffer extends UIShopOffer {
 					var _loc4_:String = null;
 					var _loc3_ = param1.getClass(iconName1);
 					if (_loc3_ != null) {
-						_loc2_ = ASCompat.dynamicAs(ASCompat.createInstance(_loc3_, []), flash.display.MovieClip);
+						_loc2_ = ASCompat.coerce(ASCompat.createInstance(_loc3_, []), flash.display.MovieClip);
 						_loc2_.scaleX = _loc2_.scaleY = 0.5;
 						mHoldIcon.root.addChild(_loc2_);
 						_loc4_ = mGMWeaponItem.WeaponController != null ? GameMasterLocale.getGameMasterSubString("WEAPON_ITEM_CONTROLLER",
@@ -206,15 +206,15 @@ class UIShopWeaponOffer extends UIShopOffer {
 		mPower.visible = true;
 		mPowerLabel.text = Std.string(mGMOfferDetail.WeaponPower);
 		if (mGMOfferDetail.Modifier1 != null) {
-			mUIModifierList.push(new UIModifier(mDBFacade, ASCompat.dynamicAs((mRoot : ASAny).modifier_icon_1, flash.display.MovieClip),
+			mUIModifierList.push(new UIModifier(mDBFacade, ASCompat.coerce((mRoot : ASAny).modifier_icon_1, flash.display.MovieClip),
 				mGMOfferDetail.Modifier1));
 		}
 		if (mGMOfferDetail.Modifier2 != null) {
-			mUIModifierList.push(new UIModifier(mDBFacade, ASCompat.dynamicAs((mRoot : ASAny).modifier_icon_2, flash.display.MovieClip),
+			mUIModifierList.push(new UIModifier(mDBFacade, ASCompat.coerce((mRoot : ASAny).modifier_icon_2, flash.display.MovieClip),
 				mGMOfferDetail.Modifier2));
 		}
 		if (mGMOfferDetail.Modifier3 != null) {
-			mUIModifierList.push(new UIModifier(mDBFacade, ASCompat.dynamicAs((mRoot : ASAny).modifier_icon_3, flash.display.MovieClip),
+			mUIModifierList.push(new UIModifier(mDBFacade, ASCompat.coerce((mRoot : ASAny).modifier_icon_3, flash.display.MovieClip),
 				mGMOfferDetail.Modifier3, (0 : UInt), true));
 		}
 		preNameModifiers = "";
@@ -263,7 +263,7 @@ class UIShopWeaponOffer extends UIShopOffer {
 		}
 		mTitle.defaultTextFormat = format;
 		mTitle.text = weaponName;
-		rarity = ASCompat.dynamicAs(mDBFacade.gameMaster.rarityByConstant.itemFor(mGMOfferDetail.Rarity), gameMasterDictionary.GMRarity);
+		rarity = ASCompat.coerce(mDBFacade.gameMaster.rarityByConstant.itemFor(mGMOfferDetail.Rarity), gameMasterDictionary.GMRarity);
 		if (rarity != null && rarity.TextColor != 0) {
 			mTitle.textColor = rarity.TextColor;
 		}

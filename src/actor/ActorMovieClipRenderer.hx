@@ -21,14 +21,14 @@ class ActorMovieClipRenderer extends MovieClipRenderController implements IRende
 		final __ax4_iter_25 = FloorView.findNavCollisions(movieClip);
 		if (checkNullIteratee(__ax4_iter_25))
 			for (_tmp_ in __ax4_iter_25) {
-				_loc3_ = ASCompat.dynamicAs(_tmp_, flash.display.DisplayObject);
+				_loc3_ = ASCompat.coerce(_tmp_, flash.display.DisplayObject);
 				_loc3_.parent.removeChild(_loc3_);
 			}
 		var _loc4_:DisplayObject;
 		final __ax4_iter_26 = FloorView.findCombatCollisions(movieClip);
 		if (checkNullIteratee(__ax4_iter_26))
 			for (_tmp_ in __ax4_iter_26) {
-				_loc4_ = ASCompat.dynamicAs(_tmp_, flash.display.DisplayObject);
+				_loc4_ = ASCompat.coerce(_tmp_, flash.display.DisplayObject);
 				_loc4_.parent.removeChild(_loc4_);
 			}
 	}

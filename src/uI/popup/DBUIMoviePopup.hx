@@ -49,7 +49,7 @@ class DBUIMoviePopup extends DBUIOneButtonPopup {
 			ASCompat.setProperty((mPopup : ASAny).pagination, "visible", false);
 		} else {
 			ASCompat.setProperty((mPopup : ASAny).center_button, "visible", false);
-			mCenterButton = new UIButton(mDBFacade, ASCompat.dynamicAs((mPopup : ASAny).center_button_news, flash.display.MovieClip));
+			mCenterButton = new UIButton(mDBFacade, ASCompat.coerce((mPopup : ASAny).center_button_news, flash.display.MovieClip));
 			mCenterButton.rolloverFilter = DBGlobal.UI_ROLLOVER_FILTER;
 			mCenterButton.label.text = mCenterText;
 			mCenterButton.releaseCallback = function() {
@@ -63,7 +63,7 @@ class DBUIMoviePopup extends DBUIOneButtonPopup {
 	}
 
 	override public function getPagination():MovieClip {
-		return ASCompat.dynamicAs((mPopup : ASAny).pagination, flash.display.MovieClip);
+		return ASCompat.coerce((mPopup : ASAny).pagination, flash.display.MovieClip);
 	}
 
 	override function getSwfPath():String {

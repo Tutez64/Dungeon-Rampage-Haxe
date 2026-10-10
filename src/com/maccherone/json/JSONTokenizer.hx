@@ -204,7 +204,7 @@ class JSONTokenizer {
 								parseError(" Excepted a hex digit, but found: " + ch);
 							}
 							_loc3_ += ch;
-							_loc4_ = ASCompat.toInt(_loc4_) + 1;
+							_loc4_++;
 						}
 						_loc1_ += String.fromCharCode(ASCompat.parseInt(_loc3_, 16));
 

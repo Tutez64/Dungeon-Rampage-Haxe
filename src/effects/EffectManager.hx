@@ -98,7 +98,7 @@ class EffectManager {
 	}
 
 	public function endManagedEffect(effectID:UInt) {
-		var _loc2_ = ASCompat.dynamicAs(mManagedEffects.itemFor(effectID), effects.EffectGameObject);
+		var _loc2_ = ASCompat.coerce(mManagedEffects.itemFor(effectID), effects.EffectGameObject);
 		if (_loc2_ != null) {
 			mManagedEffects.remove(_loc2_);
 			_loc2_.destroy();
@@ -129,7 +129,7 @@ class EffectManager {
 		if (mManagedEffects != null) {
 			_loc2_ = ASCompat.reinterpretAs(mManagedEffects.iterator(), IMapIterator);
 			while (_loc2_.hasNext()) {
-				_loc1_ = ASCompat.dynamicAs(_loc2_.next(), effects.EffectGameObject);
+				_loc1_ = ASCompat.coerce(_loc2_.next(), effects.EffectGameObject);
 				_loc1_.destroy();
 			}
 			mManagedEffects.clear();

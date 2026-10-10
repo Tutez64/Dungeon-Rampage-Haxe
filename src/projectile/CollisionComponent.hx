@@ -64,7 +64,7 @@ class CollisionComponent {
 		mDungeonFloor = dungeonFloor;
 		mNumCollisions = (0 : UInt);
 		mDontTrackGenerations = projectile.gmProjectile.NoGenerations;
-		mGeneration = (ASCompat.toInt(mDontTrackGenerations ? (0 : UInt) : generation) : UInt);
+		mGeneration = mDontTrackGenerations ? (0 : UInt) : generation;
 		mProjectile = projectile;
 		mParentActorId = parentActorId;
 		mCombatResultCallback = combatResultCallback;
@@ -74,8 +74,8 @@ class CollisionComponent {
 		mWeaponSlot = weaponSlot;
 		mActorCollisions = new Map();
 		mHitRecurDelay = mProjectile.gmProjectile.HitRecurDelay;
-		mHitsPerActor = (Std.int(mProjectile.gmProjectile.HitsPerActor) : UInt);
-		mMaxCollisions = (Std.int(mProjectile.gmProjectile.MaxCollisions + additiveHits) : UInt);
+		mHitsPerActor = (ASCompat.floatToInt(mProjectile.gmProjectile.HitsPerActor) : UInt);
+		mMaxCollisions = (ASCompat.floatToInt(mProjectile.gmProjectile.MaxCollisions + additiveHits) : UInt);
 		mRecurringHitDelayTasks = new Map();
 		mGMAttack = gmAttck;
 		mIsPierceProjectile = isPierceProjectile;
@@ -158,7 +158,7 @@ class CollisionComponent {
 		_loc7_.attack = _loc4_;
 		_loc7_.attackee = actor.id;
 		_loc7_.damage = 0;
-		_loc7_.generation = (ASCompat.toInt(mDontTrackGenerations ? (0 : UInt) : mNumCollisions + mGeneration - 1) : UInt);
+		_loc7_.generation = mDontTrackGenerations ? (0 : UInt) : mNumCollisions + mGeneration - 1;
 		if (actor.isBlocking && !mGMAttack.Unblockable) {
 			if (CombatGameObject.blockCheck(actor.getHeadingAsVector(), actor.maximumDotForBlocking, actor.worldCenter, mProjectile.worldCenter)) {
 				_loc7_.blocked = (1 : UInt);
@@ -170,7 +170,7 @@ class CollisionComponent {
 			_loc7_.knockback = (0 : UInt);
 			_loc7_.suffer = (0 : UInt);
 		} else {
-			_loc7_.knockback = (Std.int(mProjectile.gmAttack.Knockback) : UInt);
+			_loc7_.knockback = (ASCompat.floatToInt(mProjectile.gmAttack.Knockback) : UInt);
 			if (_loc7_.knockback != 0) {
 				_loc7_.suffer = (1 : UInt);
 			} else {
@@ -201,7 +201,7 @@ class CollisionComponent {
 	}
 
 	public function exitContact(actorId:UInt) {
-		var _loc2_ = ASCompat.dynamicAs(mRecurringHitDelayTasks.itemFor(actorId), brain.workLoop.Task);
+		var _loc2_ = ASCompat.coerce(mRecurringHitDelayTasks.itemFor(actorId), brain.workLoop.Task);
 		if (_loc2_ != null) {
 			_loc2_.destroy();
 			mRecurringHitDelayTasks.removeKey(actorId);
@@ -209,7 +209,7 @@ class CollisionComponent {
 	}
 
 	function addRecurringHitDelayTask(actor:ActorGameObject, delayForNextHitInSeconds:Float) {
-		var recurringHitTask = ASCompat.dynamicAs(mRecurringHitDelayTasks.removeKey(actor.id), brain.workLoop.Task);
+		var recurringHitTask = ASCompat.coerce(mRecurringHitDelayTasks.removeKey(actor.id), brain.workLoop.Task);
 		if (recurringHitTask != null) {
 			recurringHitTask.destroy();
 		}

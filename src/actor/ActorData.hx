@@ -15,7 +15,7 @@ class ActorData {
 		mFacade = facade;
 		mActorGameObject = actorGameObject;
 		var _loc3_ = mFacade.gameMaster.getActorMap(mActorGameObject.type);
-		mData = ASCompat.dynamicAs(_loc3_.itemFor(mActorGameObject.type), gameMasterDictionary.GMActor);
+		mData = ASCompat.coerce(_loc3_.itemFor(mActorGameObject.type), gameMasterDictionary.GMActor);
 		if (mData == null) {
 			throw new Error("type not found in GameMaster");
 		}

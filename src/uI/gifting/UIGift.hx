@@ -60,18 +60,18 @@ class UIGift {
 
 	function giftPopupLoaded(swfAsset:SwfAsset) {
 		var popupClass = swfAsset.getClass("gift_popup");
-		mGiftPopup = ASCompat.dynamicAs(ASCompat.createInstance(popupClass, []), flash.display.MovieClip);
+		mGiftPopup = ASCompat.coerce(ASCompat.createInstance(popupClass, []), flash.display.MovieClip);
 		ASCompat.setProperty((mGiftPopup : ASAny).title_label, "text", Locale.getString("GIFT_POPUP_TITLE"));
 		mGiftPopup.scaleY = mGiftPopup.scaleX = 1.8;
 		mGiftPopup.x = 300;
-		mSendGiftButton = new UIButton(mDBFacade, ASCompat.dynamicAs((mGiftPopup : ASAny).left_button, flash.display.MovieClip));
+		mSendGiftButton = new UIButton(mDBFacade, ASCompat.coerce((mGiftPopup : ASAny).left_button, flash.display.MovieClip));
 		mSendGiftButton.label.text = Locale.getString("GIFT_POPUP_SEND_GIFT");
 		mSendGiftButton.releaseCallback = function() {
 			if (mStoreCallback != null) {
 				mStoreCallback();
 			}
 		};
-		mAcceptAllGiftsButton = new UIButton(mDBFacade, ASCompat.dynamicAs((mGiftPopup : ASAny).right_button, flash.display.MovieClip));
+		mAcceptAllGiftsButton = new UIButton(mDBFacade, ASCompat.coerce((mGiftPopup : ASAny).right_button, flash.display.MovieClip));
 		mAcceptAllGiftsButton.label.text = Locale.getString("GIFT_POPUP_ACCEPT_ALL");
 		if (mDBFacade.dbAccountInfo.gifts.size > 0) {
 			mAcceptAllGiftsButton.releaseCallback = function() {
@@ -81,15 +81,15 @@ class UIGift {
 			mAcceptAllGiftsButton.enabled = false;
 			SceneGraphManager.setGrayScaleSaturation(mAcceptAllGiftsButton.root, 10);
 		}
-		mCloseButton = new UIButton(mDBFacade, ASCompat.dynamicAs((mGiftPopup : ASAny).close, flash.display.MovieClip));
+		mCloseButton = new UIButton(mDBFacade, ASCompat.coerce((mGiftPopup : ASAny).close, flash.display.MovieClip));
 		mCloseButton.releaseCallback = this.destroy;
-		mGiftsVector.push(new UIGiftMessage(mDBFacade, ASCompat.dynamicAs((mGiftPopup : ASAny).message_1, flash.display.MovieClip), this));
-		mGiftsVector.push(new UIGiftMessage(mDBFacade, ASCompat.dynamicAs((mGiftPopup : ASAny).message_2, flash.display.MovieClip), this));
-		mGiftsVector.push(new UIGiftMessage(mDBFacade, ASCompat.dynamicAs((mGiftPopup : ASAny).message_3, flash.display.MovieClip), this));
-		mGiftsVector.push(new UIGiftMessage(mDBFacade, ASCompat.dynamicAs((mGiftPopup : ASAny).message_4, flash.display.MovieClip), this));
-		mGiftsVector.push(new UIGiftMessage(mDBFacade, ASCompat.dynamicAs((mGiftPopup : ASAny).message_5, flash.display.MovieClip), this));
-		mScrollUpButton = new UIButton(mDBFacade, ASCompat.dynamicAs((mGiftPopup : ASAny).up, flash.display.MovieClip));
-		mScrollDownButton = new UIButton(mDBFacade, ASCompat.dynamicAs((mGiftPopup : ASAny).down, flash.display.MovieClip));
+		mGiftsVector.push(new UIGiftMessage(mDBFacade, ASCompat.coerce((mGiftPopup : ASAny).message_1, flash.display.MovieClip), this));
+		mGiftsVector.push(new UIGiftMessage(mDBFacade, ASCompat.coerce((mGiftPopup : ASAny).message_2, flash.display.MovieClip), this));
+		mGiftsVector.push(new UIGiftMessage(mDBFacade, ASCompat.coerce((mGiftPopup : ASAny).message_3, flash.display.MovieClip), this));
+		mGiftsVector.push(new UIGiftMessage(mDBFacade, ASCompat.coerce((mGiftPopup : ASAny).message_4, flash.display.MovieClip), this));
+		mGiftsVector.push(new UIGiftMessage(mDBFacade, ASCompat.coerce((mGiftPopup : ASAny).message_5, flash.display.MovieClip), this));
+		mScrollUpButton = new UIButton(mDBFacade, ASCompat.coerce((mGiftPopup : ASAny).up, flash.display.MovieClip));
+		mScrollDownButton = new UIButton(mDBFacade, ASCompat.coerce((mGiftPopup : ASAny).down, flash.display.MovieClip));
 		if (mDBFacade.dbAccountInfo.gifts.size < (mGiftsVector.length:UInt)) {
 			mScrollDownButton.visible = false;
 			mScrollUpButton.visible = false;
@@ -104,7 +104,7 @@ class UIGift {
 		mSceneGraphComponent.addChild(mGiftPopup, (105 : UInt));
 		showCurtain();
 		scrollIndex = 0;
-		mInfoMessageTF = ASCompat.dynamicAs((mGiftPopup : ASAny).message_label, flash.text.TextField);
+		mInfoMessageTF = ASCompat.coerce((mGiftPopup : ASAny).message_label, flash.text.TextField);
 		mInfoMessageTF.text = Locale.getString("GIFT_POPUP_INFO_MESSAGE");
 	}
 
@@ -131,13 +131,13 @@ class UIGift {
 		}
 		_loc2_ = 0;
 		while (_loc2_ < mGiftsVector.length) {
-			_loc3_ = ASCompat.toInt(_loc2_ + mScrollIndex);
+			_loc3_ = _loc2_ + mScrollIndex;
 			if (_loc3_ >= _loc1_.length) {
 				break;
 			}
 			mGiftsVector[_loc2_].root.visible = true;
-			mGiftsVector[_loc2_].populateGiftMessage(ASCompat.dynamicAs(mDBFacade.dbAccountInfo.gifts.itemFor(_loc1_[_loc3_]), account.GiftInfo));
-			_loc2_ = ASCompat.toInt(_loc2_) + 1;
+			mGiftsVector[_loc2_].populateGiftMessage(ASCompat.coerce(mDBFacade.dbAccountInfo.gifts.itemFor(_loc1_[_loc3_]), account.GiftInfo));
+			_loc2_++;
 		}
 	}
 
@@ -174,7 +174,7 @@ class UIGift {
 		_loc1_ = 0;
 		while (_loc1_ < mGiftsVector.length) {
 			mGiftsVector[_loc1_].root.visible = false;
-			_loc1_ = ASCompat.toInt(_loc1_) + 1;
+			_loc1_++;
 		}
 	}
 

@@ -68,17 +68,17 @@ class UIOfferPopup extends DBUIPopup {
 		var i:UInt;
 		var callback:GMOffer->Void;
 		var popupClass = swfAsset.getClass(this.getClassName());
-		mPopup = ASCompat.dynamicAs(ASCompat.createInstance(popupClass, []), flash.display.MovieClip);
+		mPopup = ASCompat.coerce(ASCompat.createInstance(popupClass, []), flash.display.MovieClip);
 		mRoot.addChild(mPopup);
 		mPopup.scaleY = mPopup.scaleX = 1.8;
 		bounds = mPopup.getBounds(mDBFacade.stageRef);
 		mPopup.x = mDBFacade.stageRef.stageWidth / 2 - bounds.width / 2 - bounds.x;
 		mPopup.y = mDBFacade.stageRef.stageHeight / 2 - bounds.height / 2 - bounds.y;
-		mTitle = ASCompat.dynamicAs((mPopup : ASAny).title_label, flash.text.TextField);
+		mTitle = ASCompat.coerce((mPopup : ASAny).title_label, flash.text.TextField);
 		mTitle.text = titleText;
-		mEmptyOffers.push(ASCompat.dynamicAs((mPopup : ASAny).coin_shop_empty_slot_1, flash.display.MovieClip));
-		mEmptyOffers.push(ASCompat.dynamicAs((mPopup : ASAny).coin_shop_empty_slot_2, flash.display.MovieClip));
-		mEmptyOffers.push(ASCompat.dynamicAs((mPopup : ASAny).coin_shop_empty_slot_3, flash.display.MovieClip));
+		mEmptyOffers.push(ASCompat.coerce((mPopup : ASAny).coin_shop_empty_slot_1, flash.display.MovieClip));
+		mEmptyOffers.push(ASCompat.coerce((mPopup : ASAny).coin_shop_empty_slot_2, flash.display.MovieClip));
+		mEmptyOffers.push(ASCompat.coerce((mPopup : ASAny).coin_shop_empty_slot_3, flash.display.MovieClip));
 		mOfferTemplateClass = swfAsset.getClass("shop_offer_template");
 		mPremiumOfferTemplateClass = swfAsset.getClass("shop_offer_premium_template");
 		mDLCOfferTemplateClass = swfAsset.getClass("shop_offer_dlc_template");
@@ -88,7 +88,7 @@ class UIOfferPopup extends DBUIPopup {
 				close(mBuyCallback, param1);
 			};
 			offerId = mOfferIds[(i : Int)];
-			gmOffer = ASCompat.dynamicAs(mDBFacade.gameMaster.offerById.itemFor(offerId), gameMasterDictionary.GMOffer);
+			gmOffer = ASCompat.coerce(mDBFacade.gameMaster.offerById.itemFor(offerId), gameMasterDictionary.GMOffer);
 			offerClass = gmOffer.CurrencyType == "PREMIUM"
 				&& ASCompat.floatAsBool(gmOffer.Price) ? mPremiumOfferTemplateClass : mOfferTemplateClass;
 			uiShopOffer = new UIShopBundleOffer(mDBFacade, offerClass, callback, mUseIconScaling, mWantNewRollOverScale);
@@ -102,7 +102,7 @@ class UIOfferPopup extends DBUIPopup {
 			mEmptyOffers[(i : Int)].visible = false;
 			i = i + 1;
 		}
-		mCloseButton = new UIButton(mDBFacade, ASCompat.dynamicAs((mPopup : ASAny).close, flash.display.MovieClip));
+		mCloseButton = new UIButton(mDBFacade, ASCompat.coerce((mPopup : ASAny).close, flash.display.MovieClip));
 		mCloseButton.releaseCallback = function() {
 			close(closeCallback);
 		};

@@ -128,38 +128,38 @@ class ItemInfoCard extends UIObject {
 		mEventComponent = new EventComponent(mDBFacade);
 		ASCompat.setProperty((mRoot : ASAny).pet_stats, "visible", false);
 		ASCompat.setProperty((mRoot : ASAny).ability.label_charge, "text", Locale.getString("HOLD"));
-		mHoldIcon = new UIObject(mDBFacade, ASCompat.dynamicAs((mRoot : ASAny).ability.icon, flash.display.MovieClip));
-		mHoldManaIcon = ASCompat.dynamicAs((mRoot : ASAny).ability.mana_icon_hold, flash.display.MovieClip);
+		mHoldIcon = new UIObject(mDBFacade, ASCompat.coerce((mRoot : ASAny).ability.icon, flash.display.MovieClip));
+		mHoldManaIcon = ASCompat.coerce((mRoot : ASAny).ability.mana_icon_hold, flash.display.MovieClip);
 		mHoldManaIcon.visible = false;
-		mTapManaIcon = ASCompat.dynamicAs((mRoot : ASAny).ability.mana_icon_tap, flash.display.MovieClip);
+		mTapManaIcon = ASCompat.coerce((mRoot : ASAny).ability.mana_icon_tap, flash.display.MovieClip);
 		mTapManaIcon.visible = false;
 		mHoldTooltip = new UITapHoldTooltip(mDBFacade, chargeTooltipClass);
 		mHoldIcon.tooltip = mHoldTooltip;
 		mHoldIcon.tooltipPos = new Point(0, mHoldIcon.root.height * 0.5);
 		mHoldTooltip.visible = false;
 		ASCompat.setProperty((mRoot : ASAny).ability.label_tap, "text", Locale.getString("TAP"));
-		mTapIcon = new UIObject(mDBFacade, ASCompat.dynamicAs((mRoot : ASAny).ability.tap_icon, flash.display.MovieClip));
+		mTapIcon = new UIObject(mDBFacade, ASCompat.coerce((mRoot : ASAny).ability.tap_icon, flash.display.MovieClip));
 		mTapTooltip = new UITapHoldTooltip(mDBFacade, chargeTooltipClass);
 		mTapIcon.tooltip = mTapTooltip;
 		mTapIcon.tooltipPos = new Point(0, mTapIcon.root.height * 0.5);
 		mTapTooltip.visible = false;
-		mDescription = ASCompat.dynamicAs((mRoot : ASAny).description, flash.text.TextField);
-		mItemParent = new UIObject(mDBFacade, ASCompat.dynamicAs((mRoot : ASAny).item_icon, flash.display.MovieClip));
+		mDescription = ASCompat.coerce((mRoot : ASAny).description, flash.text.TextField);
+		mItemParent = new UIObject(mDBFacade, ASCompat.coerce((mRoot : ASAny).item_icon, flash.display.MovieClip));
 		mOriginalXValueForIcon = ASCompat.toNumberField((mRoot : ASAny).item_icon, "x");
-		mWeaponTypeLabel = ASCompat.dynamicAs((mRoot : ASAny).weapon_type_label, flash.text.TextField);
+		mWeaponTypeLabel = ASCompat.coerce((mRoot : ASAny).weapon_type_label, flash.text.TextField);
 		mWeaponTypeLabel.visible = false;
-		mWeaponTypeUnequippableLabel = ASCompat.dynamicAs((mRoot : ASAny).weapon_type_label_unequippable, flash.text.TextField);
+		mWeaponTypeUnequippableLabel = ASCompat.coerce((mRoot : ASAny).weapon_type_label_unequippable, flash.text.TextField);
 		mWeaponTypeUnequippableLabel.visible = false;
-		mLabel = ASCompat.dynamicAs((mRoot : ASAny).label, flash.text.TextField);
+		mLabel = ASCompat.coerce((mRoot : ASAny).label, flash.text.TextField);
 		mTitleY = mLabel.y;
-		mPowerIcon = ASCompat.dynamicAs((mRoot : ASAny).power, flash.display.MovieClip);
-		mPowerLabel = ASCompat.dynamicAs((mRoot : ASAny).power.label, flash.text.TextField);
+		mPowerIcon = ASCompat.coerce((mRoot : ASAny).power, flash.display.MovieClip);
+		mPowerLabel = ASCompat.coerce((mRoot : ASAny).power.label, flash.text.TextField);
 		ASCompat.setProperty((mRoot : ASAny).power.attack_label, "text", Locale.getString("POWER"));
-		mLevelRequirement = ASCompat.dynamicAs((mRoot : ASAny).level_requirement, flash.text.TextField);
-		mLevelRequirementNotMet = ASCompat.dynamicAs((mRoot : ASAny).level_requirement_not_met, flash.text.TextField);
-		mModifierTitle = ASCompat.dynamicAs((mRoot : ASAny).ability.label_modifier, flash.text.TextField);
+		mLevelRequirement = ASCompat.coerce((mRoot : ASAny).level_requirement, flash.text.TextField);
+		mLevelRequirementNotMet = ASCompat.coerce((mRoot : ASAny).level_requirement_not_met, flash.text.TextField);
+		mModifierTitle = ASCompat.coerce((mRoot : ASAny).ability.label_modifier, flash.text.TextField);
 		mModifiersList = new Vector<UIModifier>();
-		mSellButton = new UIButton(mDBFacade, ASCompat.dynamicAs((mRoot : ASAny).sell, flash.display.MovieClip));
+		mSellButton = new UIButton(mDBFacade, ASCompat.coerce((mRoot : ASAny).sell, flash.display.MovieClip));
 		mSellButton.rolloverFilter = DBGlobal.UI_ROLLOVER_FILTER;
 		mSellButton.label.text = Locale.getString("ITEM_CARD_SELL");
 		mSellPriceLabel = ASCompat.dynamicAs((mRoot : ASAny).sell.sell_text, TextField);
@@ -170,14 +170,14 @@ class ItemInfoCard extends UIObject {
 			mSellItemCallback(mInfo);
 		};
 		ASCompat.setProperty((mRoot : ASAny).pet_stats, "visible", false);
-		mEquipButton = new UIButton(mDBFacade, ASCompat.dynamicAs((mRoot : ASAny).equip, flash.display.MovieClip));
+		mEquipButton = new UIButton(mDBFacade, ASCompat.coerce((mRoot : ASAny).equip, flash.display.MovieClip));
 		mEquipButton.rolloverFilter = DBGlobal.UI_ROLLOVER_FILTER;
 		mOriginalPosForEquipButton = new Point(mEquipButton.root.x, mEquipButton.root.y);
-		mCloseButton = new UIButton(mDBFacade, ASCompat.dynamicAs((mRoot : ASAny).close, flash.display.MovieClip));
+		mCloseButton = new UIButton(mDBFacade, ASCompat.coerce((mRoot : ASAny).close, flash.display.MovieClip));
 		mCloseButton.rolloverFilter = DBGlobal.UI_ROLLOVER_FILTER;
 		mCloseButton.releaseCallback = closeButtonCallback;
 		mCloseButton.visible = allowCloseButton;
-		mEquipLimitTF = ASCompat.dynamicAs((mRoot : ASAny).equipLimit, flash.text.TextField);
+		mEquipLimitTF = ASCompat.coerce((mRoot : ASAny).equipLimit, flash.text.TextField);
 		mAssetLoadingComponent.getSwfAsset(DBFacade.buildFullDownloadPath("Resources/Art2D/UI/db_UI_town.swf"),
 			function(param1:brain.assetRepository.SwfAsset) {
 				var _loc2_ = param1.getClass("weapon_desc_tooltip");
@@ -486,7 +486,7 @@ class ItemInfoCard extends UIObject {
 					var _loc2_:MovieClip = null;
 					var _loc3_ = param1.getClass(iconName);
 					if (_loc3_ != null) {
-						_loc2_ = ASCompat.dynamicAs(ASCompat.createInstance(_loc3_, []), flash.display.MovieClip);
+						_loc2_ = ASCompat.coerce(ASCompat.createInstance(_loc3_, []), flash.display.MovieClip);
 						_loc2_.scaleX = _loc2_.scaleY = 0.5;
 						mTapIcon.root.addChild(_loc2_);
 						mTapTooltip.setValues(GameMasterLocale.getGameMasterSubString("WEAPON_ITEM_TAP_TITLE", gmWeaponItem.Constant),
@@ -513,7 +513,7 @@ class ItemInfoCard extends UIObject {
 					var _loc4_:String = null;
 					var _loc3_ = param1.getClass(iconName1);
 					if (_loc3_ != null) {
-						_loc2_ = ASCompat.dynamicAs(ASCompat.createInstance(_loc3_, []), flash.display.MovieClip);
+						_loc2_ = ASCompat.coerce(ASCompat.createInstance(_loc3_, []), flash.display.MovieClip);
 						_loc2_.scaleX = _loc2_.scaleY = 0.5;
 						mHoldIcon.root.addChild(_loc2_);
 						_loc4_ = gmWeaponItem.WeaponController != null ? GameMasterLocale.getGameMasterSubString("WEAPON_ITEM_CONTROLLER",
@@ -629,17 +629,17 @@ class ItemInfoCard extends UIObject {
 
 	function greyOffer(value:Bool) {
 		var _loc4_ = Vector.ofArray(([
-			ASCompat.dynamicAs((mRoot : ASAny).bg, flash.display.DisplayObject),
-			ASCompat.dynamicAs((mRoot : ASAny).icon_slot, flash.display.DisplayObject),
-			ASCompat.dynamicAs((mRoot : ASAny).ribbon, flash.display.DisplayObject),
+			ASCompat.coerce((mRoot : ASAny).bg, flash.display.DisplayObject),
+			ASCompat.coerce((mRoot : ASAny).icon_slot, flash.display.DisplayObject),
+			ASCompat.coerce((mRoot : ASAny).ribbon, flash.display.DisplayObject),
 			mHoldIcon.root,
 			mTapIcon.root,
 			mPowerIcon,
 			mItemParent.root,
-			ASCompat.dynamicAs((mRoot : ASAny).unequippable, flash.display.DisplayObject),
-			ASCompat.dynamicAs((mRoot : ASAny).ability.modifier_icon_1, flash.display.DisplayObject),
-			ASCompat.dynamicAs((mRoot : ASAny).ability.modifier_icon_2, flash.display.DisplayObject),
-			ASCompat.dynamicAs((mRoot : ASAny).ability.modifier_icon_3, flash.display.DisplayObject)
+			ASCompat.coerce((mRoot : ASAny).unequippable, flash.display.DisplayObject),
+			ASCompat.coerce((mRoot : ASAny).ability.modifier_icon_1, flash.display.DisplayObject),
+			ASCompat.coerce((mRoot : ASAny).ability.modifier_icon_2, flash.display.DisplayObject),
+			ASCompat.coerce((mRoot : ASAny).ability.modifier_icon_3, flash.display.DisplayObject)
 		] : Array<DisplayObject>));
 		var _loc2_ = SceneGraphManager.getGrayScaleSaturationFilter(5);
 		var _loc3_:DisplayObject;
@@ -650,7 +650,7 @@ class ItemInfoCard extends UIObject {
 					_loc3_.filters = cast(value ? [_loc2_] : []);
 				}
 			}
-		mLabel.textColor = (ASCompat.toInt(value ? (8947848 : UInt) : mInfo.getTextColor()) : UInt);
+		mLabel.textColor = value ? (8947848 : UInt) : mInfo.getTextColor();
 	}
 
 	public function buttonsVisible(makeVisible:Bool) {
@@ -728,8 +728,8 @@ class ItemInfoCard extends UIObject {
 		while (mItemParent.root.numChildren > 0) {
 			mItemParent.root.removeChildAt(0);
 		}
-		ItemInfo.loadItemIcon(swfPath, iconName, mItemParent.root, mDBFacade, (70 : UInt), (Std.int(mInfo.iconScale) : UInt), mAssetLoadingComponent,
-			function() {
+		ItemInfo.loadItemIcon(swfPath, iconName, mItemParent.root, mDBFacade, (70 : UInt), (ASCompat.floatToInt(mInfo.iconScale) : UInt),
+			mAssetLoadingComponent, function() {
 				var bgColoredExists = mInfo.hasColoredBackground;
 				var bgSwfPath = mInfo.backgroundSwfPath;
 				var bgIconName = mInfo.backgroundIconName;
@@ -750,7 +750,7 @@ class ItemInfoCard extends UIObject {
 						}
 					});
 				}
-			});
+		});
 	}
 
 	function loadItemType(gmWeaponItem:GMWeaponItem) {
@@ -758,7 +758,7 @@ class ItemInfoCard extends UIObject {
 		var _loc2_:GMWeaponMastertype = null;
 		if (gmWeaponItem != null) {
 			_loc3_ = gmWeaponItem.MasterType;
-			_loc2_ = ASCompat.dynamicAs(mDBFacade.gameMaster.weaponSubtypeByConstant.itemFor(_loc3_), gameMasterDictionary.GMWeaponMastertype);
+			_loc2_ = ASCompat.coerce(mDBFacade.gameMaster.weaponSubtypeByConstant.itemFor(_loc3_), gameMasterDictionary.GMWeaponMastertype);
 			if (_loc2_ != null) {
 				mWeaponTypeLabel.visible = true;
 				mWeaponTypeUnequippableLabel.visible = true;
@@ -792,7 +792,7 @@ class ItemInfoCard extends UIObject {
 			return;
 		}
 		mEquipPopup = new EquipItemToSlotPopup(mDBFacade, (_loc4_.id : Int), closeEquipCallback,
-			ASCompat.dynamicAs(isConsumable ? _loc3_ : _loc2_, account.InventoryBaseInfo), null, isConsumable);
+			ASCompat.coerce(isConsumable ? _loc3_ : _loc2_, account.InventoryBaseInfo), null, isConsumable);
 		MemoryTracker.track(mEquipPopup, "EquipItemToSlotPopup - created in ItemInfoCard.loadEquipOnAvatarPopup()");
 	}
 

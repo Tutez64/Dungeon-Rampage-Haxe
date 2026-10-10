@@ -50,7 +50,7 @@ class UIWhatsNewPopup extends DBUITwoButtonPopup {
 			ASCompat.setProperty((mPopup : ASAny).pagination, "visible", false);
 		} else {
 			ASCompat.setProperty((mPopup : ASAny).left_button, "visible", false);
-			mLeftButton = new UIButton(mDBFacade, ASCompat.dynamicAs((mPopup : ASAny).left_button_news, flash.display.MovieClip));
+			mLeftButton = new UIButton(mDBFacade, ASCompat.coerce((mPopup : ASAny).left_button_news, flash.display.MovieClip));
 			mLeftButton.rolloverFilter = DBGlobal.UI_ROLLOVER_FILTER;
 			mLeftButton.label.text = mLeftText;
 			mLeftButton.releaseCallback = function() {
@@ -66,7 +66,7 @@ class UIWhatsNewPopup extends DBUITwoButtonPopup {
 	}
 
 	override public function getPagination():MovieClip {
-		return ASCompat.dynamicAs((mPopup : ASAny).pagination, flash.display.MovieClip);
+		return ASCompat.coerce((mPopup : ASAny).pagination, flash.display.MovieClip);
 	}
 
 	override function getSwfPath():String {
@@ -80,7 +80,7 @@ class UIWhatsNewPopup extends DBUITwoButtonPopup {
 	override function setupUI(swfAsset:SwfAsset, titleText:String, content:ASAny, allowClose:Bool, closeCallback:ASFunction) {
 		super.setupUI(swfAsset, titleText.toUpperCase(), content, allowClose, closeCallback);
 		Logger.debug("MOD: mPopup: " + mPopup);
-		mImageLocator = ASCompat.dynamicAs((mPopup : ASAny).whatsnew_image, flash.display.MovieClip);
+		mImageLocator = ASCompat.coerce((mPopup : ASAny).whatsnew_image, flash.display.MovieClip);
 		Logger.debug("MOD: ImageLocator: " + mImageLocator);
 		massetLoadingComponent.getImageAsset(mImageURL, function(param1:brain.assetRepository.ImageAsset) {
 			if (mLoadingPopUp != null) {

@@ -93,7 +93,7 @@ class KeyBinder extends ConsoleCore {
 	}
 
 	function tryRunKey(key:String) {
-		var _loc2_:Array<ASAny> = ASCompat.dynamicAs(this._binds[key], Array);
+		var _loc2_:Array<ASAny> = ASCompat.coerce(this._binds[key], Array);
 		if (config.keyBindsEnabled && _loc2_ != null) {
 			if (this.canTrigger()) {
 				ASCompatMacro.applyClosure(ASCompat.asFunction(_loc2_[0]), _loc2_[1]);

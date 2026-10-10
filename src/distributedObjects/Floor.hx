@@ -117,7 +117,7 @@ class Floor extends GameObject {
 		_loc2_ = 0;
 		while (_loc2_ < val.length) {
 			mActiveDungeonModifiers.push(new DungeonModifierHelper(val[_loc2_].id, val[_loc2_].new_this_floor == 1, mDBFacade));
-			_loc2_ = ASCompat.toInt(_loc2_) + 1;
+			_loc2_++;
 		}
 		return val;
 	}

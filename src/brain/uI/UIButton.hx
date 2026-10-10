@@ -97,15 +97,15 @@ class UIButton extends UIObject {
 
 	public function new(facade:Facade, root:MovieClip, tooltipDrawLayer:Int = 0, disableEventPropogation:Bool = true) {
 		if ((root : ASAny).hasOwnProperty("theButton")) {
-			root = ASCompat.dynamicAs((root : ASAny).theButton, flash.display.MovieClip);
+			root = ASCompat.coerce((root : ASAny).theButton, flash.display.MovieClip);
 		}
 		if ((root : ASAny).hasOwnProperty("up")) {
-			mUpState = ASCompat.dynamicAs((root : ASAny).up, flash.display.MovieClip);
+			mUpState = ASCompat.coerce((root : ASAny).up, flash.display.MovieClip);
 			mUpState.mouseChildren = false;
 			mUpRenderer = new MovieClipRenderController(facade, mUpState);
 		}
 		if ((root : ASAny).hasOwnProperty("down")) {
-			mDownState = ASCompat.dynamicAs((root : ASAny).down, flash.display.MovieClip);
+			mDownState = ASCompat.coerce((root : ASAny).down, flash.display.MovieClip);
 			mDownState.mouseChildren = false;
 			mDownRenderer = new MovieClipRenderController(facade, mDownState);
 		} else {
@@ -113,7 +113,7 @@ class UIButton extends UIObject {
 			mDownRenderer = mUpRenderer;
 		}
 		if ((root : ASAny).hasOwnProperty("over")) {
-			mOverState = ASCompat.dynamicAs((root : ASAny).over, flash.display.MovieClip);
+			mOverState = ASCompat.coerce((root : ASAny).over, flash.display.MovieClip);
 			mOverState.mouseChildren = false;
 			mOverRenderer = new MovieClipRenderController(facade, mOverState);
 		} else {
@@ -121,7 +121,7 @@ class UIButton extends UIObject {
 			mOverRenderer = mUpRenderer;
 		}
 		if ((root : ASAny).hasOwnProperty("disabled")) {
-			mDisabledState = ASCompat.dynamicAs((root : ASAny).disabled, flash.display.MovieClip);
+			mDisabledState = ASCompat.coerce((root : ASAny).disabled, flash.display.MovieClip);
 			mDisabledState.mouseChildren = false;
 			mDisabledRenderer = new MovieClipRenderController(facade, mDisabledState);
 		} else {
@@ -129,7 +129,7 @@ class UIButton extends UIObject {
 			mDisabledRenderer = mUpRenderer;
 		}
 		if ((root : ASAny).hasOwnProperty("selected")) {
-			mSelectedState = ASCompat.dynamicAs((root : ASAny).selected, flash.display.MovieClip);
+			mSelectedState = ASCompat.coerce((root : ASAny).selected, flash.display.MovieClip);
 			mSelectedState.mouseChildren = false;
 			mSelectedRenderer = new MovieClipRenderController(facade, mSelectedState);
 		} else {
@@ -139,13 +139,13 @@ class UIButton extends UIObject {
 		mStates = [mUpState, mDownState, mOverState, mDisabledState, mSelectedState];
 		mRenderers = [mUpRenderer, mDownRenderer, mOverRenderer, mDisabledRenderer, mSelectedRenderer];
 		if ((root : ASAny).hasOwnProperty("hit")) {
-			mHitArea = ASCompat.dynamicAs((root : ASAny).hit, flash.display.MovieClip);
+			mHitArea = ASCompat.coerce((root : ASAny).hit, flash.display.MovieClip);
 			mHitArea.visible = false;
 			mHitArea.mouseEnabled = false;
 			root.hitArea = mHitArea;
 		}
 		if ((root : ASAny).hasOwnProperty("label")) {
-			mLabel = ASCompat.dynamicAs((root : ASAny).label, flash.text.TextField);
+			mLabel = ASCompat.coerce((root : ASAny).label, flash.text.TextField);
 			mLabel.mouseEnabled = false;
 		}
 		super(facade, root, tooltipDrawLayer);
@@ -170,7 +170,7 @@ class UIButton extends UIObject {
 	}
 
 	public function flattenLabelToBitmap() {
-		var _loc1_ = new BitmapData(Std.int(mLabel.width), Std.int(mLabel.height), true, (0 : UInt));
+		var _loc1_ = new BitmapData(ASCompat.floatToInt(mLabel.width), ASCompat.floatToInt(mLabel.height), true, (0 : UInt));
 		_loc1_.draw(mLabel);
 		var _loc2_ = new Bitmap(_loc1_, "auto", true);
 		_loc2_.transform.matrix = mLabel.transform.matrix;
@@ -330,7 +330,7 @@ class UIButton extends UIObject {
 		super.enabled = value;
 		mRoot.buttonMode = mEnabled;
 		mRoot.tabEnabled = false;
-		showState((ASCompat.toInt(mEnabled ? upState : (3 : UInt)) : UInt));
+		showState(mEnabled ? upState : (3 : UInt));
 		mMouseDown = false;
 		if (!value) {
 			if (mRolloverFilter != null) {
@@ -349,7 +349,7 @@ class UIButton extends UIObject {
 		final __ax4_iter_163 = mRenderers;
 		if (checkNullIteratee(__ax4_iter_163))
 			for (_tmp_ in __ax4_iter_163) {
-				_loc1_ = ASCompat.dynamicAs(_tmp_, brain.render.MovieClipRenderController);
+				_loc1_ = ASCompat.coerce(_tmp_, brain.render.MovieClipRenderController);
 				if (_loc1_ != null) {
 					_loc1_.destroy();
 				}
@@ -376,7 +376,7 @@ class UIButton extends UIObject {
 		final __ax4_iter_164 = mStates;
 		if (checkNullIteratee(__ax4_iter_164))
 			for (_tmp_ in __ax4_iter_164) {
-				_loc3_ = ASCompat.dynamicAs(_tmp_, flash.display.MovieClip);
+				_loc3_ = ASCompat.coerce(_tmp_, flash.display.MovieClip);
 				if (_loc3_ != null) {
 					_loc3_.visible = false;
 				}
@@ -385,7 +385,7 @@ class UIButton extends UIObject {
 		final __ax4_iter_165 = mRenderers;
 		if (checkNullIteratee(__ax4_iter_165))
 			for (_tmp_ in __ax4_iter_165) {
-				_loc2_ = ASCompat.dynamicAs(_tmp_, brain.render.MovieClipRenderController);
+				_loc2_ = ASCompat.coerce(_tmp_, brain.render.MovieClipRenderController);
 				if (_loc2_ != null) {
 					_loc2_.stop();
 				}

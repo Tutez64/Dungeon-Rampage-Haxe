@@ -21,7 +21,7 @@ class AttackAutoMoveTimelineAction extends AutoMoveTimelineAction {
 
 	override public function execute(timeline:ScriptTimeline) {
 		var _loc2_:AttackTimeline = null;
-		mAttack = ASCompat.dynamicAs(mDBFacade.gameMaster.attackById.itemFor(mAttackType), gameMasterDictionary.GMAttack);
+		mAttack = ASCompat.coerce(mDBFacade.gameMaster.attackById.itemFor(mAttackType), gameMasterDictionary.GMAttack);
 		mDuration = mAttack.MoveDuration;
 		mDistance = mAttack.MoveAmount;
 		mAngle = mAttack.MoveAngle + mActorGameObject.heading;

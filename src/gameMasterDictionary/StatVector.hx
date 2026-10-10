@@ -18,7 +18,7 @@ class StatVector {
 		_loc3_ = 0;
 		while ((_loc3_ : UInt) < slotCount) {
 			_loc2_.values[_loc3_] = s1.values[_loc3_];
-			_loc3_ = ASCompat.toInt(_loc3_) + 1;
+			_loc3_++;
 		}
 		return _loc2_;
 	}
@@ -29,7 +29,7 @@ class StatVector {
 		_loc4_ = 0;
 		while ((_loc4_ : UInt) < slotCount) {
 			_loc3_.values[_loc4_] *= s2.values[_loc4_];
-			_loc4_ = ASCompat.toInt(_loc4_) + 1;
+			_loc4_++;
 		}
 		return _loc3_;
 	}
@@ -40,7 +40,7 @@ class StatVector {
 		_loc4_ = 0;
 		while ((_loc4_ : UInt) < slotCount) {
 			_loc3_.values[_loc4_] *= s2;
-			_loc4_ = ASCompat.toInt(_loc4_) + 1;
+			_loc4_++;
 		}
 		return _loc3_;
 	}
@@ -51,7 +51,7 @@ class StatVector {
 		_loc4_ = 0;
 		while ((_loc4_ : UInt) < slotCount) {
 			_loc3_.values[_loc4_] += s2.values[_loc4_];
-			_loc4_ = ASCompat.toInt(_loc4_) + 1;
+			_loc4_++;
 		}
 		return _loc3_;
 	}
@@ -61,7 +61,7 @@ class StatVector {
 		_loc2_ = 0;
 		while ((_loc2_ : UInt) < slotCount) {
 			values[_loc2_] = val;
-			_loc2_ = ASCompat.toInt(_loc2_) + 1;
+			_loc2_++;
 		}
 	}
 
@@ -73,7 +73,7 @@ class StatVector {
 				Logger.error("StatVector Reading JSON Value " + prefix + DBGlobal.StatNames[_loc3_] + "Not Found Continuing ?");
 			}
 			values[_loc3_] = ASCompat.toNumber(jsonAsset[prefix + DBGlobal.StatNames[_loc3_]]);
-			_loc3_ = ASCompat.toInt(_loc3_) + 1;
+			_loc3_++;
 		}
 	}
 
@@ -123,7 +123,7 @@ class StatVector {
 		_loc1_ = 0;
 		while ((_loc1_ : UInt) < slotCount) {
 			trace(DBGlobal.StatNames[_loc1_], this.values[_loc1_]);
-			_loc1_ = ASCompat.toInt(_loc1_) + 1;
+			_loc1_++;
 		}
 	}
 }

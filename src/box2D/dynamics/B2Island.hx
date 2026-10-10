@@ -62,17 +62,17 @@ import box2D.dynamics.joints.*;
 		_loc7_ = this.m_bodies.length;
 		while (_loc7_ < bodyCapacity) {
 			this.m_bodies[_loc7_] = null;
-			_loc7_ = ASCompat.toInt(_loc7_) + 1;
+			_loc7_++;
 		}
 		_loc7_ = this.m_contacts.length;
 		while (_loc7_ < contactCapacity) {
 			this.m_contacts[_loc7_] = null;
-			_loc7_ = ASCompat.toInt(_loc7_) + 1;
+			_loc7_++;
 		}
 		_loc7_ = this.m_joints.length;
 		while (_loc7_ < jointCapacity) {
 			this.m_joints[_loc7_] = null;
-			_loc7_ = ASCompat.toInt(_loc7_) + 1;
+			_loc7_++;
 		}
 	}
 
@@ -106,7 +106,7 @@ import box2D.dynamics.joints.*;
 				_loc6_.m_linearVelocity.Multiply(B2Math.Clamp(1 - step.dt * _loc6_.m_linearDamping, 0, 1));
 				_loc6_.m_angularVelocity *= B2Math.Clamp(1 - step.dt * _loc6_.m_angularDamping, 0, 1);
 			}
-			_loc4_ = ASCompat.toInt(_loc4_) + 1;
+			_loc4_++;
 		}
 		this.m_contactSolver.Initialize(step, this.m_contacts, this.m_contactCount, this.m_allocator);
 		var _loc8_ = this.m_contactSolver;
@@ -115,7 +115,7 @@ import box2D.dynamics.joints.*;
 		while (_loc4_ < this.m_jointCount) {
 			_loc7_ = this.m_joints[_loc4_];
 			_loc7_.InitVelocityConstraints(step);
-			_loc4_ = ASCompat.toInt(_loc4_) + 1;
+			_loc4_++;
 		}
 		_loc4_ = 0;
 		while (_loc4_ < step.velocityIterations) {
@@ -123,16 +123,16 @@ import box2D.dynamics.joints.*;
 			while (_loc5_ < this.m_jointCount) {
 				_loc7_ = this.m_joints[_loc5_];
 				_loc7_.SolveVelocityConstraints(step);
-				_loc5_ = ASCompat.toInt(_loc5_) + 1;
+				_loc5_++;
 			}
 			_loc8_.SolveVelocityConstraints();
-			_loc4_ = ASCompat.toInt(_loc4_) + 1;
+			_loc4_++;
 		}
 		_loc4_ = 0;
 		while (_loc4_ < this.m_jointCount) {
 			_loc7_ = this.m_joints[_loc4_];
 			_loc7_.FinalizeVelocityConstraints();
-			_loc4_ = ASCompat.toInt(_loc4_) + 1;
+			_loc4_++;
 		}
 		_loc8_.FinalizeVelocityConstraints();
 		_loc4_ = 0;
@@ -161,7 +161,7 @@ import box2D.dynamics.joints.*;
 				_loc6_.m_sweep.a += step.dt * _loc6_.m_angularVelocity;
 				_loc6_.SynchronizeTransform();
 			}
-			_loc4_ = ASCompat.toInt(_loc4_) + 1;
+			_loc4_++;
 		}
 		_loc4_ = 0;
 		while (_loc4_ < step.positionIterations) {
@@ -172,12 +172,12 @@ import box2D.dynamics.joints.*;
 				_loc7_ = this.m_joints[_loc5_];
 				_loc14_ = _loc7_.SolvePositionConstraints(B2Settings.b2_contactBaumgarte);
 				_loc13_ = _loc13_ && _loc14_;
-				_loc5_ = ASCompat.toInt(_loc5_) + 1;
+				_loc5_++;
 			}
 			if (_loc12_ && _loc13_) {
 				break;
 			}
-			_loc4_ = ASCompat.toInt(_loc4_) + 1;
+			_loc4_++;
 		}
 		this.Report(_loc8_.m_constraints);
 		if (allowSleep) {
@@ -202,14 +202,14 @@ import box2D.dynamics.joints.*;
 						_loc15_ = B2Math.Min(_loc15_, _loc6_.m_sleepTime);
 					}
 				}
-				_loc4_ = ASCompat.toInt(_loc4_) + 1;
+				_loc4_++;
 			}
 			if (_loc15_ >= B2Settings.b2_timeToSleep) {
 				_loc4_ = 0;
 				while (_loc4_ < this.m_bodyCount) {
 					_loc6_ = this.m_bodies[_loc4_];
 					_loc6_.SetAwake(false);
-					_loc4_ = ASCompat.toInt(_loc4_) + 1;
+					_loc4_++;
 				}
 			}
 		}
@@ -230,7 +230,7 @@ import box2D.dynamics.joints.*;
 		_loc2_ = 0;
 		while (_loc2_ < this.m_jointCount) {
 			this.m_joints[_loc2_].InitVelocityConstraints(subStep);
-			_loc2_ = ASCompat.toInt(_loc2_) + 1;
+			_loc2_++;
 		}
 		_loc2_ = 0;
 		while (_loc2_ < subStep.velocityIterations) {
@@ -238,9 +238,9 @@ import box2D.dynamics.joints.*;
 			_loc3_ = 0;
 			while (_loc3_ < this.m_jointCount) {
 				this.m_joints[_loc3_].SolveVelocityConstraints(subStep);
-				_loc3_ = ASCompat.toInt(_loc3_) + 1;
+				_loc3_++;
 			}
-			_loc2_ = ASCompat.toInt(_loc2_) + 1;
+			_loc2_++;
 		}
 		_loc2_ = 0;
 		while (_loc2_ < this.m_bodyCount) {
@@ -268,7 +268,7 @@ import box2D.dynamics.joints.*;
 				_loc6_.m_sweep.a += subStep.dt * _loc6_.m_angularVelocity;
 				_loc6_.SynchronizeTransform();
 			}
-			_loc2_ = ASCompat.toInt(_loc2_) + 1;
+			_loc2_++;
 		}
 		var _loc5_:Float = 0.75;
 		_loc2_ = 0;
@@ -279,12 +279,12 @@ import box2D.dynamics.joints.*;
 			while (_loc3_ < this.m_jointCount) {
 				_loc12_ = this.m_joints[_loc3_].SolvePositionConstraints(B2Settings.b2_contactBaumgarte);
 				_loc11_ = _loc11_ && _loc12_;
-				_loc3_ = ASCompat.toInt(_loc3_) + 1;
+				_loc3_++;
 			}
 			if (_loc10_ && _loc11_) {
 				break;
 			}
-			_loc2_ = ASCompat.toInt(_loc2_) + 1;
+			_loc2_++;
 		}
 		this.Report(_loc4_.m_constraints);
 	}
@@ -304,10 +304,10 @@ import box2D.dynamics.joints.*;
 			while (_loc5_ < _loc4_.pointCount) {
 				s_impulse.normalImpulses[_loc5_] = _loc4_.points[_loc5_].normalImpulse;
 				s_impulse.tangentImpulses[_loc5_] = _loc4_.points[_loc5_].tangentImpulse;
-				_loc5_ = ASCompat.toInt(_loc5_) + 1;
+				_loc5_++;
 			}
 			this.m_listener.PostSolve(_loc3_, s_impulse);
-			_loc2_ = ASCompat.toInt(_loc2_) + 1;
+			_loc2_++;
 		}
 	}
 

@@ -21,7 +21,7 @@ class TimelineMax extends TimelineLite implements IEventDispatcher {
 
 	public function new(vars:ASObject = null) {
 		super(vars);
-		_repeat = ASCompat.toBool(this.vars.repeat) ? Std.int(ASCompat.toNumber(this.vars.repeat)) : 0;
+		_repeat = ASCompat.toBool(this.vars.repeat) ? ASCompat.floatToInt(ASCompat.toNumber(this.vars.repeat)) : 0;
 		_repeatDelay = ASCompat.toBool(this.vars.repeatDelay) ? ASCompat.toNumber(this.vars.repeatDelay) : 0;
 		_cyclesComplete = 0;
 		this.yoyo = this.vars.yoyo == true;
@@ -124,7 +124,7 @@ class TimelineMax extends TimelineLite implements IEventDispatcher {
 		if (_repeat != 0) {
 			_loc16_ = this.cachedDuration + _repeatDelay;
 			_loc17_ = _cyclesComplete;
-			_cyclesComplete = Std.int(this.cachedTotalTime / _loc16_) >> 0;
+			_cyclesComplete = ASCompat.floatToInt(this.cachedTotalTime / _loc16_) >> 0;
 			if (_cyclesComplete == this.cachedTotalTime / _loc16_) {
 				--_cyclesComplete;
 			}
@@ -255,7 +255,7 @@ class TimelineMax extends TimelineLite implements IEventDispatcher {
 	public function tweenFromTo(fromTimeOrLabel:ASAny, toTimeOrLabel:ASAny, vars:ASObject = null):TweenLite {
 		var _loc4_ = tweenTo(toTimeOrLabel, vars);
 		_loc4_.vars.onInitParams[2] = parseTimeOrLabel(fromTimeOrLabel);
-		_loc4_.duration = Math.abs(ASCompat.toNumber(ASCompat.toNumber(_loc4_.vars.currentTime) - ASCompat.toNumber(_loc4_.vars.onInitParams[2]))) / this.cachedTimeScale;
+		_loc4_.duration = Math.abs(ASCompat.toNumber(_loc4_.vars.currentTime) - ASCompat.toNumber(_loc4_.vars.onInitParams[2])) / this.cachedTimeScale;
 		return _loc4_;
 	}
 
@@ -318,20 +318,20 @@ class TimelineMax extends TimelineLite implements IEventDispatcher {
 			_dispatcher = new EventDispatcher(this);
 		}
 		if (Reflect.isFunction(this.vars.onStartListener)) {
-			_dispatcher.addEventListener(TweenEvent.START, ASCompat.asFunction(this.vars.onStartListener), false, 0, true);
+			_dispatcher.addEventListener(TweenEvent.START, ASCompat.coerceFunction(this.vars.onStartListener), false, 0, true);
 		}
 		if (Reflect.isFunction(this.vars.onUpdateListener)) {
-			_dispatcher.addEventListener(TweenEvent.UPDATE, ASCompat.asFunction(this.vars.onUpdateListener), false, 0, true);
+			_dispatcher.addEventListener(TweenEvent.UPDATE, ASCompat.coerceFunction(this.vars.onUpdateListener), false, 0, true);
 			_hasUpdateListener = true;
 		}
 		if (Reflect.isFunction(this.vars.onCompleteListener)) {
-			_dispatcher.addEventListener(TweenEvent.COMPLETE, ASCompat.asFunction(this.vars.onCompleteListener), false, 0, true);
+			_dispatcher.addEventListener(TweenEvent.COMPLETE, ASCompat.coerceFunction(this.vars.onCompleteListener), false, 0, true);
 		}
 		if (Reflect.isFunction(this.vars.onRepeatListener)) {
-			_dispatcher.addEventListener(TweenEvent.REPEAT, ASCompat.asFunction(this.vars.onRepeatListener), false, 0, true);
+			_dispatcher.addEventListener(TweenEvent.REPEAT, ASCompat.coerceFunction(this.vars.onRepeatListener), false, 0, true);
 		}
 		if (Reflect.isFunction(this.vars.onReverseCompleteListener)) {
-			_dispatcher.addEventListener(TweenEvent.REVERSE_COMPLETE, ASCompat.asFunction(this.vars.onReverseCompleteListener), false, 0, true);
+			_dispatcher.addEventListener(TweenEvent.REVERSE_COMPLETE, ASCompat.coerceFunction(this.vars.onReverseCompleteListener), false, 0, true);
 		}
 	}
 
@@ -451,7 +451,7 @@ class TimelineMax extends TimelineLite implements IEventDispatcher {
 	}
 
 	override public function invalidate() {
-		_repeat = ASCompat.toBool(this.vars.repeat) ? Std.int(ASCompat.toNumber(this.vars.repeat)) : 0;
+		_repeat = ASCompat.toBool(this.vars.repeat) ? ASCompat.floatToInt(ASCompat.toNumber(this.vars.repeat)) : 0;
 		_repeatDelay = ASCompat.toBool(this.vars.repeatDelay) ? ASCompat.toNumber(this.vars.repeatDelay) : 0;
 		this.yoyo = this.vars.yoyo == true;
 		if (this.vars.onCompleteListener != null
@@ -475,12 +475,12 @@ class TimelineMax extends TimelineLite implements IEventDispatcher {
 		var _loc9_ = 0;
 		_loc6_ = 0;
 		while (_loc6_ < _loc8_) {
-			_loc7_ = ASCompat.dynamicAs(_loc5_[_loc6_], com.greensock.core.TweenCore);
+			_loc7_ = ASCompat.coerce(_loc5_[_loc6_], com.greensock.core.TweenCore);
 			if (!_loc7_.cachedPaused
 				&& _loc7_.timeline.cachedTotalTime >= _loc7_.cachedStartTime
 				&& _loc7_.timeline.cachedTotalTime < _loc7_.cachedStartTime + _loc7_.cachedTotalDuration / _loc7_.cachedTimeScale
 				&& !OverwriteManager.getGlobalPaused(_loc7_.timeline)) {
-				_loc4_[Std.int(_loc10_ = ASCompat.toNumber(_loc9_++))] = _loc5_[_loc6_];
+				_loc4_[ASCompat.floatToInt(_loc10_ = _loc9_++)] = _loc5_[_loc6_];
 			}
 			_loc6_ += 1;
 		}

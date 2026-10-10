@@ -23,10 +23,10 @@ class UIStatTooltip extends MovieClip {
 	public function new(dbFacade:DBFacade, templateClass:Dynamic) {
 		super();
 		mDBFacade = dbFacade;
-		mRoot = ASCompat.dynamicAs(ASCompat.createInstance(templateClass, []), flash.display.MovieClip);
+		mRoot = ASCompat.coerce(ASCompat.createInstance(templateClass, []), flash.display.MovieClip);
 		this.addChild(mRoot);
-		mTitleLabel = ASCompat.dynamicAs((mRoot : ASAny).title_label, flash.text.TextField);
-		mDescription = ASCompat.dynamicAs((mRoot : ASAny).stat_description_label, flash.text.TextField);
+		mTitleLabel = ASCompat.coerce((mRoot : ASAny).title_label, flash.text.TextField);
+		mDescription = ASCompat.coerce((mRoot : ASAny).stat_description_label, flash.text.TextField);
 	}
 
 	public function destroy() {

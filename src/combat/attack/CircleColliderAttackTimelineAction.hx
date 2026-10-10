@@ -36,23 +36,23 @@ class CircleColliderAttackTimelineAction extends ColliderTimelineAction {
 		var _loc17_ = 0;
 		if (actorGameObject.isOwner) {
 			_loc14_ = weapon != null ? weapon.collisionScale() : 1;
-			_loc16_ = ASCompat.toNumber(ASCompat.toNumberField(actionObj, "radius") * _loc14_);
+			_loc16_ = ASCompat.toNumberField(actionObj, "radius") * _loc14_;
 			_loc12_ = 0;
 			if (actionObj.xOffset != null) {
-				_loc12_ = ASCompat.toNumber(ASCompat.toNumberField(actionObj, "xOffset") * _loc14_);
+				_loc12_ = ASCompat.toNumberField(actionObj, "xOffset") * _loc14_;
 			}
 			_loc11_ = 0;
 			if (actionObj.yOffset != null) {
-				_loc11_ = ASCompat.toNumber(ASCompat.toNumberField(actionObj, "yOffset") * _loc14_);
+				_loc11_ = ASCompat.toNumberField(actionObj, "yOffset") * _loc14_;
 			}
 			_loc10_ = new Vector3D(_loc12_, _loc11_);
 			_loc9_ = 0;
 			if (actionObj.xGlobalOffset != null) {
-				_loc9_ = ASCompat.toNumber(ASCompat.toNumberField(actionObj, "xGlobalOffset") * _loc14_);
+				_loc9_ = ASCompat.toNumberField(actionObj, "xGlobalOffset") * _loc14_;
 			}
 			_loc8_ = 0;
 			if (actionObj.yGlobalOffset != null) {
-				_loc8_ = ASCompat.toNumber(ASCompat.toNumberField(actionObj, "yGlobalOffset") * _loc14_);
+				_loc8_ = ASCompat.toNumberField(actionObj, "yGlobalOffset") * _loc14_;
 			}
 			_loc13_ = new Vector3D(_loc9_, _loc8_);
 			_loc15_ = 1;

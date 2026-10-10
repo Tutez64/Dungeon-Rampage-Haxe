@@ -111,21 +111,21 @@ class JSONTokenizer {
 			_loc1_ = this.jsonString.indexOf("\"", _loc1_);
 			if (_loc1_ >= 0) {
 				_loc3_ = 0;
-				_loc4_ = ASCompat.toInt(_loc1_ - 1);
+				_loc4_ = _loc1_ - 1;
 				while (this.jsonString.charAt(_loc4_) == "\\") {
-					_loc3_ = ASCompat.toInt(_loc3_) + 1;
-					_loc4_ = ASCompat.toInt(_loc4_) - 1;
+					_loc3_++;
+					_loc4_--;
 				}
 				if ((_loc3_ & 1) == 0) {
 					break;
 				}
-				_loc1_ = ASCompat.toInt(_loc1_) + 1;
+				_loc1_++;
 			} else {
 				this.parseError("Unterminated string literal");
 			}
 		}
-		var _loc2_ = JSONToken.create(JSONTokenType.STRING, this.unescapeString(this.jsonString.substr(this.loc, ASCompat.toInt(_loc1_ - this.loc))));
-		this.loc = ASCompat.toInt(_loc1_ + 1);
+		var _loc2_ = JSONToken.create(JSONTokenType.STRING, this.unescapeString(this.jsonString.substr(this.loc, _loc1_ - this.loc)));
+		this.loc = _loc1_ + 1;
 		this.nextChar();
 		return _loc2_;
 	}
@@ -182,7 +182,7 @@ class JSONTokenizer {
 							this.parseError("Excepted a hex digit, but found: " + _loc10_);
 						}
 						_loc7_ += _loc10_;
-						_loc9_ = ASCompat.toInt(_loc9_) + 1;
+						_loc9_++;
 					}
 					_loc2_ += String.fromCharCode(ASCompat.parseInt(_loc7_, 16));
 					_loc4_ = _loc8_;

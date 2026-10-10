@@ -40,7 +40,7 @@ class DBFacebookBragFeedPost {
 				var tooltipClass = swfAsset.getClass("weapon_tavern_tooltip");
 				var gloatPopupClassName = "avatar_purchase_popup";
 				var gloatPopupClass = swfAsset.getClass(gloatPopupClassName);
-				gloatPopup = ASCompat.dynamicAs(ASCompat.createInstance(gloatPopupClass, []), flash.display.MovieClip);
+				gloatPopup = ASCompat.coerce(ASCompat.createInstance(gloatPopupClass, []), flash.display.MovieClip);
 				gloatPopup.x += 40;
 				assetLoadingComponent.getSwfAsset(DBFacade.buildFullDownloadPath(gmHero.PortraitName), function(param1:brain.assetRepository.SwfAsset) {
 					var TeamBonusUI:UIObject;
@@ -52,7 +52,7 @@ class DBFacebookBragFeedPost {
 					var popup:DBUIOneButtonPopup;
 					var swfAsset = param1;
 					var picClass = swfAsset.getClass(gmHero.IconName);
-					var avatarPic = ASCompat.dynamicAs(ASCompat.createInstance(picClass, []), flash.display.MovieClip);
+					var avatarPic = ASCompat.coerce(ASCompat.createInstance(picClass, []), flash.display.MovieClip);
 					var movieClipRenderer = new MovieClipRenderController(facade, avatarPic);
 					movieClipRenderer.play();
 					avatarPic.scaleX = avatarPic.scaleY = avatarPicScale;
@@ -62,21 +62,21 @@ class DBFacebookBragFeedPost {
 					(gloatPopup : ASAny).avatar.addChildAt(avatarPic, 0);
 					ASCompat.setProperty((gloatPopup : ASAny).gloat_text, "text",
 						Locale.getString("BRAG_BUY_HERO_SUCCESS_POPUP_TEXT") + gmHero.Name.toUpperCase());
-					TeamBonusUI = new UIObject(facade, ASCompat.dynamicAs((gloatPopup : ASAny).crewbonus, flash.display.MovieClip));
+					TeamBonusUI = new UIObject(facade, ASCompat.coerce((gloatPopup : ASAny).crewbonus, flash.display.MovieClip));
 					ASCompat.setProperty((TeamBonusUI.tooltip : ASAny).title_label, "text", Locale.getString("TEAM_BONUS_TOOLTIP_TITLE"));
 					ASCompat.setProperty((TeamBonusUI.tooltip : ASAny).description_label, "text", Locale.getString("TEAM_BONUS_TOOLTIP_DESCRIPTION"));
 					ASCompat.setProperty((TeamBonusUI.root : ASAny).header_crew_bonus_number, "text",
 						facade.dbAccountInfo.inventoryInfo.getTotalHeroesOwned() - 2);
 					teamBonusUIMCRenderer = new MovieClipRenderer(facade,
-						ASCompat.dynamicAs((TeamBonusUI.root : ASAny).header_crew_bonus_anim, flash.display.MovieClip), onCompleteFunc);
+						ASCompat.coerce((TeamBonusUI.root : ASAny).header_crew_bonus_anim, flash.display.MovieClip), onCompleteFunc);
 					teamBonusUIMCRenderer.play();
-					TeamBonusUIHeader = new UIObject(facade, ASCompat.dynamicAs((gloatPopup : ASAny).crewbonus_header, flash.display.MovieClip));
+					TeamBonusUIHeader = new UIObject(facade, ASCompat.coerce((gloatPopup : ASAny).crewbonus_header, flash.display.MovieClip));
 					ASCompat.setProperty((TeamBonusUIHeader.tooltip : ASAny).title_label, "text", Locale.getString("TEAM_BONUS_TOOLTIP_TITLE"));
 					ASCompat.setProperty((TeamBonusUIHeader.tooltip : ASAny).description_label, "text", Locale.getString("TEAM_BONUS_TOOLTIP_DESCRIPTION"));
 					ASCompat.setProperty((TeamBonusUIHeader.root : ASAny).header_crew_bonus_number, "text",
 						facade.dbAccountInfo.inventoryInfo.getTotalHeroesOwned() - 2);
 					teamBonusUIHeaderMCRenderer = new MovieClipRenderer(facade,
-						ASCompat.dynamicAs((TeamBonusUIHeader.root : ASAny).header_crew_bonus_anim, flash.display.MovieClip), onCompleteHeaderFunc);
+						ASCompat.coerce((TeamBonusUIHeader.root : ASAny).header_crew_bonus_anim, flash.display.MovieClip), onCompleteHeaderFunc);
 					teamBonusUIHeaderMCRenderer.play();
 					onCompleteFunc = function() {
 						ASCompat.setProperty((TeamBonusUI.root : ASAny).header_crew_bonus_number, "text",
@@ -122,13 +122,13 @@ class DBFacebookBragFeedPost {
 				var swfAsset = param1;
 				var tooltipClass = swfAsset.getClass("weapon_tavern_tooltip");
 				var gloatPopupClass = swfAsset.getClass("tavern_gloat");
-				gloatPopup = ASCompat.dynamicAs(ASCompat.createInstance(gloatPopupClass, []), flash.display.MovieClip);
+				gloatPopup = ASCompat.coerce(ASCompat.createInstance(gloatPopupClass, []), flash.display.MovieClip);
 				gloatPopup.x += 40;
 				assetLoadingComponent.getSwfAsset(DBFacade.buildFullDownloadPath(gmSkin.PortraitName), function(param1:brain.assetRepository.SwfAsset) {
 					var popup:DBUIOneButtonPopup;
 					var swfAsset = param1;
 					var picClass = swfAsset.getClass(gmSkin.IconName);
-					var avatarPic = ASCompat.dynamicAs(ASCompat.createInstance(picClass, []), flash.display.MovieClip);
+					var avatarPic = ASCompat.coerce(ASCompat.createInstance(picClass, []), flash.display.MovieClip);
 					var movieClipRenderer = new MovieClipRenderController(facade, avatarPic);
 					movieClipRenderer.play();
 					avatarPic.scaleX = avatarPic.scaleY = avatarPicScale;
@@ -165,13 +165,13 @@ class DBFacebookBragFeedPost {
 				var swfAsset = param1;
 				var tooltipClass = swfAsset.getClass("weapon_tavern_tooltip");
 				var gloatPopupClass = swfAsset.getClass("tavern_gloat");
-				gloatPopup = ASCompat.dynamicAs(ASCompat.createInstance(gloatPopupClass, []), flash.display.MovieClip);
+				gloatPopup = ASCompat.coerce(ASCompat.createInstance(gloatPopupClass, []), flash.display.MovieClip);
 				gloatPopup.x += 40;
 				assetLoadingComponent.getSwfAsset(DBFacade.buildFullDownloadPath(gmPet.IconSwfFilepath), function(param1:brain.assetRepository.SwfAsset) {
 					var popup:DBUIOneButtonPopup;
 					var swfAsset = param1;
 					var picClass = swfAsset.getClass(gmPet.IconName);
-					var avatarPic = ASCompat.dynamicAs(ASCompat.createInstance(picClass, []), flash.display.MovieClip);
+					var avatarPic = ASCompat.coerce(ASCompat.createInstance(picClass, []), flash.display.MovieClip);
 					var movieClipRenderer = new MovieClipRenderController(facade, avatarPic);
 					movieClipRenderer.play();
 					avatarPic.scaleX = avatarPic.scaleY = avatarPicScale;
@@ -211,7 +211,7 @@ class DBFacebookBragFeedPost {
 				var swfAsset = param1;
 				var tooltipClass = swfAsset.getClass("weapon_tavern_tooltip");
 				var gloatPopupClass = swfAsset.getClass("tavern_gloat");
-				gloatPopup = ASCompat.dynamicAs(ASCompat.createInstance(gloatPopupClass, []), flash.display.MovieClip);
+				gloatPopup = ASCompat.coerce(ASCompat.createInstance(gloatPopupClass, []), flash.display.MovieClip);
 				gloatPopup.x += 40;
 				movieClipRenderer = new MovieClipRenderController(facade, itemPic);
 				movieClipRenderer.play();
@@ -255,7 +255,7 @@ class DBFacebookBragFeedPost {
 				var swfAsset = param1;
 				var tooltipClass = swfAsset.getClass("weapon_tavern_tooltip");
 				var gloatPopupClass = swfAsset.getClass("tavern_gloat");
-				gloatPopup = ASCompat.dynamicAs(ASCompat.createInstance(gloatPopupClass, []), flash.display.MovieClip);
+				gloatPopup = ASCompat.coerce(ASCompat.createInstance(gloatPopupClass, []), flash.display.MovieClip);
 				gloatPopup.x += 40;
 				feedPosts = DBFacebookAPIController.getFeedPosts(facade, gmMapNode.Id, "MAP_NODE_DEFEATED");
 				assetLoadingComponent.getImageAsset(DBFacade.buildFullDownloadPath(feedPosts[0].FeedImageLink),

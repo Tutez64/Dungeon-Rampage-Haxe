@@ -34,7 +34,7 @@ class NPCGameObject extends ActorGameObject implements IDistributedNPCGameObject
 	}
 
 	override public function init() {
-		mGmNpc = ASCompat.dynamicAs(this.mDBFacade.gameMaster.npcById.itemFor(this.type), gameMasterDictionary.GMNpc);
+		mGmNpc = ASCompat.coerce(this.mDBFacade.gameMaster.npcById.itemFor(this.type), gameMasterDictionary.GMNpc);
 		super.init();
 		this.createOffNavCollisions(this.actorData.constant);
 		this.triggerState = this.triggerState;

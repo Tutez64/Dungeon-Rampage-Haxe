@@ -63,7 +63,7 @@ class AssetLoader {
 		mBytesTotal = (0 : UInt);
 		if (mTrackedLoads.size != 0) {
 			mTrackedLoads.clear();
-			mloadersets.splice(0, (Std.int(4294967295) : UInt));
+			mloadersets.splice(0, (ASCompat.floatToInt(4294967295) : UInt));
 		}
 		mTrackedLoadsCallback = trackedLoadsCallback;
 	}
@@ -72,7 +72,7 @@ class AssetLoader {
 		mCollectingTrackLoads = false;
 		mTrackedLoadsCallback = null;
 		mTrackedLoads.clear();
-		mloadersets.splice(0, (Std.int(4294967295) : UInt));
+		mloadersets.splice(0, (ASCompat.floatToInt(4294967295) : UInt));
 	}
 
 	public static function stopTrackingLoads() {

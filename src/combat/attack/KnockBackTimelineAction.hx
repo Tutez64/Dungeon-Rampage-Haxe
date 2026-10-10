@@ -22,7 +22,7 @@ class KnockBackTimelineAction extends AutoMoveTimelineAction {
 
 	override public function execute(timeline:ScriptTimeline) {
 		var _loc2_:Vector3D = null;
-		var _loc3_ = ASCompat.dynamicAs(mDBFacade.gameMaster.attackById.itemFor(mAttackType), gameMasterDictionary.GMAttack);
+		var _loc3_ = ASCompat.coerce(mDBFacade.gameMaster.attackById.itemFor(mAttackType), gameMasterDictionary.GMAttack);
 		if (_loc3_ != null && mAttacker != null) {
 			mDistance = _loc3_.Knockback;
 			mDuration = _loc3_.KnockbackDur;

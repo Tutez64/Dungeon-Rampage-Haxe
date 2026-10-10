@@ -54,9 +54,9 @@ class StoreServices {
 				var _loc3_:GMCashDeal = null;
 				if (param1 != 0) {
 					dbFacade.metrics.log("CashboxPaySuccess");
-					_loc3_ = ASCompat.dynamicAs(dbFacade.gameMaster.cashDealById.itemFor(dealId), gameMasterDictionary.GMCashDeal);
+					_loc3_ = ASCompat.coerce(dbFacade.gameMaster.cashDealById.itemFor(dealId), gameMasterDictionary.GMCashDeal);
 					if (_loc3_ != null) {
-						PixelTracker.purchaseEvent(dbFacade, (Std.int(_loc3_.Price * dealMultiplier) : UInt));
+						PixelTracker.purchaseEvent(dbFacade, (ASCompat.floatToInt(_loc3_.Price * dealMultiplier) : UInt));
 					}
 					Logger.debug("CashboxPaySuccess: " + param2);
 					StoreServices.orderCompleteCallback(dbFacade, "success", orderId);
@@ -107,9 +107,9 @@ class StoreServices {
 							dbFacade.metrics.log("FacebookUIPaySuccess");
 							StoreServices.orderCompleteCallback(dbFacade, "success", (ASCompat.toInt(param1.reference_id) : UInt));
 					});
-					gmCashDeal = ASCompat.dynamicAs(dbFacade.gameMaster.cashDealById.itemFor(dealId), gameMasterDictionary.GMCashDeal);
+					gmCashDeal = ASCompat.coerce(dbFacade.gameMaster.cashDealById.itemFor(dealId), gameMasterDictionary.GMCashDeal);
 					if (gmCashDeal != null) {
-						PixelTracker.purchaseEvent(dbFacade, (Std.int(gmCashDeal.Price * dealMultiplier) : UInt));
+						PixelTracker.purchaseEvent(dbFacade, (ASCompat.floatToInt(gmCashDeal.Price * dealMultiplier) : UInt));
 					}
 					Logger.debug("FB UI success: " + responseJson);
 					if (successCallback != null) {
@@ -144,9 +144,9 @@ class StoreServices {
 				var response:ASObject = param1;
 				if (ASCompat.toBool(response.success)) {
 					dbFacade.metrics.log("KongregateUIPaySuccess");
-					gmCashDeal = ASCompat.dynamicAs(dbFacade.gameMaster.cashDealById.itemFor(dealId), gameMasterDictionary.GMCashDeal);
+					gmCashDeal = ASCompat.coerce(dbFacade.gameMaster.cashDealById.itemFor(dealId), gameMasterDictionary.GMCashDeal);
 					if (gmCashDeal != null) {
-						PixelTracker.purchaseEvent(dbFacade, (Std.int(gmCashDeal.Price * dealMultiplier) : UInt));
+						PixelTracker.purchaseEvent(dbFacade, (ASCompat.floatToInt(gmCashDeal.Price * dealMultiplier) : UInt));
 					}
 					Logger.debug("Kongregate Pay success");
 					settleCashDealOrderFunc = JSONRPCService.getFunction("purchase", dbFacade.rpcRoot + "kongregate");
@@ -283,13 +283,13 @@ class StoreServices {
 			} else {
 				mLimitedOffers.add(_loc2_.id, _loc2_.usage_count);
 			}
-			_loc3_ = ASCompat.toInt(_loc3_) + 1;
+			_loc3_++;
 		}
 	}
 
 	public static function getOfferQuantitySold(gmOffer:GMOffer):UInt {
 		var _loc2_:ASAny = mLimitedOffers.itemFor(gmOffer.Id);
-		return (ASCompat.toInt(_loc2_ == null ? (0 : UInt) : (ASCompat.toInt(_loc2_) : UInt)) : UInt);
+		return _loc2_ == null ? (0 : UInt) : (ASCompat.toInt(_loc2_) : UInt);
 	}
 
 	public static function getLimitedOfferUsage(dbFacade:DBFacade, details:ASAny, successCallback:ASFunction, errorCallback:ASFunction) {
@@ -297,7 +297,7 @@ class StoreServices {
 		Logger.debug("getLimitedOfferUsage");
 		limitedOfferUsageFunc = JSONRPCService.getFunction("GetLimitedOfferStatus", dbFacade.rpcRoot + "store");
 		limitedOfferUsageFunc(dbFacade.dbAccountInfo.id, function(param1:ASAny) {
-			parseLimitedOfferUsage(ASCompat.dynamicAs(param1, Array));
+			parseLimitedOfferUsage(ASCompat.coerce(param1, Array));
 			if (successCallback != null) {
 				successCallback(param1);
 			}

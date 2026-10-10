@@ -112,7 +112,7 @@ class AbstractFacebook {
 	function handleRequestLoad(target:FacebookRequest) {
 		var _loc3_:ASObject = null;
 		var _loc4_:IResultParser = null;
-		var _loc2_ = ASCompat.asFunction(this.openRequests[target]);
+		var _loc2_ = ASCompat.coerceFunction(this.openRequests[target]);
 		if (_loc2_ == null) {
 			this.openRequests.remove(target);
 		}

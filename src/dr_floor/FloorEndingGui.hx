@@ -125,21 +125,20 @@ class FloorEndingGui {
 
 	function dungeonFinishedSwfLoaded(swfAsset:SwfAsset) {
 		var _loc2_ = swfAsset.getClass(mRootInstanceName);
-		mScreensRoot = ASCompat.dynamicAs(ASCompat.createInstance(_loc2_, []), flash.display.MovieClip);
+		mScreensRoot = ASCompat.coerce(ASCompat.createInstance(_loc2_, []), flash.display.MovieClip);
 		mScreensRoot.mouseEnabled = false;
 		if (mNodeType != "INFINITE") {
-			mVictoryRenderer = new MovieClipRenderController(mDBFacade,
-				ASCompat.dynamicAs((mScreensRoot : ASAny).scrn_victory_instance, flash.display.MovieClip));
+			mVictoryRenderer = new MovieClipRenderController(mDBFacade, ASCompat.coerce((mScreensRoot : ASAny).scrn_victory_instance, flash.display.MovieClip));
 			mCountdownRenderer = new MovieClipRenderController(mDBFacade,
-				ASCompat.dynamicAs((mScreensRoot : ASAny).scrn_countdown_instance, flash.display.MovieClip));
-			mCountdownTextField = ASCompat.dynamicAs((mCountdownRenderer.clip : ASAny).countdown_bounce.countdown.countdown_text, flash.text.TextField);
+				ASCompat.coerce((mScreensRoot : ASAny).scrn_countdown_instance, flash.display.MovieClip));
+			mCountdownTextField = ASCompat.coerce((mCountdownRenderer.clip : ASAny).countdown_bounce.countdown.countdown_text, flash.text.TextField);
 		}
-		mDefeatRenderer = new MovieClipRenderController(mDBFacade, ASCompat.dynamicAs((mScreensRoot : ASAny).scrn_defeat, flash.display.MovieClip));
-		mStartRenderer = new MovieClipRenderController(mDBFacade, ASCompat.dynamicAs((mScreensRoot : ASAny).scrn_start_instance, flash.display.MovieClip));
-		mCurrentFloorRenderer = new MovieClipRenderController(mDBFacade, ASCompat.dynamicAs((mScreensRoot : ASAny).scrn_floor, flash.display.MovieClip));
+		mDefeatRenderer = new MovieClipRenderController(mDBFacade, ASCompat.coerce((mScreensRoot : ASAny).scrn_defeat, flash.display.MovieClip));
+		mStartRenderer = new MovieClipRenderController(mDBFacade, ASCompat.coerce((mScreensRoot : ASAny).scrn_start_instance, flash.display.MovieClip));
+		mCurrentFloorRenderer = new MovieClipRenderController(mDBFacade, ASCompat.coerce((mScreensRoot : ASAny).scrn_floor, flash.display.MovieClip));
 		mDefeatCountdownRenderer = new MovieClipRenderController(mDBFacade,
-			ASCompat.dynamicAs((mScreensRoot : ASAny).scrn_defeat_countdown, flash.display.MovieClip));
-		mDefeatCountdownStartClip = ASCompat.dynamicAs((mScreensRoot : ASAny).scrn_defeat_start_text, flash.display.MovieClip);
+			ASCompat.coerce((mScreensRoot : ASAny).scrn_defeat_countdown, flash.display.MovieClip));
+		mDefeatCountdownStartClip = ASCompat.coerce((mScreensRoot : ASAny).scrn_defeat_start_text, flash.display.MovieClip);
 		mDefeatCountdownTextField = ASCompat.dynamicAs((mDefeatCountdownRenderer.clip : ASAny).countdown_bounce.countdown.countdown_text, TextField);
 		hideAll();
 		if (!mFloorGUIStarted) {
@@ -182,7 +181,7 @@ class FloorEndingGui {
 			_loc2_ = _loc1_.NodeType;
 			if (_loc2_ == "INFINITE") {
 				mKillswitchRenderer = new MovieClipRenderController(mDBFacade,
-					ASCompat.dynamicAs((mScreensRoot : ASAny).scrn_killSwitchEngage, flash.display.MovieClip));
+					ASCompat.coerce((mScreensRoot : ASAny).scrn_killSwitchEngage, flash.display.MovieClip));
 				mKillswitchRenderer.clip.visible = false;
 			}
 			displayStart();
@@ -253,7 +252,7 @@ class FloorEndingGui {
 			if (mFloor.activeGMDungeonModifiers[_loc2_].NewThisFloor) {
 				_loc1_.push(mFloor.activeGMDungeonModifiers[_loc2_].GMDungeonMod);
 			}
-			_loc2_ = ASCompat.toInt(_loc2_) + 1;
+			_loc2_++;
 		}
 		playKillswitchIntros(_loc1_, (0 : UInt));
 		checkToRemoveRoot();
@@ -400,10 +399,10 @@ class FloorEndingGui {
 		var _loc4_ = 0;
 		ASCompat.setProperty((mScreensRoot : ASAny).Scrn_nextfloor_infinite.current_reward.label_currentReward, "text", Locale.getString("TOTAL_REWARD"));
 		var _loc3_ = new Vector<MovieClip>();
-		_loc3_.push(ASCompat.dynamicAs((mScreensRoot : ASAny).Scrn_nextfloor_infinite.current_reward.basic, flash.display.MovieClip));
-		_loc3_.push(ASCompat.dynamicAs((mScreensRoot : ASAny).Scrn_nextfloor_infinite.current_reward.uncommon, flash.display.MovieClip));
-		_loc3_.push(ASCompat.dynamicAs((mScreensRoot : ASAny).Scrn_nextfloor_infinite.current_reward.rare, flash.display.MovieClip));
-		_loc3_.push(ASCompat.dynamicAs((mScreensRoot : ASAny).Scrn_nextfloor_infinite.current_reward.legendary, flash.display.MovieClip));
+		_loc3_.push(ASCompat.coerce((mScreensRoot : ASAny).Scrn_nextfloor_infinite.current_reward.basic, flash.display.MovieClip));
+		_loc3_.push(ASCompat.coerce((mScreensRoot : ASAny).Scrn_nextfloor_infinite.current_reward.uncommon, flash.display.MovieClip));
+		_loc3_.push(ASCompat.coerce((mScreensRoot : ASAny).Scrn_nextfloor_infinite.current_reward.rare, flash.display.MovieClip));
+		_loc3_.push(ASCompat.coerce((mScreensRoot : ASAny).Scrn_nextfloor_infinite.current_reward.legendary, flash.display.MovieClip));
 		_loc4_ = 0;
 		while (_loc4_ < _loc3_.length) {
 			_loc3_[_loc4_].stop();

@@ -39,7 +39,7 @@ import box2D.dynamics.*;
 		var _loc1_ = 0;
 		while (_loc1_ < B2Settings.b2_maxManifoldPoints) {
 			this.points[_loc1_] = new B2ContactConstraintPoint();
-			_loc1_ = ASCompat.toInt(_loc1_) + 1;
+			_loc1_++;
 		}
 	}
 }

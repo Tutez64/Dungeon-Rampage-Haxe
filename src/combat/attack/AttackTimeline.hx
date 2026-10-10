@@ -77,7 +77,7 @@ class AttackTimeline extends ScriptTimeline {
 	}
 
 	public function isAttackWithinComboWindow():Bool {
-		var _loc1_ = (Std.int(currentGMAttack.ComboWindow * mTotalFrames) : UInt);
+		var _loc1_ = (ASCompat.floatToInt(currentGMAttack.ComboWindow * mTotalFrames) : UInt);
 		var _loc2_ = (mLastExecutedFrame : UInt);
 		if (_loc2_ >= _loc1_) {
 			return true;
@@ -147,7 +147,7 @@ class AttackTimeline extends ScriptTimeline {
 				_loc5_ = (_loc3_.when : Int);
 				_loc2_ = new CombatResultAttackTimelineAction(mActorGameObject, mActorView, mDBFacade, _loc3_, mDistributedDungeonFloor);
 				if (mCombatResultActions.hasKey(_loc5_)) {
-					_loc4_ = ASCompat.dynamicAs(mCombatResultActions.itemFor(_loc5_), org.as3commons.collections.LinkedList);
+					_loc4_ = ASCompat.coerce(mCombatResultActions.itemFor(_loc5_), org.as3commons.collections.LinkedList);
 					_loc4_.add(_loc2_);
 				} else {
 					_loc4_ = new LinkedList();
@@ -205,7 +205,7 @@ class AttackTimeline extends ScriptTimeline {
 	}
 
 	function get_projectileScalingAngle():UInt {
-		return (Std.int(mProjectileScalingAngle) : UInt);
+		return (ASCompat.floatToInt(mProjectileScalingAngle) : UInt);
 	}
 
 	@:isVar public var distanceScalingTime(get, set):Float;

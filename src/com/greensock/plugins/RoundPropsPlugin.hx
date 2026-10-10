@@ -46,7 +46,7 @@ class RoundPropsPlugin extends TweenPlugin {
 		var _loc1_:String = null;
 		var _loc2_:String = null;
 		var _loc4_:PropTween = null;
-		var _loc3_:Array<ASAny> = ASCompat.dynamicAs(_tween.vars.roundProps, Array);
+		var _loc3_:Array<ASAny> = ASCompat.coerce(_tween.vars.roundProps, Array);
 		var _loc5_ = _loc3_.length;
 		while (--_loc5_ > -1) {
 			_loc1_ = _loc3_[_loc5_];

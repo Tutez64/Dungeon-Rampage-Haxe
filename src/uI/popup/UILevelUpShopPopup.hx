@@ -61,7 +61,7 @@ class UILevelUpShopPopup extends DBUIOneButtonPopup {
 					}
 				}
 			}
-			_loc9_ = ASCompat.toInt(_loc9_) + 1;
+			_loc9_++;
 		}
 		return _loc4_;
 	}
@@ -101,9 +101,9 @@ class UILevelUpShopPopup extends DBUIOneButtonPopup {
 		});
 		ASCompat.setProperty((mPopup : ASAny).hero_level_star_label, "text", Std.string(mAvatarInfo.level));
 		offerUIs = new Vector<MovieClip>();
-		offerUIs.push(ASCompat.dynamicAs((mPopup : ASAny).weapon_0, flash.display.MovieClip));
-		offerUIs.push(ASCompat.dynamicAs((mPopup : ASAny).weapon_1, flash.display.MovieClip));
-		offerUIs.push(ASCompat.dynamicAs((mPopup : ASAny).weapon_2, flash.display.MovieClip));
+		offerUIs.push(ASCompat.coerce((mPopup : ASAny).weapon_0, flash.display.MovieClip));
+		offerUIs.push(ASCompat.coerce((mPopup : ASAny).weapon_1, flash.display.MovieClip));
+		offerUIs.push(ASCompat.coerce((mPopup : ASAny).weapon_2, flash.display.MovieClip));
 		if (checkNullIteratee(offerUIs))
 			for (_tmp_ in offerUIs) {
 				offerUI = _tmp_;
@@ -114,10 +114,10 @@ class UILevelUpShopPopup extends DBUIOneButtonPopup {
 			offerUI = offerUIs[(i : Int)];
 			offerUI.visible = true;
 			gmOffer = mGMOffers[(i : Int)];
-			gmWeaponItem = ASCompat.dynamicAs(mDBFacade.gameMaster.weaponItemById.itemFor(gmOffer.Details[0].WeaponId), gameMasterDictionary.GMWeaponItem);
+			gmWeaponItem = ASCompat.coerce(mDBFacade.gameMaster.weaponItemById.itemFor(gmOffer.Details[0].WeaponId), gameMasterDictionary.GMWeaponItem);
 			gmAesthetic = gmWeaponItem.getWeaponAesthetic(gmOffer.Details[0].Level);
 			ASCompat.setProperty((offerUI : ASAny).weapon_label, "text", gmAesthetic.Name.toUpperCase());
-			this.loadWeaponIcon(ASCompat.dynamicAs((offerUI : ASAny).empty_slot, flash.display.DisplayObjectContainer), gmWeaponItem);
+			this.loadWeaponIcon(ASCompat.coerce((offerUI : ASAny).empty_slot, flash.display.DisplayObjectContainer), gmWeaponItem);
 			ASCompat.setProperty((offerUI : ASAny).level_star_label, "text", Std.string(gmOffer.Details[0].Level));
 			i = i + 1;
 		}
@@ -132,7 +132,7 @@ class UILevelUpShopPopup extends DBUIOneButtonPopup {
 				var _loc3_:MovieClipRenderController = null;
 				var _loc4_ = param1.getClass(iconName);
 				if (_loc4_ != null) {
-					_loc2_ = ASCompat.dynamicAs(ASCompat.createInstance(_loc4_, []), flash.display.MovieClip);
+					_loc2_ = ASCompat.coerce(ASCompat.createInstance(_loc4_, []), flash.display.MovieClip);
 					_loc3_ = new MovieClipRenderController(mDBFacade, _loc2_);
 					_loc3_.play((0 : UInt), true);
 					_loc2_.scaleX = _loc2_.scaleY = 72 / 100;

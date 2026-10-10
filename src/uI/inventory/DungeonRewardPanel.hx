@@ -64,10 +64,10 @@ class DungeonRewardPanel {
 			_loc3_.setParams((_loc5_ : UInt));
 			_loc3_.setFromDungeonSummary();
 			if (mDungeonSummary.isSingleChestList[0]) {
-				_loc2_ = new DungeonRewardElement(mDBFacade, ASCompat.dynamicAs((mRewardPanel : ASAny).equip_slot_3.graphic, flash.display.MovieClip), _loc3_,
+				_loc2_ = new DungeonRewardElement(mDBFacade, ASCompat.coerce((mRewardPanel : ASAny).equip_slot_3.graphic, flash.display.MovieClip), _loc3_,
 					mSelectedCallback);
 			} else {
-				_loc2_ = new DungeonRewardElement(mDBFacade, ASCompat.dynamicAs((mRewardPanel : ASAny).equip_slot_1.graphic, flash.display.MovieClip), _loc3_,
+				_loc2_ = new DungeonRewardElement(mDBFacade, ASCompat.coerce((mRewardPanel : ASAny).equip_slot_1.graphic, flash.display.MovieClip), _loc3_,
 					mSelectedCallback);
 			}
 			mDungeonRewardElements.push(_loc2_);
@@ -76,7 +76,7 @@ class DungeonRewardPanel {
 			_loc3_ = new ChestInfo(mDBFacade, null);
 			_loc3_.setParams((_loc4_ : UInt));
 			_loc3_.setFromDungeonSummary();
-			_loc2_ = new DungeonRewardElement(mDBFacade, ASCompat.dynamicAs((mRewardPanel : ASAny).equip_slot_2.graphic, flash.display.MovieClip), _loc3_,
+			_loc2_ = new DungeonRewardElement(mDBFacade, ASCompat.coerce((mRewardPanel : ASAny).equip_slot_2.graphic, flash.display.MovieClip), _loc3_,
 				mSelectedCallback);
 			mDungeonRewardElements.push(_loc2_);
 		}
@@ -90,7 +90,7 @@ class DungeonRewardPanel {
 				mDungeonRewardElements[_loc2_].callSelectedCallback();
 				highlightChest(mDungeonRewardElements[_loc2_].chestInfo);
 			}
-			_loc2_ = ASCompat.toInt(_loc2_) + 1;
+			_loc2_++;
 		}
 	}
 
@@ -106,7 +106,7 @@ class DungeonRewardPanel {
 		_loc1_ = 0;
 		while (_loc1_ < mDungeonRewardElements.length) {
 			mDungeonRewardElements[_loc1_].clear();
-			_loc1_ = ASCompat.toInt(_loc1_) + 1;
+			_loc1_++;
 		}
 	}
 
@@ -117,7 +117,7 @@ class DungeonRewardPanel {
 			if (mDungeonRewardElements[_loc2_].chestInfo.gmId == chestInfo.gmId) {
 				mDungeonRewardElements[_loc2_].empty();
 			}
-			_loc2_ = ASCompat.toInt(_loc2_) + 1;
+			_loc2_++;
 		}
 	}
 
@@ -138,7 +138,7 @@ class DungeonRewardPanel {
 			} else {
 				mDungeonRewardElements[_loc2_].deSelect();
 			}
-			_loc2_ = ASCompat.toInt(_loc2_) + 1;
+			_loc2_++;
 		}
 	}
 
@@ -147,7 +147,7 @@ class DungeonRewardPanel {
 		_loc1_ = 0;
 		while (_loc1_ < mDungeonRewardElements.length) {
 			mDungeonRewardElements[_loc1_].deSelect();
-			_loc1_ = ASCompat.toInt(_loc1_) + 1;
+			_loc1_++;
 		}
 	}
 
@@ -161,7 +161,7 @@ class DungeonRewardPanel {
 		_loc1_ = 0;
 		while (_loc1_ < mDungeonRewardElements.length) {
 			mDungeonRewardElements[_loc1_].destroy();
-			_loc1_ = ASCompat.toInt(_loc1_) + 1;
+			_loc1_++;
 		}
 		mDungeonRewardElements = null;
 	}

@@ -42,7 +42,7 @@ class SoundComponent extends Component {
 		var _loc1_:SoundHandle = null;
 		var _loc2_ = ASCompat.reinterpretAs(mSoundHandles.iterator(), ISetIterator);
 		while (_loc2_.hasNext()) {
-			_loc1_ = ASCompat.dynamicAs(_loc2_.next(), brain.sound.SoundHandle);
+			_loc1_ = ASCompat.coerce(_loc2_.next(), brain.sound.SoundHandle);
 			_loc1_.destroy();
 		}
 		mSoundHandles.clear();

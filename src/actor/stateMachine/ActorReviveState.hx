@@ -158,14 +158,14 @@ class ActorReviveState extends ActorState {
 		mAssetLoadingComponent.getSwfAsset(DBFacade.buildFullDownloadPath("Resources/Art2D/UI/db_UI_nametag.swf"), function(param1:SwfAsset) {
 			var swfAsset = param1;
 			var assetClass = swfAsset.getClass("UI_widget");
-			mDeadPlayerEffect = ASCompat.dynamicAs(ASCompat.createInstance(assetClass, []), flash.display.MovieClip);
+			mDeadPlayerEffect = ASCompat.coerce(ASCompat.createInstance(assetClass, []), flash.display.MovieClip);
 			mDeadPlayerEffect.y += -100;
 			ASCompat.setProperty((mDeadPlayerEffect : ASAny).NametagText, "text", "");
 			ASCompat.setProperty((mDeadPlayerEffect : ASAny).AlertText, "text", Locale.getString("NAMETAG_RESCUE"));
 			mAssetLoadingComponent.getSwfAsset(DBFacade.buildFullDownloadPath("Resources/Art2D/Icons/Avatars/db_icons_avatars.swf"),
 				function(param1:SwfAsset) {
 					var _loc3_ = param1.getClass("death_icon");
-					var _loc2_ = ASCompat.dynamicAs(ASCompat.createInstance(_loc3_, []), flash.display.MovieClip);
+					var _loc2_ = ASCompat.coerce(ASCompat.createInstance(_loc3_, []), flash.display.MovieClip);
 					_loc2_.name = "revivePic";
 					(mDeadPlayerEffect : ASAny).UI_avatar.addChild(_loc2_);
 				});
@@ -250,7 +250,7 @@ class ActorReviveState extends ActorState {
 			if (mKeyBoardInput == null) {
 				mAssetLoadingComponent.getSwfAsset(DBFacade.buildFullDownloadPath("Resources/Art2D/FX/db_fx_library.swf"), function(param1:SwfAsset) {
 					var _loc2_ = param1.getClass("db_fx_revive_spacebar");
-					mKeyBoardInput = ASCompat.dynamicAs(ASCompat.createInstance(_loc2_, []), flash.display.MovieClip);
+					mKeyBoardInput = ASCompat.coerce(ASCompat.createInstance(_loc2_, []), flash.display.MovieClip);
 					ASCompat.setProperty((mKeyBoardInput : ASAny).label, "text", Locale.getString("REVIVE_TRIGGER_BUTTON"));
 					mKeyBoardInput.x = mActorGameObject.position.x;
 					mKeyBoardInput.y = mActorGameObject.position.y;
@@ -380,7 +380,7 @@ class ActorReviveState extends ActorState {
 		var offer:GMOffer = null;
 		var assetClass:Dynamic = null;
 		assetClass = swfAsset.getClass("revive_prompt");
-		mRevivePanel = ASCompat.dynamicAs(ASCompat.createInstance(assetClass, []), flash.display.MovieClip);
+		mRevivePanel = ASCompat.coerce(ASCompat.createInstance(assetClass, []), flash.display.MovieClip);
 		mRevivePanel.x = mDBFacade.stageRef.stageWidth - mRevivePanel.width / 2.8;
 		mRevivePanel.y += 169;
 		mSceneGraphComponent.addChildAt(mRevivePanel, (105 : UInt), (0 : UInt));
@@ -390,15 +390,15 @@ class ActorReviveState extends ActorState {
 		} else {
 			ASCompat.setProperty((mRevivePanel : ASAny).prompt_text_box, "text", Locale.getString("REVIVE_PANEL_INNER_SINGLE_PLAYER"));
 		}
-		mSelfReviveMeButton = new UIButton(mDBFacade, ASCompat.dynamicAs((mRevivePanel : ASAny).prompt_button_1_buy_me, flash.display.MovieClip));
-		mSelfReviveAllButton = new UIButton(mDBFacade, ASCompat.dynamicAs((mRevivePanel : ASAny).prompt_button_1_buy_all, flash.display.MovieClip));
-		mReturnToTownButton = new UIButton(mDBFacade, ASCompat.dynamicAs((mRevivePanel : ASAny).prompt_button, flash.display.MovieClip));
+		mSelfReviveMeButton = new UIButton(mDBFacade, ASCompat.coerce((mRevivePanel : ASAny).prompt_button_1_buy_me, flash.display.MovieClip));
+		mSelfReviveAllButton = new UIButton(mDBFacade, ASCompat.coerce((mRevivePanel : ASAny).prompt_button_1_buy_all, flash.display.MovieClip));
+		mReturnToTownButton = new UIButton(mDBFacade, ASCompat.coerce((mRevivePanel : ASAny).prompt_button, flash.display.MovieClip));
 		ASCompat.setProperty((mRevivePanel : ASAny).prompt_button_1_buy_me.use_buy_me, "text", "");
 		ASCompat.setProperty((mRevivePanel : ASAny).prompt_button_1_buy_all.use_buy_me, "text", "");
 		ASCompat.setProperty((mRevivePanel : ASAny).label_buy_me, "text", Locale.getString("REVIVE_PANEL_SELF_REVIVE_BUTTON"));
 		ASCompat.setProperty((mRevivePanel : ASAny).label_buy_all, "text", Locale.getString("REVIVE_PANEL_PARTY_REVIVE_BUTTON"));
-		partyBombsOwned = ASCompat.dynamicAs(mDBFacade.dbAccountInfo.inventoryInfo.stackablesByStackableID.itemFor(60018), account.StackableInfo);
-		offer = ASCompat.dynamicAs(mDBFacade.gameMaster.offerById.itemFor(51369), gameMasterDictionary.GMOffer);
+		partyBombsOwned = ASCompat.coerce(mDBFacade.dbAccountInfo.inventoryInfo.stackablesByStackableID.itemFor(60018), account.StackableInfo);
+		offer = ASCompat.coerce(mDBFacade.gameMaster.offerById.itemFor(51369), gameMasterDictionary.GMOffer);
 		if (mDBFacade.dbAccountInfo.inventoryInfo.ownsItem((60018 : UInt)) && partyBombsOwned != null) {
 			ASCompat.setProperty((mRevivePanel : ASAny).prompt_button_1_buy_all.cost_text_buy_me, "visible", false);
 			ASCompat.setProperty((mRevivePanel : ASAny).prompt_button_1_buy_all.cash_icon_buy_me, "visible", false);
@@ -435,7 +435,7 @@ class ActorReviveState extends ActorState {
 		}
 		mReturnToTownButton.label.text = Locale.getString("REVIVE_PANEL_FORFEIT_BUTTON");
 		ownedHealthBombs = null;
-		ownedHealthBombs = ASCompat.dynamicAs(mDBFacade.dbAccountInfo.inventoryInfo.stackablesByStackableID.itemFor(60001), account.StackableInfo);
+		ownedHealthBombs = ASCompat.coerce(mDBFacade.dbAccountInfo.inventoryInfo.stackablesByStackableID.itemFor(60001), account.StackableInfo);
 		healthBombCount = (0 : UInt);
 		if (ownedHealthBombs != null) {
 			healthBombCount = ownedHealthBombs.count;
@@ -448,7 +448,7 @@ class ActorReviveState extends ActorState {
 		}
 		ASCompat.setProperty((mRevivePanel : ASAny).quantity_pBomb, "text",
 			Locale.getString("LIMITED_REVIVES_PANEL_PBOMBS_OWNED") + ": " + Std.string(partyBombCount));
-		offer = ASCompat.dynamicAs(mDBFacade.gameMaster.offerById.itemFor(51304), gameMasterDictionary.GMOffer);
+		offer = ASCompat.coerce(mDBFacade.gameMaster.offerById.itemFor(51304), gameMasterDictionary.GMOffer);
 		if (mDBFacade.dbAccountInfo.inventoryInfo.ownsItem((60001 : UInt)) && ownedHealthBombs != null) {
 			ASCompat.setProperty((mRevivePanel : ASAny).prompt_button_1_buy_me.cost_text_buy_me, "visible", false);
 			ASCompat.setProperty((mRevivePanel : ASAny).prompt_button_1_buy_me.cash_icon_buy_me, "visible", false);
@@ -464,7 +464,7 @@ class ActorReviveState extends ActorState {
 			if (healthBombCostMultiplier < 1 && 0 != 0) {
 				mSelfReviveMeButton.destroy();
 				ASCompat.setProperty((mRevivePanel : ASAny).prompt_button_1_buy_me, "visible", false);
-				mSelfReviveMeButton = new UIButton(mDBFacade, ASCompat.dynamicAs((mRevivePanel : ASAny).prompt_button_sale, flash.display.MovieClip));
+				mSelfReviveMeButton = new UIButton(mDBFacade, ASCompat.coerce((mRevivePanel : ASAny).prompt_button_sale, flash.display.MovieClip));
 				ASCompat.setProperty((mSelfReviveMeButton.root : ASAny).original_cost_text, "text",
 					Std.string(Math.fround(offer.Price / healthBombCostMultiplier)));
 				__tmpAssignObj7 = (mSelfReviveMeButton.root : ASAny).strike;
@@ -504,10 +504,10 @@ class ActorReviveState extends ActorState {
 			"y": mHitTabClip.y
 		});
 		rewardSlots = new Vector<MovieClip>();
-		rewardSlots.push(ASCompat.dynamicAs((mRevivePanel : ASAny).current_reward.loot_01, flash.display.MovieClip));
-		rewardSlots.push(ASCompat.dynamicAs((mRevivePanel : ASAny).current_reward.loot_02, flash.display.MovieClip));
-		rewardSlots.push(ASCompat.dynamicAs((mRevivePanel : ASAny).current_reward.loot_03, flash.display.MovieClip));
-		rewardSlots.push(ASCompat.dynamicAs((mRevivePanel : ASAny).current_reward.loot_04, flash.display.MovieClip));
+		rewardSlots.push(ASCompat.coerce((mRevivePanel : ASAny).current_reward.loot_01, flash.display.MovieClip));
+		rewardSlots.push(ASCompat.coerce((mRevivePanel : ASAny).current_reward.loot_02, flash.display.MovieClip));
+		rewardSlots.push(ASCompat.coerce((mRevivePanel : ASAny).current_reward.loot_03, flash.display.MovieClip));
+		rewardSlots.push(ASCompat.coerce((mRevivePanel : ASAny).current_reward.loot_04, flash.display.MovieClip));
 		ASCompat.setProperty((mRevivePanel : ASAny).current_reward.coin_count, "text",
 			Std.string(mHeroGameObject.distributedDungeonFloor.parentArea.infiniteTotalGold));
 		myHero = ASCompat.reinterpretAs(mDBFacade.gameObjectManager.getReferenceFromId(mDBFacade.dbAccountInfo.activeAvatarInfo.id), HeroGameObjectOwner);
@@ -528,10 +528,10 @@ class ActorReviveState extends ActorState {
 							continue;
 						}
 					}
-					dooberData = ASCompat.dynamicAs(mDBFacade.gameMaster.dooberById.itemFor(reward.dooberId), gameMasterDictionary.GMDoober);
-					gmChestItem = ASCompat.dynamicAs(mDBFacade.gameMaster.chestsById.itemFor(dooberData.ChestId), gameMasterDictionary.GMChest);
+					dooberData = ASCompat.coerce(mDBFacade.gameMaster.dooberById.itemFor(reward.dooberId), gameMasterDictionary.GMDoober);
+					gmChestItem = ASCompat.coerce(mDBFacade.gameMaster.chestsById.itemFor(dooberData.ChestId), gameMasterDictionary.GMChest);
 					chestClass = chestAsset.getClass(gmChestItem.IconName);
-					dooberMC = ASCompat.dynamicAs(ASCompat.createInstance(chestClass, []), flash.display.MovieClip);
+					dooberMC = ASCompat.coerce(ASCompat.createInstance(chestClass, []), flash.display.MovieClip);
 					if (slotNumber == 0) {
 						dooberMC.scaleY = 0.4;
 						dooberMC.scaleX = 0.4;
@@ -622,11 +622,11 @@ class ActorReviveState extends ActorState {
 		var assetClass:Dynamic = null;
 		var healthBomb:StackableInfo = null;
 		assetClass = swfAsset.getClass("DR_revive_prompt");
-		mRevivePanel = ASCompat.dynamicAs(ASCompat.createInstance(assetClass, []), flash.display.MovieClip);
-		mCloseButton = new UIButton(mDBFacade, ASCompat.dynamicAs((mRevivePanel : ASAny).revive_king.revive_chat_balloon.close, flash.display.MovieClip));
+		mRevivePanel = ASCompat.coerce(ASCompat.createInstance(assetClass, []), flash.display.MovieClip);
+		mCloseButton = new UIButton(mDBFacade, ASCompat.coerce((mRevivePanel : ASAny).revive_king.revive_chat_balloon.close, flash.display.MovieClip));
 		mCloseButton.rolloverFilter = DBGlobal.UI_ROLLOVER_FILTER;
 		mCloseButton.releaseCallback = function() {
-			mRevivePanel.removeChild(ASCompat.dynamicAs((mRevivePanel : ASAny).revive_king, flash.display.DisplayObject));
+			mRevivePanel.removeChild(ASCompat.coerce((mRevivePanel : ASAny).revive_king, flash.display.DisplayObject));
 		};
 		ASCompat.setProperty((mRevivePanel : ASAny).revive_king.revive_chat_balloon, "king_title", Locale.getString("KING_REVIVE_TITLE"));
 		ASCompat.setProperty((mRevivePanel : ASAny).revive_king.revive_chat_balloon, "king_text", Locale.getString("KING_REVIVE_MESSAGE"));
@@ -642,16 +642,16 @@ class ActorReviveState extends ActorState {
 		} else {
 			ASCompat.setProperty((mRevivePanel : ASAny).prompt_text_box, "text", Locale.getString("REVIVE_PANEL_INNER_SINGLE_PLAYER"));
 		}
-		mSelfReviveMeButton = new UIButton(mDBFacade, ASCompat.dynamicAs((mRevivePanel : ASAny).prompt_button_1_buy_me, flash.display.MovieClip));
-		mSelfReviveAllButton = new UIButton(mDBFacade, ASCompat.dynamicAs((mRevivePanel : ASAny).prompt_button_1_buy_all, flash.display.MovieClip));
-		mReturnToTownButton = new UIButton(mDBFacade, ASCompat.dynamicAs((mRevivePanel : ASAny).prompt_button_2, flash.display.MovieClip));
+		mSelfReviveMeButton = new UIButton(mDBFacade, ASCompat.coerce((mRevivePanel : ASAny).prompt_button_1_buy_me, flash.display.MovieClip));
+		mSelfReviveAllButton = new UIButton(mDBFacade, ASCompat.coerce((mRevivePanel : ASAny).prompt_button_1_buy_all, flash.display.MovieClip));
+		mReturnToTownButton = new UIButton(mDBFacade, ASCompat.coerce((mRevivePanel : ASAny).prompt_button_2, flash.display.MovieClip));
 		ASCompat.setProperty((mRevivePanel : ASAny).prompt_button_1_buy_me.use_buy_me, "text", "");
 		ASCompat.setProperty((mRevivePanel : ASAny).prompt_button_1_buy_all.use_buy_all, "text", "");
 		ASCompat.setProperty((mRevivePanel : ASAny).prompt_button_1_buy_me.stackable_buy_me, "text", "");
 		ASCompat.setProperty((mRevivePanel : ASAny).label_buy_me, "text", Locale.getString("REVIVE_PANEL_SELF_REVIVE_BUTTON"));
 		ASCompat.setProperty((mRevivePanel : ASAny).label_buy_all, "text", Locale.getString("REVIVE_PANEL_PARTY_REVIVE_BUTTON"));
-		partyBomb = ASCompat.dynamicAs(mDBFacade.dbAccountInfo.inventoryInfo.stackablesByStackableID.itemFor(60018), account.StackableInfo);
-		offer = ASCompat.dynamicAs(mDBFacade.gameMaster.offerById.itemFor(51369), gameMasterDictionary.GMOffer);
+		partyBomb = ASCompat.coerce(mDBFacade.dbAccountInfo.inventoryInfo.stackablesByStackableID.itemFor(60018), account.StackableInfo);
+		offer = ASCompat.coerce(mDBFacade.gameMaster.offerById.itemFor(51369), gameMasterDictionary.GMOffer);
 		if (mDBFacade.dbAccountInfo.inventoryInfo.ownsItem((60018 : UInt)) && partyBomb != null) {
 			ASCompat.setProperty((mRevivePanel : ASAny).prompt_button_1_buy_all.stackable_buy_all, "text", "X" + Std.string(partyBomb.count));
 			ASCompat.setProperty((mRevivePanel : ASAny).prompt_button_1_buy_all.cost_text_buy_all, "visible", false);
@@ -690,8 +690,8 @@ class ActorReviveState extends ActorState {
 				Locale.getString("REVIVE_PANEL_USED_MAX_PARTY_BOMBS_BUY_BUTTON_TEXT"));
 		}
 		mReturnToTownButton.label.text = Locale.getString("REVIVE_PANEL_FORFEIT_BUTTON");
-		healthBomb = ASCompat.dynamicAs(mDBFacade.dbAccountInfo.inventoryInfo.stackablesByStackableID.itemFor(60001), account.StackableInfo);
-		offer = ASCompat.dynamicAs(mDBFacade.gameMaster.offerById.itemFor(51304), gameMasterDictionary.GMOffer);
+		healthBomb = ASCompat.coerce(mDBFacade.dbAccountInfo.inventoryInfo.stackablesByStackableID.itemFor(60001), account.StackableInfo);
+		offer = ASCompat.coerce(mDBFacade.gameMaster.offerById.itemFor(51304), gameMasterDictionary.GMOffer);
 		if (mDBFacade.dbAccountInfo.inventoryInfo.ownsItem((60001 : UInt)) && healthBomb != null) {
 			ASCompat.setProperty((mRevivePanel : ASAny).prompt_button_1_buy_me.stackable_buy_me, "text", "X" + Std.string(healthBomb.count));
 			ASCompat.setProperty((mRevivePanel : ASAny).prompt_button_1_buy_me.cost_text_buy_me, "visible", false);
@@ -709,7 +709,7 @@ class ActorReviveState extends ActorState {
 			if (healthBombCostMultiplier < 1 && 0 != 0) {
 				mSelfReviveMeButton.destroy();
 				ASCompat.setProperty((mRevivePanel : ASAny).prompt_button_1_buy_me, "visible", false);
-				mSelfReviveMeButton = new UIButton(mDBFacade, ASCompat.dynamicAs((mRevivePanel : ASAny).prompt_button_sale, flash.display.MovieClip));
+				mSelfReviveMeButton = new UIButton(mDBFacade, ASCompat.coerce((mRevivePanel : ASAny).prompt_button_sale, flash.display.MovieClip));
 				ASCompat.setProperty((mSelfReviveMeButton.root : ASAny).original_cost_text, "text",
 					Std.string(Math.fround(offer.Price / healthBombCostMultiplier)));
 				__tmpAssignObj8 = (mSelfReviveMeButton.root : ASAny).strike;
@@ -788,7 +788,7 @@ class ActorReviveState extends ActorState {
 
 	public function buyReviveMe() {
 		startLogMetrics("Buy Revive Button Clicked");
-		var _loc1_ = ASCompat.dynamicAs(mDBFacade.gameMaster.offerById.itemFor(51304), gameMasterDictionary.GMOffer);
+		var _loc1_ = ASCompat.coerce(mDBFacade.gameMaster.offerById.itemFor(51304), gameMasterDictionary.GMOffer);
 		StoreServicesController.tryBuyOffer(mDBFacade, _loc1_, buyReviveMeSuccess);
 	}
 
@@ -803,7 +803,7 @@ class ActorReviveState extends ActorState {
 
 	public function buyReviveAll() {
 		startLogMetrics("Buy Revive Button Clicked");
-		var _loc1_ = ASCompat.dynamicAs(mDBFacade.gameMaster.offerById.itemFor(51369), gameMasterDictionary.GMOffer);
+		var _loc1_ = ASCompat.coerce(mDBFacade.gameMaster.offerById.itemFor(51369), gameMasterDictionary.GMOffer);
 		StoreServicesController.tryBuyOffer(mDBFacade, _loc1_, buyReviveAllSuccess);
 	}
 

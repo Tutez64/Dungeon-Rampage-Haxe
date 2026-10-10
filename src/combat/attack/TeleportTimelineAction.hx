@@ -30,7 +30,7 @@ class TeleportTimelineAction extends AttackTimelineAction {
 
 	public static function buildFromJson(actorGameObject:ActorGameObject, actorView:ActorView, dbFacade:DBFacade, actionObj:ASObject):TeleportTimelineAction {
 		var _loc5_ = ASCompat.toNumber(actionObj.duration);
-		return new TeleportTimelineAction(actorGameObject, actorView, dbFacade, (Std.int(_loc5_) : UInt));
+		return new TeleportTimelineAction(actorGameObject, actorView, dbFacade, (ASCompat.floatToInt(_loc5_) : UInt));
 	}
 
 	override public function execute(timeline:ScriptTimeline) {

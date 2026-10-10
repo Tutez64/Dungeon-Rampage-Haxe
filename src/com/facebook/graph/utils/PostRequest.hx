@@ -25,7 +25,7 @@ class PostRequest {
 		var _loc4_ = (_loc3_.length : UInt);
 		var _loc5_:Float = 0;
 		while (_loc5_ < _loc4_) {
-			this.postData.writeByte(_loc3_.charCodeAt(Std.int(_loc5_)));
+			this.postData.writeByte(_loc3_.charCodeAt(ASCompat.floatToInt(_loc5_)));
 			_loc5_++;
 		}
 		this.writeLineBreak();

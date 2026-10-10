@@ -47,7 +47,7 @@ class FacebookBatchRequest extends AbstractFacebookRequest {
 		var _loc6_ = (_loc5_.length : UInt);
 		var _loc7_ = (0 : UInt);
 		while (_loc7_ < _loc6_) {
-			_loc8_ = ASCompat.dynamicAs(_loc5_[(_loc7_ : Int)], com.facebook.graph.data.BatchItem);
+			_loc8_ = ASCompat.coerce(_loc5_[(_loc7_ : Int)], com.facebook.graph.data.BatchItem);
 			_loc9_ = this.extractFileData(_loc8_.params);
 			_loc10_ = {
 				"method": _loc8_.requestMethod,

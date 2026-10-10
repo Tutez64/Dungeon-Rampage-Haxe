@@ -28,7 +28,7 @@ class ActorMacroStateMachine extends ActorStateMachine {
 		attackTimeline.appendChoreography(attackChoreography);
 		var _loc8_ = attackChoreography.loop == 1 ? true : false;
 		attackTimeline.currentAttackType = attackChoreography.attack.attackType;
-		attackTimeline.projectileMultiplier = (Std.int(attackChoreography.scalingMaxProjectiles) : UInt);
+		attackTimeline.projectileMultiplier = (ASCompat.floatToInt(attackChoreography.scalingMaxProjectiles) : UInt);
 		enterChoreographyState(playSpeed, targetActor, attackTimeline, finishedCallback, stopCallback, loop);
 	}
 

@@ -260,7 +260,7 @@ class GMOffer {
 			for (_tmp_ in iterateDynamicValues(splitTests)) {
 				_loc3_ = _tmp_;
 				if (_loc3_.name == "GemValue1" && CurrencyType == "PREMIUM") {
-					mPrice = (Math.ceil(ASCompat.toNumber(mPrice * ASCompat.toNumberField(_loc3_, "value"))) : UInt);
+					mPrice = (Math.ceil(mPrice * ASCompat.toNumberField(_loc3_, "value")) : UInt);
 				}
 			}
 		if (CurrencyType == "PREMIUM") {
@@ -287,16 +287,16 @@ class GMOffer {
 		} else {
 			_loc10_ = this.Details[0];
 			if (_loc10_.HeroId != 0) {
-				_loc6_ = ASCompat.dynamicAs(gameMaster.heroById.itemFor(_loc10_.HeroId), gameMasterDictionary.GMHero);
+				_loc6_ = ASCompat.coerce(gameMaster.heroById.itemFor(_loc10_.HeroId), gameMasterDictionary.GMHero);
 				if (_loc6_ != null) {
 					_loc8_ = _loc6_.Name.toUpperCase();
 				}
 			} else if (_loc10_.WeaponId != 0) {
-				_loc4_ = ASCompat.dynamicAs(gameMaster.weaponItemById.itemFor(_loc10_.WeaponId), gameMasterDictionary.GMWeaponItem);
+				_loc4_ = ASCompat.coerce(gameMaster.weaponItemById.itemFor(_loc10_.WeaponId), gameMasterDictionary.GMWeaponItem);
 				_loc5_ = _loc4_.getWeaponAesthetic(_loc10_.Level, isLegendary);
 				_loc8_ = _loc5_.Name.toUpperCase();
 			} else if (_loc10_.PetId != 0) {
-				_loc7_ = ASCompat.dynamicAs(gameMaster.npcById.itemFor(_loc10_.PetId), gameMasterDictionary.GMNpc);
+				_loc7_ = ASCompat.coerce(gameMaster.npcById.itemFor(_loc10_.PetId), gameMasterDictionary.GMNpc);
 				if (_loc7_ != null) {
 					_loc8_ = _loc7_.Name.toUpperCase();
 				}
@@ -323,16 +323,16 @@ class GMOffer {
 		} else {
 			_loc10_ = this.Details[0];
 			if (_loc10_.HeroId != 0) {
-				_loc7_ = ASCompat.dynamicAs(gameMaster.heroById.itemFor(_loc10_.HeroId), gameMasterDictionary.GMHero);
+				_loc7_ = ASCompat.coerce(gameMaster.heroById.itemFor(_loc10_.HeroId), gameMasterDictionary.GMHero);
 				if (_loc7_ != null) {
 					_loc6_ = _loc7_.Constant;
 				}
 			} else if (_loc10_.WeaponId != 0) {
-				_loc4_ = ASCompat.dynamicAs(gameMaster.weaponItemById.itemFor(_loc10_.WeaponId), gameMasterDictionary.GMWeaponItem);
+				_loc4_ = ASCompat.coerce(gameMaster.weaponItemById.itemFor(_loc10_.WeaponId), gameMasterDictionary.GMWeaponItem);
 				_loc5_ = _loc4_.getWeaponAesthetic(_loc10_.Level, isLegendary);
 				_loc6_ = _loc5_.Constant;
 			} else if (_loc10_.PetId != 0) {
-				_loc8_ = ASCompat.dynamicAs(gameMaster.npcById.itemFor(_loc10_.PetId), gameMasterDictionary.GMNpc);
+				_loc8_ = ASCompat.coerce(gameMaster.npcById.itemFor(_loc10_.PetId), gameMasterDictionary.GMNpc);
 				if (_loc8_ != null) {
 					_loc6_ = _loc8_.Constant;
 				}

@@ -49,7 +49,7 @@ class Astar {
 		_loc1_ = 0;
 		while ((_loc1_ : UInt) < TotalGridCount) {
 			Nodes[_loc1_] = null;
-			_loc1_ = ASCompat.toInt(_loc1_) + 1;
+			_loc1_++;
 		}
 		mOpenList = new PriorityQueue();
 		mAnswerPath = new Vector<UInt>();
@@ -68,9 +68,9 @@ class Astar {
 				if (_loc4_ != null) {
 					InitTileAstarGrids((_loc2_ : UInt), (_loc3_ : UInt));
 				}
-				_loc2_ = ASCompat.toInt(_loc2_) + 1;
+				_loc2_++;
 			}
-			_loc3_ = ASCompat.toInt(_loc3_) + 1;
+			_loc3_++;
 		}
 	}
 
@@ -87,10 +87,10 @@ class Astar {
 		while (_loc4_ < (tj + 1) * 18) {
 			_loc3_ = ti * 18;
 			while ((_loc3_ : UInt) < (ti + 1) * 18) {
-				_loc5_ = (ASCompat.toInt(_loc3_ + _loc4_ * 216) : UInt);
+				_loc5_ = _loc3_ + _loc4_ * 216;
 				Nodes[(_loc5_ : Int)] = new AstarGridNode((_loc5_ : Int));
 				_loc7_++;
-				_loc3_ = ASCompat.toInt(_loc3_) + 1;
+				_loc3_++;
 			}
 			_loc4_++;
 		}
@@ -105,7 +105,7 @@ class Astar {
 				Nodes[_loc1_].destroy();
 				Nodes[_loc1_] = null;
 			}
-			_loc1_ = ASCompat.toInt(_loc1_) + 1;
+			_loc1_++;
 		}
 		mOpenList = null;
 		mAnswerPath = null;
@@ -132,14 +132,14 @@ class Astar {
 	}
 
 	public function GetAstarGrid(pos:Vector3D):UInt {
-		var _loc2_ = (Std.int(pos.x / 50) : UInt);
-		var _loc3_ = (Std.int(pos.y / 50) : UInt);
+		var _loc2_ = (ASCompat.floatToInt(pos.x / 50) : UInt);
+		var _loc3_ = (ASCompat.floatToInt(pos.y / 50) : UInt);
 		return _loc2_ + _loc3_ * 216;
 	}
 
 	public function GetAstarGridCenter(pos:Vector3D):Vector3D {
-		var _loc3_ = (Std.int(pos.x / 50) : UInt);
-		var _loc4_ = (Std.int(pos.y / 50) : UInt);
+		var _loc3_ = (ASCompat.floatToInt(pos.x / 50) : UInt);
+		var _loc4_ = (ASCompat.floatToInt(pos.y / 50) : UInt);
 		var _loc2_ = new Vector3D();
 		_loc2_.x = _loc3_ * 50 + 50 / 2;
 		_loc2_.y = _loc4_ * 50 + 50 / 2;
@@ -339,19 +339,19 @@ class Astar {
 		if (mDistributedDungeonFloor.debugVisualizer != null) {
 			_loc4_ = new B2Transform();
 			_loc5_ = tileIdx % 12 * 900;
-			_loc6_ = Std.int(tileIdx / 12) * 900;
-			_loc7_ = Std.int(_loc5_ / 50);
-			_loc8_ = Std.int(_loc6_ / 50);
+			_loc6_ = ASCompat.floatToInt(tileIdx / 12) * 900;
+			_loc7_ = ASCompat.floatToInt(_loc5_ / 50);
+			_loc8_ = ASCompat.floatToInt(_loc6_ / 50);
 			_loc2_ = _loc7_;
-			while (_loc2_ < ASCompat.toNumber(_loc7_ + 18)) {
+			while (_loc2_ < _loc7_ + 18) {
 				_loc3_ = _loc8_;
-				while (_loc3_ < ASCompat.toNumber(_loc8_ + 18)) {
-					_loc9_ = ASCompat.toInt(_loc2_ + _loc3_ * 216);
+				while (_loc3_ < _loc8_ + 18) {
+					_loc9_ = _loc2_ + _loc3_ * 216;
 					_loc4_.position = NavCollider.convertToB2Vec2(Nodes[_loc9_].Center);
 					mDistributedDungeonFloor.debugVisualizer.makeAGridRectangle(_loc4_, new B2Color(0.5, 0.5, 0.5));
-					_loc3_ = ASCompat.toInt(_loc3_) + 1;
+					_loc3_++;
 				}
-				_loc2_ = ASCompat.toInt(_loc2_) + 1;
+				_loc2_++;
 			}
 		}
 	}

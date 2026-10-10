@@ -57,34 +57,34 @@ class DBUIConfirmChestPurchasePopup extends UIObject {
 	}
 
 	function setupGui() {
-		mCloseButton = new UIButton(mFacade, ASCompat.dynamicAs((mRoot : ASAny).close, flash.display.MovieClip));
+		mCloseButton = new UIButton(mFacade, ASCompat.coerce((mRoot : ASAny).close, flash.display.MovieClip));
 		mCloseButton.releaseCallback = mCloseCallback;
-		mCancelButton = new UIButton(mFacade, ASCompat.dynamicAs((mRoot : ASAny).button_cancel, flash.display.MovieClip));
+		mCancelButton = new UIButton(mFacade, ASCompat.coerce((mRoot : ASAny).button_cancel, flash.display.MovieClip));
 		mCancelButton.releaseCallback = mCloseCallback;
 		mCancelButton.label.text = Locale.getString("CANCEL");
-		mBuyButton = new UIButton(mFacade, ASCompat.dynamicAs((mRoot : ASAny).buy_button_gems, flash.display.MovieClip));
+		mBuyButton = new UIButton(mFacade, ASCompat.coerce((mRoot : ASAny).buy_button_gems, flash.display.MovieClip));
 		mBuyButton.releaseCallback = mBuyCallback;
 		mBuyButton.label.text = Std.string(mChestOffer.Price);
 		ASCompat.setProperty((mBuyButton.root : ASAny).original_price, "visible", false);
 		ASCompat.setProperty((mBuyButton.root : ASAny).icons_bundle.coin, "visible", false);
 		ASCompat.setProperty((mBuyButton.root : ASAny).icons_bundle.gift_icon, "visible", false);
 		ASCompat.setProperty((mBuyButton.root : ASAny).strike, "visible", false);
-		mTitleLabel = ASCompat.dynamicAs((mRoot : ASAny).label, flash.text.TextField);
+		mTitleLabel = ASCompat.coerce((mRoot : ASAny).label, flash.text.TextField);
 		mTitleLabel.text = Locale.getString("CONFIRM_SHOP_CHEST_PURCHASE");
-		mItemIcon = ASCompat.dynamicAs((mRoot : ASAny).icon_slot, flash.display.MovieClip);
+		mItemIcon = ASCompat.coerce((mRoot : ASAny).icon_slot, flash.display.MovieClip);
 		mAssetLoadingComponent.getSwfAsset(DBFacade.buildFullDownloadPath(mChestOffer.BundleSwfFilepath), function(param1:brain.assetRepository.SwfAsset) {
 			var _loc3_ = param1.getClass(mChestOffer.BundleIcon);
-			var _loc2_ = ASCompat.dynamicAs(ASCompat.createInstance(_loc3_, []), flash.display.MovieClip);
+			var _loc2_ = ASCompat.coerce(ASCompat.createInstance(_loc3_, []), flash.display.MovieClip);
 			mItemIcon.addChild(_loc2_);
 		});
-		mHeroLabel = ASCompat.dynamicAs((mRoot : ASAny).hero_label, flash.text.TextField);
+		mHeroLabel = ASCompat.coerce((mRoot : ASAny).hero_label, flash.text.TextField);
 		mHeroLabel.text = Locale.getString("OPENING_WITH");
-		mTextContentLabel = ASCompat.dynamicAs((mRoot : ASAny).text, flash.text.TextField);
+		mTextContentLabel = ASCompat.coerce((mRoot : ASAny).text, flash.text.TextField);
 		mTextContentLabel.text = Locale.getString("PURCHASE_AND_OPEN_CHEST_TEXT_CONTENT");
-		mAvatarIcon = ASCompat.dynamicAs((mRoot : ASAny).avatar, flash.display.MovieClip);
+		mAvatarIcon = ASCompat.coerce((mRoot : ASAny).avatar, flash.display.MovieClip);
 		mAssetLoadingComponent.getSwfAsset(DBFacade.buildFullDownloadPath(mSelectedHeroSkin.IconSwfFilepath), function(param1:brain.assetRepository.SwfAsset) {
 			var _loc2_ = param1.getClass(mSelectedHeroSkin.IconName);
-			var _loc3_ = ASCompat.dynamicAs(ASCompat.createInstance(_loc2_, []), flash.display.MovieClip);
+			var _loc3_ = ASCompat.coerce(ASCompat.createInstance(_loc2_, []), flash.display.MovieClip);
 			mAvatarIcon.addChild(_loc3_);
 		});
 		mSceneGraphComponent.addChild(mRoot, (105 : UInt));

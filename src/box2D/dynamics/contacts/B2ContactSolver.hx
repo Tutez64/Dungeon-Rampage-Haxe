@@ -185,7 +185,7 @@ import box2D.dynamics.*;
 					_loc28_.pointCount = 1;
 				}
 			}
-			_loc6_ = ASCompat.toInt(_loc6_) + 1;
+			_loc6_++;
 		}
 	}
 
@@ -238,7 +238,7 @@ import box2D.dynamics.*;
 					_loc8_.m_angularVelocity += _loc12_ * (_loc20_.rB.x * _loc22_ - _loc20_.rB.y * _loc21_);
 					_loc8_.m_linearVelocity.x += _loc11_ * _loc21_;
 					_loc8_.m_linearVelocity.y += _loc11_ * _loc22_;
-					_loc18_ = ASCompat.toInt(_loc18_) + 1;
+					_loc18_++;
 				}
 			} else {
 				_loc19_ = _loc6_.pointCount;
@@ -247,10 +247,10 @@ import box2D.dynamics.*;
 					_loc23_ = _loc6_.points[_loc18_];
 					_loc23_.normalImpulse = 0;
 					_loc23_.tangentImpulse = 0;
-					_loc18_ = ASCompat.toInt(_loc18_) + 1;
+					_loc18_++;
 				}
 			}
-			_loc5_ = ASCompat.toInt(_loc5_) + 1;
+			_loc5_++;
 		}
 	}
 
@@ -347,7 +347,7 @@ import box2D.dynamics.*;
 				_loc31_.y += _loc34_ * _loc15_;
 				_loc29_ += _loc35_ * (_loc2_.rB.x * _loc15_ - _loc2_.rB.y * _loc14_);
 				_loc2_.tangentImpulse = _loc13_;
-				_loc1_ = ASCompat.toInt(_loc1_) + 1;
+				_loc1_++;
 			}
 			_loc42_ = _loc25_.pointCount;
 			if (_loc25_.pointCount == 1) {
@@ -470,7 +470,7 @@ import box2D.dynamics.*;
 			}
 			_loc26_.m_angularVelocity = _loc28_;
 			_loc27_.m_angularVelocity = _loc29_;
-			_loc24_ = ASCompat.toInt(_loc24_) + 1;
+			_loc24_++;
 		}
 	}
 
@@ -490,9 +490,9 @@ import box2D.dynamics.*;
 				_loc6_ = _loc2_.points[_loc4_];
 				_loc5_.m_normalImpulse = _loc6_.normalImpulse;
 				_loc5_.m_tangentImpulse = _loc6_.tangentImpulse;
-				_loc4_ = ASCompat.toInt(_loc4_) + 1;
+				_loc4_++;
 			}
-			_loc1_ = ASCompat.toInt(_loc1_) + 1;
+			_loc1_++;
 		}
 	}
 
@@ -551,9 +551,9 @@ import box2D.dynamics.*;
 				_loc6_.m_sweep.c.y += _loc9_ * _loc23_;
 				_loc6_.m_sweep.a += _loc10_ * (_loc18_ * _loc23_ - _loc19_ * _loc22_);
 				_loc6_.SynchronizeTransform();
-				_loc12_ = ASCompat.toInt(_loc12_) + 1;
+				_loc12_++;
 			}
-			_loc3_ = ASCompat.toInt(_loc3_) + 1;
+			_loc3_++;
 		}
 		return _loc2_ > -1.5 * B2Settings.b2_linearSlop;
 	}

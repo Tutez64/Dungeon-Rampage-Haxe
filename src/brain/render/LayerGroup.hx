@@ -33,7 +33,7 @@ class LayerGroup extends Sprite {
 	}
 
 	public function getLayer(layerIndex:Int):Layer {
-		return ASCompat.dynamicAs(mLayers.itemFor(layerIndex), brain.render.Layer);
+		return ASCompat.coerce(mLayers.itemFor(layerIndex), brain.render.Layer);
 	}
 
 	public function addLayer(layer:Layer) {
@@ -57,7 +57,7 @@ class LayerGroup extends Sprite {
 		var _loc1_ = ASCompat.reinterpretAs(mLayers.iterator(), SortedMapIterator);
 		var _loc2_ = 0;
 		while (_loc1_.hasNext()) {
-			_loc3_ = ASCompat.dynamicAs(_loc1_.next(), brain.render.Layer);
+			_loc3_ = ASCompat.coerce(_loc1_.next(), brain.render.Layer);
 			if (mTransformNode.getChildAt(_loc2_) != _loc3_) {
 				mTransformNode.setChildIndex(_loc3_, _loc2_);
 			}
@@ -76,7 +76,7 @@ class LayerGroup extends Sprite {
 		}
 		var _loc2_ = ASCompat.reinterpretAs(mLayers.iterator(), SortedMapIterator);
 		while (_loc2_.hasNext()) {
-			_loc3_ = ASCompat.dynamicAs(_loc2_.next(), brain.render.Layer);
+			_loc3_ = ASCompat.coerce(_loc2_.next(), brain.render.Layer);
 			_loc3_.render();
 		}
 	}
@@ -85,7 +85,7 @@ class LayerGroup extends Sprite {
 		var _loc2_:Layer = null;
 		var _loc1_ = ASCompat.reinterpretAs(mLayers.iterator(), SortedMapIterator);
 		while (_loc1_.hasNext()) {
-			_loc2_ = ASCompat.dynamicAs(_loc1_.next(), brain.render.Layer);
+			_loc2_ = ASCompat.coerce(_loc1_.next(), brain.render.Layer);
 			_loc2_.destroy();
 		}
 		mLayers.clear();

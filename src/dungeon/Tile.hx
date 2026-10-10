@@ -76,14 +76,14 @@ class Tile extends FloorObject {
 		var _loc2_:FloorObject = null;
 		var _loc1_ = mOwnedFloorObjects.iterator();
 		while (_loc1_.hasNext()) {
-			_loc2_ = ASCompat.dynamicAs(_loc1_.next(), dr_floor.FloorObject);
+			_loc2_ = ASCompat.coerce(_loc1_.next(), dr_floor.FloorObject);
 			_loc2_.destroy();
 		}
 		mOwnedFloorObjects.clear();
 		mOwnedFloorObjects = null;
 		_loc1_ = mProjectileGameObjects.iterator();
 		while (_loc1_.hasNext()) {
-			_loc2_ = ASCompat.dynamicAs(_loc1_.next(), dr_floor.FloorObject);
+			_loc2_ = ASCompat.coerce(_loc1_.next(), dr_floor.FloorObject);
 			_loc2_.destroy();
 		}
 		mProjectileGameObjects = null;
@@ -215,7 +215,7 @@ class Tile extends FloorObject {
 		}
 		var _loc1_ = mFloorObjects.iterator();
 		while (_loc1_.hasNext()) {
-			_loc2_ = ASCompat.dynamicAs(_loc1_.next(), dr_floor.FloorObject);
+			_loc2_ = ASCompat.coerce(_loc1_.next(), dr_floor.FloorObject);
 			if (_loc2_.view == null) {
 				Logger.warn("floorObject with null view attempted addToStage id: " + _loc2_.id);
 			} else {
@@ -235,7 +235,7 @@ class Tile extends FloorObject {
 		}
 		var _loc1_ = mFloorObjects.iterator();
 		while (_loc1_.hasNext()) {
-			_loc2_ = ASCompat.dynamicAs(_loc1_.next(), dr_floor.FloorObject);
+			_loc2_ = ASCompat.coerce(_loc1_.next(), dr_floor.FloorObject);
 			if (_loc2_.view == null) {
 				Logger.warn("floorObject with null view attempted removeFromStage id: " + _loc2_.id);
 			} else {
@@ -247,7 +247,7 @@ class Tile extends FloorObject {
 
 	public function createLocalEventCollision(distributedDungeonFloor:DistributedDungeonFloor, x:UInt, y:UInt, radius:UInt, triggerOnce:Bool,
 			onCollisionCallback:ASFunction) {
-		mLocalHeroProximitySensors.push(new LocalHeroProximitySensor(mDBFacade, distributedDungeonFloor, (Std.int(this.position.x + x) : UInt),
-			(Std.int(this.position.y + y) : UInt), radius, triggerOnce, onCollisionCallback));
+		mLocalHeroProximitySensors.push(new LocalHeroProximitySensor(mDBFacade, distributedDungeonFloor, (ASCompat.floatToInt(this.position.x + x) : UInt),
+			(ASCompat.floatToInt(this.position.y + y) : UInt), radius, triggerOnce, onCollisionCallback));
 	}
 }

@@ -387,7 +387,7 @@ class DBFacade extends Facade {
 			ASCompat.showRedrawRegions(true, (16711680 : UInt));
 		}
 		Logger.info("building engines 4");
-		this.accountId = (Std.int(mDBConfigManager.getConfigNumber("AccountId", 0)) : UInt);
+		this.accountId = (ASCompat.floatToInt(mDBConfigManager.getConfigNumber("AccountId", 0)) : UInt);
 		if (mAccountId == 0) {
 			Logger.error("AccountId is 0.  Cannot continue without a valid AccountId.");
 		}
@@ -529,8 +529,8 @@ class DBFacade extends Facade {
 		this.stageRef.showDefaultContextMenu = false;
 		this.stageRef.addEventListener("keyDown", toggleFullscreen);
 		createLetterbox();
-		mInitialLoadingClip = ASCompat.dynamicAs(ASCompat.createInstance(LoadingClass, []), flash.display.MovieClip);
-		mLoadingBar = new UIProgressBar(this, ASCompat.dynamicAs((mInitialLoadingClip : ASAny).loadingBar.loadingBar, flash.display.MovieClip));
+		mInitialLoadingClip = ASCompat.coerce(ASCompat.createInstance(LoadingClass, []), flash.display.MovieClip);
+		mLoadingBar = new UIProgressBar(this, ASCompat.coerce((mInitialLoadingClip : ASAny).loadingBar.loadingBar, flash.display.MovieClip));
 		this.loadingBarTick();
 		addRootDisplayObject(mInitialLoadingClip);
 		mEventComponent.addListener("enterFrame", this.stagetwo_init);
@@ -731,7 +731,7 @@ class DBFacade extends Facade {
 			for (_tmp_ in iterateDynamicValues(jsonAsset)) {
 				_loc3_ = _tmp_;
 				if (ASCompat.getQualifiedClassName(_loc3_) == "int") {
-					_loc2_ += Std.int(Math.abs(ASCompat.toInt(_loc3_)) % 17 + Math.abs(ASCompat.toInt(_loc3_)) / 19);
+					_loc2_ += ASCompat.floatToInt(Math.abs(ASCompat.toInt(_loc3_)) % 17 + Math.abs(ASCompat.toInt(_loc3_)) / 19);
 				}
 			}
 		return _loc2_;
@@ -810,7 +810,7 @@ class DBFacade extends Facade {
 			if (ASCompat.reinterpretAs(mLoadingBar.root.parent, MovieClip) != null
 				&& ASCompat.toBool((ASCompat.reinterpretAs(mLoadingBar.root.parent, MovieClip) : ASAny).loading_text)) {
 				_loc2_ = ASCompat.dynamicAs((ASCompat.reinterpretAs(mLoadingBar.root.parent, MovieClip) : ASAny).loading_text, TextField);
-				_loc1_ = "LOADING " + String.fromCharCode(Std.int(64 + mLoadingBarIntStatus)) + "...";
+				_loc1_ = "LOADING " + String.fromCharCode(ASCompat.floatToInt(64 + mLoadingBarIntStatus)) + "...";
 				Logger.info("loadingBarTick at: " + _loc1_);
 				_loc2_.text = _loc1_;
 			}
@@ -837,7 +837,7 @@ class DBFacade extends Facade {
 			mDistributedObjectManager = new DistributedObjectManager(this);
 			MemoryTracker.track(mDistributedObjectManager, "DistributedObjectManager - created in DBFacade.startGame()");
 			mDistributedObjectManager.Initialize(mGameSocketAddress, _loc2_, validationToken, demographicsJson, accountId,
-				(Std.int(dbConfigManager.networkId) : UInt), NODE_RULES);
+				(ASCompat.floatToInt(dbConfigManager.networkId) : UInt), NODE_RULES);
 		}
 	}
 
@@ -1151,7 +1151,7 @@ class DBFacade extends Facade {
 	}
 
 	public function regainFocus() {
-		mStageRef.focus = ASCompat.dynamicAs(mHiddenFocusText != null ? mHiddenFocusText : mStageRef, flash.display.InteractiveObject);
+		mStageRef.focus = ASCompat.coerce(mHiddenFocusText != null ? mHiddenFocusText : mStageRef, flash.display.InteractiveObject);
 	}
 
 	public function loggerErrorCall(logString:String) {

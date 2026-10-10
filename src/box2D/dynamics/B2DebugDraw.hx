@@ -105,16 +105,14 @@ import flash.display.Sprite;
 
 	public function DrawPolygon(vertices:Array<ASAny>, vertexCount:Int, color:B2Color) {
 		this.m_sprite.graphics.lineStyle(this.m_lineThickness, color.color, this.m_alpha);
-		this.m_sprite.graphics.moveTo(ASCompat.toNumber(ASCompat.toNumberField(vertices[0], "x") * this.m_drawScale),
-			ASCompat.toNumber(ASCompat.toNumberField(vertices[0], "y") * this.m_drawScale));
+		this.m_sprite.graphics.moveTo(ASCompat.toNumberField(vertices[0], "x") * this.m_drawScale, ASCompat.toNumberField(vertices[0], "y") * this.m_drawScale);
 		var _loc4_ = 1;
 		while (_loc4_ < vertexCount) {
-			this.m_sprite.graphics.lineTo(ASCompat.toNumber(ASCompat.toNumberField(vertices[_loc4_], "x") * this.m_drawScale),
-				ASCompat.toNumber(ASCompat.toNumberField(vertices[_loc4_], "y") * this.m_drawScale));
-			_loc4_ = ASCompat.toInt(_loc4_) + 1;
+			this.m_sprite.graphics.lineTo(ASCompat.toNumberField(vertices[_loc4_], "x") * this.m_drawScale,
+				ASCompat.toNumberField(vertices[_loc4_], "y") * this.m_drawScale);
+			_loc4_++;
 		}
-		this.m_sprite.graphics.lineTo(ASCompat.toNumber(ASCompat.toNumberField(vertices[0], "x") * this.m_drawScale),
-			ASCompat.toNumber(ASCompat.toNumberField(vertices[0], "y") * this.m_drawScale));
+		this.m_sprite.graphics.lineTo(ASCompat.toNumberField(vertices[0], "x") * this.m_drawScale, ASCompat.toNumberField(vertices[0], "y") * this.m_drawScale);
 	}
 
 	public function DrawSolidPolygon(vertices:Vector<B2Vec2>, vertexCount:Int, color:B2Color) {
@@ -124,7 +122,7 @@ import flash.display.Sprite;
 		var _loc4_ = 1;
 		while (_loc4_ < vertexCount) {
 			this.m_sprite.graphics.lineTo(vertices[_loc4_].x * this.m_drawScale, vertices[_loc4_].y * this.m_drawScale);
-			_loc4_ = ASCompat.toInt(_loc4_) + 1;
+			_loc4_++;
 		}
 		this.m_sprite.graphics.lineTo(vertices[0].x * this.m_drawScale, vertices[0].y * this.m_drawScale);
 		this.m_sprite.graphics.endFill();

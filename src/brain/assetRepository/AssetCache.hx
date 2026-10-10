@@ -14,7 +14,7 @@ final class AssetCache {
 
 	public function itemFor(key:AssetLoaderInfo):Asset {
 		if (key.useCache) {
-			return ASCompat.dynamicAs(mCachedAssets.itemFor(key.getKey()), brain.assetRepository.Asset);
+			return ASCompat.coerce(mCachedAssets.itemFor(key.getKey()), brain.assetRepository.Asset);
 		}
 		return null;
 	}
@@ -60,7 +60,7 @@ final class AssetCache {
 			if (_loc6_.hasKey(_loc3_)) {
 				_loc6_.removeKey(_loc3_);
 			}
-			_loc5_ = ASCompat.toInt(_loc5_) + 1;
+			_loc5_++;
 		}
 		mCachedAssets.clear();
 		mCachedAssets = _loc6_;

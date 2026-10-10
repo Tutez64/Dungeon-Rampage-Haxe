@@ -50,7 +50,7 @@ import box2D.common.math.*;
 			while (_loc17_ < _loc13_) {
 				_loc11_[_loc17_] = _loc9_[_loc17_].indexA;
 				_loc12_[_loc17_] = _loc9_[_loc17_].indexB;
-				_loc17_ = ASCompat.toInt(_loc17_) + 1;
+				_loc17_++;
 			}
 			switch (_loc8_.m_count) {
 				case 1:
@@ -76,12 +76,12 @@ import box2D.common.math.*;
 				break;
 			}
 			_loc21_ = _loc9_[_loc8_.m_count];
-			_loc21_.indexA = Std.int(_loc4_.GetSupport(B2Math.MulTMV(_loc6_.R, _loc20_.GetNegative())));
+			_loc21_.indexA = ASCompat.floatToInt(_loc4_.GetSupport(B2Math.MulTMV(_loc6_.R, _loc20_.GetNegative())));
 			_loc21_.wA = B2Math.MulX(_loc6_, _loc4_.GetVertex(_loc21_.indexA));
-			_loc21_.indexB = Std.int(_loc5_.GetSupport(B2Math.MulTMV(_loc7_.R, _loc20_)));
+			_loc21_.indexB = ASCompat.floatToInt(_loc5_.GetSupport(B2Math.MulTMV(_loc7_.R, _loc20_)));
 			_loc21_.wB = B2Math.MulX(_loc7_, _loc5_.GetVertex(_loc21_.indexB));
 			_loc21_.w = B2Math.SubtractVV(_loc21_.wB, _loc21_.wA);
-			_loc19_ = ASCompat.toInt(_loc19_) + 1;
+			_loc19_++;
 			++b2_gjkIters;
 			_loc22_ = false;
 			_loc17_ = 0;
@@ -90,14 +90,14 @@ import box2D.common.math.*;
 					_loc22_ = true;
 					break;
 				}
-				_loc17_ = ASCompat.toInt(_loc17_) + 1;
+				_loc17_++;
 			}
 			if (_loc22_) {
 				break;
 			}
 			++_loc8_.m_count;
 		}
-		b2_gjkMaxIters = Std.int(B2Math.Max(b2_gjkMaxIters, _loc19_));
+		b2_gjkMaxIters = ASCompat.floatToInt(B2Math.Max(b2_gjkMaxIters, _loc19_));
 		_loc8_.GetWitnessPoints(output.pointA, output.pointB);
 		output.distance = B2Math.SubtractVV(output.pointA, output.pointB).Length();
 		output.iterations = _loc19_;

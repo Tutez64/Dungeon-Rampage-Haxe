@@ -82,7 +82,7 @@ class CreditsTownSubState extends TownSubState {
 		ASCompat.setProperty((mRootMovieClip : ASAny).label, "selectable", false);
 		ASCompat.setProperty((mRootMovieClip : ASAny).label, "autoSize", "center");
 		applyHeaderFormatting();
-		mCreditsBitMap = textFieldToBitmap(ASCompat.dynamicAs((mRootMovieClip : ASAny).label, flash.text.TextField));
+		mCreditsBitMap = textFieldToBitmap(ASCompat.coerce((mRootMovieClip : ASAny).label, flash.text.TextField));
 		mRootMovieClip.addChild(mCreditsBitMap);
 		ASCompat.setProperty((mRootMovieClip : ASAny).label, "visible", false);
 		mCreditsBitMap.y = 603 + 100;
@@ -101,7 +101,7 @@ class CreditsTownSubState extends TownSubState {
 	}
 
 	function textFieldToBitmap(tf:TextField):Bitmap {
-		mBitMapData = new BitmapData(Std.int(tf.width * 2), Std.int(tf.height * 2), true, (0 : UInt));
+		mBitMapData = new BitmapData(ASCompat.floatToInt(tf.width * 2), ASCompat.floatToInt(tf.height * 2), true, (0 : UInt));
 		mBitMapMatrix = new Matrix();
 		mBitMapMatrix.scale(2, 2);
 		mBitMapData.draw(tf, mBitMapMatrix, null, null, null, true);

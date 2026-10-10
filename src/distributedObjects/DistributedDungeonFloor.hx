@@ -126,11 +126,11 @@ class DistributedDungeonFloor extends Floor implements IDistributedDungeonFloor 
 		if (mActiveOwnerAvatar != null && mActiveOwnerAvatar.id == id) {
 			return mActiveOwnerAvatar;
 		}
-		var _loc2_ = ASCompat.dynamicAs(mRemoteActors.itemFor(id), actor.ActorGameObject);
+		var _loc2_ = ASCompat.coerce(mRemoteActors.itemFor(id), actor.ActorGameObject);
 		if (_loc2_ != null) {
 			return _loc2_;
 		}
-		_loc2_ = ASCompat.dynamicAs(mRemoteHeroes.itemFor(id), actor.ActorGameObject);
+		_loc2_ = ASCompat.coerce(mRemoteHeroes.itemFor(id), actor.ActorGameObject);
 		if (_loc2_ != null) {
 			return _loc2_;
 		}
@@ -180,7 +180,7 @@ class DistributedDungeonFloor extends Floor implements IDistributedDungeonFloor 
 	}
 
 	override public function getMaxFloorNum():UInt {
-		return (Std.int(mCurrentFloorNum / 1000) : UInt);
+		return (ASCompat.floatToInt(mCurrentFloorNum / 1000) : UInt);
 	}
 
 	@:isVar public var tileGrid(get, never):TileGrid;
@@ -259,7 +259,7 @@ class DistributedDungeonFloor extends Floor implements IDistributedDungeonFloor 
 	}
 
 	function getFloorString():String {
-		var _loc1_ = ASCompat.dynamicAs(mDBFacade.gameMaster.coliseumTierByConstant.itemFor(mMapNode.TierRank), gameMasterDictionary.GMColiseumTier);
+		var _loc1_ = ASCompat.coerce(mDBFacade.gameMaster.coliseumTierByConstant.itemFor(mMapNode.TierRank), gameMasterDictionary.GMColiseumTier);
 		return "floor " + getCurrentFloorNum() + "/" + _loc1_.TotalFloors;
 	}
 
@@ -312,7 +312,7 @@ class DistributedDungeonFloor extends Floor implements IDistributedDungeonFloor 
 	function playMusic() {
 		var _loc3_:URLRequest = null;
 		var _loc2_:SoundLoaderContext = null;
-		var _loc1_ = ASCompat.dynamicAs(mDBFacade.gameMaster.coliseumTierByConstant.itemFor(mColiseumTierConstant), gameMasterDictionary.GMColiseumTier);
+		var _loc1_ = ASCompat.coerce(mDBFacade.gameMaster.coliseumTierByConstant.itemFor(mColiseumTierConstant), gameMasterDictionary.GMColiseumTier);
 		if (_loc1_ != null && ASCompat.stringAsBool(_loc1_.MusicFilepath)) {
 			mBgMusic = new Sound();
 			_loc3_ = new URLRequest(DBFacade.buildFullDownloadPath(_loc1_.MusicFilepath));
@@ -338,7 +338,7 @@ class DistributedDungeonFloor extends Floor implements IDistributedDungeonFloor 
 	@:isVar public var coliseumTier(get, never):GMColiseumTier;
 
 	public function get_coliseumTier():GMColiseumTier {
-		return ASCompat.dynamicAs(mDBFacade.gameMaster.coliseumTierByConstant.itemFor(mColiseumTierConstant), gameMasterDictionary.GMColiseumTier);
+		return ASCompat.coerce(mDBFacade.gameMaster.coliseumTierByConstant.itemFor(mColiseumTierConstant), gameMasterDictionary.GMColiseumTier);
 	}
 
 	@:isVar public var completionXp(get, never):UInt;
@@ -388,7 +388,7 @@ class DistributedDungeonFloor extends Floor implements IDistributedDungeonFloor 
 				var movieRenderer:MovieClipRenderController = null;
 				var asset = param1;
 				var movieClass = asset.getClass(mIntroMovieAssetClassName);
-				var movie = ASCompat.dynamicAs(ASCompat.createInstance(movieClass, []), flash.display.MovieClip);
+				var movie = ASCompat.coerce(ASCompat.createInstance(movieClass, []), flash.display.MovieClip);
 				stopMovie = function() {
 					mDBFacade.stageRef.removeEventListener("keyDown", onKeyDown);
 					mDBFacade.removeRootDisplayObject(movie);
@@ -452,12 +452,12 @@ class DistributedDungeonFloor extends Floor implements IDistributedDungeonFloor 
 					if (tiles[_loc4_].x == mTileNetworkComponents[_loc5_].x && tiles[_loc4_].y == mTileNetworkComponents[_loc5_].y) {
 						_loc2_ = true;
 					}
-					_loc5_ = ASCompat.toInt(_loc5_) + 1;
+					_loc5_++;
 				}
 				if (!_loc2_) {
 					_loc3_.push(tiles[_loc4_]);
 				}
-				_loc4_ = ASCompat.toInt(_loc4_) + 1;
+				_loc4_++;
 			}
 			mDungeonFloorFactory.buildDungeonFloor(_loc3_, finishedBuildingTiles);
 		}
@@ -499,8 +499,8 @@ class DistributedDungeonFloor extends Floor implements IDistributedDungeonFloor 
 						_loc2_ = 0;
 						_loc1_ = 0;
 						_loc7_ = new Vector3D(_loc2_, _loc1_);
-						_loc11_ = ASCompat.toNumber(ASCompat.toNumber(900 * _loc5_) - 900 * 0.5);
-						_loc3_ = ASCompat.toNumber(ASCompat.toNumber(900 * _loc9_) - 900 * 0.5);
+						_loc11_ = 900 * _loc5_ - 900 * 0.5;
+						_loc3_ = 900 * _loc9_ - 900 * 0.5;
 						_loc4_ = new Vector3D(_loc11_, _loc3_);
 						_loc10_ = 0;
 						_loc8_ = new RectangleNavCollider(mDBFacade, _loc6_, _loc7_, _loc10_, mB2World, 900 * 0.5, 900 * 0.5);
@@ -508,9 +508,9 @@ class DistributedDungeonFloor extends Floor implements IDistributedDungeonFloor 
 						mTileGrid.SetEmptyColliderAtIndex((_loc5_ : UInt), (_loc9_ : UInt), _loc8_);
 					}
 				}
-				_loc5_ = ASCompat.toInt(_loc5_) + 1;
+				_loc5_++;
 			}
-			_loc9_ = ASCompat.toInt(_loc9_) + 1;
+			_loc9_++;
 		}
 	}
 
@@ -549,7 +549,7 @@ class DistributedDungeonFloor extends Floor implements IDistributedDungeonFloor 
 		var _loc7_:HeroGameObject;
 		if (checkNullIteratee(_loc6_))
 			for (_tmp_ in _loc6_) {
-				_loc7_ = ASCompat.dynamicAs(_tmp_, distributedObjects.HeroGameObject);
+				_loc7_ = ASCompat.coerce(_tmp_, distributedObjects.HeroGameObject);
 				if (_loc7_ != null) {
 					_loc7_.destroy();
 				}
@@ -564,7 +564,7 @@ class DistributedDungeonFloor extends Floor implements IDistributedDungeonFloor 
 		var _loc1_:ActorGameObject;
 		if (checkNullIteratee(_loc5_))
 			for (_tmp_ in _loc5_) {
-				_loc1_ = ASCompat.dynamicAs(_tmp_, actor.ActorGameObject);
+				_loc1_ = ASCompat.coerce(_tmp_, actor.ActorGameObject);
 				if (_loc1_ != null) {
 					_loc1_.destroy();
 				}
@@ -657,8 +657,8 @@ class DistributedDungeonFloor extends Floor implements IDistributedDungeonFloor 
 			Logger.error("Invalid tile location in getTileNetworkComponentAtLocation");
 			return null;
 		}
-		var _loc2_ = Std.int(mActiveOwnerAvatar.position.x);
-		var _loc3_ = Std.int(mActiveOwnerAvatar.position.y);
+		var _loc2_ = ASCompat.floatToInt(mActiveOwnerAvatar.position.x);
+		var _loc3_ = ASCompat.floatToInt(mActiveOwnerAvatar.position.y);
 		var _loc5_ = mTileNetworkComponents[0];
 		var _loc1_ = getDistanceFromTileUsage(_loc2_, _loc3_, _loc5_);
 		var _loc6_ = 0;
@@ -669,7 +669,7 @@ class DistributedDungeonFloor extends Floor implements IDistributedDungeonFloor 
 				_loc1_ = _loc6_;
 				_loc5_ = mTileNetworkComponents[_loc4_];
 			}
-			_loc4_ = ASCompat.toInt(_loc4_) + 1;
+			_loc4_++;
 		}
 		return _loc5_.tileId;
 	}
@@ -677,7 +677,7 @@ class DistributedDungeonFloor extends Floor implements IDistributedDungeonFloor 
 	function getDistanceFromTileUsage(x:Int, y:Int, dtu:DungeonTileUsage):Int {
 		var _loc4_ = new Point(x, y);
 		var _loc5_ = new Point(dtu.x + 450, dtu.y + 450);
-		return Std.int(Point.distance(_loc4_, _loc5_));
+		return ASCompat.floatToInt(Point.distance(_loc4_, _loc5_));
 	}
 
 	@:isVar public var baseLining(get, set):UInt;

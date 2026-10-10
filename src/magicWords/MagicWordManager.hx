@@ -82,7 +82,7 @@ class MagicWordManager {
 				if (_loc2_.length >= 3) {
 					_loc4_ = ASCompat.toNumber(_loc2_[2]);
 				}
-				GameClock.setUserWebOffset(Std.int(_loc5_), Std.int(_loc3_), Std.int(_loc4_));
+				GameClock.setUserWebOffset(ASCompat.floatToInt(_loc5_), ASCompat.floatToInt(_loc3_), ASCompat.floatToInt(_loc4_));
 			}
 		});
 	}

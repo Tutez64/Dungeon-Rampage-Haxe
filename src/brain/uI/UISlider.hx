@@ -30,10 +30,10 @@ class UISlider extends UIObject {
 	public function new(facade:Facade, root:MovieClip, orientation:UInt = (0 : UInt)) {
 		super(facade, root);
 		mOrientation = orientation;
-		mBack = new UIButton(facade, ASCompat.dynamicAs((root : ASAny).back, flash.display.MovieClip));
+		mBack = new UIButton(facade, ASCompat.coerce((root : ASAny).back, flash.display.MovieClip));
 		MemoryTracker.track(mBack, "UIButton - slider back created in UISlider()", "brain");
 		mBack.releaseCallback = this.backCallback;
-		mHandle = new UISliderHandleButton(facade, ASCompat.dynamicAs((root : ASAny).handle, flash.display.MovieClip), mOrientation, mBack.root.width,
+		mHandle = new UISliderHandleButton(facade, ASCompat.coerce((root : ASAny).handle, flash.display.MovieClip), mOrientation, mBack.root.width,
 			mBack.root.height);
 		MemoryTracker.track(mHandle, "UISliderHandleButton - slider handle created in UISlider()", "brain");
 		mHandle.slideCallback = this.handleCallback;

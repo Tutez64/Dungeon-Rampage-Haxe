@@ -50,7 +50,7 @@ class UIDungeonSummaryLevelUpPopup extends DBUIOneButtonPopup {
 		var levelUpButton:UIButton;
 		super.setupUI(swfAsset, titleText, null, allowClose, closeCallback);
 		mPopup.x += 40;
-		avatarPic = ASCompat.dynamicAs(ASCompat.createInstance(mPicClass, []), flash.display.MovieClip);
+		avatarPic = ASCompat.coerce(ASCompat.createInstance(mPicClass, []), flash.display.MovieClip);
 		movieClipRenderer = new MovieClipRenderController(mDBFacade, avatarPic);
 		movieClipRenderer.play();
 		avatarPic.scaleX = avatarPic.scaleY = 0.45;
@@ -58,7 +58,7 @@ class UIDungeonSummaryLevelUpPopup extends DBUIOneButtonPopup {
 		ASCompat.setProperty((mPopup : ASAny).level_text, "text", mLevelUpPost.LevelTrigger);
 		ASCompat.setProperty((mPopup : ASAny).congrats_label, "text", Locale.getString("LEVEL_UP_SHARE_TITLE"));
 		ASCompat.setProperty((mPopup : ASAny).label, "text", Locale.getString("LEVEL_UP_SHARE_TEXT") + mLevelUpPost.LevelTrigger);
-		levelUpButton = new UIButton(mDBFacade, ASCompat.dynamicAs((mPopup : ASAny).share, flash.display.MovieClip));
+		levelUpButton = new UIButton(mDBFacade, ASCompat.coerce((mPopup : ASAny).share, flash.display.MovieClip));
 		if (mDBFacade.isDRPlayer) {
 			levelUpButton.label.text = Locale.getString("SWEET");
 		} else {

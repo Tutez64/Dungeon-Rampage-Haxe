@@ -58,9 +58,9 @@ class HeroOwnerView extends HeroView {
 		if (checkNullIteratee(_loc2_))
 			for (_tmp_ in _loc2_) {
 				_loc5_ = _tmp_;
-				_loc3_ = ASCompat.dynamicAs(_loc5_.floorObjects.iterator(), org.as3commons.collections.framework.IIterator);
+				_loc3_ = ASCompat.coerce(_loc5_.floorObjects.iterator(), org.as3commons.collections.framework.IIterator);
 				while (_loc3_.hasNext()) {
-					_loc9_ = ASCompat.dynamicAs(_loc3_.next(), dr_floor.FloorObject);
+					_loc9_ = ASCompat.coerce(_loc3_.next(), dr_floor.FloorObject);
 					if (_loc9_.archwayAlpha && _loc9_.view.root.hitTestObject(mBody)) {
 						_loc4_.x = mBody.x;
 						_loc4_.y = mBody.y;
@@ -97,7 +97,7 @@ class HeroOwnerView extends HeroView {
 			function(param1:brain.assetRepository.SwfAsset) {
 				var _loc2_ = param1.getClass("db_fx_player_ring");
 				if (_loc2_ != null) {
-					mFootRing = ASCompat.dynamicAs(ASCompat.createInstance(_loc2_, []), flash.display.MovieClip);
+					mFootRing = ASCompat.coerce(ASCompat.createInstance(_loc2_, []), flash.display.MovieClip);
 					mFootRing.scaleX = mFootRing.scaleY = 0.75 * (1 / mParentActorObject.actorData.scale3DModel);
 					mBody.addChildAt(mFootRing, 0);
 				}

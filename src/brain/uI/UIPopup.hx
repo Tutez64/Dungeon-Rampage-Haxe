@@ -78,18 +78,18 @@ class UIPopup extends UIObject {
 	}
 
 	function setupUI(popupClass:Dynamic) {
-		var popup = ASCompat.dynamicAs(ASCompat.createInstance(popupClass, []), flash.display.MovieClip);
+		var popup = ASCompat.coerce(ASCompat.createInstance(popupClass, []), flash.display.MovieClip);
 		MemoryTracker.track(popup, "MovieClip - popup content created in UIPopup.setupUI()", "brain");
 		mRoot.addChild(popup);
 		mTextField = cast((popup : ASAny).popupText, TextField);
 		mTextField.text = mText;
-		mYesButton = new UIButton(mFacade, ASCompat.dynamicAs((popup : ASAny).yesButton, flash.display.MovieClip));
+		mYesButton = new UIButton(mFacade, ASCompat.coerce((popup : ASAny).yesButton, flash.display.MovieClip));
 		MemoryTracker.track(mYesButton, "UIButton - yes button created in UIPopup.setupUI()", "brain");
-		mNoButton = new UIButton(mFacade, ASCompat.dynamicAs((popup : ASAny).noButton, flash.display.MovieClip));
+		mNoButton = new UIButton(mFacade, ASCompat.coerce((popup : ASAny).noButton, flash.display.MovieClip));
 		MemoryTracker.track(mNoButton, "UIButton - no button created in UIPopup.setupUI()", "brain");
-		mOkButton = new UIButton(mFacade, ASCompat.dynamicAs((popup : ASAny).okButton, flash.display.MovieClip));
+		mOkButton = new UIButton(mFacade, ASCompat.coerce((popup : ASAny).okButton, flash.display.MovieClip));
 		MemoryTracker.track(mOkButton, "UIButton - ok button created in UIPopup.setupUI()", "brain");
-		mCancelButton = new UIButton(mFacade, ASCompat.dynamicAs((popup : ASAny).cancelButton, flash.display.MovieClip));
+		mCancelButton = new UIButton(mFacade, ASCompat.coerce((popup : ASAny).cancelButton, flash.display.MovieClip));
 		MemoryTracker.track(mCancelButton, "UIButton - cancel button created in UIPopup.setupUI()", "brain");
 		mYesButton.label.text = "Yes";
 		mNoButton.label.text = "No";

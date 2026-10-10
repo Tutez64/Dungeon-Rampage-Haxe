@@ -170,7 +170,7 @@ class HeroGameObjectOwner extends HeroGameObject implements IHeroGameObjectOwner
 						return;
 					}
 				}
-				_loc2_ = ASCompat.toInt(_loc2_) + 1;
+				_loc2_++;
 			}
 		}
 	}
@@ -235,7 +235,7 @@ class HeroGameObjectOwner extends HeroGameObject implements IHeroGameObjectOwner
 				}
 				_loc2_ = ASCompat.reinterpretAs(distributedDungeonFloor.remoteHeroes.iterator(), IMapIterator);
 				while (_loc2_.hasNext()) {
-					_loc5_ = ASCompat.dynamicAs(_loc2_.next(), distributedObjects.HeroGameObject);
+					_loc5_ = ASCompat.coerce(_loc2_.next(), distributedObjects.HeroGameObject);
 					_loc5_.actorNametag.visible = _loc3_;
 				}
 
@@ -551,7 +551,7 @@ class HeroGameObjectOwner extends HeroGameObject implements IHeroGameObjectOwner
 			if (checkNullIteratee(_loc5_))
 				for (_tmp_ in _loc5_) {
 					_loc8_ = (ASCompat.toInt(_tmp_) : UInt);
-					_loc3_ = ASCompat.dynamicAs(_loc6_.itemFor(_loc8_), account.StackableInfo);
+					_loc3_ = ASCompat.coerce(_loc6_.itemFor(_loc8_), account.StackableInfo);
 					if (_loc3_.gmId == (_loc7_ : UInt)) {
 						_loc4_ = ASCompat.toInt(_loc6_.itemFor(_loc8_).count);
 						__tmpIncObj0 = _loc6_.itemFor(_loc8_);
@@ -572,8 +572,8 @@ class HeroGameObjectOwner extends HeroGameObject implements IHeroGameObjectOwner
 	@:isVar public var weaponRange(get, never):UInt;
 
 	public function get_weaponRange():UInt {
-		var _loc1_ = ASCompat.dynamicAs(mDBFacade.gameMaster.attackById.itemFor(30), gameMasterDictionary.GMAttack);
-		return (Std.int(_loc1_.Range) : UInt);
+		var _loc1_ = ASCompat.coerce(mDBFacade.gameMaster.attackById.itemFor(30), gameMasterDictionary.GMAttack);
+		return (ASCompat.floatToInt(_loc1_.Range) : UInt);
 	}
 
 	@:isVar public var inputController(get, never):InputController;
@@ -606,8 +606,8 @@ class HeroGameObjectOwner extends HeroGameObject implements IHeroGameObjectOwner
 	}
 
 	override public function ponderBuffChanges() {
-		mFacade.eventManager.dispatchEvent(new ManaEvent("ManaEvent_MANA_UPDATE", id, mMana, (Std.int(this.maxManaPoints) : UInt)));
-		mFacade.eventManager.dispatchEvent(new HpEvent("HpEvent_HP_UPDATE", id, mHitPoints, (Std.int(this.maxHitPoints) : UInt)));
+		mFacade.eventManager.dispatchEvent(new ManaEvent("ManaEvent_MANA_UPDATE", id, mMana, (ASCompat.floatToInt(this.maxManaPoints) : UInt)));
+		mFacade.eventManager.dispatchEvent(new HpEvent("HpEvent_HP_UPDATE", id, mHitPoints, (ASCompat.floatToInt(this.maxHitPoints) : UInt)));
 	}
 
 	public function ReportBuffEffect(byWho:UInt, amount:Int, buffId:UInt, effectiveness:Int) {

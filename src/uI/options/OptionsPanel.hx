@@ -142,29 +142,29 @@ class OptionsPanel {
 		var optionsPanelX:Float;
 		var optionsPanelY:Float;
 		var optionsClass = swfAsset.getClass("popup_options_02");
-		mRoot = ASCompat.dynamicAs(ASCompat.createInstance(optionsClass, []), flash.display.MovieClip);
+		mRoot = ASCompat.coerce(ASCompat.createInstance(optionsClass, []), flash.display.MovieClip);
 		mRoot.scaleY = mRoot.scaleX = 1.8;
-		mCloseButton = new UIButton(mDBFacade, ASCompat.dynamicAs((mRoot : ASAny).close, flash.display.MovieClip));
+		mCloseButton = new UIButton(mDBFacade, ASCompat.coerce((mRoot : ASAny).close, flash.display.MovieClip));
 		mCloseButton.releaseCallback = hide;
 		mTitleLabel = ASCompat.dynamicAs((mRoot : ASAny).title_label, TextField);
 		mTitleLabel.text = Locale.getString("OPTIONS_PANEL_TITLE");
 		mMusicLabel = ASCompat.dynamicAs((mRoot : ASAny).music_label, TextField);
 		mMusicLabel.text = Locale.getString("OPTIONS_PANEL_MUSIC");
-		mMusicSlider = new UISlider(mDBFacade, ASCompat.dynamicAs((mRoot : ASAny).music_slider, flash.display.MovieClip), (1 : UInt));
+		mMusicSlider = new UISlider(mDBFacade, ASCompat.coerce((mRoot : ASAny).music_slider, flash.display.MovieClip), (1 : UInt));
 		mMusicSlider.minimum = 0;
 		mMusicSlider.maximum = 1.1;
 		mMusicSlider.tick = 0.1;
 		mMusicSlider.value = mDBSoundManager.musicVolumeScale;
-		ASCompat.setProperty((mRoot : ASAny).music_slider_value, "text", Std.int(mMusicSlider.value * 10));
+		ASCompat.setProperty((mRoot : ASAny).music_slider_value, "text", ASCompat.floatToInt(mMusicSlider.value * 10));
 		mMusicSlider.updateCallback = musicSliderCallback;
 		mSfxLabel = ASCompat.dynamicAs((mRoot : ASAny).sfx_label, TextField);
 		mSfxLabel.text = Locale.getString("OPTIONS_PANEL_SOUND_EFFECTS_LABEL");
-		mSfxSlider = new UISlider(mDBFacade, ASCompat.dynamicAs((mRoot : ASAny).sfx_slider, flash.display.MovieClip), (1 : UInt));
+		mSfxSlider = new UISlider(mDBFacade, ASCompat.coerce((mRoot : ASAny).sfx_slider, flash.display.MovieClip), (1 : UInt));
 		mSfxSlider.minimum = 0;
 		mSfxSlider.maximum = 1.1;
 		mSfxSlider.tick = 0.1;
 		mSfxSlider.value = mDBSoundManager.sfxVolumeScale;
-		ASCompat.setProperty((mRoot : ASAny).sfx_slider_value, "text", Std.int(mSfxSlider.value * 10));
+		ASCompat.setProperty((mRoot : ASAny).sfx_slider_value, "text", ASCompat.floatToInt(mSfxSlider.value * 10));
 		mSfxSlider.updateCallback = sfxSliderCallback;
 		mGraphicsLabel = ASCompat.dynamicAs((mRoot : ASAny).graphics_label, TextField);
 		mGraphicsLabel.text = Locale.getString("OPTIONS_PANEL_GRAPHICS_QUALITY_LABEL");
@@ -172,9 +172,9 @@ class OptionsPanel {
 		mGraphicsLowLabel.text = Locale.getString("OPTIONS_PANEL_GRAPHICS_QUALITY_LOW_LABEL");
 		mGraphicsHighLabel = ASCompat.dynamicAs((mRoot : ASAny).gfx_high_label, TextField);
 		mGraphicsHighLabel.text = Locale.getString("OPTIONS_PANEL_GRAPHICS_QUALITY_HIGH_LABEL");
-		mGraphicsLowRadioButton = new UIRadioButton(mDBFacade, ASCompat.dynamicAs((mRoot : ASAny).gfx_low_radio_button, flash.display.MovieClip),
+		mGraphicsLowRadioButton = new UIRadioButton(mDBFacade, ASCompat.coerce((mRoot : ASAny).gfx_low_radio_button, flash.display.MovieClip),
 			"GRAPHICS_QUALITY_RADIO_BUTTON_GROUP");
-		mGraphicsHighRadioButton = new UIRadioButton(mDBFacade, ASCompat.dynamicAs((mRoot : ASAny).gfx_high_radio_button, flash.display.MovieClip),
+		mGraphicsHighRadioButton = new UIRadioButton(mDBFacade, ASCompat.coerce((mRoot : ASAny).gfx_high_radio_button, flash.display.MovieClip),
 			"GRAPHICS_QUALITY_RADIO_BUTTON_GROUP");
 		if (mDBFacade.featureFlags.getFlagValue("quality-control-button")) {
 			mGraphicsLowRadioButton.releaseCallback = function() {
@@ -190,12 +190,12 @@ class OptionsPanel {
 		mHudDefaultLabel.text = Locale.getString("OPTIONS_PANEL_DEFAULT_HUD_LABEL");
 		mHudCondensedLabel = ASCompat.dynamicAs((mRoot : ASAny).new_label, TextField);
 		mHudCondensedLabel.text = Locale.getString("OPTIONS_PANEL_CONDENSED_HUD_LABEL");
-		mHudDefaultRadioButton = new UIRadioButton(mDBFacade, ASCompat.dynamicAs((mRoot : ASAny).legacy_radio_button, flash.display.MovieClip),
+		mHudDefaultRadioButton = new UIRadioButton(mDBFacade, ASCompat.coerce((mRoot : ASAny).legacy_radio_button, flash.display.MovieClip),
 			"HUD_CHOICE_RADIO_BUTTON_GROUP");
 		mHudDefaultRadioButton.releaseCallback = function() {
 			setHud((0 : UInt));
 		};
-		mHudCondensedRadioButton = new UIRadioButton(mDBFacade, ASCompat.dynamicAs((mRoot : ASAny).new_radio_button, flash.display.MovieClip),
+		mHudCondensedRadioButton = new UIRadioButton(mDBFacade, ASCompat.coerce((mRoot : ASAny).new_radio_button, flash.display.MovieClip),
 			"HUD_CHOICE_RADIO_BUTTON_GROUP");
 		mHudCondensedRadioButton.releaseCallback = function() {
 			setHud((1 : UInt));
@@ -207,7 +207,7 @@ class OptionsPanel {
 	}
 
 	function musicSliderCallback(val:Float) {
-		var _loc2_ = Std.int(mMusicSlider.value * 10);
+		var _loc2_ = ASCompat.floatToInt(mMusicSlider.value * 10);
 		ASCompat.setProperty((mRoot : ASAny).music_slider_value, "text", _loc2_);
 		if (_loc2_ == 11 && mDBFacade.steamAchievementsManager != null) {
 			mDBFacade.steamAchievementsManager.setAchievement("MUSIC_VOLUME_SET_TO_11");
@@ -216,7 +216,7 @@ class OptionsPanel {
 	}
 
 	function sfxSliderCallback(val:Float) {
-		ASCompat.setProperty((mRoot : ASAny).sfx_slider_value, "text", Std.int(mSfxSlider.value * 10));
+		ASCompat.setProperty((mRoot : ASAny).sfx_slider_value, "text", ASCompat.floatToInt(mSfxSlider.value * 10));
 		setSfxVolume(val);
 	}
 

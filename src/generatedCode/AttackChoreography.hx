@@ -49,7 +49,7 @@ class AttackChoreography {
 			_loc2_ = 0;
 			while ((_loc2_ : UInt) < _loc1_) {
 				combatResults[_loc2_].writeToPacket(outpacket);
-				_loc2_ = ASCompat.toInt(_loc2_) + 1;
+				_loc2_++;
 			}
 			_loc3_.writeShort((outpacket.length : Int));
 			_loc3_.writeBytes(outpacket);

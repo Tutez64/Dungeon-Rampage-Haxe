@@ -181,7 +181,7 @@ class DistributedNPCGameObjectNetworkComponent extends DcNetworkClass implements
 			while ((_loc3_ : UInt) < _loc2_) {
 				_loc5_ = WeaponDetails.readFromPacket(param1);
 				_loc4_.push(_loc5_);
-				_loc3_ = ASCompat.toInt(_loc3_) + 1;
+				_loc3_++;
 			}
 			return _loc4_;
 		})(packet);

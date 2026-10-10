@@ -113,7 +113,7 @@ private class FacebookHelper {
 			mFacebookId = mDBFacade.facebookPlayerId;
 		} else if (mDBFacade.dbAccountInfo.friendInfos.hasKey(mPlayerId)) {
 			mIsFriend = true;
-			friend = ASCompat.dynamicAs(mDBFacade.dbAccountInfo.friendInfos.itemFor(mPlayerId), account.FriendInfo);
+			friend = ASCompat.coerce(mDBFacade.dbAccountInfo.friendInfos.itemFor(mPlayerId), account.FriendInfo);
 			if (friend != null) {
 				mFacebookId = friend.facebookId;
 			}

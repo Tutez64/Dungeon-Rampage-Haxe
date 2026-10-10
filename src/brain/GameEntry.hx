@@ -65,7 +65,7 @@ class GameEntry extends MovieClip {
 					trace("======================================================================");
 					keys = nodeTypes.keysToArray();
 					ASCompat.ASArray.sort(keys, function(param1:String, param2:String):Int {
-						return ASCompat.toInt(ASCompat.toNumber(nodeTypes.itemFor(param2)) - ASCompat.toNumber(nodeTypes.itemFor(param1)));
+						return ASCompat.floatToInt(ASCompat.toNumber(nodeTypes.itemFor(param2)) - ASCompat.toNumber(nodeTypes.itemFor(param1)));
 					});
 					if (checkNullIteratee(keys))
 						for (_tmp_ in keys) {

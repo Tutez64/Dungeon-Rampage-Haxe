@@ -28,7 +28,7 @@ class SoundAttackTimelineAction extends AttackTimelineAction {
 	override public function execute(timeline:ScriptTimeline) {
 		var gmAttack:GMAttack;
 		super.execute(timeline);
-		gmAttack = ASCompat.dynamicAs(mDBFacade.gameMaster.attackById.itemFor(mAttackType), gameMasterDictionary.GMAttack);
+		gmAttack = ASCompat.coerce(mDBFacade.gameMaster.attackById.itemFor(mAttackType), gameMasterDictionary.GMAttack);
 		if (gmAttack != null && ASCompat.stringAsBool(gmAttack.AttackSound)) {
 			mAssetLoadingComponent.getSoundAsset(DBFacade.buildFullDownloadPath("Resources/Audio/soundEffects.swf"), gmAttack.AttackSound,
 				function(param1:brain.sound.SoundAsset) {

@@ -257,9 +257,9 @@ class SceneGraphManager {
 		var _loc4_:Array<ASAny> = [0, 0, 0, 1, 0];
 		var _loc5_:Array<ASAny> = [0.3, 0.59, 0.11, 0, 0];
 		var _loc7_:Array<ASAny> = [];
-		_loc7_ = _loc7_.concat(ASCompat.dynamicAs(interpolateArrays(_loc5_, _loc2_, amount), Array));
-		_loc7_ = _loc7_.concat(ASCompat.dynamicAs(interpolateArrays(_loc5_, _loc3_, amount), Array));
-		_loc7_ = _loc7_.concat(ASCompat.dynamicAs(interpolateArrays(_loc5_, _loc8_, amount), Array));
+		_loc7_ = _loc7_.concat(ASCompat.coerce(interpolateArrays(_loc5_, _loc2_, amount), Array));
+		_loc7_ = _loc7_.concat(ASCompat.coerce(interpolateArrays(_loc5_, _loc3_, amount), Array));
+		_loc7_ = _loc7_.concat(ASCompat.coerce(interpolateArrays(_loc5_, _loc8_, amount), Array));
 		_loc7_ = _loc7_.concat(_loc4_);
 		_loc6_.matrix = cast(_loc7_);
 		return _loc6_;
@@ -277,7 +277,7 @@ class SceneGraphManager {
 		var _loc4_ = ary1.length >= ary2.length ? ary1.slice(0) : ary2.slice(0);
 		var _loc5_ = _loc4_.length;
 		while (_loc5_-- != 0) {
-			_loc4_[_loc5_] = ary1[_loc5_] + ASCompat.toNumber(ASCompat.toNumber(ary2[_loc5_]) - ASCompat.toNumber(ary1[_loc5_])) * t;
+			_loc4_[_loc5_] = ary1[_loc5_] + (ASCompat.toNumber(ary2[_loc5_]) - ASCompat.toNumber(ary1[_loc5_])) * t;
 		}
 		return _loc4_;
 	}
@@ -465,7 +465,7 @@ class SceneGraphManager {
 	}
 
 	public function getLayer(layerIndex:Int):Layer {
-		return ASCompat.dynamicAs(mLayers.itemFor(layerIndex), brain.render.Layer);
+		return ASCompat.coerce(mLayers.itemFor(layerIndex), brain.render.Layer);
 	}
 
 	@:isVar public var worldTransformNode(get, never):Sprite;
@@ -475,7 +475,7 @@ class SceneGraphManager {
 	}
 
 	public function contains(child:DisplayObject, layerIndex:Int):Bool {
-		var _loc3_ = ASCompat.dynamicAs(mLayers.itemFor(layerIndex), brain.render.Layer);
+		var _loc3_ = ASCompat.coerce(mLayers.itemFor(layerIndex), brain.render.Layer);
 		if (_loc3_ != null) {
 			return _loc3_.contains(child);
 		}
@@ -484,7 +484,7 @@ class SceneGraphManager {
 	}
 
 	public function addChild(child:DisplayObject, layerIndex:Int):DisplayObject {
-		var _loc3_ = ASCompat.dynamicAs(mLayers.itemFor(layerIndex), brain.render.Layer);
+		var _loc3_ = ASCompat.coerce(mLayers.itemFor(layerIndex), brain.render.Layer);
 		if (_loc3_ != null) {
 			return _loc3_.addChild(child);
 		}
@@ -493,7 +493,7 @@ class SceneGraphManager {
 	}
 
 	public function addChildAt(child:DisplayObject, layerIndex:Int, childIndex:Int):DisplayObject {
-		var _loc4_ = ASCompat.dynamicAs(mLayers.itemFor(layerIndex), brain.render.Layer);
+		var _loc4_ = ASCompat.coerce(mLayers.itemFor(layerIndex), brain.render.Layer);
 		if (_loc4_ != null) {
 			return _loc4_.addChildAt(child, childIndex);
 		}
@@ -515,7 +515,7 @@ class SceneGraphManager {
 			for (_tmp_ in _loc3_) {
 				_loc4_ = ASCompat.toInt(_tmp_);
 				if (listOfLayersToBeAvoided.indexOf(_loc4_) == -1) {
-					setGrayScaleSaturation(ASCompat.dynamicAs(mLayers.itemFor(_loc4_), flash.display.DisplayObject), value);
+					setGrayScaleSaturation(ASCompat.coerce(mLayers.itemFor(_loc4_), flash.display.DisplayObject), value);
 				}
 			}
 	}
@@ -527,14 +527,14 @@ class SceneGraphManager {
 		var _loc3_ = 0;
 		var _loc2_ = ASCompat.reinterpretAs(mLayers.iterator(), IMapIterator);
 		while (_loc2_.hasNext()) {
-			_loc4_ = ASCompat.dynamicAs(_loc2_.next(), brain.render.Layer);
+			_loc4_ = ASCompat.coerce(_loc2_.next(), brain.render.Layer);
 			Logger.debug("Layer: " + _loc4_.name + " children: " + Std.string(_loc4_.numChildren));
 			_loc3_ = 0;
 			while (_loc3_ < _loc4_.numChildren) {
 				_loc5_ = _loc4_.getChildAt(_loc3_);
 				_loc1_ = Std.isOfType(_loc5_, DisplayObjectContainer) ? cast(_loc5_, DisplayObjectContainer).numChildren : 0;
 				Logger.debug("    child " + Std.string(_loc3_) + ": " + _loc5_.toString() + " name: " + _loc5_.name + " children: " + _loc1_);
-				_loc3_ = ASCompat.toInt(_loc3_) + 1;
+				_loc3_++;
 			}
 		}
 	}

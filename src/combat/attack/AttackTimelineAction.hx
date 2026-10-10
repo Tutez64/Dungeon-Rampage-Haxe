@@ -38,7 +38,7 @@ class AttackTimelineAction {
 	public function set_attackType(attack:UInt):UInt {
 		if (mAttackType != attack) {
 			mAttackType = attack;
-			mGMAttack = ASCompat.dynamicAs(mDBFacade.gameMaster.attackById.itemFor(attack), gameMasterDictionary.GMAttack);
+			mGMAttack = ASCompat.coerce(mDBFacade.gameMaster.attackById.itemFor(attack), gameMasterDictionary.GMAttack);
 		}
 		return attack;
 	}

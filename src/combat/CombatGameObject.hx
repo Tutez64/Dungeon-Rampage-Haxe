@@ -137,7 +137,7 @@ class CombatGameObject extends FloorObject {
 		if (!_loc3_.isAttackable) {
 			return true;
 		}
-		var _loc4_ = ASCompat.dynamicAs(mDBFacade.gameMaster.attackById.itemFor(mAttackType), gameMasterDictionary.GMAttack);
+		var _loc4_ = ASCompat.coerce(mDBFacade.gameMaster.attackById.itemFor(mAttackType), gameMasterDictionary.GMAttack);
 		if (_loc4_ == null) {
 			Logger.error("No GMAttack found for attack type: " + mAttackType);
 			return true;
@@ -185,7 +185,7 @@ class CombatGameObject extends FloorObject {
 	}
 
 	function hitActor(actorGameObject:ActorGameObject) {
-		var _loc6_ = ASCompat.dynamicAs(mDBFacade.gameMaster.attackById.itemFor(mAttackType), gameMasterDictionary.GMAttack);
+		var _loc6_ = ASCompat.coerce(mDBFacade.gameMaster.attackById.itemFor(mAttackType), gameMasterDictionary.GMAttack);
 		if (_loc6_ == null) {
 			Logger.error("No GMAttack found for attack type: " + mAttackType);
 			return;
@@ -242,7 +242,7 @@ class CombatGameObject extends FloorObject {
 			_loc4_ = _loc2_.next();
 			_loc5_ = _loc4_.NPCGameObjects.iterator();
 			while (_loc5_.hasNext()) {
-				_loc1_ = ASCompat.dynamicAs(_loc5_.next(), distributedObjects.NPCGameObject);
+				_loc1_ = ASCompat.coerce(_loc5_.next(), distributedObjects.NPCGameObject);
 				_loc3_.push(_loc1_);
 			}
 		}

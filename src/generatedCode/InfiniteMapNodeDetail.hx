@@ -24,7 +24,7 @@ class InfiniteMapNodeDetail {
 			while ((_loc3_ : UInt) < _loc2_) {
 				_loc5_ = (param1.readUnsignedInt() : Int);
 				_loc4_.push((_loc5_ : UInt));
-				_loc3_ = ASCompat.toInt(_loc3_) + 1;
+				_loc3_++;
 			}
 			return _loc4_;
 		})(packet);
@@ -39,7 +39,7 @@ class InfiniteMapNodeDetail {
 		_loc3_ = 0;
 		while ((_loc3_ : UInt) < _loc2_) {
 			outpacket.writeUnsignedInt(modifiers[_loc3_]);
-			_loc3_ = ASCompat.toInt(_loc3_) + 1;
+			_loc3_++;
 		}
 	}
 }

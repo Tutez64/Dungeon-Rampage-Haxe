@@ -50,13 +50,13 @@ function getMethod(name:String, url:String):ASFunction {
 		JSONRPCService.GLobalcounter++;
 		counter = JSONRPCService.GLobalcounter;
 		if (args.length == 1 && Std.isOfType(args[0], Array)) {
-			args = ASCompat.dynamicAs(args[0], Array);
+			args = ASCompat.coerce(args[0], Array);
 		}
 		if (args.length != 0 && Reflect.isFunction(args[args.length - 1])) {
-			cbResult = ASCompat.asFunction(args.pop());
+			cbResult = ASCompat.coerceFunction(args.pop());
 			if (args.length != 0 && Reflect.isFunction(args[args.length - 1])) {
 				cbError = cbResult;
-				cbResult = ASCompat.asFunction(args.pop());
+				cbResult = ASCompat.coerceFunction(args.pop());
 			}
 		}
 		req = new URLRequest(url + "/" + name);

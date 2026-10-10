@@ -383,7 +383,7 @@ class GMHero extends GMActor {
 			UpgradeToSlotOffset[pos].push(_loc5_);
 			Normalized_upgrades.values[_loc5_] += value;
 		} else {
-			_loc6_ = ASCompat.dynamicAs(gm.superStatByConstant.itemFor(statname), gameMasterDictionary.GMSuperStat);
+			_loc6_ = ASCompat.coerce(gm.superStatByConstant.itemFor(statname), gameMasterDictionary.GMSuperStat);
 			if (_loc6_ != null) {
 				_loc7_ = 0;
 				while ((_loc7_ : UInt) < StatVector.slotCount) {
@@ -411,7 +411,7 @@ class GMHero extends GMActor {
 		var _loc2_ = _loc4_;
 		var _loc7_ = _loc2_ - _loc6_;
 		while (0 < _loc7_) {
-			_loc3_ = Std.int(_loc7_ / 2);
+			_loc3_ = ASCompat.floatToInt(_loc7_ / 2);
 			_loc5_ = _loc6_ + _loc3_;
 			if (ExperienceToLevel[_loc5_].mExperience < val) {
 				_loc6_ = ++_loc5_;

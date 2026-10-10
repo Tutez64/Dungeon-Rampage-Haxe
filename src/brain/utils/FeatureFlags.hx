@@ -85,7 +85,7 @@ class FeatureFlags {
 				__ax4_iter_57 = mFeatureFlags;
 				if (checkNullIteratee(__ax4_iter_57))
 					for (_tmp_ in __ax4_iter_57) {
-						_loc2_ = ASCompat.dynamicAs(_tmp_, brain.utils.FeatureFlag);
+						_loc2_ = ASCompat.coerce(_tmp_, brain.utils.FeatureFlag);
 						if (_loc2_.commandLineFlag == _loc5_) {
 							_loc8_ = _loc2_;
 							break;
@@ -115,7 +115,7 @@ class FeatureFlags {
 		final __ax4_iter_58 = mFeatureFlags;
 		if (checkNullIteratee(__ax4_iter_58))
 			for (_tmp_ in __ax4_iter_58) {
-				_loc2_ = ASCompat.dynamicAs(_tmp_, brain.utils.FeatureFlag);
+				_loc2_ = ASCompat.coerce(_tmp_, brain.utils.FeatureFlag);
 				_loc4_ = configManager.getConfigObject(_loc2_.configFileAttributeName, null);
 				if (_loc4_ != null) {
 					_loc3_ = ASCompat.asBool(_loc4_);

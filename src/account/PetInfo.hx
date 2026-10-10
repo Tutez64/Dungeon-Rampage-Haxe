@@ -16,7 +16,7 @@ class PetInfo extends InventoryBaseInfo {
 		PetType = mGMId = ASCompat.asUint(petJsonObject.npc_id);
 		EquippedHero = ASCompat.asUint(petJsonObject.equipped_hero);
 		mDatabaseId = ASCompat.asUint(petJsonObject.id);
-		mGMNpc = ASCompat.dynamicAs(mDBFacade.gameMaster.npcById.itemFor(PetType), gameMasterDictionary.GMNpc);
+		mGMNpc = ASCompat.coerce(mDBFacade.gameMaster.npcById.itemFor(PetType), gameMasterDictionary.GMNpc);
 		mIsNew = false;
 	}
 

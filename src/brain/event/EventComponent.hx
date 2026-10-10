@@ -31,7 +31,7 @@ class EventComponent extends Component {
 	}
 
 	public function removeListener(eventName:String) {
-		var _loc2_ = ASCompat.asFunction(mRegisteredListeners.removeKey(eventName));
+		var _loc2_ = ASCompat.coerceFunction(mRegisteredListeners.removeKey(eventName));
 		if (_loc2_ == null) {
 			return;
 		}
@@ -53,7 +53,7 @@ class EventComponent extends Component {
 		var _loc3_:ASFunction = null;
 		var _loc1_ = ASCompat.reinterpretAs(mRegisteredListeners.iterator(), IMapIterator);
 		while (_loc1_.hasNext()) {
-			_loc3_ = ASCompat.asFunction(_loc1_.next());
+			_loc3_ = ASCompat.coerceFunction(_loc1_.next());
 			_loc2_ = _loc1_.key;
 			mFacade.eventManager.removeEventListener(_loc2_, _loc3_);
 		}

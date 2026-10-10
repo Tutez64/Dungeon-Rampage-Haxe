@@ -17,7 +17,7 @@ class SortedNode {
 
 	public function new(theItem:ASAny) {
 		this.item = theItem;
-		this.priority = (Std.int(Math.random() * ASCompat.MAX_INT) : UInt);
+		this.priority = (ASCompat.floatToInt(Math.random() * ASCompat.MAX_INT) : UInt);
 		this.order = ++_order;
 	}
 }

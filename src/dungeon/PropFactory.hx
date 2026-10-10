@@ -46,7 +46,7 @@ class PropFactory {
 	public function getNavCollisionJson(constant:String):Array<ASAny> {
 		var _loc2_:ASObject = mConstantToJsonMap.itemFor(constant);
 		if (ASCompat.toBool(_loc2_)) {
-			return ASCompat.dynamicAs(_loc2_.navCollisions, Array);
+			return ASCompat.coerce(_loc2_.navCollisions, Array);
 		}
 		return null;
 	}
@@ -54,7 +54,7 @@ class PropFactory {
 	public function getNavCollisionTriggerOffJson(constant:String):Array<ASAny> {
 		var _loc2_:ASObject = mConstantToJsonMap.itemFor(constant);
 		if (ASCompat.toBool(_loc2_)) {
-			return ASCompat.dynamicAs(_loc2_.navCollisions_off, Array);
+			return ASCompat.coerce(_loc2_.navCollisions_off, Array);
 		}
 		return null;
 	}

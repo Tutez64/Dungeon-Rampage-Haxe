@@ -57,7 +57,7 @@ class ChestBuyKeysPopUp {
 		mAssetLoadingComponent = assetLoadingComponent;
 		mSceneGraphComponent = sceneGraphComponent;
 		openKeyChestClass = UIHud.isThisAConsumbleChestId((selectedGMChest.Id : Int)) ? swfAsset.getClass("popup_itemBox_open") : swfAsset.getClass("popup_chest_keyless");
-		mRoot = ASCompat.dynamicAs(ASCompat.createInstance(openKeyChestClass, []), flash.display.MovieClip);
+		mRoot = ASCompat.coerce(ASCompat.createInstance(openKeyChestClass, []), flash.display.MovieClip);
 		mRoot.scaleX = mRoot.scaleY = 1.8;
 		bounds = mRoot.getBounds(mDBFacade.stageRef);
 		mRoot.x = mDBFacade.stageRef.stageWidth / 2 - bounds.width / 2 - bounds.x;
@@ -70,12 +70,12 @@ class ChestBuyKeysPopUp {
 		}
 		swfPath = selectedGMChest.IconSwf;
 		iconName = selectedGMChest.IconName;
-		ChestInfo.loadItemIcon(swfPath, iconName, ASCompat.dynamicAs((mRoot : ASAny).content, flash.display.DisplayObjectContainer), mDBFacade, (150 : UInt),
+		ChestInfo.loadItemIcon(swfPath, iconName, ASCompat.coerce((mRoot : ASAny).content, flash.display.DisplayObjectContainer), mDBFacade, (150 : UInt),
 			(150 : UInt), mAssetLoadingComponent);
 		ASCompat.setProperty((mRoot : ASAny).content, "y", UIHud.isThisAConsumbleChestId((selectedGMChest.Id : Int)) ? -6 : -35);
-		mRenderer = new MovieClipRenderer(mDBFacade, ASCompat.dynamicAs((mRoot : ASAny).content, flash.display.MovieClip));
+		mRenderer = new MovieClipRenderer(mDBFacade, ASCompat.coerce((mRoot : ASAny).content, flash.display.MovieClip));
 		mRenderer.play((0 : UInt), true);
-		rarity = ASCompat.dynamicAs(mDBFacade.gameMaster.rarityByConstant.itemFor(selectedGMChest.Rarity), gameMasterDictionary.GMRarity);
+		rarity = ASCompat.coerce(mDBFacade.gameMaster.rarityByConstant.itemFor(selectedGMChest.Rarity), gameMasterDictionary.GMRarity);
 		bgColoredExists = rarity.HasColoredBackground;
 		bgSwfPath = rarity.BackgroundSwf;
 		bgIconName = rarity.BackgroundIcon;
@@ -101,13 +101,13 @@ class ChestBuyKeysPopUp {
 		}
 		ASCompat.setProperty((mRoot : ASAny).coin_button, "x", mCoinButtonCenteredPosition);
 		ASCompat.setProperty((mRoot : ASAny).coin_icon, "x", mCoinIconCenteredPosition);
-		mBuyCoinButton = new UIButton(mDBFacade, ASCompat.dynamicAs((mRoot : ASAny).coin_button, flash.display.MovieClip));
-		mBuyCoinButton.releaseCallback = ASCompat.asFunction(chestBuyCoinCallback(coinCostForChestKey));
+		mBuyCoinButton = new UIButton(mDBFacade, ASCompat.coerce((mRoot : ASAny).coin_button, flash.display.MovieClip));
+		mBuyCoinButton.releaseCallback = ASCompat.coerceFunction(chestBuyCoinCallback(coinCostForChestKey));
 		mBuyCoinButton.label.text = Std.string(coinCostForChestKey);
-		mBuyGemButton = new UIButton(mDBFacade, ASCompat.dynamicAs((mRoot : ASAny).gem_button, flash.display.MovieClip));
+		mBuyGemButton = new UIButton(mDBFacade, ASCompat.coerce((mRoot : ASAny).gem_button, flash.display.MovieClip));
 		ASCompat.setProperty((mRoot : ASAny).gem_icon, "visible", false);
 		mBuyGemButton.visible = false;
-		mCloseButton = new UIButton(mDBFacade, ASCompat.dynamicAs((mRoot : ASAny).close, flash.display.MovieClip));
+		mCloseButton = new UIButton(mDBFacade, ASCompat.coerce((mRoot : ASAny).close, flash.display.MovieClip));
 		mCloseButton.releaseCallback = closeKeylessChestPopup;
 		ASCompat.setProperty((mRoot : ASAny).coin_icon, "mouseEnabled", false);
 		ASCompat.setProperty((mRoot : ASAny).coin_icon, "mouseChildren", false);

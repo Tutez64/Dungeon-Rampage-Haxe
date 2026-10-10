@@ -47,7 +47,7 @@ class ActiveLoadBase {
 		var _loc3_:ASFunction = null;
 		var _loc2_ = ASCompat.reinterpretAs(mPendingErrorCallbacks.iterator(), SetIterator);
 		while (_loc2_.hasNext()) {
-			_loc3_ = ASCompat.asFunction(_loc2_.next());
+			_loc3_ = ASCompat.coerceFunction(_loc2_.next());
 			if (_loc3_ != null) {
 				_loc3_();
 			}
@@ -59,7 +59,7 @@ class ActiveLoadBase {
 		var _loc4_:ASFunction = null;
 		var _loc3_ = ASCompat.reinterpretAs(mPendingSuccessCallback.iterator(), SetIterator);
 		while (_loc3_.hasNext()) {
-			_loc4_ = ASCompat.asFunction(_loc3_.next());
+			_loc4_ = ASCompat.coerceFunction(_loc3_.next());
 			if (_loc4_ != null) {
 				_loc4_(asset);
 			}

@@ -73,8 +73,8 @@ class CountdownTextTimer {
 	}
 
 	function getTimeLeft():Int {
-		var _loc1_ = ASCompat.dynamicAs(mGetDateFunction(), Date);
-		return Std.int(mDateToFinish.getTime() - _loc1_.getTime());
+		var _loc1_ = ASCompat.coerce(mGetDateFunction(), Date);
+		return ASCompat.floatToInt(mDateToFinish.getTime() - _loc1_.getTime());
 	}
 
 	function onTick(event:TimerEvent) {
@@ -89,11 +89,11 @@ class CountdownTextTimer {
 			}
 		} else {
 			_loc5_ = getTimeLeft();
-			_loc2_ = Std.int(_loc5_ / 3600000);
+			_loc2_ = ASCompat.floatToInt(_loc5_ / 3600000);
 			_loc5_ -= _loc2_ * 3600000;
-			_loc4_ = Std.int(_loc5_ / 60000);
+			_loc4_ = ASCompat.floatToInt(_loc5_ / 60000);
 			_loc5_ -= _loc4_ * 60000;
-			_loc3_ = Std.int(_loc5_ / 1000);
+			_loc3_ = ASCompat.floatToInt(_loc5_ / 1000);
 			mCountdownText.text = mPrefixText + Std.string(_loc2_) + ":" + zeroPad(_loc4_, 2) + ":" + zeroPad(_loc3_, 2) + mPostfixText;
 		}
 	}

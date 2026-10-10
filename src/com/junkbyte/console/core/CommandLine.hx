@@ -143,7 +143,7 @@ class CommandLine extends ConsoleCore {
 		hints = new Array<ASAny>();
 		if (checkNullIteratee(all))
 			for (_tmp_ in all) {
-				canadate = ASCompat.dynamicAs(_tmp_, Array);
+				canadate = ASCompat.coerce(_tmp_, Array);
 				if (ASCompat.toNumber(Std.string(canadate[0]).toLowerCase().indexOf(str)) == 0) {
 					hints.push(canadate);
 				}
@@ -179,7 +179,7 @@ class CommandLine extends ConsoleCore {
 			if (_loc7_ > 0) {
 				this._slashCmds.setPropertyIsEnumerable(n, false);
 			}
-			_loc7_ = ASCompat.toInt(_loc7_) + 1;
+			_loc7_++;
 		}
 	}
 
@@ -187,7 +187,7 @@ class CommandLine extends ConsoleCore {
 		var _loc6_:SlashCommand = null;
 		n = new compat.RegExp("[^\\w]*", "g").replace(n, "");
 		if (this._slashCmds[n] != null) {
-			_loc6_ = ASCompat.dynamicAs(this._slashCmds[n], SlashCommand);
+			_loc6_ = ASCompat.coerce(this._slashCmds[n], SlashCommand);
 			if (!_loc6_.user) {
 				throw new Error("Can not alter build-in slash command [" + n + "]");
 			}
@@ -283,7 +283,7 @@ class CommandLine extends ConsoleCore {
 		param = brk > 0 ? str.substring(brk + 1) : "";
 		if (this._slashCmds[cmd] != null) {
 			try {
-				slashcmd = ASCompat.dynamicAs(this._slashCmds[cmd], SlashCommand);
+				slashcmd = ASCompat.coerce(this._slashCmds[cmd], SlashCommand);
 				if (!config.commandLineAllowed && !slashcmd.allow) {
 					report(DISABLED, 9);
 					return;
@@ -356,13 +356,13 @@ class CommandLine extends ConsoleCore {
 				if (_loc5_ > 0 && _loc9_ > 0) {
 					break;
 				}
-				_loc5_ = ASCompat.toInt(_loc5_) + 1;
+				_loc5_++;
 			}
 			_loc7_.push("<p" + _loc4_ + "> " + _loc10_ + "</p" + _loc4_ + ">");
 			if (_loc4_ > 6) {
-				_loc4_ = ASCompat.toInt(_loc4_) - 1;
+				_loc4_--;
 			}
-			_loc9_ = ASCompat.toInt(_loc9_) + 1;
+			_loc9_++;
 		}
 		report(_loc7_.join("\n"), 9);
 	}
@@ -409,7 +409,7 @@ class CommandLine extends ConsoleCore {
 		final __ax4_iter_114:ASObject = this._slashCmds;
 		if (checkNullIteratee(__ax4_iter_114))
 			for (_tmp_ in iterateDynamicValues(__ax4_iter_114)) {
-				_loc4_ = ASCompat.dynamicAs(_tmp_, SlashCommand);
+				_loc4_ = ASCompat.coerce(_tmp_, SlashCommand);
 				if (config.commandLineAllowed || _loc4_.allow) {
 					if (_loc4_.user) {
 						_loc3_.push(_loc4_);
@@ -422,7 +422,7 @@ class CommandLine extends ConsoleCore {
 		report("Built-in commands:" + (!config.commandLineAllowed ? " (limited permission)" : ""), 4);
 		if (checkNullIteratee(_loc2_))
 			for (_tmp_ in _loc2_) {
-				_loc4_ = ASCompat.dynamicAs(_tmp_, SlashCommand);
+				_loc4_ = ASCompat.coerce(_tmp_, SlashCommand);
 				report("<b>/" + _loc4_.n + "</b> <p-1>" + _loc4_.d + "</p-1>", -2);
 			}
 		if (_loc3_.length != 0) {
@@ -430,7 +430,7 @@ class CommandLine extends ConsoleCore {
 			report("User commands:", 4);
 			if (checkNullIteratee(_loc3_))
 				for (_tmp_ in _loc3_) {
-					_loc4_ = ASCompat.dynamicAs(_tmp_, SlashCommand);
+					_loc4_ = ASCompat.coerce(_tmp_, SlashCommand);
 					report("<b>/" + _loc4_.n + "</b> <p-1>" + _loc4_.d + "</p-1>", -2);
 				}
 		}

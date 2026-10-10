@@ -58,7 +58,7 @@ class MouseWheelEnabler {
 			if (currentItem != null && browserMouseEvent != null) {
 				currentItem.dispatchEvent(new CustomMouseWheelEvent("onMove", true, false, browserMouseEvent.localX, browserMouseEvent.localY,
 					browserMouseEvent.relatedObject, browserMouseEvent.ctrlKey, browserMouseEvent.altKey, browserMouseEvent.shiftKey,
-					browserMouseEvent.buttonDown, Std.int(_loc4_)));
+					browserMouseEvent.buttonDown, ASCompat.floatToInt(_loc4_)));
 			}
 			lastEventTime = _loc3_;
 		}

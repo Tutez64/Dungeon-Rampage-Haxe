@@ -136,7 +136,7 @@ class AvatarEquipElement extends UIButton {
 			if (iconClass == null) {
 				Logger.error("Unable to find iconClass of name: " + iconName);
 			} else {
-				mIcon = ASCompat.dynamicAs(ASCompat.createInstance(iconClass, []), flash.display.MovieClip);
+				mIcon = ASCompat.coerce(ASCompat.createInstance(iconClass, []), flash.display.MovieClip);
 				mIcon.scaleX = mIcon.scaleY = 60 / mItemInfo.iconScale;
 				(mRoot : ASAny).graphic.addChild(mIcon);
 			}

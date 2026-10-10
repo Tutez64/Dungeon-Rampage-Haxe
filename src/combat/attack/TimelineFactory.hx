@@ -48,7 +48,7 @@ class TimelineFactory {
 			for (_tmp_ in iterateDynamicValues(jsonAsset)) {
 				_loc3_ = _tmp_;
 				if (ASCompat.getQualifiedClassName(_loc3_) == "int") {
-					_loc2_ += Std.int(Math.abs(ASCompat.toInt(_loc3_)) % 17 + Math.abs(ASCompat.toInt(_loc3_)) / 19);
+					_loc2_ += ASCompat.floatToInt(Math.abs(ASCompat.toInt(_loc3_)) % 17 + Math.abs(ASCompat.toInt(_loc3_)) / 19);
 				}
 			}
 		return _loc2_ % 541;

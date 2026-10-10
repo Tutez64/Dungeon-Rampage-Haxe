@@ -65,8 +65,8 @@ class DungeonFloorFactory {
 		if (mTileGrid.isPositionOpenForATile(pos)) {
 			_loc4_ = new DungeonTileUsage();
 			_loc4_.tileId = mTileFactory.mFillerTiles[0].id;
-			_loc4_.x = Std.int(pos.x);
-			_loc4_.y = Std.int(pos.y);
+			_loc4_.x = ASCompat.floatToInt(pos.x);
+			_loc4_.y = ASCompat.floatToInt(pos.y);
 			mTileFactory.buildTile(_loc4_, addToGrid, tileInitialized, mDistributedDungeonFloor);
 		}
 	}
@@ -96,7 +96,7 @@ class DungeonFloorFactory {
 		_loc2_ = 0;
 		while (_loc2_ < tileNetworkComponents.length) {
 			mTileFactory.buildTile(tileNetworkComponents[_loc2_], addToGrid, tileInitialized, mDistributedDungeonFloor);
-			_loc2_ = ASCompat.toInt(_loc2_) + 1;
+			_loc2_++;
 		}
 	}
 
@@ -109,7 +109,7 @@ class DungeonFloorFactory {
 			_loc5_ = _loc3_.floorObjects;
 			_loc2_ = _loc5_.iterator();
 			while (_loc2_.hasNext()) {
-				_loc4_ = ASCompat.dynamicAs(_loc2_.next(), dr_floor.FloorObject);
+				_loc4_ = ASCompat.coerce(_loc2_.next(), dr_floor.FloorObject);
 				if (!_loc3_.hasOwnedFloorObject(_loc4_)) {
 					_loc4_.tile = tile;
 				}
@@ -121,7 +121,8 @@ class DungeonFloorFactory {
 
 	function tileInitialized(tile:Tile) {
 		mTileGrid.setTileAtPosition(tile.position, tile);
-		mDistributedDungeonFloor.astarGrids.InitTileAstarGrids((Std.int(tile.position.x / 900 + 1) : UInt), (Std.int(tile.position.y / 900 + 1) : UInt));
+		mDistributedDungeonFloor.astarGrids.InitTileAstarGrids((ASCompat.floatToInt(tile.position.x / 900 + 1) : UInt),
+			(ASCompat.floatToInt(tile.position.y / 900 + 1) : UInt));
 		mNumTilesCreated = mNumTilesCreated + 1;
 		if (mNumTilesCreated == (mTileNetworkComponents.length : UInt)) {
 			mTilesBuiltCallback(mTileGrid);

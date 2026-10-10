@@ -27,8 +27,8 @@ class ConsoleConfig {
 	public var showTimestamp:Bool = false;
 
 	public function timeStampFormatter(timer:UInt):String {
-		var _loc2_ = (Std.int(timer * 0.001) : UInt);
-		return this.makeTimeDigit((Std.int(_loc2_ / 60) : UInt)) + ":" + this.makeTimeDigit(_loc2_ % 60);
+		var _loc2_ = (ASCompat.floatToInt(timer * 0.001) : UInt);
+		return this.makeTimeDigit((ASCompat.floatToInt(_loc2_ / 60) : UInt)) + ":" + this.makeTimeDigit(_loc2_ % 60);
 	}
 
 	public var showLineNumber:Bool = false;

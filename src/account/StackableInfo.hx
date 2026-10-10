@@ -16,7 +16,7 @@ class StackableInfo extends InventoryBaseInfo {
 			mGMStackable = gmStackable;
 		} else {
 			super(dbFacade, json);
-			mGMStackable = ASCompat.dynamicAs(mDBFacade.gameMaster.stackableById.itemFor(mGMId), gameMasterDictionary.GMStackable);
+			mGMStackable = ASCompat.coerce(mDBFacade.gameMaster.stackableById.itemFor(mGMId), gameMasterDictionary.GMStackable);
 		}
 		mGMInventoryBase = mGMStackable;
 	}

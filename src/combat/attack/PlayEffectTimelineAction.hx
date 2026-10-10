@@ -148,7 +148,7 @@ class PlayEffectTimelineAction extends AttackTimelineAction {
 				Logger.error("Unable to find class: " + timeline_action.mInsertIconName);
 				return;
 			}
-			timeline_action.mInsertIconClip = ASCompat.dynamicAs(ASCompat.createInstance(_loc2_, []), flash.display.MovieClip);
+			timeline_action.mInsertIconClip = ASCompat.coerce(ASCompat.createInstance(_loc2_, []), flash.display.MovieClip);
 			timeline_action.mInsertIconClip.mouseChildren = false;
 			timeline_action.mInsertIconClip.mouseEnabled = false;
 			timeline_action.TryInsertClipIntoEffect();
@@ -229,7 +229,7 @@ class PlayEffectTimelineAction extends AttackTimelineAction {
 		var _loc3_ = calculatePositionBasedOnOffsets(timeline.targetActor);
 		var _loc4_ = mActorGameObject.distributedDungeonFloor.effectManager.playEffect(DBFacade.buildFullDownloadPath(mEffectPath), mEffectName, _loc3_,
 			_loc2_, mBehindAvatar, mScale, 0, 0, 0, 0, false, mLayer, mManaged, mPlayRate,
-			ASCompat.asFunction(mDoIconInsert ? assetLoadedCallback(this) : null));
+			ASCompat.coerceFunction(mDoIconInsert ? assetLoadedCallback(this) : null));
 		if (mManaged) {
 			timeline.mManagedEffects.add(_loc4_);
 		}

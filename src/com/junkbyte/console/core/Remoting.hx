@@ -71,7 +71,7 @@ class Remoting extends ConsoleCore {
 					this._sendBuffer = new ByteArray();
 				} else {
 					_loc2_ = new ByteArray();
-					this._sendBuffer.readBytes(_loc2_, (0 : UInt), (Std.int(Math.min(38000, this._sendBuffer.bytesAvailable)) : UInt));
+					this._sendBuffer.readBytes(_loc2_, (0 : UInt), (ASCompat.floatToInt(Math.min(38000, this._sendBuffer.bytesAvailable)) : UInt));
 					_loc4_ = new ByteArray();
 					this._sendBuffer.readBytes(_loc4_);
 					this._sendBuffer = _loc4_;

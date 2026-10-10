@@ -49,7 +49,7 @@ class DistributedDungionArea extends Area implements IDistributedDungionArea {
 		_loc2_ = 0;
 		while (_loc2_ < val.length) {
 			mCacheSfc.push(DBFacade.buildFullDownloadPath(val[_loc2_].fileName));
-			_loc2_ = ASCompat.toInt(_loc2_) + 1;
+			_loc2_++;
 		}
 		return val;
 	}
@@ -68,7 +68,7 @@ class DistributedDungionArea extends Area implements IDistributedDungionArea {
 		_loc2_ = 0;
 		while (_loc2_ < val.length) {
 			mTileLibrary.push(val[_loc2_].fileName);
-			_loc2_ = ASCompat.toInt(_loc2_) + 1;
+			_loc2_++;
 		}
 	}
 
@@ -77,11 +77,11 @@ class DistributedDungionArea extends Area implements IDistributedDungionArea {
 		var _loc7_ = Math.NaN;
 		var _loc5_:Float = 0;
 		if (attack.StatOffsets != null) {
-			_loc6_ = ASCompat.toNumber((weapon.power * mDBFacade.gameMaster.stat_BonusMultiplier.values[Std.int(attack.StatOffsets.offence)]
+			_loc6_ = (weapon.power * mDBFacade.gameMaster.stat_BonusMultiplier.values[ASCompat.floatToInt(attack.StatOffsets.offence)]
 				+
-				attacker.stats.values[Std.int(attack.StatOffsets.offence)]) * ASCompat.toNumber((attacker.buffHandler.multiplier : ASAny)[attack.StatOffsets.offence]));
+				attacker.stats.values[ASCompat.floatToInt(attack.StatOffsets.offence)]) * ASCompat.toNumber((attacker.buffHandler.multiplier : ASAny)[attack.StatOffsets.offence]);
 			_loc6_ = _loc6_ * attack.DamageMod;
-			_loc7_ = ASCompat.toNumber(target.stats.values[Std.int(attack.StatOffsets.defence)] * ASCompat.toNumber((target.buffHandler.multiplier : ASAny)[attack.StatOffsets.defence]));
+			_loc7_ = target.stats.values[ASCompat.floatToInt(attack.StatOffsets.defence)] * ASCompat.toNumber((target.buffHandler.multiplier : ASAny)[attack.StatOffsets.defence]);
 			_loc5_ = _loc6_ + _loc7_;
 		} else {
 			_loc5_ = weapon.power * attack.DamageMod;

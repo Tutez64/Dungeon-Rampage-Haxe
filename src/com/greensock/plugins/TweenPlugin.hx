@@ -36,7 +36,7 @@ class TweenPlugin {
 		var _loc3_:ASObject = null;
 		TweenLite.onPluginEvent = TweenPlugin.onTweenEvent;
 		var _loc2_ = plugins.length;
-		while (ASCompat.toBool(_loc2_--)) {
+		while (_loc2_-- != 0) {
 			if (plugins[_loc2_].hasOwnProperty("API")) {
 				_loc3_ = ASCompat.createInstance(((plugins[_loc2_] : Dynamic)), []);
 				TweenLite.plugins[_loc3_.propName] = plugins[_loc2_];
@@ -55,15 +55,15 @@ class TweenPlugin {
 			_loc5_ = [];
 			_loc6_ = 0;
 			while (_loc3_ != null) {
-				_loc5_[Std.int(_loc7_ = ASCompat.toNumber(_loc6_++))] = _loc3_;
+				_loc5_[ASCompat.floatToInt(_loc7_ = _loc6_++)] = _loc3_;
 				_loc3_ = _loc3_.nextNode;
 			}
 			ASCompat.ASArray.sortOn(_loc5_, "priority", (ASCompat.ASArray.NUMERIC : Int) | (ASCompat.ASArray.DESCENDING : Int));
 			while (--_loc6_ > -1) {
-				cast(_loc5_[_loc6_], PropTween).nextNode = ASCompat.dynamicAs(_loc5_[ASCompat.toInt(_loc6_ + 1)], com.greensock.core.PropTween);
-				cast(_loc5_[_loc6_], PropTween).prevNode = ASCompat.dynamicAs(_loc5_[ASCompat.toInt(_loc6_ - 1)], com.greensock.core.PropTween);
+				cast(_loc5_[_loc6_], PropTween).nextNode = ASCompat.coerce(_loc5_[_loc6_ + 1], com.greensock.core.PropTween);
+				cast(_loc5_[_loc6_], PropTween).prevNode = ASCompat.coerce(_loc5_[_loc6_ - 1], com.greensock.core.PropTween);
 			}
-			_loc3_ = tween.cachedPT1 = ASCompat.dynamicAs(_loc5_[0], com.greensock.core.PropTween);
+			_loc3_ = tween.cachedPT1 = ASCompat.coerce(_loc5_[0], com.greensock.core.PropTween);
 		}
 		while (_loc3_ != null) {
 			if (_loc3_.isPlugin && ASCompat.toBool(_loc3_.target[type])) {
@@ -90,17 +90,17 @@ class TweenPlugin {
 		var _loc2_ = _tweens.length;
 		if (this.round) {
 			while (--_loc2_ > -1) {
-				_loc3_ = ASCompat.dynamicAs(_tweens[_loc2_], com.greensock.core.PropTween);
+				_loc3_ = ASCompat.coerce(_tweens[_loc2_], com.greensock.core.PropTween);
 				_loc4_ = _loc3_.start + _loc3_.change * changeFactor;
 				if (_loc4_ > 0) {
-					_loc3_.target[_loc3_.property] = Std.int(_loc4_ + 0.5) >> 0;
+					_loc3_.target[_loc3_.property] = ASCompat.floatToInt(_loc4_ + 0.5) >> 0;
 				} else {
-					_loc3_.target[_loc3_.property] = Std.int(_loc4_ - 0.5) >> 0;
+					_loc3_.target[_loc3_.property] = ASCompat.floatToInt(_loc4_ - 0.5) >> 0;
 				}
 			}
 		} else {
 			while (--_loc2_ > -1) {
-				_loc3_ = ASCompat.dynamicAs(_tweens[_loc2_], com.greensock.core.PropTween);
+				_loc3_ = ASCompat.coerce(_tweens[_loc2_], com.greensock.core.PropTween);
 				_loc3_.target[_loc3_.property] = _loc3_.start + _loc3_.change * changeFactor;
 			}
 		}

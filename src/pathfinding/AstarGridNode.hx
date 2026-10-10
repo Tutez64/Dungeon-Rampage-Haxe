@@ -39,7 +39,7 @@ class AstarGridNode {
 		findNeighbors();
 		Center = new Vector3D();
 		Center.x = Id % 216 * 50 + 50 / 2;
-		Center.y = Std.int(Id / 216) * 50 + 50 / 2;
+		Center.y = ASCompat.floatToInt(Id / 216) * 50 + 50 / 2;
 	}
 
 	public function destroy() {
@@ -54,7 +54,7 @@ class AstarGridNode {
 		var _loc1_ = 0;
 		var _loc2_ = 0;
 		var _loc7_ = 0;
-		var _loc3_ = (Std.int(Id / 216) : UInt);
+		var _loc3_ = (ASCompat.floatToInt(Id / 216) : UInt);
 		var _loc4_ = Id % 216;
 		_loc5_ = -1;
 		while (_loc5_ < 2) {
@@ -75,7 +75,7 @@ class AstarGridNode {
 	}
 
 	public function costToNeighbor(y:UInt):Float {
-		var _loc2_ = (Std.int(Math.abs(Id - y)) : UInt);
+		var _loc2_ = (ASCompat.floatToInt(Math.abs(Id - y)) : UInt);
 		if (_loc2_ > (216 + 1 : UInt)) {
 			return 999999;
 		}

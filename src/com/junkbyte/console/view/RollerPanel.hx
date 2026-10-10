@@ -83,7 +83,7 @@ class RollerPanel extends ConsolePanel {
 		}
 		if (checkNullIteratee(_loc5_))
 			for (_tmp_ in _loc5_) {
-				_loc7_ = ASCompat.dynamicAs(_tmp_, flash.display.DisplayObject);
+				_loc7_ = ASCompat.coerce(_tmp_, flash.display.DisplayObject);
 				_loc9_ = [_loc7_];
 				_loc10_ = _loc7_.parent;
 				while (_loc10_ != null) {
@@ -93,7 +93,7 @@ class RollerPanel extends ConsolePanel {
 				_loc11_ = (_loc9_.length : UInt);
 				_loc12_ = (0 : UInt);
 				while (_loc12_ < _loc11_) {
-					_loc13_ = ASCompat.dynamicAs(_loc9_[(_loc12_ : Int)], flash.display.DisplayObject);
+					_loc13_ = ASCompat.coerce(_loc9_[(_loc12_ : Int)], flash.display.DisplayObject);
 					if (!_loc6_.exists(_loc13_)) {
 						_loc6_[_loc13_] = _loc12_;
 						_loc14_ = _loc12_;

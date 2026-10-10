@@ -30,31 +30,31 @@ class ConsoleTools extends ConsoleCore {
 		var _loc8_ = new Array<ASAny>();
 		_loc8_.push(base);
 		while (_loc6_ < _loc8_.length) {
-			_loc9_ = ASCompat.dynamicAs(_loc8_[_loc6_], flash.display.DisplayObject);
-			_loc6_ = ASCompat.toInt(_loc6_) + 1;
+			_loc9_ = ASCompat.coerce(_loc8_[_loc6_], flash.display.DisplayObject);
+			_loc6_++;
 			if (Std.isOfType(_loc9_, DisplayObjectContainer)) {
 				_loc11_ = ASCompat.reinterpretAs(_loc9_, DisplayObjectContainer);
 				_loc12_ = _loc11_.numChildren;
 				_loc13_ = 0;
 				while (_loc13_ < _loc12_) {
 					_loc14_ = _loc11_.getChildAt(_loc13_);
-					ASCompat.arraySplice(_loc8_, ASCompat.toInt(_loc6_ + _loc13_), (0 : UInt), [_loc14_]);
-					_loc13_ = ASCompat.toInt(_loc13_) + 1;
+					ASCompat.arraySplice(_loc8_, _loc6_ + _loc13_, (0 : UInt), [_loc14_]);
+					_loc13_++;
 				}
 			}
 			if (_loc7_ != null) {
 				if (Std.isOfType(_loc7_, DisplayObjectContainer)
 					&& ASCompat.reinterpretAs(_loc7_, DisplayObjectContainer).contains(_loc9_)) {
-					_loc4_ = ASCompat.toInt(_loc4_) + 1;
+					_loc4_++;
 				} else {
 					while (_loc7_ != null) {
 						_loc7_ = _loc7_.parent;
 						if (Std.isOfType(_loc7_, DisplayObjectContainer)) {
 							if (_loc4_ > 0) {
-								_loc4_ = ASCompat.toInt(_loc4_) - 1;
+								_loc4_--;
 							}
 							if (ASCompat.reinterpretAs(_loc7_, DisplayObjectContainer).contains(_loc9_)) {
-								_loc4_ = ASCompat.toInt(_loc4_) + 1;
+								_loc4_++;
 								break;
 							}
 						}
@@ -64,8 +64,8 @@ class ConsoleTools extends ConsoleCore {
 			_loc10_ = "";
 			_loc13_ = 0;
 			while (_loc13_ < _loc4_) {
-				_loc10_ += _loc13_ == ASCompat.toNumber(_loc4_ - 1) ? " ∟ " : " - ";
-				_loc13_ = ASCompat.toInt(_loc13_) + 1;
+				_loc10_ += _loc13_ == _loc4_ - 1 ? " ∟ " : " - ";
+				_loc13_++;
 			}
 			if (maxstep <= 0 || (_loc4_ : UInt) <= maxstep) {
 				_loc5_ = false;
@@ -176,7 +176,7 @@ class ConsoleTools extends ConsoleCore {
 					break;
 				}
 			}
-			_loc10_ = ASCompat.toInt(_loc10_) + 1;
+			_loc10_++;
 		}
 		return _loc5_;
 	}

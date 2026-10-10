@@ -469,8 +469,8 @@ class ActorGameObject extends FloorObject {
 
 	public function set_hitPoints(val:UInt):UInt {
 		mHitPoints = val;
-		mActorView.setHp(mHitPoints, (Std.int(this.maxHitPoints) : UInt));
-		mFacade.eventManager.dispatchEvent(new HpEvent("HpEvent_HP_UPDATE", id, mHitPoints, (Std.int(this.maxHitPoints) : UInt)));
+		mActorView.setHp(mHitPoints, (ASCompat.floatToInt(this.maxHitPoints) : UInt));
+		mFacade.eventManager.dispatchEvent(new HpEvent("HpEvent_HP_UPDATE", id, mHitPoints, (ASCompat.floatToInt(this.maxHitPoints) : UInt)));
 		return val;
 	}
 
@@ -499,7 +499,7 @@ class ActorGameObject extends FloorObject {
 		} else {
 			_loc3_ = currentWeapon;
 		}
-		var _loc6_ = ASCompat.dynamicAs(mDBFacade.gameMaster.attackById.itemFor(attackChoreography.attack.attackType), gameMasterDictionary.GMAttack);
+		var _loc6_ = ASCompat.coerce(mDBFacade.gameMaster.attackById.itemFor(attackChoreography.attack.attackType), gameMasterDictionary.GMAttack);
 		if (_loc6_ == null) {
 			Logger.error("Unable to find GMAttack for attacktype: " + attackChoreography.attack.attackType);
 			return;
@@ -515,7 +515,7 @@ class ActorGameObject extends FloorObject {
 	}
 
 	public function ReceiveCombatResult(combatResult:CombatResult) {
-		var _loc2_ = ASCompat.dynamicAs(mDBFacade.gameMaster.attackById.itemFor(combatResult.attack.attackType), gameMasterDictionary.GMAttack);
+		var _loc2_ = ASCompat.coerce(mDBFacade.gameMaster.attackById.itemFor(combatResult.attack.attackType), gameMasterDictionary.GMAttack);
 		if (_loc2_ != null) {
 			if (_loc2_.DamageMod > 0) {
 				this.actorView.receiveHeal(combatResult, _loc2_);
@@ -699,7 +699,7 @@ class ActorGameObject extends FloorObject {
 					this.currentWeapon = _loc1_;
 					break;
 				}
-				_loc2_ = ASCompat.toInt(_loc2_) + 1;
+				_loc2_++;
 			}
 		}
 	}
@@ -773,8 +773,8 @@ class ActorGameObject extends FloorObject {
 
 	function set_stats(value:StatVector):StatVector {
 		mStats = value;
-		mActorView.setHp(mHitPoints, (Std.int(this.maxHitPoints) : UInt));
-		mDBFacade.eventManager.dispatchEvent(new HpEvent("HpEvent_HP_UPDATE", id, mHitPoints, (Std.int(this.maxHitPoints) : UInt)));
+		mActorView.setHp(mHitPoints, (ASCompat.floatToInt(this.maxHitPoints) : UInt));
+		mDBFacade.eventManager.dispatchEvent(new HpEvent("HpEvent_HP_UPDATE", id, mHitPoints, (ASCompat.floatToInt(this.maxHitPoints) : UInt)));
 		return value;
 	}
 

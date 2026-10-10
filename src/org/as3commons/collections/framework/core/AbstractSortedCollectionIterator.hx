@@ -19,7 +19,7 @@ import org.as3commons.collections.framework.ICollectionIterator;
 	}
 
 	public function start() {
-		this._next = ASCompat.dynamicAs(this._collection.size != 0 ? this._collection.mostLeftNode_internal() : null,
+		this._next = ASCompat.coerce(this._collection.size != 0 ? this._collection.mostLeftNode_internal() : null,
 			org.as3commons.collections.framework.core.SortedNode);
 		this._current = null;
 	}

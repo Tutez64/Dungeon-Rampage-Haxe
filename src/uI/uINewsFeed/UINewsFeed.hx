@@ -97,9 +97,9 @@ class UINewsFeed {
 	}
 
 	function setupUI() {
-		mLabel = ASCompat.dynamicAs((mRoot : ASAny).label, flash.text.TextField);
+		mLabel = ASCompat.coerce((mRoot : ASAny).label, flash.text.TextField);
 		mLabelY = mLabel.y;
-		mIcon = ASCompat.dynamicAs((mRoot : ASAny).icon, flash.display.MovieClip);
+		mIcon = ASCompat.coerce((mRoot : ASAny).icon, flash.display.MovieClip);
 	}
 
 	public function lerpIntoScreen() {
@@ -124,7 +124,7 @@ class UINewsFeed {
 			mIsValid = false;
 			return;
 		}
-		var _loc2_ = ASCompat.dynamicAs(mDBFacade.dbAccountInfo.friendInfos.itemFor(mFriendEvent.friendId), account.FriendInfo);
+		var _loc2_ = ASCompat.coerce(mDBFacade.dbAccountInfo.friendInfos.itemFor(mFriendEvent.friendId), account.FriendInfo);
 		if (_loc2_ == null) {
 			mIsValid = false;
 			return;
@@ -215,7 +215,7 @@ class UINewsFeed {
 			if (picClassName != "") {
 				mAssetLoadingComponent.getSwfAsset(picLocation, function(param1:brain.assetRepository.SwfAsset) {
 					var _loc2_ = param1.getClass(picClassName);
-					var _loc3_ = ASCompat.dynamicAs(ASCompat.createInstance(_loc2_, []), flash.display.MovieClip);
+					var _loc3_ = ASCompat.coerce(ASCompat.createInstance(_loc2_, []), flash.display.MovieClip);
 					_loc3_.scaleX = _loc3_.scaleY = 1.07;
 					_loc3_.x -= _loc3_.width / 2 + 10;
 					_loc3_.y -= _loc3_.height / 2;

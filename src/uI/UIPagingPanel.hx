@@ -93,8 +93,8 @@ class UIPagingPanel {
 
 	function setupUI(rootClip:MovieClip) {
 		mRoot = rootClip;
-		mPageLeftButton = new UIButton(mDBFacade, ASCompat.dynamicAs((mRoot : ASAny).page_left, flash.display.MovieClip));
-		mPageRightButton = new UIButton(mDBFacade, ASCompat.dynamicAs((mRoot : ASAny).page_right, flash.display.MovieClip));
+		mPageLeftButton = new UIButton(mDBFacade, ASCompat.coerce((mRoot : ASAny).page_left, flash.display.MovieClip));
+		mPageRightButton = new UIButton(mDBFacade, ASCompat.coerce((mRoot : ASAny).page_right, flash.display.MovieClip));
 		mPageLeftButton.releaseCallback = pageLeft;
 		mPageRightButton.releaseCallback = pageRight;
 		mPageLeftButton.enabled = false;
@@ -102,14 +102,14 @@ class UIPagingPanel {
 	}
 
 	function pageLeft() {
-		this.currentPage = (Std.int(Math.max(0, mCurrentPage - 1)) : UInt);
+		this.currentPage = (ASCompat.floatToInt(Math.max(0, mCurrentPage - 1)) : UInt);
 		if (mCallback != null) {
 			mCallback(mCurrentPage);
 		}
 	}
 
 	function pageRight() {
-		this.currentPage = (Std.int(Math.min(mNumPages, mCurrentPage + 1)) : UInt);
+		this.currentPage = (ASCompat.floatToInt(Math.min(mNumPages, mCurrentPage + 1)) : UInt);
 		if (mCallback != null) {
 			mCallback(mCurrentPage);
 		}
@@ -140,13 +140,13 @@ class UIPagingPanel {
 		mPageButtons.length = 0;
 		PAD = (8 : UInt);
 		MAX_BUTTONS = (9 : UInt);
-		startPage = (Std.int(Math.max(0, Math.min(mNumPages - MAX_BUTTONS, mCurrentPage - MAX_BUTTONS / 2 + 1))) : UInt);
-		endPage = (Std.int(Math.min(startPage + MAX_BUTTONS, mNumPages)) : UInt);
+		startPage = (ASCompat.floatToInt(Math.max(0, Math.min(mNumPages - MAX_BUTTONS, mCurrentPage - MAX_BUTTONS / 2 + 1))) : UInt);
+		endPage = (ASCompat.floatToInt(Math.min(startPage + MAX_BUTTONS, mNumPages)) : UInt);
 		numPagesShowing = endPage - startPage;
 		even = numPagesShowing % 2 == 0;
 		i = startPage;
 		while (i < endPage) {
-			pageButtonMC = ASCompat.dynamicAs(ASCompat.createInstance(mPageButtonClass, []), flash.display.MovieClip);
+			pageButtonMC = ASCompat.coerce(ASCompat.createInstance(mPageButtonClass, []), flash.display.MovieClip);
 			mRoot.addChild(pageButtonMC);
 			pageButton = new UIButton(mDBFacade, pageButtonMC);
 			pageButton.rolloverFilter = DBGlobal.UI_ROLLOVER_FILTER;

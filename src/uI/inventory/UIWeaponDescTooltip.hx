@@ -16,9 +16,9 @@ class UIWeaponDescTooltip extends MovieClip {
 	public function new(dbFacade:DBFacade, templateClass:Dynamic) {
 		super();
 		mDBFacade = dbFacade;
-		mRoot = ASCompat.dynamicAs(ASCompat.createInstance(templateClass, []), flash.display.MovieClip);
+		mRoot = ASCompat.coerce(ASCompat.createInstance(templateClass, []), flash.display.MovieClip);
 		this.addChild(mRoot);
-		mDescription = ASCompat.dynamicAs((mRoot : ASAny).description_label, flash.text.TextField);
+		mDescription = ASCompat.coerce((mRoot : ASAny).description_label, flash.text.TextField);
 	}
 
 	public function destroy() {

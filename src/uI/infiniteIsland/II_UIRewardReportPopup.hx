@@ -83,10 +83,10 @@ class II_UIRewardReportPopup extends DBUIPopup {
 			}
 		super(dbFacade, titleText, content, allowClose, wantCurtain, closeCallback, useOriginalPopUp);
 		mRewardSlots = new Vector<MovieClip>();
-		mRewardSlots.push(ASCompat.dynamicAs((mPopup : ASAny).loot_01, flash.display.MovieClip));
-		mRewardSlots.push(ASCompat.dynamicAs((mPopup : ASAny).loot_02, flash.display.MovieClip));
-		mRewardSlots.push(ASCompat.dynamicAs((mPopup : ASAny).loot_03, flash.display.MovieClip));
-		mRewardSlots.push(ASCompat.dynamicAs((mPopup : ASAny).loot_04, flash.display.MovieClip));
+		mRewardSlots.push(ASCompat.coerce((mPopup : ASAny).loot_01, flash.display.MovieClip));
+		mRewardSlots.push(ASCompat.coerce((mPopup : ASAny).loot_02, flash.display.MovieClip));
+		mRewardSlots.push(ASCompat.coerce((mPopup : ASAny).loot_03, flash.display.MovieClip));
+		mRewardSlots.push(ASCompat.coerce((mPopup : ASAny).loot_04, flash.display.MovieClip));
 		mAssetLoadingComponent.getSwfAsset(DBFacade.buildFullDownloadPath("Resources/Art2D/Doobers/db_items_doobers.swf"), doobersLoaded);
 	}
 
@@ -130,10 +130,10 @@ class II_UIRewardReportPopup extends DBUIPopup {
 					if (ASCompat.toNumberField(_loc5_, "status") == 1) {
 						_loc1_ = true;
 					}
-					_loc11_ = ASCompat.dynamicAs(mDBFacade.gameMaster.dooberById.itemFor(_loc5_.dooberId), gameMasterDictionary.GMDoober);
-					_loc7_ = ASCompat.dynamicAs(mDBFacade.gameMaster.chestsById.itemFor(_loc11_.ChestId), gameMasterDictionary.GMChest);
+					_loc11_ = ASCompat.coerce(mDBFacade.gameMaster.dooberById.itemFor(_loc5_.dooberId), gameMasterDictionary.GMDoober);
+					_loc7_ = ASCompat.coerce(mDBFacade.gameMaster.chestsById.itemFor(_loc11_.ChestId), gameMasterDictionary.GMChest);
 					_loc13_ = mItemAsset.getClass(_loc7_.IconName);
-					_loc3_ = ASCompat.dynamicAs(ASCompat.createInstance(_loc13_, []), flash.display.MovieClip);
+					_loc3_ = ASCompat.coerce(ASCompat.createInstance(_loc13_, []), flash.display.MovieClip);
 					_loc6_ = new MovieClipRenderController(mDBFacade, _loc3_);
 					_loc6_.loop = false;
 					_loc6_.stop();
@@ -160,9 +160,9 @@ class II_UIRewardReportPopup extends DBUIPopup {
 		ASCompat.setProperty((mPopup : ASAny).label_next_bonus_chest, "text", "");
 		if (mFloorGold != 0 || mNewDooberId != 0) {
 			if (mNewDooberId != 0) {
-				_loc9_ = ASCompat.dynamicAs(mDBFacade.gameMaster.dooberById.itemFor(mNewDooberId), gameMasterDictionary.GMDoober);
+				_loc9_ = ASCompat.coerce(mDBFacade.gameMaster.dooberById.itemFor(mNewDooberId), gameMasterDictionary.GMDoober);
 				_loc2_ = mDooberAsset.getClass(_loc9_.AssetClassName);
-				_loc10_ = ASCompat.dynamicAs(ASCompat.createInstance(_loc2_, []), flash.display.MovieClip);
+				_loc10_ = ASCompat.coerce(ASCompat.createInstance(_loc2_, []), flash.display.MovieClip);
 				_loc8_ = new MovieClipRenderController(mDBFacade, _loc10_);
 				_loc10_.scaleY = 0.38;
 				_loc10_.scaleX = 0.38;
@@ -188,10 +188,10 @@ class II_UIRewardReportPopup extends DBUIPopup {
 			ASCompat.setProperty((mPopup : ASAny).label_loot_03, "text", "");
 			ASCompat.setProperty((mPopup : ASAny).label_loot_04, "text", "");
 			mRewardSlotLabels = new Vector<TextField>();
-			mRewardSlotLabels.push(ASCompat.dynamicAs((mPopup : ASAny).label_loot_01, flash.text.TextField));
-			mRewardSlotLabels.push(ASCompat.dynamicAs((mPopup : ASAny).label_loot_02, flash.text.TextField));
-			mRewardSlotLabels.push(ASCompat.dynamicAs((mPopup : ASAny).label_loot_03, flash.text.TextField));
-			mRewardSlotLabels.push(ASCompat.dynamicAs((mPopup : ASAny).label_loot_04, flash.text.TextField));
+			mRewardSlotLabels.push(ASCompat.coerce((mPopup : ASAny).label_loot_01, flash.text.TextField));
+			mRewardSlotLabels.push(ASCompat.coerce((mPopup : ASAny).label_loot_02, flash.text.TextField));
+			mRewardSlotLabels.push(ASCompat.coerce((mPopup : ASAny).label_loot_03, flash.text.TextField));
+			mRewardSlotLabels.push(ASCompat.coerce((mPopup : ASAny).label_loot_04, flash.text.TextField));
 			_loc4_ = 0;
 			__ax4_iter_34 = mRewardData;
 			if (checkNullIteratee(__ax4_iter_34))
@@ -219,7 +219,7 @@ class II_UIRewardReportPopup extends DBUIPopup {
 			endCountdown();
 		}
 		mTimeRemaining -= 1;
-		ASCompat.setProperty((mPopup : ASAny).countdown_bounce.countdown.countdown_text, "text", "" + Std.int(mTimeRemaining));
+		ASCompat.setProperty((mPopup : ASAny).countdown_bounce.countdown.countdown_text, "text", "" + ASCompat.floatToInt(mTimeRemaining));
 		mCountDownTimer = new Timer(1000);
 		mCountDownTimer.addEventListener("timer", tickCountdown);
 		mCountDownTimer.start();
@@ -233,7 +233,7 @@ class II_UIRewardReportPopup extends DBUIPopup {
 	}
 
 	function tickCountdown(event:TimerEvent) {
-		ASCompat.setProperty((mPopup : ASAny).countdown_bounce.countdown.countdown_text, "text", "" + Std.int(mTimeRemaining));
+		ASCompat.setProperty((mPopup : ASAny).countdown_bounce.countdown.countdown_text, "text", "" + ASCompat.floatToInt(mTimeRemaining));
 		if (mTimeRemaining <= 0) {
 			endCountdown();
 			destroy();

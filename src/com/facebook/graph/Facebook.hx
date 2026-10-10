@@ -297,7 +297,7 @@ class Facebook extends AbstractFacebook {
 
 	function handleUI(result:String, method:String) {
 		var _loc3_:ASObject = ASCompat.stringAsBool(result) ? com.adobe.serialization.json.JSON.decode(result) : null;
-		var _loc4_ = ASCompat.asFunction(this.openUICalls[method]);
+		var _loc4_ = ASCompat.coerceFunction(this.openUICalls[method]);
 		if (_loc4_ == null) {
 			this.openUICalls.remove(method);
 		} else {

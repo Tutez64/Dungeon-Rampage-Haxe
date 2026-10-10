@@ -40,12 +40,11 @@ class NavCollider {
 		var _loc10_ = Math.NaN;
 		var _loc11_:String = collisionJson.type;
 		if (_loc11_ == "circle") {
-			return new CircleNavCollider(dbFacade, parentObject, offset, ASCompat.toNumber(ASCompat.toNumberField(collisionJson, "radius") * scale.x),
-				box2DWorld, filter);
+			return new CircleNavCollider(dbFacade, parentObject, offset, ASCompat.toNumberField(collisionJson, "radius") * scale.x, box2DWorld, filter);
 		}
 		if (_loc11_ == "rectangle") {
-			_loc9_ = ASCompat.toNumber(ASCompat.toNumberField(collisionJson, "halfWidth") * scale.x);
-			_loc10_ = ASCompat.toNumber(ASCompat.toNumberField(collisionJson, "halfHeight") * scale.y);
+			_loc9_ = ASCompat.toNumberField(collisionJson, "halfWidth") * scale.x;
+			_loc10_ = ASCompat.toNumberField(collisionJson, "halfHeight") * scale.y;
 			return new RectangleNavCollider(dbFacade, parentObject, offset, angle, box2DWorld, _loc9_, _loc10_, filter);
 		}
 		Logger.error("Could not figure out collision type of json to build a b2Shape:" + Std.string(collisionJson));

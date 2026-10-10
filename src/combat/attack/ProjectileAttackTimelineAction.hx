@@ -72,7 +72,7 @@ class ProjectileAttackTimelineAction extends AttackTimelineAction {
 			_loc8_ = 0;
 			while ((_loc8_ : UInt) < _loc19_.projectileMultiplier) {
 				_loc7_ = _loc8_ % 2 == 0 ? 1 : -1;
-				_loc12_ = (_loc16_ + _loc19_.projectileScalingAngle * Std.int((_loc8_ + 1) / 2)) * _loc7_;
+				_loc12_ = (_loc16_ + _loc19_.projectileScalingAngle * ASCompat.floatToInt((_loc8_ + 1) / 2)) * _loc7_;
 				_loc9_ = mActorGameObject.getHeadingAsVector(_loc12_);
 				_loc18_ = new ChainProjectileGameObject(this.mDBFacade, mActorGameObject.id, (mActorGameObject.team : UInt), mAttackType, mWeaponGameObject,
 					mDistributedDungeonFloor, _loc14_, _loc9_, _loc10_, _loc19_.distanceScalingProjectile, (0 : UInt), null, mEffectObject,

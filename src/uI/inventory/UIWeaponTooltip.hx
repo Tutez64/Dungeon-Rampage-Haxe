@@ -38,14 +38,14 @@ class UIWeaponTooltip extends MovieClip {
 		super();
 		mDBFacade = dbFacade;
 		mAssetLoadingComponent = new AssetLoadingComponent(mDBFacade);
-		mRoot = ASCompat.dynamicAs(ASCompat.createInstance(templateClass, []), flash.display.MovieClip);
+		mRoot = ASCompat.coerce(ASCompat.createInstance(templateClass, []), flash.display.MovieClip);
 		this.addChild(mRoot);
-		mNameLabel = ASCompat.dynamicAs((mRoot : ASAny).title_label, flash.text.TextField);
-		mPowerLabel = ASCompat.dynamicAs((mRoot : ASAny).power.label, flash.text.TextField);
+		mNameLabel = ASCompat.coerce((mRoot : ASAny).title_label, flash.text.TextField);
+		mPowerLabel = ASCompat.coerce((mRoot : ASAny).power.label, flash.text.TextField);
 		ASCompat.setProperty((mRoot : ASAny).power.attack_label, "text", Locale.getString("POWER"));
-		mTapIcon = ASCompat.dynamicAs((mRoot : ASAny).tap_icon, flash.display.MovieClip);
-		mHoldIcon = ASCompat.dynamicAs((mRoot : ASAny).icon, flash.display.MovieClip);
-		mLevelLabel = ASCompat.dynamicAs((mRoot : ASAny).level_label, flash.text.TextField);
+		mTapIcon = ASCompat.coerce((mRoot : ASAny).tap_icon, flash.display.MovieClip);
+		mHoldIcon = ASCompat.coerce((mRoot : ASAny).icon, flash.display.MovieClip);
+		mLevelLabel = ASCompat.coerce((mRoot : ASAny).level_label, flash.text.TextField);
 		mModifiersList = new Vector<UIModifier>();
 	}
 
@@ -60,7 +60,7 @@ class UIWeaponTooltip extends MovieClip {
 		var _loc3_ = 0;
 		clearAllIcons();
 		mNameLabel.text = GameMasterLocale.getGameMasterSubString("WEAPON_AESTHETIC_NAME", weaponGameObject.weaponAesthetic.Constant).toUpperCase();
-		var _loc6_ = ASCompat.dynamicAs(mDBFacade.gameMaster.rarityById.itemFor(weaponGameObject.rarity), gameMasterDictionary.GMRarity);
+		var _loc6_ = ASCompat.coerce(mDBFacade.gameMaster.rarityById.itemFor(weaponGameObject.rarity), gameMasterDictionary.GMRarity);
 		var _loc4_ = (ASCompat.toInt(_loc6_ != null && _loc6_.TextColor != 0 ? _loc6_.TextColor : 15463921) : UInt);
 		mNameLabel.textColor = _loc4_;
 		mPowerLabel.text = Std.string(weaponGameObject.power);
@@ -122,7 +122,7 @@ class UIWeaponTooltip extends MovieClip {
 		if (gmWeaponAesthetic != null) {
 			mNameLabel.text = GameMasterLocale.getGameMasterSubString("WEAPON_AESTHETIC_NAME", gmWeaponAesthetic.Constant).toUpperCase();
 		}
-		var _loc15_ = ASCompat.dynamicAs(mDBFacade.gameMaster.rarityById.itemFor(rarityVal), gameMasterDictionary.GMRarity);
+		var _loc15_ = ASCompat.coerce(mDBFacade.gameMaster.rarityById.itemFor(rarityVal), gameMasterDictionary.GMRarity);
 		var _loc12_ = (ASCompat.toInt(_loc15_ != null && _loc15_.TextColor != 0 ? _loc15_.TextColor : 15463921) : UInt);
 		mNameLabel.textColor = _loc12_;
 		mPowerLabel.text = Std.string(power);
@@ -132,10 +132,10 @@ class UIWeaponTooltip extends MovieClip {
 		var _loc14_ = "";
 		var _loc13_ = new Vector<GMModifier>();
 		if (mod1 > 0) {
-			_loc13_.push(ASCompat.dynamicAs(mDBFacade.gameMaster.modifiersById.itemFor(mod1), gameMasterDictionary.GMModifier));
+			_loc13_.push(ASCompat.coerce(mDBFacade.gameMaster.modifiersById.itemFor(mod1), gameMasterDictionary.GMModifier));
 		}
 		if (mod2 > 0) {
-			_loc13_.push(ASCompat.dynamicAs(mDBFacade.gameMaster.modifiersById.itemFor(mod2), gameMasterDictionary.GMModifier));
+			_loc13_.push(ASCompat.coerce(mDBFacade.gameMaster.modifiersById.itemFor(mod2), gameMasterDictionary.GMModifier));
 		}
 		_loc11_ = 0;
 		while (_loc11_ < _loc13_.length) {
@@ -182,7 +182,7 @@ class UIWeaponTooltip extends MovieClip {
 				var _loc2_:MovieClip = null;
 				var _loc3_ = param1.getClass(iconName);
 				if (_loc3_ != null) {
-					_loc2_ = ASCompat.dynamicAs(ASCompat.createInstance(_loc3_, []), flash.display.MovieClip);
+					_loc2_ = ASCompat.coerce(ASCompat.createInstance(_loc3_, []), flash.display.MovieClip);
 					_loc2_.scaleX = _loc2_.scaleY = 0.5;
 					parentMC.addChildAt(_loc2_, 1);
 				}

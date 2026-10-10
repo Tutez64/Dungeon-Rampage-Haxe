@@ -39,7 +39,7 @@ class ActorSpriteSheetRenderer extends SpriteSheetRenderer implements IRenderer 
 		final __ax4_iter_149 = mFrameTimes;
 		if (checkNullIteratee(__ax4_iter_149))
 			for (_tmp_ in __ax4_iter_149) {
-				_loc4_ = Std.int(_tmp_);
+				_loc4_ = ASCompat.floatToInt(_tmp_);
 				mDuration += _loc4_ / 1000;
 			}
 		MemoryTracker.track(this, "ActorSpriteSheetRenderer name=" + bitmapNameValue + " - created in ActorSpriteSheetRenderer()", "brain");
@@ -84,7 +84,7 @@ class ActorSpriteSheetRenderer extends SpriteSheetRenderer implements IRenderer 
 	@:isVar public var frameRate(get, never):UInt;
 
 	public function get_frameRate():UInt {
-		return (Std.int(mFrameRate) : UInt);
+		return (ASCompat.floatToInt(mFrameRate) : UInt);
 	}
 
 	function getFrameFromTime(time:Float):UInt {

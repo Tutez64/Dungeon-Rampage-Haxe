@@ -41,13 +41,13 @@ class UIGiftMessage {
 	}
 
 	function loadInitialVariables() {
-		mGiftText = ASCompat.dynamicAs((mGiftMessage : ASAny).message_label, flash.text.TextField);
+		mGiftText = ASCompat.coerce((mGiftMessage : ASAny).message_label, flash.text.TextField);
 		mGiftText.text = "";
-		mAcceptAndSendButton = new UIButton(mDBFacade, ASCompat.dynamicAs((mGiftMessage : ASAny).left_button, flash.display.MovieClip));
+		mAcceptAndSendButton = new UIButton(mDBFacade, ASCompat.coerce((mGiftMessage : ASAny).left_button, flash.display.MovieClip));
 		mAcceptAndSendButton.label.text = Locale.getString("GIFT_MESSAGE_ACCEPT");
-		mDeclineButton = new UIButton(mDBFacade, ASCompat.dynamicAs((mGiftMessage : ASAny).right_button, flash.display.MovieClip));
-		mFriendPic = ASCompat.dynamicAs((mGiftMessage : ASAny).friendPic, flash.display.MovieClip);
-		mGiftIcon = ASCompat.dynamicAs((mGiftMessage : ASAny).icon, flash.display.MovieClip);
+		mDeclineButton = new UIButton(mDBFacade, ASCompat.coerce((mGiftMessage : ASAny).right_button, flash.display.MovieClip));
+		mFriendPic = ASCompat.coerce((mGiftMessage : ASAny).friendPic, flash.display.MovieClip);
+		mGiftIcon = ASCompat.coerce((mGiftMessage : ASAny).icon, flash.display.MovieClip);
 	}
 
 	public function populateGiftMessage(data:GiftInfo) {
@@ -62,7 +62,7 @@ class UIGiftMessage {
 		mGiftInfo = data;
 		giftText = Locale.getString("GIFT_MESSAGE_TEXT");
 		friendName = "SOMEBODY";
-		friend = ASCompat.dynamicAs(mDBFacade.dbAccountInfo.friendInfos.itemFor(data.fromAccountId), account.FriendInfo);
+		friend = ASCompat.coerce(mDBFacade.dbAccountInfo.friendInfos.itemFor(data.fromAccountId), account.FriendInfo);
 		if (friend != null) {
 			friendName = friend.name;
 			if (mFriendPic.numChildren > 0) {
@@ -76,7 +76,7 @@ class UIGiftMessage {
 			}
 		}
 		giftText = StringTools.replace(giftText, "#NAME", friendName);
-		offer = ASCompat.dynamicAs(mDBFacade.gameMaster.offerById.itemFor(mGiftInfo.offerId), gameMasterDictionary.GMOffer);
+		offer = ASCompat.coerce(mDBFacade.gameMaster.offerById.itemFor(mGiftInfo.offerId), gameMasterDictionary.GMOffer);
 		if (offer != null) {
 			offerName = offer.getDisplayName(mDBFacade.gameMaster, Locale.getString("GIFT_UNKNOWN_NAME"));
 			giftText = giftText + offerName;
@@ -84,7 +84,7 @@ class UIGiftMessage {
 				mAssetLoadingComponent.getSwfAsset(DBFacade.buildFullDownloadPath(offer.BundleSwfFilepath), function(param1:brain.assetRepository.SwfAsset) {
 					var _loc4_ = 0;
 					var _loc2_ = param1.getClass(offer.BundleIcon);
-					var _loc3_ = ASCompat.dynamicAs(ASCompat.createInstance(_loc2_, []), flash.display.MovieClip);
+					var _loc3_ = ASCompat.coerce(ASCompat.createInstance(_loc2_, []), flash.display.MovieClip);
 					_loc3_.scaleX = _loc3_.scaleY = 0.8;
 					if (mGiftIcon.numChildren > 0) {
 						_loc4_ = mGiftIcon.numChildren - 1;

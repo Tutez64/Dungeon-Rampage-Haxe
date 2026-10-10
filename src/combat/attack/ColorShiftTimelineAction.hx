@@ -53,7 +53,8 @@ class ColorShiftTimelineAction extends AttackTimelineAction {
 		var _loc6_ = ASCompat.toNumber(actionObj.filter_alpha);
 		var _loc9_ = ASCompat.toNumber(actionObj.add_alpha);
 		var _loc8_ = ASCompat.toNumber(actionObj.transitionDur);
-		return new ColorShiftTimelineAction(actorGameObject, actorView, dbFacade, (Std.int(_loc5_) : UInt), _loc10_, _loc7_, _loc6_, _loc9_, _loc8_);
+		return new ColorShiftTimelineAction(actorGameObject, actorView, dbFacade, (ASCompat.floatToInt(_loc5_) : UInt), _loc10_, _loc7_, _loc6_, _loc9_,
+			_loc8_);
 	}
 
 	function CopyColorTransform(color_src:ColorTransform):ColorTransform {

@@ -66,13 +66,13 @@ class II_UIExitDungeonPopUp extends DBUITwoButtonPopup {
 		super(dbFacade, Locale.getString("UI_HUD_EXIT_TITLE"), Locale.getString("II_UI_HUD_EXIT_MESSAGE"), Locale.getString("UI_HUD_EXIT_CONFIRM"),
 			leftCallback, Locale.getString("UI_HUD_EXIT_CANCEL"), rightCallback);
 		mEventComponent = new EventComponent(mDBFacade);
-		mCurrentRewardTF = ASCompat.dynamicAs((mPopup : ASAny).current_reward.label_currentReward, flash.text.TextField);
-		mCoinTF = ASCompat.dynamicAs((mPopup : ASAny).coin_count, flash.text.TextField);
+		mCurrentRewardTF = ASCompat.coerce((mPopup : ASAny).current_reward.label_currentReward, flash.text.TextField);
+		mCoinTF = ASCompat.coerce((mPopup : ASAny).coin_count, flash.text.TextField);
 		mRewardSlots = new Vector<MovieClip>();
-		mRewardSlots.push(ASCompat.dynamicAs((mPopup : ASAny).current_reward.loot_01, flash.display.MovieClip));
-		mRewardSlots.push(ASCompat.dynamicAs((mPopup : ASAny).current_reward.loot_02, flash.display.MovieClip));
-		mRewardSlots.push(ASCompat.dynamicAs((mPopup : ASAny).current_reward.loot_03, flash.display.MovieClip));
-		mRewardSlots.push(ASCompat.dynamicAs((mPopup : ASAny).current_reward.loot_04, flash.display.MovieClip));
+		mRewardSlots.push(ASCompat.coerce((mPopup : ASAny).current_reward.loot_01, flash.display.MovieClip));
+		mRewardSlots.push(ASCompat.coerce((mPopup : ASAny).current_reward.loot_02, flash.display.MovieClip));
+		mRewardSlots.push(ASCompat.coerce((mPopup : ASAny).current_reward.loot_03, flash.display.MovieClip));
+		mRewardSlots.push(ASCompat.coerce((mPopup : ASAny).current_reward.loot_04, flash.display.MovieClip));
 		mAssetLoadingComponent.getSwfAsset(DBFacade.buildFullDownloadPath("Resources/Art2D/Icons/Items/db_icons_items.swf"), itemsLoaded);
 	}
 
@@ -122,11 +122,11 @@ class II_UIExitDungeonPopUp extends DBUITwoButtonPopup {
 							continue;
 						}
 					}
-					_loc4_ = ASCompat.dynamicAs(mDBFacade.gameMaster.dooberById.itemFor(_loc1_.dooberId), gameMasterDictionary.GMDoober);
-					_loc8_ = ASCompat.dynamicAs(mDBFacade.gameMaster.chestsById.itemFor(_loc4_.ChestId), gameMasterDictionary.GMChest);
+					_loc4_ = ASCompat.coerce(mDBFacade.gameMaster.dooberById.itemFor(_loc1_.dooberId), gameMasterDictionary.GMDoober);
+					_loc8_ = ASCompat.coerce(mDBFacade.gameMaster.chestsById.itemFor(_loc4_.ChestId), gameMasterDictionary.GMChest);
 					_loc2_ = mDooberAsset.getClass(_loc4_.AssetClassName);
 					_loc9_ = mItemAsset.getClass(_loc8_.IconName);
-					_loc5_ = ASCompat.dynamicAs(ASCompat.createInstance(_loc9_, []), flash.display.MovieClip);
+					_loc5_ = ASCompat.coerce(ASCompat.createInstance(_loc9_, []), flash.display.MovieClip);
 					if (_loc6_ == 0) {
 						_loc5_.scaleY = 0.57;
 						_loc5_.scaleX = 0.57;

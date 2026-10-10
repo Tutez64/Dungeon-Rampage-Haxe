@@ -130,7 +130,7 @@ class Ruler extends Sprite {
 			removeChild(this._pointer);
 			removeChild(this._posTxt);
 			removeEventListener(MouseEvent.MOUSE_MOVE, this.onMouseMove);
-			_loc2_ = ASCompat.dynamicAs(this._points[0], flash.geom.Point);
+			_loc2_ = ASCompat.coerce(this._points[0], flash.geom.Point);
 			_loc4_ = new Point(e.localX, e.localY);
 			this._points.push(_loc4_);
 			graphics.clear();
@@ -251,7 +251,7 @@ class Ruler extends Sprite {
 		var _loc10_:Float = 0;
 		var _loc11_ = 1;
 		while (_loc11_ <= _loc7_ + 1) {
-			_loc12_ = ASCompat.toNumber(_loc11_ <= _loc7_ ? _loc11_ : _loc7_);
+			_loc12_ = _loc11_ <= _loc7_ ? _loc11_ : _loc7_;
 			_loc13_ = _loc12_ - _loc10_;
 			_loc14_ = 1 + 0.12 * _loc13_ * _loc13_;
 			_loc15_ = this.getPointOnCircle(radius * _loc14_, (_loc12_ - _loc13_ / 2) * (_loc6_ ? -1 : 1) + _loc8_);
@@ -260,7 +260,7 @@ class Ruler extends Sprite {
 			_loc9_.offset(pos.x, pos.y);
 			g.curveTo(_loc15_.x, _loc15_.y, _loc9_.x, _loc9_.y);
 			_loc10_ = _loc12_;
-			_loc11_ = ASCompat.toInt(_loc11_) + 1;
+			_loc11_++;
 		}
 		return _loc9_;
 	}

@@ -54,7 +54,7 @@ class UIExitPopup extends DBUITwoButtonPopup {
 
 	override function setupUI(swfAsset:SwfAsset, titleText:String, content:ASAny, allowClose:Bool, closeCallback:ASFunction) {
 		super.setupUI(swfAsset, titleText, content, allowClose, closeCallback);
-		mDiscordButton = new UIButton(mDBFacade, ASCompat.dynamicAs((mPopup : ASAny).discord_button, flash.display.MovieClip));
+		mDiscordButton = new UIButton(mDBFacade, ASCompat.coerce((mPopup : ASAny).discord_button, flash.display.MovieClip));
 		mDiscordButton.releaseCallback = function() {
 			var _loc1_ = new URLRequest("https://discord.com/invite/dungeonrampage");
 			flash.Lib.getURL(_loc1_, "_blank");

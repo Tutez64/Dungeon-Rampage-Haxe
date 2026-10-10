@@ -540,7 +540,7 @@ class DBFacebookAPIController extends FacebookAPIController {
 		if (!mDBFacade.isFacebookPlayer) {
 			return;
 		}
-		var _loc2_ = ASCompat.dynamicAs(mDBFacade.gameMaster.feedPostsByConstant.itemFor(feedConstant), gameMasterDictionary.GMFeedPosts);
+		var _loc2_ = ASCompat.coerce(mDBFacade.gameMaster.feedPostsByConstant.itemFor(feedConstant), gameMasterDictionary.GMFeedPosts);
 		if (_loc2_ != null) {
 			this.dbFeedPost(_loc2_);
 		}
@@ -568,7 +568,7 @@ class DBFacebookAPIController extends FacebookAPIController {
 		}
 		var _loc6_ = getFeedPosts(mDBFacade, id, category);
 		if (_loc6_.length > 0) {
-			_loc5_ = Std.int(Math.ffloor(Math.random() * _loc6_.length));
+			_loc5_ = ASCompat.floatToInt(Math.ffloor(Math.random() * _loc6_.length));
 			this.dbFeedPost(_loc6_[_loc5_], "", pic, false, replaceDict);
 		}
 	}
@@ -588,7 +588,7 @@ class DBFacebookAPIController extends FacebookAPIController {
 				}
 		}
 		if (mLeaderBoardFeedPosts.length > 0) {
-			_loc3_ = Std.int(Math.ffloor(Math.random() * mLeaderBoardFeedPosts.length));
+			_loc3_ = ASCompat.floatToInt(Math.ffloor(Math.random() * mLeaderBoardFeedPosts.length));
 			this.dbFeedPost(mLeaderBoardFeedPosts[_loc3_], facebookID);
 		}
 	}
@@ -677,7 +677,7 @@ class DBFacebookAPIController extends FacebookAPIController {
 	}
 
 	function achievementSuccessCallback(achievementID:String) {
-		var _loc2_ = ASCompat.dynamicAs(mDBFacade.gameMaster.achievementsById.itemFor(achievementID), gameMasterDictionary.GMAchievement);
+		var _loc2_ = ASCompat.coerce(mDBFacade.gameMaster.achievementsById.itemFor(achievementID), gameMasterDictionary.GMAchievement);
 		if (_loc2_ == null) {
 			return;
 		}

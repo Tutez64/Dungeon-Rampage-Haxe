@@ -683,10 +683,10 @@ import box2D.dynamics.joints.*;
 					if (_loc9_.GetType() != B2Body.b2_staticBody) {
 						_loc4_.Clear();
 						_loc10_ = 0;
-						_loc8_[Std.int(_loc15_ = ASCompat.toNumber(_loc10_++))] = _loc9_;
+						_loc8_[ASCompat.floatToInt(_loc15_ = _loc10_++)] = _loc9_;
 						_loc9_.m_flags = ((_loc9_.m_flags | B2Body.e_islandFlag:UInt) : UInt);
 						while (_loc10_ > 0) {
-							_loc2_ = _loc8_[Std.int(--_loc10_)];
+							_loc2_ = _loc8_[ASCompat.floatToInt(--_loc10_)];
 							_loc4_.AddBody(_loc2_);
 							if (_loc2_.IsAwake() == false) {
 								_loc2_.SetAwake(true);
@@ -702,7 +702,7 @@ import box2D.dynamics.joints.*;
 											_loc13_.contact.m_flags = ((_loc13_.contact.m_flags | B2Contact.e_islandFlag:UInt) : UInt);
 											_loc12_ = _loc13_.other;
 											if (((_loc12_.m_flags : Int) & (B2Body.e_islandFlag : Int)) == 0) {
-												_loc8_[Std.int(_loc16_ = ASCompat.toNumber(_loc10_++))] = _loc12_;
+												_loc8_[ASCompat.floatToInt(_loc16_ = _loc10_++)] = _loc12_;
 												_loc12_.m_flags = ((_loc12_.m_flags | B2Body.e_islandFlag:UInt) : UInt);
 											}
 										}
@@ -717,7 +717,7 @@ import box2D.dynamics.joints.*;
 											_loc4_.AddJoint(_loc14_.joint);
 											_loc14_.joint.m_islandFlag = true;
 											if (((_loc12_.m_flags : Int) & (B2Body.e_islandFlag : Int)) == 0) {
-												_loc8_[Std.int(_loc16_ = ASCompat.toNumber(_loc10_++))] = _loc12_;
+												_loc8_[ASCompat.floatToInt(_loc16_ = _loc10_++)] = _loc12_;
 												_loc12_.m_flags = ((_loc12_.m_flags | B2Body.e_islandFlag:UInt) : UInt);
 											}
 										}
@@ -733,7 +733,7 @@ import box2D.dynamics.joints.*;
 							if (_loc2_.GetType() == B2Body.b2_staticBody) {
 								_loc2_.m_flags = ((_loc2_.m_flags & (~(B2Body.e_islandFlag : Int) : UInt):UInt) : UInt);
 							}
-							_loc11_ = ASCompat.toInt(_loc11_) + 1;
+							_loc11_++;
 						}
 					}
 				}
@@ -746,7 +746,7 @@ import box2D.dynamics.joints.*;
 				break;
 			}
 			_loc8_[_loc11_] = null;
-			_loc11_ = ASCompat.toInt(_loc11_) + 1;
+			_loc11_++;
 		}
 		_loc2_ = this.m_bodyList;
 		while (_loc2_ != null) {
@@ -872,11 +872,11 @@ import box2D.dynamics.joints.*;
 				_loc9_.Clear();
 				_loc15_ = 0;
 				_loc16_ = 0;
-				_loc10_[ASCompat.toInt(_loc15_ + _loc16_++)] = _loc14_;
+				_loc10_[_loc15_ + _loc16_++] = _loc14_;
 				_loc14_.m_flags = ((_loc14_.m_flags | B2Body.e_islandFlag:UInt) : UInt);
 				while (_loc16_ > 0) {
-					_loc2_ = _loc10_[ASCompat.toInt(_loc15_++)];
-					_loc16_ = ASCompat.toInt(_loc16_) - 1;
+					_loc2_ = _loc10_[_loc15_++];
+					_loc16_--;
 					_loc9_.AddBody(_loc2_);
 					if (_loc2_.IsAwake() == false) {
 						_loc2_.SetAwake(true);
@@ -897,8 +897,8 @@ import box2D.dynamics.joints.*;
 											_loc22_.Advance(_loc13_);
 											_loc22_.SetAwake(true);
 										}
-										_loc10_[ASCompat.toInt(_loc15_ + _loc16_)] = _loc22_;
-										_loc16_ = ASCompat.toInt(_loc16_) + 1;
+										_loc10_[_loc15_ + _loc16_] = _loc22_;
+										_loc16_++;
 										_loc22_.m_flags = ((_loc22_.m_flags | B2Body.e_islandFlag:UInt) : UInt);
 									}
 								}
@@ -918,8 +918,8 @@ import box2D.dynamics.joints.*;
 												_loc22_.Advance(_loc13_);
 												_loc22_.SetAwake(true);
 											}
-											_loc10_[ASCompat.toInt(_loc15_ + _loc16_)] = _loc22_;
-											_loc16_ = ASCompat.toInt(_loc16_) + 1;
+											_loc10_[_loc15_ + _loc16_] = _loc22_;
+											_loc16_++;
 											_loc22_.m_flags = ((_loc22_.m_flags | B2Body.e_islandFlag:UInt) : UInt);
 										}
 									}
@@ -951,19 +951,19 @@ import box2D.dynamics.joints.*;
 							}
 						}
 					}
-					_loc18_ = ASCompat.toInt(_loc18_) + 1;
+					_loc18_++;
 				}
 				_loc18_ = 0;
 				while (_loc18_ < _loc9_.m_contactCount) {
 					_loc11_ = _loc9_.m_contacts[_loc18_];
 					_loc11_.m_flags = ((_loc11_.m_flags & (~((B2Contact.e_toiFlag : Int) | (B2Contact.e_islandFlag : Int)) : UInt):UInt) : UInt);
-					_loc18_ = ASCompat.toInt(_loc18_) + 1;
+					_loc18_++;
 				}
 				_loc18_ = 0;
 				while (_loc18_ < _loc9_.m_jointCount) {
 					_loc8_ = _loc9_.m_joints[_loc18_];
 					_loc8_.m_islandFlag = false;
-					_loc18_ = ASCompat.toInt(_loc18_) + 1;
+					_loc18_++;
 				}
 				this.m_contactManager.FindNewContacts();
 			}
@@ -1038,7 +1038,7 @@ import box2D.dynamics.joints.*;
 				_loc8_ = 0;
 				while (_loc8_ < _loc10_) {
 					_loc12_[_loc8_] = B2Math.MulX(xf, _loc11_[_loc8_]);
-					_loc8_ = ASCompat.toInt(_loc8_) + 1;
+					_loc8_++;
 				}
 				this.m_debugDraw.DrawSolidPolygon(_loc12_, _loc10_, color);
 

@@ -33,6 +33,6 @@ class GameObjectManager {
 	}
 
 	public function getReferenceFromId(id:UInt):GameObject {
-		return ASCompat.dynamicAs(mGameObjects.itemFor(id), brain.gameObject.GameObject);
+		return ASCompat.coerce(mGameObjects.itemFor(id), brain.gameObject.GameObject);
 	}
 }

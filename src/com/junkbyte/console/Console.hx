@@ -169,7 +169,7 @@ class Console extends Sprite {
 	public function listenUncaughtErrors(loaderinfo:LoaderInfo) {
 		var uncaughtErrorEvents:IEventDispatcher = null;
 		try {
-			uncaughtErrorEvents = ASCompat.dynamicAs((loaderinfo : ASAny)["uncaughtErrorEvents"], flash.events.IEventDispatcher);
+			uncaughtErrorEvents = ASCompat.coerce((loaderinfo : ASAny)["uncaughtErrorEvents"], flash.events.IEventDispatcher);
 			if (uncaughtErrorEvents != null) {
 				uncaughtErrorEvents.addEventListener("uncaughtError", this.uncaughtErrorHandle, false, 0, true);
 			}
@@ -436,7 +436,7 @@ class Console extends Sprite {
 		var _loc9_ = 0;
 		while (_loc9_ < _loc8_) {
 			_loc7_ += (_loc9_ != 0 ? " " : "") + this._refs.makeString(strings[_loc9_], null, html);
-			_loc9_ = ASCompat.toInt(_loc9_) + 1;
+			_loc9_++;
 		}
 		if (priority >= this._config.autoStackPriority && stacks < 0) {
 			stacks = this._config.defaultStackDepth;

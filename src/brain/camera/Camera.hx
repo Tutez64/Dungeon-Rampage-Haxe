@@ -252,10 +252,10 @@ class Camera {
 		while ((_loc8_ : UInt) < numShakes) {
 			strength = -strength;
 			_loc6_ = _loc8_ == 0 ? _loc5_ * 0.5 : _loc5_;
-			_loc7_.append(ASCompat.dynamicAs(createTween(_loc6_, strength), com.greensock.core.TweenCore));
-			_loc8_ = ASCompat.toInt(_loc8_) + 1;
+			_loc7_.append(ASCompat.coerce(createTween(_loc6_, strength), com.greensock.core.TweenCore));
+			_loc8_++;
 		}
-		_loc7_.append(ASCompat.dynamicAs(createTween(_loc5_ * 0.5, 0), com.greensock.core.TweenCore));
+		_loc7_.append(ASCompat.coerce(createTween(_loc5_ * 0.5, 0), com.greensock.core.TweenCore));
 		return _loc7_;
 	}
 
@@ -387,7 +387,7 @@ class Camera {
 	}
 
 	function set_yCilppingFromBottom(val:Float):Float {
-		mYClippingFromBottom = (Std.int(val) : UInt);
+		mYClippingFromBottom = (ASCompat.floatToInt(val) : UInt);
 		return val;
 	}
 

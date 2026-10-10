@@ -198,8 +198,8 @@ class UIChatLog {
 
 	function setupLog(chatLogContainer:MovieClip) {
 		mChatLogContainer = chatLogContainer;
-		mChatLog = ASCompat.dynamicAs((mChatLogContainer : ASAny).chatLog, flash.text.TextField);
-		mSlider = new UISlider(mDBFacade, ASCompat.dynamicAs((mChatLogContainer : ASAny).slider, flash.display.MovieClip), (1 : UInt));
+		mChatLog = ASCompat.coerce((mChatLogContainer : ASAny).chatLog, flash.text.TextField);
+		mSlider = new UISlider(mDBFacade, ASCompat.coerce((mChatLogContainer : ASAny).slider, flash.display.MovieClip), (1 : UInt));
 		mSlider.minimum = 100;
 		mSlider.maximum = 0;
 		mSlider.tick = 2;
@@ -291,7 +291,7 @@ class UIChatLog {
 				if (_loc3_.playerName != "") {
 					_loc1_ = new TextFormat();
 					_loc1_.color = PlayerSpecialStatus.getSpecialTextColor(_loc3_.playerName, NAME_CHAT_COLOR);
-					mChatLog.setTextFormat(_loc1_, _loc2_, ASCompat.toInt(_loc2_ + _loc3_.playerName.length + 1));
+					mChatLog.setTextFormat(_loc1_, _loc2_, _loc2_ + _loc3_.playerName.length + 1);
 					_loc2_ += _loc3_.playerName.length + 1;
 					_loc1_ = null;
 				}
@@ -321,7 +321,7 @@ class UIChatLog {
 
 	function setChatLogPosition(pos:Float) {
 		var _loc2_ = Math.fround((mChatLog.maxScrollV + 1) * pos / 100);
-		mChatLog.scrollV = Std.int(_loc2_);
+		mChatLog.scrollV = ASCompat.floatToInt(_loc2_);
 	}
 
 	public function isShowing():Bool {

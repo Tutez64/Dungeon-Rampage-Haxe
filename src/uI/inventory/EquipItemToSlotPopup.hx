@@ -65,8 +65,8 @@ class EquipItemToSlotPopup extends DBUIPopup {
 	override function setupUI(swfAsset:SwfAsset, titleText:String, content:ASAny, allowClose:Bool, closeCallback:ASFunction) {
 		mSwfAsset = swfAsset;
 		var _loc7_ = swfAsset.getClass("popup_equip");
-		mEquipPopupRoot = ASCompat.dynamicAs(ASCompat.createInstance(_loc7_, []), flash.display.MovieClip);
-		mCloseButton = new UIButton(mDBFacade, ASCompat.dynamicAs((mEquipPopupRoot : ASAny).close, flash.display.MovieClip));
+		mEquipPopupRoot = ASCompat.coerce(ASCompat.createInstance(_loc7_, []), flash.display.MovieClip);
+		mCloseButton = new UIButton(mDBFacade, ASCompat.coerce((mEquipPopupRoot : ASAny).close, flash.display.MovieClip));
 		mCloseButton.releaseCallback = mClosePopupCallback;
 		mRoot.addChild(mEquipPopupRoot);
 		mTitleLabel = ASCompat.dynamicAs((mEquipPopupRoot : ASAny).title_label, TextField);
@@ -116,7 +116,7 @@ class EquipItemToSlotPopup extends DBUIPopup {
 			i = i + 1;
 		}
 		ASCompat.setProperty((mEquipPopupRoot : ASAny).UI_potions, "visible", true);
-		mEquipSlot0 = new UIButton(mDBFacade, ASCompat.dynamicAs((mEquipPopupRoot : ASAny).UI_potions.equip_slot_0, flash.display.MovieClip));
+		mEquipSlot0 = new UIButton(mDBFacade, ASCompat.coerce((mEquipPopupRoot : ASAny).UI_potions.equip_slot_0, flash.display.MovieClip));
 		mEquipSlot0.label.visible = true;
 		mEquipSlot0.label.text = "1";
 		mEquipSlot0.rolloverFilter = DBGlobal.UI_ROLLOVER_FILTER;
@@ -127,13 +127,13 @@ class EquipItemToSlotPopup extends DBUIPopup {
 			equipToAvatarConsumableSlot((0 : UInt));
 		};
 		if (equippedItemInfo0 != null) {
-			ItemInfo.loadItemIconFromId(equippedItemInfo0.gmId, ASCompat.dynamicAs((mEquipSlot0.root : ASAny).graphic, flash.display.DisplayObjectContainer),
-				mDBFacade, (70 : UInt), (Std.int(equippedItemInfo0.iconScale) : UInt), mAssetLoadingComponent);
+			ItemInfo.loadItemIconFromId(equippedItemInfo0.gmId, ASCompat.coerce((mEquipSlot0.root : ASAny).graphic, flash.display.DisplayObjectContainer),
+				mDBFacade, (70 : UInt), (ASCompat.floatToInt(equippedItemInfo0.iconScale) : UInt), mAssetLoadingComponent);
 			ASCompat.setProperty((mEquipSlot0.root : ASAny).quantity, "visible", true);
 			ASCompat.setProperty((mEquipSlot0.root : ASAny).quantity, "text", Std.string(equippedItemInfo0.count));
 			ASCompat.setProperty((mEquipSlot0.root : ASAny).textx, "visible", true);
 		}
-		mEquipSlot1 = new UIButton(mDBFacade, ASCompat.dynamicAs((mEquipPopupRoot : ASAny).UI_potions.equip_slot_1, flash.display.MovieClip));
+		mEquipSlot1 = new UIButton(mDBFacade, ASCompat.coerce((mEquipPopupRoot : ASAny).UI_potions.equip_slot_1, flash.display.MovieClip));
 		mEquipSlot1.label.visible = true;
 		mEquipSlot1.label.text = "2";
 		mEquipSlot1.rolloverFilter = DBGlobal.UI_ROLLOVER_FILTER;
@@ -144,8 +144,8 @@ class EquipItemToSlotPopup extends DBUIPopup {
 			equipToAvatarConsumableSlot((1 : UInt));
 		};
 		if (equippedItemInfo1 != null) {
-			ItemInfo.loadItemIconFromId(equippedItemInfo1.gmId, ASCompat.dynamicAs((mEquipSlot1.root : ASAny).graphic, flash.display.DisplayObjectContainer),
-				mDBFacade, (70 : UInt), (Std.int(equippedItemInfo1.iconScale) : UInt), mAssetLoadingComponent);
+			ItemInfo.loadItemIconFromId(equippedItemInfo1.gmId, ASCompat.coerce((mEquipSlot1.root : ASAny).graphic, flash.display.DisplayObjectContainer),
+				mDBFacade, (70 : UInt), (ASCompat.floatToInt(equippedItemInfo1.iconScale) : UInt), mAssetLoadingComponent);
 			ASCompat.setProperty((mEquipSlot1.root : ASAny).quantity, "visible", true);
 			ASCompat.setProperty((mEquipSlot1.root : ASAny).quantity, "text", Std.string(equippedItemInfo1.count));
 			ASCompat.setProperty((mEquipSlot1.root : ASAny).textx, "visible", true);
@@ -178,7 +178,7 @@ class EquipItemToSlotPopup extends DBUIPopup {
 			i = i + 1;
 		}
 		if (mEquipSlot0 == null) {
-			mEquipSlot0 = new UIButton(mDBFacade, ASCompat.dynamicAs((mEquipPopupRoot : ASAny).UI_weapons.equip_slot_0, flash.display.MovieClip));
+			mEquipSlot0 = new UIButton(mDBFacade, ASCompat.coerce((mEquipPopupRoot : ASAny).UI_weapons.equip_slot_0, flash.display.MovieClip));
 		}
 		mEquipSlot0.label.text = "J";
 		mEquipSlot0.rolloverFilter = DBGlobal.UI_ROLLOVER_FILTER;
@@ -187,8 +187,8 @@ class EquipItemToSlotPopup extends DBUIPopup {
 			equipToAvatarWeaponSlot((0 : UInt));
 		};
 		if (equippedItemInfo0 != null) {
-			ItemInfo.loadItemIconFromItemInfo(equippedItemInfo0, ASCompat.dynamicAs((mEquipSlot0.root : ASAny).graphic, flash.display.DisplayObjectContainer),
-				mDBFacade, (70 : UInt), (Std.int(equippedItemInfo0.iconScale) : UInt), mAssetLoadingComponent);
+			ItemInfo.loadItemIconFromItemInfo(equippedItemInfo0, ASCompat.coerce((mEquipSlot0.root : ASAny).graphic, flash.display.DisplayObjectContainer),
+				mDBFacade, (70 : UInt), (ASCompat.floatToInt(equippedItemInfo0.iconScale) : UInt), mAssetLoadingComponent);
 			if (mEquipSlot0Tooltip == null) {
 				mEquipSlot0Tooltip = new UIWeaponTooltip(mDBFacade, mSwfAsset.getClass("DR_weapon_equip_tooltip"));
 				mEquipSlot0.tooltip = mEquipSlot0Tooltip;
@@ -196,7 +196,7 @@ class EquipItemToSlotPopup extends DBUIPopup {
 			mEquipSlot0Tooltip.setWeaponItemFromItemInfo(equippedItemInfo0);
 		}
 		if (mEquipSlot1 == null) {
-			mEquipSlot1 = new UIButton(mDBFacade, ASCompat.dynamicAs((mEquipPopupRoot : ASAny).UI_weapons.equip_slot_1, flash.display.MovieClip));
+			mEquipSlot1 = new UIButton(mDBFacade, ASCompat.coerce((mEquipPopupRoot : ASAny).UI_weapons.equip_slot_1, flash.display.MovieClip));
 		}
 		mEquipSlot1.label.text = "K";
 		mEquipSlot1.rolloverFilter = DBGlobal.UI_ROLLOVER_FILTER;
@@ -205,8 +205,8 @@ class EquipItemToSlotPopup extends DBUIPopup {
 			equipToAvatarWeaponSlot((1 : UInt));
 		};
 		if (equippedItemInfo1 != null) {
-			ItemInfo.loadItemIconFromItemInfo(equippedItemInfo1, ASCompat.dynamicAs((mEquipSlot1.root : ASAny).graphic, flash.display.DisplayObjectContainer),
-				mDBFacade, (70 : UInt), (Std.int(equippedItemInfo1.iconScale) : UInt), mAssetLoadingComponent);
+			ItemInfo.loadItemIconFromItemInfo(equippedItemInfo1, ASCompat.coerce((mEquipSlot1.root : ASAny).graphic, flash.display.DisplayObjectContainer),
+				mDBFacade, (70 : UInt), (ASCompat.floatToInt(equippedItemInfo1.iconScale) : UInt), mAssetLoadingComponent);
 			if (mEquipSlot1Tooltip == null) {
 				mEquipSlot1Tooltip = new UIWeaponTooltip(mDBFacade, mSwfAsset.getClass("DR_weapon_equip_tooltip"));
 				mEquipSlot1.tooltip = mEquipSlot1Tooltip;
@@ -214,7 +214,7 @@ class EquipItemToSlotPopup extends DBUIPopup {
 			mEquipSlot1Tooltip.setWeaponItemFromItemInfo(equippedItemInfo1);
 		}
 		if (mEquipSlot2 == null) {
-			mEquipSlot2 = new UIButton(mDBFacade, ASCompat.dynamicAs((mEquipPopupRoot : ASAny).UI_weapons.equip_slot_2, flash.display.MovieClip));
+			mEquipSlot2 = new UIButton(mDBFacade, ASCompat.coerce((mEquipPopupRoot : ASAny).UI_weapons.equip_slot_2, flash.display.MovieClip));
 		}
 		mEquipSlot2.label.text = "L";
 		mEquipSlot2.rolloverFilter = DBGlobal.UI_ROLLOVER_FILTER;
@@ -223,8 +223,8 @@ class EquipItemToSlotPopup extends DBUIPopup {
 			equipToAvatarWeaponSlot((2 : UInt));
 		};
 		if (equippedItemInfo2 != null) {
-			ItemInfo.loadItemIconFromItemInfo(equippedItemInfo2, ASCompat.dynamicAs((mEquipSlot2.root : ASAny).graphic, flash.display.DisplayObjectContainer),
-				mDBFacade, (70 : UInt), (Std.int(equippedItemInfo2.iconScale) : UInt), mAssetLoadingComponent);
+			ItemInfo.loadItemIconFromItemInfo(equippedItemInfo2, ASCompat.coerce((mEquipSlot2.root : ASAny).graphic, flash.display.DisplayObjectContainer),
+				mDBFacade, (70 : UInt), (ASCompat.floatToInt(equippedItemInfo2.iconScale) : UInt), mAssetLoadingComponent);
 			if (mEquipSlot2Tooltip == null) {
 				mEquipSlot2Tooltip = new UIWeaponTooltip(mDBFacade, mSwfAsset.getClass("DR_weapon_equip_tooltip"));
 				mEquipSlot2.tooltip = mEquipSlot2Tooltip;

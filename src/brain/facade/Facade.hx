@@ -145,7 +145,7 @@ class Facade {
 		var _loc4_ = Math.NaN;
 		var _loc5_:Float = mStageRef.numChildren - 1;
 		while (_loc5_ >= 0) {
-			_loc3_ = mStageRef.getChildAt(Std.int(_loc5_));
+			_loc3_ = mStageRef.getChildAt(ASCompat.floatToInt(_loc5_));
 			_loc4_ = ASCompat.toNumber(mChildLayer.exists(_loc3_) ? mChildLayer[_loc3_] : 0);
 			if (layer >= _loc4_) {
 				break;
@@ -153,7 +153,7 @@ class Facade {
 			_loc5_--;
 		}
 		mChildLayer[child] = layer;
-		return mStageRef.addChildAt(child, Std.int(_loc5_ + 1));
+		return mStageRef.addChildAt(child, ASCompat.floatToInt(_loc5_ + 1));
 	}
 
 	public function removeRootDisplayObject(child:DisplayObject):DisplayObject {
@@ -197,8 +197,8 @@ class Facade {
 		mSkippingFrame = false;
 		var _loc2_ = mCurrentTime;
 		mCurrentTime = Date.now().getTime();
-		var _loc4_ = Std.int(mCurrentTime - _loc2_);
-		_loc4_ = Std.int(Math.max(0, _loc4_));
+		var _loc4_ = ASCompat.floatToInt(mCurrentTime - _loc2_);
+		_loc4_ = ASCompat.floatToInt(Math.max(0, _loc4_));
 		mWallClockTimeElapsed += _loc4_;
 		mGameClockTimeElapsed += _loc9_;
 		if (mWallClockTimeElapsed > 1000) {
@@ -227,7 +227,7 @@ class Facade {
 			mPreRenderWorkManager.update(mGameClock);
 			flushInputs();
 			mElapsedTime -= mTickLength;
-			mGameClock.gameTime += Std.int(mTickLength * 1000);
+			mGameClock.gameTime += ASCompat.floatToInt(mTickLength * 1000);
 			_loc3_++;
 		}
 		mLayerRenderWorkManager.update(mRealClock);
@@ -263,7 +263,7 @@ class Facade {
 		mGameClock = new GameClock(1 / stageRef.frameRate);
 		mRealClock = new GameClock(1 / stageRef.frameRate);
 		mEventManager = new EventManager(this);
-		mAssetRepository = ASCompat.dynamicAs(ASCompat.createInstance(mAssetRepositoryClass, [this]), brain.assetRepository.AssetRepository);
+		mAssetRepository = ASCompat.coerce(ASCompat.createInstance(mAssetRepositoryClass, [this]), brain.assetRepository.AssetRepository);
 		featureFlags = new FeatureFlags();
 		mRealClockWorkManager = new WorkLoopManager(mRealClock);
 		mLogicalWorkManager = new WorkLoopManager(mGameClock);

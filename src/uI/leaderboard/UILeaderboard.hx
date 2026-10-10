@@ -165,13 +165,13 @@ class UILeaderboard {
 
 	function loadOnlinePopup(swfAsset:SwfAsset) {
 		var mcClass = swfAsset.getClass("DR_leaderboard_online_tooltip");
-		mOnlinePopup = ASCompat.dynamicAs(ASCompat.createInstance(mcClass, []), flash.display.MovieClip);
+		mOnlinePopup = ASCompat.coerce(ASCompat.createInstance(mcClass, []), flash.display.MovieClip);
 		if (mOnlinePopup == null) {
 			return;
 		}
 		mRootMovieClip.addChild(mOnlinePopup);
 		mOnlinePopup.visible = false;
-		mGiftFriendButton = new UIButton(mDBFacade, ASCompat.dynamicAs((mOnlinePopup : ASAny).join_friend, flash.display.MovieClip));
+		mGiftFriendButton = new UIButton(mDBFacade, ASCompat.coerce((mOnlinePopup : ASAny).join_friend, flash.display.MovieClip));
 		mGiftFriendButton.label.text = Locale.getString("LEADERBOARD_GIFT_FRIEND_BUTTON");
 		mGiftFriendButton.releaseCallback = function() {
 			if (mDBFacade.dbConfigManager.getConfigBoolean("FUFB", false)) {
@@ -182,7 +182,7 @@ class UILeaderboard {
 				mStoreCallback();
 			}
 		};
-		mRemoveOnlineFriendButton = new UIButton(mDBFacade, ASCompat.dynamicAs((mOnlinePopup : ASAny).remove_friend, flash.display.MovieClip));
+		mRemoveOnlineFriendButton = new UIButton(mDBFacade, ASCompat.coerce((mOnlinePopup : ASAny).remove_friend, flash.display.MovieClip));
 		mRemoveOnlineFriendButton.label.text = Locale.getString("LEADERBOARD_REMOVE_FRIEND_BUTTON");
 		mRemoveOnlineFriendButton.releaseCallback = removeFriends;
 		ASCompat.setProperty((mOnlinePopup : ASAny).nextassist, "mouseEnabled", false);
@@ -195,23 +195,23 @@ class UILeaderboard {
 
 	function loadOfflinePopup(swfAsset:SwfAsset) {
 		var _loc2_ = swfAsset.getClass("DR_leaderboard_offline_tooltip");
-		mOfflinePopup = ASCompat.dynamicAs(ASCompat.createInstance(_loc2_, []), flash.display.MovieClip);
+		mOfflinePopup = ASCompat.coerce(ASCompat.createInstance(_loc2_, []), flash.display.MovieClip);
 		if (mOfflinePopup == null) {
 			return;
 		}
 		mRootMovieClip.addChild(mOfflinePopup);
 		mOfflinePopup.visible = false;
-		SceneGraphManager.setGrayScaleSaturation(ASCompat.dynamicAs((mOfflinePopup : ASAny).join_friend, flash.display.DisplayObject), 10);
+		SceneGraphManager.setGrayScaleSaturation(ASCompat.coerce((mOfflinePopup : ASAny).join_friend, flash.display.DisplayObject), 10);
 		ASCompat.setProperty((mOfflinePopup : ASAny).title_label, "mouseEnabled", false);
 		ASCompat.setProperty((mOfflinePopup : ASAny).title_label, "text", Locale.getString("LEADERBOARD_OFFLINE_TEXT"));
 		ASCompat.setProperty((mOfflinePopup : ASAny).join_friend.label, "mouseEnabled", false);
 		ASCompat.setProperty((mOfflinePopup : ASAny).join_friend.label, "text", Locale.getString("LEADERBOARD_JOIN_FRIEND_BUTTON"));
 		ASCompat.setProperty((mOfflinePopup : ASAny).nextassist, "mouseEnabled", false);
 		ASCompat.setProperty((mOfflinePopup : ASAny).nextassist, "text", Locale.getString("LEADERBOARD_NEXT_ASSIST"));
-		mMessageFriendButton = new UIButton(mDBFacade, ASCompat.dynamicAs((mOfflinePopup : ASAny).message_friend, flash.display.MovieClip));
+		mMessageFriendButton = new UIButton(mDBFacade, ASCompat.coerce((mOfflinePopup : ASAny).message_friend, flash.display.MovieClip));
 		mMessageFriendButton.label.text = Locale.getString("LEADERBOARD_MESSAGE_FRIEND_BUTTON");
 		disableMessageFriendButton();
-		mRemoveOfflineFriendButton = new UIButton(mDBFacade, ASCompat.dynamicAs((mOfflinePopup : ASAny).remove_friend, flash.display.MovieClip));
+		mRemoveOfflineFriendButton = new UIButton(mDBFacade, ASCompat.coerce((mOfflinePopup : ASAny).remove_friend, flash.display.MovieClip));
 		mRemoveOfflineFriendButton.label.text = Locale.getString("LEADERBOARD_REMOVE_FRIEND_BUTTON");
 		mRemoveOfflineFriendButton.releaseCallback = removeFriends;
 		ASCompat.setProperty((mOfflinePopup : ASAny).nextassist, "visible", false);
@@ -222,31 +222,31 @@ class UILeaderboard {
 
 	function loadLeaderboard(swfAsset:SwfAsset) {
 		var leaderboard = swfAsset.getClass("DR_leaderboard");
-		mLeaderboard = ASCompat.dynamicAs(ASCompat.createInstance(leaderboard, []), flash.display.MovieClip);
+		mLeaderboard = ASCompat.coerce(ASCompat.createInstance(leaderboard, []), flash.display.MovieClip);
 		mLeaderboard.y = mDBFacade.viewHeight - mLeaderboard.height;
 		mRootMovieClip.addChild(mLeaderboard);
-		mFriendSlots.push(new LeaderboardFriendSlot(mDBFacade, ASCompat.dynamicAs((mLeaderboard : ASAny).slot_0, flash.display.MovieClip), this, 0));
-		mFriendSlots.push(new LeaderboardFriendSlot(mDBFacade, ASCompat.dynamicAs((mLeaderboard : ASAny).slot_1, flash.display.MovieClip), this, 1));
-		mFriendSlots.push(new LeaderboardFriendSlot(mDBFacade, ASCompat.dynamicAs((mLeaderboard : ASAny).slot_2, flash.display.MovieClip), this, 2));
-		mFriendSlots.push(new LeaderboardFriendSlot(mDBFacade, ASCompat.dynamicAs((mLeaderboard : ASAny).slot_3, flash.display.MovieClip), this, 3));
-		mFriendSlots.push(new LeaderboardFriendSlot(mDBFacade, ASCompat.dynamicAs((mLeaderboard : ASAny).slot_4, flash.display.MovieClip), this, 4));
-		mFriendSlots.push(new LeaderboardFriendSlot(mDBFacade, ASCompat.dynamicAs((mLeaderboard : ASAny).slot_5, flash.display.MovieClip), this, 5));
-		mFriendSlots.push(new LeaderboardFriendSlot(mDBFacade, ASCompat.dynamicAs((mLeaderboard : ASAny).slot_6, flash.display.MovieClip), this, 6));
-		mFriendSlots.push(new LeaderboardFriendSlot(mDBFacade, ASCompat.dynamicAs((mLeaderboard : ASAny).slot_7, flash.display.MovieClip), this, 7));
-		mFriendSlots.push(new LeaderboardFriendSlot(mDBFacade, ASCompat.dynamicAs((mLeaderboard : ASAny).slot_8, flash.display.MovieClip), this, 8));
-		mFriendSlots.push(new LeaderboardFriendSlot(mDBFacade, ASCompat.dynamicAs((mLeaderboard : ASAny).slot_9, flash.display.MovieClip), this, 9));
-		mFriendSlots.push(new LeaderboardFriendSlot(mDBFacade, ASCompat.dynamicAs((mLeaderboard : ASAny).slot_10, flash.display.MovieClip), this, 10));
-		mInviteFriendButton = new UIButton(mDBFacade, ASCompat.dynamicAs((mLeaderboard : ASAny).invite_friend, flash.display.MovieClip));
+		mFriendSlots.push(new LeaderboardFriendSlot(mDBFacade, ASCompat.coerce((mLeaderboard : ASAny).slot_0, flash.display.MovieClip), this, 0));
+		mFriendSlots.push(new LeaderboardFriendSlot(mDBFacade, ASCompat.coerce((mLeaderboard : ASAny).slot_1, flash.display.MovieClip), this, 1));
+		mFriendSlots.push(new LeaderboardFriendSlot(mDBFacade, ASCompat.coerce((mLeaderboard : ASAny).slot_2, flash.display.MovieClip), this, 2));
+		mFriendSlots.push(new LeaderboardFriendSlot(mDBFacade, ASCompat.coerce((mLeaderboard : ASAny).slot_3, flash.display.MovieClip), this, 3));
+		mFriendSlots.push(new LeaderboardFriendSlot(mDBFacade, ASCompat.coerce((mLeaderboard : ASAny).slot_4, flash.display.MovieClip), this, 4));
+		mFriendSlots.push(new LeaderboardFriendSlot(mDBFacade, ASCompat.coerce((mLeaderboard : ASAny).slot_5, flash.display.MovieClip), this, 5));
+		mFriendSlots.push(new LeaderboardFriendSlot(mDBFacade, ASCompat.coerce((mLeaderboard : ASAny).slot_6, flash.display.MovieClip), this, 6));
+		mFriendSlots.push(new LeaderboardFriendSlot(mDBFacade, ASCompat.coerce((mLeaderboard : ASAny).slot_7, flash.display.MovieClip), this, 7));
+		mFriendSlots.push(new LeaderboardFriendSlot(mDBFacade, ASCompat.coerce((mLeaderboard : ASAny).slot_8, flash.display.MovieClip), this, 8));
+		mFriendSlots.push(new LeaderboardFriendSlot(mDBFacade, ASCompat.coerce((mLeaderboard : ASAny).slot_9, flash.display.MovieClip), this, 9));
+		mFriendSlots.push(new LeaderboardFriendSlot(mDBFacade, ASCompat.coerce((mLeaderboard : ASAny).slot_10, flash.display.MovieClip), this, 10));
+		mInviteFriendButton = new UIButton(mDBFacade, ASCompat.coerce((mLeaderboard : ASAny).invite_friend, flash.display.MovieClip));
 		mInviteFriendButton.label.text = Locale.getString("INVITE_POPUP_BUTTON");
 		if (mDBFacade.isFacebookPlayer) {
 			mInviteFriendButton.releaseCallback = inviteFriendFB;
 		} else {
 			mInviteFriendButton.releaseCallback = inviteFriendDR;
 		}
-		mScrollRightButton = new UIButton(mDBFacade, ASCompat.dynamicAs((mLeaderboard : ASAny).scrollRight, flash.display.MovieClip));
-		mScrollLeftButton = new UIButton(mDBFacade, ASCompat.dynamicAs((mLeaderboard : ASAny).scrollLeft, flash.display.MovieClip));
-		mScrollPageRightButton = new UIButton(mDBFacade, ASCompat.dynamicAs((mLeaderboard : ASAny).scrollPageRight, flash.display.MovieClip));
-		mScrollPageLeftButton = new UIButton(mDBFacade, ASCompat.dynamicAs((mLeaderboard : ASAny).scrollPageLeft, flash.display.MovieClip));
+		mScrollRightButton = new UIButton(mDBFacade, ASCompat.coerce((mLeaderboard : ASAny).scrollRight, flash.display.MovieClip));
+		mScrollLeftButton = new UIButton(mDBFacade, ASCompat.coerce((mLeaderboard : ASAny).scrollLeft, flash.display.MovieClip));
+		mScrollPageRightButton = new UIButton(mDBFacade, ASCompat.coerce((mLeaderboard : ASAny).scrollPageRight, flash.display.MovieClip));
+		mScrollPageLeftButton = new UIButton(mDBFacade, ASCompat.coerce((mLeaderboard : ASAny).scrollPageLeft, flash.display.MovieClip));
 		mScrollRightButton.releaseCallback = function() {
 			scrollLeaderboard(-1);
 		};
@@ -260,12 +260,12 @@ class UILeaderboard {
 			scrollLeaderboard(mFriendSlots.length);
 		};
 		mDBFacade.dbAccountInfo.getIgnoredFriendData();
-		mFriendManagementButton = new UIButton(mDBFacade, ASCompat.dynamicAs((mLeaderboard : ASAny).block_button, flash.display.MovieClip));
+		mFriendManagementButton = new UIButton(mDBFacade, ASCompat.coerce((mLeaderboard : ASAny).block_button, flash.display.MovieClip));
 		mFriendManagementButton.label.text = Locale.getString("FRIEND_MANAGEMENT_HEADING_FRIENDS");
 		mFriendManagementButton.releaseCallback = function() {
 			mTownStateMachine.enterFriendManagementState();
 		};
-		mAlert = ASCompat.dynamicAs((mLeaderboard : ASAny).block_button.alert_icon, flash.display.MovieClip);
+		mAlert = ASCompat.coerce((mLeaderboard : ASAny).block_button.alert_icon, flash.display.MovieClip);
 		mAlertRenderer = new MovieClipRenderController(mDBFacade, mAlert);
 		mAlertRenderer.play((0 : UInt), true);
 		mAlert.visible = false;
@@ -325,13 +325,13 @@ class UILeaderboard {
 		_loc1_ = 0;
 		while (_loc1_ < mFriendSlots.length) {
 			mFriendSlots[_loc1_].populateSlot(null);
-			_loc2_ = ASCompat.toInt(_loc1_ + mScrollIndex);
+			_loc2_ = _loc1_ + mScrollIndex;
 			if (_loc2_ < mOnlineFriends.length) {
 				mFriendSlots[_loc1_].populateSlot(mOnlineFriends[_loc2_]);
-			} else if (ASCompat.toNumber(_loc2_ - mOnlineFriends.length) < mOfflineFriends.length) {
-				mFriendSlots[_loc1_].populateSlot(mOfflineFriends[ASCompat.toInt(_loc2_ - mOnlineFriends.length)]);
+			} else if (_loc2_ - mOnlineFriends.length < mOfflineFriends.length) {
+				mFriendSlots[_loc1_].populateSlot(mOfflineFriends[_loc2_ - mOnlineFriends.length]);
 			}
-			_loc1_ = ASCompat.toInt(_loc1_) + 1;
+			_loc1_++;
 		}
 	}
 
@@ -372,7 +372,7 @@ class UILeaderboard {
 		if (checkNullIteratee(_loc1_))
 			for (_tmp_ in _loc1_) {
 				_loc5_ = (ASCompat.toInt(_tmp_) : UInt);
-				_loc2_ = ASCompat.dynamicAs(_loc4_.itemFor(_loc5_), account.FriendInfo);
+				_loc2_ = ASCompat.coerce(_loc4_.itemFor(_loc5_), account.FriendInfo);
 				if (_loc2_.id == mDBFacade.accountId) {
 					_loc3_ = _loc2_;
 				} else if (_loc2_.isOnline()) {
@@ -651,13 +651,13 @@ class UILeaderboard {
 	}
 
 	public function enableMessageFriendButton() {
-		SceneGraphManager.setGrayScaleSaturation(ASCompat.dynamicAs((mOfflinePopup : ASAny).message_friend, flash.display.DisplayObject), 100);
+		SceneGraphManager.setGrayScaleSaturation(ASCompat.coerce((mOfflinePopup : ASAny).message_friend, flash.display.DisplayObject), 100);
 		ASCompat.setProperty((mOfflinePopup : ASAny).message_friend.label, "mouseEnabled", true);
 		mMessageFriendButton.enabled = true;
 	}
 
 	public function disableMessageFriendButton() {
-		SceneGraphManager.setGrayScaleSaturation(ASCompat.dynamicAs((mOfflinePopup : ASAny).message_friend, flash.display.DisplayObject), 10);
+		SceneGraphManager.setGrayScaleSaturation(ASCompat.coerce((mOfflinePopup : ASAny).message_friend, flash.display.DisplayObject), 10);
 		ASCompat.setProperty((mOfflinePopup : ASAny).message_friend.label, "mouseEnabled", false);
 		mMessageFriendButton.enabled = false;
 	}

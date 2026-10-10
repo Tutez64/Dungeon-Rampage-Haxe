@@ -91,7 +91,7 @@ class AvatarInfo {
 
 	public function init(avatarJson:ASObject) {
 		parseJson(avatarJson);
-		mGMHero = ASCompat.dynamicAs(mDBFacade.gameMaster.heroById.itemFor(avatarType), gameMasterDictionary.GMHero);
+		mGMHero = ASCompat.coerce(mDBFacade.gameMaster.heroById.itemFor(avatarType), gameMasterDictionary.GMHero);
 	}
 
 	@:isVar public var skillPointsEarned(get, never):UInt;
@@ -103,7 +103,7 @@ class AvatarInfo {
 	@:isVar public var skillPointsAvailable(get, never):Int;
 
 	public function get_skillPointsAvailable():Int {
-		return Std.int(Math.max(this.skillPointsEarned - this.skillPointsSpent, 0));
+		return ASCompat.floatToInt(Math.max(this.skillPointsEarned - this.skillPointsSpent, 0));
 	}
 
 	@:isVar public var skillPointsSpent(get, never):UInt;
@@ -115,7 +115,7 @@ class AvatarInfo {
 	@:isVar public var level(get, never):UInt;
 
 	public function get_level():UInt {
-		var _loc1_ = ASCompat.dynamicAs(mDBFacade.gameMaster.heroById.itemFor(avatarType), gameMasterDictionary.GMHero);
+		var _loc1_ = ASCompat.coerce(mDBFacade.gameMaster.heroById.itemFor(avatarType), gameMasterDictionary.GMHero);
 		return _loc1_.getLevelFromExp(experience);
 	}
 
@@ -171,7 +171,7 @@ class AvatarInfo {
 		var _loc5_:Set = null;
 		var _loc9_ = true;
 		if (mAvatarMapIndexes.hasKey(id)) {
-			_loc5_ = ASCompat.dynamicAs(mAvatarMapIndexes.itemFor(id), org.as3commons.collections.Set);
+			_loc5_ = ASCompat.coerce(mAvatarMapIndexes.itemFor(id), org.as3commons.collections.Set);
 			_loc9_ = false;
 		}
 		var _loc8_ = (0 : UInt);
@@ -181,7 +181,7 @@ class AvatarInfo {
 			while (_loc8_ < mCompletedMapnodeMask.getLength()) {
 				if (mCompletedMapnodeMask.getBit(_loc8_)) {
 					_loc6_ = new AvatarMapNodeInfo();
-					_loc7_ = ASCompat.dynamicAs(mDBFacade.gameMaster.mapNodeByBitIndex.itemFor(_loc8_), gameMasterDictionary.GMMapNode);
+					_loc7_ = ASCompat.coerce(mDBFacade.gameMaster.mapNodeByBitIndex.itemFor(_loc8_), gameMasterDictionary.GMMapNode);
 					if (_loc7_ == null) {
 						Logger.warn("Unable to find map node for bit index: " + _loc8_);
 					} else {
@@ -200,7 +200,7 @@ class AvatarInfo {
 			while (_loc8_ < _loc10_.getLength()) {
 				if (_loc10_.getBit(_loc8_)) {
 					_loc6_ = new AvatarMapNodeInfo();
-					_loc7_ = ASCompat.dynamicAs(mDBFacade.gameMaster.mapNodeByBitIndex.itemFor(_loc8_), gameMasterDictionary.GMMapNode);
+					_loc7_ = ASCompat.coerce(mDBFacade.gameMaster.mapNodeByBitIndex.itemFor(_loc8_), gameMasterDictionary.GMMapNode);
 					_loc6_.node_id = _loc7_.Id;
 					_loc2_.add(_loc7_.Id);
 					_loc6_.trophy = (mCompletedMapnodeMask.getBit(_loc8_)

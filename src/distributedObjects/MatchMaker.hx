@@ -109,6 +109,6 @@ class MatchMaker extends GameObject implements IMatchMaker {
 	}
 
 	public function getInfiniteDungeonDetailForNodeId(nodeId:UInt):InfiniteMapNodeDetail {
-		return ASCompat.dynamicAs(mInfiniteDungeonDetails.itemFor(nodeId), generatedCode.InfiniteMapNodeDetail);
+		return ASCompat.coerce(mInfiniteDungeonDetails.itemFor(nodeId), generatedCode.InfiniteMapNodeDetail);
 	}
 }

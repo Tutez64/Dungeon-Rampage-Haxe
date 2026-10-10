@@ -14,7 +14,7 @@ class PriorityQueue extends ASArrayBase {
 	}
 
 	public function front():AstarGridNode {
-		return ASCompat.dynamicAs((this : ASAny)[0], pathfinding.AstarGridNode);
+		return ASCompat.coerce((this : ASAny)[0], pathfinding.AstarGridNode);
 	}
 
 	override public function pop():ASAny {

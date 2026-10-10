@@ -67,7 +67,7 @@ class ChargeEffectGameObject extends EffectGameObject {
 			if (_loc2_ == null) {
 				return;
 			}
-			mChargeLoopClip = ASCompat.dynamicAs(ASCompat.createInstance(_loc2_, []), flash.display.MovieClip);
+			mChargeLoopClip = ASCompat.coerce(ASCompat.createInstance(_loc2_, []), flash.display.MovieClip);
 			if (mActorView.root.contains(view.root)) {
 				mActorView.root.removeChild(view.root);
 			}

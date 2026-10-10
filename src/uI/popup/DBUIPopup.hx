@@ -150,22 +150,22 @@ class DBUIPopup extends UIObject {
 			ASCompat.setProperty((mPopup : ASAny).right_button, "visible", false);
 		}
 		if (ASCompat.toBool((mPopup : ASAny).title_label)) {
-			mTitle = ASCompat.dynamicAs((mPopup : ASAny).title_label, flash.text.TextField);
+			mTitle = ASCompat.coerce((mPopup : ASAny).title_label, flash.text.TextField);
 			mTitle.text = titleText;
 		}
 		if (ASCompat.toBool((mPopup : ASAny).message_label)) {
-			mMessage = ASCompat.dynamicAs((mPopup : ASAny).message_label, flash.text.TextField);
+			mMessage = ASCompat.coerce((mPopup : ASAny).message_label, flash.text.TextField);
 			mMessage.text = "";
 		}
 		if (Std.isOfType(content, MovieClip)) {
-			mContent = ASCompat.dynamicAs((mPopup : ASAny).content, flash.display.Sprite);
-			mContent.addChild(ASCompat.dynamicAs(content, flash.display.DisplayObject));
+			mContent = ASCompat.coerce((mPopup : ASAny).content, flash.display.Sprite);
+			mContent.addChild(ASCompat.coerce(content, flash.display.DisplayObject));
 		} else if (Std.isOfType(content, String)) {
 			mMessage.text = content;
 		}
 		if (ASCompat.toBool((mPopup : ASAny).close)) {
 			if (allowClose) {
-				mCloseButton = new UIButton(mDBFacade, ASCompat.dynamicAs((mPopup : ASAny).close, flash.display.MovieClip));
+				mCloseButton = new UIButton(mDBFacade, ASCompat.coerce((mPopup : ASAny).close, flash.display.MovieClip));
 				mCloseButton.rolloverFilter = DBGlobal.UI_ROLLOVER_FILTER;
 				mCloseButton.releaseCallback = function() {
 					close(closeCallback);

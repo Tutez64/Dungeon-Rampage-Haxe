@@ -192,48 +192,48 @@ class HomeState extends TownSubState {
 
 	override function setupState() {
 		super.setupState();
-		mBattleButton = new UIButton(mDBFacade, ASCompat.dynamicAs((mRootMovieClip : ASAny).townScreen_button_battle_instance, flash.display.MovieClip));
+		mBattleButton = new UIButton(mDBFacade, ASCompat.coerce((mRootMovieClip : ASAny).townScreen_button_battle_instance, flash.display.MovieClip));
 		mBattleButton.releaseCallback = mTownStateMachine.enterMapState;
-		mInventoryButton = new UIButton(mDBFacade, ASCompat.dynamicAs((mRootMovieClip : ASAny).townScreen_inventory_button_instance, flash.display.MovieClip));
+		mInventoryButton = new UIButton(mDBFacade, ASCompat.coerce((mRootMovieClip : ASAny).townScreen_inventory_button_instance, flash.display.MovieClip));
 		mInventoryButton.releaseCallback = mTownStateMachine.enterInventoryState;
 		ASCompat.setProperty((mRootMovieClip : ASAny).townScreen_inventory_button_instance.up.label, "text", Locale.getString("INVENTORY_BUILDING"));
 		ASCompat.setProperty((mRootMovieClip : ASAny).townScreen_inventory_button_instance.over.label, "text", Locale.getString("INVENTORY_BUILDING"));
-		mInventoryAlertUp = ASCompat.dynamicAs((mRootMovieClip : ASAny).townScreen_inventory_button_instance.up.alert_icon, flash.display.MovieClip);
-		mInventoryAlertOver = ASCompat.dynamicAs((mRootMovieClip : ASAny).townScreen_inventory_button_instance.over.alert_icon, flash.display.MovieClip);
+		mInventoryAlertUp = ASCompat.coerce((mRootMovieClip : ASAny).townScreen_inventory_button_instance.up.alert_icon, flash.display.MovieClip);
+		mInventoryAlertOver = ASCompat.coerce((mRootMovieClip : ASAny).townScreen_inventory_button_instance.over.alert_icon, flash.display.MovieClip);
 		mInventoryAlertUp.visible = false;
 		mInventoryAlertOver.visible = false;
-		mTavernButton = new UIButton(mDBFacade, ASCompat.dynamicAs((mRootMovieClip : ASAny).townScreen_tavern_button_instance, flash.display.MovieClip));
+		mTavernButton = new UIButton(mDBFacade, ASCompat.coerce((mRootMovieClip : ASAny).townScreen_tavern_button_instance, flash.display.MovieClip));
 		mTavernButton.releaseCallback = mTownStateMachine.enterTavernState;
 		ASCompat.setProperty((mRootMovieClip : ASAny).townScreen_tavern_button_instance.up.label, "text", Locale.getString("TAVERN_BUILDING"));
 		ASCompat.setProperty((mRootMovieClip : ASAny).townScreen_tavern_button_instance.over.label, "text", Locale.getString("TAVERN_BUILDING"));
-		mTavernAlertUp = ASCompat.dynamicAs((mRootMovieClip : ASAny).townScreen_tavern_button_instance.up.alert_icon, flash.display.MovieClip);
-		mTavernAlertOver = ASCompat.dynamicAs((mRootMovieClip : ASAny).townScreen_tavern_button_instance.over.alert_icon, flash.display.MovieClip);
+		mTavernAlertUp = ASCompat.coerce((mRootMovieClip : ASAny).townScreen_tavern_button_instance.up.alert_icon, flash.display.MovieClip);
+		mTavernAlertOver = ASCompat.coerce((mRootMovieClip : ASAny).townScreen_tavern_button_instance.over.alert_icon, flash.display.MovieClip);
 		mTavernAlertUp.visible = false;
 		mTavernAlertOver.visible = false;
-		mTrainButton = new UIButton(mDBFacade, ASCompat.dynamicAs((mRootMovieClip : ASAny).townScreen_train_button_instance, flash.display.MovieClip));
+		mTrainButton = new UIButton(mDBFacade, ASCompat.coerce((mRootMovieClip : ASAny).townScreen_train_button_instance, flash.display.MovieClip));
 		mTrainButton.releaseCallback = mTownStateMachine.enterTrainState;
 		ASCompat.setProperty((mRootMovieClip : ASAny).townScreen_train_button_instance.up.label, "text", Locale.getString("TRAINING_BUILDING"));
 		ASCompat.setProperty((mRootMovieClip : ASAny).townScreen_train_button_instance.over.label, "text", Locale.getString("TRAINING_BUILDING"));
-		mTrainAlertUp = ASCompat.dynamicAs((mRootMovieClip : ASAny).townScreen_train_button_instance.up.alert_icon, flash.display.MovieClip);
-		mTrainAlertOver = ASCompat.dynamicAs((mRootMovieClip : ASAny).townScreen_train_button_instance.over.alert_icon, flash.display.MovieClip);
+		mTrainAlertUp = ASCompat.coerce((mRootMovieClip : ASAny).townScreen_train_button_instance.up.alert_icon, flash.display.MovieClip);
+		mTrainAlertOver = ASCompat.coerce((mRootMovieClip : ASAny).townScreen_train_button_instance.over.alert_icon, flash.display.MovieClip);
 		mTrainAlertUp.visible = false;
 		mTrainAlertOver.visible = false;
-		mCreditsButton = new UIButton(mDBFacade, ASCompat.dynamicAs((mRootMovieClip : ASAny).news, flash.display.MovieClip));
+		mCreditsButton = new UIButton(mDBFacade, ASCompat.coerce((mRootMovieClip : ASAny).news, flash.display.MovieClip));
 		mCreditsButton.releaseCallback = mTownStateMachine.enterCreditState;
 		ASCompat.setProperty((mRootMovieClip : ASAny).news.up.credit_mc.label, "text", Locale.getString("CREDITS_BUILDING"));
 		ASCompat.setProperty((mRootMovieClip : ASAny).news.over.credit_mc.label, "text", Locale.getString("CREDITS_BUILDING"));
 		ASCompat.setProperty((mRootMovieClip : ASAny).townScreen_shop_button_sale_instance, "visible", false);
-		mShopButton = new UIButton(mDBFacade, ASCompat.dynamicAs((mRootMovieClip : ASAny).townScreen_shop_button_instance, flash.display.MovieClip));
+		mShopButton = new UIButton(mDBFacade, ASCompat.coerce((mRootMovieClip : ASAny).townScreen_shop_button_instance, flash.display.MovieClip));
 		mShopButton.releaseCallback = mTownStateMachine.enterShopState;
 		ASCompat.setProperty((mRootMovieClip : ASAny).townScreen_shop_button_instance.up.label, "text", Locale.getString("SHOP_BUILDING"));
 		ASCompat.setProperty((mRootMovieClip : ASAny).townScreen_shop_button_instance.over.label, "text", Locale.getString("SHOP_BUILDING"));
-		mShopAlertUp = ASCompat.dynamicAs((mRootMovieClip : ASAny).townScreen_shop_button_instance.up.alert_icon, flash.display.MovieClip);
-		mShopAlertOver = ASCompat.dynamicAs((mRootMovieClip : ASAny).townScreen_shop_button_instance.over.alert_icon, flash.display.MovieClip);
+		mShopAlertUp = ASCompat.coerce((mRootMovieClip : ASAny).townScreen_shop_button_instance.up.alert_icon, flash.display.MovieClip);
+		mShopAlertOver = ASCompat.coerce((mRootMovieClip : ASAny).townScreen_shop_button_instance.over.alert_icon, flash.display.MovieClip);
 		mShopAlertUp.visible = false;
 		mShopAlertOver.visible = false;
-		mShopNewUp = ASCompat.dynamicAs((mRootMovieClip : ASAny).townScreen_shop_button_instance.up.new_icon, flash.display.MovieClip);
-		mShopNewOver = ASCompat.dynamicAs((mRootMovieClip : ASAny).townScreen_shop_button_instance.over.new_icon, flash.display.MovieClip);
-		mGiftButton = new UIButton(mDBFacade, ASCompat.dynamicAs((mRootMovieClip : ASAny).gift, flash.display.MovieClip));
+		mShopNewUp = ASCompat.coerce((mRootMovieClip : ASAny).townScreen_shop_button_instance.up.new_icon, flash.display.MovieClip);
+		mShopNewOver = ASCompat.coerce((mRootMovieClip : ASAny).townScreen_shop_button_instance.over.new_icon, flash.display.MovieClip);
+		mGiftButton = new UIButton(mDBFacade, ASCompat.coerce((mRootMovieClip : ASAny).gift, flash.display.MovieClip));
 		if (mDBFacade.dbConfigManager.getConfigBoolean("FUFB", false)) {
 			mGiftButton.releaseCallback = function() {
 				mDBFacade.errorPopup("GIFTING CURRENTLY DISABLED", "Sorry for the inconvenience, we are looking into resolving the issue.");
@@ -251,11 +251,11 @@ class HomeState extends TownSubState {
 		}
 		ASCompat.setProperty((mRootMovieClip : ASAny).gift.up.label, "text", Locale.getString("GIFT_BUILDING"));
 		ASCompat.setProperty((mRootMovieClip : ASAny).gift.over.label, "text", Locale.getString("GIFT_BUILDING"));
-		mGiftAlertUp = ASCompat.dynamicAs((mRootMovieClip : ASAny).gift.up.alert_icon, flash.display.MovieClip);
-		mGiftAlertOver = ASCompat.dynamicAs((mRootMovieClip : ASAny).gift.over.alert_icon, flash.display.MovieClip);
+		mGiftAlertUp = ASCompat.coerce((mRootMovieClip : ASAny).gift.up.alert_icon, flash.display.MovieClip);
+		mGiftAlertOver = ASCompat.coerce((mRootMovieClip : ASAny).gift.over.alert_icon, flash.display.MovieClip);
 		mGiftAlertUp.visible = false;
 		mGiftAlertOver.visible = false;
-		mOptionsButton = new UIButton(mDBFacade, ASCompat.dynamicAs((mRootMovieClip : ASAny).options_button, flash.display.MovieClip));
+		mOptionsButton = new UIButton(mDBFacade, ASCompat.coerce((mRootMovieClip : ASAny).options_button, flash.display.MovieClip));
 		mOptionsButton.releaseCallback = mOptionsPanel.toggleVisible;
 		mRenderer = new MovieClipRenderController(mDBFacade, mRootMovieClip);
 		loadActiveAvatarIcon(new Event("ACTIVE_AVATAR_CHANGED_EVENT"));
@@ -327,8 +327,7 @@ class HomeState extends TownSubState {
 			if (_loc2_) {
 				ASCompat.setProperty((mRootMovieClip : ASAny).townScreen_shop_button_sale_instance, "visible", true);
 				ASCompat.setProperty((mRootMovieClip : ASAny).townScreen_shop_button_instance, "visible", false);
-				mShopButton = new UIButton(mDBFacade,
-					ASCompat.dynamicAs((mRootMovieClip : ASAny).townScreen_shop_button_sale_instance, flash.display.MovieClip));
+				mShopButton = new UIButton(mDBFacade, ASCompat.coerce((mRootMovieClip : ASAny).townScreen_shop_button_sale_instance, flash.display.MovieClip));
 				mShopButton.releaseCallback = mTownStateMachine.enterShopState;
 			}
 			_loc1_ = mDBFacade.gameMaster.storeHasNewOffers();
@@ -390,7 +389,7 @@ class HomeState extends TownSubState {
 		if (checkNullIteratee(__ax4_iter_139))
 			for (_tmp_ in __ax4_iter_139) {
 				_loc5_ = _tmp_;
-				_loc6_ = ASCompat.dynamicAs(mDBFacade.gameMaster.offerById.itemFor(_loc5_), gameMasterDictionary.GMOffer);
+				_loc6_ = ASCompat.coerce(mDBFacade.gameMaster.offerById.itemFor(_loc5_), gameMasterDictionary.GMOffer);
 				_loc4_ = (_loc6_.Details[0].HeroId : Int);
 				if (!mDBFacade.dbAccountInfo.inventoryInfo.ownsItem((_loc4_ : UInt))) {
 					_loc3_.push(_loc6_);
@@ -466,7 +465,7 @@ class HomeState extends TownSubState {
 			}
 		}
 		mHasPonderedMOD = true;
-		platformParameter = (Std.int(mDBFacade.dbConfigManager.networkId) : UInt);
+		platformParameter = (ASCompat.floatToInt(mDBFacade.dbConfigManager.networkId) : UInt);
 		rpcFunc = JSONRPCService.getFunction("getmod", mDBFacade.rpcRoot + "modrpc");
 		parseResults = function(param1:ASAny) {
 			var _loc5_:ASObject;
@@ -555,7 +554,8 @@ class HomeState extends TownSubState {
 	}
 
 	function refreshPagination(page:UInt) {
-		mNewsPagination.currentPage = (Std.int(mNewsTotalPages != 0 ? (Std.int(Math.min(mNewsTotalPages - 1, page)) : UInt) : (0 : UInt)) : UInt);
+		mNewsPagination.currentPage = (ASCompat.floatToInt(mNewsTotalPages != 0 ? (ASCompat.floatToInt(Math.min(mNewsTotalPages - 1,
+			page)) : UInt) : (0 : UInt)) : UInt);
 		mNewsPagination.numPages = mNewsTotalPages;
 		mNewsPagination.visible = true;
 	}
@@ -620,7 +620,7 @@ class HomeState extends TownSubState {
 			MemoryTracker.track(_loc2_, "UIFBInvitePopup - created in HomeState.tryShowInvitePopup()");
 			mDBFacade.mainStateMachine.showedInvitePopup = true;
 			_loc1_ = ASCompat.toInt(mDBFacade.dbAccountInfo.getAttribute("INVITE_POPUP"));
-			mDBFacade.dbAccountInfo.alterAttribute("INVITE_POPUP", ASCompat.toString(_loc1_ + 1));
+			mDBFacade.dbAccountInfo.alterAttribute("INVITE_POPUP", Std.string(_loc1_ + 1));
 			return true;
 		}
 		return false;
@@ -629,7 +629,7 @@ class HomeState extends TownSubState {
 	function tryShowRewardPopup(rewardOfferId:UInt) {
 		var offer:GMOffer;
 		mDBFacade.mainStateMachine.showedRewardPopup = true;
-		offer = ASCompat.dynamicAs(mDBFacade.gameMaster.offerById.itemFor(rewardOfferId), gameMasterDictionary.GMOffer);
+		offer = ASCompat.coerce(mDBFacade.gameMaster.offerById.itemFor(rewardOfferId), gameMasterDictionary.GMOffer);
 		if (offer == null) {
 			return;
 		}
@@ -640,12 +640,12 @@ class HomeState extends TownSubState {
 				var curtain:Sprite = null;
 				var swfAsset = param1;
 				var rewardPopupClass = swfAsset.getClass("rewards_popup");
-				var rewardPopup = ASCompat.dynamicAs(ASCompat.createInstance(rewardPopupClass, []), flash.display.MovieClip);
+				var rewardPopup = ASCompat.coerce(ASCompat.createInstance(rewardPopupClass, []), flash.display.MovieClip);
 				ASCompat.setProperty((rewardPopup : ASAny).title_label, "text", Locale.getString("REWARD_POPUP_TITLE"));
 				ASCompat.setProperty((rewardPopup : ASAny).header_label, "text", Locale.getString("REWARD_POPUP_HEADER"));
 				ASCompat.setProperty((rewardPopup : ASAny).description_label, "text", offer.getDisplayName(mDBFacade.gameMaster));
-				centerCloseButton = new UIButton(mDBFacade, ASCompat.dynamicAs((rewardPopup : ASAny).close_button, flash.display.MovieClip));
-				topCloseButton = new UIButton(mDBFacade, ASCompat.dynamicAs((rewardPopup : ASAny).close, flash.display.MovieClip));
+				centerCloseButton = new UIButton(mDBFacade, ASCompat.coerce((rewardPopup : ASAny).close_button, flash.display.MovieClip));
+				topCloseButton = new UIButton(mDBFacade, ASCompat.coerce((rewardPopup : ASAny).close, flash.display.MovieClip));
 				centerCloseButton.label.text = Locale.getString("REWARD_POPUP_BUTTON");
 				centerCloseButton.releaseCallback = topCloseButton.releaseCallback = function() {
 					DBFacebookLevelUpPostController.removeCurtain(curtain, mSceneGraphComponent);
@@ -656,7 +656,7 @@ class HomeState extends TownSubState {
 					mAssetLoadingComponent.getSwfAsset(DBFacade.buildFullDownloadPath(offer.BundleSwfFilepath),
 						function(param1:brain.assetRepository.SwfAsset) {
 							var _loc3_ = param1.getClass(offer.BundleIcon);
-							var _loc2_ = ASCompat.dynamicAs(ASCompat.createInstance(_loc3_, []), flash.display.MovieClip);
+							var _loc2_ = ASCompat.coerce(ASCompat.createInstance(_loc3_, []), flash.display.MovieClip);
 							_loc2_.scaleX = _loc2_.scaleY = 0.66;
 							(rewardPopup : ASAny).icon.addChild(_loc2_);
 						});
@@ -685,12 +685,12 @@ class HomeState extends TownSubState {
 				var helpButton:UIButton;
 				var swfAsset = param1;
 				var errorPopupClass = swfAsset.getClass("reward_errors_popup");
-				var errorPopup = ASCompat.dynamicAs(ASCompat.createInstance(errorPopupClass, []), flash.display.MovieClip);
+				var errorPopup = ASCompat.coerce(ASCompat.createInstance(errorPopupClass, []), flash.display.MovieClip);
 				ASCompat.setProperty((errorPopup : ASAny).title_label, "text", rewardErrorTitle);
 				ASCompat.setProperty((errorPopup : ASAny).message_label, "text", rewardErrorDescription);
 				ASCompat.setProperty((errorPopup : ASAny).question_label, "text", rewardErrorHelp);
-				closeButton = new UIButton(mDBFacade, ASCompat.dynamicAs((errorPopup : ASAny).button, flash.display.MovieClip));
-				closeButton2 = new UIButton(mDBFacade, ASCompat.dynamicAs((errorPopup : ASAny).close, flash.display.MovieClip));
+				closeButton = new UIButton(mDBFacade, ASCompat.coerce((errorPopup : ASAny).button, flash.display.MovieClip));
+				closeButton2 = new UIButton(mDBFacade, ASCompat.coerce((errorPopup : ASAny).close, flash.display.MovieClip));
 				closeButton.label.text = rewardErrorClose;
 				closeButton2.releaseCallback = closeButton.releaseCallback = function() {
 					DBFacebookLevelUpPostController.removeCurtain(curtain, mSceneGraphComponent);
@@ -698,7 +698,7 @@ class HomeState extends TownSubState {
 					errorPopup = null;
 				};
 				helpURL = "http://help.dungeonrampage.com/";
-				helpButton = new UIButton(mDBFacade, ASCompat.dynamicAs((errorPopup : ASAny).help, flash.display.MovieClip));
+				helpButton = new UIButton(mDBFacade, ASCompat.coerce((errorPopup : ASAny).help, flash.display.MovieClip));
 				helpButton.releaseCallback = function() {
 					var _loc1_ = new URLRequest(helpURL);
 					flash.Lib.getURL(_loc1_, "_blank");
@@ -800,8 +800,8 @@ class HomeState extends TownSubState {
 		gmSkin = mDBFacade.gameMaster.getSkinByType(mActiveAvatar.skinId);
 		mAssetLoadingComponent.getSwfAsset(DBFacade.buildFullDownloadPath(gmSkin.UISwfFilepath), function(param1:brain.assetRepository.SwfAsset) {
 			var _loc4_ = param1.getClass(gmSkin.IconName);
-			var _loc5_ = ASCompat.dynamicAs((mRootMovieClip : ASAny).townScreen_tavern_button_instance.up.avatar, flash.display.MovieClip);
-			var _loc2_ = ASCompat.dynamicAs((mRootMovieClip : ASAny).townScreen_tavern_button_instance.over.avatar, flash.display.MovieClip);
+			var _loc5_ = ASCompat.coerce((mRootMovieClip : ASAny).townScreen_tavern_button_instance.up.avatar, flash.display.MovieClip);
+			var _loc2_ = ASCompat.coerce((mRootMovieClip : ASAny).townScreen_tavern_button_instance.over.avatar, flash.display.MovieClip);
 			var _loc3_ = _loc5_.getChildByName("avatarPic");
 			if (_loc3_ != null) {
 				_loc5_.removeChild(_loc3_);
@@ -811,10 +811,10 @@ class HomeState extends TownSubState {
 				_loc2_.removeChild(_loc3_);
 			}
 			if (_loc4_ != null) {
-				_loc3_ = ASCompat.dynamicAs(ASCompat.createInstance(_loc4_, []), flash.display.DisplayObject);
+				_loc3_ = ASCompat.coerce(ASCompat.createInstance(_loc4_, []), flash.display.DisplayObject);
 				_loc3_.name = "avatarPic";
 				_loc5_.addChild(_loc3_);
-				_loc3_ = ASCompat.dynamicAs(ASCompat.createInstance(_loc4_, []), flash.display.DisplayObject);
+				_loc3_ = ASCompat.coerce(ASCompat.createInstance(_loc4_, []), flash.display.DisplayObject);
 				_loc3_.name = "avatarPic";
 				_loc2_.addChild(_loc3_);
 			}

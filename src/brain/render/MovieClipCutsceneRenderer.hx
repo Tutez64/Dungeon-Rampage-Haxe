@@ -47,8 +47,8 @@ class MovieClipCutsceneRenderer extends MovieClipRenderer {
 	function buttonsSwfLoaded(swfAsset:SwfAsset) {
 		var _loc3_ = swfAsset.getClass("next_button");
 		var _loc2_ = swfAsset.getClass("skip_button");
-		mNextButton = new UIButton(mFacade, ASCompat.dynamicAs(ASCompat.createInstance(_loc3_, []), flash.display.MovieClip));
-		mSkipButton = new UIButton(mFacade, ASCompat.dynamicAs(ASCompat.createInstance(_loc2_, []), flash.display.MovieClip));
+		mNextButton = new UIButton(mFacade, ASCompat.coerce(ASCompat.createInstance(_loc3_, []), flash.display.MovieClip));
+		mSkipButton = new UIButton(mFacade, ASCompat.coerce(ASCompat.createInstance(_loc2_, []), flash.display.MovieClip));
 		mFacade.sceneGraphManager.addChild(mNextButton.root, 105);
 		mFacade.sceneGraphManager.addChild(mSkipButton.root, 105);
 		mSkipButton.root.x = mFacade.viewWidth - (mSkipButton.root.width / 2 + 10);
@@ -152,9 +152,9 @@ class MovieClipCutsceneRenderer extends MovieClipRenderer {
 					trace("Found sound: " + _loc2_ + " at frame: " + Std.string(_loc4_));
 					mSoundClasses.push(_loc2_);
 				}
-				_loc4_ = ASCompat.toInt(_loc4_) + 1;
+				_loc4_++;
 			}
 		}
-		mNextPauseFrame = (ASCompat.toInt(mPauseFrames.length != 0 ? mPauseFrames.shift() : (0 : UInt)) : UInt);
+		mNextPauseFrame = mPauseFrames.length != 0 ? mPauseFrames.shift() : (0 : UInt);
 	}
 }

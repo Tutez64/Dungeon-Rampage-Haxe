@@ -19,7 +19,7 @@ class ChestInfo extends InventoryBaseInfo {
 		if (json == null) {
 			return;
 		}
-		mGMChestData = ASCompat.dynamicAs(mDBFacade.gameMaster.chestsById.itemFor(mGMId), gameMasterDictionary.GMChest);
+		mGMChestData = ASCompat.coerce(mDBFacade.gameMaster.chestsById.itemFor(mGMId), gameMasterDictionary.GMChest);
 		if (mGMChestData == null) {
 			Logger.error("GMChest is null cannot find item for ID: " + mGMId);
 		} else {
@@ -43,7 +43,7 @@ class ChestInfo extends InventoryBaseInfo {
 				Logger.error("Unable to get iconClass for iconName: " + iconName);
 				return;
 			}
-			var _loc2_ = ASCompat.dynamicAs(ASCompat.createInstance(_loc3_, []), flash.display.MovieClip);
+			var _loc2_ = ASCompat.coerce(ASCompat.createInstance(_loc3_, []), flash.display.MovieClip);
 			_loc2_.scaleX = _loc2_.scaleY = desiredSize / iconsNativeSize;
 			container.addChild(_loc2_);
 			if (destroyAssetLoaderOnCompletion) {
@@ -54,7 +54,7 @@ class ChestInfo extends InventoryBaseInfo {
 
 	public static function loadItemIconFromId(chestId:UInt, container:DisplayObjectContainer, dbFacade:DBFacade, desiredSize:UInt, iconsNativeSize:UInt,
 			assetLoadingComponent:AssetLoadingComponent = null) {
-		var _loc7_ = ASCompat.dynamicAs(dbFacade.gameMaster.chestsById.itemFor(chestId), gameMasterDictionary.GMChest);
+		var _loc7_ = ASCompat.coerce(dbFacade.gameMaster.chestsById.itemFor(chestId), gameMasterDictionary.GMChest);
 		loadItemIcon(_loc7_.IconSwf, _loc7_.IconName, container, dbFacade, desiredSize, iconsNativeSize, assetLoadingComponent);
 	}
 
@@ -74,7 +74,7 @@ class ChestInfo extends InventoryBaseInfo {
 	public function setParams(databaseId:UInt) {
 		mDatabaseId = databaseId;
 		mGMId = (ASCompat.toInt(mDBFacade.gameMaster.dooberById.itemFor(mDatabaseId).ChestId) : UInt);
-		mGMChestData = ASCompat.dynamicAs(mDBFacade.gameMaster.chestsById.itemFor(mGMId), gameMasterDictionary.GMChest);
+		mGMChestData = ASCompat.coerce(mDBFacade.gameMaster.chestsById.itemFor(mGMId), gameMasterDictionary.GMChest);
 		if (mGMChestData == null) {
 			Logger.error("GMChest (setParams) is null cannot find item for ID: " + mGMId);
 		}
@@ -98,17 +98,17 @@ class ChestInfo extends InventoryBaseInfo {
 	}
 
 	override public function get_hasColoredBackground():Bool {
-		var _loc1_ = ASCompat.dynamicAs(mDBFacade.gameMaster.rarityByConstant.itemFor(mGMChestData.Rarity), gameMasterDictionary.GMRarity);
+		var _loc1_ = ASCompat.coerce(mDBFacade.gameMaster.rarityByConstant.itemFor(mGMChestData.Rarity), gameMasterDictionary.GMRarity);
 		return _loc1_ != null ? _loc1_.HasColoredBackground : false;
 	}
 
 	override public function get_backgroundIconName():String {
-		var _loc1_ = ASCompat.dynamicAs(mDBFacade.gameMaster.rarityByConstant.itemFor(mGMChestData.Rarity), gameMasterDictionary.GMRarity);
+		var _loc1_ = ASCompat.coerce(mDBFacade.gameMaster.rarityByConstant.itemFor(mGMChestData.Rarity), gameMasterDictionary.GMRarity);
 		return _loc1_ != null ? _loc1_.BackgroundIcon : "";
 	}
 
 	override public function get_backgroundSwfPath():String {
-		var _loc1_ = ASCompat.dynamicAs(mDBFacade.gameMaster.rarityByConstant.itemFor(mGMChestData.Rarity), gameMasterDictionary.GMRarity);
+		var _loc1_ = ASCompat.coerce(mDBFacade.gameMaster.rarityByConstant.itemFor(mGMChestData.Rarity), gameMasterDictionary.GMRarity);
 		return _loc1_ != null ? _loc1_.BackgroundSwf : "";
 	}
 

@@ -73,7 +73,7 @@ class MouseCursorManager {
 			if (!override_) {
 				return;
 			}
-			_loc4_ = ASCompat.dynamicAs(mCursorTypes.itemFor(name), CursorType);
+			_loc4_ = ASCompat.coerce(mCursorTypes.itemFor(name), CursorType);
 			_loc4_.isBuiltIn = false;
 			_loc4_.root = root;
 			if (name == mCurrentCursor) {

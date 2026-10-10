@@ -88,7 +88,7 @@ class DBBox2DVisualizer extends Box2DVisualizer {
 			if (_loc4_.mLife > 0) {
 				_loc3_.push(_loc4_);
 			}
-			_loc7_ = ASCompat.toInt(_loc7_) + 1;
+			_loc7_++;
 		}
 		mPolysToShow = _loc3_;
 		_loc8_ = 0;
@@ -96,7 +96,7 @@ class DBBox2DVisualizer extends Box2DVisualizer {
 			_loc9_ = ASCompat.reinterpretAs(mCirclesToShow[_loc8_].mShape, B2CircleShape);
 			_loc2_ = _loc9_.GetRadius();
 			mDebugDraw.DrawCircle(mCirclesToShow[_loc8_].mTransform.position, _loc2_, _loc6_);
-			_loc8_ = ASCompat.toInt(_loc8_) + 1;
+			_loc8_++;
 		}
 	}
 
@@ -127,7 +127,7 @@ class DBBox2DVisualizer extends Box2DVisualizer {
 				_loc1_.push(_loc9_);
 			}
 			mDebugDraw.DrawSolidCircle(_loc7_, _loc15_, _loc8_, _loc4_);
-			_loc10_ = ASCompat.toInt(_loc10_) + 1;
+			_loc10_++;
 		}
 		mHeroCircleAttacks = _loc1_;
 		var _loc12_ = new Vector<PolygonShapeRecord>();
@@ -142,7 +142,7 @@ class DBBox2DVisualizer extends Box2DVisualizer {
 			if (_loc5_.mLife > 0) {
 				_loc12_.push(_loc5_);
 			}
-			_loc10_ = ASCompat.toInt(_loc10_) + 1;
+			_loc10_++;
 		}
 		mHeroPolyAttacks = _loc12_;
 		var _loc11_ = new B2Color(1, 0, 0);
@@ -155,7 +155,7 @@ class DBBox2DVisualizer extends Box2DVisualizer {
 			if (_loc3_.life > 0) {
 				_loc13_.push(_loc3_);
 			}
-			_loc10_ = ASCompat.toInt(_loc10_) + 1;
+			_loc10_++;
 		}
 		mRayCasts = _loc13_;
 	}
@@ -183,7 +183,7 @@ class DBBox2DVisualizer extends Box2DVisualizer {
 				_loc2_.push(_loc6_);
 			}
 			mDebugDraw.DrawSolidCircle(_loc3_, _loc8_, _loc9_, _loc6_.mColor);
-			_loc4_ = ASCompat.toInt(_loc4_) + 1;
+			_loc4_++;
 		}
 		mAstarGridCircs = _loc2_;
 		var _loc1_ = new Vector<AstarGridRectangleDraw>();
@@ -196,7 +196,7 @@ class DBBox2DVisualizer extends Box2DVisualizer {
 				_loc1_.push(_loc10_);
 			}
 			mDebugDraw.DrawSolidPolygon(_loc5_.GetVertices(), _loc5_.GetVertexCount(), _loc10_.mColor);
-			_loc4_ = ASCompat.toInt(_loc4_) + 1;
+			_loc4_++;
 		}
 		mAstarGridRects = _loc1_;
 	}
@@ -347,7 +347,7 @@ private class PolygonShapeRecord {
 			_loc2_.Add(mTransform.position);
 			mVerticiesAsVector.push(_loc2_);
 			mVerticies.push(_loc2_);
-			_loc3_ = ASCompat.toInt(_loc3_) + 1;
+			_loc3_++;
 		}
 	}
 }

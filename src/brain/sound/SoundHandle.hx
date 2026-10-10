@@ -69,7 +69,7 @@ class SoundHandle {
 		if (!mRegistered && mManaged) {
 			registerPlaying();
 		}
-		mLoopCount = Std.int(loopCount);
+		mLoopCount = ASCompat.floatToInt(loopCount);
 		mSoundTransform = buildSoundTransform();
 		mSoundChannel = mSound.play(0, mLoopCount, mSoundTransform);
 		if (mSoundChannel == null) {

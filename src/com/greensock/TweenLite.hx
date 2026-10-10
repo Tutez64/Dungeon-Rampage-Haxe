@@ -101,13 +101,13 @@ class TweenLite extends TweenCore {
 		_overwrite = ASCompat.toNumber(vars.overwrite) <= -1
 			|| !ASCompat.toBool(overwriteManager.enabled)
 			&& ASCompat.toNumberField(vars, "overwrite") > 1 ? ASCompat.toInt(overwriteManager.mode) : ASCompat.toInt(vars.overwrite);
-		var _loc4_:Array<ASAny> = ASCompat.dynamicAs(masterList[target], Array);
+		var _loc4_:Array<ASAny> = ASCompat.coerce(masterList[target], Array);
 		if (_loc4_ == null) {
 			masterList[target] = [this];
 		} else if (_overwrite == 1) {
 			if (checkNullIteratee(_loc4_))
 				for (_tmp_ in _loc4_) {
-					_loc5_ = ASCompat.dynamicAs(_tmp_, TweenLite);
+					_loc5_ = ASCompat.coerce(_tmp_, TweenLite);
 					if (!_loc5_.gc) {
 						_loc5_.setEnabled(false, false);
 					}
@@ -143,10 +143,10 @@ class TweenLite extends TweenCore {
 		var _loc5_ = 0;
 		var _loc6_:TweenLite = null;
 		if (masterList.exists(target)) {
-			_loc4_ = ASCompat.dynamicAs(masterList[target], Array);
+			_loc4_ = ASCompat.coerce(masterList[target], Array);
 			_loc5_ = _loc4_.length;
 			while (--_loc5_ > -1) {
-				_loc6_ = ASCompat.dynamicAs(_loc4_[_loc5_], TweenLite);
+				_loc6_ = ASCompat.coerce(_loc4_[_loc5_], TweenLite);
 				if (!_loc6_.gc) {
 					if (complete) {
 						_loc6_.complete(false, false);
@@ -204,7 +204,7 @@ class TweenLite extends TweenCore {
 			if (checkNullIteratee(_loc2_))
 				for (_tmp_ in _loc2_.keys()) {
 					_loc3_ = _tmp_;
-					_loc4_ = ASCompat.dynamicAs(_loc2_[_loc3_], Array);
+					_loc4_ = ASCompat.coerce(_loc2_[_loc3_], Array);
 					_loc5_ = _loc4_.length;
 					while (--_loc5_ > -1) {
 						if (cast(_loc4_[_loc5_], TweenLite).gc) {
@@ -296,7 +296,7 @@ class TweenLite extends TweenCore {
 	override public function setEnabled(enabled:Bool, ignoreTimeline:Bool = false):Bool {
 		var _loc3_:Array<ASAny> = null;
 		if (enabled) {
-			_loc3_ = ASCompat.dynamicAs(TweenLite.masterList[this.target], Array);
+			_loc3_ = ASCompat.coerce(TweenLite.masterList[this.target], Array);
 			if (_loc3_ == null) {
 				TweenLite.masterList[this.target] = [this];
 			} else {
@@ -321,7 +321,7 @@ class TweenLite extends TweenCore {
 			ASCompatMacro.applyClosure(this.vars.onInit, this.vars.onInitParams);
 		}
 		if (ASCompat.typeof(this.vars.ease) == "function") {
-			_ease = ASCompat.asFunction(this.vars.ease);
+			_ease = ASCompat.coerceFunction(this.vars.ease);
 		}
 		if (ASCompat.toBool(this.vars.easeParams)) {
 			ASCompat.setProperty(this.vars, "proxiedEase", _ease);
@@ -357,8 +357,7 @@ class TweenLite extends TweenCore {
 						_hasPlugins = true;
 					} else {
 						this.cachedPT1 = new PropTween(this.target, _loc1_, ASCompat.toNumber(this.target[_loc1_]),
-							ASCompat.toNumber(ASCompat.typeof(this.vars[_loc1_]) == "number" ? ASCompat.toNumber(ASCompat.toNumber(this.vars[_loc1_])
-								- ASCompat.toNumber(this.target[_loc1_])) : ASCompat.toNumber(this.vars[_loc1_])),
+							ASCompat.typeof(this.vars[_loc1_]) == "number" ? ASCompat.toNumber(this.vars[_loc1_]) - ASCompat.toNumber(this.target[_loc1_]) : ASCompat.toNumber(this.vars[_loc1_]),
 							_loc1_, false, this.cachedPT1);
 						this.propTweenLookup[_loc1_] = this.cachedPT1;
 					}
@@ -384,7 +383,7 @@ class TweenLite extends TweenCore {
 		}
 		if (_overwrite > 1
 			&& this.cachedPT1 != null
-			&& ((_loc5_ = ASCompat.dynamicAs(masterList[this.target], Array)) != null)
+			&& ((_loc5_ = ASCompat.coerce(masterList[this.target], Array)) != null)
 			&& _loc5_.length > 1) {
 			if (ASCompat.toBool(overwriteManager.manageOverwrites(this, this.propTweenLookup, _loc5_, _overwrite))) {
 				init();
@@ -404,7 +403,7 @@ class TweenLite extends TweenCore {
 			for (_tmp_ in vars.___keys()) {
 				_loc3_ = _tmp_;
 				if (propTweenLookup.hasOwnProperty(_loc3_)) {
-					_loc4_ = ASCompat.dynamicAs(propTweenLookup[_loc3_], com.greensock.core.PropTween);
+					_loc4_ = ASCompat.coerce(propTweenLookup[_loc3_], com.greensock.core.PropTween);
 					if (_loc4_.isPlugin && _loc4_.name == "_MULTIPLE_") {
 						_loc4_.target.killProps(vars);
 						if (ASCompat.toNumberField(_loc4_.target.overwriteProps, "length") == 0) {

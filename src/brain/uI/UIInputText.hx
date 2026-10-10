@@ -26,7 +26,7 @@ class UIInputText extends UIObject {
 	var mCancelCallback:ASFunction;
 
 	public function new(facade:Facade, root:MovieClip) {
-		mTextField = ASCompat.dynamicAs((root : ASAny).textField, flash.text.TextField);
+		mTextField = ASCompat.coerce((root : ASAny).textField, flash.text.TextField);
 		super(facade, root);
 		mTextField.addEventListener("mouseDown", onPress);
 		mTextField.addEventListener("change", onChange);

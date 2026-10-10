@@ -76,25 +76,25 @@ class InputManager {
 	@:isVar public var mouseX(get, never):Int;
 
 	public function get_mouseX():Int {
-		return Std.int(mFacade.stageRef.mouseX);
+		return ASCompat.floatToInt(mFacade.stageRef.mouseX);
 	}
 
 	@:isVar public var mouseY(get, never):Int;
 
 	public function get_mouseY():Int {
-		return Std.int(mFacade.stageRef.mouseY);
+		return ASCompat.floatToInt(mFacade.stageRef.mouseY);
 	}
 
 	@:isVar public var mouseFlashX(get, never):Int;
 
 	public function get_mouseFlashX():Int {
-		return Std.int(mFacade.stageRef.mouseX);
+		return ASCompat.floatToInt(mFacade.stageRef.mouseX);
 	}
 
 	@:isVar public var mouseFlashY(get, never):Int;
 
 	public function get_mouseFlashY():Int {
-		return Std.int(mFacade.stageRef.mouseY);
+		return ASCompat.floatToInt(mFacade.stageRef.mouseY);
 	}
 
 	public function check(input:ASAny):Bool {

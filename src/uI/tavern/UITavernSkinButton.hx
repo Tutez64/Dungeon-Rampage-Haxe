@@ -35,17 +35,17 @@ class UITavernSkinButton extends UIRadioButton {
 		mDBFacade = dbFacade;
 		super(dbFacade, root, "skin_selector_buttons");
 		this.releaseCallback = clicked;
-		mHeroRequired = ASCompat.dynamicAs((mRoot : ASAny).hero_required, flash.display.MovieClip);
+		mHeroRequired = ASCompat.coerce((mRoot : ASAny).hero_required, flash.display.MovieClip);
 		mHeroRequired.visible = false;
 		ASCompat.setProperty((mHeroRequired : ASAny).required_text, "text", Locale.getString("TAVERN_SKIN_BUTTON_HERO_REQUIRED"));
 		mShowSkinInTavernCallback = showSkinInTavernCallback;
 		mAssetLoadingComponent = new AssetLoadingComponent(mDBFacade);
-		mAvatarIconSlot = ASCompat.dynamicAs((mRoot : ASAny).slot, flash.display.MovieClip);
-		mHighlight = ASCompat.dynamicAs((mRoot : ASAny).selected, flash.display.MovieClip);
+		mAvatarIconSlot = ASCompat.coerce((mRoot : ASAny).slot, flash.display.MovieClip);
+		mHighlight = ASCompat.coerce((mRoot : ASAny).selected, flash.display.MovieClip);
 		mHighlight.visible = false;
-		mChosenClip = ASCompat.dynamicAs((mRoot : ASAny).chosen, flash.display.MovieClip);
+		mChosenClip = ASCompat.coerce((mRoot : ASAny).chosen, flash.display.MovieClip);
 		mChosenClip.visible = false;
-		mClassicLabel = ASCompat.dynamicAs((mRoot : ASAny).classic_text, flash.text.TextField);
+		mClassicLabel = ASCompat.coerce((mRoot : ASAny).classic_text, flash.text.TextField);
 		mClassicLabel.text = Locale.getString("TAVERN_SKIN_SLOT_HERO_LABEL");
 	}
 
@@ -64,7 +64,7 @@ class UITavernSkinButton extends UIRadioButton {
 	}
 
 	function refresh() {
-		var hero = ASCompat.dynamicAs(mDBFacade.gameMaster.heroByConstant.itemFor(mGMSkin.ForHero), gameMasterDictionary.GMHero);
+		var hero = ASCompat.coerce(mDBFacade.gameMaster.heroByConstant.itemFor(mGMSkin.ForHero), gameMasterDictionary.GMHero);
 		var swfPath = mGMSkin.UISwfFilepath;
 		var iconName = mGMSkin.IconName;
 		if (mIcon != null && mAvatarIconSlot.contains(mIcon)) {
@@ -76,8 +76,8 @@ class UITavernSkinButton extends UIRadioButton {
 		mClassicLabel.visible = mGMSkin.Constant == hero.DefaultSkin;
 		mAssetLoadingComponent.getSwfAsset(DBFacade.buildFullDownloadPath(swfPath), function(param1:brain.assetRepository.SwfAsset) {
 			var _loc3_ = param1.getClass(iconName);
-			mIcon = ASCompat.dynamicAs(ASCompat.createInstance(_loc3_, []), flash.display.MovieClip);
-			var _loc2_ = (Std.int(mAvatarIconSlot.width < mAvatarIconSlot.height ? (Std.int(mAvatarIconSlot.width) : UInt) : (Std.int(mAvatarIconSlot.height) : UInt)) : UInt);
+			mIcon = ASCompat.coerce(ASCompat.createInstance(_loc3_, []), flash.display.MovieClip);
+			var _loc2_ = (ASCompat.floatToInt(mAvatarIconSlot.width < mAvatarIconSlot.height ? (ASCompat.floatToInt(mAvatarIconSlot.width) : UInt) : (ASCompat.floatToInt(mAvatarIconSlot.height) : UInt)) : UInt);
 			UIObject.scaleToFit(mIcon, _loc2_);
 			mAvatarIconSlot.addChildAt(mIcon, 1);
 		});
@@ -85,7 +85,7 @@ class UITavernSkinButton extends UIRadioButton {
 
 	function clicked() {
 		mShowSkinInTavernCallback(mGMSkin);
-		var _loc1_ = ASCompat.dynamicAs(mDBFacade.gameMaster.heroByConstant.itemFor(mGMSkin.ForHero), gameMasterDictionary.GMHero);
+		var _loc1_ = ASCompat.coerce(mDBFacade.gameMaster.heroByConstant.itemFor(mGMSkin.ForHero), gameMasterDictionary.GMHero);
 		mDBFacade.metrics.log("StyleView", {
 			"heroType": _loc1_.Id,
 			"styleType": mGMSkin.Id

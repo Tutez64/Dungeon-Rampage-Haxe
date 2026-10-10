@@ -211,9 +211,9 @@ import box2D.dynamics.*;
 							_loc13_.m_tangentImpulse = _loc16_.m_tangentImpulse;
 							break;
 						}
-						_loc15_ = ASCompat.toInt(_loc15_) + 1;
+						_loc15_++;
 					}
-					_loc12_ = ASCompat.toInt(_loc12_) + 1;
+					_loc12_++;
 				}
 			} else {
 				this.m_manifold.m_pointCount = 0;

@@ -24,12 +24,12 @@ class UIHeroTooltip extends MovieClip {
 	public function new(dbFacade:DBFacade, templateClass:Dynamic) {
 		super();
 		mDBFacade = dbFacade;
-		mRoot = ASCompat.dynamicAs(ASCompat.createInstance(templateClass, []), flash.display.MovieClip);
+		mRoot = ASCompat.coerce(ASCompat.createInstance(templateClass, []), flash.display.MovieClip);
 		this.addChild(mRoot);
-		mLabel = ASCompat.dynamicAs((mRoot : ASAny).title_label, flash.text.TextField);
-		mLevelLabel = ASCompat.dynamicAs((mRoot : ASAny).level_star_label, flash.text.TextField);
-		mDescriptionLabel = ASCompat.dynamicAs((mRoot : ASAny).description_label, flash.text.TextField);
-		mStar = ASCompat.dynamicAs((mRoot : ASAny).star, flash.display.MovieClip);
+		mLabel = ASCompat.coerce((mRoot : ASAny).title_label, flash.text.TextField);
+		mLevelLabel = ASCompat.coerce((mRoot : ASAny).level_star_label, flash.text.TextField);
+		mDescriptionLabel = ASCompat.coerce((mRoot : ASAny).description_label, flash.text.TextField);
+		mStar = ASCompat.coerce((mRoot : ASAny).star, flash.display.MovieClip);
 	}
 
 	public function destroy() {

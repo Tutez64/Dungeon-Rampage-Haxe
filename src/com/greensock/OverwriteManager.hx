@@ -60,7 +60,7 @@ final class OverwriteManager {
 			_loc13_ = targetTweens.length;
 			_loc5_ = 0;
 			while (_loc5_ < _loc13_) {
-				_loc7_ = ASCompat.dynamicAs(targetTweens[_loc5_], com.greensock.TweenLite);
+				_loc7_ = ASCompat.coerce(targetTweens[_loc5_], com.greensock.TweenLite);
 				if (_loc7_ != tween) {
 					if (_loc7_.setEnabled(false, false)) {
 						_loc6_ = true;
@@ -68,7 +68,7 @@ final class OverwriteManager {
 				} else if (mode == 5) {
 					break;
 				}
-				_loc5_ = ASCompat.toInt(_loc5_) + 1;
+				_loc5_++;
 			}
 			return _loc6_;
 		}
@@ -79,17 +79,17 @@ final class OverwriteManager {
 		var _loc12_ = 0;
 		_loc5_ = targetTweens.length;
 		while (--_loc5_ > -1) {
-			_loc7_ = ASCompat.dynamicAs(targetTweens[_loc5_], com.greensock.TweenLite);
+			_loc7_ = ASCompat.coerce(targetTweens[_loc5_], com.greensock.TweenLite);
 			if (!(_loc7_ == tween || _loc7_.gc || !_loc7_.initted && _loc8_ - _loc7_.cachedStartTime <= 2e-10)) {
 				if (_loc7_.timeline != tween.timeline) {
 					if (!getGlobalPaused(_loc7_)) {
-						_loc10_[Std.int(_loc19_ = ASCompat.toNumber(_loc11_++))] = _loc7_;
+						_loc10_[ASCompat.floatToInt(_loc19_ = _loc11_++)] = _loc7_;
 					}
 				} else if (_loc7_.cachedStartTime <= _loc8_
 					&& _loc7_.cachedStartTime + _loc7_.totalDuration + 1e-10 > _loc8_
 					&& !_loc7_.cachedPaused
 					&& !(tween.cachedDuration == 0 && _loc8_ - _loc7_.cachedStartTime <= 2e-10)) {
-					_loc9_[Std.int(_loc19_ = ASCompat.toNumber(_loc12_++))] = _loc7_;
+					_loc9_[ASCompat.floatToInt(_loc19_ = _loc12_++)] = _loc7_;
 				}
 			}
 		}
@@ -105,7 +105,7 @@ final class OverwriteManager {
 			_loc8_ = _loc14_ * _loc15_;
 			_loc5_ = _loc11_;
 			while (--_loc5_ > -1) {
-				_loc16_ = ASCompat.dynamicAs(_loc10_[_loc5_], com.greensock.core.TweenCore);
+				_loc16_ = ASCompat.coerce(_loc10_[_loc5_], com.greensock.core.TweenCore);
 				_loc14_ = _loc16_.cachedTimeScale;
 				_loc15_ = _loc16_.cachedStartTime;
 				_loc18_ = _loc16_.timeline;
@@ -116,7 +116,7 @@ final class OverwriteManager {
 				}
 				_loc17_ = _loc14_ * _loc15_;
 				if (_loc17_ <= _loc8_ && (_loc17_ + _loc16_.totalDuration * _loc14_ + 1e-10 > _loc8_ || _loc16_.cachedDuration == 0)) {
-					_loc9_[Std.int(_loc19_ = ASCompat.toNumber(_loc12_++))] = _loc16_;
+					_loc9_[ASCompat.floatToInt(_loc19_ = _loc12_++)] = _loc16_;
 				}
 			}
 		}
@@ -126,7 +126,7 @@ final class OverwriteManager {
 		_loc5_ = _loc12_;
 		if (mode == 2) {
 			while (--_loc5_ > -1) {
-				_loc7_ = ASCompat.dynamicAs(_loc9_[_loc5_], com.greensock.TweenLite);
+				_loc7_ = ASCompat.coerce(_loc9_[_loc5_], com.greensock.TweenLite);
 				if (_loc7_.killVars(props)) {
 					_loc6_ = true;
 				}

@@ -42,9 +42,9 @@ class ColorMatrix {
 
 	public function new(mat:ASObject = null) {
 		if (Std.isOfType(mat, ColorMatrix)) {
-			matrix = ASCompat.dynamicAs(ASCompat.dynConcat(mat.matrix), Array);
+			matrix = ASCompat.coerce(ASCompat.dynConcat(mat.matrix), Array);
 		} else if (Std.isOfType(mat, Array)) {
-			matrix = ASCompat.dynamicAs(ASCompat.dynConcat(mat), Array);
+			matrix = ASCompat.coerce(ASCompat.dynConcat(mat), Array);
 		} else {
 			reset();
 		}

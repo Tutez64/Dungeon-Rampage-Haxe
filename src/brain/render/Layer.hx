@@ -40,7 +40,7 @@ class Layer extends Sprite {
 		_loc2_ = 0;
 		while (_loc2_ < this.numChildren) {
 			_loc1_[_loc2_] = getChildAt(_loc2_);
-			_loc2_ = ASCompat.toInt(_loc2_) + 1;
+			_loc2_++;
 		}
 		ArrayUtils.insertionSort(_loc1_, mComparator);
 		ASCompat.ASArray.forEach(_loc1_, fixChildIndex, this);

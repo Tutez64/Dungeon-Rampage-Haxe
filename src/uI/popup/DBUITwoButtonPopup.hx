@@ -47,7 +47,7 @@ class DBUITwoButtonPopup extends DBUIPopup {
 		super.setupUI(swfAsset, titleText, content, allowClose, closeCallback);
 		if (ASCompat.stringAsBool(mLeftText)) {
 			ASCompat.setProperty((mPopup : ASAny).left_button, "visible", true);
-			mLeftButton = new UIButton(mDBFacade, ASCompat.dynamicAs((mPopup : ASAny).left_button, flash.display.MovieClip));
+			mLeftButton = new UIButton(mDBFacade, ASCompat.coerce((mPopup : ASAny).left_button, flash.display.MovieClip));
 			mLeftButton.rolloverFilter = DBGlobal.UI_ROLLOVER_FILTER;
 			mLeftButton.label.text = mLeftText;
 			mLeftButton.releaseCallback = function() {
@@ -58,7 +58,7 @@ class DBUITwoButtonPopup extends DBUIPopup {
 		}
 		if (ASCompat.stringAsBool(mRightText)) {
 			ASCompat.setProperty((mPopup : ASAny).right_button, "visible", true);
-			mRightButton = new UIButton(mDBFacade, ASCompat.dynamicAs((mPopup : ASAny).right_button, flash.display.MovieClip));
+			mRightButton = new UIButton(mDBFacade, ASCompat.coerce((mPopup : ASAny).right_button, flash.display.MovieClip));
 			mRightButton.rolloverFilter = DBGlobal.UI_ROLLOVER_FILTER;
 			mRightButton.label.text = mRightText;
 			mRightButton.releaseCallback = function() {

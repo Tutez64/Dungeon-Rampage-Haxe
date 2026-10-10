@@ -105,9 +105,9 @@ import org.as3commons.collections.framework.core.SortedNode;
 	override public function iterator(cursor:ASAny = /*undefined*/ null):IIterator {
 		var _loc2_:SortedMapNode = null;
 		if (Std.isOfType(cursor, String)) {
-			_loc2_ = ASCompat.dynamicAs(this._stringMap[cursor], org.as3commons.collections.framework.core.SortedMapNode);
+			_loc2_ = ASCompat.coerce(this._stringMap[cursor], org.as3commons.collections.framework.core.SortedMapNode);
 		} else {
-			_loc2_ = ASCompat.dynamicAs(this._items[cursor], org.as3commons.collections.framework.core.SortedMapNode);
+			_loc2_ = ASCompat.coerce(this._items[cursor], org.as3commons.collections.framework.core.SortedMapNode);
 		}
 		return new SortedMapIterator(this, _loc2_);
 	}
@@ -115,9 +115,9 @@ import org.as3commons.collections.framework.core.SortedNode;
 	public function replaceFor(key:ASAny, item:ASAny):Bool {
 		var _loc3_:SortedMapNode = null;
 		if (Std.isOfType(key, String)) {
-			_loc3_ = ASCompat.dynamicAs(this._stringMap[key], org.as3commons.collections.framework.core.SortedMapNode);
+			_loc3_ = ASCompat.coerce(this._stringMap[key], org.as3commons.collections.framework.core.SortedMapNode);
 		} else {
-			_loc3_ = ASCompat.dynamicAs(this._items[key], org.as3commons.collections.framework.core.SortedMapNode);
+			_loc3_ = ASCompat.coerce(this._items[key], org.as3commons.collections.framework.core.SortedMapNode);
 		}
 		if (_loc3_ != null && _loc3_.item != item) {
 			this.removeNode(_loc3_);
@@ -131,18 +131,18 @@ import org.as3commons.collections.framework.core.SortedNode;
 	public function itemFor(key:ASAny):ASAny {
 		var _loc2_:SortedMapNode = null;
 		if (Std.isOfType(key, String)) {
-			_loc2_ = ASCompat.dynamicAs(this._stringMap[key], org.as3commons.collections.framework.core.SortedMapNode);
+			_loc2_ = ASCompat.coerce(this._stringMap[key], org.as3commons.collections.framework.core.SortedMapNode);
 		} else {
-			_loc2_ = ASCompat.dynamicAs(this._items[key], org.as3commons.collections.framework.core.SortedMapNode);
+			_loc2_ = ASCompat.coerce(this._items[key], org.as3commons.collections.framework.core.SortedMapNode);
 		}
 		return _loc2_ != null ? _loc2_.item : /*undefined*/ null;
 	}
 
 	function getNode(key:ASAny):SortedMapNode {
 		if (Std.isOfType(key, String)) {
-			return ASCompat.dynamicAs(this._stringMap[key], org.as3commons.collections.framework.core.SortedMapNode);
+			return ASCompat.coerce(this._stringMap[key], org.as3commons.collections.framework.core.SortedMapNode);
 		}
-		return ASCompat.dynamicAs(this._items[key], org.as3commons.collections.framework.core.SortedMapNode);
+		return ASCompat.coerce(this._items[key], org.as3commons.collections.framework.core.SortedMapNode);
 	}
 
 	public function lesserKey(item:ASAny):ASAny {
@@ -159,12 +159,12 @@ import org.as3commons.collections.framework.core.SortedNode;
 			if (!ASCompat.hasProperty(this._stringMap, key)) {
 				return /*undefined*/ null;
 			}
-			_loc2_ = ASCompat.dynamicAs(this._stringMap[key], org.as3commons.collections.framework.core.SortedMapNode);
+			_loc2_ = ASCompat.coerce(this._stringMap[key], org.as3commons.collections.framework.core.SortedMapNode);
 		} else {
 			if (!this._keys.exists(key)) {
 				return /*undefined*/ null;
 			}
-			_loc2_ = ASCompat.dynamicAs(this._items[key], org.as3commons.collections.framework.core.SortedMapNode);
+			_loc2_ = ASCompat.coerce(this._items[key], org.as3commons.collections.framework.core.SortedMapNode);
 		}
 		this.removeNode(_loc2_);
 		return _loc2_.item;

@@ -50,7 +50,7 @@ class SpriteSheetAsset extends Asset {
 		mTimingVector = new Vector<Float>();
 		_loc8_ = 0;
 		while ((_loc8_ : UInt) < mNumFramesX) {
-			_loc9_ = ASCompat.toNumber(ASCompat.toNumber(dict.Timing[_loc8_]) * 1000) / 24;
+			_loc9_ = ASCompat.toNumber(dict.Timing[_loc8_]) * 1000 / 24;
 			mTimingVector.push(_loc9_);
 			_loc8_++;
 		}
@@ -61,10 +61,9 @@ class SpriteSheetAsset extends Asset {
 			while ((_loc4_ : UInt) < mNumFramesX) {
 				_loc7_ = basename + "_" + Std.string(_loc6_) + "_" + Std.string(_loc4_) + ".png";
 				_loc5_ = Type.resolveClass(_loc7_);
-				mFrames[_loc10_] = ASCompat.dynamicAs(ASCompat.createInstance(_loc5_, []), flash.display.BitmapData);
-				mCenters[_loc10_] = new Point(ASCompat.toNumber(mFrameWidth * 0.5
-					- ASCompat.toNumberField(ASCompat.dynGetIndex(dict.offsets[_loc6_], _loc4_), "y")),
-					ASCompat.toNumber(mFrameHeight * 0.5 - ASCompat.toNumberField(ASCompat.dynGetIndex(dict.offsets[_loc6_], _loc4_), "x")));
+				mFrames[_loc10_] = ASCompat.coerce(ASCompat.createInstance(_loc5_, []), flash.display.BitmapData);
+				mCenters[_loc10_] = new Point(mFrameWidth * 0.5 - ASCompat.toNumberField(ASCompat.dynGetIndex(dict.offsets[_loc6_], _loc4_), "y"),
+					mFrameHeight * 0.5 - ASCompat.toNumberField(ASCompat.dynGetIndex(dict.offsets[_loc6_], _loc4_), "x"));
 				_loc10_++;
 				_loc4_++;
 			}
@@ -90,7 +89,7 @@ class SpriteSheetAsset extends Asset {
 		mTimingVector = new Vector<Float>();
 		_loc8_ = 0;
 		while ((_loc8_ : UInt) < mNumFramesX) {
-			_loc9_ = ASCompat.toNumber(ASCompat.toNumber(dict.Timing[_loc8_]) * 1000) / 24;
+			_loc9_ = ASCompat.toNumber(dict.Timing[_loc8_]) * 1000 / 24;
 			mTimingVector.push(_loc9_);
 			_loc8_++;
 		}
@@ -101,10 +100,9 @@ class SpriteSheetAsset extends Asset {
 			while ((_loc4_ : UInt) < mNumFramesX) {
 				_loc7_ = basename + "_" + Std.string(_loc6_) + "_" + Std.string(_loc4_) + ".png";
 				_loc5_ = swfAsset.getClass(_loc7_, false);
-				mFrames[_loc10_] = ASCompat.dynamicAs(ASCompat.createInstance(_loc5_, []), flash.display.BitmapData);
-				mCenters[_loc10_] = new Point(ASCompat.toNumber(mFrameWidth * 0.5
-					- ASCompat.toNumberField(ASCompat.dynGetIndex(dict.offsets[_loc6_], _loc4_), "y")),
-					ASCompat.toNumber(mFrameHeight * 0.5 - ASCompat.toNumberField(ASCompat.dynGetIndex(dict.offsets[_loc6_], _loc4_), "x")));
+				mFrames[_loc10_] = ASCompat.coerce(ASCompat.createInstance(_loc5_, []), flash.display.BitmapData);
+				mCenters[_loc10_] = new Point(mFrameWidth * 0.5 - ASCompat.toNumberField(ASCompat.dynGetIndex(dict.offsets[_loc6_], _loc4_), "y"),
+					mFrameHeight * 0.5 - ASCompat.toNumberField(ASCompat.dynGetIndex(dict.offsets[_loc6_], _loc4_), "x"));
 				_loc10_++;
 				_loc4_++;
 			}

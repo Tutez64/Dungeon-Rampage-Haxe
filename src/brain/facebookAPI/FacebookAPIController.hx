@@ -45,7 +45,7 @@ class FacebookAPIController {
 	}
 
 	function handleLogin(successCallback:ASFunction) {
-		Facebook.login(ASCompat.asFunction((function():ASAny {
+		Facebook.login(ASCompat.coerceFunction((function():ASAny {
 			var detectLogin:ASFunction;
 			return detectLogin = function(param1:ASObject, param2:ASObject) {
 				if (ASCompat.toBool(param1)) {

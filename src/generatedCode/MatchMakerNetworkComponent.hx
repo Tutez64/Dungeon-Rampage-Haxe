@@ -156,7 +156,7 @@ class MatchMakerNetworkComponent extends DcNetworkClass implements DcNetworkInte
 			while ((_loc3_ : UInt) < _loc2_) {
 				_loc5_ = GameServerPartyMember.readFromPacket(param1);
 				_loc4_.push(_loc5_);
-				_loc3_ = ASCompat.toInt(_loc3_) + 1;
+				_loc3_++;
 			}
 			return _loc4_;
 		})(packet);

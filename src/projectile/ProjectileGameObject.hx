@@ -97,11 +97,11 @@ class ProjectileGameObject extends FloorObject implements IContactResolver {
 			combatResultCallback:ASFunction = null, autoAim:Bool = true, dontRotate:Bool = false, generation:UInt = (0 : UInt)) {
 		mCombatResultCallback = combatResultCallback;
 		mAttackType = attackType;
-		mGMAttack = ASCompat.dynamicAs(dbFacade.gameMaster.attackById.itemFor(attackType), gameMasterDictionary.GMAttack);
+		mGMAttack = ASCompat.coerce(dbFacade.gameMaster.attackById.itemFor(attackType), gameMasterDictionary.GMAttack);
 		if (mGMAttack == null) {
 			Logger.error("Unable to find GMAttack record for attack type: " + attackType);
 		}
-		mGMProjectile = ASCompat.dynamicAs(dbFacade.gameMaster.projectileByConstant.itemFor(mGMAttack.Projectile), gameMasterDictionary.GMProjectile);
+		mGMProjectile = ASCompat.coerce(dbFacade.gameMaster.projectileByConstant.itemFor(mGMAttack.Projectile), gameMasterDictionary.GMProjectile);
 		if (mGMProjectile == null) {
 			Logger.error("No projectile defined for attack type: " + attackType);
 		}
@@ -433,9 +433,9 @@ class ProjectileGameObject extends FloorObject implements IContactResolver {
 		}
 		var _loc1_ = mDistributedDungeonFloor.getActor(mParentActorId);
 		if (_loc1_ != null && _loc1_.isOwner && mGMProjectile != null && ASCompat.stringAsBool(mGMProjectile.OnDeathNPC)) {
-			_loc2_ = ASCompat.dynamicAs(mDBFacade.gameMaster.npcByConstant.itemFor(mGMProjectile.OnDeathNPC), gameMasterDictionary.GMNpc);
+			_loc2_ = ASCompat.coerce(mDBFacade.gameMaster.npcByConstant.itemFor(mGMProjectile.OnDeathNPC), gameMasterDictionary.GMNpc);
 			_loc3_ = ASCompat.reinterpretAs(_loc1_, HeroGameObjectOwner);
-			_loc3_.ProposeCreateNPC(_loc2_.Id, (this.weapon.slot : UInt), Std.int(position.x), Std.int(position.y));
+			_loc3_.ProposeCreateNPC(_loc2_.Id, (this.weapon.slot : UInt), ASCompat.floatToInt(position.x), ASCompat.floatToInt(position.y));
 		}
 		mIsAlive = false;
 		mWeaponGameObject = null;

@@ -59,7 +59,7 @@ class BackgroundFader {
 			execute();
 		} else {
 			_loc6_ = Std.int(mDuration - mFramesElapsed);
-			mDuration = (ASCompat.toInt((_loc6_ : UInt) > duration ? (_loc6_ : UInt) : duration) : UInt);
+			mDuration = (_loc6_ : UInt) > duration ? (_loc6_ : UInt) : duration;
 			mTransitionDuration = transitionDur;
 			mFramesElapsed = 0;
 			mAlpha = mAlpha > alpha ? mAlpha : alpha;
@@ -74,7 +74,7 @@ class BackgroundFader {
 		mFramesElapsed = 0;
 		mRectSprite = new Sprite();
 		MemoryTracker.track(mRectSprite, "Sprite - fade rect created in BackgroundFader.execute()", "brain");
-		mRectSprite.graphics.beginFill((Std.int(mColor.x) << 16 | Std.int(mColor.y) << 8 | Std.int(mColor.z):UInt), 1);
+		mRectSprite.graphics.beginFill((ASCompat.floatToInt(mColor.x) << 16 | ASCompat.floatToInt(mColor.y) << 8 | ASCompat.floatToInt(mColor.z):UInt), 1);
 		mStartTop = mFacade.camera.visibleRectangle.top - 1300 * 0.5;
 		mStartLeft = mFacade.camera.visibleRectangle.left - 1300 * 0.5;
 		mRectSprite.graphics.drawRect(mStartLeft, mStartTop, mFacade.stageRef.fullScreenWidth + 1300, mFacade.stageRef.fullScreenHeight + 1300);
@@ -86,7 +86,7 @@ class BackgroundFader {
 		final __ax4_iter_204 = mExcludes;
 		if (checkNullIteratee(__ax4_iter_204))
 			for (_tmp_ in __ax4_iter_204) {
-				_loc1_ = ASCompat.dynamicAs(_tmp_, flash.display.Sprite);
+				_loc1_ = ASCompat.coerce(_tmp_, flash.display.Sprite);
 				mFacade.sceneGraphManager.addChild(_loc1_, 46);
 			}
 		mFadeTask = mWorkComponent.doEveryFrame(UpdateBackgroundFade);
@@ -121,7 +121,7 @@ class BackgroundFader {
 		final __ax4_iter_205 = mExcludes;
 		if (checkNullIteratee(__ax4_iter_205))
 			for (_tmp_ in __ax4_iter_205) {
-				_loc1_ = ASCompat.dynamicAs(_tmp_, flash.display.Sprite);
+				_loc1_ = ASCompat.coerce(_tmp_, flash.display.Sprite);
 				mFacade.sceneGraphManager.addChild(_loc1_, 20);
 			}
 		mExcludes = null;

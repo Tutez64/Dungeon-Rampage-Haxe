@@ -49,7 +49,7 @@ class JSONRPCPendingInvokation extends EventDispatcher {
 		if (!mRegisteredListeners.has(eventName)) {
 			return;
 		}
-		var _loc2_ = ASCompat.asFunction(mRegisteredListeners.itemFor(eventName));
+		var _loc2_ = ASCompat.coerceFunction(mRegisteredListeners.itemFor(eventName));
 		removeEventListener(eventName, _loc2_);
 		mRegisteredListeners.remove(eventName);
 	}

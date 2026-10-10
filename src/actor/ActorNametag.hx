@@ -95,25 +95,25 @@ class ActorNametag extends Sprite {
 
 	function setupNametagFromSwf(swfAsset:SwfAsset) {
 		var _loc3_ = swfAsset.getClass("UI_nametag");
-		var _loc5_ = ASCompat.dynamicAs(ASCompat.createInstance(_loc3_, []), flash.display.MovieClip);
-		mNametagFBPicSlot = ASCompat.dynamicAs((_loc5_ : ASAny).avatar, flash.display.MovieClip);
+		var _loc5_ = ASCompat.coerce(ASCompat.createInstance(_loc3_, []), flash.display.MovieClip);
+		mNametagFBPicSlot = ASCompat.coerce((_loc5_ : ASAny).avatar, flash.display.MovieClip);
 		mNametagFBPicSlot.visible = false;
-		mHpBarHolder = ASCompat.dynamicAs((_loc5_ : ASAny).hp, flash.display.MovieClip);
-		mHpProgressBar = new UIProgressBar(mFacade, ASCompat.dynamicAs((_loc5_ : ASAny).hp.hpBar, flash.display.MovieClip));
+		mHpBarHolder = ASCompat.coerce((_loc5_ : ASAny).hp, flash.display.MovieClip);
+		mHpProgressBar = new UIProgressBar(mFacade, ASCompat.coerce((_loc5_ : ASAny).hp.hpBar, flash.display.MovieClip));
 		mHpProgressBar.value = mHealth;
 		mHpProgressBar.visible = mHpProgressBarVisible;
-		mTextField = ASCompat.dynamicAs((_loc5_ : ASAny).nameText, flash.text.TextField);
+		mTextField = ASCompat.coerce((_loc5_ : ASAny).nameText, flash.text.TextField);
 		updateNameTagText();
-		mAFKText = ASCompat.dynamicAs((_loc5_ : ASAny).AFKText, flash.text.TextField);
+		mAFKText = ASCompat.coerce((_loc5_ : ASAny).AFKText, flash.text.TextField);
 		mAFKText.text = "";
-		mHpBarBg = ASCompat.dynamicAs((_loc5_ : ASAny).hp.hpBarBg, flash.display.Sprite);
+		mHpBarBg = ASCompat.coerce((_loc5_ : ASAny).hp.hpBarBg, flash.display.Sprite);
 		mNametagTop.addChild(_loc5_);
 		mNametagTopStartingYPosition = mNametagTop.y;
 		var _loc4_ = swfAsset.getClass("UI_speechbubble");
-		var _loc2_ = ASCompat.dynamicAs(ASCompat.createInstance(_loc4_, []), flash.display.MovieClip);
+		var _loc2_ = ASCompat.coerce(ASCompat.createInstance(_loc4_, []), flash.display.MovieClip);
 		mChatBalloon.initializeChatBalloon(swfAsset);
 		var _loc6_ = swfAsset.getClass("UI_speechbubble_typing");
-		mPlayerIsTypingNotification = ASCompat.dynamicAs(ASCompat.createInstance(_loc6_, []), flash.display.MovieClip);
+		mPlayerIsTypingNotification = ASCompat.coerce(ASCompat.createInstance(_loc6_, []), flash.display.MovieClip);
 		this.addChild(mPlayerIsTypingNotification);
 		showPlayerIsTypingNotification(false);
 	}

@@ -25,7 +25,7 @@ import box2D.common.math.*;
 		var _loc1_ = 0;
 		while (_loc1_ < B2Settings.b2_maxManifoldPoints) {
 			this.m_points[_loc1_] = new B2ManifoldPoint();
-			_loc1_ = ASCompat.toInt(_loc1_) + 1;
+			_loc1_++;
 		}
 		this.m_localPlaneNormal = new B2Vec2();
 		this.m_localPoint = new B2Vec2();
@@ -35,7 +35,7 @@ import box2D.common.math.*;
 		var _loc1_ = 0;
 		while (_loc1_ < B2Settings.b2_maxManifoldPoints) {
 			this.m_points[_loc1_].Reset();
-			_loc1_ = ASCompat.toInt(_loc1_) + 1;
+			_loc1_++;
 		}
 		this.m_localPlaneNormal.SetZero();
 		this.m_localPoint.SetZero();
@@ -48,7 +48,7 @@ import box2D.common.math.*;
 		var _loc2_ = 0;
 		while (_loc2_ < B2Settings.b2_maxManifoldPoints) {
 			this.m_points[_loc2_].Set(m.m_points[_loc2_]);
-			_loc2_ = ASCompat.toInt(_loc2_) + 1;
+			_loc2_++;
 		}
 		this.m_localPlaneNormal.SetV(m.m_localPlaneNormal);
 		this.m_localPoint.SetV(m.m_localPoint);

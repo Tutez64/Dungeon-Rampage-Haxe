@@ -46,7 +46,7 @@ import box2D.common.math.*;
 				_loc2_ = _loc4_;
 				_loc3_ = _loc5_;
 			}
-			_loc4_ = ASCompat.toInt(_loc4_) + 1;
+			_loc4_++;
 		}
 		return _loc2_;
 	}
@@ -62,7 +62,7 @@ import box2D.common.math.*;
 				_loc2_ = _loc4_;
 				_loc3_ = _loc5_;
 			}
-			_loc4_ = ASCompat.toInt(_loc4_) + 1;
+			_loc4_++;
 		}
 		return this.m_vertices[_loc2_];
 	}

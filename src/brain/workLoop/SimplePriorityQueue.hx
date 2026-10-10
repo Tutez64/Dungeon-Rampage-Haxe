@@ -22,7 +22,7 @@ class SimplePriorityQueue {
 	@:isVar public var front(get, never):IPrioritizable;
 
 	public function get_front():IPrioritizable {
-		return ASCompat.dynamicAs(_heap[1], brain.workLoop.IPrioritizable);
+		return ASCompat.coerce(_heap[1], brain.workLoop.IPrioritizable);
 	}
 
 	@:isVar public var maxSize(get, never):Int;
@@ -51,7 +51,7 @@ class SimplePriorityQueue {
 			walkDown(1);
 			_heap[_count] = null;
 			_count = _count - 1;
-			return ASCompat.dynamicAs(_loc1_, brain.workLoop.IPrioritizable);
+			return ASCompat.coerce(_loc1_, brain.workLoop.IPrioritizable);
 		}
 		return null;
 	}
@@ -138,10 +138,10 @@ class SimplePriorityQueue {
 	function walkUp(index:Int) {
 		var _loc5_:IPrioritizable = null;
 		var _loc3_ = index >> 1;
-		var _loc4_ = ASCompat.dynamicAs(_heap[index], brain.workLoop.IPrioritizable);
+		var _loc4_ = ASCompat.coerce(_heap[index], brain.workLoop.IPrioritizable);
 		var _loc2_ = _loc4_.priority;
 		while (_loc3_ > 0) {
-			_loc5_ = ASCompat.dynamicAs(_heap[_loc3_], brain.workLoop.IPrioritizable);
+			_loc5_ = ASCompat.coerce(_heap[_loc3_], brain.workLoop.IPrioritizable);
 			if (_loc2_ - _loc5_.priority <= 0) {
 				break;
 			}
@@ -157,15 +157,15 @@ class SimplePriorityQueue {
 	function walkDown(index:Int) {
 		var _loc3_:IPrioritizable = null;
 		var _loc5_ = index << 1;
-		var _loc4_ = ASCompat.dynamicAs(_heap[index], brain.workLoop.IPrioritizable);
+		var _loc4_ = ASCompat.coerce(_heap[index], brain.workLoop.IPrioritizable);
 		var _loc2_ = _loc4_.priority;
 		while (_loc5_ < _count) {
 			if (_loc5_ < _count - 1) {
-				if (ASCompat.toNumber(ASCompat.toNumberField(_heap[_loc5_], "priority") - ASCompat.toNumberField(_heap[_loc5_ + 1], "priority")) < 0) {
+				if (ASCompat.toNumberField(_heap[_loc5_], "priority") - ASCompat.toNumberField(_heap[_loc5_ + 1], "priority") < 0) {
 					_loc5_++;
 				}
 			}
-			_loc3_ = ASCompat.dynamicAs(_heap[_loc5_], brain.workLoop.IPrioritizable);
+			_loc3_ = ASCompat.coerce(_heap[_loc5_], brain.workLoop.IPrioritizable);
 			if (_loc2_ - _loc3_.priority >= 0) {
 				break;
 			}

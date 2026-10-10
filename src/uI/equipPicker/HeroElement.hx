@@ -52,19 +52,19 @@ class HeroElement extends UIButton {
 		this.releaseCallbackThis = function(param1:UIButton) {
 			mHeroClicked(param1, owned);
 		};
-		mOverlay = ASCompat.dynamicAs((mRoot : ASAny).overlay, flash.display.MovieClip);
+		mOverlay = ASCompat.coerce((mRoot : ASAny).overlay, flash.display.MovieClip);
 		mOverlay.visible = false;
-		mWeaponUnusable = ASCompat.dynamicAs((mRoot : ASAny).unusable, flash.display.MovieClip);
-		mWeaponWeaker = ASCompat.dynamicAs((mRoot : ASAny).arrow_down, flash.display.MovieClip);
-		mWeaponStronger = ASCompat.dynamicAs((mRoot : ASAny).arrow_up, flash.display.MovieClip);
+		mWeaponUnusable = ASCompat.coerce((mRoot : ASAny).unusable, flash.display.MovieClip);
+		mWeaponWeaker = ASCompat.coerce((mRoot : ASAny).arrow_down, flash.display.MovieClip);
+		mWeaponStronger = ASCompat.coerce((mRoot : ASAny).arrow_up, flash.display.MovieClip);
 		hideWeaponComparison();
-		mAlert = ASCompat.dynamicAs((mRoot : ASAny).alert_icon, flash.display.MovieClip);
+		mAlert = ASCompat.coerce((mRoot : ASAny).alert_icon, flash.display.MovieClip);
 		mAlertRenderer = new MovieClipRenderController(dbFacade, mAlert);
 		mAlertRenderer.play((0 : UInt), true);
 		mAlert.visible = false;
 		mAssetLoadingComponent = new AssetLoadingComponent(mDBFacade);
-		mContainerHeight = (Std.int(mRoot.height) : UInt);
-		mContainerWidth = (Std.int(mRoot.width) : UInt);
+		mContainerHeight = (ASCompat.floatToInt(mRoot.height) : UInt);
+		mContainerWidth = (ASCompat.floatToInt(mRoot.width) : UInt);
 		this.rolloverFilter = DBGlobal.UI_ROLLOVER_FILTER;
 		mHeroTooltip = new UIHeroTooltip(mDBFacade, tooltipClass);
 		this.tooltip = mHeroTooltip;
@@ -179,7 +179,7 @@ class HeroElement extends UIButton {
 		}
 		mAssetLoadingComponent.getSwfAsset(DBFacade.buildFullDownloadPath(swfPath), function(param1:brain.assetRepository.SwfAsset) {
 			var _loc3_ = param1.getClass(iconName);
-			mIcon = ASCompat.dynamicAs(ASCompat.createInstance(_loc3_, []), flash.display.MovieClip);
+			mIcon = ASCompat.coerce(ASCompat.createInstance(_loc3_, []), flash.display.MovieClip);
 			var _loc2_ = mContainerWidth < mContainerHeight ? mContainerWidth : mContainerHeight;
 			UIObject.scaleToFit(mIcon, _loc2_);
 			mRoot.addChildAt(mIcon, 0);

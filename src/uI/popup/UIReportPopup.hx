@@ -135,23 +135,23 @@ class UIReportPopup extends DBUIPopup {
 		super.colorizeMessage(tf, Locale.getString("VICTORY_SCREEN_REPORT_POPUP_MESSAGE_01").length,
 			Locale.getString("VICTORY_SCREEN_REPORT_POPUP_MESSAGE_01").length + mPersonName.length);
 		ASCompat.setProperty((mPopup : ASAny).check_button_a_label, "text", check_button_label_a);
-		check_button_a = new UIButton(mDBFacade, ASCompat.dynamicAs((mPopup : ASAny).check_button_a, flash.display.MovieClip));
+		check_button_a = new UIButton(mDBFacade, ASCompat.coerce((mPopup : ASAny).check_button_a, flash.display.MovieClip));
 		check_button_a.releaseCallback = function() {
 			checkButtonCallback(check_button_a, check_button_a_value);
 		};
 		ASCompat.setProperty((mPopup : ASAny).check_button_b_label, "text", check_button_label_b);
-		check_button_b = new UIButton(mDBFacade, ASCompat.dynamicAs((mPopup : ASAny).check_button_b, flash.display.MovieClip));
+		check_button_b = new UIButton(mDBFacade, ASCompat.coerce((mPopup : ASAny).check_button_b, flash.display.MovieClip));
 		check_button_b.releaseCallback = function() {
 			checkButtonCallback(check_button_b, check_button_b_value);
 		};
 		ASCompat.setProperty((mPopup : ASAny).check_button_c_label, "text", check_button_label_c);
-		check_button_c = new UIButton(mDBFacade, ASCompat.dynamicAs((mPopup : ASAny).check_button_c, flash.display.MovieClip));
+		check_button_c = new UIButton(mDBFacade, ASCompat.coerce((mPopup : ASAny).check_button_c, flash.display.MovieClip));
 		check_button_c.releaseCallback = function() {
 			checkButtonCallback(check_button_c, check_button_c_value);
 		};
 		if (ASCompat.stringAsBool(mLeftButtonLabelText)) {
 			ASCompat.setProperty((mPopup : ASAny).left_button, "visible", true);
-			mLeftButton = new UIButton(mDBFacade, ASCompat.dynamicAs((mPopup : ASAny).left_button, flash.display.MovieClip));
+			mLeftButton = new UIButton(mDBFacade, ASCompat.coerce((mPopup : ASAny).left_button, flash.display.MovieClip));
 			mLeftButton.rolloverFilter = DBGlobal.UI_ROLLOVER_FILTER;
 			mLeftButton.label.text = mLeftButtonLabelText;
 			mLeftButton.releaseCallback = function() {
@@ -162,7 +162,7 @@ class UIReportPopup extends DBUIPopup {
 		}
 		if (ASCompat.stringAsBool(mRightButtonLabelText)) {
 			ASCompat.setProperty((mPopup : ASAny).right_button, "visible", true);
-			mRightButton = new UIButton(mDBFacade, ASCompat.dynamicAs((mPopup : ASAny).right_button, flash.display.MovieClip));
+			mRightButton = new UIButton(mDBFacade, ASCompat.coerce((mPopup : ASAny).right_button, flash.display.MovieClip));
 			mRightButton.rolloverFilter = DBGlobal.UI_ROLLOVER_FILTER;
 			mRightButton.label.text = mRightButtonLabelText;
 			mRightButton.releaseCallback = function() {

@@ -43,16 +43,13 @@ class ColorTransformPlugin extends TintPlugin {
 			_loc5_.redOffset *= _loc7_;
 			_loc5_.greenOffset *= _loc7_;
 			_loc5_.blueOffset *= _loc7_;
-			_loc5_.redMultiplier = _loc5_.greenMultiplier = _loc5_.blueMultiplier = ASCompat.toNumber(1 - ASCompat.toNumberField(value, "tintAmount"));
+			_loc5_.redMultiplier = _loc5_.greenMultiplier = _loc5_.blueMultiplier = 1 - ASCompat.toNumberField(value, "tintAmount");
 		} else if (!Math.isNaN(ASCompat.toNumberField(value, "exposure"))) {
-			_loc5_.redOffset = _loc5_.greenOffset = _loc5_.blueOffset = ASCompat.toNumber(255 * ASCompat.toNumber(ASCompat.toNumberField(value,
-				"exposure") - 1));
+			_loc5_.redOffset = _loc5_.greenOffset = _loc5_.blueOffset = 255 * (ASCompat.toNumberField(value, "exposure") - 1);
 			_loc5_.redMultiplier = _loc5_.greenMultiplier = _loc5_.blueMultiplier = 1;
 		} else if (!Math.isNaN(ASCompat.toNumberField(value, "brightness"))) {
-			_loc5_.redOffset = _loc5_.greenOffset = _loc5_.blueOffset = Math.max(0,
-				ASCompat.toNumber(ASCompat.toNumber(ASCompat.toNumberField(value, "brightness") - 1) * 255));
-			_loc5_.redMultiplier = _loc5_.greenMultiplier = _loc5_.blueMultiplier = 1
-				- Math.abs(ASCompat.toNumber(ASCompat.toNumberField(value, "brightness") - 1));
+			_loc5_.redOffset = _loc5_.greenOffset = _loc5_.blueOffset = Math.max(0, (ASCompat.toNumberField(value, "brightness") - 1) * 255);
+			_loc5_.redMultiplier = _loc5_.greenMultiplier = _loc5_.blueMultiplier = 1 - Math.abs(ASCompat.toNumberField(value, "brightness") - 1);
 		}
 		_ignoreAlpha = tween.vars.alpha != /*undefined*/ null && value.alphaMultiplier == /*undefined*/ null;
 		init(_loc4_, _loc5_);

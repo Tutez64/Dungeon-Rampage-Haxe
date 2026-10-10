@@ -197,18 +197,18 @@ class UIInventory {
 		ASCompat.setProperty((mInventoryRoot : ASAny).pet_picker, "visible", false);
 		ASCompat.setProperty((mInventoryRoot : ASAny).potion_picker, "visible", false);
 		ASCompat.setProperty((mInventoryRoot : ASAny).stuff_picker, "visible", false);
-		mHeroWithEquipPicker = new HeroWithEquipPicker(mDBFacade, ASCompat.dynamicAs((mInventoryRoot : ASAny).weapon_picker, flash.display.MovieClip), _loc3_,
+		mHeroWithEquipPicker = new HeroWithEquipPicker(mDBFacade, ASCompat.coerce((mInventoryRoot : ASAny).weapon_picker, flash.display.MovieClip), _loc3_,
 			_loc4_, heroSelected, itemSelected, getSelectedAvatar, setSelectedAvatar, refresh, true);
-		mStacksWithEquipPicker = new StacksWithEquipPicker(mDBFacade, ASCompat.dynamicAs((mInventoryRoot : ASAny).potion_picker, flash.display.MovieClip),
+		mStacksWithEquipPicker = new StacksWithEquipPicker(mDBFacade, ASCompat.coerce((mInventoryRoot : ASAny).potion_picker, flash.display.MovieClip),
 			_loc3_, _loc4_, itemSelected, refresh, true, getSelectedAvatar, setSelectedAvatar);
 		if (mWantPets) {
-			mPetsWithEquipPicker = new PetsWithEquipPicker(mDBFacade, ASCompat.dynamicAs((mInventoryRoot : ASAny).pet_picker, flash.display.MovieClip),
-				_loc3_, _loc4_, itemSelected, getSelectedAvatar, setSelectedAvatar, refresh, true);
+			mPetsWithEquipPicker = new PetsWithEquipPicker(mDBFacade, ASCompat.coerce((mInventoryRoot : ASAny).pet_picker, flash.display.MovieClip), _loc3_,
+				_loc4_, itemSelected, getSelectedAvatar, setSelectedAvatar, refresh, true);
 		}
-		mStuffWithEquipPicker = new StuffWithEquipPicker(mDBFacade, ASCompat.dynamicAs((mInventoryRoot : ASAny).stuff_picker, flash.display.MovieClip),
-			_loc4_, getSelectedAvatar, setSelectedAvatar);
+		mStuffWithEquipPicker = new StuffWithEquipPicker(mDBFacade, ASCompat.coerce((mInventoryRoot : ASAny).stuff_picker, flash.display.MovieClip), _loc4_,
+			getSelectedAvatar, setSelectedAvatar);
 		ASCompat.setProperty((mInventoryRoot : ASAny).close, "visible", false);
-		var _loc5_ = ASCompat.dynamicAs((mInventoryRoot : ASAny).treasure, flash.display.MovieClip);
+		var _loc5_ = ASCompat.coerce((mInventoryRoot : ASAny).treasure, flash.display.MovieClip);
 		if (mDungeonSummary != null) {
 			mDungeonRewardPanel = new DungeonRewardPanel(mDBFacade, _loc5_, mDungeonSummary, itemSelected);
 			ASCompat.setProperty((_loc5_ : ASAny).label, "text", Locale.getString("LOOT"));
@@ -277,7 +277,7 @@ class UIInventory {
 				}
 				mItems[_loc4_].equippable = (_loc3_ : UInt);
 			}
-			_loc4_ = ASCompat.toInt(_loc4_) + 1;
+			_loc4_++;
 		}
 	}
 
@@ -334,47 +334,46 @@ class UIInventory {
 			mPagination = null;
 		}
 		mPagination = new UIPagingPanel(mDBFacade, this.numPagesInCurrentCategory(),
-			ASCompat.dynamicAs((mInventoryRoot : ASAny).grid_widget.pagination, flash.display.MovieClip), mSwfAsset.getClass("pagination_button"),
+			ASCompat.coerce((mInventoryRoot : ASAny).grid_widget.pagination, flash.display.MovieClip), mSwfAsset.getClass("pagination_button"),
 			this.setCurrentPage);
 		chargeTooltipClass = mSwfAsset.getClass("DR_charge_tooltip");
-		mInfoCard = new ItemInfoCard(mDBFacade, ASCompat.dynamicAs((root : ASAny).item_card, flash.display.MovieClip), chargeTooltipClass,
-			mHeroWithEquipPicker, mPetsWithEquipPicker, refresh, mDungeonSummary, false, sellItem, takeItemCallback);
+		mInfoCard = new ItemInfoCard(mDBFacade, ASCompat.coerce((root : ASAny).item_card, flash.display.MovieClip), chargeTooltipClass, mHeroWithEquipPicker,
+			mPetsWithEquipPicker, refresh, mDungeonSummary, false, sellItem, takeItemCallback);
 		mInfoCard.visible = false;
 		if (mChestCard != null) {
 			mChestCard.destroy();
 			mChestCard = null;
 		}
-		mChestCard = new ChestInfoCard(mDBFacade, mSceneGraphComponent, ASCompat.dynamicAs((root : ASAny).inv_chests, flash.display.MovieClip), abandonChest,
+		mChestCard = new ChestInfoCard(mDBFacade, mSceneGraphComponent, ASCompat.coerce((root : ASAny).inv_chests, flash.display.MovieClip), abandonChest,
 			openChest, abandonChestDS, openChestDS, keepChestDS);
 		if (mConsumableChestCard != null) {
 			mConsumableChestCard.destroy();
 			mConsumableChestCard = null;
 		}
-		mConsumableChestCard = new ChestInfoCard(mDBFacade, mSceneGraphComponent, ASCompat.dynamicAs((root : ASAny).inv_consumable, flash.display.MovieClip),
+		mConsumableChestCard = new ChestInfoCard(mDBFacade, mSceneGraphComponent, ASCompat.coerce((root : ASAny).inv_consumable, flash.display.MovieClip),
 			abandonChest, openChest, abandonChestDS, openChestDS, keepChestDS);
 		if (mBoosterCard != null) {
 			mBoosterCard.destroy();
 			mBoosterCard = null;
 		}
-		mBoosterCard = new BoosterInfoCard(mDBFacade, mSceneGraphComponent, ASCompat.dynamicAs((root : ASAny).booster_card, flash.display.MovieClip));
+		mBoosterCard = new BoosterInfoCard(mDBFacade, mSceneGraphComponent, ASCompat.coerce((root : ASAny).booster_card, flash.display.MovieClip));
 		group = "UIInventoryTabGroup";
 		mTabButtons.add("WEAPON",
-			new UIRadioButton(mDBFacade, ASCompat.dynamicAs((mInventoryRoot : ASAny).grid_widget.tab_weapons, flash.display.MovieClip), group));
+			new UIRadioButton(mDBFacade, ASCompat.coerce((mInventoryRoot : ASAny).grid_widget.tab_weapons, flash.display.MovieClip), group));
 		ASCompat.setProperty((mInventoryRoot : ASAny).grid_widget.tab_weapons.label, "text", Locale.getString("TAB_LOOT"));
 		mTabButtons.add("POWERUP",
-			new UIRadioButton(mDBFacade, ASCompat.dynamicAs((mInventoryRoot : ASAny).grid_widget.tab_potions, flash.display.MovieClip), group));
+			new UIRadioButton(mDBFacade, ASCompat.coerce((mInventoryRoot : ASAny).grid_widget.tab_potions, flash.display.MovieClip), group));
 		ASCompat.setProperty((mInventoryRoot : ASAny).grid_widget.tab_potions.label, "text", Locale.getString("TAB_POWERUPS"));
 		if (mWantPets) {
 			mTabButtons.add("PET",
-				new UIRadioButton(mDBFacade, ASCompat.dynamicAs((mInventoryRoot : ASAny).grid_widget.tab_pets, flash.display.MovieClip), group));
+				new UIRadioButton(mDBFacade, ASCompat.coerce((mInventoryRoot : ASAny).grid_widget.tab_pets, flash.display.MovieClip), group));
 			ASCompat.setProperty((mInventoryRoot : ASAny).grid_widget.tab_pets.label, "text", Locale.getString("TAB_PETS"));
 		}
-		mTabButtons.add("STUFF",
-			new UIRadioButton(mDBFacade, ASCompat.dynamicAs((mInventoryRoot : ASAny).grid_widget.tab_stuff, flash.display.MovieClip), group));
+		mTabButtons.add("STUFF", new UIRadioButton(mDBFacade, ASCompat.coerce((mInventoryRoot : ASAny).grid_widget.tab_stuff, flash.display.MovieClip), group));
 		ASCompat.setProperty((mInventoryRoot : ASAny).grid_widget.tab_stuff.label, "text", Locale.getString("TAB_STUFF"));
 		iter = ASCompat.reinterpretAs(mTabButtons.iterator(), IMapIterator);
 		while (iter.hasNext()) {
-			tabButton = ASCompat.dynamicAs(iter.next(), brain.uI.UIRadioButton);
+			tabButton = ASCompat.coerce(iter.next(), brain.uI.UIRadioButton);
 			ASCompat.setProperty((tabButton.root : ASAny).new_label, "text", Locale.getString("INV_NEW"));
 			ASCompat.setProperty((tabButton.root : ASAny).new_label, "visible", this.categoryHasAnyNewItems(iter.key));
 			ASCompat.setProperty(tabButton.root, "category", iter.key);
@@ -384,21 +383,21 @@ class UIInventory {
 			tabButton.rolloverFilter = DBGlobal.UI_ROLLOVER_FILTER;
 			tabButton.selectedFilter = DBGlobal.UI_SELECTED_FILTER;
 		}
-		mInventoryGridElements.push(ASCompat.dynamicAs((mInventoryRoot : ASAny).grid_widget.slot_0, flash.display.MovieClip));
-		mInventoryGridElements.push(ASCompat.dynamicAs((mInventoryRoot : ASAny).grid_widget.slot_1, flash.display.MovieClip));
-		mInventoryGridElements.push(ASCompat.dynamicAs((mInventoryRoot : ASAny).grid_widget.slot_2, flash.display.MovieClip));
-		mInventoryGridElements.push(ASCompat.dynamicAs((mInventoryRoot : ASAny).grid_widget.slot_3, flash.display.MovieClip));
-		mInventoryGridElements.push(ASCompat.dynamicAs((mInventoryRoot : ASAny).grid_widget.slot_4, flash.display.MovieClip));
-		mInventoryGridElements.push(ASCompat.dynamicAs((mInventoryRoot : ASAny).grid_widget.slot_5, flash.display.MovieClip));
-		mInventoryGridElements.push(ASCompat.dynamicAs((mInventoryRoot : ASAny).grid_widget.slot_6, flash.display.MovieClip));
-		mInventoryGridElements.push(ASCompat.dynamicAs((mInventoryRoot : ASAny).grid_widget.slot_7, flash.display.MovieClip));
-		mInventoryGridElements.push(ASCompat.dynamicAs((mInventoryRoot : ASAny).grid_widget.slot_8, flash.display.MovieClip));
-		mInventoryGridElements.push(ASCompat.dynamicAs((mInventoryRoot : ASAny).grid_widget.slot_9, flash.display.MovieClip));
-		mInventoryGridElements.push(ASCompat.dynamicAs((mInventoryRoot : ASAny).grid_widget.slot_10, flash.display.MovieClip));
-		mInventoryGridElements.push(ASCompat.dynamicAs((mInventoryRoot : ASAny).grid_widget.slot_11, flash.display.MovieClip));
-		mInventoryGridElements.push(ASCompat.dynamicAs((mInventoryRoot : ASAny).grid_widget.slot_12, flash.display.MovieClip));
-		mInventoryGridElements.push(ASCompat.dynamicAs((mInventoryRoot : ASAny).grid_widget.slot_13, flash.display.MovieClip));
-		mInventoryGridElements.push(ASCompat.dynamicAs((mInventoryRoot : ASAny).grid_widget.slot_14, flash.display.MovieClip));
+		mInventoryGridElements.push(ASCompat.coerce((mInventoryRoot : ASAny).grid_widget.slot_0, flash.display.MovieClip));
+		mInventoryGridElements.push(ASCompat.coerce((mInventoryRoot : ASAny).grid_widget.slot_1, flash.display.MovieClip));
+		mInventoryGridElements.push(ASCompat.coerce((mInventoryRoot : ASAny).grid_widget.slot_2, flash.display.MovieClip));
+		mInventoryGridElements.push(ASCompat.coerce((mInventoryRoot : ASAny).grid_widget.slot_3, flash.display.MovieClip));
+		mInventoryGridElements.push(ASCompat.coerce((mInventoryRoot : ASAny).grid_widget.slot_4, flash.display.MovieClip));
+		mInventoryGridElements.push(ASCompat.coerce((mInventoryRoot : ASAny).grid_widget.slot_5, flash.display.MovieClip));
+		mInventoryGridElements.push(ASCompat.coerce((mInventoryRoot : ASAny).grid_widget.slot_6, flash.display.MovieClip));
+		mInventoryGridElements.push(ASCompat.coerce((mInventoryRoot : ASAny).grid_widget.slot_7, flash.display.MovieClip));
+		mInventoryGridElements.push(ASCompat.coerce((mInventoryRoot : ASAny).grid_widget.slot_8, flash.display.MovieClip));
+		mInventoryGridElements.push(ASCompat.coerce((mInventoryRoot : ASAny).grid_widget.slot_9, flash.display.MovieClip));
+		mInventoryGridElements.push(ASCompat.coerce((mInventoryRoot : ASAny).grid_widget.slot_10, flash.display.MovieClip));
+		mInventoryGridElements.push(ASCompat.coerce((mInventoryRoot : ASAny).grid_widget.slot_11, flash.display.MovieClip));
+		mInventoryGridElements.push(ASCompat.coerce((mInventoryRoot : ASAny).grid_widget.slot_12, flash.display.MovieClip));
+		mInventoryGridElements.push(ASCompat.coerce((mInventoryRoot : ASAny).grid_widget.slot_13, flash.display.MovieClip));
+		mInventoryGridElements.push(ASCompat.coerce((mInventoryRoot : ASAny).grid_widget.slot_14, flash.display.MovieClip));
 		itemTemplateClass = mSwfAsset.getClass("inv_slot");
 		weaponTooltipClass = mSwfAsset.getClass("DR_weapon_tooltip");
 		i = (0 : UInt);
@@ -414,7 +413,7 @@ class UIInventory {
 			uiInventoryItem.visible = false;
 			i = i + 1;
 		}
-		mAddStorageButton = new UIButton(mDBFacade, ASCompat.dynamicAs((mInventoryRoot : ASAny).grid_widget.add_storage_button, flash.display.MovieClip));
+		mAddStorageButton = new UIButton(mDBFacade, ASCompat.coerce((mInventoryRoot : ASAny).grid_widget.add_storage_button, flash.display.MovieClip));
 		mAddStorageButton.rolloverFilter = DBGlobal.UI_ROLLOVER_FILTER;
 		mAddStorageButton.label.text = Locale.getString("INV_ADD_STORAGE");
 		mAddStorageButton.releaseCallback = function() {
@@ -567,7 +566,7 @@ class UIInventory {
 				mDBFacade.dbAccountInfo.inventoryInfo.chests.splice(_loc2_, (1 : UInt));
 				break;
 			}
-			_loc2_ = ASCompat.toInt(_loc2_) + 1;
+			_loc2_++;
 		}
 		takeItemCallback();
 	}
@@ -598,7 +597,7 @@ class UIInventory {
 			}
 			ASCompat.setProperty((mInventoryRoot : ASAny).grid_widget, "visible", false);
 			mLogicalWorkComponent.doLater(0.16666666666666666, function(param1:brain.clock.GameClock) {
-				UITownTweens.rightPanelTweenSequence(ASCompat.dynamicAs((mInventoryRoot : ASAny).grid_widget, flash.display.MovieClip), mDBFacade);
+				UITownTweens.rightPanelTweenSequence(ASCompat.coerce((mInventoryRoot : ASAny).grid_widget, flash.display.MovieClip), mDBFacade);
 			});
 			if (mCurrentTab != "WEAPON") {
 				return;
@@ -630,10 +629,10 @@ class UIInventory {
 		final __ax4_iter_16:Array<ASAny> = [_loc8_, _loc3_, _loc1_];
 		if (checkNullIteratee(__ax4_iter_16))
 			for (_tmp_ in __ax4_iter_16) {
-				_loc4_ = ASCompat.dynamicAs(_tmp_, org.as3commons.collections.Map);
+				_loc4_ = ASCompat.coerce(_tmp_, org.as3commons.collections.Map);
 				_loc5_ = ASCompat.reinterpretAs(_loc4_.iterator(), IMapIterator);
 				while (_loc5_.hasNext()) {
-					_loc10_ = ASCompat.dynamicAs(_loc5_.next(), account.InventoryBaseInfo);
+					_loc10_ = ASCompat.coerce(_loc5_.next(), account.InventoryBaseInfo);
 					if (_loc10_.gmInventoryBase != null) {
 						_loc7_ = _loc10_.gmInventoryBase.ItemCategory;
 					} else {
@@ -788,7 +787,7 @@ class UIInventory {
 		this.lookForNewEquippedItems();
 		iter = ASCompat.reinterpretAs(mTabButtons.iterator(), IMapIterator);
 		while (iter.hasNext()) {
-			tabButton = ASCompat.dynamicAs(iter.next(), brain.uI.UIRadioButton);
+			tabButton = ASCompat.coerce(iter.next(), brain.uI.UIRadioButton);
 			ASCompat.setProperty((tabButton.root : ASAny).new_label, "visible", this.categoryHasAnyNewItems(iter.key));
 		}
 		if (mSelectedItemInfo != null && !dontRefreshChestSelection) {
@@ -833,7 +832,7 @@ class UIInventory {
 		if (mRevealedItemType == 1) {
 			mCurrentTab = "WEAPON";
 			mRevealedItemOfferId %= (100000 : UInt);
-			_loc1_ = ASCompat.dynamicAs(mDBFacade.gameMaster.weaponItemById.itemFor(mRevealedItemOfferId), gameMasterDictionary.GMWeaponItem);
+			_loc1_ = ASCompat.coerce(mDBFacade.gameMaster.weaponItemById.itemFor(mRevealedItemOfferId), gameMasterDictionary.GMWeaponItem);
 			__ax4_iter_17 = mCategorizedItems.itemFor(mCurrentTab);
 			if (checkNullIteratee(__ax4_iter_17))
 				for (_tmp_ in __ax4_iter_17) {
@@ -847,13 +846,13 @@ class UIInventory {
 					}
 				}
 		} else if (mRevealedItemType == 2) {
-			_loc5_ = ASCompat.dynamicAs(mDBFacade.gameMaster.offerById.itemFor(mRevealedItemOfferId), gameMasterDictionary.GMOffer);
+			_loc5_ = ASCompat.coerce(mDBFacade.gameMaster.offerById.itemFor(mRevealedItemOfferId), gameMasterDictionary.GMOffer);
 			_loc10_ = 0;
 			_loc9_ = _loc5_.Details;
 			if (checkNullIteratee(_loc9_))
 				for (_tmp_ in _loc9_) {
 					_loc2_ = _tmp_;
-					_loc3_ = ASCompat.dynamicAs(mDBFacade.gameMaster.stackableById.itemFor(_loc2_.StackableId), gameMasterDictionary.GMStackable);
+					_loc3_ = ASCompat.coerce(mDBFacade.gameMaster.stackableById.itemFor(_loc2_.StackableId), gameMasterDictionary.GMStackable);
 				}
 			if (_loc3_ != null) {
 				mCurrentTab = "POWERUP";
@@ -879,21 +878,21 @@ class UIInventory {
 		var _loc1_:PetInfo = null;
 		_loc2_ = ASCompat.reinterpretAs(mDBFacade.dbAccountInfo.inventoryInfo.items.iterator(), IMapIterator);
 		while (_loc2_.hasNext()) {
-			_loc3_ = ASCompat.dynamicAs(_loc2_.next(), account.ItemInfo);
+			_loc3_ = ASCompat.coerce(_loc2_.next(), account.ItemInfo);
 			if (_loc3_.isEquipped && _loc3_.isNew && mNewItemIds.indexOf(_loc3_.databaseId) == -1) {
 				mNewItemIds.push(_loc3_.databaseId);
 			}
 		}
 		_loc2_ = ASCompat.reinterpretAs(mDBFacade.dbAccountInfo.inventoryInfo.stackables.iterator(), IMapIterator);
 		while (_loc2_.hasNext()) {
-			_loc4_ = ASCompat.dynamicAs(_loc2_.next(), account.StackableInfo);
+			_loc4_ = ASCompat.coerce(_loc2_.next(), account.StackableInfo);
 			if (_loc4_.isEquipped && _loc4_.isNew && mNewStackableIds.indexOf(_loc4_.databaseId) == -1) {
 				mNewStackableIds.push(_loc4_.databaseId);
 			}
 		}
 		_loc2_ = ASCompat.reinterpretAs(mDBFacade.dbAccountInfo.inventoryInfo.pets.iterator(), IMapIterator);
 		while (_loc2_.hasNext()) {
-			_loc1_ = ASCompat.dynamicAs(_loc2_.next(), account.PetInfo);
+			_loc1_ = ASCompat.coerce(_loc2_.next(), account.PetInfo);
 			if (_loc1_.isEquipped && _loc1_.isNew && mNewPetIds.indexOf(_loc1_.databaseId) == -1) {
 				mNewPetIds.push(_loc1_.databaseId);
 			}
@@ -1052,15 +1051,15 @@ class UIInventory {
 		mCurrentTab = category;
 		var _loc5_ = ASCompat.reinterpretAs(mTabButtons.iterator(), IMapIterator);
 		while (_loc5_.hasNext()) {
-			_loc4_ = ASCompat.dynamicAs(_loc5_.next(), brain.uI.UIRadioButton);
+			_loc4_ = ASCompat.coerce(_loc5_.next(), brain.uI.UIRadioButton);
 			_loc4_.enabled = true;
 		}
-		_loc4_ = ASCompat.dynamicAs(mTabButtons.itemFor(mCurrentTab), brain.uI.UIRadioButton);
+		_loc4_ = ASCompat.coerce(mTabButtons.itemFor(mCurrentTab), brain.uI.UIRadioButton);
 		_loc4_.selected = true;
 		_loc4_.enabled = false;
 		_loc4_.label.visible = true;
 		var _loc3_ = this.numPagesInCurrentCategory();
-		page = (Std.int(Math.min(_loc3_, page)) : UInt);
+		page = (ASCompat.floatToInt(Math.min(_loc3_, page)) : UInt);
 		mPagination.currentPage = mCurrentPage = page;
 		mPagination.numPages = _loc3_;
 		mPagination.visible = _loc3_ > 1;
@@ -1135,7 +1134,7 @@ class UIInventory {
 			_loc3_ = 0;
 			while (_loc3_ < 15) {
 				mItems[_loc3_].deSelect();
-				_loc3_ = ASCompat.toInt(_loc3_) + 1;
+				_loc3_++;
 			}
 			mDungeonRewardPanel.highlightChest(_loc1_);
 			return;
@@ -1148,7 +1147,7 @@ class UIInventory {
 			} else {
 				_loc2_.deSelect();
 			}
-			_loc3_ = ASCompat.toInt(_loc3_) + 1;
+			_loc3_++;
 		}
 	}
 
@@ -1181,7 +1180,7 @@ class UIInventory {
 				} else {
 					_loc1_.deSelect();
 				}
-				_loc3_ = ASCompat.toInt(_loc3_) + 1;
+				_loc3_++;
 			}
 		}
 		if (_loc2_ != null) {
@@ -1213,7 +1212,7 @@ class UIInventory {
 				} else {
 					_loc2_.deSelect();
 				}
-				_loc3_ = ASCompat.toInt(_loc3_) + 1;
+				_loc3_++;
 			}
 		}
 		if (_loc4_ != null) {}
@@ -1242,7 +1241,7 @@ class UIInventory {
 				} else {
 					_loc3_.deSelect();
 				}
-				_loc4_ = ASCompat.toInt(_loc4_) + 1;
+				_loc4_++;
 			}
 		}
 	}
@@ -1305,7 +1304,7 @@ class UIInventory {
 		mDungeonRewardPanel = null;
 		var _loc3_ = ASCompat.reinterpretAs(mTabButtons.iterator(), IMapIterator);
 		while (_loc3_.hasNext()) {
-			_loc4_ = ASCompat.dynamicAs(_loc3_.next(), brain.uI.UIRadioButton);
+			_loc4_ = ASCompat.coerce(_loc3_.next(), brain.uI.UIRadioButton);
 			_loc4_.destroy();
 		}
 		mTabButtons.clear();
@@ -1318,7 +1317,7 @@ class UIInventory {
 		while (_loc5_ < mItems.length) {
 			_loc1_ = mItems[_loc5_];
 			_loc1_.destroy();
-			_loc5_ = ASCompat.toInt(_loc5_) + 1;
+			_loc5_++;
 		}
 		mItems = null;
 		if (mInventoryGridElements != null) {
@@ -1326,7 +1325,7 @@ class UIInventory {
 			while (_loc5_ < mInventoryGridElements.length) {
 				_loc2_ = mInventoryGridElements[_loc6_];
 				_loc2_ = null;
-				_loc5_ = ASCompat.toInt(_loc5_) + 1;
+				_loc5_++;
 			}
 		}
 		mInventoryGridElements.length = 0;

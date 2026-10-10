@@ -143,7 +143,7 @@ class Executer extends EventDispatcher {
 				_loc4_ = _loc2_;
 				_loc5_ = _loc2_ + 1;
 				while (_loc4_ >= 0 && _loc4_ < _loc5_) {
-					_loc4_ = ASCompat.toInt(_loc4_) + 1;
+					_loc4_++;
 					_loc4_ = line.indexOf("(", _loc4_);
 					_loc5_ = line.indexOf(")", _loc5_ + 1);
 				}
@@ -155,7 +155,7 @@ class Executer extends EventDispatcher {
 					if (new compat.RegExp("[^\\s]").match(_loc9_) != null || _loc8_ <= 0) {
 						break;
 					}
-					_loc8_ = ASCompat.toInt(_loc8_) - 1;
+					_loc8_--;
 				}
 				if (new compat.RegExp("\\w").match(_loc9_) != null) {
 					_loc7_ = true;
@@ -236,7 +236,7 @@ class Executer extends EventDispatcher {
 		while (_loc6_ < _loc5_) {
 			_loc7_ = _loc4_[_loc6_];
 			if (_loc9_.replace(_loc7_, "") != "") {
-				_loc8_ = this.operate(ASCompat.dynamicAs(_loc4_[_loc6_ - 1], ExeValue), _loc7_, ASCompat.dynamicAs(_loc4_[_loc6_ + 1], ExeValue));
+				_loc8_ = this.operate(ASCompat.coerce(_loc4_[_loc6_ - 1], ExeValue), _loc7_, ASCompat.coerce(_loc4_[_loc6_ + 1], ExeValue));
 				_loc14_ = cast(_loc4_[_loc6_ - 1], ExeValue);
 				_loc14_.setValue(_loc8_);
 				_loc4_.splice(_loc6_, (2 : UInt));
@@ -246,13 +246,13 @@ class Executer extends EventDispatcher {
 			_loc6_ += 2;
 		}
 		ASCompat.ASArray.reverse(_loc4_);
-		var _loc10_ = ASCompat.dynamicAs(_loc4_[0], ExeValue);
+		var _loc10_ = ASCompat.coerce(_loc4_[0], ExeValue);
 		_loc6_ = 1;
 		while (_loc6_ < _loc5_) {
 			_loc7_ = _loc4_[_loc6_];
 			if (_loc9_.replace(_loc7_, "") == "") {
-				_loc10_ = ASCompat.dynamicAs(_loc4_[_loc6_ - 1], ExeValue);
-				_loc15_ = ASCompat.dynamicAs(_loc4_[_loc6_ + 1], ExeValue);
+				_loc10_ = ASCompat.coerce(_loc4_[_loc6_ - 1], ExeValue);
+				_loc15_ = ASCompat.coerce(_loc4_[_loc6_ + 1], ExeValue);
 				if (_loc7_.length > 1) {
 					_loc7_ = _loc7_.substring(0, _loc7_.length - 1);
 				}
@@ -333,7 +333,7 @@ class Executer extends EventDispatcher {
 				paramstr = this.ignoreWhite(paramstr);
 				params = [];
 				if (ASCompat.stringAsBool(paramstr)) {
-					params = ASCompat.dynamicAs(this.execValue(paramstr).value, Array);
+					params = ASCompat.coerce(this.execValue(paramstr).value, Array);
 				}
 				if (!Reflect.isFunction(newbase)) {
 					try {
@@ -387,7 +387,7 @@ class Executer extends EventDispatcher {
 		} else if (!Math.isNaN(ASCompat.toNumber(str))) {
 			v.obj = ASCompat.toNumber(str);
 		} else if (str.indexOf(VALKEY) == 0) {
-			vv = ASCompat.dynamicAs((this._values : ASAny)[ASCompat.toInt(str.substring(VALKEY.length))], ExeValue);
+			vv = ASCompat.coerce((this._values : ASAny)[ASCompat.toInt(str.substring(VALKEY.length))], ExeValue);
 			v.obj = vv.value;
 		} else if (str.charAt(0) == "$") {
 			key = str.substring(1);
@@ -487,7 +487,7 @@ class Executer extends EventDispatcher {
 			_loc6_ = this.ignoreWhite(_loc6_);
 			_loc7_ = [];
 			if (ASCompat.stringAsBool(_loc6_)) {
-				_loc7_ = ASCompat.dynamicAs(this.execValue(_loc6_).value, Array);
+				_loc7_ = ASCompat.coerce(this.execValue(_loc6_).value, Array);
 			}
 			_loc8_ = _loc7_.length;
 			if (_loc8_ == 0) {
@@ -556,7 +556,7 @@ class Executer extends EventDispatcher {
 				break;
 			}
 			str = str.substring(0, _loc2_);
-			_loc2_ = ASCompat.toInt(_loc2_) - 1;
+			_loc2_--;
 		}
 		return str;
 	}

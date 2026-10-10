@@ -31,7 +31,7 @@ package box2D.collision;
 		this.features._referenceEdge = (this._key : Int) & 0xFF;
 		this.features._incidentEdge = ((this._key : Int) & 0xFF00) >> 8 & 0xFF;
 		this.features._incidentVertex = ((this._key : Int) & 0xFF0000) >> 16 & 0xFF;
-		this.features._flip = ((this._key : Int) & Std.int(0xFF000000)) >> 24 & 0xFF;
+		this.features._flip = ((this._key : Int) & ASCompat.floatToInt(0xFF000000)) >> 24 & 0xFF;
 		return value;
 	}
 }

@@ -62,7 +62,7 @@ class UIObject {
 			if (tooltipDrawLayer != 0) {
 				mTooltipLayer = tooltipDrawLayer;
 			}
-			this.tooltip = ASCompat.dynamicAs((mRoot : ASAny).tooltip, flash.display.MovieClip);
+			this.tooltip = ASCompat.coerce((mRoot : ASAny).tooltip, flash.display.MovieClip);
 		}
 		try {
 			ASCompat.setProperty(mRoot, "UIObject", this);
@@ -271,7 +271,7 @@ class UIObject {
 				mTooltip.x = mTooltipPos.x;
 				mTooltip.y = mTooltipPos.y;
 			}
-			mFacade.sceneGraphManager.addChild(mTooltip, Std.int(mTooltipLayer));
+			mFacade.sceneGraphManager.addChild(mTooltip, ASCompat.floatToInt(mTooltipLayer));
 		}
 	}
 
@@ -324,25 +324,25 @@ class UIObject {
 	@:isVar public var leftNavigation(get, set):UIObject;
 
 	public function get_leftNavigation():UIObject {
-		return ASCompat.dynamicAs(mNavigationDictionary["LEFT"], UIObject);
+		return ASCompat.coerce(mNavigationDictionary["LEFT"], UIObject);
 	}
 
 	@:isVar public var rightNavigation(get, set):UIObject;
 
 	public function get_rightNavigation():UIObject {
-		return ASCompat.dynamicAs(mNavigationDictionary["RIGHT"], UIObject);
+		return ASCompat.coerce(mNavigationDictionary["RIGHT"], UIObject);
 	}
 
 	@:isVar public var upNavigation(get, set):UIObject;
 
 	public function get_upNavigation():UIObject {
-		return ASCompat.dynamicAs(mNavigationDictionary["UP"], UIObject);
+		return ASCompat.coerce(mNavigationDictionary["UP"], UIObject);
 	}
 
 	@:isVar public var downNavigation(get, set):UIObject;
 
 	public function get_downNavigation():UIObject {
-		return ASCompat.dynamicAs(mNavigationDictionary["DOWN"], UIObject);
+		return ASCompat.coerce(mNavigationDictionary["DOWN"], UIObject);
 	}
 
 	function set_leftNavigation(leftUiObject:UIObject):UIObject {
@@ -431,37 +431,37 @@ class UIObject {
 	@:isVar public var leftNavigationAdditionalInteraction(get, set):ASFunction;
 
 	public function get_leftNavigationAdditionalInteraction():ASFunction {
-		return ASCompat.asFunction(mNavigationAdditionalInteraction["LEFT"]);
+		return ASCompat.coerceFunction(mNavigationAdditionalInteraction["LEFT"]);
 	}
 
 	@:isVar public var rightNavigationAdditionalInteraction(get, set):ASFunction;
 
 	public function get_rightNavigationAdditionalInteraction():ASFunction {
-		return ASCompat.asFunction(mNavigationAdditionalInteraction["RIGHT"]);
+		return ASCompat.coerceFunction(mNavigationAdditionalInteraction["RIGHT"]);
 	}
 
 	@:isVar public var upNavigationAdditionalInteraction(get, set):ASFunction;
 
 	public function get_upNavigationAdditionalInteraction():ASFunction {
-		return ASCompat.asFunction(mNavigationAdditionalInteraction["UP"]);
+		return ASCompat.coerceFunction(mNavigationAdditionalInteraction["UP"]);
 	}
 
 	@:isVar public var downNavigationAdditionalInteraction(get, set):ASFunction;
 
 	public function get_downNavigationAdditionalInteraction():ASFunction {
-		return ASCompat.asFunction(mNavigationAdditionalInteraction["DOWN"]);
+		return ASCompat.coerceFunction(mNavigationAdditionalInteraction["DOWN"]);
 	}
 
 	@:isVar public var navigationSelectedInteraction(get, set):ASFunction;
 
 	public function get_navigationSelectedInteraction():ASFunction {
-		return ASCompat.asFunction(mNavigationAdditionalInteraction["SELECTED"]);
+		return ASCompat.coerceFunction(mNavigationAdditionalInteraction["SELECTED"]);
 	}
 
 	@:isVar public var navigationSetToUnselectedInteraction(get, set):ASFunction;
 
 	public function get_navigationSetToUnselectedInteraction():ASFunction {
-		return ASCompat.asFunction(mNavigationAdditionalInteraction["SET_TO_UNSELECTED"]);
+		return ASCompat.coerceFunction(mNavigationAdditionalInteraction["SET_TO_UNSELECTED"]);
 	}
 
 	function set_leftNavigationAdditionalInteraction(leftUiObjectInteraction:ASFunction):ASFunction {

@@ -23,30 +23,30 @@ class B2DynamicTreeBroadPhase implements IBroadPhase {
 	}
 
 	public function DestroyProxy(proxy:ASAny) {
-		this.UnBufferMove(ASCompat.dynamicAs(proxy, box2D.collision.B2DynamicTreeNode));
+		this.UnBufferMove(ASCompat.coerce(proxy, box2D.collision.B2DynamicTreeNode));
 		--this.m_proxyCount;
-		this.m_tree.DestroyProxy(ASCompat.dynamicAs(proxy, box2D.collision.B2DynamicTreeNode));
+		this.m_tree.DestroyProxy(ASCompat.coerce(proxy, box2D.collision.B2DynamicTreeNode));
 	}
 
 	public function MoveProxy(proxy:ASAny, aabb:B2AABB, displacement:B2Vec2) {
-		var _loc4_ = this.m_tree.MoveProxy(ASCompat.dynamicAs(proxy, box2D.collision.B2DynamicTreeNode), aabb, displacement);
+		var _loc4_ = this.m_tree.MoveProxy(ASCompat.coerce(proxy, box2D.collision.B2DynamicTreeNode), aabb, displacement);
 		if (_loc4_) {
-			this.BufferMove(ASCompat.dynamicAs(proxy, box2D.collision.B2DynamicTreeNode));
+			this.BufferMove(ASCompat.coerce(proxy, box2D.collision.B2DynamicTreeNode));
 		}
 	}
 
 	public function TestOverlap(proxyA:ASAny, proxyB:ASAny):Bool {
-		var _loc3_ = this.m_tree.GetFatAABB(ASCompat.dynamicAs(proxyA, box2D.collision.B2DynamicTreeNode));
-		var _loc4_ = this.m_tree.GetFatAABB(ASCompat.dynamicAs(proxyB, box2D.collision.B2DynamicTreeNode));
+		var _loc3_ = this.m_tree.GetFatAABB(ASCompat.coerce(proxyA, box2D.collision.B2DynamicTreeNode));
+		var _loc4_ = this.m_tree.GetFatAABB(ASCompat.coerce(proxyB, box2D.collision.B2DynamicTreeNode));
 		return _loc3_.TestOverlap(_loc4_);
 	}
 
 	public function GetUserData(proxy:ASAny):ASAny {
-		return this.m_tree.GetUserData(ASCompat.dynamicAs(proxy, box2D.collision.B2DynamicTreeNode));
+		return this.m_tree.GetUserData(ASCompat.coerce(proxy, box2D.collision.B2DynamicTreeNode));
 	}
 
 	public function GetFatAABB(proxy:ASAny):B2AABB {
-		return this.m_tree.GetFatAABB(ASCompat.dynamicAs(proxy, box2D.collision.B2DynamicTreeNode));
+		return this.m_tree.GetFatAABB(ASCompat.coerce(proxy, box2D.collision.B2DynamicTreeNode));
 	}
 
 	public function GetProxyCount():Int {

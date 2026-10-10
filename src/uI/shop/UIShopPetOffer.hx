@@ -19,7 +19,7 @@ class UIShopPetOffer extends UIShopOffer {
 	override public function showOffer(gmOffer:GMOffer, gmHero:GMHero) {
 		this.offer = gmOffer;
 		mGMOfferDetail = this.offer.Details[0];
-		mGMOfferPet = ASCompat.dynamicAs(mDBFacade.gameMaster.npcById.itemFor(mGMOfferDetail.PetId), gameMasterDictionary.GMNpc);
+		mGMOfferPet = ASCompat.coerce(mDBFacade.gameMaster.npcById.itemFor(mGMOfferDetail.PetId), gameMasterDictionary.GMNpc);
 		super.showOffer(gmOffer, gmHero);
 	}
 

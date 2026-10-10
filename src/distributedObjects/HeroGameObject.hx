@@ -50,7 +50,7 @@ class HeroGameObject extends ActorGameObject implements IHeroGameObject {
 
 	var mMana:UInt = 0;
 
-	var mMaxBusterPoints:UInt = (Std.int(4294967295) : UInt);
+	var mMaxBusterPoints:UInt = (ASCompat.floatToInt(4294967295) : UInt);
 
 	var mBusterPoints:UInt = 0;
 
@@ -226,7 +226,7 @@ class HeroGameObject extends ActorGameObject implements IHeroGameObject {
 
 	public function set_manaPoints(mana:UInt):UInt {
 		mMana = mana;
-		mFacade.eventManager.dispatchEvent(new ManaEvent("ManaEvent_MANA_UPDATE", id, mMana, (Std.int(this.maxManaPoints) : UInt)));
+		mFacade.eventManager.dispatchEvent(new ManaEvent("ManaEvent_MANA_UPDATE", id, mMana, (ASCompat.floatToInt(this.maxManaPoints) : UInt)));
 		return mana;
 	}
 
@@ -289,7 +289,7 @@ class HeroGameObject extends ActorGameObject implements IHeroGameObject {
 			Logger.warn("More healthbombs have been consumed than allowed in limited use dungeons.");
 			_loc1_ = 0;
 		}
-		return Std.int(_loc1_);
+		return ASCompat.floatToInt(_loc1_);
 	}
 
 	@:isVar public var partyBombUsesRemaining(get, never):Int;
@@ -300,7 +300,7 @@ class HeroGameObject extends ActorGameObject implements IHeroGameObject {
 			Logger.warn("More partybombs have been consumed than allowed in limited use dungeons.");
 			_loc1_ = 0;
 		}
-		return Std.int(_loc1_);
+		return ASCompat.floatToInt(_loc1_);
 	}
 
 	@:isVar public var healthBombsUsed(never, set):UInt;
@@ -331,10 +331,10 @@ class HeroGameObject extends ActorGameObject implements IHeroGameObject {
 
 	override public function postGenerate() {
 		super.postGenerate();
-		mFacade.eventManager.dispatchEvent(new ManaEvent("ManaEvent_MANA_UPDATE", id, mMana, (Std.int(this.maxManaPoints) : UInt)));
+		mFacade.eventManager.dispatchEvent(new ManaEvent("ManaEvent_MANA_UPDATE", id, mMana, (ASCompat.floatToInt(this.maxManaPoints) : UInt)));
 		mFacade.eventManager.dispatchEvent(new BusterPointsEvent("BusterPointEvent_BUSTER_POINTS_UPDATE", id, mBusterPoints, mMaxBusterPoints));
 		mFacade.eventManager.dispatchEvent(new ExperienceEvent("ExperienceEvent_EXPERIENCE_UPDATE", id, mExperiencePoints));
-		mFacade.eventManager.dispatchEvent(new HpEvent("HpEvent_HP_UPDATE", id, mHitPoints, (Std.int(this.maxHitPoints) : UInt)));
+		mFacade.eventManager.dispatchEvent(new HpEvent("HpEvent_HP_UPDATE", id, mHitPoints, (ASCompat.floatToInt(this.maxHitPoints) : UInt)));
 		mChatEventComponent.addListener(GameObjectEvent.uniqueEvent("ChatEvent_INCOMING_CHAT_UPDATE", mPlayerID), function(param1:events.ChatEvent) {
 			Chat(param1.message);
 		});
@@ -394,7 +394,7 @@ class HeroGameObject extends ActorGameObject implements IHeroGameObject {
 
 	override public function set_stats(value:StatVector):StatVector {
 		super.stats = value;
-		mFacade.eventManager.dispatchEvent(new ManaEvent("ManaEvent_MANA_UPDATE", id, mMana, (Std.int(this.maxManaPoints) : UInt)));
+		mFacade.eventManager.dispatchEvent(new ManaEvent("ManaEvent_MANA_UPDATE", id, mMana, (ASCompat.floatToInt(this.maxManaPoints) : UInt)));
 		return value;
 	}
 
@@ -528,7 +528,7 @@ class HeroGameObject extends ActorGameObject implements IHeroGameObject {
 	override public function get_attackCooldownMultiplier():Float {
 		var _loc1_:GMSuperStat = null;
 		if (gMHero.StatUpgrade3 == "MAGIC_COOLDOWN") {
-			_loc1_ = ASCompat.dynamicAs(mDBFacade.gameMaster.superStatByConstant.itemFor(gMHero.StatUpgrade3), gameMasterDictionary.GMSuperStat);
+			_loc1_ = ASCompat.coerce(mDBFacade.gameMaster.superStatByConstant.itemFor(gMHero.StatUpgrade3), gameMasterDictionary.GMSuperStat);
 			return 0.01 * (mSlotPoints[2] * gMHero.AmtStat3 * _loc1_.CooldownReduction);
 		}
 		return buffHandler.attackCooldownMultiplier - 1;

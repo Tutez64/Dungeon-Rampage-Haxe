@@ -80,7 +80,7 @@ class UINewsFeedController {
 		if (_loc4_ != null) {
 			return;
 		}
-		var _loc2_ = new UINewsFeed(mDBFacade, ASCompat.dynamicAs(ASCompat.createInstance(mNewsFeedClass, []), flash.display.MovieClip), removeNewsFeed,
+		var _loc2_ = new UINewsFeed(mDBFacade, ASCompat.coerce(ASCompat.createInstance(mNewsFeedClass, []), flash.display.MovieClip), removeNewsFeed,
 			(0 : UInt), event);
 		if (_loc2_.isValid) {
 			mQueuedFeeds.push(_loc2_);
@@ -88,7 +88,7 @@ class UINewsFeedController {
 	}
 
 	function friendSummaryStatusUpdate(event:FriendSummaryNewsFeedEvent) {
-		var _loc2_ = new UINewsFeed(mDBFacade, ASCompat.dynamicAs(ASCompat.createInstance(mNewsFeedClass, []), flash.display.MovieClip), removeNewsFeed,
+		var _loc2_ = new UINewsFeed(mDBFacade, ASCompat.coerce(ASCompat.createInstance(mNewsFeedClass, []), flash.display.MovieClip), removeNewsFeed,
 			(3 : UInt), event);
 		if (_loc2_.isValid) {
 			mQueuedFeeds.push(_loc2_);
@@ -104,7 +104,7 @@ class UINewsFeedController {
 		if (!ASCompat.toBool(mDBFacade.dbAccountInfo.friendInfos.itemFor(event.friendId))) {
 			return;
 		}
-		var _loc2_ = new UINewsFeed(mDBFacade, ASCompat.dynamicAs(ASCompat.createInstance(mNewsFeedClass, []), flash.display.MovieClip), removeNewsFeed,
+		var _loc2_ = new UINewsFeed(mDBFacade, ASCompat.coerce(ASCompat.createInstance(mNewsFeedClass, []), flash.display.MovieClip), removeNewsFeed,
 			(1 : UInt), event);
 		if (_loc2_.isValid) {
 			mQueuedFeeds.push(_loc2_);
@@ -112,7 +112,7 @@ class UINewsFeedController {
 	}
 
 	function genericNewsFeedMessage(event:GenericNewsFeedEvent) {
-		var _loc2_ = new UINewsFeed(mDBFacade, ASCompat.dynamicAs(ASCompat.createInstance(mNewsFeedClass, []), flash.display.MovieClip), removeNewsFeed,
+		var _loc2_ = new UINewsFeed(mDBFacade, ASCompat.coerce(ASCompat.createInstance(mNewsFeedClass, []), flash.display.MovieClip), removeNewsFeed,
 			(2 : UInt), event);
 		if (_loc2_.isValid) {
 			mQueuedFeeds.push(_loc2_);

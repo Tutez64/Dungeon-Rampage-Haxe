@@ -18,7 +18,7 @@ class TimelineLite extends SimpleTimeline {
 		this.autoRemoveChildren = this.vars.autoRemoveChildren == true;
 		_hasUpdate = ASCompat.typeof(this.vars.onUpdate) == "function";
 		if (Std.isOfType(this.vars.tweens, Array)) {
-			this.insertMultiple(ASCompat.dynamicAs(this.vars.tweens, Array), 0, this.vars.align != null ? this.vars.align : "normal",
+			this.insertMultiple(ASCompat.coerce(this.vars.tweens, Array), 0, this.vars.align != null ? this.vars.align : "normal",
 				ASCompat.toBool(this.vars.stagger) ? ASCompat.toNumber(this.vars.stagger) : 0);
 		}
 	}
@@ -153,8 +153,8 @@ class TimelineLite extends SimpleTimeline {
 		if (!skipDisable) {
 			tween.setEnabled(false, true);
 		}
-		var _loc3_ = ASCompat.dynamicAs(this.gc ? ASCompat.dynamicAs(_endCaps[0], com.greensock.core.TweenCore) : _firstChild, com.greensock.core.TweenCore);
-		var _loc4_ = ASCompat.dynamicAs(this.gc ? ASCompat.dynamicAs(_endCaps[1], com.greensock.core.TweenCore) : _lastChild, com.greensock.core.TweenCore);
+		var _loc3_ = ASCompat.coerce(this.gc ? ASCompat.coerce(_endCaps[0], com.greensock.core.TweenCore) : _firstChild, com.greensock.core.TweenCore);
+		var _loc4_ = ASCompat.coerce(this.gc ? ASCompat.coerce(_endCaps[1], com.greensock.core.TweenCore) : _lastChild, com.greensock.core.TweenCore);
 		if (tween.nextNode != null) {
 			tween.nextNode.prevNode = tween.prevNode;
 		} else if (_loc4_ == tween) {
@@ -190,7 +190,7 @@ class TimelineLite extends SimpleTimeline {
 		var _loc5_:TweenCore = null;
 		if (this.cacheIsDirty) {
 			_loc1_ = 0;
-			_loc3_ = ASCompat.dynamicAs(this.gc ? ASCompat.dynamicAs(_endCaps[0], com.greensock.core.TweenCore) : _firstChild, com.greensock.core.TweenCore);
+			_loc3_ = ASCompat.coerce(this.gc ? ASCompat.coerce(_endCaps[0], com.greensock.core.TweenCore) : _firstChild, com.greensock.core.TweenCore);
 			_loc4_ = Math.NEGATIVE_INFINITY;
 			while (_loc3_ != null) {
 				_loc5_ = _loc3_.nextNode;
@@ -266,7 +266,7 @@ class TimelineLite extends SimpleTimeline {
 	}
 
 	public function hasPausedChild():Bool {
-		var _loc1_ = ASCompat.dynamicAs(this.gc ? ASCompat.dynamicAs(_endCaps[0], com.greensock.core.TweenCore) : _firstChild, com.greensock.core.TweenCore);
+		var _loc1_ = ASCompat.coerce(this.gc ? ASCompat.coerce(_endCaps[0], com.greensock.core.TweenCore) : _firstChild, com.greensock.core.TweenCore);
 		while (_loc1_ != null) {
 			if (_loc1_.cachedPaused
 				|| Std.isOfType(_loc1_, TimelineLite)
@@ -288,7 +288,7 @@ class TimelineLite extends SimpleTimeline {
 		_loc5_ = 0;
 		while (_loc5_ < _loc6_) {
 			if (cast(_loc3_[_loc5_], TweenLite).target == target) {
-				_loc4_[Std.int(_loc8_ = ASCompat.toNumber(_loc7_++))] = _loc3_[_loc5_];
+				_loc4_[ASCompat.floatToInt(_loc8_ = _loc7_++)] = _loc3_[_loc5_];
 			}
 			_loc5_ += 1;
 		}
@@ -325,7 +325,7 @@ class TimelineLite extends SimpleTimeline {
 	public function shiftChildren(amount:Float, adjustLabels:Bool = false, ignoreBeforeTime:Float = 0) {
 		var __ax4_iter_154:ASObject;
 		var _loc5_:String = null;
-		var _loc4_ = ASCompat.dynamicAs(this.gc ? ASCompat.dynamicAs(_endCaps[0], com.greensock.core.TweenCore) : _firstChild, com.greensock.core.TweenCore);
+		var _loc4_ = ASCompat.coerce(this.gc ? ASCompat.coerce(_endCaps[0], com.greensock.core.TweenCore) : _firstChild, com.greensock.core.TweenCore);
 		while (_loc4_ != null) {
 			if (_loc4_.cachedStartTime >= ignoreBeforeTime) {
 				_loc4_.cachedStartTime += amount;
@@ -354,7 +354,7 @@ class TimelineLite extends SimpleTimeline {
 		var _loc4_ = getTweensOf(target, nested);
 		var _loc5_ = _loc4_.length;
 		while (--_loc5_ > -1) {
-			_loc6_ = ASCompat.dynamicAs(_loc4_[_loc5_], com.greensock.TweenLite);
+			_loc6_ = ASCompat.coerce(_loc4_[_loc5_], com.greensock.TweenLite);
 			if (vars != null) {
 				_loc6_.killVars(vars);
 			}
@@ -420,16 +420,16 @@ class TimelineLite extends SimpleTimeline {
 		var _loc8_:Float;
 		var _loc5_:Array<ASAny> = [];
 		var _loc6_ = 0;
-		var _loc7_ = ASCompat.dynamicAs(this.gc ? ASCompat.dynamicAs(_endCaps[0], com.greensock.core.TweenCore) : _firstChild, com.greensock.core.TweenCore);
+		var _loc7_ = ASCompat.coerce(this.gc ? ASCompat.coerce(_endCaps[0], com.greensock.core.TweenCore) : _firstChild, com.greensock.core.TweenCore);
 		while (_loc7_ != null) {
 			if (_loc7_.cachedStartTime >= ignoreBeforeTime) {
 				if (Std.isOfType(_loc7_, TweenLite)) {
 					if (tweens) {
-						_loc5_[Std.int(_loc8_ = ASCompat.toNumber(_loc6_++))] = _loc7_;
+						_loc5_[ASCompat.floatToInt(_loc8_ = _loc6_++)] = _loc7_;
 					}
 				} else {
 					if (timelines) {
-						_loc5_[Std.int(_loc8_ = ASCompat.toNumber(_loc6_++))] = _loc7_;
+						_loc5_[ASCompat.floatToInt(_loc8_ = _loc6_++)] = _loc7_;
 					}
 					if (nested) {
 						_loc5_ = _loc5_.concat(cast(_loc7_, TimelineLite).getChildren(true, tweens, timelines));
@@ -517,8 +517,8 @@ class TimelineLite extends SimpleTimeline {
 			tween.setEnabled(true, true);
 		}
 		setDirtyCache(true);
-		var _loc3_ = ASCompat.dynamicAs(this.gc ? ASCompat.dynamicAs(_endCaps[0], com.greensock.core.TweenCore) : _firstChild, com.greensock.core.TweenCore);
-		var _loc4_ = ASCompat.dynamicAs(this.gc ? ASCompat.dynamicAs(_endCaps[1], com.greensock.core.TweenCore) : _lastChild, com.greensock.core.TweenCore);
+		var _loc3_ = ASCompat.coerce(this.gc ? ASCompat.coerce(_endCaps[0], com.greensock.core.TweenCore) : _firstChild, com.greensock.core.TweenCore);
+		var _loc4_ = ASCompat.coerce(this.gc ? ASCompat.coerce(_endCaps[1], com.greensock.core.TweenCore) : _lastChild, com.greensock.core.TweenCore);
 		if (_loc4_ == null) {
 			_loc3_ = _loc4_ = tween;
 			tween.nextNode = tween.prevNode = null;
@@ -572,7 +572,7 @@ class TimelineLite extends SimpleTimeline {
 	}
 
 	override public function invalidate() {
-		var _loc1_ = ASCompat.dynamicAs(this.gc ? ASCompat.dynamicAs(_endCaps[0], com.greensock.core.TweenCore) : _firstChild, com.greensock.core.TweenCore);
+		var _loc1_ = ASCompat.coerce(this.gc ? ASCompat.coerce(_endCaps[0], com.greensock.core.TweenCore) : _firstChild, com.greensock.core.TweenCore);
 		while (_loc1_ != null) {
 			_loc1_.invalidate();
 			_loc1_ = _loc1_.nextNode;
@@ -599,8 +599,8 @@ class TimelineLite extends SimpleTimeline {
 		var _loc3_:TweenCore = null;
 		if (enabled == this.gc) {
 			if (enabled) {
-				_firstChild = _loc3_ = ASCompat.dynamicAs(_endCaps[0], com.greensock.core.TweenCore);
-				_lastChild = ASCompat.dynamicAs(_endCaps[1], com.greensock.core.TweenCore);
+				_firstChild = _loc3_ = ASCompat.coerce(_endCaps[0], com.greensock.core.TweenCore);
+				_lastChild = ASCompat.coerce(_endCaps[1], com.greensock.core.TweenCore);
 				_endCaps = [null, null];
 			} else {
 				_loc3_ = _firstChild;

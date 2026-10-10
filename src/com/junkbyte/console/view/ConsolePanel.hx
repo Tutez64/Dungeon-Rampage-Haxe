@@ -74,7 +74,7 @@ class ConsolePanel extends Sprite {
 			field.width = w + scrollH;
 			index = field.getCharIndexAtPoint(field.mouseX + scrollH, field.mouseY);
 			field.width = w;
-			field.scrollH = Std.int(scrollH);
+			field.scrollH = ASCompat.floatToInt(scrollH);
 		} else {
 			index = field.getCharIndexAtPoint(field.mouseX, field.mouseY);
 		}
@@ -109,8 +109,7 @@ class ConsolePanel extends Sprite {
 
 	function init(w:Float, h:Float, resizable:Bool = false, col:Float = -1, a:Float = -1, rounding:Int = -1) {
 		this.bg.graphics.clear();
-		this.bg.graphics.beginFill((ASCompat.toInt(col >= 0 ? (Std.int(col) : UInt) : this.style.backgroundColor) : UInt),
-			a >= 0 ? a : this.style.backgroundAlpha);
+		this.bg.graphics.beginFill(col >= 0 ? (ASCompat.floatToInt(col) : UInt) : this.style.backgroundColor, a >= 0 ? a : this.style.backgroundAlpha);
 		if (rounding < 0) {
 			rounding = this.style.roundBorder;
 		}
@@ -247,7 +246,7 @@ class ConsolePanel extends Sprite {
 	function set_scalable(b:Bool):Bool {
 		var _loc2_ = (0 : UInt);
 		if (b && this.scaler == null) {
-			_loc2_ = (Std.int(8 + this.style.controlSize * 0.5) : UInt);
+			_loc2_ = (ASCompat.floatToInt(8 + this.style.controlSize * 0.5) : UInt);
 			this.scaler = new Sprite();
 			this.scaler.name = "scaler";
 			this.scaler.graphics.beginFill((0 : UInt), 0);
@@ -333,7 +332,7 @@ class ConsolePanel extends Sprite {
 	function getSnapOf(v:Float, isX:Bool):Float {
 		var _loc6_ = Math.NaN;
 		var _loc3_ = v + this.width;
-		var _loc4_:Array<ASAny> = ASCompat.dynamicAs(this._snaps[isX ? 0 : 1], Array);
+		var _loc4_:Array<ASAny> = ASCompat.coerce(this._snaps[isX ? 0 : 1], Array);
 		var _loc5_ = this.style.panelSnapping;
 		if (checkNullIteratee(_loc4_))
 			for (_tmp_ in _loc4_) {

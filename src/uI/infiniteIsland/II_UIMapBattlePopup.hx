@@ -88,22 +88,22 @@ class II_UIMapBattlePopup extends UIMapBattlePopup {
 				ASCompat.reinterpretAs(mPopup.getChildByName("floor_modifier_" + Std.string((i + 1))), MovieClip)));
 			i = i + 1;
 		}
-		mScrollPane = new UIScrollPane(mDBFacade, ASCompat.dynamicAs((mPopup : ASAny).leaderboard_scroll_panel, flash.display.MovieClip));
-		mSlider = new UISlider(mDBFacade, ASCompat.dynamicAs((mPopup : ASAny).slider, flash.display.MovieClip), (1 : UInt));
+		mScrollPane = new UIScrollPane(mDBFacade, ASCompat.coerce((mPopup : ASAny).leaderboard_scroll_panel, flash.display.MovieClip));
+		mSlider = new UISlider(mDBFacade, ASCompat.coerce((mPopup : ASAny).slider, flash.display.MovieClip), (1 : UInt));
 		mSlider.minimum = 500;
 		mSlider.maximum = 0;
 		mSlider.value = 0;
 		mSlider.updateCallback = mScrollPane.scrollToY;
-		mSliderUpButton = new UIButton(mDBFacade, ASCompat.dynamicAs((mPopup : ASAny).uparrow, flash.display.MovieClip));
+		mSliderUpButton = new UIButton(mDBFacade, ASCompat.coerce((mPopup : ASAny).uparrow, flash.display.MovieClip));
 		mSliderUpButton.releaseCallback = function() {
 			mSlider.valueWithCallback = mSlider.value - 20;
 		};
-		mSliderDownButton = new UIButton(mDBFacade, ASCompat.dynamicAs((mPopup : ASAny).downarrow, flash.display.MovieClip));
+		mSliderDownButton = new UIButton(mDBFacade, ASCompat.coerce((mPopup : ASAny).downarrow, flash.display.MovieClip));
 		mSliderDownButton.releaseCallback = function() {
 			mSlider.valueWithCallback = mSlider.value + 20;
 		};
 		mScrollPane.addMouseWheelFunctionality(mSlider, 20, mPopup);
-		mTopScoresBtn = new UIButton(mDBFacade, ASCompat.dynamicAs((mPopup : ASAny).button_topScores, flash.display.MovieClip));
+		mTopScoresBtn = new UIButton(mDBFacade, ASCompat.coerce((mPopup : ASAny).button_topScores, flash.display.MovieClip));
 		mTopScoresBtn.visible = false;
 		mTopScoresBtn.enabled = false;
 		mTopScoresBtn.releaseCallback = switchChampionsBoardType;
@@ -115,7 +115,7 @@ class II_UIMapBattlePopup extends UIMapBattlePopup {
 		if (checkNullIteratee(friendsKeyArray))
 			for (_tmp_ in friendsKeyArray) {
 				key = (ASCompat.toInt(_tmp_) : UInt);
-				mFriends.push(ASCompat.dynamicAs(friends.itemFor(key), account.FriendInfo));
+				mFriends.push(ASCompat.coerce(friends.itemFor(key), account.FriendInfo));
 				mChampionsboardFriendSlots.push(new II_UIChampionsboardSlot(mDBFacade, i++));
 			}
 		mChampionsboardTopSlots = new Vector<II_UIChampionsboardSlot>();
@@ -139,7 +139,7 @@ class II_UIMapBattlePopup extends UIMapBattlePopup {
 		if (_loc2_ == null) {
 			return;
 		}
-		var _loc5_ = ASCompat.dynamicAs(mDBFacade.gameMaster.infiniteDungeonsByConstant.itemFor(mCurrentDungeon.InfiniteDungeon),
+		var _loc5_ = ASCompat.coerce(mDBFacade.gameMaster.infiniteDungeonsByConstant.itemFor(mCurrentDungeon.InfiniteDungeon),
 			gameMasterDictionary.GMInfiniteDungeon);
 		_loc3_ = 0;
 		while (_loc3_ < _loc2_.modifiers.length) {
@@ -149,7 +149,7 @@ class II_UIMapBattlePopup extends UIMapBattlePopup {
 		}
 		_loc3_ = 0;
 		while (_loc3_ < _loc2_.modifiers.length) {
-			_loc4_ = ASCompat.dynamicAs(mDBFacade.gameMaster.dungeonModifierById.itemFor(_loc2_.modifiers[_loc3_]), gameMasterDictionary.GMDungeonModifier);
+			_loc4_ = ASCompat.coerce(mDBFacade.gameMaster.dungeonModifierById.itemFor(_loc2_.modifiers[_loc3_]), gameMasterDictionary.GMDungeonModifier);
 			if (_loc4_ != null) {
 				mAssetLoadingComponent.getSwfAsset(DBFacade.buildFullDownloadPath(_loc4_.IconFilepath), lateLoadForModifier((_loc3_ : UInt), _loc4_));
 			}
@@ -190,11 +190,11 @@ class II_UIMapBattlePopup extends UIMapBattlePopup {
 		}
 		mRewardChests = new Vector<MovieClip>();
 		mRewardSlots = new Vector<MovieClip>();
-		mRewardSlots.push(ASCompat.dynamicAs((mPopup : ASAny).loot_01, flash.display.MovieClip));
-		mRewardSlots.push(ASCompat.dynamicAs((mPopup : ASAny).loot_02, flash.display.MovieClip));
-		mRewardSlots.push(ASCompat.dynamicAs((mPopup : ASAny).loot_03, flash.display.MovieClip));
-		mRewardSlots.push(ASCompat.dynamicAs((mPopup : ASAny).loot_04, flash.display.MovieClip));
-		var _loc11_ = ASCompat.dynamicAs(mDBFacade.gameMaster.infiniteDungeonsByConstant.itemFor(mCurrentDungeon.InfiniteDungeon),
+		mRewardSlots.push(ASCompat.coerce((mPopup : ASAny).loot_01, flash.display.MovieClip));
+		mRewardSlots.push(ASCompat.coerce((mPopup : ASAny).loot_02, flash.display.MovieClip));
+		mRewardSlots.push(ASCompat.coerce((mPopup : ASAny).loot_03, flash.display.MovieClip));
+		mRewardSlots.push(ASCompat.coerce((mPopup : ASAny).loot_04, flash.display.MovieClip));
+		var _loc11_ = ASCompat.coerce(mDBFacade.gameMaster.infiniteDungeonsByConstant.itemFor(mCurrentDungeon.InfiniteDungeon),
 			gameMasterDictionary.GMInfiniteDungeon);
 		_loc12_ = mDBFacade.dbAccountInfo.localFriendInfo;
 		if (_loc11_ == null || _loc12_ == null) {
@@ -220,10 +220,10 @@ class II_UIMapBattlePopup extends UIMapBattlePopup {
 					_loc1_ = ASCompat.toInt(_loc11_.FloorRewardsMap.itemFor(_loc6_));
 				}
 				if (_loc1_ != 0) {
-					_loc3_ = ASCompat.dynamicAs(mDBFacade.gameMaster.dooberById.itemFor(_loc1_), gameMasterDictionary.GMDoober);
-					_loc9_ = ASCompat.dynamicAs(mDBFacade.gameMaster.chestsById.itemFor(_loc3_.ChestId), gameMasterDictionary.GMChest);
+					_loc3_ = ASCompat.coerce(mDBFacade.gameMaster.dooberById.itemFor(_loc1_), gameMasterDictionary.GMDoober);
+					_loc9_ = ASCompat.coerce(mDBFacade.gameMaster.chestsById.itemFor(_loc3_.ChestId), gameMasterDictionary.GMChest);
 					_loc10_ = mItemAsset.getClass(_loc9_.IconName);
-					_loc4_ = ASCompat.dynamicAs(ASCompat.createInstance(_loc10_, []), flash.display.MovieClip);
+					_loc4_ = ASCompat.coerce(ASCompat.createInstance(_loc10_, []), flash.display.MovieClip);
 					_loc8_ = new MovieClipRenderController(mDBFacade, _loc4_);
 					_loc8_.loop = false;
 					_loc8_.stop();
@@ -286,7 +286,7 @@ class II_UIMapBattlePopup extends UIMapBattlePopup {
 				_loc3_++;
 			}
 			if (mTopTwentyScores.hasKey(mCurrentDungeon.Id)) {
-				_loc1_ = ASCompat.dynamicAs(mTopTwentyScores.itemFor(mCurrentDungeon.Id), uI.infiniteIsland.II_ChampionsboardListPerNode);
+				_loc1_ = ASCompat.coerce(mTopTwentyScores.itemFor(mCurrentDungeon.Id), uI.infiniteIsland.II_ChampionsboardListPerNode);
 				_loc1_.sort();
 				_loc3_ = 0;
 				while (_loc3_ < _loc1_.getTotalScores()) {

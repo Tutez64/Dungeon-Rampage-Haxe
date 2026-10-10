@@ -20,7 +20,7 @@ class HexColorsPlugin extends TweenPlugin {
 			if (ASCompat.hasProperty(lookup, ASCompat.dynGetIndex(_colors[_loc2_], 1))) {
 				_colors.splice(_loc2_, (1 : UInt));
 			}
-			_loc2_ = ASCompat.toInt(_loc2_) - 1;
+			_loc2_--;
 		}
 		super.killProps(lookup);
 	}
@@ -51,7 +51,7 @@ class HexColorsPlugin extends TweenPlugin {
 		var _loc3_:Array<ASAny> = null;
 		var _loc2_ = _colors.length;
 		while (--_loc2_ > -1) {
-			_loc3_ = ASCompat.dynamicAs(_colors[_loc2_], Array);
+			_loc3_ = ASCompat.coerce(_colors[_loc2_], Array);
 			_loc3_[0][_loc3_[1]] = ASCompat.toInt(_loc3_[2] + n * ASCompat.toNumber(_loc3_[3])) << 16 | ASCompat.toInt(_loc3_[4]
 				+ n * ASCompat.toNumber(_loc3_[5])) << 8 | ASCompat.toInt(_loc3_[6] + n * ASCompat.toNumber(_loc3_[7]));
 		}

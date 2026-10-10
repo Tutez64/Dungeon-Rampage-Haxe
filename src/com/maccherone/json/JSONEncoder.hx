@@ -28,7 +28,7 @@ class JSONEncoder {
 		var _loc4_ = 1;
 		while (_loc4_ <= _loc2_) {
 			_loc3_ += " ";
-			_loc4_ = ASCompat.toInt(_loc4_) + 1;
+			_loc4_++;
 		}
 		return _loc3_;
 	}
@@ -91,7 +91,7 @@ class JSONEncoder {
 				}
 			}
 			_loc2_ += convertToString(a[_loc3_]);
-			_loc3_ = ASCompat.toInt(_loc3_) + 1;
+			_loc3_++;
 		}
 		return "[" + _loc2_ + "]";
 	}
@@ -189,7 +189,7 @@ class JSONEncoder {
 						_loc2_ += _loc3_;
 					}
 			}
-			_loc5_ = ASCompat.toInt(_loc5_) + 1;
+			_loc5_++;
 		}
 		return "\"" + _loc2_ + "\"";
 	}
@@ -203,7 +203,7 @@ class JSONEncoder {
 				_loc2_ += ",\n";
 			}
 			_loc2_ += getPadding(level) + convertToString(a[_loc3_]);
-			_loc3_ = ASCompat.toInt(_loc3_) + 1;
+			_loc3_++;
 		}
 		--level;
 		return "[" + "\n" + _loc2_ + "\n" + getPadding(level) + "]";

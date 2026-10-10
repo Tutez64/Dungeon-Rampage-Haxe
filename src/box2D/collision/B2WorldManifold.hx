@@ -13,7 +13,7 @@ import box2D.common.math.*;
 		var _loc1_ = 0;
 		while (_loc1_ < B2Settings.b2_maxManifoldPoints) {
 			this.m_points[_loc1_] = new B2Vec2();
-			_loc1_ = ASCompat.toInt(_loc1_) + 1;
+			_loc1_++;
 		}
 	}
 
@@ -89,7 +89,7 @@ import box2D.common.math.*;
 					_loc14_ = xfB.position.y + _loc8_.col1.y * _loc7_.x + _loc8_.col2.y * _loc7_.y;
 					this.m_points[_loc6_].x = _loc13_ + 0.5 * (radiusA - (_loc13_ - _loc11_) * _loc9_ - (_loc14_ - _loc12_) * _loc10_ - radiusB) * _loc9_;
 					this.m_points[_loc6_].y = _loc14_ + 0.5 * (radiusA - (_loc13_ - _loc11_) * _loc9_ - (_loc14_ - _loc12_) * _loc10_ - radiusB) * _loc10_;
-					_loc6_ = ASCompat.toInt(_loc6_) + 1;
+					_loc6_++;
 				}
 
 			case B2Manifold.e_faceB:
@@ -111,7 +111,7 @@ import box2D.common.math.*;
 					_loc14_ = xfA.position.y + _loc8_.col1.y * _loc7_.x + _loc8_.col2.y * _loc7_.y;
 					this.m_points[_loc6_].x = _loc13_ + 0.5 * (radiusB - (_loc13_ - _loc11_) * _loc9_ - (_loc14_ - _loc12_) * _loc10_ - radiusA) * _loc9_;
 					this.m_points[_loc6_].y = _loc14_ + 0.5 * (radiusB - (_loc13_ - _loc11_) * _loc9_ - (_loc14_ - _loc12_) * _loc10_ - radiusA) * _loc10_;
-					_loc6_ = ASCompat.toInt(_loc6_) + 1;
+					_loc6_++;
 				}
 		}
 	}

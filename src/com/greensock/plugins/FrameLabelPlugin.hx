@@ -21,7 +21,7 @@ class FrameLabelPlugin extends FramePlugin {
 		var _loc5_:String = value;
 		var _loc6_ = _target.currentFrame;
 		var _loc7_ = _loc4_.length;
-		while (ASCompat.toBool(_loc7_--)) {
+		while (_loc7_-- != 0) {
 			if (_loc4_[_loc7_].name == _loc5_) {
 				_loc6_ = ASCompat.toInt(_loc4_[_loc7_].frame);
 				break;

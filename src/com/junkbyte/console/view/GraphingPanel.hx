@@ -150,8 +150,8 @@ class GraphingPanel extends ConsolePanel {
 		}
 		this._needRedraw = false;
 		var _loc4_ = group.interests;
-		var _loc5_ = Std.int(width - this.startOffset);
-		var _loc6_ = Std.int(height - this.graph.y);
+		var _loc5_ = ASCompat.floatToInt(width - this.startOffset);
+		var _loc6_ = ASCompat.floatToInt(height - this.graph.y);
 		var _loc7_ = group.low;
 		var _loc8_ = group.hi;
 		var _loc9_ = _loc8_ - _loc7_;
@@ -163,42 +163,41 @@ class GraphingPanel extends ConsolePanel {
 		}
 		if (checkNullIteratee(_loc4_))
 			for (_tmp_ in _loc4_) {
-				_loc11_ = ASCompat.dynamicAs(_tmp_, com.junkbyte.console.vos.GraphInterest);
+				_loc11_ = ASCompat.coerce(_tmp_, com.junkbyte.console.vos.GraphInterest);
 				this._interest = _loc11_;
 				_loc13_ = this._interest.key;
-				_loc14_ = ASCompat.dynamicAs(this._infoMap[_loc13_], Array);
+				_loc14_ = ASCompat.coerce(this._infoMap[_loc13_], Array);
 				if (_loc14_ == null) {
 					_loc10_ = true;
 					_loc14_ = [ASCompat.toRadix(this._interest.col, (16 : UInt)), new Array<ASAny>()];
 					this._infoMap[_loc13_] = _loc14_;
 				}
-				_loc15_ = ASCompat.dynamicAs(_loc14_[1], Array);
+				_loc15_ = ASCompat.coerce(_loc14_[1], Array);
 				if (_loc3_ == 1) {
 					if (group.type == GraphGroup.FPS) {
-						_loc17_ = Std.int(Math.ffloor(group.hi / this._interest.v));
+						_loc17_ = ASCompat.floatToInt(Math.ffloor(group.hi / this._interest.v));
 						if (_loc17_ > 30) {
 							_loc17_ = 30;
 						}
 						while (_loc17_ > 0) {
 							_loc15_.push(this._interest.v);
-							_loc17_ = ASCompat.toInt(_loc17_) - 1;
+							_loc17_--;
 						}
 					} else {
 						_loc15_.push(this._interest.v);
 					}
 				}
-				_loc16_ = Std.int(Math.ffloor(_loc5_) + 10);
+				_loc16_ = ASCompat.floatToInt(Math.ffloor(_loc5_) + 10);
 				while (_loc15_.length > _loc16_) {
 					_loc15_.shift();
 				}
 				if (draw) {
 					_loc18_ = _loc15_.length;
-					this.graph.graphics.lineStyle(1, (Std.int(this._interest.col) : UInt));
+					this.graph.graphics.lineStyle(1, (ASCompat.floatToInt(this._interest.col) : UInt));
 					_loc19_ = _loc5_ > _loc18_ ? _loc18_ : _loc5_;
 					_loc20_ = 1;
 					while (_loc20_ < _loc19_) {
-						_loc21_ = (ASCompat.floatAsBool(_loc9_) ? ASCompat.toNumber(ASCompat.toNumber(_loc15_[ASCompat.toInt(_loc18_ - _loc20_)])
-							- _loc7_) / _loc9_ : 0.5) * _loc6_;
+						_loc21_ = (ASCompat.floatAsBool(_loc9_) ? (ASCompat.toNumber(_loc15_[_loc18_ - _loc20_]) - _loc7_) / _loc9_ : 0.5) * _loc6_;
 						if (!group.inv) {
 							_loc21_ = _loc6_ - _loc21_;
 						}
@@ -211,8 +210,8 @@ class GraphingPanel extends ConsolePanel {
 						if (_loc20_ == 1) {
 							this.graph.graphics.moveTo(width, _loc21_);
 						}
-						this.graph.graphics.lineTo(ASCompat.toNumber(_loc5_ - _loc20_), _loc21_);
-						_loc20_ = ASCompat.toInt(_loc20_) + 1;
+						this.graph.graphics.lineTo(_loc5_ - _loc20_, _loc21_);
+						_loc20_++;
 					}
 					if (Math.isNaN(this._interest.avg) && ASCompat.floatAsBool(_loc9_)) {
 						_loc21_ = (this._interest.avg - _loc7_) / _loc9_ * _loc6_;
@@ -225,7 +224,7 @@ class GraphingPanel extends ConsolePanel {
 						if (_loc21_ > _loc6_) {
 							_loc21_ = _loc6_;
 						}
-						this.graph.graphics.lineStyle(1, (Std.int(this._interest.col) : UInt), 0.3);
+						this.graph.graphics.lineStyle(1, (ASCompat.floatToInt(this._interest.col) : UInt), 0.3);
 						this.graph.graphics.moveTo(0, _loc21_);
 						this.graph.graphics.lineTo(_loc5_, _loc21_);
 					}
@@ -237,7 +236,7 @@ class GraphingPanel extends ConsolePanel {
 				_loc12_ = _tmp_;
 				if (checkNullIteratee(_loc4_))
 					for (_tmp_ in _loc4_) {
-						_loc11_ = ASCompat.dynamicAs(_tmp_, com.junkbyte.console.vos.GraphInterest);
+						_loc11_ = ASCompat.coerce(_tmp_, com.junkbyte.console.vos.GraphInterest);
 						if (_loc11_.key == _loc12_) {
 							_loc22_ = true;
 						}

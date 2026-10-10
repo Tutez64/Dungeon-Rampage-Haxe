@@ -42,31 +42,31 @@ class TimeSpan {
 	@:isVar public var days(get, never):Int;
 
 	public function get_days():Int {
-		return Std.int(_totalMilliseconds / 86400000);
+		return ASCompat.floatToInt(_totalMilliseconds / 86400000);
 	}
 
 	@:isVar public var hours(get, never):Int;
 
 	public function get_hours():Int {
-		return Std.int(_totalMilliseconds / 3600000) % 24;
+		return ASCompat.floatToInt(_totalMilliseconds / 3600000) % 24;
 	}
 
 	@:isVar public var minutes(get, never):Int;
 
 	public function get_minutes():Int {
-		return Std.int(_totalMilliseconds / 60000) % 60;
+		return ASCompat.floatToInt(_totalMilliseconds / 60000) % 60;
 	}
 
 	@:isVar public var seconds(get, never):Int;
 
 	public function get_seconds():Int {
-		return Std.int(_totalMilliseconds / 1000) % 60;
+		return ASCompat.floatToInt(_totalMilliseconds / 1000) % 60;
 	}
 
 	@:isVar public var milliseconds(get, never):Int;
 
 	public function get_milliseconds():Int {
-		return Std.int(_totalMilliseconds) % 1000;
+		return ASCompat.floatToInt(_totalMilliseconds) % 1000;
 	}
 
 	@:isVar public var totalDays(get, never):Float;

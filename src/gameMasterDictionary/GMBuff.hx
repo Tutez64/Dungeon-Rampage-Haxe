@@ -72,7 +72,7 @@ class GMBuff extends GMItem {
 		DeltaValues.SetFromJSON(jsonAsset);
 		Exp = ASCompat.toNumberField(jsonAsset, "EXP");
 		EventExp = ASCompat.toNumberField(jsonAsset, "EVENT_EXP");
-		Gold = ASCompat.toNumber(ASCompat.toBool(jsonAsset.Gold) ? ASCompat.toNumberField(jsonAsset, "Gold") : 1);
+		Gold = ASCompat.toBool(jsonAsset.Gold) ? ASCompat.toNumberField(jsonAsset, "Gold") : 1;
 		VFX = jsonAsset.VFX;
 		VFXFilepath = ASCompat.toBool(jsonAsset.VFXFilepath) ? jsonAsset.VFXFilepath : "Resources/Art2D/FX/db_fx_library.swf";
 		SortLayer = jsonAsset.SortLayer;
@@ -93,8 +93,8 @@ class GMBuff extends GMItem {
 		ShowInHUD = ASCompat.toBool(jsonAsset.ShowInHUD);
 		IconSwf = jsonAsset.IconSwf;
 		IconName = jsonAsset.IconName;
-		DescriptionPercentForEachStack = ASCompat.toNumber(ASCompat.toBool(jsonAsset.DescriptionPercentForEachStack) ? ASCompat.toNumberField(jsonAsset,
-			"DescriptionPercentForEachStack") : 0);
+		DescriptionPercentForEachStack = ASCompat.toBool(jsonAsset.DescriptionPercentForEachStack) ? ASCompat.toNumberField(jsonAsset,
+			"DescriptionPercentForEachStack") : 0;
 		AttackCooldownMultiplier = 1;
 		if (jsonAsset.AttackCooldownMultiplier != null) {
 			AttackCooldownMultiplier = ASCompat.toNumberField(jsonAsset, "AttackCooldownMultiplier");

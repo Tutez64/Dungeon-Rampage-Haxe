@@ -33,14 +33,14 @@ class BezierPlugin extends TweenPlugin {
 			if (checkNullIteratee(props))
 				for (_tmp_ in props.___keys()) {
 					_loc6_ = _tmp_;
-					_loc4_ = ASCompat.dynamicAs(props[_loc6_], Array);
+					_loc4_ = ASCompat.coerce(props[_loc6_], Array);
 					_loc7_[_loc6_] = _loc5_ = [];
 					if (_loc4_.length > 2) {
-						_loc5_[_loc5_.length] = [
+						_loc5_[_loc5_.length] = ([
 							_loc4_[0],
-							ASCompat.toNumber(_loc4_[1]) - ASCompat.toNumber(ASCompat.toNumber(_loc4_[2]) - ASCompat.toNumber(_loc4_[0])) / 4,
+							ASCompat.toNumber(_loc4_[1]) - (ASCompat.toNumber(_loc4_[2]) - ASCompat.toNumber(_loc4_[0])) / 4,
 							_loc4_[1]
-						];
+						] : Array<ASAny>);
 						_loc3_ = 1;
 						while (_loc3_ < _loc4_.length - 1) {
 							_loc5_[_loc5_.length] = [
@@ -59,7 +59,7 @@ class BezierPlugin extends TweenPlugin {
 			if (checkNullIteratee(props))
 				for (_tmp_ in props.___keys()) {
 					_loc6_ = _tmp_;
-					_loc4_ = ASCompat.dynamicAs(props[_loc6_], Array);
+					_loc4_ = ASCompat.coerce(props[_loc6_], Array);
 					_loc7_[_loc6_] = _loc5_ = [];
 					if (_loc4_.length > 3) {
 						_loc5_[_loc5_.length] = ([_loc4_[0], _loc4_[1], ASCompat.toNumber(_loc4_[1] + _loc4_[2]) / 2] : Array<ASAny>);
@@ -73,7 +73,7 @@ class BezierPlugin extends TweenPlugin {
 							_loc3_ += 1;
 						}
 						_loc5_[_loc5_.length] = [
-							ASCompat.dynGetIndex(_loc5_[ASCompat.toNumberField(_loc5_, "length") - 1], 2),
+							ASCompat.dynGetIndex(_loc5_[Std.string(ASCompat.toNumberField(_loc5_, "length") - 1)], 2),
 							_loc4_[_loc4_.length - 2],
 							_loc4_[_loc4_.length - 1]
 						];
@@ -111,7 +111,7 @@ class BezierPlugin extends TweenPlugin {
 			_orientData = [(["x", "y", "rotation", 0, 0.01] : Array<ASAny>)];
 			_orient = true;
 		} else if (Std.isOfType(_loc4_.orientToBezier, Array)) {
-			_orientData = ASCompat.dynamicAs(_loc4_.orientToBezier, Array);
+			_orientData = ASCompat.coerce(_loc4_.orientToBezier, Array);
 			_orient = true;
 		}
 		var _loc5_:ASObject = {};
@@ -181,7 +181,7 @@ class BezierPlugin extends TweenPlugin {
 			if (checkNullIteratee(__ax4_iter_29))
 				for (_tmp_ in __ax4_iter_29.___keys()) {
 					_loc3_ = _tmp_;
-					_loc2_ = ASCompat.toInt(ASCompat.toNumberField(_beziers[_loc3_], "length") - 1);
+					_loc2_ = ASCompat.floatToInt(ASCompat.toNumberField(_beziers[_loc3_], "length") - 1);
 					_target[_loc3_] = ASCompat.dynGetIndex(ASCompat.dynGetIndex(_beziers[_loc3_], _loc2_), 2);
 				}
 		} else {
@@ -195,33 +195,31 @@ class BezierPlugin extends TweenPlugin {
 					} else if (n >= 1) {
 						_loc2_ = _loc6_ - 1;
 					} else {
-						_loc2_ = Std.int(_loc6_ * n) >> 0;
+						_loc2_ = ASCompat.floatToInt(_loc6_ * n) >> 0;
 					}
-					_loc5_ = ASCompat.toNumber(ASCompat.toNumber(n - ASCompat.toNumber(_loc2_ * (1 / _loc6_))) * _loc6_);
+					_loc5_ = (n - _loc2_ * (1 / _loc6_)) * _loc6_;
 					_loc4_ = ASCompat.dynGetIndex(_beziers[_loc3_], _loc2_);
 					if (this.round) {
 						_loc7_ = ASCompat.toNumber(_loc4_[Std.string(0)]
-							+ _loc5_ * ASCompat.toNumber(2 * (1 - _loc5_) * ASCompat.toNumber(ASCompat.toNumber(_loc4_[Std.string(1)])
-								- ASCompat.toNumber(_loc4_[Std.string(0)]))
-								+ _loc5_ * ASCompat.toNumber(ASCompat.toNumber(_loc4_[Std.string(2)]) - ASCompat.toNumber(_loc4_[Std.string(0)]))));
+							+ _loc5_ * (2 * (1 - _loc5_) * (ASCompat.toNumber(_loc4_[Std.string(1)]) - ASCompat.toNumber(_loc4_[Std.string(0)]))
+								+ _loc5_ * (ASCompat.toNumber(_loc4_[Std.string(2)]) - ASCompat.toNumber(_loc4_[Std.string(0)]))));
 						if (_loc7_ > 0) {
-							_target[_loc3_] = Std.int(_loc7_ + 0.5) >> 0;
+							_target[_loc3_] = ASCompat.floatToInt(_loc7_ + 0.5) >> 0;
 						} else {
-							_target[_loc3_] = Std.int(_loc7_ - 0.5) >> 0;
+							_target[_loc3_] = ASCompat.floatToInt(_loc7_ - 0.5) >> 0;
 						}
 					} else {
 						_target[_loc3_] = _loc4_[Std.string(0)]
-							+ _loc5_ * ASCompat.toNumber(2 * (1 - _loc5_) * ASCompat.toNumber(ASCompat.toNumber(_loc4_[Std.string(1)])
-								- ASCompat.toNumber(_loc4_[Std.string(0)]))
-								+ _loc5_ * ASCompat.toNumber(ASCompat.toNumber(_loc4_[Std.string(2)]) - ASCompat.toNumber(_loc4_[Std.string(0)])));
+							+ _loc5_ * (2 * (1 - _loc5_) * (ASCompat.toNumber(_loc4_[Std.string(1)]) - ASCompat.toNumber(_loc4_[Std.string(0)]))
+								+ _loc5_ * (ASCompat.toNumber(_loc4_[Std.string(2)]) - ASCompat.toNumber(_loc4_[Std.string(0)])));
 					}
 				}
 		}
 		if (_orient) {
 			_loc2_ = _orientData.length;
 			_loc8_ = {};
-			while (ASCompat.toBool(_loc2_--)) {
-				_loc11_ = ASCompat.dynamicAs(_orientData[_loc2_], Array);
+			while (_loc2_-- != 0) {
+				_loc11_ = ASCompat.coerce(_orientData[_loc2_], Array);
 				_loc8_[_loc11_[0]] = _target[_loc11_[0]];
 				_loc8_[_loc11_[1]] = _target[_loc11_[1]];
 			}
@@ -231,12 +229,12 @@ class BezierPlugin extends TweenPlugin {
 			this.round = false;
 			_orient = false;
 			_loc2_ = _orientData.length;
-			while (ASCompat.toBool(_loc2_--)) {
-				_loc11_ = ASCompat.dynamicAs(_orientData[_loc2_], Array);
+			while (_loc2_-- != 0) {
+				_loc11_ = ASCompat.coerce(_orientData[_loc2_], Array);
 				this.changeFactor = ASCompat.toNumber(n + (if (ASCompat.toBool(_loc11_[4])) _loc11_[4] else 0.01));
 				_loc12_ = ASCompat.toNumber(ASCompat.thisOrDefault(ASCompat.toNumber(_loc11_[3]), 0));
-				_loc9_ = ASCompat.toNumber(ASCompat.toNumber(_future[_loc11_[0]]) - ASCompat.toNumber(_loc8_[_loc11_[0]]));
-				_loc10_ = ASCompat.toNumber(ASCompat.toNumber(_future[_loc11_[1]]) - ASCompat.toNumber(_loc8_[_loc11_[1]]));
+				_loc9_ = ASCompat.toNumber(_future[_loc11_[0]]) - ASCompat.toNumber(_loc8_[_loc11_[0]]);
+				_loc10_ = ASCompat.toNumber(_future[_loc11_[1]]) - ASCompat.toNumber(_loc8_[_loc11_[1]]);
 				_loc13_[_loc11_[2]] = Math.atan2(_loc10_, _loc9_) * _RAD2DEG + _loc12_;
 			}
 			_target = _loc13_;

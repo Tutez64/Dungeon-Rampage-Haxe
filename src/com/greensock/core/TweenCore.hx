@@ -69,8 +69,8 @@ class TweenCore {
 			TweenLite.initClass();
 			_classInitted = true;
 		}
-		var _loc3_ = ASCompat.dynamicAs(Std.isOfType(this.vars.timeline,
-			SimpleTimeline) ? ASCompat.dynamicAs(this.vars.timeline,
+		var _loc3_ = ASCompat.coerce(Std.isOfType(this.vars.timeline,
+			SimpleTimeline) ? ASCompat.coerce(this.vars.timeline,
 				com.greensock.core.SimpleTimeline) : (ASCompat.toBool(this.vars.useFrames) ? TweenLite.rootFramesTimeline : TweenLite.rootTimeline),
 			com.greensock.core.SimpleTimeline);
 		_loc3_.insert(this, _loc3_.cachedTotalTime);
@@ -196,7 +196,7 @@ class TweenCore {
 	}
 
 	function setDirtyCache(includeSelf:Bool = true) {
-		var _loc2_ = ASCompat.dynamicAs(includeSelf ? this : this.timeline, TweenCore);
+		var _loc2_ = ASCompat.coerce(includeSelf ? this : this.timeline, TweenCore);
 		while (_loc2_ != null) {
 			_loc2_.cacheIsDirty = true;
 			_loc2_ = _loc2_.timeline;

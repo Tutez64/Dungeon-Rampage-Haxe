@@ -33,7 +33,7 @@ class UIDragonKnightUpsellPopup extends DBUIPopup {
 
 	override function setupUI(swfAsset:SwfAsset, titleText:String, content:ASAny, allowClose:Bool, closeCallback:ASFunction) {
 		super.setupUI(swfAsset, titleText, content, allowClose, closeCallback);
-		mBuyButton = new UIButton(mDBFacade, ASCompat.dynamicAs((mPopup : ASAny).button_purchase, flash.display.MovieClip));
+		mBuyButton = new UIButton(mDBFacade, ASCompat.coerce((mPopup : ASAny).button_purchase, flash.display.MovieClip));
 		mBuyButton.label.text = Locale.getString("DRAGON_KNIGHT_UPSELL_POPUP_BUY_BUTTON");
 		mBuyButton.releaseCallbackThis = function(param1:UIButton) {
 			var _this = param1;

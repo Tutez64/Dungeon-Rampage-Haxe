@@ -246,7 +246,7 @@ class HeroGameObjectNetworkComponent extends DcNetworkClass implements DcNetwork
 			while ((_loc3_ : UInt) < _loc2_) {
 				_loc5_ = WeaponDetails.readFromPacket(param1);
 				_loc4_.push(_loc5_);
-				_loc3_ = ASCompat.toInt(_loc3_) + 1;
+				_loc3_++;
 			}
 			return _loc4_;
 		})(packet);
@@ -263,7 +263,7 @@ class HeroGameObjectNetworkComponent extends DcNetworkClass implements DcNetwork
 			while ((_loc3_ : UInt) < _loc2_) {
 				_loc5_ = ConsumableDetails.readFromPacket(param1);
 				_loc4_.push(_loc5_);
-				_loc3_ = ASCompat.toInt(_loc3_) + 1;
+				_loc3_++;
 			}
 			return _loc4_;
 		})(packet);
@@ -335,7 +335,7 @@ class HeroGameObjectNetworkComponent extends DcNetworkClass implements DcNetwork
 			while ((_loc3_ : UInt) < _loc2_) {
 				_loc5_ = (param1.readUnsignedShort() : Int);
 				_loc4_.push((_loc5_ : UInt));
-				_loc3_ = ASCompat.toInt(_loc3_) + 1;
+				_loc3_++;
 			}
 			return _loc4_;
 		})(packet);

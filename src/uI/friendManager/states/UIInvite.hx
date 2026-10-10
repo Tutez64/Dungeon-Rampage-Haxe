@@ -72,11 +72,11 @@ class UIInvite extends UIFMState {
 		ASCompat.setProperty((mInviteUIMC : ASAny).search_label, "textColor", 16711680);
 		ASCompat.setProperty((mInviteUIMC : ASAny).search_label, "visible", false);
 		ASCompat.setProperty((mInviteUIMC : ASAny).message_label, "visible", false);
-		mInviteInputText = new UIInputText(mDBFacade, ASCompat.dynamicAs((mInviteUIMC : ASAny).friend_enterEmailId, flash.display.MovieClip));
+		mInviteInputText = new UIInputText(mDBFacade, ASCompat.coerce((mInviteUIMC : ASAny).friend_enterEmailId, flash.display.MovieClip));
 		mInviteInputText.defaultText = Locale.getString("DRINVITE_PROMPT");
 		mInviteInputText.enterCallback = inviteViaEmail;
 		mInviteInputText.textField.maxChars = 200;
-		mInviteViaEmailButton = new UIButton(mDBFacade, ASCompat.dynamicAs((mInviteUIMC : ASAny).send_button, flash.display.MovieClip));
+		mInviteViaEmailButton = new UIButton(mDBFacade, ASCompat.coerce((mInviteUIMC : ASAny).send_button, flash.display.MovieClip));
 		mInviteViaEmailButton.label.text = Locale.getString("DRINVITE_FRIEND_EMAIL_BUTTON");
 		mInviteViaEmailButton.releaseCallback = function() {
 			var _loc1_ = new compat.RegExp("[\\s\\r\\n]*", "gim");
@@ -86,7 +86,7 @@ class UIInvite extends UIFMState {
 			ASCompat.setProperty((mInviteUIMC : ASAny).friend_enterEmailId.textField, "text", "");
 		};
 		ASCompat.setProperty((mInviteUIMC : ASAny).connect_button_kongregate, "visible", false);
-		mInviteViaFBConnectButton = new UIButton(mDBFacade, ASCompat.dynamicAs((mInviteUIMC : ASAny).connect_button_facebook, flash.display.MovieClip));
+		mInviteViaFBConnectButton = new UIButton(mDBFacade, ASCompat.coerce((mInviteUIMC : ASAny).connect_button_facebook, flash.display.MovieClip));
 		mInviteViaFBConnectButton.releaseCallback = inviteViaFBConnect;
 		if (!mDBFacade.isFacebookPlayer) {
 			mInviteViaFBConnectButton.visible = false;
@@ -171,7 +171,7 @@ class UIInvite extends UIFMState {
 			skin = mDBFacade.gameMaster.getSkinByType((ASCompat.toInt(requestJson.active_skin) : UInt));
 			mAssetLoadingComponent.getSwfAsset(DBFacade.buildFullDownloadPath(skin.UISwfFilepath), function(param1:brain.assetRepository.SwfAsset) {
 				var _loc3_ = param1.getClass(skin.IconName);
-				var _loc2_ = ASCompat.dynamicAs(ASCompat.createInstance(_loc3_, []), flash.display.MovieClip);
+				var _loc2_ = ASCompat.coerce(ASCompat.createInstance(_loc3_, []), flash.display.MovieClip);
 				UIObject.scaleToFit(_loc2_, 65);
 				iconContainer.addChild(_loc2_);
 				mEventComponent.dispatchEvent(new FriendSummaryNewsFeedEvent("FRIEND_SUMMARY_NEWS_FEED_MESSAGE_EVENT",
@@ -210,7 +210,7 @@ class UIInvite extends UIFMState {
 		var _loc4_:ASObject = null;
 		var _loc3_:Vector<UInt> = /*undefined*/ null;
 		if (ASCompat.getQualifiedClassName(details) == "Array") {
-			_loc2_ = ASCompat.dynamicAs(details[0], Array);
+			_loc2_ = ASCompat.coerce(details[0], Array);
 			_loc4_ = details[1];
 			_loc3_ = new Vector<UInt>();
 			_loc3_.push(_loc4_.account_id);

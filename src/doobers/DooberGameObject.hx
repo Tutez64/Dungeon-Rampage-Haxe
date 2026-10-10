@@ -68,7 +68,7 @@ class DooberGameObject extends FloorObject implements IDistributedDooberGameObje
 
 	function set_type(value:UInt):UInt {
 		mDooberId = value;
-		this.mDooberData = ASCompat.dynamicAs(mDBFacade.gameMaster.dooberById.itemFor(mDooberId), gameMasterDictionary.GMDoober);
+		this.mDooberData = ASCompat.coerce(mDBFacade.gameMaster.dooberById.itemFor(mDooberId), gameMasterDictionary.GMDoober);
 		this.mClassName = mDooberData.AssetClassName;
 		mSwfPath = DBFacade.buildFullDownloadPath(mDooberData.SwfFilePath);
 		return value;
@@ -103,12 +103,12 @@ class DooberGameObject extends FloorObject implements IDistributedDooberGameObje
 				_loc5_ = ASCompat.reinterpretAs(mDBFacade.gameObjectManager.getReferenceFromId(heroId), HeroGameObjectOwner);
 				_loc4_ = Math.fround(mDooberData.HPPercentage * _loc5_.maxHitPoints);
 				_loc3_ = 0;
-				_loc5_.heroView.spawnHealFloater(Std.int(_loc4_), true, true, _loc3_, (0 : UInt), "DAMAGE_MOVEMENT_TYPE");
+				_loc5_.heroView.spawnHealFloater(ASCompat.floatToInt(_loc4_), true, true, _loc3_, (0 : UInt), "DAMAGE_MOVEMENT_TYPE");
 			} else if (isHeroOwner && mDooberData.DooberType == "MANA") {
 				_loc5_ = ASCompat.reinterpretAs(mDBFacade.gameObjectManager.getReferenceFromId(heroId), HeroGameObjectOwner);
 				_loc4_ = Math.fround(mDooberData.MPPercentage * _loc5_.maxManaPoints);
 				_loc3_ = 0;
-				_loc5_.heroView.spawnHealFloater(Std.int(_loc4_), true, true, _loc3_, (2 : UInt), "DAMAGE_MOVEMENT_TYPE");
+				_loc5_.heroView.spawnHealFloater(ASCompat.floatToInt(_loc4_), true, true, _loc3_, (2 : UInt), "DAMAGE_MOVEMENT_TYPE");
 			}
 		}
 	}

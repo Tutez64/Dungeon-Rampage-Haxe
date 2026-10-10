@@ -94,14 +94,14 @@ class BuffHandler {
 		var _loc5_ = IsBerserk();
 		var _loc4_ = mExpMultiplier;
 		var _loc8_ = mEventExpMultiplier;
-		var _loc2_ = ASCompat.dynamicAs(mBuffs.itemFor(dBuff.type), actor.buffs.BuffGameObject);
+		var _loc2_ = ASCompat.coerce(mBuffs.itemFor(dBuff.type), actor.buffs.BuffGameObject);
 		if (_loc2_ == null) {
 			_loc9_ = new BuffGameObject(mFacade, mActorGameObject, mActorGameObject.actorView, dBuff.type, (0 : UInt), dBuff.attackerActor);
 			MemoryTracker.track(_loc9_, "BuffGameObject - created in BuffHandler.activateBuff()");
 			mBuffs.add(dBuff.type, _loc9_);
 			recalcBuffMultiplier();
 			recalcBuffAbility();
-			_loc3_ = ASCompat.dynamicAs(mBuffs.itemFor(dBuff.type), actor.buffs.BuffGameObject);
+			_loc3_ = ASCompat.coerce(mBuffs.itemFor(dBuff.type), actor.buffs.BuffGameObject);
 			if (_loc3_.CanSwapDisplay) {
 				mSwappableBuffs.push(_loc3_);
 				if (mSwappableBuffDisplayTask == null && mSwappableBuffs.length > 1) {
@@ -147,7 +147,7 @@ class BuffHandler {
 				_loc6_.inputController.enableCombat();
 			}
 		}
-		var _loc2_ = ASCompat.dynamicAs(mBuffs.itemFor(dBuff.type), actor.buffs.BuffGameObject);
+		var _loc2_ = ASCompat.coerce(mBuffs.itemFor(dBuff.type), actor.buffs.BuffGameObject);
 		if (_loc2_ != null) {
 			_loc2_.instanceCount -= (1 : UInt);
 			_loc2_.updateInstanceCountOnHud();
@@ -216,14 +216,14 @@ class BuffHandler {
 		mAttackCooldownMultiplier = 1;
 		var _loc3_ = ASCompat.reinterpretAs(mBuffs.iterator(), IMapIterator);
 		while (_loc3_.hasNext()) {
-			_loc2_ = ASCompat.dynamicAs(_loc3_.next(), actor.buffs.BuffGameObject);
+			_loc2_ = ASCompat.coerce(_loc3_.next(), actor.buffs.BuffGameObject);
 			_loc1_ = 0;
 			while ((_loc1_ : UInt) < _loc2_.instanceCount) {
 				mMultiplier = StatVector.multiply(mMultiplier, _loc2_.deltaValues);
 				mExpMultiplier *= _loc2_.ExpMult;
 				mEventExpMultiplier *= _loc2_.EventExpMult;
 				mAttackCooldownMultiplier *= _loc2_.attackCooldownMultiplier;
-				_loc1_ = ASCompat.toInt(_loc1_) + 1;
+				_loc1_++;
 			}
 		}
 	}
@@ -240,11 +240,11 @@ class BuffHandler {
 		Ability = (0 : UInt);
 		var _loc3_ = ASCompat.reinterpretAs(mBuffs.iterator(), IMapIterator);
 		while (_loc3_.hasNext()) {
-			_loc2_ = ASCompat.dynamicAs(_loc3_.next(), actor.buffs.BuffGameObject);
+			_loc2_ = ASCompat.coerce(_loc3_.next(), actor.buffs.BuffGameObject);
 			_loc1_ = 0;
 			while ((_loc1_ : UInt) < _loc2_.instanceCount) {
 				Ability = ((Ability | _loc2_.Ability : UInt) : UInt);
-				_loc1_ = ASCompat.toInt(_loc1_) + 1;
+				_loc1_++;
 			}
 		}
 	}

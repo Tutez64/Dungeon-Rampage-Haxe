@@ -45,13 +45,13 @@ class WorkLoopManager extends Sprite {
 	}
 
 	public function CalculateCallbackTime(delay:Float):UInt {
-		return (Std.int(mCurrentGameClock.gameTime + delay * 1000) : UInt);
+		return (ASCompat.floatToInt(mCurrentGameClock.gameTime + delay * 1000) : UInt);
 	}
 
 	public function doLater(delay:Float, callback:ASFunction, repeat:Bool = true, ownerLabel:String = null):DoLater {
 		var _loc6_ = new DoLater(repeat);
 		_loc6_.delay = delay;
-		_loc6_.dueTime = (Std.int(mCurrentGameClock.gameTime + _loc6_.delay * 1000) : UInt);
+		_loc6_.dueTime = (ASCompat.floatToInt(mCurrentGameClock.gameTime + _loc6_.delay * 1000) : UInt);
 		_loc6_.callback = callback;
 		doLaterQueue.enqueue(_loc6_);
 		var _loc5_ = ASCompat.stringAsBool(ownerLabel) ? "DoLater - " + ownerLabel + " delay=" + delay + "s repeat=" + repeat : "DoLater - delay="
@@ -85,7 +85,7 @@ class WorkLoopManager extends Sprite {
 		}
 		var _loc1_ = ASCompat.reinterpretAs(mTasks.iterator(), ISetIterator);
 		while (_loc1_.hasNext()) {
-			_loc2_ = ASCompat.dynamicAs(_loc1_.next(), brain.workLoop.Task);
+			_loc2_ = ASCompat.coerce(_loc1_.next(), brain.workLoop.Task);
 			if (_loc2_.isDestroyed()) {
 				_loc1_.remove();
 				removeTask(_loc2_);
@@ -107,7 +107,7 @@ class WorkLoopManager extends Sprite {
 					_loc1_.callback(mCurrentGameClock);
 				}
 				if (_loc1_.repeat) {
-					_loc1_.dueTime += (Std.int(_loc1_.delay * 1000) : UInt);
+					_loc1_.dueTime += (ASCompat.floatToInt(_loc1_.delay * 1000) : UInt);
 					doLaterQueue.enqueue(_loc1_);
 				}
 			}

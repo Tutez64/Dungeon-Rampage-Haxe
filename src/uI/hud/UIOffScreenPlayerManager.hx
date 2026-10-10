@@ -143,12 +143,12 @@ class UIOffScreenPlayerManager {
 				}
 			_loc2_ = ASCompat.reinterpretAs(_loc4_.iterator(), IMapIterator);
 			while (_loc2_.hasNext()) {
-				_loc7_ = ASCompat.dynamicAs(_loc2_.next(), distributedObjects.HeroGameObject);
+				_loc7_ = ASCompat.coerce(_loc2_.next(), distributedObjects.HeroGameObject);
 				updatePosition(_loc7_);
 			}
 			_loc2_ = ASCompat.reinterpretAs(mSpecialActorsMap.iterator(), IMapIterator);
 			while (_loc2_.hasNext()) {
-				_loc3_ = ASCompat.dynamicAs(_loc2_.next(), actor.ActorGameObject);
+				_loc3_ = ASCompat.coerce(_loc2_.next(), actor.ActorGameObject);
 				if (_loc3_ != null) {
 					updatePosition(_loc3_);
 				}
@@ -175,7 +175,7 @@ class UIOffScreenPlayerManager {
 		var _loc9_ = new Vector3D(-1, 0, 0);
 		if (!mOffScreenPlayerMap.hasKey(player.id)) {
 			_loc5_ = mNametagSwfAsset.getClass("UI_widget");
-			_loc3_ = ASCompat.dynamicAs(ASCompat.createInstance(_loc5_, []), flash.display.MovieClip);
+			_loc3_ = ASCompat.coerce(ASCompat.createInstance(_loc5_, []), flash.display.MovieClip);
 			_loc8_ = normalize(_loc8_);
 			_loc12_ = Math.acos(_loc8_.dotProduct(_loc9_));
 			_loc12_ = _loc12_ * 180 / 3.141592653589793;
@@ -195,9 +195,9 @@ class UIOffScreenPlayerManager {
 			_loc3_.visible = false;
 			_loc6_ = new UIOffScreenClip(mDBFacade, _loc3_, player, mNametagSwfAsset);
 			mOffScreenPlayerMap.add(player.id, _loc6_);
-			_loc6_.setHp(player.hitPoints, (Std.int(player.maxHitPoints) : UInt));
+			_loc6_.setHp(player.hitPoints, (ASCompat.floatToInt(player.maxHitPoints) : UInt));
 		} else {
-			_loc7_ = ASCompat.dynamicAs(mOffScreenPlayerMap.itemFor(player.id), uI.hud.UIOffScreenClip);
+			_loc7_ = ASCompat.coerce(mOffScreenPlayerMap.itemFor(player.id), uI.hud.UIOffScreenClip);
 			if (_loc7_ != null && _loc7_.clip != null) {
 				if (!_loc2_.contains(_loc11_.x, _loc11_.y)) {
 					if (_loc7_.clip.visible == false) {
@@ -222,7 +222,7 @@ class UIOffScreenPlayerManager {
 	}
 
 	function removeClip(id:Float) {
-		var _loc2_ = ASCompat.dynamicAs(mOffScreenPlayerMap.itemFor(id), uI.hud.UIOffScreenClip);
+		var _loc2_ = ASCompat.coerce(mOffScreenPlayerMap.itemFor(id), uI.hud.UIOffScreenClip);
 		if (_loc2_ != null) {
 			if (mUIRoot.contains(_loc2_.clip)) {
 				mUIRoot.removeChild(_loc2_.clip);
@@ -272,7 +272,7 @@ class UIOffScreenPlayerManager {
 	public function handlePicChange(playerID:Int, picType:String) {
 		var _loc3_:UIOffScreenClip = null;
 		if (mOffScreenPlayerMap.hasKey(playerID)) {
-			_loc3_ = ASCompat.dynamicAs(mOffScreenPlayerMap.itemFor(playerID), uI.hud.UIOffScreenClip);
+			_loc3_ = ASCompat.coerce(mOffScreenPlayerMap.itemFor(playerID), uI.hud.UIOffScreenClip);
 			if (_loc3_ == null) {
 				return;
 			}

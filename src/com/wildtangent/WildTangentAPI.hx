@@ -95,7 +95,7 @@ class WildTangentAPI extends Sprite {
 	function loadAPI(param1:Event) {
 		var e = param1;
 		myVex = e.target.content;
-		addChild(ASCompat.dynamicAs(myVex, flash.display.DisplayObject));
+		addChild(ASCompat.coerce(myVex, flash.display.DisplayObject));
 		if (root.loaderInfo.parameters.canvasSize != null) {
 			ASCompat.setProperty(myVex, "canvasSize", root.loaderInfo.parameters.canvasSize);
 		}

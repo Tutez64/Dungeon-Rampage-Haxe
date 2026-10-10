@@ -144,7 +144,7 @@ class PlayerOwnerAttackController {
 
 	function buildDungeonBuster() {
 		var _loc1_ = mDistributedPlayerOwner.gMHero.DBuster1;
-		mDungeonBusterGMAttack = ASCompat.dynamicAs(mDBFacade.gameMaster.attackByConstant.itemFor(_loc1_), gameMasterDictionary.GMAttack);
+		mDungeonBusterGMAttack = ASCompat.coerce(mDBFacade.gameMaster.attackByConstant.itemFor(_loc1_), gameMasterDictionary.GMAttack);
 		mDungeonBusterAttackTimeline = mDBFacade.timelineFactory.createAttackTimeline(mDungeonBusterGMAttack.AttackTimeline, null, mDistributedPlayerOwner,
 			mDistributedPlayerOwner.distributedDungeonFloor);
 		mDistributedPlayerOwner.maxBusterPoints = mDungeonBusterGMAttack.CrowdCost;
@@ -239,7 +239,7 @@ class PlayerOwnerAttackController {
 			return;
 		}
 		while (mPotentialWeaponInputQueue.length > 0) {
-			_loc2_ = ASCompat.dynamicAs(mPotentialWeaponInputQueue[0], combat.attack.PotentialWeaponInputQueueStruct);
+			_loc2_ = ASCompat.coerce(mPotentialWeaponInputQueue[0], combat.attack.PotentialWeaponInputQueueStruct);
 			_loc1_ = false;
 			if (_loc2_.weaponIndex == 3 && canPlayDungeonBusterAttack()) {
 				mNextWeaponCommand = new PotentialWeaponInputQueueStruct(_loc2_.weaponController, _loc2_.weaponIndex, _loc2_.down, _loc2_.autoAim);
@@ -380,7 +380,7 @@ class PlayerOwnerAttackController {
 			if (mWeaponControllers[_loc1_] != null && mWeaponControllers[_loc1_].weaponDownActive) {
 				return true;
 			}
-			_loc1_ = ASCompat.toInt(_loc1_) + 1;
+			_loc1_++;
 		}
 		return false;
 	}
@@ -404,7 +404,7 @@ class PlayerOwnerAttackController {
 
 	public function resetCombosOnAllBut(weaponIndex:UInt = null) {
 		if (weaponIndex == null)
-			weaponIndex = (Std.int(4294967295) : UInt);
+			weaponIndex = (ASCompat.floatToInt(4294967295) : UInt);
 		var _loc2_ = 0;
 		var _loc3_:WeaponController = null;
 		_loc2_ = 0;
@@ -415,7 +415,7 @@ class PlayerOwnerAttackController {
 					_loc3_.resetCombos();
 				}
 			}
-			_loc2_ = ASCompat.toInt(_loc2_) + 1;
+			_loc2_++;
 		}
 	}
 
@@ -429,12 +429,12 @@ class PlayerOwnerAttackController {
 			if (_loc2_ != null) {
 				_loc2_.reset();
 			}
-			_loc1_ = ASCompat.toInt(_loc1_) + 1;
+			_loc1_++;
 		}
 	}
 
 	public function playPotentialPotionAttack(stackableID:UInt) {
-		var _loc3_ = ASCompat.dynamicAs(mDBFacade.gameMaster.stackableById.itemFor(stackableID), gameMasterDictionary.GMStackable);
+		var _loc3_ = ASCompat.coerce(mDBFacade.gameMaster.stackableById.itemFor(stackableID), gameMasterDictionary.GMStackable);
 		if (_loc3_ == null) {
 			return;
 		}
@@ -442,7 +442,7 @@ class PlayerOwnerAttackController {
 		if (_loc2_ == null) {
 			return;
 		}
-		var _loc4_ = ASCompat.dynamicAs(mDBFacade.gameMaster.attackByConstant.itemFor(_loc2_), gameMasterDictionary.GMAttack);
+		var _loc4_ = ASCompat.coerce(mDBFacade.gameMaster.attackByConstant.itemFor(_loc2_), gameMasterDictionary.GMAttack);
 		if (_loc4_ == null) {
 			return;
 		}
@@ -464,7 +464,7 @@ class PlayerOwnerAttackController {
 			if (_loc2_ != null) {
 				_loc2_.berserkModeStart();
 			}
-			_loc3_ = ASCompat.toInt(_loc3_) + 1;
+			_loc3_++;
 		}
 	}
 
@@ -477,7 +477,7 @@ class PlayerOwnerAttackController {
 			if (_loc2_ != null) {
 				_loc2_.berserkModeEnd();
 			}
-			_loc3_ = ASCompat.toInt(_loc3_) + 1;
+			_loc3_++;
 		}
 	}
 

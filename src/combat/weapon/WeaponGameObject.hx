@@ -75,22 +75,22 @@ class WeaponGameObject extends GameObject {
 		mCooldownReduction = 1;
 		mChargeReduction = 1;
 		mWeaponDetails = weaponDetails;
-		mGMRarity = ASCompat.dynamicAs(mDBFacade.gameMaster.rarityById.itemFor(mWeaponDetails.rarity), gameMasterDictionary.GMRarity);
+		mGMRarity = ASCompat.coerce(mDBFacade.gameMaster.rarityById.itemFor(mWeaponDetails.rarity), gameMasterDictionary.GMRarity);
 		mActorGameObject = actorGameObject;
 		mModifiers = new Vector<GMModifier>();
 		if (mWeaponDetails.modifier1 > 0) {
-			mModifiers.push(ASCompat.dynamicAs(mDBFacade.gameMaster.modifiersById.itemFor(mWeaponDetails.modifier1), gameMasterDictionary.GMModifier));
+			mModifiers.push(ASCompat.coerce(mDBFacade.gameMaster.modifiersById.itemFor(mWeaponDetails.modifier1), gameMasterDictionary.GMModifier));
 		}
 		if (mWeaponDetails.modifier2 > 0) {
-			mModifiers.push(ASCompat.dynamicAs(mDBFacade.gameMaster.modifiersById.itemFor(mWeaponDetails.modifier2), gameMasterDictionary.GMModifier));
+			mModifiers.push(ASCompat.coerce(mDBFacade.gameMaster.modifiersById.itemFor(mWeaponDetails.modifier2), gameMasterDictionary.GMModifier));
 		}
 		if (mWeaponDetails.legendarymodifier > 0) {
-			mLegendaryModifier = ASCompat.dynamicAs(mDBFacade.gameMaster.legendaryModifiersById.itemFor(mWeaponDetails.legendarymodifier),
+			mLegendaryModifier = ASCompat.coerce(mDBFacade.gameMaster.legendaryModifiersById.itemFor(mWeaponDetails.legendarymodifier),
 				gameMasterDictionary.GMLegendaryModifier);
 		}
 		updateStatsForModifiers();
 		updateStatsForLegendaryModifier();
-		mGMWeapon = ASCompat.dynamicAs(mDBFacade.gameMaster.weaponItemById.itemFor(mWeaponDetails.type), gameMasterDictionary.GMWeaponItem);
+		mGMWeapon = ASCompat.coerce(mDBFacade.gameMaster.weaponItemById.itemFor(mWeaponDetails.type), gameMasterDictionary.GMWeaponItem);
 		mActorView = actorView;
 		mDistributedDungeonFloor = distributedDungeonFloor;
 		mAttackTimelineMap = new Map();
@@ -209,7 +209,7 @@ class WeaponGameObject extends GameObject {
 	@:isVar public var slot(get, never):Int;
 
 	public function get_slot():Int {
-		return Std.int(this.mSlot);
+		return ASCompat.floatToInt(this.mSlot);
 	}
 
 	@:isVar public var requiredLevel(get, never):Int;
@@ -252,7 +252,7 @@ class WeaponGameObject extends GameObject {
 
 	public function getAttackTimeline(attackType:UInt):AttackTimeline {
 		var _loc2_ = findTimelineNameFromAttackType(attackType);
-		var _loc3_ = ASCompat.dynamicAs(mAttackTimelineMap.itemFor(_loc2_), combat.attack.AttackTimeline);
+		var _loc3_ = ASCompat.coerce(mAttackTimelineMap.itemFor(_loc2_), combat.attack.AttackTimeline);
 		if (_loc3_ == null) {
 			_loc3_ = mDBFacade.timelineFactory.createAttackTimeline(_loc2_, this, mActorGameObject, mDistributedDungeonFloor);
 			mAttackTimelineMap.add(_loc2_, _loc3_);
@@ -261,7 +261,7 @@ class WeaponGameObject extends GameObject {
 	}
 
 	function findTimelineNameFromAttackType(attackType:UInt):String {
-		var _loc2_ = ASCompat.dynamicAs(mDBFacade.gameMaster.attackById.itemFor(attackType), gameMasterDictionary.GMAttack);
+		var _loc2_ = ASCompat.coerce(mDBFacade.gameMaster.attackById.itemFor(attackType), gameMasterDictionary.GMAttack);
 		if (_loc2_ == null) {
 			return "";
 		}

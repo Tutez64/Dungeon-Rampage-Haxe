@@ -140,14 +140,14 @@ class TweenMax extends TweenLite implements IEventDispatcher {
 		var _loc6_:Float;
 		var _loc4_ = 0;
 		var _loc5_ = 0;
-		var _loc2_:Array<ASAny> = ASCompat.dynamicAs(TweenLite.masterList[target], Array);
+		var _loc2_:Array<ASAny> = ASCompat.coerce(TweenLite.masterList[target], Array);
 		var _loc3_:Array<ASAny> = [];
 		if (_loc2_ != null) {
 			_loc4_ = _loc2_.length;
 			_loc5_ = 0;
 			while (--_loc4_ > -1) {
 				if (!cast(_loc2_[_loc4_], TweenLite).gc) {
-					_loc3_[Std.int(_loc6_ = ASCompat.toNumber(_loc5_++))] = _loc2_[_loc4_];
+					_loc3_[ASCompat.floatToInt(_loc6_ = _loc5_++)] = _loc2_[_loc4_];
 				}
 			}
 		}
@@ -166,7 +166,7 @@ class TweenMax extends TweenLite implements IEventDispatcher {
 		while (--_loc6_ > -1) {
 			_loc4_ = _loc3_[_loc6_].target;
 			if (Std.isOfType(_loc4_, DisplayObject)) {
-				_loc5_ = ASCompat.dynamicAs(_loc4_.parent, flash.display.DisplayObjectContainer);
+				_loc5_ = ASCompat.coerce(_loc4_.parent, flash.display.DisplayObjectContainer);
 				while (_loc5_ != null) {
 					if (_loc5_ == parent) {
 						if (complete) {
@@ -197,7 +197,7 @@ class TweenMax extends TweenLite implements IEventDispatcher {
 		var _loc2_ = getTweensOf(target);
 		var _loc3_ = _loc2_.length;
 		while (--_loc3_ > -1) {
-			_loc4_ = ASCompat.dynamicAs(_loc2_[_loc3_], com.greensock.TweenLite);
+			_loc4_ = ASCompat.coerce(_loc2_[_loc3_], com.greensock.TweenLite);
 			if (_loc4_.active || _loc4_.cachedStartTime == _loc4_.timeline.cachedTime && _loc4_.timeline.active) {
 				return true;
 			}
@@ -265,11 +265,11 @@ class TweenMax extends TweenLite implements IEventDispatcher {
 		var _loc3_:Array<ASAny> = [];
 		if (checkNullIteratee(_loc1_))
 			for (_tmp_ in _loc1_) {
-				_loc4_ = ASCompat.dynamicAs(_tmp_, Array);
+				_loc4_ = ASCompat.coerce(_tmp_, Array);
 				_loc5_ = _loc4_.length;
 				while (--_loc5_ > -1) {
 					if (!cast(_loc4_[_loc5_], TweenLite).gc) {
-						_loc3_[Std.int(_loc8_ = ASCompat.toNumber(_loc2_++))] = _loc4_[_loc5_];
+						_loc3_[ASCompat.floatToInt(_loc8_ = _loc2_++)] = _loc4_[_loc5_];
 					}
 				}
 			}
@@ -299,8 +299,8 @@ class TweenMax extends TweenLite implements IEventDispatcher {
 			vars = vars.vars;
 		}
 		curDelay = vars.hasOwnProperty("delay") ? ASCompat.toNumber(vars.delay) : 0;
-		onCompleteProxy = ASCompat.asFunction(vars.onComplete);
-		onCompleteParamsProxy = ASCompat.dynamicAs(vars.onCompleteParams, Array);
+		onCompleteProxy = ASCompat.coerceFunction(vars.onComplete);
+		onCompleteParamsProxy = ASCompat.coerce(vars.onCompleteParams, Array);
 		lastIndex = l - 1;
 		i = 0;
 		while (i < l) {
@@ -389,7 +389,7 @@ class TweenMax extends TweenLite implements IEventDispatcher {
 		if (_repeat != 0) {
 			_loc10_ = this.cachedDuration + _repeatDelay;
 			_loc11_ = _cyclesComplete;
-			_cyclesComplete = Std.int(this.cachedTotalTime / _loc10_) >> 0;
+			_cyclesComplete = ASCompat.floatToInt(this.cachedTotalTime / _loc10_) >> 0;
 			if (_cyclesComplete == this.cachedTotalTime / _loc10_) {
 				--_cyclesComplete;
 			}
@@ -553,23 +553,23 @@ class TweenMax extends TweenLite implements IEventDispatcher {
 			_dispatcher = new EventDispatcher(this);
 		}
 		if (Reflect.isFunction(this.vars.onInitListener)) {
-			_dispatcher.addEventListener(TweenEvent.INIT, ASCompat.asFunction(this.vars.onInitListener), false, 0, true);
+			_dispatcher.addEventListener(TweenEvent.INIT, ASCompat.coerceFunction(this.vars.onInitListener), false, 0, true);
 		}
 		if (Reflect.isFunction(this.vars.onStartListener)) {
-			_dispatcher.addEventListener(TweenEvent.START, ASCompat.asFunction(this.vars.onStartListener), false, 0, true);
+			_dispatcher.addEventListener(TweenEvent.START, ASCompat.coerceFunction(this.vars.onStartListener), false, 0, true);
 		}
 		if (Reflect.isFunction(this.vars.onUpdateListener)) {
-			_dispatcher.addEventListener(TweenEvent.UPDATE, ASCompat.asFunction(this.vars.onUpdateListener), false, 0, true);
+			_dispatcher.addEventListener(TweenEvent.UPDATE, ASCompat.coerceFunction(this.vars.onUpdateListener), false, 0, true);
 			_hasUpdateListener = true;
 		}
 		if (Reflect.isFunction(this.vars.onCompleteListener)) {
-			_dispatcher.addEventListener(TweenEvent.COMPLETE, ASCompat.asFunction(this.vars.onCompleteListener), false, 0, true);
+			_dispatcher.addEventListener(TweenEvent.COMPLETE, ASCompat.coerceFunction(this.vars.onCompleteListener), false, 0, true);
 		}
 		if (Reflect.isFunction(this.vars.onRepeatListener)) {
-			_dispatcher.addEventListener(TweenEvent.REPEAT, ASCompat.asFunction(this.vars.onRepeatListener), false, 0, true);
+			_dispatcher.addEventListener(TweenEvent.REPEAT, ASCompat.coerceFunction(this.vars.onRepeatListener), false, 0, true);
 		}
 		if (Reflect.isFunction(this.vars.onReverseCompleteListener)) {
-			_dispatcher.addEventListener(TweenEvent.REVERSE_COMPLETE, ASCompat.asFunction(this.vars.onReverseCompleteListener), false, 0, true);
+			_dispatcher.addEventListener(TweenEvent.REVERSE_COMPLETE, ASCompat.coerceFunction(this.vars.onReverseCompleteListener), false, 0, true);
 		}
 	}
 
@@ -706,7 +706,7 @@ class TweenMax extends TweenLite implements IEventDispatcher {
 
 	override public function invalidate() {
 		this.yoyo = this.vars.yoyo == true;
-		_repeat = ASCompat.toBool(this.vars.repeat) ? Std.int(ASCompat.toNumber(this.vars.repeat)) : 0;
+		_repeat = ASCompat.toBool(this.vars.repeat) ? ASCompat.floatToInt(ASCompat.toNumber(this.vars.repeat)) : 0;
 		_repeatDelay = ASCompat.toBool(this.vars.repeatDelay) ? ASCompat.toNumber(this.vars.repeatDelay) : 0;
 		_hasUpdateListener = false;
 		if (this.vars.onCompleteListener != null || this.vars.onUpdateListener != null || this.vars.onStartListener != null) {

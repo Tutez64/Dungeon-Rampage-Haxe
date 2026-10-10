@@ -412,7 +412,7 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 
 	function nametagSwfLoaded(swfAsset:SwfAsset) {
 		var _loc2_ = swfAsset.getClass("fb_avatar_holder");
-		mFacebookPicHolder = ASCompat.dynamicAs(ASCompat.createInstance(_loc2_, []), flash.display.MovieClip);
+		mFacebookPicHolder = ASCompat.coerce(ASCompat.createInstance(_loc2_, []), flash.display.MovieClip);
 		mSceneGraphComponent.addChild(mFacebookPicHolder, (105 : UInt));
 		mFacebookPicHolder.visible = false;
 	}
@@ -422,7 +422,7 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 	}
 
 	public function postGenerate() {
-		mCurrentMapNode = ASCompat.dynamicAs(mDBFacade.gameMaster.mapNodeById.itemFor(mMapNodeId), gameMasterDictionary.GMMapNode);
+		mCurrentMapNode = ASCompat.coerce(mDBFacade.gameMaster.mapNodeById.itemFor(mMapNodeId), gameMasterDictionary.GMMapNode);
 		if (mCurrentMapNode == null) {
 			Logger.error("Couldn\'t find GMMapNode for node id : " + mMapNodeId);
 			return;
@@ -453,7 +453,7 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 		final __ax4_iter_220 = mUILootSlotsTwoTreasures;
 		if (checkNullIteratee(__ax4_iter_220))
 			for (_tmp_ in __ax4_iter_220) {
-				_loc2_ = ASCompat.dynamicAs(_tmp_, Array);
+				_loc2_ = ASCompat.coerce(_tmp_, Array);
 				_loc3_ = 0;
 				while (_loc3_ < _loc2_.length) {
 					ASCompat.setProperty(_loc2_[_loc3_], "visible", isVisible);
@@ -468,7 +468,7 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 		final __ax4_iter_221 = mUILootSlotsFourTreasures;
 		if (checkNullIteratee(__ax4_iter_221))
 			for (_tmp_ in __ax4_iter_221) {
-				_loc2_ = ASCompat.dynamicAs(_tmp_, Array);
+				_loc2_ = ASCompat.coerce(_tmp_, Array);
 				_loc3_ = 0;
 				while (_loc3_ < _loc2_.length) {
 					ASCompat.setProperty(_loc2_[_loc3_], "visible", isVisible);
@@ -628,16 +628,16 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 						if (mDungeonReport[(i : Int)].valid != 0) {
 							ASCompat.setProperty(stats[(i : Int)].stats.xp_bar.bonus_xp_reveal, "visible", false);
 							ASCompat.setProperty(stats[(i : Int)].stats.xp_bar.bonus_xp, "visible", true);
-							maxBonus = (Std.int(Math.max(maxBonus, mDungeonReport[(i : Int)].xp_bonus)) : UInt);
+							maxBonus = (ASCompat.floatToInt(Math.max(maxBonus, mDungeonReport[(i : Int)].xp_bonus)) : UInt);
 							speed = (maxBonus - mBonusXPTick[(i : Int)]) / 10;
 							if (speed < 1 && maxBonus > mBonusXPTick[(i : Int)]) {
 								speed = 1;
 							}
 							if (mBonusXPTick[(i : Int)] < mDungeonReport[(i : Int)].xp_bonus) {
-								gmHero = ASCompat.dynamicAs(mDBFacade.gameMaster.heroById.itemFor(mDungeonReport[(i : Int)].type), gameMasterDictionary.GMHero);
+								gmHero = ASCompat.coerce(mDBFacade.gameMaster.heroById.itemFor(mDungeonReport[(i : Int)].type), gameMasterDictionary.GMHero);
 								oldLevel = gmHero.getLevelFromExp(mDungeonReport[(i : Int)].xp + mBonusXPTick[(i : Int)]);
 								allFinished = false;
-								mBonusXPTick[(i : Int)] += (Std.int(speed) : UInt);
+								mBonusXPTick[(i : Int)] += (ASCompat.floatToInt(speed) : UInt);
 								currentExp = mDungeonReport[(i : Int)].xp + mBonusXPTick[(i : Int)];
 								level = gmHero.getLevelFromExp(currentExp);
 								levelIndex = (gmHero.getLevelIndex(currentExp) : UInt);
@@ -652,12 +652,12 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 									ASCompat.setProperty(stats[(i : Int)].stats.fx_level_up_text, "visible", true);
 									ASCompat.setProperty(stats[(i : Int)].stats.fx_level_up_anim, "visible", true);
 									animMcr = new MovieClipRenderController(mDBFacade,
-										ASCompat.dynamicAs(stats[(i : Int)].stats.fx_level_up_anim, flash.display.MovieClip));
+										ASCompat.coerce(stats[(i : Int)].stats.fx_level_up_anim, flash.display.MovieClip));
 									animMcr.play((0 : UInt), false, function() {
 										animMcr.destroy();
 									});
 									textMcr = new MovieClipRenderController(mDBFacade,
-										ASCompat.dynamicAs(stats[(i : Int)].stats.fx_level_up_text, flash.display.MovieClip));
+										ASCompat.coerce(stats[(i : Int)].stats.fx_level_up_text, flash.display.MovieClip));
 									textMcr.play((0 : UInt), false, function() {
 										textMcr.destroy();
 									});
@@ -684,7 +684,7 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 					i = (0 : UInt);
 					while (i < (stats.length:UInt)) {
 						if (mDungeonReport[(i : Int)].valid != 0) {
-							teamBonusUI = ASCompat.dynamicAs(mTeamBonusUI.itemFor(i), brain.uI.UIObject);
+							teamBonusUI = ASCompat.coerce(mTeamBonusUI.itemFor(i), brain.uI.UIObject);
 							teamBonusUI.visible = true;
 						}
 						i = i + 1;
@@ -707,17 +707,17 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 					i = (0 : UInt);
 					while (i < (stats.length:UInt)) {
 						if (mDungeonReport[(i : Int)].valid != 0) {
-							maxBonusTeam = (Std.int(Math.max(maxBonusTeam, mDungeonReport[(i : Int)].team_xp_bonus)) : UInt);
+							maxBonusTeam = (ASCompat.floatToInt(Math.max(maxBonusTeam, mDungeonReport[(i : Int)].team_xp_bonus)) : UInt);
 							speedTeam = (maxBonusTeam - mTeamBonusXPTick[(i : Int)]) / 10;
 							if (speedTeam < 1 && maxBonusTeam > mTeamBonusXPTick[(i : Int)]) {
 								speedTeam = 1;
 							}
 							if (mTeamBonusXPTick[(i : Int)] < mDungeonReport[(i : Int)].team_xp_bonus) {
-								gmHeroTeam = ASCompat.dynamicAs(mDBFacade.gameMaster.heroById.itemFor(mDungeonReport[(i : Int)].type),
+								gmHeroTeam = ASCompat.coerce(mDBFacade.gameMaster.heroById.itemFor(mDungeonReport[(i : Int)].type),
 									gameMasterDictionary.GMHero);
 								oldLevelTeam = gmHeroTeam.getLevelFromExp(mDungeonReport[(i : Int)].xp + mBonusXPTick[(i : Int)]);
 								allFinished = false;
-								mTeamBonusXPTick[(i : Int)] += (Std.int(speedTeam) : UInt);
+								mTeamBonusXPTick[(i : Int)] += (ASCompat.floatToInt(speedTeam) : UInt);
 								currentExpTeam = mDungeonReport[(i : Int)].xp + mBonusXPTick[(i : Int)] + mTeamBonusXPTick[(i : Int)];
 								levelTeam = gmHeroTeam.getLevelFromExp(currentExpTeam);
 								levelIndexTeam = (gmHeroTeam.getLevelIndex(currentExpTeam) : UInt);
@@ -725,7 +725,7 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 								maxTeam = gmHeroTeam.getExpFromIndex(levelIndexTeam);
 								ASCompat.setProperty(mXpBar[(i : Int)], "value", (currentExpTeam - lastLevelExpTeam) / (maxTeam - lastLevelExpTeam));
 								ASCompat.setProperty(xp_barsTeam[(i : Int)].xp_level, "text", Std.string(levelTeam));
-								teamBonusUITeam = ASCompat.dynamicAs(mTeamBonusUI.itemFor(i), brain.uI.UIObject);
+								teamBonusUITeam = ASCompat.coerce(mTeamBonusUI.itemFor(i), brain.uI.UIObject);
 								ASCompat.setProperty((teamBonusUITeam.root : ASAny).xp, "text", Std.string(mTeamBonusXPTick[(i : Int)]));
 								ASCompat.setProperty(stats[(i : Int)].stats.xp_bar.UI_XP.xp_points, "text", Std.string(currentExpTeam));
 								ASCompat.setProperty(stats[(i : Int)].stats.xp_bar.UI_XP.xp_level, "text", Std.string(levelTeam));
@@ -733,12 +733,12 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 									ASCompat.setProperty(stats[(i : Int)].stats.fx_level_up_text, "visible", true);
 									ASCompat.setProperty(stats[(i : Int)].stats.fx_level_up_anim, "visible", true);
 									animMcrTeam = new MovieClipRenderController(mDBFacade,
-										ASCompat.dynamicAs(stats[(i : Int)].stats.fx_level_up_anim, flash.display.MovieClip));
+										ASCompat.coerce(stats[(i : Int)].stats.fx_level_up_anim, flash.display.MovieClip));
 									animMcrTeam.play((0 : UInt), false, function() {
 										animMcrTeam.destroy();
 									});
 									textMcrTeam = new MovieClipRenderController(mDBFacade,
-										ASCompat.dynamicAs(stats[(i : Int)].stats.fx_level_up_text, flash.display.MovieClip));
+										ASCompat.coerce(stats[(i : Int)].stats.fx_level_up_text, flash.display.MovieClip));
 									textMcrTeam.play((0 : UInt), false, function() {
 										textMcrTeam.destroy();
 									});
@@ -776,7 +776,7 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 					i = (0 : UInt);
 					while (i < (stats.length:UInt)) {
 						if (mDungeonReport[(i : Int)].valid != 0) {
-							maxKills = (Std.int(Math.max(maxKills, mDungeonReport[(i : Int)].kills)) : UInt);
+							maxKills = (ASCompat.floatToInt(Math.max(maxKills, mDungeonReport[(i : Int)].kills)) : UInt);
 							ASCompat.setProperty(stats[(i : Int)].stats.kills.enemies_killed_reveal, "visible", false);
 							ASCompat.setProperty(stats[(i : Int)].stats.kills.enemies_killed, "visible", true);
 							if (mKillsTick[(i : Int)] < mDungeonReport[(i : Int)].kills) {
@@ -811,17 +811,17 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 					while (i < (stats.length:UInt)) {
 						if (mDungeonReport[(i : Int)].valid != 0) {
 							if (mItemCount > 2) {
-								loot = ASCompat.dynamicAs(mUILootSlotsFourTreasures[(i : Int)], Array);
+								loot = ASCompat.coerce(mUILootSlotsFourTreasures[(i : Int)], Array);
 								setUILootSlotsTwoTreasuresVisible(false);
 							} else {
-								loot = ASCompat.dynamicAs(mUILootSlotsTwoTreasures[(i : Int)], Array);
+								loot = ASCompat.coerce(mUILootSlotsTwoTreasures[(i : Int)], Array);
 								setUILootSlotsFourTreasuresVisible(false);
 							}
 							if (i == 0) {
 								localLoot = loot;
 							}
 							if (ASCompat.toNumberField(loot[(slot : Int)], "numChildren") > 2) {
-								weapon_clip = ASCompat.dynamicAs(loot[(slot : Int)].getChildAt(2), flash.display.MovieClip);
+								weapon_clip = ASCompat.coerce(loot[(slot : Int)].getChildAt(2), flash.display.MovieClip);
 								if (weapon_clip != null) {
 									weapon_clip.visible = true;
 									global_position = weapon_clip.localToGlobal(new Point(0, 0));
@@ -849,16 +849,18 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 						break;
 					}
 					if (mBoosterPopup.expStack != null) {
-						maxBonus = (Std.int(Math.max(mDungeonReport[0].xp_bonus + mDungeonReport[0].team_xp_bonus, mDungeonReport[0].xp_earned)) : UInt);
+						maxBonus = (ASCompat.floatToInt(Math.max(mDungeonReport[0].xp_bonus + mDungeonReport[0].team_xp_bonus,
+							mDungeonReport[0].xp_earned)) : UInt);
 						totalXP = (mDungeonReport[0].xp_bonus + mDungeonReport[0].team_xp_bonus + mDungeonReport[0].xp_earned:Int);
-						mBoosterExpTick = (Std.int(totalXP * mBoosterPopup.expStack.ExpMult - totalXP) : UInt);
+						mBoosterExpTick = (ASCompat.floatToInt(totalXP * mBoosterPopup.expStack.ExpMult - totalXP) : UInt);
 						if (mBoosterPopup != null) {
 							mBoosterPopup.setExp((mBoosterExpTick : Int));
 						}
 						mDungeonReport[0].xp_bonus += mBoosterExpTick;
 					}
 					if (mBoosterPopup.goldStack != null) {
-						mBoosterPopup.setGold(Std.int(mDungeonReport[0].gold_earned * mBoosterPopup.goldStack.GoldMult - mDungeonReport[0].gold_earned));
+						mBoosterPopup.setGold(ASCompat.floatToInt(mDungeonReport[0].gold_earned * mBoosterPopup.goldStack.GoldMult
+							- mDungeonReport[0].gold_earned));
 					}
 					setRevealState((7 : UInt), 0.45);
 
@@ -882,9 +884,10 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 					local_i = (0 : UInt);
 					ASCompat.setProperty(stats[(local_i : Int)].stats.xp_bar.bonus_xp_reveal, "visible", false);
 					ASCompat.setProperty(stats[(local_i : Int)].stats.xp_bar.bonus_xp, "visible", true);
-					maxBonus = (Std.int(Math.max(maxBonus, mDungeonReport[(local_i : Int)].xp_bonus + mDungeonReport[(local_i : Int)].team_xp_bonus)) : UInt);
+					maxBonus = (ASCompat.floatToInt(Math.max(maxBonus,
+						mDungeonReport[(local_i : Int)].xp_bonus + mDungeonReport[(local_i : Int)].team_xp_bonus)) : UInt);
 					if (mBonusXPTick[(local_i : Int)] < mDungeonReport[(local_i : Int)].xp_bonus + mDungeonReport[(local_i : Int)].team_xp_bonus) {
-						gmHero = ASCompat.dynamicAs(mDBFacade.gameMaster.heroById.itemFor(mDungeonReport[(local_i : Int)].type), gameMasterDictionary.GMHero);
+						gmHero = ASCompat.coerce(mDBFacade.gameMaster.heroById.itemFor(mDungeonReport[(local_i : Int)].type), gameMasterDictionary.GMHero);
 						oldLevel = gmHero.getLevelFromExp(mDungeonReport[(local_i : Int)].xp + mBonusXPTick[(local_i : Int)]);
 						allFinished = false;
 						__tmpIncObj3 = mBonusXPTick;
@@ -904,12 +907,12 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 							ASCompat.setProperty(stats[(local_i : Int)].stats.fx_level_up_text, "visible", true);
 							ASCompat.setProperty(stats[(local_i : Int)].stats.fx_level_up_anim, "visible", true);
 							animMcr = new MovieClipRenderController(mDBFacade,
-								ASCompat.dynamicAs(stats[(local_i : Int)].stats.fx_level_up_anim, flash.display.MovieClip));
+								ASCompat.coerce(stats[(local_i : Int)].stats.fx_level_up_anim, flash.display.MovieClip));
 							animMcr.play((0 : UInt), false, function() {
 								animMcr.destroy();
 							});
 							textMcr = new MovieClipRenderController(mDBFacade,
-								ASCompat.dynamicAs(stats[(local_i : Int)].stats.fx_level_up_text, flash.display.MovieClip));
+								ASCompat.coerce(stats[(local_i : Int)].stats.fx_level_up_text, flash.display.MovieClip));
 							textMcr.play((0 : UInt), false, function() {
 								textMcr.destroy();
 							});
@@ -920,7 +923,7 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 					}
 					if (allFinished) {
 						setRevealState((12 : UInt), 0.1);
-						applyGlowFilter(ASCompat.dynamicAs(stats[0].stats.xp_bar.bonus_xp, flash.display.MovieClip));
+						applyGlowFilter(ASCompat.coerce(stats[0].stats.xp_bar.bonus_xp, flash.display.MovieClip));
 					} else {
 						tickingFilter = [];
 						tickingFilter.push(new GlowFilter((16777215 : UInt), 1, 12, 12, 6));
@@ -1052,25 +1055,25 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 		_loc3_ = 0;
 		while (_loc3_ < 4) {
 			if (mDungeonReport[_loc3_].valid == ASCompat.toNumber(true)) {
-				_loc1_ = ASCompat.dynamicAs(_loc4_[_loc3_].stats.trophies.trophies, flash.text.TextField);
+				_loc1_ = ASCompat.coerce(_loc4_[_loc3_].stats.trophies.trophies, flash.text.TextField);
 				_loc1_.text = Std.string(mDungeonReport[_loc3_].trophyCount);
 				_loc2_ = mDBFacade.gameMaster.getSkinByType(mDungeonReport[_loc3_].skin_type);
 				if (_loc2_ == null) {
 					Logger.error("Could not find skin for skin_type: " + mDungeonReport[_loc3_].skin_type);
 				} else {
-					loadPortraitForReport(mDungeonReport[_loc3_], _loc2_, ASCompat.dynamicAs(_loc5_[_loc3_], flash.display.MovieClip));
+					loadPortraitForReport(mDungeonReport[_loc3_], _loc2_, ASCompat.coerce(_loc5_[_loc3_], flash.display.MovieClip));
 				}
 			} else {
 				ASCompat.setProperty(_loc5_[_loc3_], "visible", false);
 			}
-			_loc3_ = ASCompat.toInt(_loc3_) + 1;
+			_loc3_++;
 		}
 	}
 
 	function loadPortraitForReport(dungeonReport:DungeonReport, skin:GMSkin, iconContainer:MovieClip) {
 		mAssetLoadingComponent.getSwfAsset(DBFacade.buildFullDownloadPath(skin.UISwfFilepath), function(param1:SwfAsset) {
 			var _loc3_ = param1.getClass(skin.IconName);
-			var _loc2_ = ASCompat.dynamicAs(ASCompat.createInstance(_loc3_, []), flash.display.MovieClip);
+			var _loc2_ = ASCompat.coerce(ASCompat.createInstance(_loc3_, []), flash.display.MovieClip);
 			UIObject.scaleToFit(_loc2_, 65);
 			iconContainer.addChild(_loc2_);
 			saveFacebookPicAndAchievement(dungeonReport.id, iconContainer);
@@ -1081,7 +1084,7 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 		if (mFacebookPicHolder == null) {
 			return;
 		}
-		var _loc2_ = ASCompat.dynamicAs(mFacebookPicMap.itemFor(playerId), FacebookPicHelper);
+		var _loc2_ = ASCompat.coerce(mFacebookPicMap.itemFor(playerId), FacebookPicHelper);
 		if (_loc2_ == null) {
 			return;
 		}
@@ -1097,7 +1100,7 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 			return;
 		}
 		mFacebookPicHolder.visible = false;
-		var _loc2_ = ASCompat.dynamicAs(mFacebookPicMap.itemFor(playerId), FacebookPicHelper);
+		var _loc2_ = ASCompat.coerce(mFacebookPicMap.itemFor(playerId), FacebookPicHelper);
 		if (_loc2_ == null) {
 			return;
 		}
@@ -1181,21 +1184,21 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 		_loc7_ = 0;
 		while (_loc7_ < 4) {
 			if (mDungeonReport[_loc7_].valid != 0) {
-				_loc4_ = ASCompat.dynamicAs(mDBFacade.gameMaster.heroById.itemFor(mDungeonReport[_loc7_].type), gameMasterDictionary.GMHero);
+				_loc4_ = ASCompat.coerce(mDBFacade.gameMaster.heroById.itemFor(mDungeonReport[_loc7_].type), gameMasterDictionary.GMHero);
 				_loc5_ = (_loc4_.getLevelFromExp(mDungeonReport[_loc7_].xp) : Int);
 				_loc2_ = (mDungeonReport[_loc7_].xp : Int);
 				_loc1_ = _loc4_.getLevelIndex(_loc2_);
-				_loc8_ = ASCompat.toInt(_loc1_ > 0 ? _loc4_.getExpFromIndex((ASCompat.toInt(_loc1_ - 1) : UInt)) : 0);
+				_loc8_ = ASCompat.toInt(_loc1_ > 0 ? _loc4_.getExpFromIndex((_loc1_ - 1 : UInt)) : 0);
 				_loc6_ = (_loc4_.getExpFromIndex((_loc1_ : UInt)) : Int);
-				mXpBar[_loc7_] = new UIProgressBar(mFacade, ASCompat.dynamicAs(_loc3_[_loc7_].xp_bar, flash.display.MovieClip));
-				ASCompat.setProperty(mXpBar[_loc7_], "value", ASCompat.toNumber(_loc2_ - _loc8_) / ASCompat.toNumber(_loc6_ - _loc8_));
+				mXpBar[_loc7_] = new UIProgressBar(mFacade, ASCompat.coerce(_loc3_[_loc7_].xp_bar, flash.display.MovieClip));
+				ASCompat.setProperty(mXpBar[_loc7_], "value", (_loc2_ - _loc8_) / (_loc6_ - _loc8_));
 				ASCompat.setProperty(_loc3_[_loc7_].xp_level, "text", Std.string(_loc5_));
 				ASCompat.setProperty(_loc3_[_loc7_].xp_points, "visible", true);
 				ASCompat.setProperty(_loc3_[_loc7_].xp_points, "text", Std.string(mDungeonReport[_loc7_].xp));
 			} else {
 				ASCompat.setProperty(_loc3_[_loc7_], "visible", false);
 			}
-			_loc7_ = ASCompat.toInt(_loc7_) + 1;
+			_loc7_++;
 		}
 		mBoosterExpTick = (0 : UInt);
 		mBoosterGoldTick = (0 : UInt);
@@ -1223,7 +1226,7 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 						mChestRevealPopUp.updateRevealLoot(details);
 					};
 				};
-				updateRevealPopupCallback = ASCompat.asFunction(callbackHelper(details));
+				updateRevealPopupCallback = ASCompat.coerceFunction(callbackHelper(details));
 			}
 			if (mInfoPopup != null) {
 				if (mSelectedItemSlot == 1000 && mItemCount > 0) {
@@ -1318,7 +1321,7 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 				if (ASCompat.toNumber(_loc2_[_loc3_]) != 0) {
 					_loc5_++;
 				}
-				_loc3_ = ASCompat.toInt(_loc3_) + 1;
+				_loc3_++;
 			}
 		}
 		return _loc5_;
@@ -1355,41 +1358,40 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 				_loc6_ = 0;
 				while (_loc6_ < _loc1_.length) {
 					if (ASCompat.toNumber(_loc1_[_loc6_]) != 0) {
-						_loc4_ = ASCompat.dynamicAs(mDBFacade.gameMaster.chestsById.itemFor(_loc1_[_loc6_]), gameMasterDictionary.GMChest);
+						_loc4_ = ASCompat.coerce(mDBFacade.gameMaster.chestsById.itemFor(_loc1_[_loc6_]), gameMasterDictionary.GMChest);
 						if (_loc4_ != null && ASCompat.stringAsBool(_loc4_.IconName)) {
 							if (isSingleChestList[_loc2_]) {
 								if (_loc3_[_loc2_] == null || ASCompat.dynGetIndex(_loc3_[_loc2_], 2) == null) {
 									Logger.warn("Could not load loot for singleChestList player slot: " + _loc2_);
-									_loc6_ = ASCompat.toInt(_loc6_) + 1;
+									_loc6_++;
 									continue;
 								}
 								ASCompat.setProperty(ASCompat.dynGetIndex(_loc3_[_loc2_], 2), "visible", false);
 								mAssetLoadingComponent.getSwfAsset(DBFacade.buildFullDownloadPath(_loc4_.IconSwf),
-									loadChestIconCallback(_loc4_,
-										ASCompat.dynamicAs(ASCompat.dynGetIndex(mChestMovieClips[_loc2_], 2), flash.display.MovieClip),
+									loadChestIconCallback(_loc4_, ASCompat.coerce(ASCompat.dynGetIndex(mChestMovieClips[_loc2_], 2), flash.display.MovieClip),
 										(ASCompat.toInt(_loc1_[_loc6_]) : UInt), (_loc2_ : UInt), (_loc6_ : UInt), this));
 							} else {
 								if (_loc3_[_loc2_] == null || ASCompat.dynGetIndex(_loc3_[_loc2_], _loc6_) == null) {
 									Logger.warn("Could not load loot for player slot: " + _loc2_ + " chest slot: " + _loc6_);
-									_loc6_ = ASCompat.toInt(_loc6_) + 1;
+									_loc6_++;
 									continue;
 								}
 								ASCompat.setProperty(ASCompat.dynGetIndex(_loc3_[_loc2_], _loc6_), "visible", false);
 								mAssetLoadingComponent.getSwfAsset(DBFacade.buildFullDownloadPath(_loc4_.IconSwf),
 									loadChestIconCallback(_loc4_,
-										ASCompat.dynamicAs(ASCompat.dynGetIndex(mChestMovieClips[_loc2_], _loc6_), flash.display.MovieClip),
+										ASCompat.coerce(ASCompat.dynGetIndex(mChestMovieClips[_loc2_], _loc6_), flash.display.MovieClip),
 										(ASCompat.toInt(_loc1_[_loc6_]) : UInt), (_loc2_ : UInt), (_loc6_ : UInt), this));
 							}
 						} else {
 							Logger.error("Could not find GMChestItem for loot item: " + Std.string(_loc1_[_loc6_]));
 						}
 					}
-					_loc6_ = ASCompat.toInt(_loc6_) + 1;
+					_loc6_++;
 				}
 			} else {
 				ASCompat.setProperty(_loc5_[_loc2_], "visible", false);
 			}
-			_loc2_ = ASCompat.toInt(_loc2_) + 1;
+			_loc2_++;
 		}
 	}
 
@@ -1443,7 +1445,7 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 					if (ASCompat.toBool(_loc2_[_loc5_])) {
 						_loc12_++;
 					}
-					_loc5_ = ASCompat.toInt(_loc5_) + 1;
+					_loc5_++;
 				}
 				if (_loc12_ > 2) {
 					ASCompat.ASArray.sort(_loc2_, reverseChestTypeComparison);
@@ -1454,9 +1456,9 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 					_loc10_ = 0;
 					while (_loc10_ < 4) {
 						if (!(ASCompat.toNumber(_loc2_[_loc10_]) == 0 || ASCompat.dynGetIndex(loot[_loc9_], _loc10_) == null)) {
-							_loc7_ = ASCompat.dynamicAs(mDBFacade.gameMaster.dooberById.itemFor(_loc2_[_loc10_]), gameMasterDictionary.GMDoober);
+							_loc7_ = ASCompat.coerce(mDBFacade.gameMaster.dooberById.itemFor(_loc2_[_loc10_]), gameMasterDictionary.GMDoober);
 							if (_loc7_ != null) {
-								_loc8_ = ASCompat.dynamicAs(mDBFacade.gameMaster.chestsById.itemFor(_loc7_.ChestId), gameMasterDictionary.GMChest);
+								_loc8_ = ASCompat.coerce(mDBFacade.gameMaster.chestsById.itemFor(_loc7_.ChestId), gameMasterDictionary.GMChest);
 								_loc6_ = _loc8_.IconSwf;
 								_loc4_ = _loc8_.IconName;
 								if (isSingleChestList[_loc9_]) {
@@ -1466,18 +1468,18 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 									ASCompat.toNumberField(ASCompat.dynGetIndex(loot[_loc9_], _loc10_), "y"));
 								_loc3_ = mChestMovieClips;
 								ChestInfo.loadItemIcon(_loc6_, _loc4_,
-									ASCompat.dynamicAs(ASCompat.dynGetIndex(mChestMovieClips[_loc9_], _loc10_), flash.display.DisplayObjectContainer),
-									mDBFacade, (150 : UInt), (150 : UInt), mAssetLoadingComponent);
+									ASCompat.coerce(ASCompat.dynGetIndex(mChestMovieClips[_loc9_], _loc10_), flash.display.DisplayObjectContainer), mDBFacade,
+									(150 : UInt), (150 : UInt), mAssetLoadingComponent);
 								ASCompat.setProperty(ASCompat.dynGetIndex(mChestMovieClips[_loc9_], _loc10_), "scaleX",
 									ASCompat.setProperty(ASCompat.dynGetIndex(mChestMovieClips[_loc9_], _loc10_), "scaleY", yScale));
 								ASCompat.setProperty(ASCompat.dynGetIndex(mChestMovieClips[_loc9_], _loc10_), "x", _loc11_.x);
 								ASCompat.setProperty(ASCompat.dynGetIndex(mChestMovieClips[_loc9_], _loc10_), "y", _loc11_.y);
 							}
 						}
-						_loc10_ = ASCompat.toInt(_loc10_) + 1;
+						_loc10_++;
 					}
 				}
-				_loc9_ = ASCompat.toInt(_loc9_) + 1;
+				_loc9_++;
 			}
 		});
 		setupItemButtons();
@@ -1490,8 +1492,8 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 		if (b == 0) {
 			return -1;
 		}
-		var _loc3_ = ASCompat.dynamicAs(mDBFacade.gameMaster.dooberById.itemFor(a), gameMasterDictionary.GMDoober);
-		var _loc4_ = ASCompat.dynamicAs(mDBFacade.gameMaster.dooberById.itemFor(b), gameMasterDictionary.GMDoober);
+		var _loc3_ = ASCompat.coerce(mDBFacade.gameMaster.dooberById.itemFor(a), gameMasterDictionary.GMDoober);
+		var _loc4_ = ASCompat.coerce(mDBFacade.gameMaster.dooberById.itemFor(b), gameMasterDictionary.GMDoober);
 		if (mRarityMap.itemFor(_loc3_.Rarity) > mRarityMap.itemFor(_loc4_.Rarity)) {
 			return -1;
 		}
@@ -1505,8 +1507,8 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 		if (a == 0 || b == 0) {
 			return 1;
 		}
-		var _loc3_ = ASCompat.dynamicAs(mDBFacade.gameMaster.dooberById.itemFor(a), gameMasterDictionary.GMDoober);
-		var _loc4_ = ASCompat.dynamicAs(mDBFacade.gameMaster.dooberById.itemFor(b), gameMasterDictionary.GMDoober);
+		var _loc3_ = ASCompat.coerce(mDBFacade.gameMaster.dooberById.itemFor(a), gameMasterDictionary.GMDoober);
+		var _loc4_ = ASCompat.coerce(mDBFacade.gameMaster.dooberById.itemFor(b), gameMasterDictionary.GMDoober);
 		if (mRarityMap.itemFor(_loc3_.Rarity) > mRarityMap.itemFor(_loc4_.Rarity)) {
 			return 1;
 		}
@@ -1535,10 +1537,10 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 								}
 							}
 						}
-						_loc3_ = ASCompat.toInt(_loc3_) + 1;
+						_loc3_++;
 					}
 				}
-				_loc2_ = ASCompat.toInt(_loc2_) + 1;
+				_loc2_++;
 			}
 		});
 	}
@@ -1582,26 +1584,26 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 				.stats_d.stats.loot_slot_A3
 			]
 		];
-		var weapon = new UIObject(mDBFacade, ASCompat.dynamicAs(ASCompat.dynGetIndex(weaponButtons[(statNum : Int)], weaponSlotNum), flash.display.MovieClip));
+		var weapon = new UIObject(mDBFacade, ASCompat.coerce(ASCompat.dynGetIndex(weaponButtons[(statNum : Int)], weaponSlotNum), flash.display.MovieClip));
 		mWeapons.push(weapon);
 		tooltipClass = swfAsset.getClass("DR_weapon_tooltip");
 		weaponTooltip = new UIWeaponTooltip(mDBFacade, tooltipClass);
 		ASCompat.dynPush(mWeaponTooltips[(statNum : Int)], weaponTooltip);
 		switch (weaponSlotNum) {
 			case 0:
-				gmWeaponItem = ASCompat.dynamicAs(mDBFacade.gameMaster.weaponItemById.itemFor(mDungeonReport[(statNum : Int)].weapon_type_1),
+				gmWeaponItem = ASCompat.coerce(mDBFacade.gameMaster.weaponItemById.itemFor(mDungeonReport[(statNum : Int)].weapon_type_1),
 					gameMasterDictionary.GMWeaponItem);
 				gmWeaponAesthetic = gmWeaponItem.getWeaponAesthetic(mDungeonReport[(statNum : Int)].weapon_level_1,
 					mDungeonReport[(statNum : Int)].legendary_modifier_type_1 > 0);
 
 			case 1:
-				gmWeaponItem = ASCompat.dynamicAs(mDBFacade.gameMaster.weaponItemById.itemFor(mDungeonReport[(statNum : Int)].weapon_type_2),
+				gmWeaponItem = ASCompat.coerce(mDBFacade.gameMaster.weaponItemById.itemFor(mDungeonReport[(statNum : Int)].weapon_type_2),
 					gameMasterDictionary.GMWeaponItem);
 				gmWeaponAesthetic = gmWeaponItem.getWeaponAesthetic(mDungeonReport[(statNum : Int)].weapon_level_2,
 					mDungeonReport[(statNum : Int)].legendary_modifier_type_2 > 0);
 
 			case 2:
-				gmWeaponItem = ASCompat.dynamicAs(mDBFacade.gameMaster.weaponItemById.itemFor(mDungeonReport[(statNum : Int)].weapon_type_3),
+				gmWeaponItem = ASCompat.coerce(mDBFacade.gameMaster.weaponItemById.itemFor(mDungeonReport[(statNum : Int)].weapon_type_3),
 					gameMasterDictionary.GMWeaponItem);
 				gmWeaponAesthetic = gmWeaponItem.getWeaponAesthetic(mDungeonReport[(statNum : Int)].weapon_level_3,
 					mDungeonReport[(statNum : Int)].legendary_modifier_type_3 > 0);
@@ -1619,15 +1621,15 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 			weapon.tooltip = weaponTooltip;
 			switch (weaponSlotNum) {
 				case 0:
-					rarity = ASCompat.dynamicAs(mDBFacade.gameMaster.rarityById.itemFor(mDungeonReport[(statNum : Int)].weapon_rarity_1),
+					rarity = ASCompat.coerce(mDBFacade.gameMaster.rarityById.itemFor(mDungeonReport[(statNum : Int)].weapon_rarity_1),
 						gameMasterDictionary.GMRarity);
 
 				case 1:
-					rarity = ASCompat.dynamicAs(mDBFacade.gameMaster.rarityById.itemFor(mDungeonReport[(statNum : Int)].weapon_rarity_2),
+					rarity = ASCompat.coerce(mDBFacade.gameMaster.rarityById.itemFor(mDungeonReport[(statNum : Int)].weapon_rarity_2),
 						gameMasterDictionary.GMRarity);
 
 				case 2:
-					rarity = ASCompat.dynamicAs(mDBFacade.gameMaster.rarityById.itemFor(mDungeonReport[(statNum : Int)].weapon_rarity_3),
+					rarity = ASCompat.coerce(mDBFacade.gameMaster.rarityById.itemFor(mDungeonReport[(statNum : Int)].weapon_rarity_3),
 						gameMasterDictionary.GMRarity);
 			}
 			bgColoredExists = rarity.HasColoredBackground;
@@ -1696,7 +1698,7 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 			if (ASCompat.toNumber(ASCompat.dynGetIndex(_loc3_[0], 1)) != 0) {
 				_loc6_ = ASCompat.toInt(ASCompat.dynGetIndex(_loc3_[0], 0));
 				_loc2_ = ASCompat.toInt(ASCompat.dynGetIndex(_loc3_[0], 1));
-				_loc4_ = ASCompat.dynamicAs(mDBFacade.gameMaster.chestsById.itemFor(mDBFacade.gameMaster.dooberById.itemFor(_loc2_).ChestId),
+				_loc4_ = ASCompat.coerce(mDBFacade.gameMaster.chestsById.itemFor(mDBFacade.gameMaster.dooberById.itemFor(_loc2_).ChestId),
 					gameMasterDictionary.GMChest);
 				chestOpenPopUp(_loc4_, (_loc6_ : UInt));
 				return;
@@ -1746,7 +1748,7 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 		var i:Int;
 		mSceneGraphComponent.showPopupCurtain();
 		openKeyChestClass = UIHud.isThisAConsumbleChestId((mSelectedGMChest.Id : Int)) ? swfAsset.getClass("popup_itemBox") : swfAsset.getClass("popup_chest");
-		mOpenKeyChestMC = ASCompat.dynamicAs(ASCompat.createInstance(openKeyChestClass, []), flash.display.MovieClip);
+		mOpenKeyChestMC = ASCompat.coerce(ASCompat.createInstance(openKeyChestClass, []), flash.display.MovieClip);
 		mOpenKeyChestMC.scaleX = mOpenKeyChestMC.scaleY = 1.8;
 		bounds = mOpenKeyChestMC.getBounds(mDBFacade.stageRef);
 		mOpenKeyChestMC.x = mDBFacade.stageRef.stageWidth / 2 - bounds.width / 2 - bounds.x;
@@ -1754,9 +1756,9 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 		ASCompat.setProperty((mOpenKeyChestMC : ASAny).title_label, "text", Locale.getString("TREASURE_FOUND"));
 		swfPath = mSelectedGMChest.IconSwf;
 		iconName = mSelectedGMChest.IconName;
-		ChestInfo.loadItemIcon(swfPath, iconName, ASCompat.dynamicAs((mOpenKeyChestMC : ASAny).content, flash.display.DisplayObjectContainer), mDBFacade,
+		ChestInfo.loadItemIcon(swfPath, iconName, ASCompat.coerce((mOpenKeyChestMC : ASAny).content, flash.display.DisplayObjectContainer), mDBFacade,
 			(150 : UInt), (150 : UInt), mAssetLoadingComponent);
-		rarity = ASCompat.dynamicAs(mDBFacade.gameMaster.rarityByConstant.itemFor(mSelectedGMChest.Rarity), gameMasterDictionary.GMRarity);
+		rarity = ASCompat.coerce(mDBFacade.gameMaster.rarityByConstant.itemFor(mSelectedGMChest.Rarity), gameMasterDictionary.GMRarity);
 		bgColoredExists = rarity.HasColoredBackground;
 		bgSwfPath = rarity.BackgroundSwf;
 		bgIconName = rarity.BackgroundIcon;
@@ -1771,15 +1773,15 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 				}
 			});
 		}
-		mOpenKeyChestRenderer = new MovieClipRenderer(mDBFacade, ASCompat.dynamicAs((mOpenKeyChestMC : ASAny).content, flash.display.MovieClip));
+		mOpenKeyChestRenderer = new MovieClipRenderer(mDBFacade, ASCompat.coerce((mOpenKeyChestMC : ASAny).content, flash.display.MovieClip));
 		mOpenKeyChestRenderer.play((0 : UInt), true);
-		mAbandonButton = new UIButton(mDBFacade, ASCompat.dynamicAs((mOpenKeyChestMC : ASAny).abandon_button, flash.display.MovieClip));
+		mAbandonButton = new UIButton(mDBFacade, ASCompat.coerce((mOpenKeyChestMC : ASAny).abandon_button, flash.display.MovieClip));
 		mAbandonButton.releaseCallback = abandonChestCallback;
 		mAbandonButton.label.text = Locale.getString("ABANDON");
-		mKeepButton = new UIButton(mDBFacade, ASCompat.dynamicAs((mOpenKeyChestMC : ASAny).keep_button, flash.display.MovieClip));
+		mKeepButton = new UIButton(mDBFacade, ASCompat.coerce((mOpenKeyChestMC : ASAny).keep_button, flash.display.MovieClip));
 		mKeepButton.releaseCallback = keepChestCallback;
 		mKeepButton.label.text = Locale.getString("KEEP");
-		mOpenButton = new UIButton(mDBFacade, ASCompat.dynamicAs((mOpenKeyChestMC : ASAny).open_button, flash.display.MovieClip));
+		mOpenButton = new UIButton(mDBFacade, ASCompat.coerce((mOpenKeyChestMC : ASAny).open_button, flash.display.MovieClip));
 		mOpenButton.releaseCallback = openChestCallback;
 		mOpenButton.label.text = Locale.getString("UNLOCK");
 		ASCompat.setProperty((mOpenKeyChestMC : ASAny).close, "visible", false);
@@ -1816,7 +1818,7 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 				if (_loc3_ == null) {
 					return;
 				}
-				var _loc4_ = ASCompat.dynamicAs(ASCompat.createInstance(_loc3_, []), flash.display.MovieClip);
+				var _loc4_ = ASCompat.coerce(ASCompat.createInstance(_loc3_, []), flash.display.MovieClip);
 				var _loc2_ = new MovieClipRenderController(mDBFacade, _loc4_);
 				_loc2_.play();
 				if (ASCompat.toNumberField((chestMC : ASAny).avatar, "numChildren") > 0) {
@@ -2059,12 +2061,12 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 			_loc4_ = 0;
 			while (_loc4_ < 4) {
 				if (ASCompat.toNumber(_loc2_[_loc4_]) != 0) {
-					_loc3_ = ASCompat.dynamicAs(mDBFacade.gameMaster.dooberById.itemFor(_loc2_[_loc4_]), gameMasterDictionary.GMDoober);
+					_loc3_ = ASCompat.coerce(mDBFacade.gameMaster.dooberById.itemFor(_loc2_[_loc4_]), gameMasterDictionary.GMDoober);
 					if (_loc3_.ChestId == gmChest.Id) {
 						return (_loc4_ : UInt);
 					}
 				}
-				_loc4_ = ASCompat.toInt(_loc4_) + 1;
+				_loc4_++;
 			}
 		}
 		return (0 : UInt);
@@ -2198,10 +2200,10 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 			}
 			i = i + 1;
 		}
-		mUIChatLog = new UIChatLog(mDBFacade, ASCompat.dynamicAs((mScoreReportRoot : ASAny).chatLogContainer, flash.display.MovieClip),
-			ASCompat.dynamicAs((mScoreReportRoot : ASAny).UI_chat, flash.display.MovieClip),
-			ASCompat.dynamicAs((mScoreReportRoot : ASAny).UI_chat.log_btn, flash.display.MovieClip),
-			ASCompat.dynamicAs((mScoreReportRoot : ASAny).UI_chat.chat_btn, flash.display.MovieClip));
+		mUIChatLog = new UIChatLog(mDBFacade, ASCompat.coerce((mScoreReportRoot : ASAny).chatLogContainer, flash.display.MovieClip),
+			ASCompat.coerce((mScoreReportRoot : ASAny).UI_chat, flash.display.MovieClip),
+			ASCompat.coerce((mScoreReportRoot : ASAny).UI_chat.log_btn, flash.display.MovieClip),
+			ASCompat.coerce((mScoreReportRoot : ASAny).UI_chat.chat_btn, flash.display.MovieClip));
 		mUIChatLog.hideChatLog();
 		mAssetLoadingComponent.getSwfAsset(DBFacade.buildFullDownloadPath("Resources/Art2D/UI/db_UI_nametag.swf"), function(param1:SwfAsset) {
 			var _loc3_:Dynamic = null;
@@ -2222,15 +2224,15 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 			while (i < 4) {
 				if (mDungeonReport[(i : Int)].valid != 0) {
 					_loc3_ = param1.getClass("UI_speechbubble");
-					_loc2_ = ASCompat.dynamicAs(ASCompat.createInstance(_loc3_, []), flash.display.MovieClip);
+					_loc2_ = ASCompat.coerce(ASCompat.createInstance(_loc3_, []), flash.display.MovieClip);
 					_loc2_.visible = false;
 					_loc6_ = param1.getClass("UI_speechbubble_typing");
-					mPlayerIsTypingNotification = ASCompat.dynamicAs(ASCompat.createInstance(_loc6_, []), flash.display.MovieClip);
+					mPlayerIsTypingNotification = ASCompat.coerce(ASCompat.createInstance(_loc6_, []), flash.display.MovieClip);
 					mPlayerIsTypingNotification.visible = false;
 					mChatBalloon[(i : Int)].initializeChatBalloon(param1, mPlayerIsTypingNotification);
 					mSceneGraphComponent.addChild(mChatBalloon[(i : Int)], (50 : UInt));
 					mChatBalloon[(i : Int)].text = "";
-					_loc5_ = ASCompat.dynamicAs(_loc4_[(i : Int)].stats.player_name.localToGlobal(new Point(0, 0)), flash.geom.Point);
+					_loc5_ = ASCompat.coerce(_loc4_[(i : Int)].stats.player_name.localToGlobal(new Point(0, 0)), flash.geom.Point);
 					mChatBalloon[(i : Int)].scaleY = mChatBalloon[(i : Int)].scaleX = 1.8;
 					mChatBalloon[(i : Int)].x = _loc5_.x + 69 + 55;
 					mChatBalloon[(i : Int)].y = _loc5_.y + 32 - 32;
@@ -2264,7 +2266,7 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 			if (ASCompat.toNumber(ASCompat.dynGetIndex(mSortedLootData[_loc3_], 0)) == slot) {
 				_loc5_ = (_loc3_ : UInt);
 			}
-			_loc3_ = ASCompat.toInt(_loc3_) + 1;
+			_loc3_++;
 		}
 		var _loc4_ = (0 : UInt);
 		switch (slot) {
@@ -2293,7 +2295,7 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 		} else {
 			mDBFacade.metrics.log("DungeonLootSoldItem", {"itemId": _loc4_});
 		}
-		var _loc2_:Array<ASAny> = ASCompat.dynamicAs(mUILootSlots[0], Array);
+		var _loc2_:Array<ASAny> = ASCompat.coerce(mUILootSlots[0], Array);
 		if (isSingleChestList[0]) {
 			slot = (2 : UInt);
 		}
@@ -2323,7 +2325,7 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 	}
 
 	function updateBannerAlpha(clock:GameClock) {
-		var _loc2_ = ASCompat.toNumber(1 - ASCompat.toNumberField((mScoreReportRoot : ASAny).stats_a, "alpha"));
+		var _loc2_ = 1 - ASCompat.toNumberField((mScoreReportRoot : ASAny).stats_a, "alpha");
 		_loc2_ = 1 - Math.pow(_loc2_, Math.pow(2, clock.tickLength / GameClock.ANIMATION_FRAME_DURATION));
 		ASCompat.setProperty((mScoreReportRoot : ASAny).stats_a, "alpha", _loc2_);
 		ASCompat.setProperty((mScoreReportRoot : ASAny).stats_b, "alpha", _loc2_);
@@ -2420,7 +2422,7 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 				_loc8_ = _loc8_.concat([0, 0, 0, 1, 0]);
 				ASCompat.setProperty(_loc7_[_loc6_], "filters", [new ColorMatrixFilter(cast(_loc8_))]);
 			}
-			_loc6_ = ASCompat.toInt(_loc6_) + 1;
+			_loc6_++;
 		}
 	}
 
@@ -2621,7 +2623,7 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 		var skin = mDBFacade.gameMaster.getSkinByType(DR.skin_type);
 		mAssetLoadingComponent.getSwfAsset(DBFacade.buildFullDownloadPath(skin.UISwfFilepath), function(param1:SwfAsset) {
 			var _loc3_ = param1.getClass(skin.IconName);
-			var _loc2_ = ASCompat.dynamicAs(ASCompat.createInstance(_loc3_, []), flash.display.MovieClip);
+			var _loc2_ = ASCompat.coerce(ASCompat.createInstance(_loc3_, []), flash.display.MovieClip);
 			UIObject.scaleToFit(_loc2_, 65);
 			iconContainer.addChild(_loc2_);
 			saveFacebookPicAndAchievement(DR.id, iconContainer);
@@ -2653,9 +2655,9 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 		if (mDBFacade.hud != null) {
 			mDBFacade.hud.hideStacks();
 		}
-		mBgRenderer = new MovieClipRenderController(mDBFacade, ASCompat.dynamicAs((mScoreReportRoot : ASAny).bg, flash.display.MovieClip));
+		mBgRenderer = new MovieClipRenderController(mDBFacade, ASCompat.coerce((mScoreReportRoot : ASAny).bg, flash.display.MovieClip));
 		mBgRenderer.play();
-		movieClipRenderer = new MovieClipRenderController(mDBFacade, ASCompat.dynamicAs((mScoreReportRoot : ASAny).rays, flash.display.MovieClip));
+		movieClipRenderer = new MovieClipRenderController(mDBFacade, ASCompat.coerce((mScoreReportRoot : ASAny).rays, flash.display.MovieClip));
 		movieClipRenderer.play();
 		mSceneGraphComponent.addChild(mScoreReportRoot, (50 : UInt));
 		setupPortraits();
@@ -2700,11 +2702,11 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 				ASCompat.setProperty(stats_panels[(i : Int)].stats.text_booster, "text", Locale.getString("ACTIVE_BOOSTERS"));
 				ASCompat.setProperty(stats_panels[(i : Int)].stats.text_booster, "visible", false);
 				if (mBoosterXP != null) {
-					mXPBoosterUI = new UIObject(mDBFacade, ASCompat.dynamicAs(stats_panels[(i : Int)].stats.boosterXP, flash.display.MovieClip));
+					mXPBoosterUI = new UIObject(mDBFacade, ASCompat.coerce(stats_panels[(i : Int)].stats.boosterXP, flash.display.MovieClip));
 					ASCompat.setProperty(stats_panels[(i : Int)].stats.boosterXP.label, "text", mBoosterXP.BuffInfo.Exp + "X");
 					ASCompat.setProperty(stats_panels[(i : Int)].stats.boosterXP.tooltip.title_label, "text", mBoosterXP.StackInfo.Name);
 					ASCompat.setProperty(stats_panels[(i : Int)].stats.boosterXP, "visible", true);
-					mCountDownTextXP = new CountdownTextTimer(ASCompat.dynamicAs((mXPBoosterUI.tooltip : ASAny).time_label, flash.text.TextField),
+					mCountDownTextXP = new CountdownTextTimer(ASCompat.coerce((mXPBoosterUI.tooltip : ASAny).time_label, flash.text.TextField),
 						mBoosterXP.getEndDate(), GameClock.getWebServerDate, null, Locale.getString("BOOSTER_REMAINING"), "", Locale.getString("EXPIRED"));
 					mCountDownTextXP.start();
 					ASCompat.setProperty(stats_panels[(i : Int)].stats.text_booster, "visible", true);
@@ -2712,11 +2714,11 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 					ASCompat.setProperty(stats_panels[(i : Int)].stats.boosterXP, "visible", false);
 				}
 				if (mBoosterGold != null) {
-					mCoinBoosterUI = new UIObject(mDBFacade, ASCompat.dynamicAs(stats_panels[(i : Int)].stats.boosterCoin, flash.display.MovieClip));
+					mCoinBoosterUI = new UIObject(mDBFacade, ASCompat.coerce(stats_panels[(i : Int)].stats.boosterCoin, flash.display.MovieClip));
 					ASCompat.setProperty(stats_panels[(i : Int)].stats.boosterCoin.label, "text", mBoosterGold.BuffInfo.Gold + "X");
 					ASCompat.setProperty(stats_panels[(i : Int)].stats.boosterCoin.tooltip.title_label, "text", mBoosterGold.StackInfo.Name);
 					ASCompat.setProperty(stats_panels[(i : Int)].stats.boosterCoin, "visible", true);
-					mCountDownTextGold = new CountdownTextTimer(ASCompat.dynamicAs((mCoinBoosterUI.tooltip : ASAny).time_label, flash.text.TextField),
+					mCountDownTextGold = new CountdownTextTimer(ASCompat.coerce((mCoinBoosterUI.tooltip : ASAny).time_label, flash.text.TextField),
 						mBoosterGold.getEndDate(), GameClock.getWebServerDate, null, Locale.getString("BOOSTER_REMAINING"), "", Locale.getString("EXPIRED"));
 					mCountDownTextGold.start();
 					ASCompat.setProperty(stats_panels[(i : Int)].stats.text_booster, "visible", true);
@@ -2724,8 +2726,8 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 					ASCompat.setProperty(stats_panels[(i : Int)].stats.boosterCoin, "visible", false);
 				}
 			}
-			mTeamBonusUI.add(i, new UIObject(mDBFacade, ASCompat.dynamicAs(stats_panels[(i : Int)].stats.crewbonus, flash.display.MovieClip)));
-			teamBonusUI = ASCompat.dynamicAs(mTeamBonusUI.itemFor(i), brain.uI.UIObject);
+			mTeamBonusUI.add(i, new UIObject(mDBFacade, ASCompat.coerce(stats_panels[(i : Int)].stats.crewbonus, flash.display.MovieClip)));
+			teamBonusUI = ASCompat.coerce(mTeamBonusUI.itemFor(i), brain.uI.UIObject);
 			ASCompat.setProperty((teamBonusUI.root : ASAny).header_crew_bonus_txt1, "text", Locale.getString("TEAM_BONUS_TITLE_CREW"));
 			ASCompat.setProperty((teamBonusUI.root : ASAny).header_crew_bonus_txt2, "text", Locale.getString("TEAM_BONUS_TITLE_BONUS"));
 			ASCompat.setProperty((teamBonusUI.tooltip : ASAny).title_label, "text", Locale.getString("TEAM_BONUS_TOOLTIP_TITLE"));
@@ -2744,7 +2746,7 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 				ASCompat.setProperty(stats_panels[(i : Int)].stats.boosterXP, "visible", false);
 				ASCompat.setProperty(stats_panels[(i : Int)].stats.boosterCoin, "visible", false);
 				if (mDungeonReport[(i : Int)].boost_xp > 1) {
-					mBoosterInfos.push(new UIObject(mDBFacade, ASCompat.dynamicAs(stats_panels[(i : Int)].stats.boosterXP, flash.display.MovieClip)));
+					mBoosterInfos.push(new UIObject(mDBFacade, ASCompat.coerce(stats_panels[(i : Int)].stats.boosterXP, flash.display.MovieClip)));
 					ASCompat.setProperty(stats_panels[(i : Int)].stats.boosterXP, "visible", true);
 					ASCompat.setProperty(stats_panels[(i : Int)].stats.boosterXP.label, "text", mDungeonReport[(i : Int)].boost_xp + "X");
 					ASCompat.setProperty(stats_panels[(i : Int)].stats.boosterXP.tooltip.title_label, "text", Locale.getString("BOOST_XP_SUMMARY_TITLE"));
@@ -2752,7 +2754,7 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 						Locale.getString("BOOST_XP_SUMMARY_DESCRIPTION") + mDungeonReport[(i : Int)].boost_xp + "X");
 				}
 				if (mDungeonReport[(i : Int)].boost_gold > 1) {
-					mBoosterInfos.push(new UIObject(mDBFacade, ASCompat.dynamicAs(stats_panels[(i : Int)].stats.boosterCoin, flash.display.MovieClip)));
+					mBoosterInfos.push(new UIObject(mDBFacade, ASCompat.coerce(stats_panels[(i : Int)].stats.boosterCoin, flash.display.MovieClip)));
 					ASCompat.setProperty(stats_panels[(i : Int)].stats.boosterCoin, "visible", true);
 					ASCompat.setProperty(stats_panels[(i : Int)].stats.boosterCoin.label, "text", mDungeonReport[(i : Int)].boost_gold + "X");
 					ASCompat.setProperty(stats_panels[(i : Int)].stats.boosterCoin.tooltip.title_label, "text", Locale.getString("BOOST_GOLD_SUMMARY_TITLE"));
@@ -2775,27 +2777,26 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 				if (!ASCompat.toBool(stats_panels[(i : Int)].stats.friend_indicator_icon.visible)) {
 					ASCompat.setProperty(stats_panels[(i : Int)].stats.add_button, "visible", true);
 					ASCompat.setProperty(stats_panels[(i : Int)].stats.add_button.label, "text", Locale.getString("ADD_FRIEND"));
-					mAddFriendButtons.push(new UIButton(mDBFacade, ASCompat.dynamicAs(stats_panels[(i : Int)].stats.add_button, flash.display.MovieClip)));
+					mAddFriendButtons.push(new UIButton(mDBFacade, ASCompat.coerce(stats_panels[(i : Int)].stats.add_button, flash.display.MovieClip)));
 					ASCompat.setProperty(mAddFriendButtons[mAddFriendButtons.length - 1], "releaseCallback",
-						addFriendCallback(ASCompat.dynamicAs(mAddFriendButtons[mAddFriendButtons.length - 1], brain.uI.UIButton), i));
+						addFriendCallback(ASCompat.coerce(mAddFriendButtons[mAddFriendButtons.length - 1], brain.uI.UIButton), i));
 					ASCompat.setProperty(stats_panels[(i : Int)].stats.block_button, "visible", true);
 					ASCompat.setProperty(stats_panels[(i : Int)].stats.block_button.label, "text", Locale.getString("BLOCK"));
-					mBlockFriendButtons.push(new UIButton(mDBFacade, ASCompat.dynamicAs(stats_panels[(i : Int)].stats.block_button, flash.display.MovieClip)));
+					mBlockFriendButtons.push(new UIButton(mDBFacade, ASCompat.coerce(stats_panels[(i : Int)].stats.block_button, flash.display.MovieClip)));
 					ASCompat.setProperty(mBlockFriendButtons[mBlockFriendButtons.length - 1], "releaseCallback",
-						blockFriendCallback(ASCompat.dynamicAs(mBlockFriendButtons[mBlockFriendButtons.length - 1], brain.uI.UIButton), i));
+						blockFriendCallback(ASCompat.coerce(mBlockFriendButtons[mBlockFriendButtons.length - 1], brain.uI.UIButton), i));
 					ASCompat.setProperty(stats_panels[(i : Int)].stats.report_button, "visible", true);
 					ASCompat.setProperty(stats_panels[(i : Int)].stats.report_button.label, "text", Locale.getString("REPORT"));
-					mReportPlayerButtons.push(new UIButton(mDBFacade,
-						ASCompat.dynamicAs(stats_panels[(i : Int)].stats.report_button, flash.display.MovieClip)));
+					mReportPlayerButtons.push(new UIButton(mDBFacade, ASCompat.coerce(stats_panels[(i : Int)].stats.report_button, flash.display.MovieClip)));
 					ASCompat.setProperty(mReportPlayerButtons[mReportPlayerButtons.length - 1], "releaseCallback",
-						reportPlayerCallback(ASCompat.dynamicAs(mReportPlayerButtons[mReportPlayerButtons.length - 1], brain.uI.UIButton), i));
+						reportPlayerCallback(ASCompat.coerce(mReportPlayerButtons[mReportPlayerButtons.length - 1], brain.uI.UIButton), i));
 				}
 			}
 			if (i == 0) {
-				mXPBonusStarEffect = ASCompat.dynamicAs(stats_panels[(i : Int)].stats.doublexp_effect_star, flash.display.MovieClip);
-				mXPBonusBarEffect = ASCompat.dynamicAs(stats_panels[(i : Int)].stats.doublexp_effect, flash.display.MovieClip);
-				mXPBonusTextFlash = ASCompat.dynamicAs(stats_panels[(i : Int)].stats.doublxp_effect_flash_text, flash.display.MovieClip);
-				mXPBonusText = ASCompat.dynamicAs((mXPBonusTextFlash : ASAny).doublexp_text, flash.text.TextField);
+				mXPBonusStarEffect = ASCompat.coerce(stats_panels[(i : Int)].stats.doublexp_effect_star, flash.display.MovieClip);
+				mXPBonusBarEffect = ASCompat.coerce(stats_panels[(i : Int)].stats.doublexp_effect, flash.display.MovieClip);
+				mXPBonusTextFlash = ASCompat.coerce(stats_panels[(i : Int)].stats.doublxp_effect_flash_text, flash.display.MovieClip);
+				mXPBonusText = ASCompat.coerce((mXPBonusTextFlash : ASAny).doublexp_text, flash.text.TextField);
 			}
 			ASCompat.setProperty(stats_panels[(i : Int)], "visible", mDungeonReport[(i : Int)].valid);
 			ASCompat.setProperty(stats_panels[(i : Int)].stats.kills.enemies_killed.kills, "text", Std.string(mDungeonReport[(i : Int)].kills));
@@ -2822,7 +2823,7 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 		mRevealState = (1 : UInt);
 		updateRevealState(null);
 		mDungeonAchievementPanelMovieClipRenderer = new MovieClipRenderer(mDBFacade,
-			ASCompat.dynamicAs((mScoreReportRoot : ASAny).achievement, flash.display.MovieClip), destroyAchievementBossPanel);
+			ASCompat.coerce((mScoreReportRoot : ASAny).achievement, flash.display.MovieClip), destroyAchievementBossPanel);
 		mDungeonAchievementPanelMovieClipRenderer.clip.visible = false;
 		ASCompat.setProperty((mScoreReportRoot : ASAny).achievement.label.label, "text", Locale.getString("DUNGEON_SUMMARY_REWARD_PANEL_LABEL"));
 		if (mCurrentMapNode.InfiniteDungeon != null) {
@@ -2838,11 +2839,11 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 				var _loc2_:String = null;
 				var _loc5_ = mDungeonReport[0].loot_type_2 > 0 ? mDungeonReport[0].loot_type_2 : mDungeonReport[0].loot_type_1;
 				if (_loc5_ != 0 && !ASCompat.stringAsBool(mCurrentMapNode.InfiniteDungeon)) {
-					_loc4_ = ASCompat.dynamicAs(mDBFacade.gameMaster.chestsById.itemFor(_loc5_), gameMasterDictionary.GMChest);
+					_loc4_ = ASCompat.coerce(mDBFacade.gameMaster.chestsById.itemFor(_loc5_), gameMasterDictionary.GMChest);
 					_loc3_ = _loc4_.IconSwf;
 					_loc2_ = _loc4_.IconName;
 					ChestInfo.loadItemIcon(_loc3_, _loc2_,
-						ASCompat.dynamicAs((mScoreReportRoot : ASAny).achievement.chest, flash.display.DisplayObjectContainer), mDBFacade, (400 : UInt),
+						ASCompat.coerce((mScoreReportRoot : ASAny).achievement.chest, flash.display.DisplayObjectContainer), mDBFacade, (400 : UInt),
 						(150 : UInt), mAssetLoadingComponent);
 				}
 			});
@@ -2862,7 +2863,7 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 		var _loc4_:ASObject = null;
 		var _loc3_:Vector<UInt> = /*undefined*/ null;
 		if (ASCompat.getQualifiedClassName(details) == "Array") {
-			_loc2_ = ASCompat.dynamicAs(details[0], Array);
+			_loc2_ = ASCompat.coerce(details[0], Array);
 			_loc4_ = details[1];
 			_loc3_ = new Vector<UInt>();
 			_loc3_.push(_loc4_.account_id);
@@ -2974,7 +2975,7 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 		final __ax4_iter_223 = mTeamBonusUI;
 		if (checkNullIteratee(__ax4_iter_223))
 			for (_tmp_ in __ax4_iter_223.iterator()) {
-				_loc3_ = ASCompat.dynamicAs(_tmp_, brain.uI.UIObject);
+				_loc3_ = ASCompat.coerce(_tmp_, brain.uI.UIObject);
 				_loc3_.destroy();
 			}
 		mTeamBonusUI = null;
@@ -3008,10 +3009,10 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 		while (_loc4_ < 4) {
 			_loc6_ = 0;
 			while (_loc6_ < 2) {
-				mSceneGraphComponent.removeChild(ASCompat.dynamicAs(ASCompat.dynGetIndex(mChestMovieClips[_loc4_], _loc6_), flash.display.DisplayObject));
+				mSceneGraphComponent.removeChild(ASCompat.coerce(ASCompat.dynGetIndex(mChestMovieClips[_loc4_], _loc6_), flash.display.DisplayObject));
 				_loc6_++;
 			}
-			_loc4_ = ASCompat.toInt(_loc4_) + 1;
+			_loc4_++;
 		}
 		mChestMovieClips = null;
 		mDBFacade.regainFocus();
@@ -3024,7 +3025,7 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 		if (checkNullIteratee(_loc1_))
 			for (_tmp_ in _loc1_) {
 				_loc8_ = (ASCompat.toInt(_tmp_) : UInt);
-				_loc2_ = ASCompat.dynamicAs(mFacebookPicMap.itemFor(_loc8_), FacebookPicHelper);
+				_loc2_ = ASCompat.coerce(mFacebookPicMap.itemFor(_loc8_), FacebookPicHelper);
 				if (_loc2_ != null) {
 					_loc2_.destroy();
 				}
@@ -3047,25 +3048,25 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 		_loc4_ = 0;
 		while (_loc4_ < mAddFriendButtons.length) {
 			mAddFriendButtons[_loc4_].destroy();
-			_loc4_ = ASCompat.toInt(_loc4_) + 1;
+			_loc4_++;
 		}
 		mAddFriendButtons = null;
 		_loc4_ = 0;
 		while (_loc4_ < mBlockFriendButtons.length) {
 			mBlockFriendButtons[_loc4_].destroy();
-			_loc4_ = ASCompat.toInt(_loc4_) + 1;
+			_loc4_++;
 		}
 		mBlockFriendButtons = null;
 		_loc4_ = 0;
 		while (_loc4_ < mReportPlayerButtons.length) {
 			mReportPlayerButtons[_loc4_].destroy();
-			_loc4_ = ASCompat.toInt(_loc4_) + 1;
+			_loc4_++;
 		}
 		mReportPlayerButtons = null;
 		_loc4_ = 0;
 		while (_loc4_ < mBoosterInfos.length) {
 			mBoosterInfos[_loc4_].destroy();
-			_loc4_ = ASCompat.toInt(_loc4_) + 1;
+			_loc4_++;
 		}
 		mBoosterInfos = null;
 		_loc4_ = 0;
@@ -3076,9 +3077,9 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 					ASCompat.dynGetIndex(mItemButtons[_loc4_], _loc7_).destroy();
 					mItemButtons[_loc4_][_loc7_] = null;
 				}
-				_loc7_ = ASCompat.toInt(_loc7_) + 1;
+				_loc7_++;
 			}
-			_loc4_ = ASCompat.toInt(_loc4_) + 1;
+			_loc4_++;
 		}
 		mItemButtons = null;
 		if (mTownHeader != null) {
@@ -3102,7 +3103,7 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 		_loc4_ = 0;
 		while (_loc4_ < mChestRenderers.length) {
 			mChestRenderers[_loc4_].destroy();
-			_loc4_ = ASCompat.toInt(_loc4_) + 1;
+			_loc4_++;
 		}
 		mChestRenderers = null;
 		isSingleChestList.length = 0;
@@ -3162,7 +3163,7 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 				mDungeonReport[0] = _loc2_;
 				break;
 			}
-			_loc4_ = ASCompat.toInt(_loc4_) + 1;
+			_loc4_++;
 		}
 		var _loc5_:Array<ASAny> = [
 			mDungeonReport[0].chest_type_1,
@@ -3267,7 +3268,7 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 				}
 				_loc2_++;
 			}
-			_loc1_ = ASCompat.toInt(_loc1_) + 1;
+			_loc1_++;
 		}
 	}
 

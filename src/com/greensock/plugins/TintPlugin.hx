@@ -66,11 +66,11 @@ class TintPlugin extends TweenPlugin {
 		_ct = start;
 		var _loc3_ = _props.length;
 		var _loc5_ = _tweens.length;
-		while (ASCompat.toBool(_loc3_--)) {
+		while (_loc3_-- != 0) {
 			_loc4_ = _props[_loc3_];
 			if ((_ct : ASAny)[_loc4_] != (end : ASAny)[_loc4_]) {
-				_tweens[Std.int(_loc6_ = ASCompat.toNumber(_loc5_++))] = new PropTween(_ct, _loc4_, ASCompat.toNumber((_ct : ASAny)[_loc4_]),
-					ASCompat.toNumber(ASCompat.toNumber((end : ASAny)[_loc4_]) - ASCompat.toNumber((_ct : ASAny)[_loc4_])), "tint", false);
+				_tweens[ASCompat.floatToInt(_loc6_ = _loc5_++)] = new PropTween(_ct, _loc4_, ASCompat.toNumber((_ct : ASAny)[_loc4_]),
+					ASCompat.toNumber((end : ASAny)[_loc4_]) - ASCompat.toNumber((_ct : ASAny)[_loc4_]), "tint", false);
 			}
 		}
 	}

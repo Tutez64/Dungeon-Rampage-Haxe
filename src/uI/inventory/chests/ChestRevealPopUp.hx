@@ -200,7 +200,7 @@ class ChestRevealPopUp {
 		mPopUpMC.x = mDBFacade.stageRef.stageWidth / 2 - bounds.width / 2 - bounds.x;
 		mPopUpMC.y = mDBFacade.stageRef.stageHeight / 2 - bounds.height / 2 - bounds.y;
 		ASCompat.setProperty((mPopUpMC : ASAny).title_label, "text", mChestGM.Name);
-		rarity = ASCompat.dynamicAs(mDBFacade.gameMaster.rarityByConstant.itemFor(mChestGM.Rarity), gameMasterDictionary.GMRarity);
+		rarity = ASCompat.coerce(mDBFacade.gameMaster.rarityByConstant.itemFor(mChestGM.Rarity), gameMasterDictionary.GMRarity);
 		if (rarity != null && rarity.TextColor != 0) {
 			ASCompat.setProperty((mPopUpMC : ASAny).title_label, "textColor", rarity.TextColor);
 		}
@@ -210,11 +210,11 @@ class ChestRevealPopUp {
 		mSlotMachineAnimationMC = ASCompat.dynamicAs(ASCompat.createInstance(slotMachineAnimation, []), MovieClip);
 		weaponClass = swfAsset.getClass("reveal_chest_weapon_total");
 		mItemMC = ASCompat.dynamicAs(ASCompat.createInstance(weaponClass, []), MovieClip);
-		mWeaponTextField = ASCompat.dynamicAs((mItemMC : ASAny).reveal_chest_weaponTextField, flash.text.TextField);
+		mWeaponTextField = ASCompat.coerce((mItemMC : ASAny).reveal_chest_weaponTextField, flash.text.TextField);
 		if (ASCompat.toBool((mSlotMachineAnimationMC : ASAny).reveal_chest_forgeTextField)) {
 			ASCompat.setProperty((mSlotMachineAnimationMC : ASAny).reveal_chest_forgeTextField, "visible", false);
 		}
-		mCloseButton = new UIButton(mDBFacade, ASCompat.dynamicAs((mPopUpMC : ASAny).close, flash.display.MovieClip));
+		mCloseButton = new UIButton(mDBFacade, ASCompat.coerce((mPopUpMC : ASAny).close, flash.display.MovieClip));
 		mCloseButton.visible = false;
 		mCloseButton.enabled = false;
 		mCloseButton.releaseCallback = preCloseCallback;
@@ -222,12 +222,12 @@ class ChestRevealPopUp {
 		mItemInfoCardMC = ASCompat.dynamicAs(ASCompat.createInstance(itemInfoCardSwfClass, []), MovieClip);
 		mAssetLoadingComponent.getSwfAsset(DBFacade.buildFullDownloadPath("Resources/Art2D/UI/db_UI_town.swf"), function(param1:SwfAsset) {
 			var _loc2_ = param1.getClass("DR_charge_tooltip");
-			mTapIcon = new UIObject(mDBFacade, ASCompat.dynamicAs((mItemInfoCardMC : ASAny).ability.tap_icon, flash.display.MovieClip));
+			mTapIcon = new UIObject(mDBFacade, ASCompat.coerce((mItemInfoCardMC : ASAny).ability.tap_icon, flash.display.MovieClip));
 			mTapTooltip = new UITapHoldTooltip(mDBFacade, _loc2_);
 			mTapIcon.tooltip = mTapTooltip;
 			mTapIcon.tooltipPos = new Point(0, mTapIcon.root.height * 0.5);
 			mTapTooltip.visible = false;
-			mHoldIcon = new UIObject(mDBFacade, ASCompat.dynamicAs((mItemInfoCardMC : ASAny).ability.icon, flash.display.MovieClip));
+			mHoldIcon = new UIObject(mDBFacade, ASCompat.coerce((mItemInfoCardMC : ASAny).ability.icon, flash.display.MovieClip));
 			mHoldTooltip = new UITapHoldTooltip(mDBFacade, _loc2_);
 			mHoldIcon.tooltip = mHoldTooltip;
 			mHoldIcon.tooltipPos = new Point(0, mHoldIcon.root.height * 0.5);
@@ -299,9 +299,9 @@ class ChestRevealPopUp {
 				weaponId = ASCompat.asUint(details.customResult.purchasedChestResults.WeaponId);
 			}
 		}
-		mRevealedGMOffer = ASCompat.dynamicAs(mDBFacade.gameMaster.offerById.itemFor(offerId), gameMasterDictionary.GMOffer);
+		mRevealedGMOffer = ASCompat.coerce(mDBFacade.gameMaster.offerById.itemFor(offerId), gameMasterDictionary.GMOffer);
 		if (mRevealedGMOffer == null) {
-			mRevealedItemInfo = ASCompat.dynamicAs(mDBFacade.dbAccountInfo.inventoryInfo.items.itemFor(weaponId), account.ItemInfo);
+			mRevealedItemInfo = ASCompat.coerce(mDBFacade.dbAccountInfo.inventoryInfo.items.itemFor(weaponId), account.ItemInfo);
 			if (mRevealedItemInfo == null) {
 				Logger.warn("Can\'t find gmOffer or itemInfo for loot with offerId: "
 					+ Std.string(offerId)
@@ -340,7 +340,7 @@ class ChestRevealPopUp {
 					for (_tmp_ in __ax4_iter_120) {
 						offerDetail = _tmp_;
 						if (offerDetail.StackableId != 0) {
-							gmStackable = ASCompat.dynamicAs(mDBFacade.gameMaster.stackableById.itemFor(offerDetail.StackableId),
+							gmStackable = ASCompat.coerce(mDBFacade.gameMaster.stackableById.itemFor(offerDetail.StackableId),
 								gameMasterDictionary.GMStackable);
 							swfPath = gmStackable.UISwfFilepath;
 							iconClass = gmStackable.IconName;
@@ -348,7 +348,7 @@ class ChestRevealPopUp {
 							mItemType = (2 : UInt);
 							mRevealedItemId = offerDetail.StackableId;
 						} else if (offerDetail.PetId != 0) {
-							gmPet = ASCompat.dynamicAs(mDBFacade.gameMaster.npcById.itemFor(offerDetail.PetId), gameMasterDictionary.GMNpc);
+							gmPet = ASCompat.coerce(mDBFacade.gameMaster.npcById.itemFor(offerDetail.PetId), gameMasterDictionary.GMNpc);
 							swfPath = gmPet.IconSwfFilepath;
 							iconClass = gmPet.IconName;
 							name = GameMasterLocale.getGameMasterSubString("PET_NAME", gmPet.Constant);
@@ -457,7 +457,7 @@ class ChestRevealPopUp {
 			ASCompat.setProperty((mItemInfoCardMC : ASAny).ability, "visible", true);
 			ASCompat.setProperty((mItemInfoCardMC : ASAny).pet_stats, "visible", false);
 			mRevealedItemIcon.scaleX = mRevealedItemIcon.scaleY = 0.5;
-			gmWeaponItem = ASCompat.dynamicAs(mDBFacade.gameMaster.weaponItemById.itemFor(mRevealedItemId), gameMasterDictionary.GMWeaponItem);
+			gmWeaponItem = ASCompat.coerce(mDBFacade.gameMaster.weaponItemById.itemFor(mRevealedItemId), gameMasterDictionary.GMWeaponItem);
 			mItemDesc = GameMasterLocale.getGameMasterSubString("WEAPON_AESTHETIC_DESCRIPTION",
 				gmWeaponItem.getWeaponAesthetic(mRevealedItemLevel, mRevealedItemInfo.legendaryModifier > 0).WeaponItemConstant);
 			isWeapon = isSellable = true;
@@ -475,7 +475,7 @@ class ChestRevealPopUp {
 			levelRequirement = Locale.getString("REQUIRES_LEVEL") + Std.string(weaponRequiredLevel);
 			power = Std.string(mRevealedItemInfo.power);
 			if (ASCompat.stringAsBool(gmWeaponItem.ChargeAttack)) {
-				chargeAttack = ASCompat.dynamicAs(mDBFacade.gameMaster.attackByConstant.itemFor(gmWeaponItem.ChargeAttack), gameMasterDictionary.GMAttack);
+				chargeAttack = ASCompat.coerce(mDBFacade.gameMaster.attackByConstant.itemFor(gmWeaponItem.ChargeAttack), gameMasterDictionary.GMAttack);
 				if (chargeAttack != null) {
 					chargeAttackName = "MAKO" + chargeAttack.Name.toUpperCase();
 				}
@@ -522,9 +522,9 @@ class ChestRevealPopUp {
 			__tmpAssignObj5 = (mItemInfoCardMC : ASAny).item_card_frame;
 			ASCompat.setProperty(__tmpAssignObj5, "x", __tmpAssignObj5.x + 100);
 			mRevealedItemIcon.scaleX = mRevealedItemIcon.scaleY = 0.6;
-			gmStackable = ASCompat.dynamicAs(mDBFacade.gameMaster.stackableById.itemFor(mRevealedItemId), gameMasterDictionary.GMStackable);
+			gmStackable = ASCompat.coerce(mDBFacade.gameMaster.stackableById.itemFor(mRevealedItemId), gameMasterDictionary.GMStackable);
 			if (gmStackable == null) {
-				gmOffer = ASCompat.dynamicAs(mDBFacade.gameMaster.offerById.itemFor(mRevealedItemId), gameMasterDictionary.GMOffer);
+				gmOffer = ASCompat.coerce(mDBFacade.gameMaster.offerById.itemFor(mRevealedItemId), gameMasterDictionary.GMOffer);
 				mItemDesc = GameMasterLocale.getGameMasterSubString("BUNDLE_OFFER_DESCRIPTION", Std.string(gmOffer.Id));
 				if (gmOffer.Details.length > 0) {
 					if (gmOffer.Details[0].StackableId != 0) {
@@ -541,19 +541,19 @@ class ChestRevealPopUp {
 			ASCompat.setProperty((mItemInfoCardMC : ASAny).ability, "visible", false);
 			ASCompat.setProperty((mItemInfoCardMC : ASAny).pet_stats, "visible", true);
 			mRevealedItemIcon.scaleX = mRevealedItemIcon.scaleY = 1;
-			gmPet = ASCompat.dynamicAs(mDBFacade.gameMaster.npcById.itemFor(mRevealedItemId), gameMasterDictionary.GMNpc);
+			gmPet = ASCompat.coerce(mDBFacade.gameMaster.npcById.itemFor(mRevealedItemId), gameMasterDictionary.GMNpc);
 			mItemDesc = GameMasterLocale.getGameMasterSubString("PET_DESCRIPTION", gmPet.Constant);
 			j = (1 : UInt);
 			while (j <= 5) {
-				powerStarMC = ASCompat.dynamicAs(cast((mItemInfoCardMC : ASAny).pet_stats.pet_stats_power, flash.display.DisplayObjectContainer)
+				powerStarMC = ASCompat.coerce(cast((mItemInfoCardMC : ASAny).pet_stats.pet_stats_power, flash.display.DisplayObjectContainer)
 					.getChildByName("star"
 					+ Std.string(j)),
 					flash.display.MovieClip);
-				defenseStarMC = ASCompat.dynamicAs(cast((mItemInfoCardMC : ASAny).pet_stats.pet_stats_power, flash.display.DisplayObjectContainer)
+				defenseStarMC = ASCompat.coerce(cast((mItemInfoCardMC : ASAny).pet_stats.pet_stats_power, flash.display.DisplayObjectContainer)
 					.getChildByName("star"
 					+ Std.string(j)),
 					flash.display.MovieClip);
-				speedStarMC = ASCompat.dynamicAs(cast((mItemInfoCardMC : ASAny).pet_stats.pet_stats_power, flash.display.DisplayObjectContainer)
+				speedStarMC = ASCompat.coerce(cast((mItemInfoCardMC : ASAny).pet_stats.pet_stats_power, flash.display.DisplayObjectContainer)
 					.getChildByName("star"
 					+ Std.string(j)),
 					flash.display.MovieClip);
@@ -602,7 +602,7 @@ class ChestRevealPopUp {
 						var _loc2_:MovieClip = null;
 						var _loc3_ = param1.getClass(iconName);
 						if (_loc3_ != null) {
-							_loc2_ = ASCompat.dynamicAs(ASCompat.createInstance(_loc3_, []), flash.display.MovieClip);
+							_loc2_ = ASCompat.coerce(ASCompat.createInstance(_loc3_, []), flash.display.MovieClip);
 							_loc2_.scaleX = _loc2_.scaleY = 0.5;
 							mTapIcon.root.addChild(_loc2_);
 							mTapTooltip.setValues(GameMasterLocale.getGameMasterSubString("WEAPON_ITEM_TAP_TITLE", gmWeaponItem.Constant),
@@ -625,7 +625,7 @@ class ChestRevealPopUp {
 						var _loc4_:String = null;
 						var _loc3_ = param1.getClass(iconName1);
 						if (_loc3_ != null) {
-							_loc2_ = ASCompat.dynamicAs(ASCompat.createInstance(_loc3_, []), flash.display.MovieClip);
+							_loc2_ = ASCompat.coerce(ASCompat.createInstance(_loc3_, []), flash.display.MovieClip);
 							_loc2_.scaleX = _loc2_.scaleY = 0.5;
 							mHoldIcon.root.addChild(_loc2_);
 							_loc4_ = gmWeaponItem.WeaponController != null ? GameMasterLocale.getGameMasterSubString("WEAPON_ITEM_CONTROLLER",
@@ -647,7 +647,7 @@ class ChestRevealPopUp {
 			ASCompat.setProperty((mItemInfoCardMC : ASAny).power, "visible", false);
 		}
 		ASCompat.setProperty((mItemInfoCardMC : ASAny).unequippable, "visible", !isEquippable);
-		mItemInfoCardSellButton = new UIButton(mDBFacade, ASCompat.dynamicAs((mItemInfoCardMC : ASAny).sell, flash.display.MovieClip));
+		mItemInfoCardSellButton = new UIButton(mDBFacade, ASCompat.coerce((mItemInfoCardMC : ASAny).sell, flash.display.MovieClip));
 		mItemInfoCardSellButton.label.text = Locale.getString("ITEM_CARD_SELL");
 		mItemInfoCardSellButton.visible = isSellable;
 		mItemInfoCardSellButton.enabled = isSellable;
@@ -655,10 +655,10 @@ class ChestRevealPopUp {
 			ASCompat.setProperty((mItemInfoCardMC : ASAny).sell.sell_text, "text", Std.string(price));
 		}
 		mItemInfoCardSellButton.releaseCallback = sellRevealedItem;
-		mItemInfoCardStoreButton = new UIButton(mDBFacade, ASCompat.dynamicAs((mItemInfoCardMC : ASAny).store, flash.display.MovieClip));
+		mItemInfoCardStoreButton = new UIButton(mDBFacade, ASCompat.coerce((mItemInfoCardMC : ASAny).store, flash.display.MovieClip));
 		mItemInfoCardStoreButton.label.text = Locale.getString("KEEP");
 		mItemInfoCardStoreButton.releaseCallback = preCloseCallback;
-		mItemInfoCardEquipButton = new UIButton(mDBFacade, ASCompat.dynamicAs((mItemInfoCardMC : ASAny).equip, flash.display.MovieClip));
+		mItemInfoCardEquipButton = new UIButton(mDBFacade, ASCompat.coerce((mItemInfoCardMC : ASAny).equip, flash.display.MovieClip));
 		mItemInfoCardEquipButton.label.text = Locale.getString("ITEM_CARD_EQUIP");
 		if (isEquippable) {
 			mItemInfoCardEquipButton.releaseCallback = goToStorage;
@@ -715,8 +715,8 @@ class ChestRevealPopUp {
 		var _loc2_:IMapIterator = null;
 		var _loc4_:ItemInfo = null;
 		if (mItemType == 1) {
-			_loc1_ = ASCompat.dynamicAs(mDBFacade.gameMaster.weaponItemById.itemFor(mRevealedItemId), gameMasterDictionary.GMWeaponItem);
-			_loc3_ = Std.int(mNewWeaponDBID);
+			_loc1_ = ASCompat.coerce(mDBFacade.gameMaster.weaponItemById.itemFor(mRevealedItemId), gameMasterDictionary.GMWeaponItem);
+			_loc3_ = ASCompat.floatToInt(mNewWeaponDBID);
 			if (_loc3_ == 0) {
 				Logger.error(" sellRevealedItem  had to find a weapon .. arg  Somethign is rong ");
 				_loc2_ = ASCompat.reinterpretAs(mDBFacade.dbAccountInfo.inventoryInfo.items.iterator(), IMapIterator);
@@ -748,7 +748,7 @@ class ChestRevealPopUp {
 		var _loc2_:String = null;
 		var _loc1_:String = null;
 		var _loc4_:GMOffer = null;
-		var _loc3_ = (Std.int(mDBFacade.dbConfigManager.getConfigNumber("min_feedpost_weapon_rarity", 2)) : UInt);
+		var _loc3_ = (ASCompat.floatToInt(mDBFacade.dbConfigManager.getConfigNumber("min_feedpost_weapon_rarity", 2)) : UInt);
 		if (mItemType == 1 && mRevealedItemInfo.rarity.Id >= _loc3_) {
 			_loc2_ = mRevealedItemInfo.gmWeaponAesthetic.Name;
 			_loc1_ = mItemName;
@@ -756,7 +756,7 @@ class ChestRevealPopUp {
 			_loc1_ += ", " + Locale.getString(mRevealedItemInfo.rarity.Constant) + "!";
 			DBFacebookBragFeedPost.openChestBrag(mDBFacade, _loc2_, _loc1_, mRevealedItemIcon, mItemFeedPostImagePath, mItemType, mAssetLoadingComponent);
 		} else if (mItemType == 2) {
-			_loc4_ = ASCompat.dynamicAs(mDBFacade.gameMaster.offerByStackableId.itemFor(mRevealedItemId), gameMasterDictionary.GMOffer);
+			_loc4_ = ASCompat.coerce(mDBFacade.gameMaster.offerByStackableId.itemFor(mRevealedItemId), gameMasterDictionary.GMOffer);
 			if (_loc4_ != null) {
 				if (_loc4_.IsBundle && _loc4_.Details[0].Gems > 0) {
 					DBFacebookBragFeedPost.openChestBrag(mDBFacade, mItemName, mItemName, mRevealedItemIcon, "", _loc4_.Id, mAssetLoadingComponent);

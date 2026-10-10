@@ -42,10 +42,10 @@ class UIProgressBar extends UIObject {
 		mValue = mMinimum;
 		mDeltaValue = mMinimum;
 		mTrueValue = mMinimum;
-		bar = ASCompat.dynamicAs(ASCompat.toBool((root : ASAny).bar) ? ASCompat.dynamicAs((root : ASAny).bar, flash.display.MovieClip) : root,
+		bar = ASCompat.coerce(ASCompat.toBool((root : ASAny).bar) ? ASCompat.coerce((root : ASAny).bar, flash.display.MovieClip) : root,
 			flash.display.MovieClip);
 		if (delta != null) {
-			mDeltaBar = ASCompat.dynamicAs(ASCompat.toBool((delta : ASAny).bar) ? ASCompat.dynamicAs((delta : ASAny).bar, flash.display.MovieClip) : delta,
+			mDeltaBar = ASCompat.coerce(ASCompat.toBool((delta : ASAny).bar) ? ASCompat.coerce((delta : ASAny).bar, flash.display.MovieClip) : delta,
 				flash.display.MovieClip);
 			mDeltaBar.alpha = 0.3;
 		}
@@ -161,7 +161,7 @@ class UIProgressBar extends UIObject {
 	public function displayErrorMessage(message:String) {
 		mErrorMessage = new MovieClip();
 		MemoryTracker.track(mErrorMessage, "MovieClip - error message container created in UIProgressBar.displayErrorMessage()", "brain");
-		mFacade.sceneGraphManager.addChild(mErrorMessage, Std.int(mTooltipLayer));
+		mFacade.sceneGraphManager.addChild(mErrorMessage, ASCompat.floatToInt(mTooltipLayer));
 		mErrorMessageLabel = new TextField();
 		MemoryTracker.track(mErrorMessageLabel, "TextField - error label created in UIProgressBar.displayErrorMessage()", "brain");
 		mErrorMessageLabel.x = 320;

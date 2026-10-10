@@ -87,7 +87,7 @@ class ActorRenderer extends Sprite {
 		}
 		var _loc2_ = ASCompat.reinterpretAs(mAnims.iterator(), IMapIterator);
 		while (_loc2_.hasNext()) {
-			_loc1_ = ASCompat.dynamicAs(_loc2_.next(), brain.render.IRenderer);
+			_loc1_ = ASCompat.coerce(_loc2_.next(), brain.render.IRenderer);
 			_loc1_.destroy();
 		}
 		mAnims.clear();
@@ -164,21 +164,21 @@ class ActorRenderer extends Sprite {
 		var _loc5_ = swfAsset.getClass(_loc3_, true);
 		var _loc11_ = swfAsset.getClass(_loc9_, true);
 		if (_loc4_ != null) {
-			_loc6_ = ASCompat.dynamicAs(ASCompat.createInstance(_loc4_, []), flash.display.MovieClip);
+			_loc6_ = ASCompat.coerce(ASCompat.createInstance(_loc4_, []), flash.display.MovieClip);
 			_loc8_ = new ActorMovieClipRenderer(mDBFacade, _loc6_);
 			setAnimInDictionary("idle", _loc8_);
 			movieClipRendererLoaded(_loc6_);
 		}
 		if (_loc10_ != null) {
-			_loc8_ = new ActorMovieClipRenderer(mDBFacade, ASCompat.dynamicAs(ASCompat.createInstance(_loc10_, []), flash.display.MovieClip));
+			_loc8_ = new ActorMovieClipRenderer(mDBFacade, ASCompat.coerce(ASCompat.createInstance(_loc10_, []), flash.display.MovieClip));
 			setAnimInDictionary("run", _loc8_);
 		}
 		if (_loc5_ != null) {
-			_loc8_ = new ActorMovieClipRenderer(mDBFacade, ASCompat.dynamicAs(ASCompat.createInstance(_loc5_, []), flash.display.MovieClip));
+			_loc8_ = new ActorMovieClipRenderer(mDBFacade, ASCompat.coerce(ASCompat.createInstance(_loc5_, []), flash.display.MovieClip));
 			setAnimInDictionary("suffer", _loc8_);
 		}
 		if (_loc11_ != null) {
-			_loc8_ = new ActorMovieClipRenderer(mDBFacade, ASCompat.dynamicAs(ASCompat.createInstance(_loc11_, []), flash.display.MovieClip));
+			_loc8_ = new ActorMovieClipRenderer(mDBFacade, ASCompat.coerce(ASCompat.createInstance(_loc11_, []), flash.display.MovieClip));
 			setAnimInDictionary("death", _loc8_);
 		}
 	}
@@ -208,12 +208,12 @@ class ActorRenderer extends Sprite {
 	}
 
 	public function getAnimDurationInSeconds(animName:String):Float {
-		var _loc2_ = ASCompat.dynamicAs(mAnims.itemFor(animName), brain.render.IRenderer);
+		var _loc2_ = ASCompat.coerce(mAnims.itemFor(animName), brain.render.IRenderer);
 		return _loc2_ != null ? _loc2_.durationInSeconds : 0;
 	}
 
 	public function getAnimFrameCount(animName:String):Float {
-		var _loc2_ = ASCompat.dynamicAs(mAnims.itemFor(animName), brain.render.IRenderer);
+		var _loc2_ = ASCompat.coerce(mAnims.itemFor(animName), brain.render.IRenderer);
 		return _loc2_ != null ? _loc2_.frameCount : 0;
 	}
 
@@ -268,7 +268,7 @@ class ActorRenderer extends Sprite {
 	}
 
 	function getRenderer(animName:String):IRenderer {
-		var _loc2_ = ASCompat.dynamicAs(mAnims.itemFor(animName), brain.render.IRenderer);
+		var _loc2_ = ASCompat.coerce(mAnims.itemFor(animName), brain.render.IRenderer);
 		if (_loc2_ == null && this.assetType == "SPRITE_SHEET") {
 			loadSpriteSheetAsset(animName);
 		}

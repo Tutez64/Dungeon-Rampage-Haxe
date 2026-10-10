@@ -88,7 +88,7 @@ class UIFriends extends UIFMState {
 						_loc3_ = true;
 						break;
 					}
-					_loc4_ = ASCompat.toInt(_loc4_) + 1;
+					_loc4_++;
 				}
 				if (!_loc3_) {
 					_loc4_ = 0;
@@ -98,7 +98,7 @@ class UIFriends extends UIFMState {
 							_loc3_ = true;
 							break;
 						}
-						_loc4_ = ASCompat.toInt(_loc4_) + 1;
+						_loc4_++;
 					}
 				}
 			}
@@ -169,7 +169,7 @@ class UIFriends extends UIFMState {
 				_loc2_ = 0;
 				while (_loc2_ < mSelectedDRFriends.length) {
 					mDBFacade.metrics.log("DRFriendRemove", {"friendId": Std.string(mSelectedDRFriends[_loc2_])});
-					_loc2_ = ASCompat.toInt(_loc2_) + 1;
+					_loc2_++;
 				}
 			});
 		}

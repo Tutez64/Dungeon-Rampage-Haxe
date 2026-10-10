@@ -70,7 +70,7 @@ class FriendPopulater {
 		mFriendsSelectedAcrossPages = new Map();
 		togglesSelectedArray = [];
 		var _loc5_ = mTownStateMachine.getTownAsset("friends_populater");
-		mFriendPopulaterMC = ASCompat.dynamicAs(ASCompat.createInstance(_loc5_, []), flash.display.MovieClip);
+		mFriendPopulaterMC = ASCompat.coerce(ASCompat.createInstance(_loc5_, []), flash.display.MovieClip);
 		mFriendPopulaterMC.x = 732.9;
 		mFriendPopulaterMC.y = 542.15;
 		mUIFriendManager.addToUI(mFriendPopulaterMC);
@@ -81,24 +81,24 @@ class FriendPopulater {
 	function createSelectionOptionsUI() {
 		ASCompat.setProperty((mFriendPopulaterMC : ASAny).fm_selection_options, "visible", true);
 		ASCompat.setProperty((mFriendPopulaterMC : ASAny).fm_selection_options.txt_select, "text", Locale.getString("SELECT"));
-		mSelectAllButton = new UIButton(mDBFacade, ASCompat.dynamicAs((mFriendPopulaterMC : ASAny).fm_selection_options.button_all, flash.display.MovieClip));
+		mSelectAllButton = new UIButton(mDBFacade, ASCompat.coerce((mFriendPopulaterMC : ASAny).fm_selection_options.button_all, flash.display.MovieClip));
 		ASCompat.setProperty((mFriendPopulaterMC : ASAny).fm_selection_options.button_all.label, "text", Locale.getString("ALL"));
 		mSelectAllButton.releaseCallback = selectAllButtonPressed;
-		mSelectNoneButton = new UIButton(mDBFacade, ASCompat.dynamicAs((mFriendPopulaterMC : ASAny).fm_selection_options.button_none, flash.display.MovieClip));
+		mSelectNoneButton = new UIButton(mDBFacade, ASCompat.coerce((mFriendPopulaterMC : ASAny).fm_selection_options.button_none, flash.display.MovieClip));
 		ASCompat.setProperty((mFriendPopulaterMC : ASAny).fm_selection_options.button_none.label, "text", Locale.getString("NONE"));
 		mSelectNoneButton.releaseCallback = selectNoneButtonPressed;
 	}
 
 	function createPagination() {
-		mTotalPages = (Std.int(1 + Math.ffloor(mListOfFriends.length / (5 * 3))) : UInt);
-		mPagination = new UIPagingPanel(mDBFacade, (0 : UInt), ASCompat.dynamicAs((mFriendPopulaterMC : ASAny).pagination_friends, flash.display.MovieClip),
+		mTotalPages = (ASCompat.floatToInt(1 + Math.ffloor(mListOfFriends.length / (5 * 3))) : UInt);
+		mPagination = new UIPagingPanel(mDBFacade, (0 : UInt), ASCompat.coerce((mFriendPopulaterMC : ASAny).pagination_friends, flash.display.MovieClip),
 			mTownStateMachine.townSwf.getClass("pagination_button"), setCurrentPage);
 		MemoryTracker.track(mPagination, "UIPagingPanel - created in FriendPopulater.createPagination()");
 		setCurrentPage((0 : UInt));
 	}
 
 	function refreshPagination(page:UInt) {
-		mPagination.currentPage = (Std.int(mTotalPages != 0 ? (Std.int(Math.min(mTotalPages - 1, page)) : UInt) : (0 : UInt)) : UInt);
+		mPagination.currentPage = (ASCompat.floatToInt(mTotalPages != 0 ? (ASCompat.floatToInt(Math.min(mTotalPages - 1, page)) : UInt) : (0 : UInt)) : UInt);
 		mPagination.numPages = mTotalPages;
 		mPagination.visible = true;
 	}
@@ -159,8 +159,7 @@ class FriendPopulater {
 		ASCompat.setProperty((_loc5_ : ASAny).friend_level.level, "text", Std.string(friend.trophies));
 		var _loc6_ = mFriendsSelectedAcrossPages.hasKey(mCurrentPage * (5 * 3) + idx);
 		mFriendSelectedToggles.add(idx,
-			new UIToggleButton(mDBFacade, idx, ASCompat.dynamicAs((_loc5_ : ASAny).friends_toggle, flash.display.MovieClip), _loc6_,
-				changeToggleStatusCallback));
+			new UIToggleButton(mDBFacade, idx, ASCompat.coerce((_loc5_ : ASAny).friends_toggle, flash.display.MovieClip), _loc6_, changeToggleStatusCallback));
 		mUIFriendManager.addToUI(_loc5_);
 		mListOfFriendSlots.push(_loc5_);
 	}
@@ -220,7 +219,7 @@ class FriendPopulater {
 		var _loc2_ = ((mCurrentPage + 1) * (5 * 3) - 1 : Int);
 		_loc8_ = _loc3_;
 		while (_loc8_ < _loc2_) {
-			_loc5_ = ASCompat.dynamicAs(mFriendSelectedToggles.itemFor(_loc8_ - _loc3_), brain.uI.UIToggleButton);
+			_loc5_ = ASCompat.coerce(mFriendSelectedToggles.itemFor(_loc8_ - _loc3_), brain.uI.UIToggleButton);
 			if (_loc5_ != null) {
 				_loc1_ = (mCurrentPage * (5 * 3) : Int);
 				if (_loc1_ <= mListOfFriends.length) {
@@ -254,7 +253,7 @@ class FriendPopulater {
 		NoneButtonSelected = true;
 		_loc1_ = 0;
 		while (_loc1_ < mListOfFriendSlots.length) {
-			_loc2_ = ASCompat.dynamicAs(mFriendSelectedToggles.itemFor(_loc1_), brain.uI.UIToggleButton);
+			_loc2_ = ASCompat.coerce(mFriendSelectedToggles.itemFor(_loc1_), brain.uI.UIToggleButton);
 			if (_loc2_ != null) {
 				_loc2_.selected = false;
 			}
@@ -286,7 +285,7 @@ class FriendPopulater {
 		if (checkNullIteratee(_loc1_))
 			for (_tmp_ in _loc1_) {
 				_loc3_ = (ASCompat.toInt(_tmp_) : UInt);
-				_loc2_ = ASCompat.dynamicAs(mFriendSelectedToggles.itemFor(_loc3_), brain.uI.UIToggleButton);
+				_loc2_ = ASCompat.coerce(mFriendSelectedToggles.itemFor(_loc3_), brain.uI.UIToggleButton);
 				_loc2_.destroy();
 			}
 		mFriendSelectedToggles = null;

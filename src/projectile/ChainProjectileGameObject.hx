@@ -49,9 +49,9 @@ class ChainProjectileGameObject extends ProjectileGameObject {
 		} else {
 			mIgnoreList = ignoreList;
 		}
-		var _loc17_ = (Std.int(weapon != null ? (Std.int(weapon.chains()) : UInt) : (0 : UInt)) : UInt);
+		var _loc17_ = (ASCompat.floatToInt(weapon != null ? (ASCompat.floatToInt(weapon.chains()) : UInt) : (0 : UInt)) : UInt);
 		mMaxChain = mGMProjectile.NumChains + _loc17_;
-		mMaxBranches = (ASCompat.toInt(mGMProjectile.NumBranches > 0 ? mGMProjectile.NumBranches : (1 : UInt)) : UInt);
+		mMaxBranches = mGMProjectile.NumBranches > 0 ? mGMProjectile.NumBranches : (1 : UInt);
 		mChainCheckDistance = mGMProjectile.ChainDist > 0 ? mGMProjectile.ChainDist : 300;
 	}
 
@@ -133,7 +133,7 @@ class ChainProjectileGameObject extends ProjectileGameObject {
 				return;
 			}
 			shootNewChain(targets[_loc2_]);
-			_loc2_ = ASCompat.toInt(_loc2_) + 1;
+			_loc2_++;
 		}
 	}
 

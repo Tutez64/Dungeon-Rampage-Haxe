@@ -26,7 +26,7 @@ class TrickleCacheLoader {
 					dbFacade.AddTileLibraryJson(path, param1);
 				};
 			};
-			loadJsonHelperFunction(trash_AssetLoadingComponent, DBFacade.buildFullDownloadPath(name), ASCompat.asFunction(makeCallback(name)));
+			loadJsonHelperFunction(trash_AssetLoadingComponent, DBFacade.buildFullDownloadPath(name), ASCompat.coerceFunction(makeCallback(name)));
 		}
 	}
 
@@ -37,15 +37,15 @@ class TrickleCacheLoader {
 	}
 
 	public static function loadNPCSpriteSheet(gmNPC:GMNpc, dbFacade:DBFacade, weaponsNames:Vector<String>) {
-		ActorRenderer.cache_loadSpriteSheetAsset(dbFacade, DBFacade.buildFullDownloadPath(gmNPC.SwfFilepath), (Std.int(gmNPC.SpriteHeight) : UInt),
-			(Std.int(gmNPC.SpriteWidth) : UInt), gmNPC.AssetType, weaponsNames);
+		ActorRenderer.cache_loadSpriteSheetAsset(dbFacade, DBFacade.buildFullDownloadPath(gmNPC.SwfFilepath),
+			(ASCompat.floatToInt(gmNPC.SpriteHeight) : UInt), (ASCompat.floatToInt(gmNPC.SpriteWidth) : UInt), gmNPC.AssetType, weaponsNames);
 	}
 
 	public static function loadHeroSpriteSheet(dbFacade:DBFacade, gmSkin:GMSkin, weaponsNames:Vector<String> = null) {
 		if (weaponsNames == null) {
 			weaponsNames = new Vector<String>();
 		}
-		var _loc4_ = ASCompat.dynamicAs(dbFacade.gameMaster.heroByConstant.itemFor(gmSkin.ForHero), gameMasterDictionary.GMHero);
+		var _loc4_ = ASCompat.coerce(dbFacade.gameMaster.heroByConstant.itemFor(gmSkin.ForHero), gameMasterDictionary.GMHero);
 		ActorRenderer.cache_loadSpriteSheetAsset(dbFacade, DBFacade.buildFullDownloadPath(gmSkin.SwfFilepath), gmSkin.SpriteHeight, gmSkin.SpriteWidth,
 			gmSkin.AssetType, weaponsNames);
 	}
@@ -68,7 +68,7 @@ class TrickleCacheLoader {
 		while (_loc4_ < files.length) {
 			_loc3_ = files[_loc4_];
 			swfAsset(_loc3_, dbFacade);
-			_loc4_ = ASCompat.toInt(_loc4_) + 1;
+			_loc4_++;
 		}
 	}
 
@@ -81,14 +81,14 @@ class TrickleCacheLoader {
 		_loc5_ = 0;
 		while (_loc5_ < cacheNpc.length) {
 			_loc7_ = (cacheNpc[_loc5_] : Int);
-			_loc3_ = ASCompat.dynamicAs(dbFacade.gameMaster.npcById.itemFor(_loc7_), gameMasterDictionary.GMNpc);
+			_loc3_ = ASCompat.coerce(dbFacade.gameMaster.npcById.itemFor(_loc7_), gameMasterDictionary.GMNpc);
 			if (_loc3_ != null) {
 				if (_loc3_.SwfFilepath == null || _loc3_.SwfFilepath == "null") {
 					Logger.info("NPC with Costant: " + _loc3_.Constant + " does not contain a SwfFilePath.");
 				} else {
 					_loc6_ = new Vector<String>();
 					if (ASCompat.stringAsBool(_loc3_.Weapon1) && _loc3_.Weapon1.length > 0) {
-						_loc4_ = ASCompat.dynamicAs(dbFacade.gameMaster.weaponItemByConstant.itemFor(_loc3_.Weapon1), gameMasterDictionary.GMWeaponItem);
+						_loc4_ = ASCompat.coerce(dbFacade.gameMaster.weaponItemByConstant.itemFor(_loc3_.Weapon1), gameMasterDictionary.GMWeaponItem);
 						if (_loc4_ != null) {
 							if (_loc4_.WeaponAestheticList == null) {
 								Logger.error("Unable to find aesthetics for npc weapon: " + _loc3_.Weapon1);
@@ -102,7 +102,7 @@ class TrickleCacheLoader {
 			} else {
 				trace(" No Npc Found For ", _loc7_);
 			}
-			_loc5_ = ASCompat.toInt(_loc5_) + 1;
+			_loc5_++;
 		}
 	}
 }

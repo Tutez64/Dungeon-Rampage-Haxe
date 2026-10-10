@@ -200,7 +200,7 @@ class UIDailyRewards extends DBUIPopup {
 	function displayWindow() {
 		if (mWindowGoldDisplayed == false) {
 			mRoot.addChild(mDailyRewardGoldPopup);
-			mGoldEndY = Std.int(mDailyRewardGoldPopup.y + 40);
+			mGoldEndY = ASCompat.floatToInt(mDailyRewardGoldPopup.y + 40);
 			mDailyRewardGoldPopup.y = mGoldStartY;
 			mWindowGoldDisplayed = true;
 			mGoldSlideTimer = new Timer(16);
@@ -226,12 +226,12 @@ class UIDailyRewards extends DBUIPopup {
 	function startGoldCount() {
 		mCountGold = 0;
 		mCountCrew = 0;
-		var _loc1_ = Std.int(10 / ASCompat.toNumber(mRewardInfo[1]) + 2);
+		var _loc1_ = ASCompat.floatToInt(10 / ASCompat.toNumber(mRewardInfo[1]) + 2);
 		mGoldCountTimer = new Timer(50);
 		mGoldCountTimer.addEventListener("timer", goldCountTimerTick);
-		mGoldCountTotal = ASCompat.toInt(ASCompat.toNumber(ASCompat.dynGetIndex(mRewardInfo[2],
+		mGoldCountTotal = ASCompat.floatToInt(ASCompat.toNumber(ASCompat.dynGetIndex(mRewardInfo[2],
 			ASCompat.toNumber(mRewardInfo[0]) - 1)) * ASCompat.toNumber(mRewardInfo[1]));
-		mGoldPerCount = Std.int(5 + 0.5 * (mGoldCountTotal / 30));
+		mGoldPerCount = ASCompat.floatToInt(5 + 0.5 * (mGoldCountTotal / 30));
 		mGoldPerCrew = ASCompat.toInt(ASCompat.dynGetIndex(mRewardInfo[2], ASCompat.toNumber(mRewardInfo[0]) - 1));
 		if (mSkipGoldCount) {
 			startMysterySlide();
@@ -252,7 +252,7 @@ class UIDailyRewards extends DBUIPopup {
 		}
 		mCountGold += mGoldPerCount;
 		ASCompat.setProperty((mDailyRewardGoldPopup : ASAny).label_number, "text", mCountGold);
-		if (mCountGold >= mGoldPerCrew * (mCountCrew + 1) && mCountCrew < ASCompat.toNumber(ASCompat.toNumber(mRewardInfo[1]) - 1)) {
+		if (mCountGold >= mGoldPerCrew * (mCountCrew + 1) && mCountCrew < ASCompat.toNumber(mRewardInfo[1]) - 1) {
 			if (mSoundGoldPlunk != null) {
 				mSoundComponent.playSfxOneShot(mSoundGoldPlunk);
 			}
@@ -296,7 +296,7 @@ class UIDailyRewards extends DBUIPopup {
 			mRoot.addChild(mDailyRewardMysteryBoxPopup);
 			mWindowMysteryDisplayed = true;
 		}
-		mMysteryEndY = Std.int(mDailyRewardMysteryBoxPopup.y + 40);
+		mMysteryEndY = ASCompat.floatToInt(mDailyRewardMysteryBoxPopup.y + 40);
 		mDailyRewardMysteryBoxPopup.y = mMysteryStartY;
 		mMysterySlideTimer = new Timer(16);
 		mMysterySlideTimer.addEventListener("timer", mysterySlideTimerTick);
@@ -369,11 +369,11 @@ class UIDailyRewards extends DBUIPopup {
 		popupGoldClass = swfAsset.getClass("UI_daily_rewards");
 		popupMysteryBoxClass = swfAsset.getClass("UI_daily_rewards_mysterybox");
 		slotMovieClass = swfAsset.getClass("reveal_storageBox_slotMachine");
-		mDailyRewardGoldPopup = ASCompat.dynamicAs(ASCompat.createInstance(popupGoldClass, []), flash.display.MovieClip);
-		mDailyRewardMysteryBoxPopup = ASCompat.dynamicAs(ASCompat.createInstance(popupMysteryBoxClass, []), flash.display.MovieClip);
-		mSlotMovie = ASCompat.dynamicAs(ASCompat.createInstance(slotMovieClass, []), flash.display.MovieClip);
+		mDailyRewardGoldPopup = ASCompat.coerce(ASCompat.createInstance(popupGoldClass, []), flash.display.MovieClip);
+		mDailyRewardMysteryBoxPopup = ASCompat.coerce(ASCompat.createInstance(popupMysteryBoxClass, []), flash.display.MovieClip);
+		mSlotMovie = ASCompat.coerce(ASCompat.createInstance(slotMovieClass, []), flash.display.MovieClip);
 		mCrewBonusController = new MovieClipRenderController(mDBFacade,
-			ASCompat.dynamicAs((mDailyRewardGoldPopup : ASAny).crewBonus_anim, flash.display.MovieClip));
+			ASCompat.coerce((mDailyRewardGoldPopup : ASAny).crewBonus_anim, flash.display.MovieClip));
 		mCrewBonusController.loop = false;
 		mCrewBonusController.stop();
 		ASCompat.setProperty((mDailyRewardGoldPopup : ASAny).crewBonus_anim, "visible", false);
@@ -408,14 +408,14 @@ class UIDailyRewards extends DBUIPopup {
 		ASCompat.setProperty((mDailyRewardMysteryBoxPopup : ASAny).label_message3, "text", Locale.getString("DAILY_REWARDS_COMEBACK"));
 		ASCompat.setProperty((mDailyRewardGoldPopup : ASAny).crewBonus_anim.crewBonus.plus, "text", Locale.getString("DAILY_REWARDS_WITH"));
 		ASCompat.setProperty((mDailyRewardGoldPopup : ASAny).label_dailybonus, "text", Locale.getString("DAILY_REWARDS_BONUS"));
-		mAcceptButton = new UIButton(mDBFacade, ASCompat.dynamicAs((mDailyRewardMysteryBoxPopup : ASAny).button_accept, flash.display.MovieClip));
-		mReplayButton = new UIButton(mDBFacade, ASCompat.dynamicAs((mDailyRewardMysteryBoxPopup : ASAny).button_replay, flash.display.MovieClip));
+		mAcceptButton = new UIButton(mDBFacade, ASCompat.coerce((mDailyRewardMysteryBoxPopup : ASAny).button_accept, flash.display.MovieClip));
+		mReplayButton = new UIButton(mDBFacade, ASCompat.coerce((mDailyRewardMysteryBoxPopup : ASAny).button_replay, flash.display.MovieClip));
 		ASCompat.setProperty((mDailyRewardMysteryBoxPopup : ASAny).button_replay.l_numberabel, "text", "");
-		mExitButton = new UIButton(mDBFacade, ASCompat.dynamicAs((mDailyRewardGoldPopup : ASAny).close, flash.display.MovieClip));
+		mExitButton = new UIButton(mDBFacade, ASCompat.coerce((mDailyRewardGoldPopup : ASAny).close, flash.display.MovieClip));
 		mExitButton.releaseCallback = function() {
 			exitButtonPushed();
 		};
-		mCrewButton = new UIButton(mDBFacade, ASCompat.dynamicAs((mDailyRewardGoldPopup : ASAny).crewBonus_anim.crewBonus, flash.display.MovieClip));
+		mCrewButton = new UIButton(mDBFacade, ASCompat.coerce((mDailyRewardGoldPopup : ASAny).crewBonus_anim.crewBonus, flash.display.MovieClip));
 		mReplayButton.isToTheLeftOf(mAcceptButton);
 		mReplayButton.upNavigation = mExitButton;
 		mAcceptButton.upNavigation = mExitButton;
@@ -510,15 +510,15 @@ class UIDailyRewards extends DBUIPopup {
 		var _loc2_ = Date.now();
 		ASCompat.ASDate.setTime(_loc2_, 3600000 * 8);
 		ASCompat.ASDate.setTime(_loc7_, _loc2_.getTime() + mTimerTargetDate.getTime() - _loc6_.getTime());
-		var _loc3_ = Std.int(mTimerTargetDate.getSeconds() - _loc6_.getSeconds());
-		var _loc5_ = Std.int(mTimerTargetDate.getMinutes() - _loc6_.getMinutes());
-		var _loc4_ = Std.int(mTimerTargetDate.getHours() - _loc6_.getHours());
+		var _loc3_ = ASCompat.floatToInt(mTimerTargetDate.getSeconds() - _loc6_.getSeconds());
+		var _loc5_ = ASCompat.floatToInt(mTimerTargetDate.getMinutes() - _loc6_.getMinutes());
+		var _loc4_ = ASCompat.floatToInt(mTimerTargetDate.getHours() - _loc6_.getHours());
 		ASCompat.setProperty((mDailyRewardMysteryBoxPopup : ASAny).label_timer, "text",
 			Std.string(_loc7_.getHours())
 			+ ":"
-			+ zeroPad(Std.int(_loc7_.getMinutes()), 2)
+			+ zeroPad(ASCompat.floatToInt(_loc7_.getMinutes()), 2)
 			+ ":"
-			+ zeroPad(Std.int(_loc7_.getSeconds()), 2));
+			+ zeroPad(ASCompat.floatToInt(_loc7_.getSeconds()), 2));
 		if (mTimerTargetDate.getTime() <= _loc6_.getTime()) {
 			resetMysteryBox();
 			askAboutDailyReward();
@@ -648,9 +648,9 @@ class UIDailyRewards extends DBUIPopup {
 			return;
 		}
 		mysteryBoxClass = swfAsset.getClass("db_items_box_mystery");
-		mBox0 = ASCompat.dynamicAs(ASCompat.createInstance(mysteryBoxClass, []), flash.display.MovieClip);
-		mBox1 = ASCompat.dynamicAs(ASCompat.createInstance(mysteryBoxClass, []), flash.display.MovieClip);
-		mBox2 = ASCompat.dynamicAs(ASCompat.createInstance(mysteryBoxClass, []), flash.display.MovieClip);
+		mBox0 = ASCompat.coerce(ASCompat.createInstance(mysteryBoxClass, []), flash.display.MovieClip);
+		mBox1 = ASCompat.coerce(ASCompat.createInstance(mysteryBoxClass, []), flash.display.MovieClip);
+		mBox2 = ASCompat.coerce(ASCompat.createInstance(mysteryBoxClass, []), flash.display.MovieClip);
 		mBoxButton0 = new UIButton(mDBFacade, mBox0);
 		mBoxButton1 = new UIButton(mDBFacade, mBox1);
 		mBoxButton2 = new UIButton(mDBFacade, mBox2);
@@ -710,7 +710,7 @@ class UIDailyRewards extends DBUIPopup {
 		} else if (ASCompat.toNumber(mRewardInfo[0]) == 3) {
 			largeCoinClass = swfAsset.getClass("db_items_gems_large");
 		}
-		setRewardAmounts(ASCompat.toInt(mRewardInfo[0]), ASCompat.toInt(mRewardInfo[1]), ASCompat.dynamicAs(mRewardInfo[2], Array),
+		setRewardAmounts(ASCompat.toInt(mRewardInfo[0]), ASCompat.toInt(mRewardInfo[1]), ASCompat.coerce(mRewardInfo[2], Array),
 			ASCompat.toInt(mRewardInfo[3]), ASCompat.toInt(mRewardInfo[4]), smallCoinClass, mediumCoinClass, largeCoinClass);
 	}
 
@@ -749,9 +749,9 @@ class UIDailyRewards extends DBUIPopup {
 		}
 		ASCompat.setProperty((mDailyRewardGoldPopup : ASAny).crewBonus_anim, "visible", true);
 		mCrewBonusController.play();
-		var _loc14_ = ASCompat.dynamicAs(ASCompat.createInstance(smallCoinClass, []), flash.display.MovieClip);
-		var _loc15_ = ASCompat.dynamicAs(ASCompat.createInstance(mediumCoinClass, []), flash.display.MovieClip);
-		var _loc16_ = ASCompat.dynamicAs(ASCompat.createInstance(largeCoinClass, []), flash.display.MovieClip);
+		var _loc14_ = ASCompat.coerce(ASCompat.createInstance(smallCoinClass, []), flash.display.MovieClip);
+		var _loc15_ = ASCompat.coerce(ASCompat.createInstance(mediumCoinClass, []), flash.display.MovieClip);
+		var _loc16_ = ASCompat.coerce(ASCompat.createInstance(largeCoinClass, []), flash.display.MovieClip);
 		var _loc12_ = new MovieClipRenderController(mDBFacade, _loc14_);
 		var _loc10_ = new MovieClipRenderController(mDBFacade, _loc15_);
 		var _loc11_ = new MovieClipRenderController(mDBFacade, _loc16_);
@@ -813,7 +813,7 @@ class UIDailyRewards extends DBUIPopup {
 				_loc2_ = [0, 0, 0];
 				displayRewards(boxPicked, _loc2_, ASCompat.toInt(param1[2]), false);
 			} else {
-				displayRewards(boxPicked, ASCompat.dynamicAs(param1[0], Array), ASCompat.toInt(param1[2]), ASCompat.toBool(param1[3]));
+				displayRewards(boxPicked, ASCompat.coerce(param1[0], Array), ASCompat.toInt(param1[2]), ASCompat.toBool(param1[3]));
 				mDBFacade.dbAccountInfo.parseResponse(param1[1]);
 			}
 		}, function(param1:Error) {
@@ -839,7 +839,7 @@ class UIDailyRewards extends DBUIPopup {
 			return;
 		}
 		while (rewards.length > 0) {
-			mDisplayOffers.push(ASCompat.dynamicAs(mDBFacade.gameMaster.offerById.itemFor(rewards.pop()), gameMasterDictionary.GMOffer));
+			mDisplayOffers.push(ASCompat.coerce(mDBFacade.gameMaster.offerById.itemFor(rewards.pop()), gameMasterDictionary.GMOffer));
 		}
 		ASCompat.ASVector.reverse(mDisplayOffers);
 		if (mDisplayOffers.length == 3) {
@@ -859,7 +859,7 @@ class UIDailyRewards extends DBUIPopup {
 					var rewardController0:MovieClipRenderController;
 					var swfAsset = param1;
 					var rewardIconClass0 = swfAsset.getClass(offer0.BundleIcon);
-					mRewardIcon0 = ASCompat.dynamicAs(ASCompat.createInstance(rewardIconClass0, []), flash.display.MovieClip);
+					mRewardIcon0 = ASCompat.coerce(ASCompat.createInstance(rewardIconClass0, []), flash.display.MovieClip);
 					(mDailyRewardMysteryBoxPopup : ASAny).inv_empty_slot_storage_box01.addChild(mRewardIcon0);
 					rewardController0 = new MovieClipRenderController(mDBFacade, mRewardIcon0);
 					rewardController0.play((0 : UInt), true);
@@ -881,7 +881,7 @@ class UIDailyRewards extends DBUIPopup {
 					var rewardController1:MovieClipRenderController;
 					var swfAsset = param1;
 					var rewardIconClass1 = swfAsset.getClass(offer1.BundleIcon);
-					mRewardIcon1 = ASCompat.dynamicAs(ASCompat.createInstance(rewardIconClass1, []), flash.display.MovieClip);
+					mRewardIcon1 = ASCompat.coerce(ASCompat.createInstance(rewardIconClass1, []), flash.display.MovieClip);
 					(mDailyRewardMysteryBoxPopup : ASAny).inv_empty_slot_storage_box02.addChild(mRewardIcon1);
 					rewardController1 = new MovieClipRenderController(mDBFacade, mRewardIcon1);
 					rewardController1.play((0 : UInt), true);
@@ -903,7 +903,7 @@ class UIDailyRewards extends DBUIPopup {
 					var rewardController2:MovieClipRenderController;
 					var swfAsset = param1;
 					var rewardIconClass2 = swfAsset.getClass(offer2.BundleIcon);
-					mRewardIcon2 = ASCompat.dynamicAs(ASCompat.createInstance(rewardIconClass2, []), flash.display.MovieClip);
+					mRewardIcon2 = ASCompat.coerce(ASCompat.createInstance(rewardIconClass2, []), flash.display.MovieClip);
 					(mDailyRewardMysteryBoxPopup : ASAny).inv_empty_slot_storage_box03.addChild(mRewardIcon2);
 					rewardController2 = new MovieClipRenderController(mDBFacade, mRewardIcon2);
 					rewardController2.play((0 : UInt), true);
@@ -966,7 +966,7 @@ class UIDailyRewards extends DBUIPopup {
 		_loc3_ = 0;
 		while (_loc3_ < 3) {
 			if (rewardIndex != _loc3_) {
-				desaturate(ASCompat.dynamicAs(mRewardArray[_loc3_], flash.display.DisplayObject));
+				desaturate(ASCompat.coerce(mRewardArray[_loc3_], flash.display.DisplayObject));
 			}
 			_loc3_++;
 		}
