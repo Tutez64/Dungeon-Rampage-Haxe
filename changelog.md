@@ -34,6 +34,10 @@ At tag time, copy these sections into the GitHub release notes under `Changelog`
   open window; the in-game Quit popup and the connection-error dialog dispatch
   `exiting` before `exit()` instead of skipping it. Steam dispose only runs once
   if that event fires twice.
+- Text outlines are thicker, closer to the original game's, instead of barely
+  visible. Outlined text is now rendered on the GPU rather than blurred on the
+  CPU each time it changes, which also makes menus (a lot) and dungeons (a bit?)
+  smoother (#3).
 - Internal: the preprocessing of the SWF files no longer occasionally fails
   with `std@sys_create_dir`, as Lime now creates the shared SWF directory
   once before the parallel handlers.
