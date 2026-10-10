@@ -5,7 +5,7 @@ The steps to make and test a mod for DRH. The rules are in the [modding document
 ## Create
 
 1. On [DRH-Mod-Template](https://github.com/Tutez64/DRH-Mod-Template), *Use this template* creates your repository. Its name is free (`DRH-Mod-<Name>` is the suggestion); add the topic `drh-mod`.
-2. Pick an `id` ([rules](modding.md#modjson)): it is the mod's folder and package. Replace `my_mod` with it in `mod.json` and in the `package` line of `src/Main.hx`, then fill `name`, `description` and `author`.
+2. Pick an `id` ([rules](modding.md#modjson)): it is the mod's folder and package. Replace `my_mod` with it in `mod.json` and in the `package` line of `src/Main.hx`, then fill `name`, `description` and `author`. `api` is the version of the `api` you test with (the `version` of its `mod.json`, as `major.minor`); keep it in step when you update that clone.
 3. Write `README.md`: its shown zone is what the launcher will show on the mod's page ([markers](modding.md#mod-repository)); the line after it is for you, remove it.
 
 ## Write
