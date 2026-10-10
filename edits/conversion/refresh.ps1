@@ -53,6 +53,7 @@ if ($LASTEXITCODE -ne 0) { Die "not a git repository" }
 
 function Get-StatePath { (git rev-parse --git-path drh-refresh-suffix).Trim() }
 function Get-WorktreePathFile { (git rev-parse --git-path drh-refresh-worktree).Trim() }
+function Get-PendingPath { (git rev-parse --git-path drh-refresh-pending).Trim() }
 
 function Invoke-Git {
     git @args
@@ -492,8 +493,12 @@ function Publish-EditsHead([string]$Suffix, [string]$Wt) {
 }
 
 function Invoke-ApplyGroups([string]$Wt, [object[]]$Groups) {
-    foreach ($group in $Groups) {
-        $members = @($group)
+    $pendingPath = Get-PendingPath
+    for ($i = 0; $i -lt $Groups.Count; $i++) {
+        # A conflict stops the script here: continue resumes with the groups after this one.
+        $rest = @(for ($j = $i + 1; $j -lt $Groups.Count; $j++) { (@($Groups[$j]) -join ' ') })
+        Set-Content -LiteralPath $pendingPath -Value $rest
+        $members = @($Groups[$i])
         if ($members.Count -eq 1) {
             Invoke-Git -C $Wt cherry-pick $members[0]
             continue
@@ -504,6 +509,15 @@ function Invoke-ApplyGroups([string]$Wt, [object[]]$Groups) {
         $msg = Combine-Messages $members
         Invoke-Git -C $Wt commit -m $msg
     }
+    Remove-Item -LiteralPath $pendingPath -ErrorAction SilentlyContinue
+}
+
+function Invoke-ApplyPendingGroups([string]$Wt) {
+    $pendingPath = Get-PendingPath
+    if (-not (Test-Path -LiteralPath $pendingPath)) { return }
+    $pending = @(Get-Content -LiteralPath $pendingPath | Where-Object { $_.Trim() } | ForEach-Object { , @($_.Trim() -split ' ') })
+    Remove-Item -LiteralPath $pendingPath
+    if ($pending.Count -gt 0) { Invoke-ApplyGroups $Wt $pending }
 }
 
 function Invoke-ReplayOnto([string]$Suffix, [string[]]$Shas) {
@@ -677,6 +691,7 @@ function Invoke-Continue {
     else {
         Die "no rebase or cherry-pick in progress in $wt"
     }
+    Invoke-ApplyPendingGroups $wt
     Publish-EditsHead $suffix $wt
 }
 
@@ -693,6 +708,7 @@ function Invoke-Abort {
                 git -C $wt rebase --abort | Out-Null
             }
             Remove-RefreshWorktree
+            Remove-Item -LiteralPath (Get-PendingPath) -ErrorAction SilentlyContinue
             Write-Host "aborted"
             return
         }

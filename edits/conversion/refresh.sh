@@ -52,6 +52,7 @@ git rev-parse --is-inside-work-tree >/dev/null 2>&1 || die "not a git repository
 
 STATE="$(git rev-parse --git-path drh-refresh-suffix)"
 WT_PATH_FILE="$(git rev-parse --git-path drh-refresh-worktree)"
+PENDING_FILE="$(git rev-parse --git-path drh-refresh-pending)"
 
 in_rebase() {
   local gitdir="${1:-}"
@@ -554,10 +555,12 @@ publish_edits_head() {
 apply_groups() {
   local wt="$1"
   shift
-  local group sha
-  for group in "$@"; do
+  local groups=("$@") i sha
+  for ((i = 0; i < ${#groups[@]}; i++)); do
+    # A conflict stops the script here: continue resumes with the groups after this one.
+    printf '%s\n' "${groups[@]:i+1}" > "$PENDING_FILE"
     # shellcheck disable=SC2206
-    local members=($group)
+    local members=(${groups[i]})
     if [[ "${#members[@]}" -eq 1 ]]; then
       git -C "$wt" cherry-pick "${members[0]}"
       continue
@@ -567,6 +570,15 @@ apply_groups() {
     done
     git -C "$wt" commit -m "$(combine_messages "${members[@]}")"
   done
+  rm -f "$PENDING_FILE"
+}
+
+apply_pending_groups() {
+  local wt="$1" pending=()
+  [[ -f "$PENDING_FILE" ]] || return 0
+  mapfile -t pending < <(grep -v '^$' "$PENDING_FILE" || true)
+  rm -f "$PENDING_FILE"
+  [[ "${#pending[@]}" -eq 0 ]] || apply_groups "$wt" "${pending[@]}"
 }
 
 cmd_start() {
@@ -746,6 +758,7 @@ cmd_continue() {
   else
     die "no rebase or cherry-pick in progress in $wt"
   fi
+  apply_pending_groups "$wt"
   publish_edits_head "$suffix" "$wt"
 }
 
@@ -761,6 +774,7 @@ cmd_abort() {
       git -C "$wt" rebase --abort
     fi
     remove_refresh_worktree
+    rm -f "$PENDING_FILE"
     echo "aborted"
     return
   fi
