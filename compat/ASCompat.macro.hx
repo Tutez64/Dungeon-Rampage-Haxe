@@ -124,19 +124,19 @@ class ASCompat {
 
 	static function processNull(e:Expr):Expr {
 		var e = Context.typeExpr(e);
-		switch e.t {
+		var actualMethod = switch e.t {
 			case TAbstract(_.toString() => "Null", [actualType]):
-				var actualMethod = switch actualType.toString() {
+				switch actualType.toString() {
 					case "Int" | "UInt": "processNullInt";
 					case "Float": "processNullFloat";
 					case "Bool": "processNullBool";
-					case _: throw new Error("processNull can only be called with Null<Int/UInt/Bool/Float>", e.pos);
+					case _: "processNullValue";
 				}
-				var e = Context.storeTypedExpr(e);
-				return macro @:pos(Context.currentPos()) ASCompat.$actualMethod($e);
 			case _:
-				throw new Error("processNull can only be called with Null<Int/UInt/Bool/Float>", e.pos);
+				"processNullValue";
 		}
+		var e = Context.storeTypedExpr(e);
+		return macro @:pos(Context.currentPos()) ASCompat.$actualMethod($e);
 	}
 
 	static inline function textFieldGetXMLText(field:Dynamic, ?beginIndex:Int, ?endIndex:Int):String {

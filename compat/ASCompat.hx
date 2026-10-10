@@ -56,6 +56,26 @@ class ASCompat {
 		#end
 	}
 
+	// `for ... in`: an Array or ASArrayBase gives its indices as strings, anything else its property names.
+	public static function iterateDynamicKeys(v:Dynamic):Iterator<String> {
+		if (Std.isOfType(v, Array)) {
+			return indexKeys((cast v : Array<Dynamic>).length);
+		}
+		if (Std.isOfType(v, ASArrayBase)) {
+			return indexKeys((cast v : ASArrayBase).length);
+		}
+
+		#if flash
+		return new NativePropertyIterator<String>(v);
+		#else
+		return (cast v : haxe.DynamicAccess<ASAny>).keys().iterator();
+		#end
+	}
+
+	static function indexKeys(length:Int):Iterator<String> {
+		return [for (i in 0...length) Std.string(i)].iterator();
+	}
+
 	static function reportNullIteratee(pos:haxe.PosInfos) {
 		haxe.Log.trace("FIXME: Null value passed as an iteratee for for-in/for-each expression!", pos);
 	}
@@ -284,9 +304,27 @@ class ASCompat {
 		#if flash
 		return untyped __global__["int"](d);
 		#else
-		var n = toNumber(d);
-		return if (Math.isNaN(n)) 0 else Std.int(n);
+		return floatToInt(toNumber(d));
 		#end
+	}
+
+	// int(n) for a Number: NaN and infinities give 0, out-of-range values wrap modulo 2^32.
+	// Std.int already does this on flash and js; native targets leave it undefined.
+	public static inline function floatToInt(n:Float):Int {
+		#if (flash || js)
+		return Std.int(n);
+		#else
+		return if (n >= -2147483648.0 && n < 2147483648.0) Std.int(n) else floatToIntWrap(n);
+		#end
+	}
+
+	static function floatToIntWrap(n:Float):Int {
+		if (!Math.isFinite(n)) {
+			return 0;
+		}
+		var m = (n < 0 ? Math.fceil(n) : Math.ffloor(n)) % 4294967296.0;
+		if (m < 0) m += 4294967296.0;
+		return Std.int(m >= 2147483648.0 ? m - 4294967296.0 : m);
 	}
 
 	// Number(d)
@@ -347,9 +385,8 @@ class ASCompat {
 			return null;
 		}
 		#if !flash
-		var proxyGetter = Reflect.field(obj, "getProperty");
-		if (proxyGetter != null && Reflect.isFunction(proxyGetter)) {
-			return Reflect.callMethod(obj, proxyGetter, [fieldName]);
+		if (Std.isOfType(obj, ASProxyBase)) {
+			return (cast obj : ASProxyBase).getProperty(fieldName);
 		}
 		var name = propertyName(fieldName);
 		if (name == "length" && Std.isOfType(obj, Array)) {
@@ -380,9 +417,8 @@ class ASCompat {
 			return value;
 		}
 		#if !flash
-		var proxySetter = Reflect.field(obj, "setProperty");
-		if (proxySetter != null && Reflect.isFunction(proxySetter)) {
-			Reflect.callMethod(obj, proxySetter, [fieldName, value]);
+		if (Std.isOfType(obj, ASProxyBase)) {
+			(cast obj : ASProxyBase).setProperty(fieldName, value);
 			return value;
 		}
 		var name = propertyName(fieldName);
@@ -407,9 +443,8 @@ class ASCompat {
 			return true;
 		}
 		#if !flash
-		var proxyDelete = Reflect.field(obj, "deleteProperty");
-		if (proxyDelete != null && Reflect.isFunction(proxyDelete)) {
-			return toBool(Reflect.callMethod(obj, proxyDelete, [fieldName]));
+		if (Std.isOfType(obj, ASProxyBase)) {
+			return (cast obj : ASProxyBase).deleteProperty(fieldName);
 		}
 		var name = propertyName(fieldName);
 		var deleted = false;
@@ -469,10 +504,14 @@ class ASCompat {
 						var fields = Type.getInstanceFields(clazz);
 						for (field in fields) {
 							cachedFields.set(field, true);
+							// An accessor also stands for its property.
+							if (field.startsWith("get_") || field.startsWith("set_")) {
+								cachedFields.set(field.substr(4), true);
+							}
 						}
 						reflectedFieldCacheByClass.set(className, cachedFields);
 					}
-					return cachedFields.exists(name) || cachedFields.exists("get_" + name) || cachedFields.exists("set_" + name);
+					return cachedFields.exists(name);
 				}
 			}
 		} catch (_:Dynamic) {
@@ -487,10 +526,9 @@ class ASCompat {
 		if (dynamicProperties != null && dynamicProperties.exists(name)) {
 			cachedValue = dynamicProperties.get(name);
 		}
-		var getChildByName = Reflect.field(obj, "getChildByName");
-		if (getChildByName != null && Reflect.isFunction(getChildByName)) {
+		if (Std.isOfType(obj, flash.display.DisplayObjectContainer)) {
 			try {
-				var child = Reflect.callMethod(obj, getChildByName, [name]);
+				var child:Dynamic = (cast obj : flash.display.DisplayObjectContainer).getChildByName(name);
 				if (child != null) {
 					if (cachedValue != child) {
 						setDynamicProperty(obj, name, child);
@@ -650,7 +688,7 @@ class ASCompat {
 
 	public static inline function isUndefinedValue(value:Dynamic):Bool {
 		#if js
-		return js.Syntax.code("typeof {0} === 'undefined'", value);
+		return js.Syntax.code("(typeof {0} === 'undefined')", value);
 		#elseif flash
 		return false;
 		#else
@@ -751,6 +789,36 @@ class ASCompat {
 
 	public static inline function dynamicAs<T>(v:Dynamic, c:Class<T>):T {
 		return flash.Lib.as(v, c);
+	}
+
+	// Implicit coercion of an untyped value to a class, as AVM2 does on assignment or argument passing:
+	// null and undefined give null, a value of another type throws a TypeError (`as` returns null instead).
+	public static function coerce<T>(v:Dynamic, c:Class<T>):T {
+		if (v == null || isUndefinedValue(v)) {
+			return null;
+		}
+		if (Std.isOfType(v, c)) {
+			return v;
+		}
+		throw new flash.errors.TypeError('Error #1034: Type Coercion failed: cannot convert ${typeNameOf(v)} to ${Type.getClassName(c)}.');
+	}
+
+	// Implicit coercion of an untyped value to Function: like coerce, a TypeError on a non-function.
+	public static function coerceFunction(v:Dynamic):Null<ASFunction> {
+		if (v == null || isUndefinedValue(v)) {
+			return null;
+		}
+		if (Reflect.isFunction(v)) {
+			return v;
+		}
+		throw new flash.errors.TypeError('Error #1034: Type Coercion failed: cannot convert ${typeNameOf(v)} to Function.');
+	}
+
+	static function typeNameOf(v:Dynamic):String {
+		return switch Type.typeof(v) {
+			case TClass(c): Type.getClassName(c);
+			case other: Std.string(other);
+		}
 	}
 
 	public static inline function reinterpretAs<T>(v:Dynamic, c:Class<T>):T {
@@ -864,15 +932,25 @@ class ASCompat {
 	}
 
 	public static inline function stringAsBool(s:Null<String>):Bool {
-		return (s : ASAny);
+		return s != null && s.length > 0;
 	}
 
-	public static inline function floatAsBool(f:Null<Float>):Bool {
+	// Static targets take the basic type: a Null<T> parameter would box the value.
+	// A null argument already reads as 0 there, which is falsy like in AS3.
+	public static inline function floatAsBool(f:#if (js || flash) Null<Float> #else Float #end):Bool {
+		#if (js || flash)
 		return (f : ASAny);
+		#else
+		return f != 0 && !Math.isNaN(f);
+		#end
 	}
 
-	public static inline function intAsBool(i:Null<Int>):Bool {
+	public static inline function intAsBool(i:#if (js || flash) Null<Int> #else Int #end):Bool {
+		#if (js || flash)
 		return (i : ASAny);
+		#else
+		return i != 0;
+		#end
 	}
 
 	public static inline function allocArray<T>(length:Int):Array<T> {
@@ -1154,8 +1232,13 @@ class ASCompat {
 		#if flash
 		return v;
 		#else
-		return !!v;
+		return v != null && !isUndefinedValue(v) && (v : Bool);
 		#end
+	}
+
+	// A missing typed Dictionary value of any other type: undefined reads as null.
+	public static inline function processNullValue<T>(v:Null<T>):Null<T> {
+		return if (isUndefinedValue(v)) null else v;
 	}
 
 	/**
@@ -1598,7 +1681,7 @@ class ASCompat {
 		return null;
 	}
 
-	static inline function toNumberNative(d:Dynamic):Float {
+	static function toNumberNative(d:Dynamic):Float {
 		if (isUndefinedValue(d)) {
 			return Math.NaN;
 		}
@@ -1657,7 +1740,7 @@ class ASCompat {
 		return s;
 	}
 
-	static inline function toBoolNative(d:Dynamic):Bool {
+	static function toBoolNative(d:Dynamic):Bool {
 		if (isUndefinedValue(d)) {
 			return false;
 		}

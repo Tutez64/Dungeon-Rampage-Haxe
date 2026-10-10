@@ -9,7 +9,8 @@ class ASCompatMacro {
 		var cases:Array<Case> = [];
 		var maxDirectArgs = 24;
 		var minArgs = 0;
-		var maxArgs = maxDirectArgs;
+		// Unknown signature: a direct call per argument count would only repeat Reflect.callMethod.
+		var maxArgs = -1;
 		var returnsVoid = false;
 
 		var isRestArg = function(t:Type):Bool {
@@ -75,7 +76,7 @@ class ASCompatMacro {
 		var setupClosure = macro var __ax4ApplyClosure:Dynamic = $closureExpr;
 		var setupArgs = macro var __ax4ApplyArgs = $argsExpr;
 		var ensureArgs = macro if (__ax4ApplyArgs == null) __ax4ApplyArgs = [];
-		var switchExpr:Expr = {
+		var switchExpr:Expr = if (cases.length == 1) cases[0].expr else {
 			expr: ESwitch(macro __ax4ApplyArgs.length, cases, null),
 			pos: closureExpr.pos
 		};
@@ -97,7 +98,8 @@ class ASCompatMacro {
 		var cases:Array<Case> = [];
 		var maxDirectArgs = 24;
 		var minArgs = 0;
-		var maxArgs = maxDirectArgs;
+		// Unknown signature: a direct call per argument count would only repeat Reflect.callMethod.
+		var maxArgs = -1;
 		var returnsVoid = false;
 		var methodFieldForTyping:Expr = {
 			expr: EField(obj, methodName),
@@ -169,7 +171,7 @@ class ASCompatMacro {
 
 		var setupArgs = macro var __ax4ApplyArgs = $argsExpr;
 		var ensureArgs = macro if (__ax4ApplyArgs == null) __ax4ApplyArgs = [];
-		var switchExpr:Expr = {
+		var switchExpr:Expr = if (cases.length == 1) cases[0].expr else {
 			expr: ESwitch(macro __ax4ApplyArgs.length, cases, null),
 			pos: methodNameExpr.pos
 		};
