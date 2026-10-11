@@ -10,7 +10,7 @@ param(
     [string]$Ffdec = $env:FFDEC_HOME,
     [string]$AirSdk = $env:AIR_SDK,
     [string]$Ane,
-    [switch]$BuildAx4,
+    [switch]$NoBuildAx4,
     [switch]$PrepareOnly,
     [switch]$KeepTmp
 )
@@ -405,14 +405,15 @@ if ($PrepareOnly) {
     exit 0
 }
 
-if ($BuildAx4 -or -not (Test-Path -LiteralPath $Jar -PathType Leaf)) {
+# ax4 does not track converter.jar: build it so it matches the ax4 commit the stamp records.
+if (-not $NoBuildAx4) {
     $hxml = Join-Path $Ax4Abs "build.hxml"
     if (-not (Test-Path -LiteralPath $hxml)) { throw "ax4 build.hxml not found in $Ax4Abs" }
     Write-Host "Building ax4 ..."
     Push-Location $Ax4Abs
     try { npx haxe build.hxml } finally { Pop-Location }
 }
-if (-not (Test-Path -LiteralPath $Jar -PathType Leaf)) { throw "converter.jar not found in $Ax4Abs. Pass -BuildAx4." }
+if (-not (Test-Path -LiteralPath $Jar -PathType Leaf)) { throw "converter.jar not found in $Ax4Abs. Drop -NoBuildAx4." }
 
 Write-Host "Converting with ax4 ..."
 Push-Location $Root

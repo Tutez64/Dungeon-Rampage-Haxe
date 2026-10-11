@@ -19,7 +19,7 @@ AIR_SDK="${AIR_SDK:-}"
 ANE_PATH=""
 KEEP_TMP=0
 PREPARE_ONLY=0
-BUILD_AX4=0
+BUILD_AX4=1
 
 usage() {
   cat <<EOF
@@ -31,7 +31,7 @@ Usage: $(basename "$0") [options]
   --ffdec PATH        ffdec, ffdec.sh, or ffdec.jar (or set FFDEC_HOME)
   --air-sdk DIR       HARMAN AIR SDK (or set AIR_SDK). Used to find airglobal.swc
   --ane PATH          FRESteamWorks.ane, or a directory containing library.swf
-  --build-ax4         Run npx haxe build.hxml in ax4 before converting
+  --no-build-ax4      Use ax4's existing converter.jar instead of rebuilding it
   --prepare-only      Export ANE scripts and write the runtime config, then stop
   --keep-tmp          Keep edits/conversion/.tmp after a successful run
   -h, --help          Show this help
@@ -51,7 +51,7 @@ while [[ $# -gt 0 ]]; do
     --ffdec) FFDEC="$2"; shift 2 ;;
     --air-sdk) AIR_SDK="$2"; shift 2 ;;
     --ane) ANE_PATH="$2"; shift 2 ;;
-    --build-ax4) BUILD_AX4=1; shift ;;
+    --no-build-ax4) BUILD_AX4=0; shift ;;
     --prepare-only) PREPARE_ONLY=1; shift ;;
     --keep-tmp) KEEP_TMP=1; shift ;;
     -h|--help) usage; exit 0 ;;
@@ -499,12 +499,13 @@ if [[ "$PREPARE_ONLY" -eq 1 ]]; then
   exit 0
 fi
 
-if [[ "$BUILD_AX4" -eq 1 || ! -f "$JAR" ]]; then
+# ax4 does not track converter.jar: build it so it matches the ax4 commit the stamp records.
+if [[ "$BUILD_AX4" -eq 1 ]]; then
   [[ -f "$AX4_ABS/build.hxml" ]] || die "ax4 build.hxml not found in $AX4_ABS"
   echo "Building ax4 ..."
   (cd "$AX4_ABS" && npx haxe build.hxml)
 fi
-[[ -f "$JAR" ]] || die "converter.jar not found in $AX4_ABS. Pass --build-ax4."
+[[ -f "$JAR" ]] || die "converter.jar not found in $AX4_ABS. Drop --no-build-ax4."
 
 echo "Converting with ax4 ..."
 (
