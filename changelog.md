@@ -38,9 +38,19 @@ At tag time, copy these sections into the GitHub release notes under `Changelog`
   visible. Outlined text is now rendered on the GPU rather than blurred on the
   CPU each time it changes, which also makes menus (a lot) and dungeons (a bit?)
   smoother (#3).
+- The town's "what's new" popup opens when the server sends news: walking an
+  untyped array with `for each` or `for … in` did nothing. The official server
+  never sends any, so this only showed on other servers (#44).
+- Converted code follows AS3 where it silently differed: a NaN or out-of-range
+  Number converted to `int` gives 0 or wraps, an untyped value of the wrong
+  type assigned to a typed variable throws a `TypeError` (logged, the game
+  keeps running) instead of becoming `null`, and `undefined` assigned to a
+  String is `null`, not `"undefined"`. None of these showed up in play.
 - Internal: the preprocessing of the SWF files no longer occasionally fails
   with `std@sys_create_dir`, as Lime now creates the shared SWF directory
   once before the parallel handlers.
+- Internal: `refresh.cmd continue` replays the rest of the edits stack after
+  a conflict instead of dropping it.
 
 ### Improved
 
@@ -56,3 +66,7 @@ At tag time, copy these sections into the GitHub release notes under `Changelog`
 - Internal: Lime, OpenFL, swf, hxcpp, SteamWrap, and hxScript are resolved
   with `haxelib dev` on the submodules. `project.xml` no longer passes
   `path=`.
+- Internal: the ax4 converter drops redundant conversions from the generated
+  code (inferred locals, already numeric expressions) and the compat layer
+  takes faster paths for dynamic property access and typed conversions. The
+  Linux executable is about 3.5 MB smaller; no CPU gain was measurable in a dungeon.
