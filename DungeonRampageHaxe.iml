@@ -12,7 +12,11 @@
     <content url="file://$MODULE_DIR$">
       <sourceFolder url="file://$MODULE_DIR$/compat" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src-modding" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src-steam" isTestSource="false" />
+      <excludeFolder url="file://$MODULE_DIR$/.claude/worktrees" />
       <excludeFolder url="file://$MODULE_DIR$/bin" />
+      <excludeFolder url="file://$MODULE_DIR$/profiling" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
