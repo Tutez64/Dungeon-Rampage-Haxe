@@ -437,11 +437,11 @@ Every step is a DRH Launcher command. The checks exist once, in the launcher; th
 
 | Command | Does |
 | --- | --- |
-| `--new-mod <dir>` | Copies the template with git into a fresh history, asks for `id`, `name` and `author` and writes them (the `id` into the `package` line of `src/Main.hx` too) with `api` set to the `major.minor` of the latest indexed `api`, then opens `github.com/new` pre-filled. The repository is created there, with the topic `drh-mod`; the first push is plain git. |
-| `--check-mod <dir>` | Checks what needs no game: the `mod.json` schema (`id` rules, `version`, `api` and dependency syntax, `drh` present exactly when `uses` names `extends` or `replace`), values left from the template (`id` `my_mod`, `name`, `description`, an empty `author`, `README.md`), the lengths (what `README.md` shows included) and its markers, the package rule for every file under `src/`, no `import.hx`, a non-empty `LICENSE`. |
-| `--run-mod <dir>` | Installs the mod's dependencies (`api` included) from the index into a cache, composes a temporary mods folder with them and `<dir>`, and launches DRH on it. Loading and behaviour are the author's own run. |
-| `--pack-mod <dir>` | Checks, then builds the zip from a fixed list (`mod.json`, `src/`, `Resources/` when present, `LICENSE`, `README.md`, flat at its root, extracted as is into `mods/<id>/`) and its index entry. |
-| `--submit-mod <dir>` | Adds the index entry of the published release on a branch of the author's fork of the index (forked once, in the browser), pushes it with git, and opens the pre-filled compare page: one click opens the PR, whose template says the entry is published under CC BY 4.0. |
+| `--new-mod <dir>` | Copies the template with git into a fresh history and its first commit, asks for `id`, `name` and `author` and writes them (the `id` into the `package` line of `src/Main.hx` too, the `name` into the README's title) with `api` set to the `major.minor` of the latest indexed `api`, then opens `github.com/new` with the suggested name. The repository is created there, with the topic `drh-mod`; the first push is plain git. |
+| `--check-mod <dir>` | Checks what needs no game: the `mod.json` schema (`id` rules, `version`, `api` and dependency syntax, `drh` present exactly when `uses` names `extends` or `replace`), values left from the template (`id` `my_mod`, `name`, `description`, an empty `author`, `README.md`), the lengths (what `README.md` shows included) and its markers, no field outside the schema, the package rule for every file under `src/` (and folder names that are package names), the entry's module (`src/<entry>.hx`), no `import.hx`, a non-empty `LICENSE`. |
+| `--run-mod <dir or zip>` | Installs the mod's dependencies (`api` included) from the index into a cache, composes a temporary mods folder with them and the mod (its folder, or a zip such as the one the release workflow drafted), and launches the installed DRH on it, the launcher's options and its own `--mods-dir` included. Prints the game's output, then each mod's outcome from `last-run.json`; fails unless the mod is `ok`. Only `id`, `api` and `dependencies` need to be valid. Loading and behaviour are the author's own run. |
+| `--pack-mod <dir> [<out-dir>]` | Checks, then builds the zip from a fixed list (`mod.json`, `src/`, `Resources/` when present, `LICENSE`, `README.md`, flat at its root, extracted as is into `mods/<id>/`; sorted, fixed dates: the same sources give the same zip) and its index entry, `<id>-<version>.zip` and `.json` in `<out-dir>` (the current one by default). `source` is the repository the workflow runs in, or else the `origin` remote. Run on a tag, it refuses one that is not `v<version>`. |
+| `--submit-mod <dir> [<fork-owner>]` | Adds the index entry of the published release on a branch of the author's fork of the index (forked once, in the browser: without one, it opens the fork page), pushes it with git, and opens the pre-filled compare page: one click opens the PR, whose template says the entry is published under CC BY 4.0. The fork is the `source` owner's unless `<fork-owner>` is given (a repository owned by an organization). |
 
 Publishing:
 
@@ -584,10 +584,10 @@ Needed before a real host; not a restatement of the rules above.
 2. **Done.** hxcpp cppia patch.
 3. **Done.** The flags above are in `project.xml`.
 4. **Done**, except `replace`. `src-modding/` loads `--mods-dir` into one world, runs the lifecycle, re-registers the overlay, and bakes the release tag (no `V`) into the host. `uncaughtError` and the mod `exiting` listener sit at the top of the constructor. Still later: `ASCompat.createInstance` consulting the `replace` table, once the fork has `replace`.
-5. Launcher: index fetch, catalog install, `enabled.json`, `--mods-dir`, `last-run.json` display — no destructive overlay. The modders' commands, `--new-mod` to `--submit-mod`.
+5. Launcher: index fetch, catalog install, `enabled.json`, `--mods-dir`, `last-run.json` display — no destructive overlay. **Done**: the modders' commands, `--new-mod` to `--submit-mod`, for its next release.
 6. Repository created (`Tutez64/DRH-Mod-Index`: README, license, owner). Its CI comes with the launcher's commands.
 7. **Done.** The `api` mod has its repository, pinned as `mods/api` ([Versioning](#versioning)). The wrappers live in the `api` mod, core events hand game objects, dependency failures propagate.
-8. **Done.** `DRH-Mod-Template`. `DRH-Mod-Workflows` comes with `--pack-mod`.
+8. **Done.** `DRH-Mod-Template`, and `DRH-Mod-Workflows`, which runs the first launcher release with `--pack-mod`.
 
 ## Out of scope for this document
 
