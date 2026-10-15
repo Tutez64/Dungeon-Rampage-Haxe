@@ -497,13 +497,13 @@ A launcher refuses a `format` it does not know and asks to be updated. Each vers
 
 - the pull request only adds `mods/<id>/<version>.json` files that match their content, for versions not indexed yet, or adds `yanked` to one;
 - the zip downloads from `url` without an account (the release is published) and matches `size` and `sha256`;
-- the launcher's checks (`--check-mod`) pass on the extracted zip, and its `mod.json` and shown README match the entry;
-- `source` is the one the `id` belongs to, or a reviewer labels the takeover;
+- the launcher's checks (`--check-mod`) pass on the extracted zip, and its `mod.json` and shown README match the entry: the entry `--pack-mod` would write from that zip is the one submitted;
+- `source` is the one the `id` belongs to (its highest indexed version's), or a reviewer adds the `takeover` label;
 - every dependency, `api` included, has an indexed version that satisfies it.
 
-It writes in the job summary the diff of the sources against the zip of the last indexed version, what the reviewer reads, and flags an `author` that changed since that version. A pull request only brings JSON; the CI downloads and inspects a zip, never runs it. Merging needs the CI and the owner's approval (`CODEOWNERS`, branch protection). On the main branch, the CI generates `index.json` and deploys it to Pages.
+It writes in the job summary the diff of the sources against the zip of the last indexed version, what the reviewer reads, and flags an `author` that changed since that version. The checks on an entry are the launcher's `--check-entry <entry> <base-index> <work-dir> [--takeover]`; the rest, the pull request's shape and the summary, is the CI's script. A pull request only brings JSON; the CI downloads and inspects a zip, never runs it. Merging needs the CI and the owner's approval (`CODEOWNERS`, branch protection). On the main branch, the CI generates `index.json` (`--build-index <index> <out-file>`) and deploys it to Pages. The repository variable `DRHL_VERSION` picks the launcher release both run, a pre-release to test one; empty, the latest.
 
-The entries and `index.json` are under CC BY 4.0 (credit the index, and each entry's `author` for its texts), so a website or a tool may reuse them. Submitting an entry publishes it so, its texts included; a reviewer makes sure someone else than the author has their consent. The CI's code is GPLv3.
+The entries and `index.json` are under CC BY 4.0 (credit the index, and each entry's `author` for its texts), so a website or a tool may reuse them. Submitting an entry publishes it so, its texts included; a reviewer makes sure someone else than the author has their consent. The CI's code, under `.github/`, is GPLv3.
 
 Out of v1, same index: ratings, galleries, collections, dependency solving beyond [one version per id](#modjson), a publishing UI in the launcher (its [commands](#mod-repository) cover it), a separate website.
 
@@ -585,7 +585,7 @@ Needed before a real host; not a restatement of the rules above.
 3. **Done.** The flags above are in `project.xml`.
 4. **Done**, except `replace`. `src-modding/` loads `--mods-dir` into one world, runs the lifecycle, re-registers the overlay, and bakes the release tag (no `V`) into the host. `uncaughtError` and the mod `exiting` listener sit at the top of the constructor. Still later: `ASCompat.createInstance` consulting the `replace` table, once the fork has `replace`.
 5. Launcher: index fetch, catalog install, `enabled.json`, `--mods-dir`, `last-run.json` display — no destructive overlay. **Done**: the modders' commands, `--new-mod` to `--submit-mod`, for its next release.
-6. Repository created (`Tutez64/DRH-Mod-Index`: README, license, owner). Its CI comes with the launcher's commands.
+6. **Done.** `Tutez64/DRH-Mod-Index`: README, licenses, owner, its CI, which runs the first launcher release with `--check-entry`.
 7. **Done.** The `api` mod has its repository, pinned as `mods/api` ([Versioning](#versioning)). The wrappers live in the `api` mod, core events hand game objects, dependency failures propagate.
 8. **Done.** `DRH-Mod-Template`, and `DRH-Mod-Workflows`, which runs the first launcher release with `--pack-mod`.
 
