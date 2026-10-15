@@ -14,9 +14,9 @@ At tag time, copy these sections into the GitHub release notes under `Changelog`
   what they carry), the game's portraits, weapon icons and tooltips, adding a
   player as a friend, blocking or reporting them, and events for heroes,
   floors, town and key presses.
-- `docs/making-a-mod.md` gives a modder's steps, from the
-  [DRH-Mod-Template](https://github.com/Tutez64/DRH-Mod-Template) repository
-  to testing the mod in the game.
+- `docs/making-a-mod.md` gives a modder's steps with the launcher's commands,
+  from the [DRH-Mods-Template](https://github.com/Tutez64/DRH-Mods-Template)
+  repository to publishing the mod.
 - `mods/` holds an example mod that uses the whole `api` mod and checks it as
   it runs, plus test mods for load, runtime and dependency failures. Run the
   game with `--mods-dir` pointing at it.

@@ -28,9 +28,9 @@ The game owns the runtime. The launcher owns the folder, enablement, and launch.
 | Distribution | decided | Pointer index we control; not a monorepo; not Thunderstore/Nexus as identity. [Distribution](#distribution) |
 | Trust for updates | decided | Trust artifacts (`id` + version + SHA-256), not author repos. |
 | v1 discovery UI | decided | Minimal catalog in DRHL, same index a later site can reuse. |
-| Index schema | decided | `Tutez64/DRH-Mod-Index`, served by GitHub Pages; one file per version, a merged entry only gets `yanked`. [Index entry](#index-entry) |
+| Index schema | decided | `Tutez64/DRH-Mods-Index`, served by GitHub Pages; one file per version, a merged entry only gets `yanked`. [Index entry](#index-entry) |
 | Mod page in the launcher | open | What it shows is undecided, beyond `description` above the long description. The long description (`README.md` and its markers) is a draft: [Mod repository](#mod-repository). |
-| Mod repository and publishing | decided | Repo = mod folder from `DRH-Mod-Template`, DRH Launcher commands for every step (checks implemented once, also run by the index CI), `vX.Y.Z` tags, flat zip, PR to the index with git. [Mod repository](#mod-repository) |
+| Mod repository and publishing | decided | Repo = mod folder from `DRH-Mods-Template`, DRH Launcher commands for every step (checks implemented once, also run by the index CI), `vX.Y.Z` tags, flat zip, PR to the index with git. [Mod repository](#mod-repository) |
 | Thunderstore / Nexus / itch as mirrors | open | Optional later; must not replace `mod.json` or the index. |
 | Resource overlay rules | open | `Resources/` is composited at runtime; precedence, SWF vs JSON, and `Locale/` merge are unspecified. No separate `locale/` tree. |
 | Type blacklist | decided | None. Interpreted and compiled see the same types. [Compilation](#compilation) |
@@ -425,22 +425,22 @@ The Mods page (fetch, install, enable, order, `last-run` display) is specified i
 
 ### Mod repository
 
-A mod's repository **is** its folder: `mod.json`, `src/`, `Resources/` (when the mod has any) at the root, plus `README.md`, `LICENSE` and `.github/`. Cloning it into a mods folder runs it as is, and DRH can pin one as a submodule (`mods/api`). Its name is free; `DRH-Mod-<Name>` is the suggestion. The GitHub topic `drh-mod` is required, so mods can be found.
+A mod's repository **is** its folder: `mod.json`, `src/`, `Resources/` (when the mod has any) at the root, plus `README.md`, `LICENSE` and `.github/`. Cloning it into a mods folder runs it as is, and DRH can pin one as a submodule (`mods/api`). It is named `DRH-Mod-<Name>`, `<Name>` free: `--pack-mod` and the index CI refuse another name, so a repository's name says it is a DRH mod, and a search on it finds them. The repositories around mods are named `DRH-Mods-*`: `DRH-Mods-Index`, `DRH-Mods-Template`, `DRH-Mods-Workflows`.
 
 `README.md` is also the long description, shown on the mod's page in the launcher. HTML comments, invisible on GitHub, pick what the launcher shows: `<!-- drh:show -->` … `<!-- /drh:show -->` keeps only those zones (several allowed, joined in order), and `<!-- drh:hide -->` … `<!-- /drh:hide -->` drops one, inside a shown zone too. Without a shown zone, the whole file is shown, minus its hidden zones. The page always shows `description` above it, so an empty shown zone (`<!-- drh:show --><!-- /drh:show -->`) leaves just that. Zones do not nest, except a hidden one inside a shown one; an unclosed or misplaced marker fails `--check-mod`. What is shown is Markdown, at most 4000 characters. It need not say it is a DRH mod: the catalog says so, and GitHub shows the repository's name and topic.
 
 A mod runs combined with DRH and `api` (GPLv3), so its license must be GPL-compatible (GPL, LGPL, MIT, BSD, Apache 2.0, MPL 2.0, …). A reviewer checks it at an `id`'s first entry and whenever `LICENSE` changes.
 
-`DRH-Mod-Template` is the skeleton: `mod.json`, `src/Main.hx` (`class Main extends mods.api.Mod`), `README.md` (a placeholder: a shown zone to fill, and a pointer to [Making a mod](making-a-mod.md), the modders' steps; `--check-mod` refuses it while the shown zone keeps the template's sentence), `LICENSE` (GPLv3, as DRH and `api`), and `.github/workflows/release.yml`, which only calls the reusable workflow of `Tutez64/DRH-Mod-Workflows`, pinned to its moving major tag (`@v1`, moved along its `v1.x.y` releases): fixes reach every mod, only a breaking change needs a new major. Nothing else is copied into a mod, so nothing there needs updating. It runs as is, as `my_mod` (its `Main` logs `loaded`): the `id` is only in `mod.json` and in the `package` line of `src/Main.hx`. It is a GitHub template repository: until `--new-mod` exists, *Use this template* gives the fresh history, and the author changes both by hand.
+`DRH-Mods-Template` is the skeleton: `mod.json`, `src/Main.hx` (`class Main extends mods.api.Mod`), `README.md` (a placeholder: a shown zone to fill, and a pointer to [Making a mod](making-a-mod.md), the modders' steps; `--check-mod` refuses it while the shown zone keeps the template's sentence), `LICENSE` (GPLv3, as DRH and `api`), and `.github/workflows/release.yml`, which only calls the reusable workflow of `Tutez64/DRH-Mods-Workflows`, pinned to its moving major tag (`@v1`, moved along its `v1.x.y` releases): fixes reach every mod, only a breaking change needs a new major. Nothing else is copied into a mod, so nothing there needs updating. It runs as is, as `my_mod` (its `Main` logs `loaded`): the `id` is only in `mod.json` and in the `package` line of `src/Main.hx`. It is a GitHub template repository: until `--new-mod` exists, *Use this template* gives the fresh history, and the author changes both by hand.
 
 Every step is a DRH Launcher command. The checks exist once, in the launcher; the release workflow and the index CI run its latest Linux release (the AppImage, with `APPIMAGE_EXTRACT_AND_RUN=1`: runners have no FUSE), and a modder editing them gains nothing.
 
 | Command | Does |
 | --- | --- |
-| `--new-mod <dir>` | Copies the template with git into a fresh history and its first commit, asks for `id`, `name` and `author` and writes them (the `id` into the `package` line of `src/Main.hx` too, the `name` into the README's title) with `api` set to the `major.minor` of the latest indexed `api`, then opens `github.com/new` with the suggested name. The repository is created there, with the topic `drh-mod`; the first push is plain git. |
+| `--new-mod <dir>` | Copies the template with git into a fresh history and its first commit, asks for `id`, `name` and `author` and writes them (the `id` into the `package` line of `src/Main.hx` too, the `name` into the README's title) with `api` set to the `major.minor` of the latest indexed `api`, then opens `github.com/new` with the suggested name. The repository is created there; the first push is plain git. |
 | `--check-mod <dir>` | Checks what needs no game: the `mod.json` schema (`id` rules, `version`, `api` and dependency syntax, `drh` present exactly when `uses` names `extends` or `replace`), values left from the template (`id` `my_mod`, `name`, `description`, an empty `author`, `README.md`), the lengths (what `README.md` shows included) and its markers, no field outside the schema, the package rule for every file under `src/` (and folder names that are package names), the entry's module (`src/<entry>.hx`), no `import.hx`, a non-empty `LICENSE`. |
 | `--run-mod <dir or zip>` | Installs the mod's dependencies (`api` included) from the index into a cache, composes a temporary mods folder with them and the mod (its folder, or a zip such as the one the release workflow drafted), and launches the installed DRH on it, the launcher's options and its own `--mods-dir` included. Prints the game's output, then each mod's outcome from `last-run.json`; fails unless the mod is `ok`. Only `id`, `api` and `dependencies` need to be valid. Loading and behaviour are the author's own run. |
-| `--pack-mod <dir> [<out-dir>]` | Checks, then builds the zip from a fixed list (`mod.json`, `src/`, `Resources/` when present, `LICENSE`, `README.md`, flat at its root, extracted as is into `mods/<id>/`; sorted, fixed dates: the same sources give the same zip) and its index entry, `<id>-<version>.zip` and `.json` in `<out-dir>` (the current one by default). `source` is the repository the workflow runs in, or else the `origin` remote. Run on a tag, it refuses one that is not `v<version>`. |
+| `--pack-mod <dir> [<out-dir>]` | Checks, then builds the zip from a fixed list (`mod.json`, `src/`, `Resources/` when present, `LICENSE`, `README.md`, flat at its root, extracted as is into `mods/<id>/`; sorted, fixed dates: the same sources give the same zip) and its index entry, `<id>-<version>.zip` and `.json` in `<out-dir>` (the current one by default). `source` is the repository the workflow runs in, or else the `origin` remote. It refuses a `source` not named `DRH-Mod-<Name>` and, run on a tag, a tag that is not `v<version>`. |
 | `--submit-mod <dir> [<fork-owner>]` | Adds the index entry of the published release on a branch of the author's fork of the index (forked once, in the browser: without one, it opens the fork page), pushes it with git, and opens the pre-filled compare page: one click opens the PR, whose template says the entry is published under CC BY 4.0. The fork is the `source` owner's unless `<fork-owner>` is given (a repository owned by an organization). |
 
 Publishing:
@@ -452,7 +452,7 @@ Publishing:
 
 ### Index entry
 
-The index is `Tutez64/DRH-Mod-Index`. One file per version (`mods/<id>/<version>.json`), so concurrent PRs do not conflict; the index CI checks each one and generates the static file the launcher reads, `https://tutez64.github.io/DRH-Mod-Index/index.json`, served by GitHub Pages, not through the GitHub API, whose unauthenticated rate limit would throttle the catalog. A later website can live on the same Pages site. A move to another owner keeps that URL with a custom domain or a redirect left behind.
+The index is `Tutez64/DRH-Mods-Index`. One file per version (`mods/<id>/<version>.json`), so concurrent PRs do not conflict; the index CI checks each one and generates the static file the launcher reads, `https://tutez64.github.io/DRH-Mods-Index/index.json`, served by GitHub Pages, not through the GitHub API, whose unauthenticated rate limit would throttle the catalog. A later website can live on the same Pages site. A move to another owner keeps that URL with a custom domain or a redirect left behind.
 
 ```json
 {
@@ -498,7 +498,7 @@ A launcher refuses a `format` it does not know and asks to be updated. Each vers
 - the pull request only adds `mods/<id>/<version>.json` files that match their content, for versions not indexed yet, or adds `yanked` to one;
 - the zip downloads from `url` without an account (the release is published) and matches `size` and `sha256`;
 - the launcher's checks (`--check-mod`) pass on the extracted zip, and its `mod.json` and shown README match the entry: the entry `--pack-mod` would write from that zip is the one submitted;
-- `source` is the one the `id` belongs to (its highest indexed version's), or a reviewer adds the `takeover` label;
+- `source` is named `DRH-Mod-<Name>`, and is the one the `id` belongs to (its highest indexed version's), or a reviewer adds the `takeover` label;
 - every dependency, `api` included, has an indexed version that satisfies it.
 
 It writes in the job summary the diff of the sources against the zip of the last indexed version, what the reviewer reads, and flags an `author` that changed since that version. The checks on an entry are the launcher's `--check-entry <entry> <base-index> <work-dir> [--takeover]`; the rest, the pull request's shape and the summary, is the CI's script. A pull request only brings JSON; the CI downloads and inspects a zip, never runs it. Merging needs the CI and the owner's approval (`CODEOWNERS`, branch protection). On the main branch, the CI generates `index.json` (`--build-index <index> <out-file>`) and deploys it to Pages. The repository variable `DRHL_VERSION` picks the launcher release both run, a pre-release to test one; empty, the latest.
@@ -585,9 +585,9 @@ Needed before a real host; not a restatement of the rules above.
 3. **Done.** The flags above are in `project.xml`.
 4. **Done**, except `replace`. `src-modding/` loads `--mods-dir` into one world, runs the lifecycle, re-registers the overlay, and bakes the release tag (no `V`) into the host. `uncaughtError` and the mod `exiting` listener sit at the top of the constructor. Still later: `ASCompat.createInstance` consulting the `replace` table, once the fork has `replace`.
 5. Launcher: index fetch, catalog install, `enabled.json`, `--mods-dir`, `last-run.json` display — no destructive overlay. **Done**: the modders' commands, `--new-mod` to `--submit-mod`, for its next release.
-6. **Done.** `Tutez64/DRH-Mod-Index`: README, licenses, owner, its CI, which runs the first launcher release with `--check-entry`.
+6. **Done.** `Tutez64/DRH-Mods-Index`: README, licenses, owner, its CI, which runs the first launcher release with `--check-entry`.
 7. **Done.** The `api` mod has its repository, pinned as `mods/api` ([Versioning](#versioning)). The wrappers live in the `api` mod, core events hand game objects, dependency failures propagate.
-8. **Done.** `DRH-Mod-Template`, and `DRH-Mod-Workflows`, which runs the first launcher release with `--pack-mod`.
+8. **Done.** `DRH-Mods-Template`, and `DRH-Mods-Workflows`, which runs the first launcher release with `--pack-mod`.
 
 ## Out of scope for this document
 
