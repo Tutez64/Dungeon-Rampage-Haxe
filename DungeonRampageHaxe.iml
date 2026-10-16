@@ -34,11 +34,11 @@
     <orderEntry type="module-library" scope="PROVIDED">
       <library name="Haxelib: hxcpp:4.3.0 [dev]">
         <CLASSES>
-          <root url="file://$MODULE_DIR$/submodules/hxcpp" />
+          <root url="file://$MODULE_DIR$/submodules/libhxcpp" />
         </CLASSES>
         <JAVADOC />
         <SOURCES>
-          <root url="file://$MODULE_DIR$/submodules/hxcpp" />
+          <root url="file://$MODULE_DIR$/submodules/libhxcpp" />
         </SOURCES>
       </library>
     </orderEntry>

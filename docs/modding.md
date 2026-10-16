@@ -138,7 +138,7 @@ A scriptable base is any eligible class that ships as **game or engine code**: D
 | `submodules/lime` | `lime` | in — windows / input / timing |
 | `submodules/swf` | `swf` | in — Animate symbols and timelines |
 | `submodules/SteamWrap` | `steamwrap` | in — binding under `src-steam`; mostly `@:cffi` / statics, near-zero cost |
-| `submodules/hxcpp` | — | out — C++ runtime / build tool. `cpp.*` lives in the Haxe std |
+| `submodules/libhxcpp` | — | out — C++ runtime / build tool. `cpp.*` lives in the Haxe std |
 | hxScript (`-lib hxscript`) | `hxscript` | out — the loader, not game content. `replace(Environment, …)` would rewrite the loader that loaded the mod; `compile.*` / `cppia.*` bridges break on every rebase |
 | Haxe std, `cpp.*` | — | out of the *bridge* scan — presets handle the std; `cpp.*` is almost all `extern` / `abstract` / `@:coreType` |
 | haxelib `format` | `format` | out — used from Lime / OpenFL / swf internals, never from `src/`. Add it the day someone has a use |
@@ -546,7 +546,7 @@ If the binary is too fat, cut `openfl._internal` and Lime backends first, then n
 
 `-dce no` keeps what is **typed**; it does not type what nothing references. A mod calling `haxe.crypto.Sha256` when nothing in the host names it gets `Type not found`. Libraries are already covered (Autowire + the bridge scan). The std is the gap. DRH goes **further than hxScript** and force-includes it: `--macro include('haxe', true, ['haxe.macro'])` and `include('sys', true, ['sys.db'])`. `sys` is 34 modules and Lime already types most of them; the net addition is `Http`, `FileStat`, thread pools, `EventLoop`, `Condition`, `Semaphore`, `ssl.Digest`. `sys.db` is excluded up front (`Sqlite` / `Mysql` need linking). `haxe.atomic.AtomicObject` is `#error` on hxcpp, so it is on the ignore list; anything else that fails to type joins it. `cpp.*` is **not** included wholesale (`cpp.objc`, `cpp.link`); name what a mod may want via `-D hxscript_keep`. Cost is mostly **build time** (one `.cpp` per class). If it hurts, grow the ignore list; never return to `-dce std`.
 
-**hxcpp.** Patched with `submodules/hxscript/patches/apply-hxcpp.py` on `submodules/hxcpp`.
+**hxcpp.** libhxcpp (`submodules/libhxcpp`) already has the fixes of `submodules/hxscript/patches/apply-hxcpp.py`, two of them (issues 1 and 3) in its own form, which the script reports as `NO MATCH`.
 
 **JIT.** On before any module loads: `Compiler.compile` does it (`Compiler.jit`) and retries a refused batch once without it.
 

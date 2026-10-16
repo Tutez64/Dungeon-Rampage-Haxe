@@ -58,6 +58,9 @@ At tag time, copy these sections into the GitHub release notes under `Changelog`
   host. I forked hxScript to improve and fix it (`submodules/hxscript`,
   [Tutez64/hxscript](https://github.com/Tutez64/hxscript)), and added
   the cppia host and hxScript flags to `project.xml`.
+- Internal: hxcpp is replaced by [libhxcpp](https://github.com/openfl/libhxcpp),
+  which continues it and includes many fixes and improvements (`submodules/libhxcpp`,
+  [Tutez64/libhxcpp](https://github.com/Tutez64/libhxcpp)).
 - Internal: package builds cache native libraries, preprocessed SWFs, and
   C++ objects. A game file or one SWF change reuses the rest. A compiler,
   Lime, or `project.xml` change does not.

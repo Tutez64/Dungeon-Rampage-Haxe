@@ -55,13 +55,13 @@ This project required months of work, most of it in the following open-source pr
 
 - [JPEXS](https://github.com/Tutez64/jpexs-decompiler/tree/dev), the decompiler (see [Dungeon Rampage Decompiled](https://github.com/Tutez64/Dungeon-Rampage-Decompiled)).
 - [ax4](https://github.com/Tutez64/ax4), my AS3 to Haxe converter based on ax3.
-- [OpenFL](https://github.com/Tutez64/openfl), [SWF](https://github.com/Tutez64/swf), [Lime](https://github.com/Tutez64/lime), and [hxcpp](https://github.com/Tutez64/hxcpp).
+- [OpenFL](https://github.com/Tutez64/openfl), [SWF](https://github.com/Tutez64/swf), [Lime](https://github.com/Tutez64/lime), and [libhxcpp](https://github.com/Tutez64/libhxcpp), which continues hxcpp.
 - [SteamWrap](https://github.com/Tutez64/SteamWrap), used to replace the Steam ANE.
 - [hxScript](https://github.com/Tutez64/hxscript), the in-process Haxe/cppia runtime for mods.
 
 ## Build from source
 
-The project depends on forked versions of OpenFL, Lime, SWF, hxcpp, SteamWrap, and hxScript,
+The project depends on forked versions of OpenFL, Lime, SWF, libhxcpp, SteamWrap, and hxScript,
 which are included as Git submodules.
 
 ### Requirements
@@ -100,16 +100,18 @@ haxelib dev lime submodules/lime
 haxelib dev openfl submodules/openfl
 haxelib dev swf submodules/swf
 haxelib dev steamwrap submodules/SteamWrap
-haxelib dev hxcpp submodules/hxcpp
+haxelib dev hxcpp submodules/libhxcpp
 haxelib dev hxscript submodules/hxscript
 ```
+
+libhxcpp is registered as `hxcpp`, which is what `haxelib run libhxcpp setup` does.
 
 ### Rebuild helper tools
 
 ```bash
+haxelib run lime rebuild hxcpp
 haxelib run lime rebuild cpp -debug
 haxelib run lime rebuild tools
-haxelib run lime rebuild hxcpp
 haxelib run lime rebuild swf
 ```
 

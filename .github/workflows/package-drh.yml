@@ -115,7 +115,7 @@ jobs:
         run: |
           haxelib --quiet --always install format 3.8.0
           haxelib --quiet --always install hxp 1.3.1
-          haxelib dev hxcpp "$PWD/submodules/hxcpp"
+          haxelib dev hxcpp "$PWD/submodules/libhxcpp"
           haxelib dev lime "$PWD/submodules/lime"
           haxelib dev openfl "$PWD/submodules/openfl"
           haxelib dev swf "$PWD/submodules/swf"
@@ -132,15 +132,15 @@ jobs:
             submodules/lime/run.n
             submodules/lime/tools/tools.n
             submodules/swf/run.n
-            submodules/hxcpp/hxcpp.n
+            submodules/libhxcpp/hxcpp.n
             submodules/SteamWrap/ndll
-          key: native-${{ inputs.platform }}-nolto-${{ hashFiles('submodules/lime/**', 'submodules/hxcpp/**', 'submodules/swf/**', 'submodules/SteamWrap/**', 'tools/release/hxcpp-x86-64-v2.xml', 'tools/release/lime-ci-config.xml') }}
+          key: native-${{ inputs.platform }}-nolto-${{ hashFiles('submodules/lime/**', 'submodules/libhxcpp/**', 'submodules/swf/**', 'submodules/SteamWrap/**', 'tools/release/hxcpp-x86-64-v2.xml', 'tools/release/lime-ci-config.xml') }}
 
       - name: Bootstrap hxcpp
         if: steps.native-cache.outputs.cache-hit != 'true'
         shell: bash
         run: |
-          cd submodules/hxcpp/tools/hxcpp
+          cd submodules/libhxcpp/tools/hxcpp
           haxe compile.hxml
 
       - name: Clone Steamworks SDK
@@ -183,7 +183,7 @@ jobs:
             "$steamwrap/native/lib/win64"
 
           cp "$sdk"/public/steam/*.h "$steamwrap/native/include/steam/"
-          cp submodules/hxcpp/include/hx/*.h "$steamwrap/native/include/hx/"
+          cp submodules/libhxcpp/include/hx/*.h "$steamwrap/native/include/hx/"
 
           case "${{ inputs.platform }}" in
             linux)
@@ -283,9 +283,9 @@ jobs:
         id: cpp-cache
         with:
           path: bin/${{ inputs.platform }}/obj
-          key: cpp-obj-${{ inputs.platform }}-nolto-${{ hashFiles('project.xml', 'submodules/hxcpp/**', 'submodules/hxscript/**', 'submodules/openfl/**', 'submodules/lime/**', 'submodules/swf/**', 'submodules/SteamWrap/**') }}-${{ hashFiles('src/**', 'src-steam/**', 'src-modding/**', 'compat/**', 'generated_swf_libraries.xml') }}
+          key: cpp-obj-${{ inputs.platform }}-nolto-${{ hashFiles('project.xml', 'submodules/libhxcpp/**', 'submodules/hxscript/**', 'submodules/openfl/**', 'submodules/lime/**', 'submodules/swf/**', 'submodules/SteamWrap/**') }}-${{ hashFiles('src/**', 'src-steam/**', 'src-modding/**', 'compat/**', 'generated_swf_libraries.xml') }}
           restore-keys: |
-            cpp-obj-${{ inputs.platform }}-nolto-${{ hashFiles('project.xml', 'submodules/hxcpp/**', 'submodules/hxscript/**', 'submodules/openfl/**', 'submodules/lime/**', 'submodules/swf/**', 'submodules/SteamWrap/**') }}-
+            cpp-obj-${{ inputs.platform }}-nolto-${{ hashFiles('project.xml', 'submodules/libhxcpp/**', 'submodules/hxscript/**', 'submodules/openfl/**', 'submodules/lime/**', 'submodules/swf/**', 'submodules/SteamWrap/**') }}-
 
       - name: Install cached SWF libraries
         shell: bash

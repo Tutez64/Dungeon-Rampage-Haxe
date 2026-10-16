@@ -10,9 +10,9 @@
 [submodule "submodules/SteamWrap"]
 	path = submodules/SteamWrap
 	url = https://github.com/Tutez64/SteamWrap
-[submodule "submodules/hxcpp"]
-	path = submodules/hxcpp
-	url = https://github.com/Tutez64/hxcpp
+[submodule "submodules/libhxcpp"]
+	path = submodules/libhxcpp
+	url = https://github.com/Tutez64/libhxcpp
 [submodule "submodules/hxscript"]
 	path = submodules/hxscript
 	url = https://github.com/Tutez64/hxscript

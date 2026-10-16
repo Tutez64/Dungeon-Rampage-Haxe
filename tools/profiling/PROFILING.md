@@ -20,21 +20,21 @@ tools/profiling/patches/hxcpp_gc_timeline_census_retention.patch
 Appliquer depuis la racine du projet, uniquement pour un build de diagnostic :
 
 ```bash
-git -C submodules/hxcpp apply \
+git -C submodules/libhxcpp apply \
   ../../tools/profiling/patches/hxcpp_gc_timeline_census_retention.patch
 ```
 
 Retirer ensuite le patch (tip release propre) :
 
 ```bash
-git -C submodules/hxcpp apply -R \
+git -C submodules/libhxcpp apply -R \
   ../../tools/profiling/patches/hxcpp_gc_timeline_census_retention.patch
-# ou : git -C submodules/hxcpp checkout -- .
+# ou : git -C submodules/libhxcpp checkout -- .
 ```
 
 Le patch cible le commit hxcpp actuellement pointé par DRH (`c4487bf3` au
 moment de l’écriture). Après une mise à jour du submodule, vérifier
-`git -C submodules/hxcpp apply --check …` et régénérer le patch si besoin.
+`git -C submodules/libhxcpp apply --check …` et régénérer le patch si besoin.
 
 Ces defines ne doivent jamais être activés dans `project.xml` de la release.
 Sans le patch, un build qui les demande ne compilera pas ou n’émettra pas les

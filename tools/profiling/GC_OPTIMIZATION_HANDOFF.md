@@ -306,7 +306,7 @@ la version non générationnelle.
 Point de reprise exact dans :
 
 ```text
-submodules/hxcpp/src/hx/gc/Immix.cpp
+submodules/libhxcpp/src/hx/gc/Immix.cpp
 ```
 
 Autour de la ligne 5638 :
