@@ -43,6 +43,7 @@
 	<haxedef name="swf_hardware_bitmap_cache" />
 	<!-- Cache filtered text fields on the GPU so they render faster and are visually closer to AIR's. -->
 	<haxedef name="openfl_force_gl_cacheasbitmap" />
+	<define name="openfl_flash_strict" />
 
 	<setenv name="STEAM_APP_ID" value="3053950" if="cpp" />
 	<dependency name="com.amanitadesign.steam.FRESteamWorks" path="extensions/FRESteamWorks.ane" if="air" />
