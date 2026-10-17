@@ -1703,6 +1703,10 @@ class ASCompat {
 			if (s == "") {
 				return 0;
 			}
+			// Number("0xff") is 255, while Std.parseFloat gives 0 as the Haxe spec says
+			if (s.length >= 2 && s.charCodeAt(0) == "0".code && (s.charCodeAt(1) == "x".code || s.charCodeAt(1) == "X".code)) {
+				return parseHexNumber(s);
+			}
 			var f = Std.parseFloat(s);
 			return if (Math.isNaN(f)) Math.NaN else f;
 		}
@@ -1715,6 +1719,28 @@ class ASCompat {
 			}
 		}
 		return Math.NaN;
+	}
+
+	// The digits after "0x", as a Float so values past 2^31 stay exact. NaN without digits or on another char.
+	static function parseHexNumber(s:String):Float {
+		if (s.length == 2) {
+			return Math.NaN;
+		}
+		var n = 0.0;
+		for (i in 2...s.length) {
+			var c = s.charCodeAt(i);
+			var digit = if (c >= "0".code && c <= "9".code) {
+				c - "0".code;
+			} else if (c >= "a".code && c <= "f".code) {
+				c - "a".code + 10;
+			} else if (c >= "A".code && c <= "F".code) {
+				c - "A".code + 10;
+			} else {
+				return Math.NaN;
+			}
+			n = n * 16 + digit;
+		}
+		return n;
 	}
 
 	static function toFixedNative(n:Float, digits:Int):String {
