@@ -73,3 +73,5 @@ At tag time, copy these sections into the GitHub release notes under `Changelog`
   code (inferred locals, already numeric expressions) and the compat layer
   takes faster paths for dynamic property access and typed conversions. The
   Linux executable is about 3.5 MB smaller; no CPU gain was measurable in a dungeon.
+- Internal: ax4 is a submodule (`submodules/ax4`). The game compiles with its
+  `compat/` instead of a copy, and the conversion scripts run it by default.
