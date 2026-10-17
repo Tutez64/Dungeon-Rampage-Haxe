@@ -47,9 +47,11 @@ function Find-Ax4Dir {
         if (-not (Test-Path -LiteralPath $Ax4 -PathType Container)) { throw "ax4 directory not found: $Ax4" }
         return (Resolve-Path -LiteralPath $Ax4).Path
     }
-    $found = Find-Sibling "ax4"
-    if (-not $found) { throw "ax4 not found. Pass -Ax4 / AX4_DIR." }
-    return $found
+    $submodule = Join-Path $Root "submodules\ax4"
+    if (-not (Test-Path -LiteralPath (Join-Path $submodule "build.hxml"))) {
+        throw "ax4 submodule missing. Run: git submodule update --init submodules/ax4"
+    }
+    return (Resolve-Path -LiteralPath $submodule).Path
 }
 
 function Find-DecompiledDir {
@@ -341,12 +343,11 @@ function Install-AsTree([string]$ExportDir, [string]$Dest) {
     }
 }
 
-function Write-RuntimeConfig([string]$DecompiledAbs, [string]$Ax4Abs) {
+function Write-RuntimeConfig([string]$DecompiledAbs) {
     $cfg = Get-Content -LiteralPath $Template -Raw | ConvertFrom-Json
     $gameSrcRel = Get-RelativePath (Join-Path $DecompiledAbs "src") $Root
     $cfg.src = @($gameSrcRel, (Get-RelativePath $AneSrc $Root))
     $cfg.hxout = "src"
-    $cfg.copy = @(@{ unit = (Get-RelativePath (Join-Path $Ax4Abs "compat") $Root); to = "compat" })
     $cfg.swc = @(Get-RelativePath $AirglobalTmp $Root)
 
     $json = $cfg | ConvertTo-Json -Depth 10
@@ -394,7 +395,7 @@ Invoke-Ffdec -FfdecPath $FfdecPath -FfdecArgs @(
 )
 
 Install-AsTree $AneExport $AneSrc
-Write-RuntimeConfig $DecompiledAbs $Ax4Abs
+Write-RuntimeConfig $DecompiledAbs
 Write-Host "Wrote $RuntimeConfig"
 
 if ($PrepareOnly) {
@@ -411,7 +412,13 @@ if (-not $NoBuildAx4) {
     if (-not (Test-Path -LiteralPath $hxml)) { throw "ax4 build.hxml not found in $Ax4Abs" }
     Write-Host "Building ax4 ..."
     Push-Location $Ax4Abs
-    try { npx haxe build.hxml } finally { Pop-Location }
+    try {
+        if (-not (Test-Path -LiteralPath "node_modules" -PathType Container)) {
+            npm ci
+            npx lix download
+        }
+        npx haxe build.hxml
+    } finally { Pop-Location }
 }
 if (-not (Test-Path -LiteralPath $Jar -PathType Leaf)) { throw "converter.jar not found in $Ax4Abs. Drop -NoBuildAx4." }
 

@@ -150,6 +150,11 @@ sibling_head() {
   fi
 }
 
+# The ax4 that convert runs: AX4_DIR, else the submodule.
+ax4_head() {
+  git -C "${AX4_DIR:-$ROOT/submodules/ax4}" rev-parse HEAD 2>/dev/null || true
+}
+
 find_sibling() {
   local dir="$ROOT/../$1"
   if [[ -d "$dir" ]]; then
@@ -188,7 +193,7 @@ date=$date
 buildid=$buildid
 reasons=$reasons
 jpexs=$(sibling_head jpexs-decompiler)
-ax4=$(sibling_head ax4)
+ax4=$(ax4_head)
 EOF
 }
 
@@ -627,7 +632,7 @@ Convert ${date} b${buildid} (${reasons})
 BuildID: ${buildid}
 reasons: ${reasons}
 jpexs: $(sibling_head jpexs-decompiler)
-ax4:   $(sibling_head ax4)
+ax4:   $(ax4_head)
 EOF
 )")"
   git branch "$branch" "$commit"

@@ -7,7 +7,6 @@ See [Dungeon Rampage Decompiled](https://github.com/Tutez64/Dungeon-Rampage-Deco
 Recommended layout:
 
 ```text
-ax4/
 Dungeon-Rampage-Decompiled/
 Dungeon-Rampage-Haxe/
 jpexs-decompiler/   # optional; FFDEC_HOME or PATH also work
@@ -21,11 +20,11 @@ The script:
 2. Replaces `DbConfiguration/` and `Resources/` with the decompiled `data/` copies
 3. Extracts `library.swf` from that ANE
 4. Decompiles it with FFDec into a temporary folder (the ANE ActionScript is not part of the game SWF)
-5. Runs [ax4](https://github.com/Tutez64/ax4) with `edits/conversion/config.json`, after building its `converter.jar`
+5. Runs [ax4](https://github.com/Tutez64/ax4) from `submodules/ax4` with `edits/conversion/config.json`, after building its `converter.jar`
 6. Moves `com.amanitadesign` to `src-steam/` (C++ classpath only)
 
 Useful options: `--prepare-only`, `--keep-tmp`, `--no-build-ax4`.
-Overrides: `--ax4` / `AX4_DIR`, `--decompiled` / `DECOMPILED_DIR`, `--ffdec` / `FFDEC_HOME`, `--air-sdk` / `AIR_SDK`, `--ane`.
+Overrides: `--ax4` / `AX4_DIR` (another ax4 checkout; `refresh` stamps `AX4_DIR`, so prefer it), `--decompiled` / `DECOMPILED_DIR`, `--ffdec` / `FFDEC_HOME`, `--air-sdk` / `AIR_SDK`, `--ane`.
 
 ## After conversion
 
@@ -40,7 +39,7 @@ Those branches contain only `src/`, `src-steam/`, and `edits/conversion/stamp`. 
 
 `converted/latest` and `edits/latest` point at the current pair.
 
-`compat/` is ax4’s runtime. A converter change that only touches `compat/` is a `master` commit, not a reason to open a new pair.
+The game compiles with `submodules/ax4/compat`, ax4’s runtime. A converter change that only touches `compat/` is a submodule bump on `master`, not a reason to open a new pair. After converting with another ax4 commit, bump the submodule to it so `compat/` matches `src/`.
 
 ### Naming
 
@@ -109,7 +108,7 @@ The polyglot script `./edits/conversion/refresh.cmd` (Bash + PowerShell) drives 
 
 A small official update without ax4 is also a `refresh commit` on the current `edits/X` (debt until the next real convert; the branch name still has the previous BuildID).
 
-`src/` that must survive the next rebase is committed on `edits/X`. Project files, submodules, `compat/`, extensions, `DbConfiguration/`, `Resources/`, and tools stay on `master`. Releases are tagged on `master`.
+`src/` that must survive the next rebase is committed on `edits/X`. Project files, submodules, extensions, `DbConfiguration/`, `Resources/`, and tools stay on `master`. Releases are tagged on `master`.
 
 ### Squash-with / Squash-as
 

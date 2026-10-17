@@ -25,7 +25,7 @@ usage() {
   cat <<EOF
 Usage: $(basename "$0") [options]
 
-  --ax4 DIR           ax4 checkout (or set AX4_DIR). Default: ../ax4
+  --ax4 DIR           ax4 checkout (or set AX4_DIR). Default: submodules/ax4
   --decompiled DIR    Dungeon-Rampage-Decompiled checkout (or set DECOMPILED_DIR).
                       Default: ../Dungeon-Rampage-Decompiled
   --ffdec PATH        ffdec, ffdec.sh, or ffdec.jar (or set FFDEC_HOME)
@@ -38,7 +38,6 @@ Usage: $(basename "$0") [options]
 
 Sibling layout expected by the committed config.json:
 
-  ax4/
   Dungeon-Rampage-Decompiled/
   Dungeon-Rampage-Haxe/
 EOF
@@ -117,7 +116,8 @@ find_ax4_dir() {
     (cd "$AX4_DIR" && pwd)
     return 0
   fi
-  find_sibling ax4 || die "ax4 not found. Pass --ax4 / AX4_DIR."
+  [[ -f "$ROOT/submodules/ax4/build.hxml" ]] || die "ax4 submodule missing. Run: git submodule update --init submodules/ax4"
+  (cd "$ROOT/submodules/ax4" && pwd)
 }
 
 find_decompiled_dir() {
@@ -397,10 +397,9 @@ install_as_tree() {
 write_runtime_config() {
   [[ -f "$TEMPLATE" ]] || die "missing $TEMPLATE"
   # Same as convert.ps1: keep committed flags, rewrite only path fields.
-  export DRH_GAME_SRC DRH_ANE_SRC DRH_COMPAT DRH_AIRGLOBAL
+  export DRH_GAME_SRC DRH_ANE_SRC DRH_AIRGLOBAL
   DRH_GAME_SRC="$(relpath "$DECOMPILED_ABS/src" "$ROOT")"
   DRH_ANE_SRC="$(relpath "$ANE_SRC" "$ROOT")"
-  DRH_COMPAT="$(relpath "$AX4_ABS/compat" "$ROOT")"
   DRH_AIRGLOBAL="$(relpath "$AIRGLOBAL_TMP" "$ROOT")"
   awk '
     function esc(s, t) {
@@ -412,7 +411,6 @@ write_runtime_config() {
     BEGIN {
       game = esc(ENVIRON["DRH_GAME_SRC"])
       ane = esc(ENVIRON["DRH_ANE_SRC"])
-      compat = esc(ENVIRON["DRH_COMPAT"])
       air = esc(ENVIRON["DRH_AIRGLOBAL"])
     }
     {
@@ -431,11 +429,6 @@ write_runtime_config() {
       }
       if (skip_src) {
         if ($0 ~ /]/) skip_src = 0
-        next
-      }
-      if ($0 ~ /"unit"/) {
-        sub(/:[[:space:]]*"[^"]*"/, ": \"" compat "\"")
-        print
         next
       }
       if ($0 ~ /"swc"[[:space:]]*:/) { in_swc = 1; print; next }
@@ -503,6 +496,9 @@ fi
 if [[ "$BUILD_AX4" -eq 1 ]]; then
   [[ -f "$AX4_ABS/build.hxml" ]] || die "ax4 build.hxml not found in $AX4_ABS"
   echo "Building ax4 ..."
+  if [[ ! -d "$AX4_ABS/node_modules" ]]; then
+    (cd "$AX4_ABS" && npm ci && npx lix download)
+  fi
   (cd "$AX4_ABS" && npx haxe build.hxml)
 fi
 [[ -f "$JAR" ]] || die "converter.jar not found in $AX4_ABS. Drop --no-build-ax4."

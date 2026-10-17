@@ -170,6 +170,14 @@ function Read-DecompiledBuildId {
     return $buildId
 }
 
+# The ax4 that convert runs: AX4_DIR, else the submodule.
+function Get-Ax4Head {
+    $dir = if ($env:AX4_DIR) { $env:AX4_DIR } else { Join-Path $Root "submodules\ax4" }
+    $sha = git -C $dir rev-parse HEAD 2>$null
+    if ($LASTEXITCODE -eq 0) { return $sha.Trim() }
+    ""
+}
+
 function Get-SiblingHead([string]$Name) {
     $dir = Join-Path (Split-Path -Parent $Root) $Name
     if (Test-Path -LiteralPath (Join-Path $dir ".git")) {
@@ -189,7 +197,7 @@ date=$StampDate
 buildid=$Id
 reasons=$StampReasons
 jpexs=$(Get-SiblingHead 'jpexs-decompiler')
-ax4=$(Get-SiblingHead 'ax4')
+ax4=$(Get-Ax4Head)
 "@
     [System.IO.File]::WriteAllText($full, $text.TrimEnd() + "`n")
 }
@@ -573,7 +581,7 @@ function Invoke-Start([string[]]$Argv) {
 
     Write-Stamp $suffix $stampDate $buildId $reasons
     $jpexs = Get-SiblingHead "jpexs-decompiler"
-    $ax4 = Get-SiblingHead "ax4"
+    $ax4 = Get-Ax4Head
     $msg = @"
 Convert $stampDate b$buildId ($reasons)
 
