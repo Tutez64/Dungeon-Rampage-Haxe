@@ -283,7 +283,7 @@ jobs:
         id: cpp-cache
         with:
           path: bin/${{ inputs.platform }}/obj
-          key: cpp-obj-${{ inputs.platform }}-nolto-${{ hashFiles('project.xml', 'submodules/libhxcpp/**', 'submodules/hxscript/**', 'submodules/openfl/**', 'submodules/lime/**', 'submodules/swf/**', 'submodules/SteamWrap/**') }}-${{ hashFiles('src/**', 'src-steam/**', 'src-modding/**', 'compat/**', 'generated_swf_libraries.xml') }}
+          key: cpp-obj-${{ inputs.platform }}-nolto-${{ hashFiles('project.xml', 'submodules/libhxcpp/**', 'submodules/hxscript/**', 'submodules/openfl/**', 'submodules/lime/**', 'submodules/swf/**', 'submodules/SteamWrap/**') }}-${{ hashFiles('src/**', 'src-steam/**', 'src-modding/**', 'submodules/ax4/compat/**', 'generated_swf_libraries.xml') }}
           restore-keys: |
             cpp-obj-${{ inputs.platform }}-nolto-${{ hashFiles('project.xml', 'submodules/libhxcpp/**', 'submodules/hxscript/**', 'submodules/openfl/**', 'submodules/lime/**', 'submodules/swf/**', 'submodules/SteamWrap/**') }}-
 

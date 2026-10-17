@@ -133,7 +133,7 @@ A scriptable base is any eligible class that ships as **game or engine code**: D
 | --- | --- | --- |
 | `src/` | 35 packages incl. vendored `box2D`, `org`, `com`, `generatedCode` | in — the game |
 | `src-steam/` | `com.amanitadesign.steam` (FRESteamWorks shim, `if="cpp"`) | in — DRH code; `replace(FRESteamWorks, …)` intercepts Steam calls |
-| `compat/` | `compat.*` plus 15 **root-level** files (`ASCompat`, `ASDictionary`, `ASProxyBase`, …) | in — DRH code. Abstracts (`ASAny` / `ASObject` / `ASFunction`) and macros drop out via `eligible()` / `*.macro.hx` |
+| `submodules/ax4/compat` | `compat.*` plus 15 **root-level** files (`ASCompat`, `ASDictionary`, `ASProxyBase`, …) | in — DRH code. Abstracts (`ASAny` / `ASObject` / `ASFunction`) and macros drop out via `eligible()` / `*.macro.hx` |
 | `submodules/openfl` | `openfl` | in — display list (`Sprite`, `MovieClip`, `Bitmap`, `TextField`, …) |
 | `submodules/lime` | `lime` | in — windows / input / timing |
 | `submodules/swf` | `swf` | in — Animate symbols and timelines |
@@ -170,7 +170,7 @@ Do not hand out internal instances as the stable API. A HUD that peeks `actor.He
 
 Explicit `replace(HostClass, Sub)` so host `new HostClass(...)` constructs the subclass. **`extend` is not `replace`.** `class HudIcon extends Sprite` is a widget; it does not steal OpenFL's `new Sprite()`. Only `replace(Sprite, …)` would. Same rule for every type, including OpenFL/Lime: no special blacklist.
 
-Disjoint-method merge lives in hxScript; DRH calls `replace` and gets one class or a conflict. A `new` rewrite does not see dynamic instantiation. DRH's own goes through **`ASCompat.createInstance`** (`compat/ASCompat.hx`): `AssetRepository`, the loading clip, the skip button, every `var X:Dynamic = SomeClass` pattern. The host makes `createInstance` consult the same `replace` table. That function is `inline`, so the lookup goes **into its body**; a runtime wrap would miss every already-inlined call site. Outside: Lime's `Type.createInstance` (e.g. `AnimateLibrary` from the asset manifest) — `extends` works, `replace` does not.
+Disjoint-method merge lives in hxScript; DRH calls `replace` and gets one class or a conflict. A `new` rewrite does not see dynamic instantiation. DRH's own goes through **`ASCompat.createInstance`** (`submodules/ax4/compat/ASCompat.hx`): `AssetRepository`, the loading clip, the skip button, every `var X:Dynamic = SomeClass` pattern. The host makes `createInstance` consult the same `replace` table. That function is `inline`, so the lookup goes **into its body**; a runtime wrap would miss every already-inlined call site. Outside: Lime's `Type.createInstance` (e.g. `AnimateLibrary` from the asset manifest) — `extends` works, `replace` does not.
 
 - Off by default: a type is replaceable because a mod registered it, not because it is scriptable or because a script `extend`s it.
 - Any number of mods may `extend` without `replace`. Several `replace` on the same base are OK if rewritten methods/fields/`new` do not overlap. Overlap → error or explicit priority. Residual risk: `A.update` can call `this.onWeaponDown()` and hit `B`'s override on the same instance. A wrap/`callNext` chain is how you *intentionally* stack one method. Out of scope to prove disjoint `this` use statically.
@@ -519,7 +519,7 @@ Intended game build flags (`hxscript` = **our fork**):
 -D scriptable
 -D hxscript_verbose                                         # the CI log is where a skipped module is explained
 -D hxscript_host=modding
--D hxscript_bridge_classpath=src,src-steam,compat,src-modding   # classpath entries walked with an empty package
+-D hxscript_bridge_classpath=src,src-steam,submodules/ax4/compat,src-modding   # classpath entries walked with an empty package
 -D hxscript_bridge_exclude=DungeonBustersProject,...        # value in project.xml, explained below
 -D hxscript_bridge_packages=openfl,lime,swf,steamwrap       # stock; whole trees until measured
 -D hxscript_bridge_eager                                     # type each bridge before the next: hundreds of bases overflow the compiler otherwise
@@ -529,7 +529,7 @@ Intended game build flags (`hxscript` = **our fork**):
 -D hxscript_keep=cpp.vm.Gc,cpp.vm.Profiler                  # cpp.* by name (package has objc / link)
 ```
 
-**Bridge scan (fork).** Submodules each have one root package, so stock `-D hxscript_bridge_packages=openfl,lime,swf,steamwrap` covers them (recursive; presets' ignore lists do not apply). DRH's own roots need a **classpath-entry scan** — walking the empty root would include the std — so the pinned fork has `-D hxscript_bridge_classpath=src,src-steam,compat,src-modding` and `-D hxscript_bridge_exclude`. `src-modding` is the cpp-only host (`modding.Mod`). Necessity is `compat/` (root-level types no package scan can reach); for `src/` alone a 35-package list would do. The define names **classpath entries** walked with an **empty package**, not a package called `src` (`modulesUnder("src")` would look for `src/src/` and emit `src.actor.Hero`). The walk skips `*.macro.hx`. `-D hxscript_host=modding` stays upstream's meaning: packages scanned for `@:scriptAmbient` / `@:scriptStatic`. `-D scriptable` is hxcpp's cppia flag; it does not generate extend bridges.
+**Bridge scan (fork).** Submodules each have one root package, so stock `-D hxscript_bridge_packages=openfl,lime,swf,steamwrap` covers them (recursive; presets' ignore lists do not apply). DRH's own roots need a **classpath-entry scan** — walking the empty root would include the std — so the pinned fork has `-D hxscript_bridge_classpath=src,src-steam,submodules/ax4/compat,src-modding` and `-D hxscript_bridge_exclude`. `src-modding` is the cpp-only host (`modding.Mod`). Necessity is `submodules/ax4/compat` (root-level types no package scan can reach); for `src/` alone a 35-package list would do. The define names **classpath entries** walked with an **empty package**, not a package called `src` (`modulesUnder("src")` would look for `src/src/` and emit `src.actor.Hero`). The walk skips `*.macro.hx`. `-D hxscript_host=modding` stays upstream's meaning: packages scanned for `@:scriptAmbient` / `@:scriptStatic`. `-D scriptable` is hxcpp's cppia flag; it does not generate extend bridges.
 
 What the first cppia build does not compile:
 

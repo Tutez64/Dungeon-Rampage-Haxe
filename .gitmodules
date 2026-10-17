@@ -19,3 +19,6 @@
 [submodule "mods/api"]
 	path = mods/api
 	url = https://github.com/Tutez64/DRH-Mod-API
+[submodule "submodules/ax4"]
+	path = submodules/ax4
+	url = https://github.com/Tutez64/ax4
