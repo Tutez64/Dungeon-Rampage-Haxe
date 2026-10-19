@@ -108,7 +108,7 @@ v1 does **not** warn or block those three paths in the index, the launcher, or t
 
 DRHL shows this **once** (launcher config) the first time the user would actually use mods: first install or enable, or first Play with a non-empty `enabled.json`. Do not nag every launch. **`--play`** with a non-empty `enabled.json` and no confirmation yet opens the **full UI** with the notice; confirming it plays. Browsing the catalog does not require it. Not an EULA lecture: one line per point.
 
-1. **Code in-process.** It runs inside the game, with the game's access to the computer. Catalog mods have public code, one click from their page, and a human review, which is not a proof. Sideload is not reviewed.
+1. **Code in-process.** It runs inside the game, with the game's access to the computer. Catalog mods are open source, one click from their page, and get a human review, which is not a proof. Sideload is not reviewed.
 2. **Servers.** The same as DRH alone. No promise about bans either way.
 3. **Updates and clashes.** A DRH update can break a mod; some mods may not work together.
 4. **Back to vanilla.** Disable them. Nothing is written into `current/`.
@@ -428,7 +428,7 @@ A mod's repository **is** its folder: `mod.json`, `src/`, `Resources/` (when the
 
 `README.md` is also the long description, shown on the mod's page in the launcher. HTML comments, invisible on GitHub, pick what the launcher shows: `<!-- drh:show -->` … `<!-- /drh:show -->` keeps only those zones (several allowed, joined in order), and `<!-- drh:hide -->` … `<!-- /drh:hide -->` drops one, inside a shown zone too. Without a shown zone, the whole file is shown, minus its hidden zones. The page always shows `description` above it, so an empty shown zone (`<!-- drh:show --><!-- /drh:show -->`) leaves just that. Zones do not nest, except a hidden one inside a shown one; an unclosed or misplaced marker fails `--check-mod`. What is shown is Markdown, at most 4000 characters. It need not say it is a DRH mod: the catalog says so, and GitHub shows the repository's name and topic.
 
-A mod runs combined with DRH and `api` (GPLv3), so its license must be GPL-compatible (GPL, LGPL, MIT, BSD, Apache 2.0, MPL 2.0, …). A reviewer checks it at an `id`'s first entry and whenever `LICENSE` changes.
+A mod builds on `api` and runs combined with it and with DRH's own code, all GPLv3, so its license must be GPL-compatible (GPL, LGPL, MIT, BSD, Apache 2.0, MPL 2.0, …). A reviewer checks it at an `id`'s first entry and whenever `LICENSE` changes.
 
 `DRH-Mods-Template` is the skeleton: `mod.json`, `src/Main.hx` (`class Main extends mods.api.Mod`), `README.md` (a placeholder: a shown zone to fill, and a pointer to [Making a mod](making-a-mod.md), the modders' steps; `--check-mod` refuses it while the shown zone keeps the template's sentence), `LICENSE` (GPLv3, as DRH and `api`), and `.github/workflows/release.yml`, which only calls the reusable workflow of `Tutez64/DRH-Mods-Workflows`, pinned to its moving major tag (`@v1`, moved along its `v1.x.y` releases): fixes reach every mod, only a breaking change needs a new major. Nothing else is copied into a mod, so nothing there needs updating. It runs as is, as `my_mod` (its `Main` logs `loaded`): the `id` is only in `mod.json` and in the `package` line of `src/Main.hx`. It is a GitHub template repository: until `--new-mod` exists, *Use this template* gives the fresh history, and the author changes both by hand.
 
