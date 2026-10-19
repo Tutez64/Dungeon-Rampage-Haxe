@@ -106,14 +106,13 @@ v1 does **not** warn or block those three paths in the index, the launcher, or t
 
 ## First-run disclosure
 
-DRHL shows this **once** (launcher config) the first time the user would actually use mods: first enable, or first Play with a non-empty `enabled.json`. Do not nag every launch. **`--play`** with a non-empty `enabled.json` and no confirmation yet opens the **full UI**, like an available update. Browsing the catalog does not require it. Not an EULA lecture: one line that DRH is already a modified client is enough.
+DRHL shows this **once** (launcher config) the first time the user would actually use mods: first install or enable, or first Play with a non-empty `enabled.json`. Do not nag every launch. **`--play`** with a non-empty `enabled.json` and no confirmation yet opens the **full UI** with the notice; confirming it plays. Browsing the catalog does not require it. Not an EULA lecture: one line per point.
 
-1. **Code in-process.** Haxe/cppia inside the game, not a skin pack. Index review is human, not a proof. Sideload is weaker.
-2. **Official servers.** Same as vanilla DRH. No promise about bans either way.
-3. **Updates.** Mods follow the `api` mod's major version. `extends` / `replace` can also break on any DRH update. A modded session is not supported like vanilla.
-4. **Several mods.** `replace` on the same rewritten surface can clash. Load order is in the launcher.
-5. **Back to vanilla.** Disable all mods / Play with an empty list. Nothing is written into `current/`.
-6. **EULA / blessing.** Like DRH, this is not the official Steam client; rights holders do not endorse it.
+1. **Code in-process.** It runs inside the game, with the game's access to the computer. Catalog mods have public code, one click from their page, and a human review, which is not a proof. Sideload is not reviewed.
+2. **Servers.** The same as DRH alone. No promise about bans either way.
+3. **Updates and clashes.** A DRH update can break a mod; some mods may not work together.
+4. **Back to vanilla.** Disable them. Nothing is written into `current/`.
+5. **EULA / blessing.** Like DRH, mods are not made or endorsed by the rights holders.
 
 ## API surface
 
