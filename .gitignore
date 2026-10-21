@@ -3,6 +3,7 @@ out
 dist
 edits/conversion/.tmp
 /mods/last-run.json
+/mods/data/
 __pycache__/
 /export_classes.info
 profiling

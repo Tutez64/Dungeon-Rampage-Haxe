@@ -32,6 +32,7 @@ The game owns the runtime. The launcher owns the folder, enablement, and launch.
 | Mod page in the launcher | decided | `description` above the long description: the index entry's `longDescription`, else the shown zone of `README.md` ([Mod repository](#mod-repository)). The rest is DRH Launcher's. |
 | Mod repository and publishing | decided | Repo = mod folder from `DRH-Mods-Template`, DRH Launcher commands for every step (checks implemented once, also run by the index CI), `vX.Y.Z` tags, flat zip, PR to the index with git. [Mod repository](#mod-repository) |
 | Thunderstore / Nexus / itch as mirrors | open | Optional later; must not replace `mod.json` or the index. |
+| Mod settings | open | After DR 1.0's new settings screen, which mods should extend. A mod keeps its own in its `data` folder meanwhile. |
 | Resource overlay rules | open | Until DR's Starling update, a mod's `Resources/` are its own files only, read from that folder; overriding the game's assets (precedence, SWF vs JSON, `Locale/` merge) comes after. |
 | Type blacklist | decided | None. Interpreted and compiled see the same types. [Compilation](#compilation) |
 | Host build (cppia) | decided | `-dce no`, force-include std, patch hxcpp, JIT on, verbose log, `HXCPP_CHECK_POINTER`. [Compilation](#compilation) |
@@ -238,11 +239,11 @@ Subscribe from `onInit` or `onReady` with `ModContext.on<Event>(handler)` (`onHe
 | `townEnter` / `townExit` | — | `TownState` entered / left, including `ReloadTownState`. |
 | `keyDown` | key code | A key goes down: once per press, not while a text field (chat) has focus. A handler returning `true` keeps the key: the game never sees that press (its shortcuts, OpenFL's Tab focus, repeats, release). |
 
-`ModContext`: overlay layer and view size, its `Resources/` folder (`resources`), log, `replace`, these subscriptions, `facade` (from `onReady`, a host type), and `alive`, false once the mod failed, so another mod holding handlers for it stops calling them.
+`ModContext`: overlay layer and view size, its `Resources/` folder (`resources`), its folder to write in (`data`), log, `replace`, these subscriptions, `facade` (from `onReady`, a host type), and `alive`, false once the mod failed, so another mod holding handlers for it stops calling them.
 
 ### The `api` mod
 
-`mods.api.*`, loaded before every other mod. `mods.api.Mod` hands its own context: overlay layer, view size, its `Resources/` folder, log, `tablesLoaded`, `townEnter` / `townExit`, `keyDown`, the hero and floor events with wrappers, and the raw core `ModContext` (`core`, an `extends` use). Its subscriptions hold the subscriber's `ModContext`: a handler of a failed mod is no longer called (`alive`), and a handler's throw is logged under that mod.
+`mods.api.*`, loaded before every other mod. `mods.api.Mod` hands its own context: overlay layer, view size, its `Resources/` folder, its folder to write in, log, `tablesLoaded`, `townEnter` / `townExit`, `keyDown`, the hero and floor events with wrappers, and the raw core `ModContext` (`core`, an `extends` use). Its subscriptions hold the subscriber's `ModContext`: a handler of a failed mod is no longer called (`alive`), and a handler's throw is logged under that mod.
 
 Its types sit by what they read: `mods.api` (`Mod`, `Context`, `State`, `Subscription`), `mods.api.dungeon` (`Floor`, `Hero`, `Player`), `mods.api.account` (`Account`, `Inventory`, `OwnedHero`, `Pet`, `Stack`, `Weapon`). `mods.api._internal` is the `api` mod's own plumbing: not API, not covered by its version.
 
@@ -265,6 +266,8 @@ Mods live outside `Dungeon Rampage Haxe/current/`, so they survive updates and r
   mods/
     enabled.json      # launcher-owned: enabled ids, the user's load order
     last-run.json     # game-owned: last session outcome per mod
+    data/
+      some_mod/       # what the mod writes (ctx.data), kept through updates and uninstall
     some_mod/         # folder name = id
       mod.json
       src/            # .hx sources; package mods.some_mod (+ subfolders); no import.hx
@@ -372,7 +375,7 @@ Shared launcher/game contract.
 
 | Field | Role |
 | --- | --- |
-| `id` | Stable identifier, install folder, and the mod's **package**: every source file is in `mods.<id>` or a sub-package. Must match `^[a-z][a-z0-9_]{1,62}[a-z0-9]$` (3–64, snake_case, letter start, no trailing underscore) and must **not** be a Haxe keyword or a Windows reserved device name. Index CI, launcher install, and host skip all apply the same regex + lists. Display name stays in `name`. |
+| `id` | Stable identifier, install folder, and the mod's **package**: every source file is in `mods.<id>` or a sub-package. Must match `^[a-z][a-z0-9_]{1,62}[a-z0-9]$` (3–64, snake_case, letter start, no trailing underscore) and must **not** be a Haxe keyword, a Windows reserved device name, or `data` (the mods folder's `data/`, where each mod writes). Index CI, launcher install, and host skip all apply the same regex + lists. Display name stays in `name`. |
 | `name` | Display name, at most 64 characters. |
 | `description` | One line for the catalog, at most 120 characters. |
 | `version` | `MAJOR.MINOR.PATCH`, digits only. Semver over what other mods may rely on. |

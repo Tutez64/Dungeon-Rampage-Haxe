@@ -48,6 +48,9 @@ class Host {
 
 	static inline final MODS_DIR_ARGUMENT = "--mods-dir";
 
+	/** Where each mod writes, by id; a reserved id, so never a mod's folder. */
+	static inline final MOD_DATA = "data";
+
 	/** The official mod every other one builds on. Its entry is the only one extending `modding.Mod` directly. */
 	static inline final API_ID = "api";
 
@@ -747,7 +750,7 @@ class Host {
 			}
 			record.instance = instance;
 			record.layer = createLayer(record.id);
-			record.context = new ModContext(record.id, record.layer, record.directory + "/Resources");
+			record.context = new ModContext(record.id, record.layer, record.directory + "/Resources", modsRoot + "/" + MOD_DATA + "/" + record.id);
 			try {
 				instance.onInit(record.context);
 			} catch (e:Dynamic) {
@@ -1071,7 +1074,7 @@ class Host {
 	}
 
 	static function isReserved(id:String):Bool {
-		if (id == "con" || id == "prn" || id == "aux" || id == "nul")
+		if (id == MOD_DATA || id == "con" || id == "prn" || id == "aux" || id == "nul")
 			return true;
 		if (id.length != 4)
 			return false;

@@ -24,6 +24,14 @@ class ModContext {
 	 */
 	public var resources(default, null):String;
 
+	/**
+	 * This mod's folder to write in, absolute and without a trailing slash: `data/<id>/` in the mods
+	 * folder, created on first read. Kept when the mod is updated or uninstalled.
+	 */
+	public var data(get, never):String;
+
+	var dataPath:String;
+
 	/** Size of the game's view in overlay coordinates. 0 before `onReady`. */
 	public var viewWidth(get, never):Float;
 
@@ -41,10 +49,17 @@ class ModContext {
 	var id:String;
 
 	@:allow(modding.Host)
-	function new(id:String, overlay:Sprite, resources:String) {
+	function new(id:String, overlay:Sprite, resources:String, data:String) {
 		this.id = id;
 		this.overlay = overlay;
 		this.resources = resources;
+		this.dataPath = data;
+	}
+
+	function get_data():String {
+		if (!sys.FileSystem.exists(dataPath))
+			sys.FileSystem.createDirectory(dataPath);
+		return dataPath;
 	}
 
 	function get_viewWidth():Float {

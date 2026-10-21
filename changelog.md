@@ -8,7 +8,8 @@ At tag time, copy these sections into the GitHub release notes under `Changelog`
   their startup and shutdown hooks. A mod that fails, or whose dependency
   fails, is silenced without stopping the others. The session writes
   `mods/last-run.json`. A mod reads its own files from its `Resources/`
-  folder; they do not replace the game's. `replace` is not available
+  folder; they do not replace the game's. It writes in its own `data/<id>/`
+  folder, kept when it is updated or uninstalled. `replace` is not available
   yet.
 - Mods build on the official `api` mod, released on its own: players in a
   dungeon (hero, level, weapons), the account (currencies, trophies, and its
