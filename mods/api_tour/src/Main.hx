@@ -47,6 +47,7 @@ class Main extends Mod {
 		check("init: account empty", ctx.state.account == null);
 		check("init: no floor", ctx.state.floor == null);
 		check("init: no heroes", ctx.state.heroes.length == 0);
+		check("init: reads its own resources", sys.io.File.getContent(ctx.resources + "/tour.txt") == "api_tour\n");
 
 		var cancelled:Subscription = ctx.onTownEnter(function() cancelledCalls++);
 		check("subscription starts active", cancelled.active);

@@ -17,6 +17,13 @@ class ModContext {
 	/** This mod's layer of the overlay, above the letterbox and stacked in load order. Removed if the mod fails. */
 	public var overlay(default, null):Sprite;
 
+	/**
+	 * This mod's `Resources/` folder, absolute and without a trailing slash, where it reads its own
+	 * files; the only ones its release holds besides its code. It may not exist. They never replace the
+	 * game's.
+	 */
+	public var resources(default, null):String;
+
 	/** Size of the game's view in overlay coordinates. 0 before `onReady`. */
 	public var viewWidth(get, never):Float;
 
@@ -34,9 +41,10 @@ class ModContext {
 	var id:String;
 
 	@:allow(modding.Host)
-	function new(id:String, overlay:Sprite) {
+	function new(id:String, overlay:Sprite, resources:String) {
 		this.id = id;
 		this.overlay = overlay;
+		this.resources = resources;
 	}
 
 	function get_viewWidth():Float {

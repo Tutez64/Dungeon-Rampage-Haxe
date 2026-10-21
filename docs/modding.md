@@ -32,7 +32,7 @@ The game owns the runtime. The launcher owns the folder, enablement, and launch.
 | Mod page in the launcher | decided | `description` above the long description: the index entry's `longDescription`, else the shown zone of `README.md` ([Mod repository](#mod-repository)). The rest is DRH Launcher's. |
 | Mod repository and publishing | decided | Repo = mod folder from `DRH-Mods-Template`, DRH Launcher commands for every step (checks implemented once, also run by the index CI), `vX.Y.Z` tags, flat zip, PR to the index with git. [Mod repository](#mod-repository) |
 | Thunderstore / Nexus / itch as mirrors | open | Optional later; must not replace `mod.json` or the index. |
-| Resource overlay rules | open | `Resources/` is composited at runtime; precedence, SWF vs JSON, and `Locale/` merge are unspecified. No separate `locale/` tree. |
+| Resource overlay rules | open | Until DR's Starling update, a mod's `Resources/` are its own files only, read from that folder; overriding the game's assets (precedence, SWF vs JSON, `Locale/` merge) comes after. |
 | Type blacklist | decided | None. Interpreted and compiled see the same types. [Compilation](#compilation) |
 | Host build (cppia) | decided | `-dce no`, force-include std, patch hxcpp, JIT on, verbose log, `HXCPP_CHECK_POINTER`. [Compilation](#compilation) |
 | Mod `id` and zip extract | decided | `id` = folder = package `mods.<id>`. Regex + keyword/reserved-name lists. No zip-slip, no size cap. [`mod.json`](#modjson) |
@@ -238,11 +238,11 @@ Subscribe from `onInit` or `onReady` with `ModContext.on<Event>(handler)` (`onHe
 | `townEnter` / `townExit` | — | `TownState` entered / left, including `ReloadTownState`. |
 | `keyDown` | key code | A key goes down: once per press, not while a text field (chat) has focus. A handler returning `true` keeps the key: the game never sees that press (its shortcuts, OpenFL's Tab focus, repeats, release). |
 
-`ModContext`: overlay layer and view size, log, `replace`, these subscriptions, `facade` (from `onReady`, a host type), and `alive`, false once the mod failed, so another mod holding handlers for it stops calling them.
+`ModContext`: overlay layer and view size, its `Resources/` folder (`resources`), log, `replace`, these subscriptions, `facade` (from `onReady`, a host type), and `alive`, false once the mod failed, so another mod holding handlers for it stops calling them.
 
 ### The `api` mod
 
-`mods.api.*`, loaded before every other mod. `mods.api.Mod` hands its own context: overlay layer, view size, log, `tablesLoaded`, `townEnter` / `townExit`, `keyDown`, the hero and floor events with wrappers, and the raw core `ModContext` (`core`, an `extends` use). Its subscriptions hold the subscriber's `ModContext`: a handler of a failed mod is no longer called (`alive`), and a handler's throw is logged under that mod.
+`mods.api.*`, loaded before every other mod. `mods.api.Mod` hands its own context: overlay layer, view size, its `Resources/` folder, log, `tablesLoaded`, `townEnter` / `townExit`, `keyDown`, the hero and floor events with wrappers, and the raw core `ModContext` (`core`, an `extends` use). Its subscriptions hold the subscriber's `ModContext`: a handler of a failed mod is no longer called (`alive`), and a handler's throw is logged under that mod.
 
 Its types sit by what they read: `mods.api` (`Mod`, `Context`, `State`, `Subscription`), `mods.api.dungeon` (`Floor`, `Hero`, `Player`), `mods.api.account` (`Account`, `Inventory`, `OwnedHero`, `Pet`, `Stack`, `Weapon`). `mods.api._internal` is the `api` mod's own plumbing: not API, not covered by its version.
 
@@ -270,13 +270,13 @@ Mods live outside `Dungeon Rampage Haxe/current/`, so they survive updates and r
       src/            # .hx sources; package mods.some_mod (+ subfolders); no import.hx
         Main.hx       #   package mods.some_mod;
         ui/Panel.hx   #   package mods.some_mod.ui;
-      Resources/      # non-destructive overlay (including Locale/)
+      Resources/      # the mod's own files, read from ctx.resources
       README.md       # long description
 ```
 
 `<install-dir>` is the launcher managed content root (not the launcher executable). Linux default looks like `~/.local/share/DRH Launcher`.
 
-**No destructive overlay** in `current/Resources/`. The game composites mod resources over vanilla at runtime. The launcher does not copy, patch, or verify files inside the game install. Merge rules are still [open](#open-decisions).
+**No destructive overlay** in `current/Resources/`. A mod reads its own files from its `Resources/` (`resources` in its context); they do not replace the game's ([open](#open-decisions)). The launcher does not copy, patch, or verify files inside the game install.
 
 ## Passing the list
 

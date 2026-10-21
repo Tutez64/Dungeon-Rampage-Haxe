@@ -747,7 +747,7 @@ class Host {
 			}
 			record.instance = instance;
 			record.layer = createLayer(record.id);
-			record.context = new ModContext(record.id, record.layer);
+			record.context = new ModContext(record.id, record.layer, record.directory + "/Resources");
 			try {
 				instance.onInit(record.context);
 			} catch (e:Dynamic) {
