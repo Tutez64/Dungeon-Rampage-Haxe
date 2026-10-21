@@ -29,7 +29,7 @@ The game owns the runtime. The launcher owns the folder, enablement, and launch.
 | Trust for updates | decided | Trust artifacts (`id` + version + SHA-256), not author repos. |
 | v1 discovery UI | decided | Minimal catalog in DRHL, same index a later site can reuse. |
 | Index schema | decided | `Tutez64/DRH-Mods-Index`, served by GitHub Pages; one file per version, a merged entry only gets `yanked`. [Index entry](#index-entry) |
-| Mod page in the launcher | open | What it shows is undecided, beyond `description` above the long description. The long description (`README.md` and its markers) is a draft: [Mod repository](#mod-repository). |
+| Mod page in the launcher | decided | `description` above the long description: the index entry's `longDescription`, else the shown zone of `README.md` ([Mod repository](#mod-repository)). The rest is DRH Launcher's. |
 | Mod repository and publishing | decided | Repo = mod folder from `DRH-Mods-Template`, DRH Launcher commands for every step (checks implemented once, also run by the index CI), `vX.Y.Z` tags, flat zip, PR to the index with git. [Mod repository](#mod-repository) |
 | Thunderstore / Nexus / itch as mirrors | open | Optional later; must not replace `mod.json` or the index. |
 | Resource overlay rules | open | `Resources/` is composited at runtime; precedence, SWF vs JSON, and `Locale/` merge are unspecified. No separate `locale/` tree. |
@@ -583,7 +583,7 @@ Needed before a real host; not a restatement of the rules above.
 2. **Done.** hxcpp cppia patch.
 3. **Done.** The flags above are in `project.xml`.
 4. **Done**, except `replace`. `src-modding/` loads `--mods-dir` into one world, runs the lifecycle, re-registers the overlay, and bakes the release tag (no `V`) into the host. `uncaughtError` and the mod `exiting` listener sit at the top of the constructor. Still later: `ASCompat.createInstance` consulting the `replace` table, once the fork has `replace`.
-5. Launcher: index fetch, catalog install, `enabled.json`, `--mods-dir`, `last-run.json` display — no destructive overlay. **Done**: the modders' commands, `--new-mod` to `--submit-mod`, in the `0.4.0` pre-releases. With `0.4.0`, the CI of 6 and 8 goes back to the latest release (`v1` moved); until then it takes the most recent, a pre-release included.
+5. **Done.** Launcher, in the `0.4.0` pre-releases: the Mods page (catalog and installed mods, install with dependencies from the index, a zip or a repository link, `enabled.json` and load order, `--mods-dir`, `last-run.json` display; no destructive overlay), and the modders' commands, `--new-mod` to `--submit-mod`. With `0.4.0`, the CI of 6 and 8 goes back to the latest release (`v1` moved); until then it takes the most recent, a pre-release included.
 6. **Done.** `Tutez64/DRH-Mods-Index`: README, licenses, owner, its CI, which runs the launcher with `--check-entry`.
 7. **Done.** The `api` mod has its repository, pinned as `mods/api` ([Versioning](#versioning)). The wrappers live in the `api` mod, core events hand game objects, dependency failures propagate.
 8. **Done.** `DRH-Mods-Template`, and `DRH-Mods-Workflows`, which runs the launcher with `--pack-mod`.
