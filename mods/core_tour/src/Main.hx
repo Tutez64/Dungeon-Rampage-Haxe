@@ -11,7 +11,9 @@ import mods.api.Mod;
 /**
  * Checks what the core's generic events promise (docs/modding.md, lifecycle): nothing before `ready`,
  * each object ready once, an actor never before its floor, an object still whole while it goes, fields
- * only for ready objects, and a state machine's enter and exit in step. Events are many, so it counts
+ * only for ready objects, and a state machine's enter and exit in step. The server may create a new
+ * object with the id of one it removed, so objects are told apart by identity, and an id is only
+ * checked to be held by one live object at a time. Events are many, so it counts
  * them and logs `ok` or `FAIL` per rule at `dispose`, with the first breach.
  */
 class Main extends Mod {
@@ -19,11 +21,17 @@ class Main extends Mod {
 
 	var readySeen:Bool = false;
 
-	/** Ready and not gone, by id. */
-	var live:Map<String, Bool> = new Map();
+	/** Ready and not gone. */
+	var live:haxe.ds.ObjectMap<GameObject, Bool> = new haxe.ds.ObjectMap();
 
-	/** Every id ever ready, to catch one announced twice. */
-	var seen:Map<String, Bool> = new Map();
+	/** Every object ever ready, to catch one announced twice. */
+	var seen:haxe.ds.ObjectMap<GameObject, Bool> = new haxe.ds.ObjectMap();
+
+	/** The live object holding each id. */
+	var holders:Map<String, GameObject> = new Map();
+
+	/** Every id ever ready, to count those a later object takes again. */
+	var idsSeen:Map<String, Bool> = new Map();
 
 	var counts:Map<String, Int> = new Map();
 
@@ -36,6 +44,7 @@ class Main extends Mod {
 		for (rule in [
 			"nothing before ready",
 			"ready once",
+			"one live object per id",
 			"actor after its floor",
 			"gone only once ready",
 			"gone while whole",
@@ -61,7 +70,7 @@ class Main extends Mod {
 			core.log(breach == null ? "ok   " + rule : "FAIL " + rule + ": " + breach);
 		}
 		var parts = [];
-		for (event in ["ready", "gone", "fields", "states"])
+		for (event in ["ready", "gone", "fields", "states", "ids reused"])
 			parts.push(event + " " + count(event));
 		core.log(parts.join(", "));
 	}
@@ -70,26 +79,34 @@ class Main extends Mod {
 		bump("ready");
 		check("nothing before ready", readySeen, "an object before ready");
 		var key = keyOf(object);
-		check("ready once", !seen.exists(key), key + " twice");
-		seen.set(key, true);
-		live.set(key, true);
+		check("ready once", !seen.exists(object), key + " twice");
+		var holder = holders.get(key);
+		check("one live object per id", holder == null, key + " held by two objects");
+		if (!seen.exists(object) && holder == null && idsSeen.exists(key))
+			bump("ids reused");
+		seen.set(object, true);
+		live.set(object, true);
+		holders.set(key, object);
+		idsSeen.set(key, true);
 		if (Std.isOfType(object, ActorGameObject)) {
 			var floor = (cast object : ActorGameObject).distributedDungeonFloor;
-			check("actor after its floor", floor == null || live.exists(keyOf(floor)), key + " before its floor");
+			check("actor after its floor", floor == null || live.exists(floor), key + " before its floor");
 		}
 	}
 
 	function objectGone(object:GameObject):Void {
 		bump("gone");
 		var key = keyOf(object);
-		check("gone only once ready", live.exists(key), key);
+		check("gone only once ready", live.exists(object), key);
 		check("gone while whole", !object.isDestroyed, key + " already destroyed");
-		live.remove(key);
+		live.remove(object);
+		if (holders.get(key) == object)
+			holders.remove(key);
 	}
 
 	function fieldReceived(object:GameObject, field:UInt):Void {
 		bump("fields");
-		check("fields only for ready objects", live.exists(keyOf(object)), keyOf(object) + " field " + field);
+		check("fields only for ready objects", live.exists(object), keyOf(object) + " field " + field);
 	}
 
 	function stateEnter(machine:StateMachine, state:State):Void {
