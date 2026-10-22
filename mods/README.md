@@ -7,6 +7,7 @@ They test what DRH does: the host, the lifecycle, dependencies, the `api` mod, t
 | Id | Role | Expected in `last-run.json` |
 | --- | --- | --- |
 | `api_tour` | Uses every `mods.api` member and checks the contract. Each check logs `ok` or `FAIL`; the panel top-left shows the totals. | `ok` |
+| `core_tour` | Checks the core's generic events against their rules (nothing before `ready`, an actor after its floor, an object whole while it goes…). Logs `ok` or `FAIL` per rule at `dispose`, with the first breach. | `ok` |
 | `broken_init` | Subscribes, draws a red square, then throws in `init`. Nothing of it may show or fire afterwards. | `failed` |
 | `broken_static` | A static initialiser throws while the world starts. Never compiles, never reaches `init`; the other mods still compile. | `failed`, `static Main.value: thrown on purpose`, no `mode` |
 | `null_ready` | Calls a method on `null` in `ready`. `HXCPP_CHECK_POINTER` makes it a throw: the game keeps running; the mod goes quiet. | `failed`, `Null Object Reference` |

@@ -9,8 +9,10 @@ At tag time, copy these sections into the GitHub release notes under `Changelog`
   fails, is silenced without stopping the others. The session writes
   `mods/last-run.json`. A mod reads its own files from its `Resources/`
   folder; they do not replace the game's. It writes in its own `data/<id>/`
-  folder, kept when it is updated or uninstalled. `replace` is not available
-  yet.
+  folder, kept when it is updated or uninstalled. The game tells mods when any
+  of its objects is ready or gone, when the server updates one, and when it
+  changes state, so the `api` mod can grow without a new DRH release.
+  `replace` is not available yet.
 - Mods build on the official `api` mod, released on its own: players in a
   dungeon (hero, level, weapons), the account (currencies, trophies, and its
   inventory: weapons, pets and consumables in storage, and its heroes with
@@ -21,8 +23,8 @@ At tag time, copy these sections into the GitHub release notes under `Changelog`
   from the [DRH-Mods-Template](https://github.com/Tutez64/DRH-Mods-Template)
   repository to publishing the mod.
 - `mods/` holds an example mod that uses the whole `api` mod and checks it as
-  it runs, plus test mods for load, runtime and dependency failures. Run the
-  game with `--mods-dir` pointing at it.
+  it runs, plus test mods for the core's events and for load, runtime and
+  dependency failures. Run the game with `--mods-dir` pointing at it.
 - Release manifests now include the official Steam BuildID this version was
   converted from, so DRH Launcher can warn when official Dungeon Rampage has
   moved on.

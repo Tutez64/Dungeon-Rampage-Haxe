@@ -1,8 +1,11 @@
 package modding;
 
+import actor.ActorGameObject;
+import brain.gameObject.GameObject;
+import brain.stateMachine.State;
+import brain.stateMachine.StateMachine;
 import facade.DBFacade;
 import distributedObjects.DistributedDungeonFloor;
-import distributedObjects.HeroGameObject;
 import flash.display.Sprite;
 import flash.display.Stage;
 import haxe.Json;
@@ -17,26 +20,23 @@ import haxe.Json;
  */
 @:allow(DungeonBustersProject)
 @:allow(facade.DBFacade)
-@:allow(stateMachine.mainStateMachine.TownState)
-@:allow(distributedObjects.HeroGameObject)
-@:allow(distributedObjects.HeroGameObjectOwner)
-@:allow(distributedObjects.DistributedDungeonFloor)
+@:allow(networkCode.DcSocket)
+@:allow(actor.ActorGameObject)
+@:allow(brain.stateMachine.StateMachine)
 @:allow(modding.ModContext)
 @:allow(modding.ModSubscription)
 class Host {
-	static inline final HERO_SPAWNED = "heroSpawned";
+	static inline final OBJECT_READY = "objectReady";
 
-	static inline final HERO_DESPAWNED = "heroDespawned";
+	static inline final OBJECT_GONE = "objectGone";
 
-	static inline final FLOOR_ENTER = "floorEnter";
+	static inline final FIELD_RECEIVED = "fieldReceived";
 
-	static inline final FLOOR_EXIT = "floorExit";
+	static inline final STATE_ENTER = "stateEnter";
+
+	static inline final STATE_EXIT = "stateExit";
 
 	static inline final TABLES_LOADED = "tablesLoaded";
-
-	static inline final TOWN_ENTER = "townEnter";
-
-	static inline final TOWN_EXIT = "townExit";
 
 	static inline final KEY_DOWN = "keyDown";
 
@@ -92,14 +92,14 @@ class Host {
 
 	static var listeners:Map<String, Array<ModSubscription>> = new Map();
 
-	/** Heroes announced and not yet gone, by object id. */
-	static var heroes:Map<UInt, Bool> = new Map();
+	/** Game objects announced ready and not yet gone. */
+	static var announced:haxe.ds.ObjectMap<GameObject, Bool> = new haxe.ds.ObjectMap();
 
-	/** Floors announced and not yet gone, by object id. */
-	static var floors:Map<UInt, Bool> = new Map();
+	/** Ready before `onReady`, announced right after it, in order. */
+	static var early:Array<GameObject> = [];
 
-	/** Heroes initialised on a floor that has not been announced yet, released by its `floorEnter`. */
-	static var waiting:Array<WaitingHero> = [];
+	/** Actors ready on a floor that has not been announced yet, released by it. */
+	static var waiting:Array<ActorGameObject> = [];
 
 	static var world:hxscript.Environment;
 
@@ -177,6 +177,10 @@ class Host {
 				logNow("warn", summary(records[index]));
 		reportReady = true;
 		writeReport();
+		var ready = early;
+		early = [];
+		for (object in ready)
+			announce(object);
 	}
 
 	static function dispose():Void {
@@ -201,60 +205,90 @@ class Host {
 		emit(TABLES_LOADED, null);
 	}
 
-	static function townEnter():Void {
-		emit(TOWN_ENTER, null);
-	}
-
-	static function townExit():Void {
-		emit(TOWN_EXIT, null);
-	}
-
-	static function heroSpawned(hero:HeroGameObject, local:Bool):Void {
-		if (!booted || hero == null || heroes.exists(hero.id))
+	/**
+	 * A network object exists, generated and post-generated: ready, except an actor, which only is
+	 * once initialised (`actorReady`).
+	 */
+	static function objectCreated(object:GameObject):Void {
+		if (!booted || object == null || Std.isOfType(object, ActorGameObject))
 			return;
-		var floor = hero.distributedDungeonFloor;
-		if (floor != null && !floors.exists(floor.id)) {
-			for (entry in waiting)
-				if (entry.hero == hero)
-					return;
-			waiting.push({hero: hero, local: local, floor: floor});
+		announce(object);
+	}
+
+	/** An actor (hero, monster, NPC) has its data and its floor, and is initialised. */
+	static function actorReady(actor:ActorGameObject):Void {
+		if (!booted || actor == null)
+			return;
+		announce(actor);
+	}
+
+	/** Once per object; an actor waits for its floor, and everything for `onReady`. */
+	static function announce(object:GameObject):Void {
+		if (object.isDestroyed || announced.exists(object) || early.indexOf(object) >= 0 || waiting.indexOf(cast object) >= 0)
+			return;
+		if (!reportReady) {
+			early.push(object);
 			return;
 		}
-		heroes.set(hero.id, true);
-		emit(HERO_SPAWNED, hero);
+		if (Std.isOfType(object, ActorGameObject)) {
+			var actor:ActorGameObject = cast object;
+			var floor = actor.distributedDungeonFloor;
+			if (floor != null && !announced.exists(floor)) {
+				waiting.push(actor);
+				return;
+			}
+		}
+		announced.set(object, true);
+		emit(OBJECT_READY, object);
+		if (Std.isOfType(object, DistributedDungeonFloor) && waiting.length > 0) {
+			var released = waiting.filter(actor -> actor.distributedDungeonFloor == object);
+			waiting = waiting.filter(actor -> actor.distributedDungeonFloor != object);
+			for (actor in released)
+				announce(actor);
+		}
 	}
 
-	/** While the hero is still whole. */
-	static function heroDespawned(hero:HeroGameObject):Void {
-		if (!booted || hero == null)
+	/** At the start of a game object's `destroy()`, while it is whole; added by `Hooks`. */
+	static function gone(object:GameObject):Void {
+		if (!booted || object == null)
 			return;
-		waiting = waiting.filter(entry -> entry.hero != hero);
-		if (!heroes.exists(hero.id))
+		if (waiting.length > 0)
+			waiting = waiting.filter(actor -> actor != object && actor.distributedDungeonFloor != object);
+		if (early.length > 0)
+			early.remove(object);
+		if (!announced.exists(object))
 			return;
-		heroes.remove(hero.id);
-		emit(HERO_DESPAWNED, hero);
+		announced.remove(object);
+		emit(OBJECT_GONE, object);
 	}
 
-	static function floorEnter(floor:DistributedDungeonFloor):Void {
-		if (!booted || floor == null || floors.exists(floor.id))
+	/** The server set a field or called a method on the object `doId`: only while someone listens. */
+	static function fieldReceived(doId:UInt, field:UInt):Void {
+		if (!booted || facade == null || !listened(FIELD_RECEIVED))
 			return;
-		floors.set(floor.id, true);
-		emit(FLOOR_ENTER, floor);
-		var released = waiting.filter(entry -> entry.floor == floor);
-		waiting = waiting.filter(entry -> entry.floor != floor);
-		for (entry in released)
-			if (!entry.hero.isDestroyed)
-				heroSpawned(entry.hero, entry.local);
+		var object = facade.gameObjectManager.getReferenceFromId(doId);
+		if (object == null)
+			return;
+		object = object.getTrueObject();
+		if (announced.exists(object))
+			emit(FIELD_RECEIVED, {object: object, field: field});
 	}
 
-	static function floorExit(floor:DistributedDungeonFloor):Void {
-		if (!booted || floor == null)
-			return;
-		waiting = waiting.filter(entry -> entry.floor != floor);
-		if (!floors.exists(floor.id))
-			return;
-		floors.remove(floor.id);
-		emit(FLOOR_EXIT, floor);
+	/** After `state` entered; not before `onReady`. */
+	static function stateEntered(machine:StateMachine, state:State):Void {
+		if (reportReady && listened(STATE_ENTER))
+			emit(STATE_ENTER, {machine: machine, state: state});
+	}
+
+	/** Before `state` exits; not before `onReady`. */
+	static function stateExited(machine:StateMachine, state:State):Void {
+		if (reportReady && listened(STATE_EXIT))
+			emit(STATE_EXIT, {machine: machine, state: state});
+	}
+
+	static function listened(event:String):Bool {
+		var list = listeners.get(event);
+		return list != null && list.length > 0;
 	}
 
 	static function modLog(id:String, message:String):Void {
@@ -1230,12 +1264,6 @@ private class ModRecord {
 		this.id = id;
 		this.status = status;
 	}
-}
-
-private typedef WaitingHero = {
-	var hero:HeroGameObject;
-	var local:Bool;
-	var floor:DistributedDungeonFloor;
 }
 
 private typedef LogLine = {

@@ -31,6 +31,8 @@
 	<haxeflag name="--macro" value="include('haxe', true, ['haxe.macro', 'haxe.atomic.AtomicObject'])" if="cpp" />
 	<haxeflag name="--macro" value="include('sys', true, ['sys.db'])" if="cpp" />
 	<haxedef name="hxscript_bridge_eager" if="cpp" />
+	<!-- Each game object's destroy() tells the mods first, while the object is whole. -->
+	<haxeflag name="--macro" value="modding.Hooks.install('src')" if="cpp" />
 
 	<!-- A null dereference throws, and the game's uncaughtError listener keeps it running like AIR,
 	     instead of crashing. Covers mod code too. About 7-8% more CPU in a dungeon. -->

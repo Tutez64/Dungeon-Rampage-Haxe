@@ -1,7 +1,8 @@
 package modding;
 
-import distributedObjects.DistributedDungeonFloor;
-import distributedObjects.HeroGameObject;
+import brain.gameObject.GameObject;
+import brain.stateMachine.State;
+import brain.stateMachine.StateMachine;
 import flash.display.Sprite;
 
 /**
@@ -83,39 +84,43 @@ class ModContext {
 	}
 
 	/**
-	 * A hero, local (a `HeroGameObjectOwner`) or remote, is on a dungeon floor and initialised. Not
-	 * town. Always after that floor's `onFloorEnter`.
+	 * A game object is ready: a network object (floor, loot, dungeon summary, matchmaker…) once
+	 * generated, an actor (hero, monster, NPC) once initialised, and never before its floor. The objects
+	 * that were ready before `onReady` are announced right after it, in order.
 	 */
-	public function onHeroSpawned(handler:HeroGameObject->Void):ModSubscription {
-		return listen(Host.HERO_SPAWNED, handler);
+	public function onObjectReady(handler:GameObject->Void):ModSubscription {
+		return listen(Host.OBJECT_READY, handler);
 	}
 
-	/** A hero leaves the floor; it is still whole while the handlers run. */
-	public function onHeroDespawned(handler:HeroGameObject->Void):ModSubscription {
-		return listen(Host.HERO_DESPAWNED, handler);
+	/**
+	 * A ready object is being destroyed, by the server or by the game: it is still whole while the
+	 * handlers run.
+	 */
+	public function onObjectGone(handler:GameObject->Void):ModSubscription {
+		return listen(Host.OBJECT_GONE, handler);
 	}
 
-	/** A dungeon floor starts: its grid is built and its map node set. Art may still be loading. */
-	public function onFloorEnter(handler:DistributedDungeonFloor->Void):ModSubscription {
-		return listen(Host.FLOOR_ENTER, handler);
+	/** The server set a field or called a method on a ready object, by its network field id. */
+	public function onFieldReceived(handler:(GameObject, UInt) -> Void):ModSubscription {
+		return listen(Host.FIELD_RECEIVED, handler == null ? null : function(received:Dynamic) handler(received.object, received.field));
 	}
 
-	public function onFloorExit(handler:DistributedDungeonFloor->Void):ModSubscription {
-		return listen(Host.FLOOR_EXIT, handler);
+	/**
+	 * A state machine of the game entered a state, after its `enterState`: the main one (loading,
+	 * town, dungeon run…), the town's (inventory, shop, map…) or an actor's. Not before `onReady`.
+	 */
+	public function onStateEnter(handler:(StateMachine, State) -> Void):ModSubscription {
+		return listen(Host.STATE_ENTER, handler == null ? null : function(change:Dynamic) handler(change.machine, change.state));
+	}
+
+	/** A state machine leaves a state, before its `exitState`. Not before `onReady`. */
+	public function onStateExit(handler:(StateMachine, State) -> Void):ModSubscription {
+		return listen(Host.STATE_EXIT, handler == null ? null : function(change:Dynamic) handler(change.machine, change.state));
 	}
 
 	/** Tables are in, the account is not parsed against them yet. Fires before `onReady`. */
 	public function onTablesLoaded(handler:Void->Void):ModSubscription {
 		return listen(Host.TABLES_LOADED, handler == null ? null : function(_:Dynamic) handler());
-	}
-
-	/** Town entered, including a return from a dungeon. */
-	public function onTownEnter(handler:Void->Void):ModSubscription {
-		return listen(Host.TOWN_ENTER, handler == null ? null : function(_:Dynamic) handler());
-	}
-
-	public function onTownExit(handler:Void->Void):ModSubscription {
-		return listen(Host.TOWN_EXIT, handler == null ? null : function(_:Dynamic) handler());
 	}
 
 	/**

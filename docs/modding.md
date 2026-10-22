@@ -212,7 +212,7 @@ Core. `mods.api.Mod` mirrors them as `init(context)`, `ready(context)` and `disp
 
 `onReady` is `LoadingFinishedEvent`, not `ManagersLoadedEvent`, because the `api` mod promises an **inventory** wrapper and inventory is account data. At `ManagersLoaded` the tables are in and the account / matchmaker / `initTime()` are not. Mutating GameMaster before the account is parsed against it is the additive `tablesLoaded` event, not a fourth method.
 
-**Order:** `onInit` → (`tablesLoaded`) → `onReady` → any gameplay event. Town / tutorial dungeon is entered by the `mainStateMachine.start()` that follows `onReady`, so no `heroSpawned` / `floorEnter` can precede it. In a dungeon, a hero's `heroSpawned` follows its floor's `floorEnter` (the host holds the hero back until then).
+**Order:** `onInit` → (`tablesLoaded`) → `onReady` → any gameplay event. Town / tutorial dungeon is entered by the `mainStateMachine.start()` that follows `onReady`. Objects ready during loading are announced right after `onReady`, in order; state changes before it are not reported. An actor is announced after its floor (the host holds it back until then).
 
 **Boot that never reaches `onReady`:** `SocketErrorState` (service discovery failed) and `blockCheater()` — `ManagersLoadedEvent` never fires. Mods must tolerate a missing `onReady`; `last-run.json` records `ready: false`. An account with **no active avatar** is *not* that case: `MainStateMachine.start()` logs and returns, but it runs **after** `onReady`, so `ready: true` and no town. Wait for `heroSpawned`, do not infer a hero from `onReady`.
 
@@ -229,15 +229,17 @@ Host obligations:
 
 ### Game events
 
-Subscribe from `onInit` or `onReady` with `ModContext.on<Event>(handler)` (`onHeroSpawned(f:HeroGameObject->Void)`, `onTownEnter(f:Void->Void)`, …), which returns a `ModSubscription` (`cancel()`). Host-emitted; not existing game `Event` class names. They are what the `api` mod is built on; an event is added in a release when it needs a hook it cannot reach otherwise.
+Subscribe from `onInit` or `onReady` with `ModContext.on<Event>(handler)` (`onObjectReady(f:GameObject->Void)`, …), which returns a `ModSubscription` (`cancel()`). Host-emitted; not existing game `Event` class names. They are generic on purpose: the `api` mod turns them into its own events (hero, floor, town…), so it grows without a DRH release. The game's own event bus (`facade.eventManager`: chat, HP, mana, experience, currencies, friends…) is read directly, from `onReady`.
 
 | Event | Hands | When |
 | --- | --- | --- |
-| `heroSpawned` / `heroDespawned` | `HeroGameObject` | A hero (local **or** other players) is initialised on a dungeon floor / is destroyed. Dungeon only. |
-| `floorEnter` / `floorExit` | `DistributedDungeonFloor` | A dungeon floor starts (grid built, map node set) / is destroyed. |
+| `objectReady` / `objectGone` | `GameObject` | A game object is ready: a network object once generated (floor, loot, dungeon summary, matchmaker…), an actor (hero, monster, NPC) once initialised, never before its floor. Gone: a ready object starts its `destroy()`, from the server or the game; it is still whole while the handlers run. |
+| `fieldReceived` | `GameObject`, field id | The server set a field or called a method on a ready object, by its network field id. Only looked up while someone listens. |
+| `stateEnter` / `stateExit` | `StateMachine`, `State` | A state machine of the game entered a state, after its `enterState` / leaves it, before its `exitState`: the main one (loading, town, run…), the town's (inventory, shop, map…), an actor's. |
 | `tablesLoaded` | — | `ManagersLoadedEvent`: tables in, account not yet parsed against them. Window to mutate tables (`extends` use). |
-| `townEnter` / `townExit` | — | `TownState` entered / left, including `ReloadTownState`. |
 | `keyDown` | key code | A key goes down: once per press, not while a text field (chat) has focus. A handler returning `true` keeps the key: the game never sees that press (its shortcuts, OpenFL's Tab focus, repeats, release). |
+
+The game calls the host at a few points every object or state goes through: object creation and field reception in `DcSocket`, actor initialisation in `ActorGameObject.checkIfReadyForInit`, transitions in `StateMachine`. `objectGone` needs no `src/` edit: a build macro over `src/` (`modding.Hooks`) starts every game object's `destroy()` with it, so the most derived class reports the object before tearing it down.
 
 `ModContext`: overlay layer and view size, its `Resources/` folder (`resources`), its folder to write in (`data`), log, `replace`, these subscriptions, `facade` (from `onReady`, a host type), and `alive`, false once the mod failed, so another mod holding handlers for it stops calling them.
 

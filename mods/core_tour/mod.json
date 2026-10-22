@@ -1,0 +1,11 @@
+{
+  "id": "core_tour",
+  "name": "Core tour",
+  "version": "1.0.0",
+  "author": "DRH",
+  "api": "1.0",
+  "uses": ["extends"],
+  "drh": "14",
+  "entry": "Main",
+  "dependencies": {}
+}

@@ -2,6 +2,7 @@
   "mods": [
     { "id": "api" },
     { "id": "api_tour" },
+    { "id": "core_tour" },
     { "id": "broken_init" },
     { "id": "broken_static" },
     { "id": "dep_ready" },
