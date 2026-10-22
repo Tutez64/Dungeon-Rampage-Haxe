@@ -2,6 +2,10 @@
 
 The steps to make, test and publish a mod for DRH. Each one is a DRH Launcher command ([Mod repository](modding.md#mod-repository) says what each does); the rules are in the [modding document](modding.md), linked here instead of repeated.
 
+- What a mod can read, listen to and draw: the [`api` reference](https://github.com/Tutez64/DRH-Mod-API/blob/master/docs/api.md).
+- Examples: [Party Board](https://github.com/Tutez64/DRH-Mod-Party-Board) only uses the `api`; [Inspector](https://github.com/Tutez64/DRH-Mod-Inspector) reaches the game's own classes, and shows them as they run.
+- Questions, and what the `api` should offer next: the [Discord server](https://discord.gg/VvWbNspZrQ).
+
 ## Commands
 
 They run in a terminal, from the launcher's executable (DRH Launcher 0.4 or later). Below, `DRH-Launcher` stands for its path:
@@ -18,11 +22,13 @@ They need git. Publishing needs a GitHub account.
 
 1. `DRH-Launcher --new-mod <folder>` asks for the mod's `id` ([rules](modding.md#modjson): it is the mod's folder and package), its `name` and your `author` name, then makes the folder from [DRH-Mods-Template](https://github.com/Tutez64/DRH-Mods-Template), with its first commit.
 2. It opens GitHub's page to create the repository: keep it public and named `DRH-Mod-<Name>` as it suggests (the index takes no other name), then push with the two lines it prints.
-3. Fill `description` in `mod.json`, and `README.md`: its shown zone is what the launcher shows on the mod's page ([markers](modding.md#mod-repository)); the line after it is for you, remove it. `DRH-Launcher --check-mod <folder>` says what is left.
+3. Fill `description` in `mod.json`, and `README.md`: its first line is what GitHub visitors read first, replace it with what the repository is; its shown zone is what the launcher shows on the mod's page ([markers](modding.md#mod-repository)). `DRH-Launcher --check-mod <folder>` says what is left.
 
 ## Write
 
-The entry is `src/Main.hx`, a `mods.api.Mod` ([Lifecycle](modding.md#lifecycle)). Each file under `src/` is in `mods.<id>` or the sub-package of its folder ([package rule](modding.md#modjson)). What the `api` offers is in [The `api` mod](modding.md#the-api-mod) and its sources ([DRH-Mod-API](https://github.com/Tutez64/DRH-Mod-API)). Reaching the game's own classes is an `extends` mod ([Mod kinds](modding.md#mod-kinds)).
+The entry is `src/Main.hx`, a `mods.api.Mod`. Each file under `src/` is in `mods.<id>` or the sub-package of its folder ([package rule](modding.md#modjson)). The [`api` reference](https://github.com/Tutez64/DRH-Mod-API/blob/master/docs/api.md) lists what the mod gets: its lifecycle, the game's events and live state, the overlay to draw on, and its folders, `Resources/` to read and `data` to write.
+
+A mod that only uses the `api` keeps working across DRH updates. Reaching the game's own classes, through `context.core`, makes it `extends`: add `"uses": ["extends"]` and `drh`, the DRH tags it was tested on, to `mod.json` ([Mod kinds](modding.md#mod-kinds)). The launcher warns its players that a DRH update may break it. Inspector shows how, and what there is to reach.
 
 ## Test
 
