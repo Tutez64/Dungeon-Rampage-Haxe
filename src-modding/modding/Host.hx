@@ -207,12 +207,23 @@ class Host {
 
 	/**
 	 * A network object exists, generated and post-generated: ready, except an actor, which only is
-	 * once initialised (`actorReady`).
+	 * once initialised (`actorReady`). Taken from its network component, not by its id: the game may
+	 * still hold an earlier object under that id (`addIdReference` then keeps the earlier one).
 	 */
-	static function objectCreated(object:GameObject):Void {
-		if (!booted || object == null || Std.isOfType(object, ActorGameObject))
+	static function objectCreated(component:Dynamic):Void {
+		if (!booted)
+			return;
+		var object = objectOf(component);
+		if (object == null || Std.isOfType(object, ActorGameObject))
 			return;
 		announce(object);
+	}
+
+	/** The game object a network component carries, as mods know it. */
+	static function objectOf(component:Dynamic):Null<GameObject> {
+		var network = Std.downcast(component, networkCode.DcNetworkClass);
+		var object:Null<GameObject> = network == null ? null : Std.downcast((network.instance : Dynamic), GameObject);
+		return object == null ? null : object.getTrueObject();
 	}
 
 	/** An actor (hero, monster, NPC) has its data and its floor, and is initialised. */
@@ -262,15 +273,12 @@ class Host {
 		emit(OBJECT_GONE, object);
 	}
 
-	/** The server set a field or called a method on the object `doId`: only while someone listens. */
-	static function fieldReceived(doId:UInt, field:UInt):Void {
-		if (!booted || facade == null || !listened(FIELD_RECEIVED))
+	/** The server set a field or called a method on a network component's object: only while someone listens. */
+	static function fieldReceived(component:Dynamic, field:UInt):Void {
+		if (!booted || !listened(FIELD_RECEIVED))
 			return;
-		var object = facade.gameObjectManager.getReferenceFromId(doId);
-		if (object == null)
-			return;
-		object = object.getTrueObject();
-		if (announced.exists(object))
+		var object = objectOf(component);
+		if (object != null && announced.exists(object))
 			emit(FIELD_RECEIVED, {object: object, field: field});
 	}
 
