@@ -267,6 +267,9 @@ class DcSocket extends Socket {
 			Logger.warn("Process_CLIENT_OBJECT_UPDATE_FIELD DcNetworkInterface is null " + _loc4_ + " " + _loc3_ + " " + _loc2_);
 		} else {
 			_loc4_.recvById(game_packet, _loc2_);
+			#if cpp
+			modding.Host.fieldReceived(_loc4_, _loc2_);
+			#end
 		}
 	}
 
@@ -281,6 +284,9 @@ class DcSocket extends Socket {
 				_loc3_.newNetworkChild(_loc4_.getTrueObject());
 			}
 		}
+		#if cpp
+		modding.Host.objectCreated(Doid_NetInterfaces[Std.string(child_do_id)]);
+		#end
 	}
 
 	function Process_CLIENT_CREATE_OBJECT_REQUIRED_RESP(game_packet:DcNetworkPacket) {
