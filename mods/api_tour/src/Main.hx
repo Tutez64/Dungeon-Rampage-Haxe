@@ -42,7 +42,7 @@ class Main extends Mod {
 	override public function init(ctx:Context):Void {
 		this.ctx = ctx;
 		panel = new Panel();
-		ctx.overlay.addChild(panel.root);
+		ctx.overlay.addChild(panel);
 
 		check("init: account empty", ctx.state.account == null);
 		check("init: no floor", ctx.state.floor == null);

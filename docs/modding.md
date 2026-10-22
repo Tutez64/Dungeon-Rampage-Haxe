@@ -188,7 +188,7 @@ Every mod depends on `api` (`mod.json` `api` field). `uses` says what it touches
 
 | Kind | What it means | DRH versions | Other mods |
 | --- | --- | --- | --- |
-| stable only (`uses` empty) | Uses only `mods.api.*`. OpenFL/Lime for drawing on the overlay is OK; the core, `actor.*` / `combat.*` / `facade.*` are not. | Tied to the `api` major. [Versioning](#versioning). | Best. No `replace` occupancy. |
+| stable only (`uses` empty) | Uses only `mods.api.*`. OpenFL/Lime for drawing on the overlay is OK, subclassing their display classes included; the core, `actor.*` / `combat.*` / `facade.*` are not. | Tied to the `api` major. [Versioning](#versioning). | Best. No `replace` occupancy. |
 | `extends` | Subclasses or calls **host** types but does **not** `replace` vanilla `new`. Helpers, `new MyRepeater()`, reading public internals. | Tied to those class/method names. Starling / conversions can break it even if `api` is unchanged. | Usually fine with others. Still shares live objects with a `replace` on the same type (`is RepeaterWeaponController` remains true). |
 | `replace` | Explicit `replace(HostClass, Sub)` at `onInit`. Host `new HostClass(...)` becomes the subclass (merge if rewritten methods/fields/`new` are disjoint). | Same host-type fragility as `extends`, plus construction. | Conflicts when rewritten surfaces overlap. One occupancy per method/field/`new`. |
 
