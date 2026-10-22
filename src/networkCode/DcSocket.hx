@@ -268,7 +268,7 @@ class DcSocket extends Socket {
 		} else {
 			_loc4_.recvById(game_packet, _loc2_);
 			#if cpp
-			modding.Host.fieldReceived(_loc3_, _loc2_);
+			modding.Host.fieldReceived(_loc4_, _loc2_);
 			#end
 		}
 	}
@@ -285,8 +285,7 @@ class DcSocket extends Socket {
 			}
 		}
 		#if cpp
-		if (_loc4_ != null)
-			modding.Host.objectCreated(_loc4_.getTrueObject());
+		modding.Host.objectCreated(Doid_NetInterfaces[Std.string(child_do_id)]);
 		#end
 	}
 
