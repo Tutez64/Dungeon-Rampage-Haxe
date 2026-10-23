@@ -234,12 +234,12 @@ Subscribe from `onInit` or `onReady` with `ModContext.on<Event>(handler)` (`onOb
 | Event | Hands | When |
 | --- | --- | --- |
 | `objectReady` / `objectGone` | `GameObject` | A game object is ready: a network object once generated (floor, loot, dungeon summary, matchmaker…), an actor (hero, monster, NPC) once initialised, never before its floor. Gone: a ready object starts its `destroy()`, from the server or the game; it is still whole while the handlers run. |
-| `fieldReceived` | `GameObject`, field id | The server set a field or called a method on a ready object, by its network field id. Only looked up while someone listens. |
+| `fieldReceived` | `GameObject`, field id, name | The server set a field or called a method on a ready object: its network field id, and its name as the generated code's `recv_` method calls it, `<Class>.name`. Only looked up while someone listens. |
 | `stateEnter` / `stateExit` | `StateMachine`, `State` | A state machine of the game entered a state, after its `enterState` / leaves it, before its `exitState`: the main one (loading, town, run…), the town's (inventory, shop, map…), an actor's. |
 | `tablesLoaded` | — | `ManagersLoadedEvent`: tables in, account not yet parsed against them. Window to mutate tables (`extends` use). |
 | `keyDown` | key code | A key goes down: once per press, not while a text field (chat) has focus. A handler returning `true` keeps the key: the game never sees that press (its shortcuts, OpenFL's Tab focus, repeats, release). |
 
-The game calls the host at a few points every object or state goes through: object creation and field reception in `DcSocket`, actor initialisation in `ActorGameObject.checkIfReadyForInit`, transitions in `StateMachine`. `objectGone` needs no `src/` edit: a build macro over `src/` (`modding.Hooks`) starts every game object's `destroy()` with it, so the most derived class reports the object before tearing it down.
+The game calls the host at a few points every object or state goes through: object creation and field reception in `DcSocket`, actor initialisation in `ActorGameObject.checkIfReadyForInit`, transitions in `StateMachine`. `objectGone` needs no `src/` edit: a build macro over `src/` (`modding.Hooks`) starts every game object's `destroy()` with it, so the most derived class reports the object before tearing it down. The same macro gives each generated network component the names of the fields its `recvById` dispatches, which `fieldReceived` hands with the id.
 
 `ModContext`: overlay layer and view size, its `Resources/` folder (`resources`), its folder to write in (`data`), log, `replace`, these subscriptions, `facade` (from `onReady`, a host type), and `alive`, false once the mod failed, so another mod holding handlers for it stops calling them.
 

@@ -279,7 +279,22 @@ class Host {
 			return;
 		var object = objectOf(component);
 		if (object != null && announced.exists(object))
-			emit(FIELD_RECEIVED, {object: object, field: field});
+			emit(FIELD_RECEIVED, {object: object, field: field, name: fieldName(component, field)});
+	}
+
+	/**
+	 * `<Class>.name`, as the component's `recv_` method names the field: from the table `Hooks` gives
+	 * each generated component, its own or a base's. Empty when none has it.
+	 */
+	static function fieldName(component:Dynamic, field:UInt):String {
+		var type:Class<Dynamic> = Type.getClass(component);
+		while (type != null) {
+			var names:Null<Map<Int, String>> = Reflect.field(type, "__fieldNames");
+			if (names != null && names.exists(field))
+				return names.get(field);
+			type = Type.getSuperClass(type);
+		}
+		return "";
 	}
 
 	/** After `state` entered; not before `onReady`. */

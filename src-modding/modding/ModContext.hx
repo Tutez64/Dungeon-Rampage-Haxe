@@ -100,9 +100,13 @@ class ModContext {
 		return listen(Host.OBJECT_GONE, handler);
 	}
 
-	/** The server set a field or called a method on a ready object, by its network field id. */
-	public function onFieldReceived(handler:(GameObject, UInt) -> Void):ModSubscription {
-		return listen(Host.FIELD_RECEIVED, handler == null ? null : function(received:Dynamic) handler(received.object, received.field));
+	/**
+	 * The server set a field or called a method on a ready object: its network field id, and its name
+	 * as the game's generated code calls it, `<Class>.name` (`DistributedBuffGameObject.effectedActor`).
+	 */
+	public function onFieldReceived(handler:(GameObject, UInt, String) -> Void):ModSubscription {
+		return listen(Host.FIELD_RECEIVED,
+			handler == null ? null : function(received:Dynamic) handler(received.object, received.field, received.name));
 	}
 
 	/**

@@ -45,6 +45,7 @@ class Main extends Mod {
 			"gone only once ready",
 			"gone while whole",
 			"fields only for ready objects",
+			"fields named",
 			"state entered is current",
 			"state exited is current"
 		])
@@ -95,9 +96,10 @@ class Main extends Mod {
 		live.remove(object);
 	}
 
-	function fieldReceived(object:GameObject, field:UInt):Void {
+	function fieldReceived(object:GameObject, field:UInt, name:String):Void {
 		bump("fields");
 		check("fields only for ready objects", live.exists(object), keyOf(object) + " field " + field);
+		check("fields named", name != "", keyOf(object) + " field " + field);
 	}
 
 	function stateEnter(machine:StateMachine, state:State):Void {
