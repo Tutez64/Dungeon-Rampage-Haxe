@@ -12,7 +12,7 @@ with a configurable frame rate and modding support.
 
 The recommended way to play DRH is
 [DRH Launcher](https://github.com/Tutez64/DRH-Launcher), which handles DRH installation,
-updates, repairs, and launch for you.
+updates, and launch for you.
 
 DRH Launcher also provides additional features such as mods, launch option presets,
 custom launch arguments, session history with logs and playtime, release history,
