@@ -5,7 +5,7 @@
 
 <p align="center">
 A smoother native port of Dungeon Rampage for Windows, Linux, and macOS,
-with a configurable frame rate.
+with a configurable frame rate and modding support.
 </p>
 
 ## Install and play
@@ -14,7 +14,7 @@ The recommended way to play DRH is
 [DRH Launcher](https://github.com/Tutez64/DRH-Launcher), which handles DRH installation,
 updates, repairs, and launch for you.
 
-DRH Launcher also provides additional features such as launch option presets,
+DRH Launcher also provides additional features such as mods, launch option presets,
 custom launch arguments, session history with logs and playtime, release history,
 and more.
 
@@ -34,15 +34,21 @@ especially in **Quality** mode, and avoids the input delay issue.
 
 Like the official game, restarting before each new party is recommended because performance can degrade over time.
 
+## Mods
+
+DRH runs mods. Install them from the **Mods** page of
+[DRH Launcher](https://github.com/Tutez64/DRH-Launcher): it lists the mods of the
+[DRH Mods Index](https://github.com/Tutez64/DRH-Mods-Index), each reviewed before it
+is listed, installs what they need, and keeps them updated.
+
+To make one, start with [Making a mod](docs/making-a-mod.md); share ideas and ask
+questions on the [Discord server](https://discord.gg/VvWbNspZrQ). The design is in
+[docs/modding.md](docs/modding.md).
+
 ## Community
 
 Join the [Discord server](https://discord.gg/VvWbNspZrQ) to discuss DRH and DRH Launcher,
 get update notifications, and see occasional previews.
-
-## Modding
-
-Modding is not implemented yet. The living design document is
-[docs/modding.md](docs/modding.md).
 
 ## Technical overview
 
