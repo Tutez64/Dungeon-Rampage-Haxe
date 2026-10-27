@@ -9,7 +9,15 @@ class DcNetworkClass {
 
 	var mCreationOrder:UInt = 0;
 
+	#if cpp
+	/** The game object this component networks, for the mods host. */
+	public var instance(default, null):ASAny;
+	#end
+
 	public function new(trash:ASAny, gs:DcSocket, id:UInt) {
+		#if cpp
+		instance = trash;
+		#end
 		do_id = id;
 		the_gamesocket = gs;
 		mCreationOrder = ++CREATION_ORDER_SEED;

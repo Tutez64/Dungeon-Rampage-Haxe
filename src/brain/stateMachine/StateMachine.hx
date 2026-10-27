@@ -31,15 +31,24 @@ class StateMachine {
 			if (!mCurrentState.running) {
 				Logger.warn("transitionToState (" + nextState.name + ") but old state (" + mCurrentState.name + ") was not running.");
 			}
+			#if cpp
+			modding.Host.stateExited(this, mCurrentState);
+			#end
 			mCurrentState.exitState();
 		}
 		mCurrentState = nextState;
 		mCurrentState.enterState();
+		#if cpp
+		modding.Host.stateEntered(this, mCurrentState);
+		#end
 		return true;
 	}
 
 	public function destroy() {
 		if (mCurrentState != null && mCurrentState.running) {
+			#if cpp
+			modding.Host.stateExited(this, mCurrentState);
+			#end
 			mCurrentState.exitState();
 		}
 		mCurrentState = null;
