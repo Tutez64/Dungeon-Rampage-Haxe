@@ -29,6 +29,9 @@ import gameMasterDictionary.GameMaster;
 import generatedCode.InfiniteMapNodeDetail;
 import input.MenuNavigationController;
 import magicWords.MagicWordManager;
+#if cpp
+import modding.Host;
+#end
 import metrics.MetricsLogger;
 import metrics.PixelTracker;
 import networkCode.transport.GameEndpoints;
@@ -795,6 +798,9 @@ class DBFacade extends Facade {
 
 	function checkIfFactoryReadyToLoad() {
 		if (mTimelineFinishedLoading && this.mGameMasterJsonLoaded && this.mLibraryJsonLoaded) {
+			#if cpp
+			Host.tablesLoaded();
+			#end
 			mEventComponent.dispatchEvent(new ManagersLoadedEvent());
 		}
 	}
@@ -967,6 +973,9 @@ class DBFacade extends Facade {
 		PixelTracker.returnDAU(this);
 		mEventComponent.removeListener("LoadingFinishedEvent");
 		mGameClock.initTime();
+		#if cpp
+		Host.ready(this);
+		#end
 		this.run();
 		mMainStateMachine.start();
 		if (mInitialLoadingClip != null) {
