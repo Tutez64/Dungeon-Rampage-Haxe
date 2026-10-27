@@ -145,6 +145,7 @@ class Logger {
 	public static function log(logString:String) {
 		logString = "" + logString;
 		emit(logString);
+		trace(logString);
 		if (mWantConsole) {
 			Cc.log(logString);
 		}
@@ -156,6 +157,7 @@ class Logger {
 		}
 		logString = "[DEBUG] " + getDateString() + logString;
 		emit(logString);
+		trace(logString);
 		if (mWantConsole) {
 			Cc.debug(logString);
 		}
@@ -167,6 +169,7 @@ class Logger {
 		}
 		logString = "[DEBUG] " + getDateString() + logString;
 		emit(logString);
+		trace(logString);
 		if (mWantConsole) {
 			Cc.debugch(channel, logString);
 		}
@@ -178,6 +181,7 @@ class Logger {
 		}
 		logString = "[INFO]  " + getDateString() + logString;
 		emit(logString);
+		trace(logString);
 		if (mWantConsole) {
 			Cc.info(logString);
 		}
@@ -189,6 +193,7 @@ class Logger {
 		}
 		logString = "[INFO] " + getDateString() + logString;
 		emit(logString);
+		trace(logString);
 		if (mWantConsole) {
 			Cc.infoch(channel, logString);
 		}
@@ -200,6 +205,7 @@ class Logger {
 		}
 		logString = "[WARN]  " + getDateString() + logString;
 		emit(logString);
+		trace(logString);
 		if (mWantConsole) {
 			Cc.warn(logString);
 		}
@@ -211,6 +217,7 @@ class Logger {
 		}
 		logString = "[WARN] " + getDateString() + logString;
 		emit(logString);
+		trace(logString);
 		if (mWantConsole) {
 			Cc.warnch(channel, logString);
 		}
@@ -223,6 +230,7 @@ class Logger {
 		tryErrorCallback(_loc3_);
 		logString = "[ERROR] " + getDateString() + _loc3_;
 		emit(logString);
+		trace(logString);
 		if (mWantConsole) {
 			Cc.error(logString);
 		}
@@ -248,6 +256,7 @@ class Logger {
 		logString = "[FATAL] " + getDateString() + logString;
 		var _loc3_ = logString + "\n" + _loc4_;
 		emit(_loc3_);
+		trace(_loc3_);
 		if (mWantConsole) {
 			displayConsole();
 			Cc.minimumPriority = Console.WARN;
@@ -269,6 +278,7 @@ class Logger {
 		}
 		logString = "[" + customLoggerString + "]  " + getDateString() + logString;
 		emit(logString);
+		trace(logString);
 		if (mWantConsole) {
 			Cc.warn(logString);
 		}
