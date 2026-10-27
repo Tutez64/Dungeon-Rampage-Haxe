@@ -93,6 +93,7 @@ class MapTownSubState extends TownSubState {
 		super.enterState();
 		mEventComponent.addListener(FriendInfo.FRIEND_SCORES_PARSED, function(param1:flash.events.Event) {
 			var currentNodeButton:UIObject;
+			popBattlePopupLayer();
 			mWorldMap.deinit();
 			initMap();
 			currentNodeButton = mWorldMap.getCurrentNodeButton();
@@ -112,6 +113,7 @@ class MapTownSubState extends TownSubState {
 
 	override public function exitState() {
 		super.exitState();
+		popBattlePopupLayer();
 		mWorldMap.deinit();
 		mDBFacade.menuNavigationController.popLayer("MAP_MENU");
 		if (mWorkComponent != null) {
@@ -124,6 +126,17 @@ class MapTownSubState extends TownSubState {
 		}
 		if (mEventComponent != null) {
 			mEventComponent.removeAllListeners();
+		}
+	}
+
+	/**
+		An open battle popup's layer sits above MAP_MENU and holds the popup's buttons, which deinit destroys
+		without popping it: MAP_MENU's popLayer was then refused, and the next layer popped focused a
+		destroyed button.
+	**/
+	function popBattlePopupLayer() {
+		if (mDBFacade.menuNavigationController.getTopUILayer() == "UI_MAP_BATTLE_POPUP") {
+			mDBFacade.menuNavigationController.popLayer("UI_MAP_BATTLE_POPUP");
 		}
 	}
 
