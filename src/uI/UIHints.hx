@@ -29,9 +29,9 @@ class UIHints {
 		var _loc2_ = new Vector<GMHints>();
 		var _loc5_ = mDBFacade.dbAccountInfo.activeAvatarInfo.level;
 		var _loc4_:GMHints;
-		final __ax4_iter_134 = mDBFacade.gameMaster.Hints;
-		if (checkNullIteratee(__ax4_iter_134))
-			for (_tmp_ in __ax4_iter_134) {
+		final __ax4_iter_137 = mDBFacade.gameMaster.Hints;
+		if (checkNullIteratee(__ax4_iter_137))
+			for (_tmp_ in __ax4_iter_137) {
 				_loc4_ = _tmp_;
 				if (_loc4_.MinLevel <= _loc5_ && _loc4_.MaxLevel >= _loc5_) {
 					_loc2_.push(_loc4_);

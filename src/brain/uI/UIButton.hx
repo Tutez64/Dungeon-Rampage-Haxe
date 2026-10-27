@@ -346,9 +346,9 @@ class UIButton extends UIObject {
 		popRollOverMouseCursor();
 		mStates = null;
 		var _loc1_:MovieClipRenderController;
-		final __ax4_iter_163 = mRenderers;
-		if (checkNullIteratee(__ax4_iter_163))
-			for (_tmp_ in __ax4_iter_163) {
+		final __ax4_iter_166 = mRenderers;
+		if (checkNullIteratee(__ax4_iter_166))
+			for (_tmp_ in __ax4_iter_166) {
 				_loc1_ = ASCompat.coerce(_tmp_, brain.render.MovieClipRenderController);
 				if (_loc1_ != null) {
 					_loc1_.destroy();
@@ -373,18 +373,18 @@ class UIButton extends UIObject {
 
 	function showState(i:UInt) {
 		var _loc3_:MovieClip;
-		final __ax4_iter_164 = mStates;
-		if (checkNullIteratee(__ax4_iter_164))
-			for (_tmp_ in __ax4_iter_164) {
+		final __ax4_iter_167 = mStates;
+		if (checkNullIteratee(__ax4_iter_167))
+			for (_tmp_ in __ax4_iter_167) {
 				_loc3_ = ASCompat.coerce(_tmp_, flash.display.MovieClip);
 				if (_loc3_ != null) {
 					_loc3_.visible = false;
 				}
 			}
 		var _loc2_:MovieClipRenderController;
-		final __ax4_iter_165 = mRenderers;
-		if (checkNullIteratee(__ax4_iter_165))
-			for (_tmp_ in __ax4_iter_165) {
+		final __ax4_iter_168 = mRenderers;
+		if (checkNullIteratee(__ax4_iter_168))
+			for (_tmp_ in __ax4_iter_168) {
 				_loc2_ = ASCompat.coerce(_tmp_, brain.render.MovieClipRenderController);
 				if (_loc2_ != null) {
 					_loc2_.stop();

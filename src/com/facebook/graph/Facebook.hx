@@ -315,16 +315,16 @@ class Facebook extends AbstractFacebook {
 	}
 
 	function handleJSEvent(event:String, result:String = null) {
-		var __ax4_iter_155:ASAny;
+		var __ax4_iter_158:ASAny;
 		var _loc3_:ASObject = null;
 		var _loc4_:ASObject = null;
 		if (this.jsCallbacks[event] != null) {
 			try {
 				_loc3_ = com.adobe.serialization.json.JSON.decode(result);
 			} catch (e:com.adobe.serialization.json.JSONParseError) {}
-			__ax4_iter_155 = this.jsCallbacks[event];
-			if (checkNullIteratee(__ax4_iter_155))
-				for (_tmp_ in __ax4_iter_155.___keys()) {
+			__ax4_iter_158 = this.jsCallbacks[event];
+			if (checkNullIteratee(__ax4_iter_158))
+				for (_tmp_ in __ax4_iter_158.___keys()) {
 					_loc4_ = _tmp_;
 					ASCompat.asFunction(_loc4_)(_loc3_);
 					ASCompat.deleteProperty(this.jsCallbacks[event], _loc4_);

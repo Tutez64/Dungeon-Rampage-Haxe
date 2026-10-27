@@ -231,9 +231,9 @@ class UIShop {
 		var _loc4_:ASAny = null;
 		var _loc5_ = 0;
 		mCategorizedGMOffers = new Map();
-		final __ax4_iter_129 = CATEGORIES;
-		if (checkNullIteratee(__ax4_iter_129))
-			for (_tmp_ in __ax4_iter_129) {
+		final __ax4_iter_132 = CATEGORIES;
+		if (checkNullIteratee(__ax4_iter_132))
+			for (_tmp_ in __ax4_iter_132) {
 				_loc6_ = _tmp_;
 				mCategorizedGMOffers.add(_loc6_, new Vector<GMOffer>());
 			}
@@ -612,9 +612,7 @@ class UIShop {
 		}
 	}
 
-	function chestRevealResponse(obj:ASObject) {
-		trace("Made it to here.");
-	}
+	function chestRevealResponse(obj:ASObject) {}
 
 	function getDate():String {
 		var _loc4_:String = null;
@@ -796,7 +794,7 @@ class UIShop {
 	}
 
 	function filterOffers() {
-		var __ax4_iter_131:Vector<GMOffer>;
+		var __ax4_iter_134:Vector<GMOffer>;
 		var _loc10_:String = null;
 		var _loc1_:Vector<GMOffer> = /*undefined*/ null;
 		var _loc2_:GMOffer = null;
@@ -807,19 +805,18 @@ class UIShop {
 		var _loc4_:String = null;
 		var _loc3_ = 0;
 		var _loc6_:GMHero = null;
-		trace("UIShop:filterOffers");
 		var _loc5_ = ASCompat.coerce(mSelectedHero != null ? mDBFacade.dbAccountInfo.inventoryInfo.getAvatarInfoForHeroType(mSelectedHero.Id) : null,
 			account.AvatarInfo);
 		mFilteredGMOffers.clear();
-		final __ax4_iter_130 = CATEGORIES;
-		if (checkNullIteratee(__ax4_iter_130))
-			for (_tmp_ in __ax4_iter_130) {
+		final __ax4_iter_133 = CATEGORIES;
+		if (checkNullIteratee(__ax4_iter_133))
+			for (_tmp_ in __ax4_iter_133) {
 				_loc10_ = _tmp_;
 				_loc1_ = new Vector<GMOffer>();
 				mFilteredGMOffers.add(_loc10_, _loc1_);
-				__ax4_iter_131 = mCategorizedGMOffers.itemFor(_loc10_);
-				if (checkNullIteratee(__ax4_iter_131))
-					for (_tmp_ in __ax4_iter_131) {
+				__ax4_iter_134 = mCategorizedGMOffers.itemFor(_loc10_);
+				if (checkNullIteratee(__ax4_iter_134))
+					for (_tmp_ in __ax4_iter_134) {
 						_loc2_ = _tmp_;
 						if (!ASCompat.toBool(_loc2_.SaleTargetOffer)) {
 							if (!ASCompat.toBool(_loc2_.IsCoinAltOffer)) {

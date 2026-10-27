@@ -277,14 +277,10 @@ class DBGlobal {
 
 	public static function traceClipChildren(clipToTrace:MovieClip) {
 		var _loc2_ = 0;
-		trace("+ number of DisplayObject: " + clipToTrace.numChildren + "  --------------------------------");
 		_loc2_ = 0;
 		while (_loc2_ < clipToTrace.numChildren) {
-			trace("\t|\t " + _loc2_ + ".\t name:" + clipToTrace.getChildAt(_loc2_).name + "\t type:" + ASCompat.typeof(clipToTrace.getChildAt(_loc2_))
-				+ "\t" + clipToTrace.getChildAt(_loc2_));
 			_loc2_++;
 		}
-		trace("\t+ --------------------------------------------------------------------------------------");
 	}
 
 	public static function highlightButton(button:ASAny, quality:UInt = (1 : UInt)) {

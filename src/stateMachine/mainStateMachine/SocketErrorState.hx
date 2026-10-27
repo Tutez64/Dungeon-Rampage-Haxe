@@ -9,6 +9,8 @@ import uI.popup.DBUIOneButtonPopup;
 class SocketErrorState extends State {
 	public static inline final NAME = "SocketErrorState";
 
+	public static inline final MAINTENANCE_CODE = (1504 : UInt);
+
 	var mDBFacade:DBFacade;
 
 	public function new(dbFacade:DBFacade, finishedCallback:ASFunction = null) {
@@ -40,6 +42,9 @@ class SocketErrorState extends State {
 		} else if (errorCode == 61) {
 			_loc3_ = new DBUIOneButtonPopup(mDBFacade, Locale.getString("SOCKET_CLOSE_61_HEADER"), Locale.getString("SOCKET_CLOSE_61_TEXT"),
 				Locale.getString("EXIT"), errorDialogResponce, false);
+		} else if (errorCode == 1504) {
+			_loc3_ = new DBUIOneButtonPopup(mDBFacade, Locale.getString("SOCKET_CLOSE_61_HEADER"), errorText, Locale.getString("EXIT"), errorDialogResponce,
+				false);
 		} else {
 			_loc3_ = new DBUIOneButtonPopup(mDBFacade, Locale.getString("SOCKET_UNEXPECT_CLOSE"), Locale.getError((errorCode : Int)) + "\n" + errorText,
 				Locale.getString("CENTER_BUTTON_POPUP_RELOAD_TEXT"), errorDialogResponce, false);

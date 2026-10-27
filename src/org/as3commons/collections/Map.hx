@@ -24,9 +24,9 @@ class Map implements IMap {
 		var _loc3_:String = null;
 		var _loc4_:ASAny = /*undefined*/ null;
 		var _loc2_ = (0 : UInt);
-		final __ax4_iter_177:ASObject = this._stringMap;
-		if (checkNullIteratee(__ax4_iter_177))
-			for (_tmp_ in __ax4_iter_177.___keys()) {
+		final __ax4_iter_180:ASObject = this._stringMap;
+		if (checkNullIteratee(__ax4_iter_180))
+			for (_tmp_ in __ax4_iter_180.___keys()) {
 				_loc3_ = _tmp_;
 				if (this._stringMap[_loc3_] == item) {
 					ASCompat.deleteProperty(this._stringMap, _loc3_);
@@ -35,9 +35,9 @@ class Map implements IMap {
 					_loc2_++;
 				}
 			}
-		final __ax4_iter_178 = this._items;
-		if (checkNullIteratee(__ax4_iter_178))
-			for (_tmp_ in __ax4_iter_178.keys()) {
+		final __ax4_iter_181 = this._items;
+		if (checkNullIteratee(__ax4_iter_181))
+			for (_tmp_ in __ax4_iter_181.keys()) {
 				_loc4_ = _tmp_;
 				if (this._items[_loc4_] == item) {
 					this._keys.remove(_loc4_);
@@ -60,15 +60,15 @@ class Map implements IMap {
 		var _loc2_:String = null;
 		var _loc3_:ASAny = /*undefined*/ null;
 		var _loc1_ = new Array<ASAny>();
-		final __ax4_iter_179:ASObject = this._stringMap;
-		if (checkNullIteratee(__ax4_iter_179))
-			for (_tmp_ in __ax4_iter_179.___keys()) {
+		final __ax4_iter_182:ASObject = this._stringMap;
+		if (checkNullIteratee(__ax4_iter_182))
+			for (_tmp_ in __ax4_iter_182.___keys()) {
 				_loc2_ = _tmp_;
 				_loc1_.push(_loc2_);
 			}
-		final __ax4_iter_180 = this._keys;
-		if (checkNullIteratee(__ax4_iter_180))
-			for (_tmp_ in __ax4_iter_180) {
+		final __ax4_iter_183 = this._keys;
+		if (checkNullIteratee(__ax4_iter_183))
+			for (_tmp_ in __ax4_iter_183) {
 				_loc3_ = _tmp_;
 				_loc1_.push(_loc3_);
 			}
@@ -89,17 +89,17 @@ class Map implements IMap {
 	public function count(item:ASAny):UInt {
 		var _loc3_:ASAny = /*undefined*/ null;
 		var _loc2_ = (0 : UInt);
-		final __ax4_iter_181:ASObject = this._stringMap;
-		if (checkNullIteratee(__ax4_iter_181))
-			for (_tmp_ in iterateDynamicValues(__ax4_iter_181)) {
+		final __ax4_iter_184:ASObject = this._stringMap;
+		if (checkNullIteratee(__ax4_iter_184))
+			for (_tmp_ in iterateDynamicValues(__ax4_iter_184)) {
 				_loc3_ = _tmp_;
 				if (_loc3_ == item) {
 					_loc2_++;
 				}
 			}
-		final __ax4_iter_182 = this._items;
-		if (checkNullIteratee(__ax4_iter_182))
-			for (_tmp_ in __ax4_iter_182) {
+		final __ax4_iter_185 = this._items;
+		if (checkNullIteratee(__ax4_iter_185))
+			for (_tmp_ in __ax4_iter_185) {
 				_loc3_ = _tmp_;
 				if (_loc3_ == item) {
 					_loc2_++;
@@ -110,17 +110,17 @@ class Map implements IMap {
 
 	public function has(item:ASAny):Bool {
 		var _loc2_:ASAny = /*undefined*/ null;
-		final __ax4_iter_183:ASObject = this._stringMap;
-		if (checkNullIteratee(__ax4_iter_183))
-			for (_tmp_ in iterateDynamicValues(__ax4_iter_183)) {
+		final __ax4_iter_186:ASObject = this._stringMap;
+		if (checkNullIteratee(__ax4_iter_186))
+			for (_tmp_ in iterateDynamicValues(__ax4_iter_186)) {
 				_loc2_ = _tmp_;
 				if (_loc2_ == item) {
 					return true;
 				}
 			}
-		final __ax4_iter_184 = this._items;
-		if (checkNullIteratee(__ax4_iter_184))
-			for (_tmp_ in __ax4_iter_184) {
+		final __ax4_iter_187 = this._items;
+		if (checkNullIteratee(__ax4_iter_187))
+			for (_tmp_ in __ax4_iter_187) {
 				_loc2_ = _tmp_;
 				if (_loc2_ == item) {
 					return true;
@@ -132,9 +132,9 @@ class Map implements IMap {
 	public function remove(item:ASAny):Bool {
 		var _loc2_:String = null;
 		var _loc3_:ASAny = /*undefined*/ null;
-		final __ax4_iter_185:ASObject = this._stringMap;
-		if (checkNullIteratee(__ax4_iter_185))
-			for (_tmp_ in __ax4_iter_185.___keys()) {
+		final __ax4_iter_188:ASObject = this._stringMap;
+		if (checkNullIteratee(__ax4_iter_188))
+			for (_tmp_ in __ax4_iter_188.___keys()) {
 				_loc2_ = _tmp_;
 				if (this._stringMap[_loc2_] == item) {
 					ASCompat.deleteProperty(this._stringMap, _loc2_);
@@ -143,9 +143,9 @@ class Map implements IMap {
 					return true;
 				}
 			}
-		final __ax4_iter_186 = this._items;
-		if (checkNullIteratee(__ax4_iter_186))
-			for (_tmp_ in __ax4_iter_186.keys()) {
+		final __ax4_iter_189 = this._items;
+		if (checkNullIteratee(__ax4_iter_189))
+			for (_tmp_ in __ax4_iter_189.keys()) {
 				_loc3_ = _tmp_;
 				if (this._items[_loc3_] == item) {
 					this._keys.remove(_loc3_);
@@ -161,15 +161,15 @@ class Map implements IMap {
 	public function toArray():Array<ASAny> {
 		var _loc2_:ASAny = /*undefined*/ null;
 		var _loc1_ = new Array<ASAny>();
-		final __ax4_iter_187:ASObject = this._stringMap;
-		if (checkNullIteratee(__ax4_iter_187))
-			for (_tmp_ in iterateDynamicValues(__ax4_iter_187)) {
+		final __ax4_iter_190:ASObject = this._stringMap;
+		if (checkNullIteratee(__ax4_iter_190))
+			for (_tmp_ in iterateDynamicValues(__ax4_iter_190)) {
 				_loc2_ = _tmp_;
 				_loc1_.push(_loc2_);
 			}
-		final __ax4_iter_188 = this._items;
-		if (checkNullIteratee(__ax4_iter_188))
-			for (_tmp_ in __ax4_iter_188) {
+		final __ax4_iter_191 = this._items;
+		if (checkNullIteratee(__ax4_iter_191))
+			for (_tmp_ in __ax4_iter_191) {
 				_loc2_ = _tmp_;
 				_loc1_.push(_loc2_);
 			}

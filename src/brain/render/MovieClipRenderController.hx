@@ -48,9 +48,9 @@ class MovieClipRenderController implements IPoolable {
 
 	function determineRenderer(finishedCallback:ASFunction, assetLabel:String = null) {
 		var _loc3_:FrameLabel;
-		final __ax4_iter_151 = mClip.currentLabels;
-		if (checkNullIteratee(__ax4_iter_151))
-			for (_tmp_ in __ax4_iter_151) {
+		final __ax4_iter_154 = mClip.currentLabels;
+		if (checkNullIteratee(__ax4_iter_154))
+			for (_tmp_ in __ax4_iter_154) {
 				_loc3_ = _tmp_;
 				if (_loc3_.name.indexOf("random") >= 0) {
 					mRenderer = new MovieClipRandomRenderer(mFacade, mClip, finishedCallback, assetLabel);

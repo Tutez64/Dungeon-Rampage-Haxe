@@ -71,9 +71,9 @@ class DBFacebookLevelUpPostController {
 
 	function loadMap() {
 		var _loc1_:GMFeedPosts;
-		final __ax4_iter_194 = mDBFacade.gameMaster.FeedPosts;
-		if (checkNullIteratee(__ax4_iter_194))
-			for (_tmp_ in __ax4_iter_194) {
+		final __ax4_iter_197 = mDBFacade.gameMaster.FeedPosts;
+		if (checkNullIteratee(__ax4_iter_197))
+			for (_tmp_ in __ax4_iter_197) {
 				_loc1_ = _tmp_;
 				if (_loc1_.Category == "LEVELUP") {
 					if (!mLevelUpFeedPostsMap.hasKey(_loc1_.LevelTrigger)) {

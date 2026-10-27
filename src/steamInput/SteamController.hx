@@ -103,16 +103,16 @@ class SteamController {
 		var _loc5_:InputDigitalActionData = null;
 		var _loc3_ = new Vector<SteamInputAction>();
 		var _loc6_:SteamInputAction;
-		final __ax4_iter_91 = mInGameControlsActionSet.digitalActionHandles;
-		if (checkNullIteratee(__ax4_iter_91))
-			for (_tmp_ in __ax4_iter_91) {
+		final __ax4_iter_94 = mInGameControlsActionSet.digitalActionHandles;
+		if (checkNullIteratee(__ax4_iter_94))
+			for (_tmp_ in __ax4_iter_94) {
 				_loc6_ = _tmp_;
 				_loc3_.push(_loc6_);
 			}
 		var _loc2_:SteamInputAction;
-		final __ax4_iter_92 = mMenuControlsActionSet.digitalActionHandles;
-		if (checkNullIteratee(__ax4_iter_92))
-			for (_tmp_ in __ax4_iter_92) {
+		final __ax4_iter_95 = mMenuControlsActionSet.digitalActionHandles;
+		if (checkNullIteratee(__ax4_iter_95))
+			for (_tmp_ in __ax4_iter_95) {
 				_loc2_ = _tmp_;
 				_loc3_.push(_loc2_);
 			}

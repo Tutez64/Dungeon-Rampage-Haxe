@@ -107,9 +107,9 @@ class UIPending extends UIFMState {
 		var _loc2_:FriendInfo = null;
 		pendingFriendRequests = mPendingFriendRequests;
 		var _loc1_:ASObject;
-		final __ax4_iter_200 = mPendingFriendRequests;
-		if (checkNullIteratee(__ax4_iter_200))
-			for (_tmp_ in __ax4_iter_200) {
+		final __ax4_iter_203 = mPendingFriendRequests;
+		if (checkNullIteratee(__ax4_iter_203))
+			for (_tmp_ in __ax4_iter_203) {
 				_loc1_ = _tmp_;
 				_loc2_ = new FriendInfo(mDBFacade, _loc1_);
 				mListOfFriendRequests.push(_loc2_);
@@ -124,9 +124,9 @@ class UIPending extends UIFMState {
 		var idx:UInt;
 		mSelectedFriendToIds.splice(0, (mSelectedFriendToIds.length : UInt));
 		mSelectedFriendRequestIds.splice(0, (mSelectedFriendRequestIds.length : UInt));
-		final __ax4_iter_201 = mFriendRequestPopulater.getSelectedToggles();
-		if (checkNullIteratee(__ax4_iter_201))
-			for (_tmp_ in __ax4_iter_201) {
+		final __ax4_iter_204 = mFriendRequestPopulater.getSelectedToggles();
+		if (checkNullIteratee(__ax4_iter_204))
+			for (_tmp_ in __ax4_iter_204) {
 				idx = (ASCompat.toInt(_tmp_) : UInt);
 				mSelectedFriendToIds.push(mPendingFriendRequests[(idx : Int)].account_id);
 				mSelectedFriendRequestIds.push(mPendingFriendRequests[(idx : Int)].id);
@@ -152,9 +152,9 @@ class UIPending extends UIFMState {
 		mSelectedFriendToIds.splice(0, (mSelectedFriendToIds.length : UInt));
 		mSelectedFriendRequestIds.splice(0, (mSelectedFriendRequestIds.length : UInt));
 		fullAcceptList = "[";
-		final __ax4_iter_202 = mFriendRequestPopulater.getSelectedToggles();
-		if (checkNullIteratee(__ax4_iter_202))
-			for (_tmp_ in __ax4_iter_202) {
+		final __ax4_iter_205 = mFriendRequestPopulater.getSelectedToggles();
+		if (checkNullIteratee(__ax4_iter_205))
+			for (_tmp_ in __ax4_iter_205) {
 				idx = (ASCompat.toInt(_tmp_) : UInt);
 				mSelectedFriendToIds.push(mPendingFriendRequests[(idx : Int)].account_id);
 				mSelectedFriendRequestIds.push(mPendingFriendRequests[(idx : Int)].id);

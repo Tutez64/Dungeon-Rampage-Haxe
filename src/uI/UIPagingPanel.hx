@@ -130,9 +130,9 @@ class UIPagingPanel {
 		var offset:Float;
 		mPageLeftButton.enabled = mCurrentPage != 0;
 		mPageRightButton.enabled = mCurrentPage < mNumPages - 1;
-		final __ax4_iter_135 = mPageButtons;
-		if (checkNullIteratee(__ax4_iter_135))
-			for (_tmp_ in __ax4_iter_135) {
+		final __ax4_iter_138 = mPageButtons;
+		if (checkNullIteratee(__ax4_iter_138))
+			for (_tmp_ in __ax4_iter_138) {
 				pageButton = _tmp_;
 				pageButton.detach();
 				pageButton.destroy();

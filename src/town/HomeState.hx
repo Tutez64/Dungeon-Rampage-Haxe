@@ -385,9 +385,9 @@ class HomeState extends TownSubState {
 		}
 		var _loc3_ = new Vector<GMOffer>();
 		var _loc5_:UInt;
-		final __ax4_iter_139 = StoreServicesController.HERO_OFFERS;
-		if (checkNullIteratee(__ax4_iter_139))
-			for (_tmp_ in __ax4_iter_139) {
+		final __ax4_iter_142 = StoreServicesController.HERO_OFFERS;
+		if (checkNullIteratee(__ax4_iter_142))
+			for (_tmp_ in __ax4_iter_142) {
 				_loc5_ = _tmp_;
 				_loc6_ = ASCompat.coerce(mDBFacade.gameMaster.offerById.itemFor(_loc5_), gameMasterDictionary.GMOffer);
 				_loc4_ = (_loc6_.Details[0].HeroId : Int);

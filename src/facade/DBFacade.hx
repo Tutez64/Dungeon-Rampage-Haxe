@@ -34,6 +34,8 @@ import modding.Host;
 #end
 import metrics.MetricsLogger;
 import metrics.PixelTracker;
+import networkCode.transport.GameEndpoints;
+import networkCode.transport.TransportSettings;
 import sound.DBSoundManager;
 import stateMachine.mainStateMachine.LoadingFinishedEvent;
 import stateMachine.mainStateMachine.MainStateMachine;
@@ -43,6 +45,7 @@ import town.AdManager;
 import uI.hud.UIHud;
 import uI.map.PlayerActivityCount;
 import uI.popup.DBUIOneButtonPopup;
+import uI.UIReconnectingIndicator;
 import com.amanitadesign.steam.FRESteamWorks;
 import com.maccherone.json.JSON;
 import flash.display.DisplayObject;
@@ -99,6 +102,12 @@ class DBFacade extends Facade {
 
 	var mMovieClipPool:MovieClipPool;
 
+	var mReconnectingIndicator:UIReconnectingIndicator;
+
+	var mReconnectFrozeInput:Bool = false;
+
+	var mMainStateAtDrop:String;
+
 	var mMetricsLogger:MetricsLogger;
 
 	var mTileLibraryMap:Map;
@@ -139,7 +148,9 @@ class DBFacade extends Facade {
 
 	var mGameSocketPort:Int = 0;
 
-	var mGameSocketFallbackPort:Int = 0;
+	var mGameSocketTlsOffered:Bool = false;
+
+	var mGameSocketWssPath:String = "";
 
 	var mWebAPIRoot:String;
 
@@ -583,8 +594,6 @@ class DBFacade extends Facade {
 				mMetricsLogger.log("FacebookEarnCallback");
 			});
 			Logger.debug("ExternalInterface setup complete");
-		} else {
-			trace("ExternalInterface not available");
 		}
 	}
 
@@ -623,7 +632,8 @@ class DBFacade extends Facade {
 		mWebServicesUrl = ASCompat.asString(result.webServicesUrl);
 		mGameSocketAddress = ASCompat.asString(result.gameSocketAddress);
 		mGameSocketPort = ASCompat.asInt(result.gameSocketPort);
-		mGameSocketFallbackPort = result.gameSocketFallbackPort != null ? ASCompat.toInt(result.gameSocketFallbackPort) : 0;
+		mGameSocketTlsOffered = result.gameSocketTls == true;
+		mGameSocketWssPath = result.gameSocketWssPath != null ? ASCompat.toString(result.gameSocketWssPath) : "";
 		mWebAPIRoot = mWebServicesUrl + "/api/";
 		mRPCRoot = mWebServicesUrl + "/rpc/";
 		mSteamAPIRoot = mWebServicesUrl + "/steam/";
@@ -818,8 +828,9 @@ class DBFacade extends Facade {
 	}
 
 	public function powerUpDistributedObjectManager() {
-		var _loc1_ = false;
-		var _loc2_ = 0;
+		var _loc2_ = false;
+		var _loc1_:GameEndpoints = null;
+		var _loc3_ = false;
 		Logger.info("*****************Starting powerUpDistributedObjectManager");
 		this.loadingBarTick();
 		if (mDistributedObjectManager == null) {
@@ -827,18 +838,73 @@ class DBFacade extends Facade {
 				Logger.fatal("GameSocketAddress is empty.  Unable to continue.");
 				return;
 			}
-			_loc1_ = featureFlags.getFlagValue("use-fallback-socket-port");
-			_loc2_ = _loc1_ ? mGameSocketFallbackPort : mGameSocketPort;
-			if (_loc2_ == 0) {
-				Logger.fatal("GameSocketPort is empty (useFallback=" + _loc1_ + ").  Unable to continue.");
-				return;
-			}
-			Security.loadPolicyFile("xmlsocket://" + mGameSocketAddress + ":843");
+			TransportSettings.applyOverrides(dbConfigManager);
+			_loc2_ = dbConfigManager.getConfigBoolean("EnforceServerCertificate", true);
+			_loc1_ = new GameEndpoints(mGameSocketAddress, mGameSocketPort, mGameSocketWssPath, _loc2_, mGameSocketTlsOffered);
+			_loc3_ = featureFlags.getFlagValue("experimental-websocket-reconnects");
+			Logger.info("WorldServer endpoints: " + _loc1_ + " experimentalWebSocketReconnects=" + _loc3_);
 			mDistributedObjectManager = new DistributedObjectManager(this);
 			MemoryTracker.track(mDistributedObjectManager, "DistributedObjectManager - created in DBFacade.startGame()");
-			mDistributedObjectManager.Initialize(mGameSocketAddress, _loc2_, validationToken, demographicsJson, accountId,
+			mDistributedObjectManager.Initialize(_loc1_, _loc3_, validationToken, demographicsJson, accountId,
 				(ASCompat.floatToInt(dbConfigManager.networkId) : UInt), NODE_RULES);
 		}
+	}
+
+	public function onConnectionReconnecting(reason:String) {
+		Logger.warn("WorldServer connection lost, resuming: " + reason);
+		mMainStateAtDrop = mMainStateMachine?.currentStateName;
+		showReconnectingIndicator();
+		if (!mReconnectFrozeInput && inputManager != null && !inputManager.disableInputs) {
+			inputManager.disableControls();
+			mReconnectFrozeInput = true;
+		}
+	}
+
+	public function onConnectionReconnectAttempt(attempt:Int, elapsedMilliseconds:Int, graceMilliseconds:Int) {
+		showReconnectingIndicator();
+		mReconnectingIndicator.update(attempt, elapsedMilliseconds, graceMilliseconds);
+	}
+
+	public function onConnectionResumed() {
+		Logger.info("WorldServer connection resumed.");
+		if (reconnectChangedMainState) {
+			Logger.warn("WorldServer connection resumed into " + mMainStateMachine.currentStateName + " after dropping in " + mMainStateAtDrop);
+		}
+		endReconnecting();
+	}
+
+	@:isVar public var reconnectChangedMainState(get, never):Bool;
+
+	public function get_reconnectChangedMainState():Bool {
+		return mMainStateAtDrop != null && mMainStateMachine != null && mMainStateMachine.currentStateName != mMainStateAtDrop;
+	}
+
+	public function onConnectionReconnectFailed() {
+		Logger.warn("WorldServer connection could not be resumed.");
+		endReconnecting();
+	}
+
+	function endReconnecting() {
+		var _loc1_:UIReconnectingIndicator = null;
+		mMainStateAtDrop = null;
+		if (mReconnectingIndicator != null) {
+			_loc1_ = mReconnectingIndicator;
+			mReconnectingIndicator = null;
+			_loc1_.destroy();
+		}
+		if (mReconnectFrozeInput) {
+			mReconnectFrozeInput = false;
+			if (inputManager != null) {
+				inputManager.enableControls();
+			}
+		}
+	}
+
+	function showReconnectingIndicator() {
+		if (mReconnectingIndicator == null) {
+			mReconnectingIndicator = new UIReconnectingIndicator(this);
+		}
+		mReconnectingIndicator.show();
 	}
 
 	public function warningPopup(title:String, message:String) {

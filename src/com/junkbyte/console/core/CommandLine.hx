@@ -111,16 +111,16 @@ class CommandLine extends ConsoleCore {
 	}
 
 	public function getHintsFor(str:String, max:UInt):Array<ASAny> {
-		var __ax4_iter_111:WeakObject;
+		var __ax4_iter_114:WeakObject;
 		var hints:Array<ASAny>;
 		var X:String = null;
 		var canadate:Array<ASAny> = null;
 		var cmd:ASObject = null;
 		var Y:String = null;
 		var all = new Array<ASAny>();
-		final __ax4_iter_110:ASObject = this._slashCmds;
-		if (checkNullIteratee(__ax4_iter_110))
-			for (_tmp_ in __ax4_iter_110.___keys()) {
+		final __ax4_iter_113:ASObject = this._slashCmds;
+		if (checkNullIteratee(__ax4_iter_113))
+			for (_tmp_ in __ax4_iter_113.___keys()) {
 				X = _tmp_;
 				cmd = this._slashCmds[X];
 				if (config.commandLineAllowed || ASCompat.toBool(cmd.allow)) {
@@ -128,9 +128,9 @@ class CommandLine extends ConsoleCore {
 				}
 			}
 		if (config.commandLineAllowed) {
-			__ax4_iter_111 = this._saved;
-			if (checkNullIteratee(__ax4_iter_111))
-				for (_tmp_ in (__ax4_iter_111 : ASAny).___keys()) {
+			__ax4_iter_114 = this._saved;
+			if (checkNullIteratee(__ax4_iter_114))
+				for (_tmp_ in (__ax4_iter_114 : ASAny).___keys()) {
 					Y = _tmp_;
 					all.push(["$" + Y, LogReferences.ShortClassName(this._saved.get(Y))]);
 				}
@@ -200,7 +200,7 @@ class CommandLine extends ConsoleCore {
 	}
 
 	public function run(str:String, saves:ASObject = null):ASAny {
-		var __ax4_iter_112:WeakObject;
+		var __ax4_iter_115:WeakObject;
 		var v:ASAny;
 		var bytes:ByteArray = null;
 		var exe:Executer = null;
@@ -235,9 +235,9 @@ class CommandLine extends ConsoleCore {
 				exe = new Executer();
 				exe.addEventListener(Event.COMPLETE, this.onExecLineComplete, false, 0, true);
 				if (ASCompat.toBool(saves)) {
-					__ax4_iter_112 = this._saved;
-					if (checkNullIteratee(__ax4_iter_112))
-						for (_tmp_ in (__ax4_iter_112 : ASAny).___keys()) {
+					__ax4_iter_115 = this._saved;
+					if (checkNullIteratee(__ax4_iter_115))
+						for (_tmp_ in (__ax4_iter_115 : ASAny).___keys()) {
 							X = _tmp_;
 							if (!ASCompat.toBool(saves[X])) {
 								saves[X] = (this._saved : ASAny)[X];
@@ -382,9 +382,9 @@ class CommandLine extends ConsoleCore {
 		report("Saved vars: ", -1);
 		var _loc2_ = (0 : UInt);
 		var _loc3_ = (0 : UInt);
-		final __ax4_iter_113 = this._saved;
-		if (checkNullIteratee(__ax4_iter_113))
-			for (_tmp_ in (__ax4_iter_113 : ASAny).___keys()) {
+		final __ax4_iter_116 = this._saved;
+		if (checkNullIteratee(__ax4_iter_116))
+			for (_tmp_ in (__ax4_iter_116 : ASAny).___keys()) {
 				_loc4_ = _tmp_;
 				_loc5_ = this._saved.getWeakRef(_loc4_);
 				_loc2_++;
@@ -406,9 +406,9 @@ class CommandLine extends ConsoleCore {
 		var _loc4_:SlashCommand = null;
 		var _loc2_:Array<ASAny> = [];
 		var _loc3_:Array<ASAny> = [];
-		final __ax4_iter_114:ASObject = this._slashCmds;
-		if (checkNullIteratee(__ax4_iter_114))
-			for (_tmp_ in iterateDynamicValues(__ax4_iter_114)) {
+		final __ax4_iter_117:ASObject = this._slashCmds;
+		if (checkNullIteratee(__ax4_iter_117))
+			for (_tmp_ in iterateDynamicValues(__ax4_iter_117)) {
 				_loc4_ = ASCompat.coerce(_tmp_, SlashCommand);
 				if (config.commandLineAllowed || _loc4_.allow) {
 					if (_loc4_.user) {

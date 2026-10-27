@@ -47,7 +47,7 @@ class GMOfferDetail {
 		OfferId = (ASCompat.toInt(jsonAsset.OfferId) : UInt);
 		WeaponId = (ASCompat.toInt(jsonAsset.WeaponId) : UInt);
 		WeaponPower = (ASCompat.toInt(jsonAsset.WeaponPower) : UInt);
-		Level = jsonAsset.Level != null ? (ASCompat.toInt(jsonAsset.Level) : UInt) : (0 : UInt);
+		Level = (ASCompat.toInt(jsonAsset.Level ?? (0 : UInt)) : UInt);
 		Rarity = jsonAsset.Rarity;
 		Modifier1 = jsonAsset.Modifier1;
 		Modifier2 = jsonAsset.Modifier2;

@@ -481,13 +481,13 @@ class UIShopOffer extends UIObject {
 
 	function greyOffer(value:Bool) {
 		var _loc3_:DisplayObject;
-		var __ax4_iter_127:Vector<DisplayObject>;
+		var __ax4_iter_130:Vector<DisplayObject>;
 		var _loc2_:ColorMatrixFilter = null;
 		if (value) {
 			_loc2_ = SceneGraphManager.getGrayScaleSaturationFilter(5);
-			__ax4_iter_127 = this.nodesToGrey;
-			if (checkNullIteratee(__ax4_iter_127))
-				for (_tmp_ in __ax4_iter_127) {
+			__ax4_iter_130 = this.nodesToGrey;
+			if (checkNullIteratee(__ax4_iter_130))
+				for (_tmp_ in __ax4_iter_130) {
 					_loc3_ = _tmp_;
 					if (_loc3_ != null) {
 						_loc3_.filters = cast([_loc2_]);

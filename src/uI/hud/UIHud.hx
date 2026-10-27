@@ -1545,18 +1545,18 @@ class UIHud {
 		if (mPetPortrait != null) {
 			mPetPortrait.destroy();
 		}
-		final __ax4_iter_82 = mWeaponButtons;
-		if (checkNullIteratee(__ax4_iter_82))
-			for (_tmp_ in __ax4_iter_82) {
+		final __ax4_iter_85 = mWeaponButtons;
+		if (checkNullIteratee(__ax4_iter_85))
+			for (_tmp_ in __ax4_iter_85) {
 				_loc1_ = _tmp_;
 				if (_loc1_ != null) {
 					_loc1_.destroy();
 				}
 				_loc1_ = null;
 			}
-		final __ax4_iter_83 = mConsumableWeaponButtons;
-		if (checkNullIteratee(__ax4_iter_83))
-			for (_tmp_ in __ax4_iter_83) {
+		final __ax4_iter_86 = mConsumableWeaponButtons;
+		if (checkNullIteratee(__ax4_iter_86))
+			for (_tmp_ in __ax4_iter_86) {
 				_loc1_ = _tmp_;
 				if (_loc1_ != null) {
 					_loc1_.destroy();
@@ -1612,9 +1612,9 @@ class UIHud {
 
 	public function setWeaponHighlight(currentWeaponIndex:Int) {
 		var _loc2_:UIButton;
-		final __ax4_iter_84 = mWeaponButtons;
-		if (checkNullIteratee(__ax4_iter_84))
-			for (_tmp_ in __ax4_iter_84) {
+		final __ax4_iter_87 = mWeaponButtons;
+		if (checkNullIteratee(__ax4_iter_87))
+			for (_tmp_ in __ax4_iter_87) {
 				_loc2_ = _tmp_;
 				ASCompat.setProperty((_loc2_.root : ASAny).selectionFrame, "visible", false);
 			}

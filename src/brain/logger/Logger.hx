@@ -71,9 +71,9 @@ class Logger {
 
 	public static function listSlashCommands() {
 		var _loc1_:String;
-		final __ax4_iter_122 = mListSlashCommands;
-		if (checkNullIteratee(__ax4_iter_122))
-			for (_tmp_ in __ax4_iter_122) {
+		final __ax4_iter_125 = mListSlashCommands;
+		if (checkNullIteratee(__ax4_iter_125))
+			for (_tmp_ in __ax4_iter_125) {
 				_loc1_ = _tmp_;
 				log(_loc1_);
 			}
@@ -116,7 +116,6 @@ class Logger {
 
 	public static function log(logString:String) {
 		logString = "" + logString;
-		trace(logString);
 		if (mWantConsole) {
 			Cc.log(logString);
 		}
@@ -127,7 +126,6 @@ class Logger {
 			return;
 		}
 		logString = "[DEBUG] " + getDateString() + logString;
-		trace(logString);
 		if (mWantConsole) {
 			Cc.debug(logString);
 		}
@@ -138,7 +136,6 @@ class Logger {
 			return;
 		}
 		logString = "[DEBUG] " + getDateString() + logString;
-		trace(logString);
 		if (mWantConsole) {
 			Cc.debugch(channel, logString);
 		}
@@ -149,7 +146,6 @@ class Logger {
 			return;
 		}
 		logString = "[INFO]  " + getDateString() + logString;
-		trace(logString);
 		if (mWantConsole) {
 			Cc.info(logString);
 		}
@@ -160,7 +156,6 @@ class Logger {
 			return;
 		}
 		logString = "[INFO] " + getDateString() + logString;
-		trace(logString);
 		if (mWantConsole) {
 			Cc.infoch(channel, logString);
 		}
@@ -171,7 +166,6 @@ class Logger {
 			return;
 		}
 		logString = "[WARN]  " + getDateString() + logString;
-		trace(logString);
 		if (mWantConsole) {
 			Cc.warn(logString);
 		}
@@ -182,7 +176,6 @@ class Logger {
 			return;
 		}
 		logString = "[WARN] " + getDateString() + logString;
-		trace(logString);
 		if (mWantConsole) {
 			Cc.warnch(channel, logString);
 		}
@@ -194,7 +187,6 @@ class Logger {
 		var _loc3_ = ASCompat.stringAsBool(_loc4_) ? logString + "\n" + _loc4_ : logString;
 		tryErrorCallback(_loc3_);
 		logString = "[ERROR] " + getDateString() + _loc3_;
-		trace(logString);
 		if (mWantConsole) {
 			Cc.error(logString);
 		}
@@ -219,7 +211,6 @@ class Logger {
 		var _loc4_:String = (_loc5_ : ASAny).hasOwnProperty("getStackTrace") ? _loc5_.getStackTrace() : null;
 		logString = "[FATAL] " + getDateString() + logString;
 		var _loc3_ = logString + "\n" + _loc4_;
-		trace(_loc3_);
 		if (mWantConsole) {
 			displayConsole();
 			Cc.minimumPriority = (8 : UInt);
@@ -242,7 +233,6 @@ class Logger {
 			return;
 		}
 		logString = "[" + customLoggerString + "]  " + getDateString() + logString;
-		trace(logString);
 		if (mWantConsole) {
 			Cc.warn(logString);
 		}

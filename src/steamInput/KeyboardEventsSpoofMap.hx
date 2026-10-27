@@ -9,9 +9,9 @@ class KeyboardEventsSpoofMap {
 		mActionNamesToKeyCodes["revive_ally"] = 32;
 		mActionNamesToKeyCodes["toggle_menu"] = 27;
 		var _loc1_:String;
-		final __ax4_iter_89 = mActionNamesToKeyCodes;
-		if (checkNullIteratee(__ax4_iter_89))
-			for (_tmp_ in __ax4_iter_89.keys()) {
+		final __ax4_iter_92 = mActionNamesToKeyCodes;
+		if (checkNullIteratee(__ax4_iter_92))
+			for (_tmp_ in __ax4_iter_92.keys()) {
 				_loc1_ = _tmp_;
 				mActionNames.push(_loc1_);
 			}

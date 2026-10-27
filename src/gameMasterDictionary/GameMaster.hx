@@ -269,9 +269,7 @@ class GameMaster {
 		_loc3_ = 0;
 		while (_loc3_ < DBGlobal.StatNames.length) {
 			_loc2_ = ASCompat.coerce(statByConstant.itemFor(DBGlobal.StatNames[_loc3_]), gameMasterDictionary.GMStat);
-			if (_loc2_ == null) {
-				trace("Error Finding State By name ", DBGlobal.StatNames[_loc3_]);
-			} else {
+			if (_loc2_ != null) {
 				stat_BonusMultiplier.values[_loc3_] = _loc2_.Bonus;
 				stat_MaxCap.values[_loc3_] = _loc2_.MaxCap;
 			}

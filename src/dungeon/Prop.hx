@@ -30,8 +30,8 @@ class Prop extends FloorObject {
 	}
 
 	public static function parseFromTileJson(propJsonObj:ASObject, tile:Tile, dbFacade:DBFacade):Prop {
-		var _loc6_ = ASCompat.toNumber(tile.position.x + (propJsonObj.x != null ? propJsonObj.x : 0));
-		var _loc7_ = ASCompat.toNumber(tile.position.y + (propJsonObj.y != null ? propJsonObj.y : 0));
+		var _loc6_ = ASCompat.toNumber(tile.position.x + (propJsonObj.x ?? 0));
+		var _loc7_ = ASCompat.toNumber(tile.position.y + (propJsonObj.y ?? 0));
 		var _loc8_ = new Vector3D(_loc6_, _loc7_);
 		var _loc5_ = new Prop(dbFacade);
 		_loc5_.tile = tile;
@@ -50,7 +50,7 @@ class Prop extends FloorObject {
 		if (ASCompat.toBool(propJsonObj.rotation)) {
 			_loc5_.view.root.rotation = ASCompat.toNumberField(propJsonObj, "rotation");
 		}
-		var _loc9_:String = propJsonObj.layer != null ? propJsonObj.layer : "sorted";
+		var _loc9_:String = propJsonObj.layer ?? "sorted";
 		_loc5_.layer = SceneGraphManager.getLayerFromName(_loc9_);
 		return _loc5_;
 	}

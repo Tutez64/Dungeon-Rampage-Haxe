@@ -57,9 +57,6 @@ class GeneratedDcSocket extends DcSocket implements DcSocketGenerate {
 
 			case 1:
 				Doid_NetInterfaces[Std.string(do_id)] = PlayerGameObjectOwnerNetworkComponent.ownerFactory(game_packet, this, do_id);
-
-			default:
-				trace("Received generate for object of unknown Class ID " + classid);
 		}
 	}
 
@@ -100,9 +97,6 @@ class GeneratedDcSocket extends DcSocket implements DcSocketGenerate {
 
 			case 15:
 				Doid_NetInterfaces[Std.string(do_id)] = MatchMakerNetworkComponent.netFactory(game_packet, this, do_id);
-
-			default:
-				trace("Received generate for object of unknown Class ID " + classid);
 		}
 	}
 }

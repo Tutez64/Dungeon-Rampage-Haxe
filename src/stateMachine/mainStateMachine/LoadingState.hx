@@ -10,6 +10,7 @@ import brain.event.EventComponent;
 import brain.logger.Logger;
 import brain.stateMachine.State;
 import config.DBConfigManager;
+import config.ServiceDiscoveryLoader;
 import config.ServiceDiscoveryReadyEvent;
 import events.DBAccountLoadedEvent;
 import events.ManagersLoadedEvent;
@@ -91,6 +92,11 @@ class LoadingState extends State {
 		mDBFacade.loadingBarTick();
 		if (event.serviceDiscoveryResult == null) {
 			mDBFacade.mainStateMachine.enterSocketErrorState((event.serviceDiscoveryErrorCode : UInt), event.serviceDiscoveryErrorText);
+			return;
+		}
+		var _loc2_ = ServiceDiscoveryLoader.maintenanceMessage(event.serviceDiscoveryResult);
+		if (_loc2_ != null) {
+			mDBFacade.mainStateMachine.enterSocketErrorState((1504 : UInt), _loc2_);
 			return;
 		}
 		mDBFacade.applyServiceDiscoveryResult(event.serviceDiscoveryResult);

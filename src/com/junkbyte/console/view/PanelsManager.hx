@@ -165,9 +165,9 @@ class PanelsManager {
 					_loc8_.update(_loc5_, this._canDraw);
 				}
 			}
-		final __ax4_iter_124:ASObject = this._graphsMap;
-		if (checkNullIteratee(__ax4_iter_124))
-			for (_tmp_ in __ax4_iter_124.___keys()) {
+		final __ax4_iter_127:ASObject = this._graphsMap;
+		if (checkNullIteratee(__ax4_iter_127))
+			for (_tmp_ in __ax4_iter_127.___keys()) {
 				_loc6_ = _tmp_;
 				if (_loc2_ == null || !ASCompat.toBool(_loc2_[_loc6_])) {
 					this._graphsMap[_loc6_].close();

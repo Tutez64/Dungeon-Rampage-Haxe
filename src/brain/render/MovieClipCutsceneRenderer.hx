@@ -149,7 +149,6 @@ class MovieClipCutsceneRenderer extends MovieClipRenderer {
 				} else if (ASCompat.stringAsBool(clip.currentFrameLabel) && clip.currentFrameLabel.indexOf("play ") == 0) {
 					mSoundFrames.push((_loc4_ : UInt));
 					_loc2_ = clip.currentFrameLabel.substring(5);
-					trace("Found sound: " + _loc2_ + " at frame: " + Std.string(_loc4_));
 					mSoundClasses.push(_loc2_);
 				}
 				_loc4_++;

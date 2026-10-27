@@ -120,9 +120,9 @@ class HeroWithEquipPicker extends UIObject {
 
 	public function showWeaponComparison(gmWeaponItem:GMWeaponItem, power:UInt) {
 		var _loc3_:HeroElement;
-		final __ax4_iter_160 = mHeroSlots;
-		if (checkNullIteratee(__ax4_iter_160))
-			for (_tmp_ in __ax4_iter_160) {
+		final __ax4_iter_163 = mHeroSlots;
+		if (checkNullIteratee(__ax4_iter_163))
+			for (_tmp_ in __ax4_iter_163) {
 				_loc3_ = _tmp_;
 				_loc3_.showWeaponComparison(gmWeaponItem, power);
 			}
@@ -130,9 +130,9 @@ class HeroWithEquipPicker extends UIObject {
 
 	public function hideWeaponComparison() {
 		var _loc1_:HeroElement;
-		final __ax4_iter_161 = mHeroSlots;
-		if (checkNullIteratee(__ax4_iter_161))
-			for (_tmp_ in __ax4_iter_161) {
+		final __ax4_iter_164 = mHeroSlots;
+		if (checkNullIteratee(__ax4_iter_164))
+			for (_tmp_ in __ax4_iter_164) {
 				_loc1_ = _tmp_;
 				_loc1_.hideWeaponComparison();
 			}

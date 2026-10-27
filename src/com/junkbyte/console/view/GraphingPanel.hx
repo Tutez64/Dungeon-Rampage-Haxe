@@ -230,9 +230,9 @@ class GraphingPanel extends ConsolePanel {
 					}
 				}
 			}
-		final __ax4_iter_125:ASObject = this._infoMap;
-		if (checkNullIteratee(__ax4_iter_125))
-			for (_tmp_ in __ax4_iter_125.___keys()) {
+		final __ax4_iter_128:ASObject = this._infoMap;
+		if (checkNullIteratee(__ax4_iter_128))
+			for (_tmp_ in __ax4_iter_128.___keys()) {
 				_loc12_ = _tmp_;
 				if (checkNullIteratee(_loc4_))
 					for (_tmp_ in _loc4_) {
@@ -252,7 +252,7 @@ class GraphingPanel extends ConsolePanel {
 	}
 
 	public function updateKeyText() {
-		var __ax4_iter_126:ASObject;
+		var __ax4_iter_129:ASObject;
 		var _loc2_:String = null;
 		var _loc1_ = "<r><low>";
 		if (ASCompat.stringAsBool(this._type)) {
@@ -264,9 +264,9 @@ class GraphingPanel extends ConsolePanel {
 				_loc1_ += this._interest.v + "mb";
 			}
 		} else {
-			__ax4_iter_126 = this._infoMap;
-			if (checkNullIteratee(__ax4_iter_126))
-				for (_tmp_ in __ax4_iter_126.___keys()) {
+			__ax4_iter_129 = this._infoMap;
+			if (checkNullIteratee(__ax4_iter_129))
+				for (_tmp_ in __ax4_iter_129.___keys()) {
 					_loc2_ = _tmp_;
 					_loc1_ += " <font color=\'#" + Std.string(ASCompat.dynGetIndex(this._infoMap[_loc2_], 0)) + "\'>" + _loc2_ + "</font>";
 				}

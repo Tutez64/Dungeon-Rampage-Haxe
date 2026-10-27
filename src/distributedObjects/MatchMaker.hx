@@ -46,9 +46,9 @@ class MatchMaker extends GameObject implements IMatchMaker {
 	function setInfiniteDungeonDetails() {
 		var _loc1_:InfiniteMapNodeDetail = null;
 		mInfiniteDungeonDetails = new Map();
-		final __ax4_iter_219 = mInfiniteMapNodeDetails;
-		if (checkNullIteratee(__ax4_iter_219))
-			for (_tmp_ in __ax4_iter_219) {
+		final __ax4_iter_222 = mInfiniteMapNodeDetails;
+		if (checkNullIteratee(__ax4_iter_222))
+			for (_tmp_ in __ax4_iter_222) {
 				_loc1_ = _tmp_;
 				if (_loc1_ != null) {
 					mInfiniteDungeonDetails.add(_loc1_.nodeId, _loc1_);
@@ -57,12 +57,10 @@ class MatchMaker extends GameObject implements IMatchMaker {
 	}
 
 	public function ClientInformPartyComposition(partyMembers:Vector<GameServerPartyMember>) {
-		trace("ClientInformPartyComposition");
 		var _loc2_:GameServerPartyMember;
 		if (checkNullIteratee(partyMembers))
 			for (_tmp_ in partyMembers) {
 				_loc2_ = _tmp_;
-				trace("Member Id:" + _loc2_.id + " Status:" + _loc2_.status);
 			}
 	}
 

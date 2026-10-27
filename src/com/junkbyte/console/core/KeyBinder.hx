@@ -82,9 +82,9 @@ class KeyBinder extends ConsoleCore {
 		var _loc3_:String = null;
 		report("Key binds:", -2);
 		var _loc2_ = (0 : UInt);
-		final __ax4_iter_115:ASObject = this._binds;
-		if (checkNullIteratee(__ax4_iter_115))
-			for (_tmp_ in __ax4_iter_115.___keys()) {
+		final __ax4_iter_118:ASObject = this._binds;
+		if (checkNullIteratee(__ax4_iter_118))
+			for (_tmp_ in __ax4_iter_118.___keys()) {
 				_loc3_ = _tmp_;
 				_loc2_++;
 				report(_loc3_, -2);

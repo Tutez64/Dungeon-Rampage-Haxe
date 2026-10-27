@@ -63,9 +63,9 @@ class B2DynamicTreeBroadPhase implements IBroadPhase {
 		var userDataB:ASAny = /*undefined*/ null;
 		var pair:B2DynamicTreePair = null;
 		this.m_pairCount = 0;
-		final __ax4_iter_88 = this.m_moveBuffer;
-		if (checkNullIteratee(__ax4_iter_88))
-			for (_tmp_ in __ax4_iter_88) {
+		final __ax4_iter_91 = this.m_moveBuffer;
+		if (checkNullIteratee(__ax4_iter_91))
+			for (_tmp_ in __ax4_iter_91) {
 				queryProxy = _tmp_;
 				QueryCallback = function(proxy:B2DynamicTreeNode):Bool {
 					if (proxy == queryProxy) {

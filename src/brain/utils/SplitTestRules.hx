@@ -113,7 +113,6 @@ class SplitTestRules {
 		while (_loc4_ < _loc5_.length) {
 			_loc1_ = toArray(_loc5_[_loc4_]);
 			_loc3_ = hash(_loc1_);
-			trace("SHA256 Test " + _loc4_, fromArray(_loc3_) == Std.string(_loc2_[_loc4_]).toLowerCase());
 			_loc4_++;
 		}
 	}

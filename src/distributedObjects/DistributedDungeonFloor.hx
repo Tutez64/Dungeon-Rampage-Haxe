@@ -563,9 +563,9 @@ class DistributedDungeonFloor extends Floor implements IDistributedDungeonFloor 
 		mRemoteActors.clear();
 		mRemoteActors = null;
 		var _loc8_:ASObject;
-		final __ax4_iter_228 = mDoobers;
-		if (checkNullIteratee(__ax4_iter_228))
-			for (_tmp_ in __ax4_iter_228.keys()) {
+		final __ax4_iter_231 = mDoobers;
+		if (checkNullIteratee(__ax4_iter_231))
+			for (_tmp_ in __ax4_iter_231.keys()) {
 				_loc8_ = _tmp_;
 				_loc2_ = ASCompat.dynamicAs(_loc8_, DooberGameObject);
 				if (_loc2_ != null && !_loc2_.isDestroyed) {

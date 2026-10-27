@@ -10,11 +10,11 @@ class II_ChampionsboardListPerNode {
 			for (_tmp_ in iterateDynamicValues(json)) {
 				_loc2_ = _tmp_;
 				if (ASCompat.toBool(_loc2_.name)) {
-					mListOfTopScores.push(new II_ChampionsboardTopScore(_loc2_.name, ASCompat.toInt(_loc2_.score),
-						_loc2_.active_skin != null ? ASCompat.toInt(_loc2_.active_skin) : 151, _loc2_.weapon1, _loc2_.weapon2, _loc2_.weapon3));
+					mListOfTopScores.push(new II_ChampionsboardTopScore(_loc2_.name, ASCompat.toInt(_loc2_.score), ASCompat.toInt(_loc2_.active_skin ?? 151),
+						_loc2_.weapon1, _loc2_.weapon2, _loc2_.weapon3));
 				} else {
 					mListOfTopScores.push(new II_ChampionsboardTopScore(_loc2_.account_id, ASCompat.toInt(_loc2_.score),
-						_loc2_.active_skin != null ? ASCompat.toInt(_loc2_.active_skin) : 151, _loc2_.weapon1, _loc2_.weapon2, _loc2_.weapon3));
+						ASCompat.toInt(_loc2_.active_skin ?? 151), _loc2_.weapon1, _loc2_.weapon2, _loc2_.weapon3));
 				}
 			}
 	}

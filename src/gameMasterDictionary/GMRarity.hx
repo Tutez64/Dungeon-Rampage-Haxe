@@ -66,7 +66,7 @@ class GMRarity {
 		BasePowerConstant = ASCompat.toNumberField(jsonAsset, "BasePowerConstant");
 		if (HasColoredBackground) {
 			BackgroundIcon = jsonAsset.BackgroundIcon;
-			BackgroundIconBorder = jsonAsset.BackgroundIconBorder != null ? jsonAsset.BackgroundIconBorder : "";
+			BackgroundIconBorder = jsonAsset.BackgroundIconBorder ?? "";
 			BackgroundSwf = jsonAsset.BackgroundSwf;
 		}
 	}

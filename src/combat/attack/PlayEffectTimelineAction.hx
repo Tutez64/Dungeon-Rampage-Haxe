@@ -80,7 +80,7 @@ class PlayEffectTimelineAction extends AttackTimelineAction {
 		mScale = scale;
 		mAutoAdjustHeading = autoAdjustHeading;
 		mLoop = loop;
-		mLayer = layer != null ? layer : "sorted";
+		mLayer = layer ?? "sorted";
 		mManaged = managed;
 		if (!ASCompat.floatAsBool(mScale)) {
 			mScale = 1;

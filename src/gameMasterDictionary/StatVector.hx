@@ -122,7 +122,6 @@ class StatVector {
 		var _loc1_ = 0;
 		_loc1_ = 0;
 		while ((_loc1_ : UInt) < slotCount) {
-			trace(DBGlobal.StatNames[_loc1_], this.values[_loc1_]);
 			_loc1_++;
 		}
 	}

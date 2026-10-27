@@ -75,9 +75,9 @@ class UIBlocked extends UIFMState {
 		var idx:UInt;
 		Logger.debug("unblock button clicked");
 		mSelectedFriends.splice(0, (mSelectedFriends.length : UInt));
-		final __ax4_iter_203 = mFriendPopulater.getSelectedToggles();
-		if (checkNullIteratee(__ax4_iter_203))
-			for (_tmp_ in __ax4_iter_203) {
+		final __ax4_iter_206 = mFriendPopulater.getSelectedToggles();
+		if (checkNullIteratee(__ax4_iter_206))
+			for (_tmp_ in __ax4_iter_206) {
 				idx = (ASCompat.toInt(_tmp_) : UInt);
 				mSelectedFriends.push(mListOfBlockedFriends[(idx : Int)].id);
 			}

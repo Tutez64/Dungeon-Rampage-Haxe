@@ -292,7 +292,6 @@ class SceneGraphManager {
 			_loc4_++;
 		}
 		_loc3_ += node.toString() + " " + node.name;
-		trace(_loc3_);
 		var _loc5_ = ASCompat.reinterpretAs(node, DisplayObjectContainer);
 		if (_loc5_ != null) {
 			_loc6_ = 0;

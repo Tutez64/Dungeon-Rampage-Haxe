@@ -423,7 +423,6 @@ class StoreServicesController {
 	}
 
 	public static function getWebServerTimestamp(dbFacade:DBFacade, useSuccessCallback:ASFunction = null, errorCallback:ASFunction = null) {
-		trace("getWebServerTimestamp");
 		StoreServices.getWebServerTimestamp(dbFacade, useSuccessCallback, errorCallback);
 	}
 

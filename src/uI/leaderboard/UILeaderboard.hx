@@ -521,9 +521,9 @@ class UILeaderboard {
 		initialized = false;
 		mDBFacade = null;
 		var _loc2_:LeaderboardFriendSlot;
-		final __ax4_iter_156 = mFriendSlots;
-		if (checkNullIteratee(__ax4_iter_156))
-			for (_tmp_ in __ax4_iter_156) {
+		final __ax4_iter_159 = mFriendSlots;
+		if (checkNullIteratee(__ax4_iter_159))
+			for (_tmp_ in __ax4_iter_159) {
 				_loc2_ = _tmp_;
 				_loc2_.destroy();
 				_loc2_ = null;
@@ -541,16 +541,16 @@ class UILeaderboard {
 		}
 		mAlertRenderer = null;
 		var _loc3_:FriendInfo;
-		final __ax4_iter_157 = mOnlineFriends;
-		if (checkNullIteratee(__ax4_iter_157))
-			for (_tmp_ in __ax4_iter_157) {
+		final __ax4_iter_160 = mOnlineFriends;
+		if (checkNullIteratee(__ax4_iter_160))
+			for (_tmp_ in __ax4_iter_160) {
 				_loc3_ = _tmp_;
 				_loc3_ = null;
 			}
 		var _loc1_:FriendInfo;
-		final __ax4_iter_158 = mOfflineFriends;
-		if (checkNullIteratee(__ax4_iter_158))
-			for (_tmp_ in __ax4_iter_158) {
+		final __ax4_iter_161 = mOfflineFriends;
+		if (checkNullIteratee(__ax4_iter_161))
+			for (_tmp_ in __ax4_iter_161) {
 				_loc1_ = _tmp_;
 				_loc1_ = null;
 			}

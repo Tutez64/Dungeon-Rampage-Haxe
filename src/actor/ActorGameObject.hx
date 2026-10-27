@@ -525,8 +525,6 @@ class ActorGameObject extends FloorObject {
 			} else if (combatResult.blocked == 0) {
 				this.actorView.receiveDamage(combatResult, _loc2_);
 				receiveDamage(combatResult);
-			} else {
-				trace("TODO: Implement blocked view things and such!   BLOCKED!!!!!");
 			}
 		}
 	}

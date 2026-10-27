@@ -248,16 +248,16 @@ class HeroGameObjectOwner extends HeroGameObject implements IHeroGameObjectOwner
 	}
 
 	function doVisibility(gameClock:GameClock) {
-		var __ax4_iter_214:Vector<Tile>;
+		var __ax4_iter_217:Vector<Tile>;
 		var _loc3_:Rectangle = null;
 		var _loc2_:Vector<Tile> = /*undefined*/ null;
 		var _loc4_:Tile = null;
 		if (mDistributedDungeonFloor != null && mDistributedDungeonFloor.tileGrid != null) {
 			_loc3_ = mFacade.camera.visibleRectangle;
 			_loc2_ = mDistributedDungeonFloor.tileGrid.getVisibleTiles(_loc3_);
-			__ax4_iter_214 = mVisibleTiles;
-			if (checkNullIteratee(__ax4_iter_214))
-				for (_tmp_ in __ax4_iter_214) {
+			__ax4_iter_217 = mVisibleTiles;
+			if (checkNullIteratee(__ax4_iter_217))
+				for (_tmp_ in __ax4_iter_217) {
 					_loc4_ = _tmp_;
 					if (ASCompat.toNumber(_loc2_.indexOf(_loc4_)) < 0) {
 						_loc4_.removeFromStage();
@@ -380,9 +380,9 @@ class HeroGameObjectOwner extends HeroGameObject implements IHeroGameObjectOwner
 
 	public function doAttackOnHit(newAttack:String, weaponFromAttack:WeaponGameObject) {
 		var _loc3_:WeaponController;
-		final __ax4_iter_215 = weaponControllers;
-		if (checkNullIteratee(__ax4_iter_215))
-			for (_tmp_ in __ax4_iter_215) {
+		final __ax4_iter_218 = weaponControllers;
+		if (checkNullIteratee(__ax4_iter_218))
+			for (_tmp_ in __ax4_iter_218) {
 				_loc3_ = _tmp_;
 				if (_loc3_ != null && _loc3_.weapon == weaponFromAttack) {
 					_loc3_.queueAttack(newAttack);

@@ -323,7 +323,7 @@ class TimelineLite extends SimpleTimeline {
 	}
 
 	public function shiftChildren(amount:Float, adjustLabels:Bool = false, ignoreBeforeTime:Float = 0) {
-		var __ax4_iter_154:ASObject;
+		var __ax4_iter_157:ASObject;
 		var _loc5_:String = null;
 		var _loc4_ = ASCompat.coerce(this.gc ? ASCompat.coerce(_endCaps[0], com.greensock.core.TweenCore) : _firstChild, com.greensock.core.TweenCore);
 		while (_loc4_ != null) {
@@ -333,9 +333,9 @@ class TimelineLite extends SimpleTimeline {
 			_loc4_ = _loc4_.nextNode;
 		}
 		if (adjustLabels) {
-			__ax4_iter_154 = _labels;
-			if (checkNullIteratee(__ax4_iter_154))
-				for (_tmp_ in __ax4_iter_154.___keys()) {
+			__ax4_iter_157 = _labels;
+			if (checkNullIteratee(__ax4_iter_157))
+				for (_tmp_ in __ax4_iter_157.___keys()) {
 					_loc5_ = _tmp_;
 					if (ASCompat.toNumber(_labels[_loc5_]) >= ignoreBeforeTime) {
 						_labels[_loc5_] += amount;

@@ -46,7 +46,6 @@ class GameEntry extends MovieClip {
 							_loc5_++;
 						}
 						_loc3_ += param1.toString() + " " + param1.name;
-						trace(_loc3_);
 						var _loc6_ = ASCompat.reinterpretAs(param1, DisplayObjectContainer);
 						if (_loc6_ != null) {
 							_loc8_ = 0;
@@ -56,13 +55,7 @@ class GameEntry extends MovieClip {
 							}
 						}
 					};
-					trace("======================================================================");
-					trace(" Stage Scene Graph");
-					trace("======================================================================");
 					recurse(stage, 0);
-					trace("======================================================================");
-					trace(" Class Counts");
-					trace("======================================================================");
 					keys = nodeTypes.keysToArray();
 					ASCompat.ASArray.sort(keys, function(param1:String, param2:String):Int {
 						return ASCompat.floatToInt(ASCompat.toNumber(nodeTypes.itemFor(param2)) - ASCompat.toNumber(nodeTypes.itemFor(param1)));
@@ -70,7 +63,6 @@ class GameEntry extends MovieClip {
 					if (checkNullIteratee(keys))
 						for (_tmp_ in keys) {
 							key = _tmp_;
-							trace(nodeTypes.itemFor(key), "\t", key);
 						}
 			}
 		}

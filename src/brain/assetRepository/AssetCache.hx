@@ -69,14 +69,11 @@ final class AssetCache {
 
 	public function Dump() {
 		var _loc2_:Asset = null;
-		trace(" Asset Cache ------------------------------");
 		var _loc1_ = ASCompat.reinterpretAs(mCachedAssets.iterator(), IMapIterator);
 		while (_loc1_.hasNext()) {
 			_loc1_.next();
 			_loc2_ = ASCompat.dynamicAs(_loc1_.current, Asset);
-			if (_loc2_ != null) {
-				trace("AssetCache : ", _loc1_.key, ASCompat.getQualifiedClassName(((((_loc2_ : ASObject)) : ASAny).constructor : Dynamic)));
-			}
+			if (_loc2_ != null) {}
 		}
 	}
 }

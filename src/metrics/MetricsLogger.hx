@@ -30,9 +30,9 @@ class MetricsLogger {
 			eventData = {};
 		}
 		var _loc6_:String;
-		final __ax4_iter_132:ASObject = mDBFacade.demographics;
-		if (checkNullIteratee(__ax4_iter_132))
-			for (_tmp_ in __ax4_iter_132.___keys()) {
+		final __ax4_iter_135:ASObject = mDBFacade.demographics;
+		if (checkNullIteratee(__ax4_iter_135))
+			for (_tmp_ in __ax4_iter_135.___keys()) {
 				_loc6_ = _tmp_;
 				if (eventData.hasOwnProperty(_loc6_)) {
 					Logger.warn("Duplicate metric property: " + _loc6_ + " in event: " + eventName);

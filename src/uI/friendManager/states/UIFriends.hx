@@ -147,9 +147,9 @@ class UIFriends extends UIFMState {
 		mSelectedDRFriends.splice(0, (mSelectedDRFriends.length : UInt));
 		mSelectedFBFriends.splice(0, (mSelectedFBFriends.length : UInt));
 		mSelectedKGFriends.splice(0, (mSelectedKGFriends.length : UInt));
-		final __ax4_iter_195 = mFriendPopulater.getSelectedToggles();
-		if (checkNullIteratee(__ax4_iter_195))
-			for (_tmp_ in __ax4_iter_195) {
+		final __ax4_iter_198 = mFriendPopulater.getSelectedToggles();
+		if (checkNullIteratee(__ax4_iter_198))
+			for (_tmp_ in __ax4_iter_198) {
 				idx = (ASCompat.toInt(_tmp_) : UInt);
 				if (mListOfFriends[(idx : Int)].isDRFriend) {
 					mSelectedDRFriends.push(mListOfFriends[(idx : Int)].id);
@@ -194,9 +194,9 @@ class UIFriends extends UIFMState {
 			return;
 		}
 		newFriendsFound = false;
-		final __ax4_iter_196 = mFriendPopulater.getSelectedToggles();
-		if (checkNullIteratee(__ax4_iter_196))
-			for (_tmp_ in __ax4_iter_196) {
+		final __ax4_iter_199 = mFriendPopulater.getSelectedToggles();
+		if (checkNullIteratee(__ax4_iter_199))
+			for (_tmp_ in __ax4_iter_199) {
 				idx = (ASCompat.toInt(_tmp_) : UInt);
 				if (mDBFacade.dbAccountInfo.giftExcludeIds.indexOf(mListOfFriends[(idx : Int)].excludeId) < 0) {
 					newFriendsFound = true;
@@ -208,63 +208,51 @@ class UIFriends extends UIFMState {
 	}
 
 	function sendGifts(offerName:String, offerId:UInt) {
-		trace("sendGifts");
 		if (mDBFacade.isFacebookPlayer) {
-			trace("  isFacebookPlayer");
 			fbGiftFlow(offerName, offerId);
 		} else if (mDBFacade.isDRPlayer) {
-			trace("  isDRPlayer");
 			if (ASCompat.stringAsBool(mDBFacade.facebookController.accessToken)) {
 				fbGiftFlow(offerName, offerId);
-				trace("    fbGiftFlow");
 			} else {
 				drGiftFlow(offerName, offerId);
-				trace("    drGiftFlow");
 			}
 		} else if (mDBFacade.isKongregatePlayer) {
-			trace("  isKongregatePlayer");
 			kongGiftFlow(offerName, offerId);
 		} else {
-			trace("  isNotPlayer");
 			Logger.warn("What kind of player are you??? ");
 		}
 	}
 
 	function fbGiftFlow(offerName:String, offerId:UInt) {
-		trace("fbGiftFlow");
 		var _loc3_:Array<ASAny> = [];
 		var _loc4_:Array<ASAny> = [];
 		var _loc5_:UInt;
-		final __ax4_iter_197 = mFriendPopulater.getSelectedToggles();
-		if (checkNullIteratee(__ax4_iter_197))
-			for (_tmp_ in __ax4_iter_197) {
+		final __ax4_iter_200 = mFriendPopulater.getSelectedToggles();
+		if (checkNullIteratee(__ax4_iter_200))
+			for (_tmp_ in __ax4_iter_200) {
 				_loc5_ = (ASCompat.toInt(_tmp_) : UInt);
-				if (mDBFacade.dbAccountInfo.giftExcludeIds.indexOf(mListOfFriends[(_loc5_ : Int)].excludeId) >= 0) {
-					trace("  giftExcludeIds");
-				} else if (mListOfFriends[(_loc5_ : Int)].isDRFriend) {
-					_loc4_.push(_loc5_);
-					trace("  isDRFriend");
-				} else {
-					_loc3_.push(_loc5_);
-					trace("  isFBFriend");
+				if (mDBFacade.dbAccountInfo.giftExcludeIds.indexOf(mListOfFriends[(_loc5_ : Int)].excludeId) < 0) {
+					if (mListOfFriends[(_loc5_ : Int)].isDRFriend) {
+						_loc4_.push(_loc5_);
+					} else {
+						_loc3_.push(_loc5_);
+					}
 				}
 			}
 		if (_loc3_.length > 0) {
 			sendFacebookGift(offerName, offerId, _loc3_);
-			trace("  sendFacebookGift");
 		}
 		if (_loc4_.length > 0) {
 			sendDRComGift(offerName, offerId, _loc4_);
-			trace("  sendDRGift");
 		}
 	}
 
 	function drGiftFlow(offerName:String, offerId:UInt) {
 		var _loc3_:Array<ASAny> = [];
 		var _loc4_:UInt;
-		final __ax4_iter_198 = mFriendPopulater.getSelectedToggles();
-		if (checkNullIteratee(__ax4_iter_198))
-			for (_tmp_ in __ax4_iter_198) {
+		final __ax4_iter_201 = mFriendPopulater.getSelectedToggles();
+		if (checkNullIteratee(__ax4_iter_201))
+			for (_tmp_ in __ax4_iter_201) {
 				_loc4_ = (ASCompat.toInt(_tmp_) : UInt);
 				if (mDBFacade.dbAccountInfo.giftExcludeIds.indexOf(mListOfFriends[(_loc4_ : Int)].excludeId) < 0) {
 					_loc3_.push(_loc4_);
@@ -279,9 +267,9 @@ class UIFriends extends UIFMState {
 		var _loc4_:Array<ASAny> = [];
 		var _loc3_:Array<ASAny> = [];
 		var _loc5_:UInt;
-		final __ax4_iter_199 = mFriendPopulater.getSelectedToggles();
-		if (checkNullIteratee(__ax4_iter_199))
-			for (_tmp_ in __ax4_iter_199) {
+		final __ax4_iter_202 = mFriendPopulater.getSelectedToggles();
+		if (checkNullIteratee(__ax4_iter_202))
+			for (_tmp_ in __ax4_iter_202) {
 				_loc5_ = (ASCompat.toInt(_tmp_) : UInt);
 				if (mDBFacade.dbAccountInfo.giftExcludeIds.indexOf(mListOfFriends[(_loc5_ : Int)].excludeId) < 0) {
 					if (mListOfFriends[(_loc5_ : Int)].isDRFriend) {

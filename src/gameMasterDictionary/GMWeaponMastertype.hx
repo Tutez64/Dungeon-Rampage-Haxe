@@ -22,6 +22,6 @@ class GMWeaponMastertype {
 		Icon = jsonAsset.Icon;
 		UISwfFilepath = jsonAsset.UISwfFilepath;
 		Description = jsonAsset.Description;
-		DontShowInTavern = ASCompat.toBool(jsonAsset.DontShowInTavern != null ? ASCompat.toBool(jsonAsset.DontShowInTavern) : false);
+		DontShowInTavern = ASCompat.toBool(jsonAsset.DontShowInTavern ?? false);
 	}
 }

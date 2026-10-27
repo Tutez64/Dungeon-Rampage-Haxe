@@ -239,9 +239,9 @@ class MenuNavigationController {
 
 	function onSteamInputButtonPressed(eventData:OnSteamInputButtonPressedEvent) {
 		var _loc2_:String;
-		final __ax4_iter_133 = mSteamInputActionsToKeyCodes;
-		if (checkNullIteratee(__ax4_iter_133))
-			for (_tmp_ in __ax4_iter_133.keys()) {
+		final __ax4_iter_136 = mSteamInputActionsToKeyCodes;
+		if (checkNullIteratee(__ax4_iter_136))
+			for (_tmp_ in __ax4_iter_136.keys()) {
 				_loc2_ = _tmp_;
 				if (mSteamInputManager.pressedAction(_loc2_)) {
 					onKeyPressed(ASCompat.toInt(mSteamInputActionsToKeyCodes[_loc2_]));

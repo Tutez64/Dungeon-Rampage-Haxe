@@ -155,7 +155,7 @@ class TweenMax extends TweenLite implements IEventDispatcher {
 	}
 
 	static function get_globalTimeScale():Float {
-		return TweenLite.rootTimeline == null ? 1 : TweenLite.rootTimeline.cachedTimeScale;
+		return ASCompat.toNumber(TweenLite.rootTimeline?.cachedTimeScale);
 	}
 
 	public static function killChildTweensOf(parent:DisplayObjectContainer, complete:Bool = false) {

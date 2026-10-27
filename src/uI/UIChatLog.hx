@@ -243,7 +243,7 @@ class UIChatLog {
 
 	function addChatLog(chat:String, color:UInt, playerName:String = "") {
 		var _loc4_:ChatTextFieldHelper;
-		var __ax4_iter_136:Vector<ChatTextFieldHelper>;
+		var __ax4_iter_139:Vector<ChatTextFieldHelper>;
 		var _loc8_:ChatTextFieldHelper = null;
 		var _loc6_ = 0;
 		if (mChatLog == null) {
@@ -261,9 +261,9 @@ class UIChatLog {
 		if ((mChats.length : UInt) > MAX_CHATS) {
 			_loc8_ = mChats.shift();
 			_loc6_ = _loc8_.colorEndIndex - _loc8_.colorStartIndex;
-			__ax4_iter_136 = mChats;
-			if (checkNullIteratee(__ax4_iter_136))
-				for (_tmp_ in __ax4_iter_136) {
+			__ax4_iter_139 = mChats;
+			if (checkNullIteratee(__ax4_iter_139))
+				for (_tmp_ in __ax4_iter_139) {
 					_loc4_ = _tmp_;
 					_loc4_.colorEndIndex -= (_loc6_ : UInt);
 					_loc4_.colorStartIndex -= (_loc6_ : UInt);
@@ -277,15 +277,15 @@ class UIChatLog {
 		var _loc2_ = 0;
 		mChatLog.text = "";
 		var _loc3_:ChatTextFieldHelper;
-		final __ax4_iter_137 = mChats;
-		if (checkNullIteratee(__ax4_iter_137))
-			for (_tmp_ in __ax4_iter_137) {
+		final __ax4_iter_140 = mChats;
+		if (checkNullIteratee(__ax4_iter_140))
+			for (_tmp_ in __ax4_iter_140) {
 				_loc3_ = _tmp_;
 				mChatLog.text = mChatLog.text + _loc3_.chatText;
 			}
-		final __ax4_iter_138 = mChats;
-		if (checkNullIteratee(__ax4_iter_138))
-			for (_tmp_ in __ax4_iter_138) {
+		final __ax4_iter_141 = mChats;
+		if (checkNullIteratee(__ax4_iter_141))
+			for (_tmp_ in __ax4_iter_141) {
 				_loc3_ = _tmp_;
 				_loc2_ = (_loc3_.colorStartIndex : Int);
 				if (_loc3_.playerName != "") {

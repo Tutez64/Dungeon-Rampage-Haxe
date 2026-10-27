@@ -29,7 +29,7 @@ class FeatureFlags {
 
 	public static inline final WANT_STEAM_ACHIEVEMENTS = "want-steam-achievements";
 
-	public static inline final USE_FALLBACK_SOCKET_PORT = "use-fallback-socket-port";
+	public static inline final EXPERIMENTAL_WEBSOCKET_RECONNECTS = "experimental-websocket-reconnects";
 
 	var mFeatureFlags:ASDictionary<ASAny, ASAny>;
 
@@ -48,8 +48,8 @@ class FeatureFlags {
 		addFeatureFlag("want-numbered-hud", false);
 		addFeatureFlag("want-hud-refresh-on-floor-transition", false);
 		addFeatureFlag("experimental-use-steam-input", false);
+		addFeatureFlag("experimental-websocket-reconnects", false);
 		addFeatureFlag("want-steam-achievements", false);
-		addFeatureFlag("use-fallback-socket-port", false);
 	}
 
 	function addFeatureFlag(name:String, defaultValue:Bool, commandLineFlag:String = null, configFileAttributeName:String = null) {
@@ -62,6 +62,10 @@ class FeatureFlags {
 
 	public function setFlagDatabaseValueOnFirstLoad(flagName:String, value:Bool) {
 		mFeatureFlags[flagName].setDbValue(value);
+	}
+
+	public function setFlagConfigFileValue(flagName:String, value:Bool) {
+		mFeatureFlags[flagName].setConfigFileValue(value);
 	}
 
 	public function setFlagOverrideValue(flagName:String, value:Bool) {

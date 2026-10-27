@@ -329,9 +329,9 @@ class TweenLite extends TweenCore {
 		}
 		this.cachedPT1 = null;
 		this.propTweenLookup = {};
-		final __ax4_iter_152:ASObject = this.vars;
-		if (checkNullIteratee(__ax4_iter_152))
-			for (_tmp_ in __ax4_iter_152.___keys()) {
+		final __ax4_iter_155:ASObject = this.vars;
+		if (checkNullIteratee(__ax4_iter_155))
+			for (_tmp_ in __ax4_iter_155.___keys()) {
 				_loc1_ = _tmp_;
 				if (!(_reservedProps.hasOwnProperty(_loc1_) && !(_loc1_ == "timeScale" && Std.isOfType(this.target, TweenCore)))) {
 					if (plugins.hasOwnProperty(_loc1_)

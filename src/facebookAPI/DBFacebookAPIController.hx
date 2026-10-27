@@ -121,9 +121,9 @@ class DBFacebookAPIController extends FacebookAPIController {
 	public static function getFeedPosts(facade:DBFacade, id:UInt, category:String):Vector<GMFeedPosts> {
 		var _loc5_ = new Vector<GMFeedPosts>();
 		var _loc4_:GMFeedPosts;
-		final __ax4_iter_189 = facade.gameMaster.FeedPosts;
-		if (checkNullIteratee(__ax4_iter_189))
-			for (_tmp_ in __ax4_iter_189) {
+		final __ax4_iter_192 = facade.gameMaster.FeedPosts;
+		if (checkNullIteratee(__ax4_iter_192))
+			for (_tmp_ in __ax4_iter_192) {
 				_loc4_ = _tmp_;
 				if (_loc4_.Category == category && _loc4_.IdTrigger == id) {
 					_loc5_.push(_loc4_);
@@ -291,9 +291,9 @@ class DBFacebookAPIController extends FacebookAPIController {
 	function kongregateFriendResponse(event:Event, friendIdsArray:Array<ASAny>) {
 		var _loc3_:ASObject = com.adobe.serialization.json.JSON.decode(ASCompat.asString(event.target.data));
 		var _loc4_:Int;
-		final __ax4_iter_190:Array<ASAny> = _loc3_.friend_ids;
-		if (checkNullIteratee(__ax4_iter_190))
-			for (_tmp_ in __ax4_iter_190) {
+		final __ax4_iter_193:Array<ASAny> = _loc3_.friend_ids;
+		if (checkNullIteratee(__ax4_iter_193))
+			for (_tmp_ in __ax4_iter_193) {
 				_loc4_ = ASCompat.toInt(_tmp_);
 				friendIdsArray.push(Std.string(_loc4_));
 			}
@@ -404,7 +404,7 @@ class DBFacebookAPIController extends FacebookAPIController {
 	}
 
 	public function genericFriendRequests(isRetry:Bool = false) {
-		var __ax4_iter_191:Vector<GMFeedPosts>;
+		var __ax4_iter_194:Vector<GMFeedPosts>;
 		var loginCallback:ASFunction;
 		var filters:Array<ASAny>;
 		var feedPostData:GMFeedPosts;
@@ -427,9 +427,9 @@ class DBFacebookAPIController extends FacebookAPIController {
 		}
 		filters = ["app_non_users"];
 		if (mFriendInvitePosts.length == 0) {
-			__ax4_iter_191 = mDBFacade.gameMaster.FeedPosts;
-			if (checkNullIteratee(__ax4_iter_191))
-				for (_tmp_ in __ax4_iter_191) {
+			__ax4_iter_194 = mDBFacade.gameMaster.FeedPosts;
+			if (checkNullIteratee(__ax4_iter_194))
+				for (_tmp_ in __ax4_iter_194) {
 					feedPostData = _tmp_;
 					if (feedPostData.Category == "INVITE_REQUEST") {
 						mFriendInvitePosts.push(feedPostData);
@@ -575,12 +575,12 @@ class DBFacebookAPIController extends FacebookAPIController {
 
 	public function leaderboardFeedPostToASingleUser(facebookID:String) {
 		var _loc2_:GMFeedPosts;
-		var __ax4_iter_192:Vector<GMFeedPosts>;
+		var __ax4_iter_195:Vector<GMFeedPosts>;
 		var _loc3_ = 0;
 		if (mLeaderBoardFeedPosts.length == 0) {
-			__ax4_iter_192 = mDBFacade.gameMaster.FeedPosts;
-			if (checkNullIteratee(__ax4_iter_192))
-				for (_tmp_ in __ax4_iter_192) {
+			__ax4_iter_195 = mDBFacade.gameMaster.FeedPosts;
+			if (checkNullIteratee(__ax4_iter_195))
+				for (_tmp_ in __ax4_iter_195) {
 					_loc2_ = _tmp_;
 					if (_loc2_.Category == "MESSAGE") {
 						mLeaderBoardFeedPosts.push(_loc2_);
@@ -594,7 +594,7 @@ class DBFacebookAPIController extends FacebookAPIController {
 	}
 
 	public function sendGiftRequests(giftName:String, giftOfferID:UInt, facebookIds:String = "") {
-		var __ax4_iter_193:Vector<GMFeedPosts>;
+		var __ax4_iter_196:Vector<GMFeedPosts>;
 		var filters:Array<ASAny>;
 		var feedCaption:String;
 		var excludeIds:Array<ASAny>;
@@ -610,9 +610,9 @@ class DBFacebookAPIController extends FacebookAPIController {
 		excludeIds = mDBFacade.dbAccountInfo.giftExcludeIds;
 		data = {"offerID": giftOfferID};
 		if (mGiftFriendPosts.length == 0) {
-			__ax4_iter_193 = mDBFacade.gameMaster.FeedPosts;
-			if (checkNullIteratee(__ax4_iter_193))
-				for (_tmp_ in __ax4_iter_193) {
+			__ax4_iter_196 = mDBFacade.gameMaster.FeedPosts;
+			if (checkNullIteratee(__ax4_iter_196))
+				for (_tmp_ in __ax4_iter_196) {
 					feedPostData = _tmp_;
 					if (feedPostData.Category == "SEND_GIFT_REQUEST") {
 						mGiftFriendPosts.push(feedPostData);

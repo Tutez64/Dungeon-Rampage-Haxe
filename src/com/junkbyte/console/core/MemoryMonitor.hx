@@ -42,9 +42,9 @@ class MemoryMonitor extends ConsoleCore {
 
 	public function unwatch(n:String) {
 		var _loc2_:ASObject = null;
-		final __ax4_iter_107 = this._objectsList;
-		if (checkNullIteratee(__ax4_iter_107))
-			for (_tmp_ in __ax4_iter_107.keys()) {
+		final __ax4_iter_110 = this._objectsList;
+		if (checkNullIteratee(__ax4_iter_110))
+			for (_tmp_ in __ax4_iter_110.keys()) {
 				_loc2_ = _tmp_;
 				if (this._objectsList[_loc2_] == n) {
 					this._objectsList.remove(_loc2_);
@@ -64,15 +64,15 @@ class MemoryMonitor extends ConsoleCore {
 		}
 		var _loc1_ = new Array<ASAny>();
 		var _loc2_:ASObject = new ASObject();
-		final __ax4_iter_108 = this._objectsList;
-		if (checkNullIteratee(__ax4_iter_108))
-			for (_tmp_ in __ax4_iter_108.keys()) {
+		final __ax4_iter_111 = this._objectsList;
+		if (checkNullIteratee(__ax4_iter_111))
+			for (_tmp_ in __ax4_iter_111.keys()) {
 				_loc3_ = _tmp_;
 				_loc2_[this._objectsList[_loc3_]] = true;
 			}
-		final __ax4_iter_109:ASObject = this._namesList;
-		if (checkNullIteratee(__ax4_iter_109))
-			for (_tmp_ in __ax4_iter_109.___keys()) {
+		final __ax4_iter_112:ASObject = this._namesList;
+		if (checkNullIteratee(__ax4_iter_112))
+			for (_tmp_ in __ax4_iter_112.___keys()) {
 				_loc4_ = _tmp_;
 				if (!ASCompat.toBool(_loc2_[_loc4_])) {
 					_loc1_.push(_loc4_);

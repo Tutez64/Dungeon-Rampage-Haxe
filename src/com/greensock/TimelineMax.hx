@@ -375,9 +375,9 @@ class TimelineMax extends TimelineLite implements IEventDispatcher {
 	function getLabelsArray():Array<ASAny> {
 		var _loc2_:String = null;
 		var _loc1_:Array<ASAny> = [];
-		final __ax4_iter_153:ASObject = _labels;
-		if (checkNullIteratee(__ax4_iter_153))
-			for (_tmp_ in __ax4_iter_153.___keys()) {
+		final __ax4_iter_156:ASObject = _labels;
+		if (checkNullIteratee(__ax4_iter_156))
+			for (_tmp_ in __ax4_iter_156.___keys()) {
 				_loc2_ = _tmp_;
 				_loc1_[_loc1_.length] = {
 					"time": _labels[_loc2_],
