@@ -479,6 +479,9 @@ class ActorGameObject extends FloorObject {
 	function checkIfReadyForInit() {
 		if (mDistributedDungeonFloor != null && mActorData != null) {
 			init();
+			#if cpp
+			modding.Host.actorReady(this);
+			#end
 		}
 	}
 

@@ -8,6 +8,9 @@ import dBGlobals.DBGlobal;
 import facade.DBFacade;
 import util.GameLogOutput;
 import util.LaunchWindowOptions;
+#if cpp
+import modding.Host;
+#end
 import flash.desktop.NativeApplication;
 import flash.events.ErrorEvent;
 import flash.events.Event;
@@ -23,43 +26,63 @@ class DungeonBustersProject extends GameEntry {
 
 	public function new() {
 		super();
+		// uncaughtError does not see a synchronous throw in this constructor; mod
+		// init is wrapped on its own. exiting is registered before Steam's listener.
+		EventListeners.add(this.loaderInfo.uncaughtErrorEvents, "uncaughtError", onUncaughtError);
+		EventListeners.add(NativeApplication.nativeApplication, "exiting", onModsExiting);
+		#if cpp
+		Host.boot(stage, Sys.args());
+		#end
 		stage.scaleMode = "noScale";
 		stage.align = "TL";
 		stage.quality = "high";
 		mDBFacade = new DBFacade();
 		mDBFacade.init(this.stage);
+		#if cpp
+		Host.attachOverlay(mDBFacade);
+		Host.flush();
+		#end
 		EventListeners.add(NativeApplication.nativeApplication, "invoke", onInvoke);
-		EventListeners.add(this.loaderInfo.uncaughtErrorEvents, "uncaughtError", function(param1:flash.events.UncaughtErrorEvent) {
-			var _loc2_:String = null;
-			var _loc5_:Error = null;
-			param1.preventDefault();
-			var _loc4_ = false;
-			if (Std.isOfType(param1.error, Error)) {
-				_loc5_ = ASCompat.dynamicAs(param1.error, Error);
-				_loc2_ = (_loc5_ : ASAny).hasOwnProperty("getStackTrace") ? _loc5_.getStackTrace() : Std.string(_loc5_);
-				if (_loc5_ != null && ASCompat.toBool(_loc5_.name) && ASCompat.toNumber(_loc5_.name.indexOf("LOGGED")) == 0) {
-					_loc4_ = true;
-				}
-			} else if (Std.isOfType(param1.error, ErrorEvent)) {
-				_loc2_ = cast(param1.error, ErrorEvent).text;
-			} else {
-				#if cpp
-				// A Haxe exception (hxcpp's Null Object Reference, Invalid field access, a thrown
-				// String...) is not an Error: say what it is, with its stack when the build keeps one.
-				_loc2_ = Std.string(param1.error) + haxe.CallStack.toString(haxe.CallStack.exceptionStack());
-				#else
-				_loc2_ = "Unknown error";
-				#end
+	}
+
+	function onModsExiting(_:Event):Void {
+		#if cpp
+		Host.dispose();
+		#end
+	}
+
+	function onUncaughtError(param1:flash.events.UncaughtErrorEvent) {
+		var _loc2_:String = null;
+		var _loc5_:Error = null;
+		param1.preventDefault();
+		var _loc4_ = false;
+		if (Std.isOfType(param1.error, Error)) {
+			_loc5_ = ASCompat.dynamicAs(param1.error, Error);
+			_loc2_ = (_loc5_ : ASAny).hasOwnProperty("getStackTrace") ? _loc5_.getStackTrace() : Std.string(_loc5_);
+			if (_loc5_ != null && ASCompat.toBool(_loc5_.name) && ASCompat.toNumber(_loc5_.name.indexOf("LOGGED")) == 0) {
+				_loc4_ = true;
 			}
-			var _loc3_ = 0;
-			if (mDBFacade != null && mDBFacade.gameClock != null) {
-				_loc3_ = mDBFacade.gameClock.gameTime;
-			}
-			if (!_loc4_) {
-				Logger.error("UncaughtError: " + _loc2_);
-			}
+		} else if (Std.isOfType(param1.error, ErrorEvent)) {
+			_loc2_ = cast(param1.error, ErrorEvent).text;
+		} else {
+			#if cpp
+			// A Haxe exception (hxcpp's Null Object Reference, Invalid field access, a thrown
+			// String...) is not an Error: say what it is, with its stack when the build keeps one.
+			_loc2_ = Std.string(param1.error) + haxe.CallStack.toString(haxe.CallStack.exceptionStack());
+			#else
+			_loc2_ = "Unknown error";
+			#end
+		}
+		var _loc3_ = 0;
+		if (mDBFacade != null && mDBFacade.gameClock != null) {
+			_loc3_ = mDBFacade.gameClock.gameTime;
+		}
+		if (!_loc4_) {
+			Logger.error("UncaughtError: " + _loc2_);
+		}
+		if (mDBFacade != null) {
 			mDBFacade.loggerErrorCall("UncaughtError: " + _loc2_ + " GameTime: " + _loc3_);
-		});
+		}
 	}
 
 	public function onInvoke(e:InvokeEvent) {
