@@ -2,42 +2,29 @@ package networkCode.transport;
 
 import flash.events.Event;
 import flash.events.EventDispatcher;
-import flash.events.TimerEvent;
+import flash.events.IOErrorEvent;
+import flash.events.ProgressEvent;
+import flash.events.SecurityErrorEvent;
 import flash.net.SecureSocket;
-import flash.system.MessageChannel;
-import flash.system.Worker;
-import flash.system.WorkerDomain;
 import flash.utils.ByteArray;
-import flash.utils.Timer;
 
+/**
+ * The official client runs its SecureSocket in a Worker, a second SWF embedded as bytes, which no
+ * native target can run. OpenFL's SecureSocket does not block the main thread, so this drives it
+ * directly, as that worker (TlsSocketWorker) does, and reports the way the worker's replies did.
+ */
 class TlsSocketTransport extends EventDispatcher implements IGameTransport {
-	static inline final MAX_WORKERS = 4;
-
-	static var liveWorkers:Int = 0;
-
-	static var reaper:Timer;
-
-	static final WorkerBytes:Dynamic = TlsSocketWorker_swf;
-
-	static final workers:ASDictionary<ASAny, ASAny> = new ASDictionary();
-
 	var mHost:String;
 
 	var mPort:Int = 0;
 
 	var mEnforceServerCertificate:Bool = false;
 
-	var mWorker:Worker;
-
-	var mCommands:MessageChannel;
-
-	var mReplies:MessageChannel;
+	var mSocket:SecureSocket;
 
 	var mConnected:Bool = false;
 
 	var mFinished:Bool = false;
-
-	var mDrainingReplies:Bool = false;
 
 	public function new(host:String, port:Int, enforceServerCertificate:Bool) {
 		super();
@@ -46,51 +33,18 @@ class TlsSocketTransport extends EventDispatcher implements IGameTransport {
 		mEnforceServerCertificate = enforceServerCertificate;
 	}
 
-	static function reapWorkers(event:TimerEvent = null) {
-		var _loc3_:Worker = null;
-		var _loc2_:TlsSocketTransport = null;
-		var _loc4_:ASObject;
-		final __ax4_iter_81 = workers;
-		if (checkNullIteratee(__ax4_iter_81))
-			for (_tmp_ in __ax4_iter_81.keys()) {
-				_loc4_ = _tmp_;
-				_loc3_ = ASCompat.dynamicAs(_loc4_, Worker);
-				if (_loc3_.state == "terminated") {
-					_loc2_ = ASCompat.dynamicAs(workers[_loc3_], TlsSocketTransport);
-					if (_loc2_ != null) {
-						_loc2_.onWorkerState(null);
-					}
-					if (_loc2_ == null || _loc2_.mFinished) {
-						releaseWorker(_loc3_);
-					}
-				}
-			}
+	static function day(date:Date):String {
+		if (date == null) {
+			return "?";
+		}
+		return date.getUTCFullYear() + "-" + pad(date.getUTCMonth() + 1) + "-" + pad(date.getUTCDate());
 	}
 
-	static function releaseWorker(worker:Worker) {
-		if (ASCompat.toBool(workers[worker])) {
-			workers.remove(worker);
-			liveWorkers = liveWorkers - 1;
-		}
-		if (liveWorkers == 0 && reaper != null) {
-			reaper.stop();
-		}
-		var _loc3_ = ASCompat.dynamicAs(worker.getSharedProperty("commands"), MessageChannel);
-		var _loc2_ = ASCompat.dynamicAs(worker.getSharedProperty("replies"), MessageChannel);
-		if (_loc3_ != null) {
-			_loc3_.close();
-		}
-		if (_loc2_ != null) {
-			_loc2_.close();
-		}
-		worker.setSharedProperty("commands", null);
-		worker.setSharedProperty("replies", null);
-		worker.setSharedProperty("config", null);
+	static function pad(value:Int):String {
+		return (value < 10 ? "0" : "") + value;
 	}
 
-	static function element(reply:Array<ASAny>, index:Int):String {
-		return reply.length > index && reply[index] != null ? ASCompat.toString(reply[index]) : "";
-	}
+	static function absorbError(event:Event) {}
 
 	@:isVar public var name(get, never):String;
 
@@ -115,48 +69,26 @@ class TlsSocketTransport extends EventDispatcher implements IGameTransport {
 	}
 
 	public function connect() {
-		var _loc1_:Worker = null;
-		if (mWorker != null || mFinished) {
+		if (mSocket != null || mFinished) {
 			return;
 		}
-		if (!SecureSocket.isSupported || !Worker.isSupported) {
+		if (!SecureSocket.isSupported) {
 			fail((603 : UInt), "Secure connections are not supported by this runtime.");
 			return;
 		}
-		reapWorkers();
-		if (liveWorkers >= 4) {
-			fail((602 : UInt), "Previous connections are still closing; please retry shortly.");
-			return;
-		}
 		try {
-			mWorker = createWorker();
-			mCommands = Worker.current.createMessageChannel(mWorker);
-			mReplies = mWorker.createMessageChannel(Worker.current);
-			mWorker.setSharedProperty("commands", mCommands);
-			mWorker.setSharedProperty("replies", mReplies);
-			mWorker.setSharedProperty("config", {
-				"host": mHost,
-				"port": mPort,
-				"enforceCertificate": mEnforceServerCertificate,
-				"timeout": TransportSettings.connectTimeoutMilliseconds
-			});
-			mReplies.addEventListener("channelMessage", onReply);
-			mWorker.addEventListener("workerState", onWorkerState);
-			workers[mWorker] = this;
-			liveWorkers = liveWorkers + 1;
-			if (reaper == null) {
-				reaper = new Timer(100);
-				reaper.addEventListener("timer", reapWorkers);
-			}
-			reaper.start();
-			mWorker.start();
+			mSocket = new SecureSocket();
+			mSocket.endian = "littleEndian";
+			mSocket.timeout = TransportSettings.connectTimeoutMilliseconds;
+			mSocket.addEventListener("connect", onConnect);
+			mSocket.addEventListener("close", onClose);
+			mSocket.addEventListener("socketData", onData);
+			mSocket.addEventListener("ioError", onIoError);
+			mSocket.addEventListener("securityError", onSecurityError);
+			mSocket.addEventListener("certificateError", onCertificateError);
+			mSocket.connect(mHost, mPort);
 		} catch (error:Dynamic) {
-			_loc1_ = mWorker;
 			fail((602 : UInt), error.message);
-			if (_loc1_ != null) {
-				_loc1_.terminate();
-				releaseWorker(_loc1_);
-			}
 		}
 	}
 
@@ -165,7 +97,8 @@ class TlsSocketTransport extends EventDispatcher implements IGameTransport {
 			return;
 		}
 		try {
-			mCommands.send((["send", bytes] : Array<ASAny>));
+			mSocket.writeBytes(bytes, 0, bytes.length);
+			mSocket.flush();
 		} catch (error:Dynamic) {
 			fail((602 : UInt), error.message);
 		}
@@ -177,89 +110,101 @@ class TlsSocketTransport extends EventDispatcher implements IGameTransport {
 		}
 		mFinished = true;
 		mConnected = false;
-		if (mReplies != null) {
-			mReplies.removeEventListener("channelMessage", onReply);
+		var socket = mSocket;
+		mSocket = null;
+		if (socket == null) {
+			return;
 		}
-		if (mWorker != null) {
-			mWorker.removeEventListener("workerState", onWorkerState);
-			if (ASCompat.toBool(workers[mWorker])) {
-				workers[mWorker] = true;
-			}
-			try {
-				mCommands.send(["close"]);
-			} catch (error:Dynamic) {
-				mWorker.terminate();
-			}
-		}
-		mWorker = null;
-		mCommands = null;
-		mReplies = null;
+		socket.removeEventListener("connect", onConnect);
+		socket.removeEventListener("close", onClose);
+		socket.removeEventListener("socketData", onData);
+		socket.removeEventListener("ioError", onIoError);
+		socket.removeEventListener("securityError", onSecurityError);
+		socket.removeEventListener("certificateError", onCertificateError);
+		socket.addEventListener("ioError", absorbError);
+		socket.addEventListener("securityError", absorbError);
+		socket.addEventListener("certificateError", absorbError);
+		try {
+			socket.close();
+		} catch (error:Dynamic) {}
 	}
 
 	public function abandon() {
 		close();
 	}
 
-	function createWorker():Worker {
-		return WorkerDomain.current.createWorker((ASCompat.createInstance(WorkerBytes, []) : ByteArray), true);
+	function onConnect(event:Event) {
+		mConnected = true;
+		dispatchEvent(GameTransportEvent.connectedEvent());
 	}
 
-	function onReply(event:Event) {
-		var _loc3_:Array<ASAny> = null;
-		var _loc2_:ByteArray = null;
-		if (mFinished || mDrainingReplies) {
-			return;
-		}
-		mDrainingReplies = true;
-		{
-			try {
-				while (!mFinished && mReplies.messageAvailable) {
-					_loc3_ = ASCompat.dynamicAs(mReplies.receive(), Array);
-					switch (_loc3_[0]) {
-						case "connected":
-							mConnected = true;
-							dispatchEvent(GameTransportEvent.connectedEvent());
-
-						case "data":
-							_loc2_ = (_loc3_[1] : ByteArray);
-							_loc2_.endian = "littleEndian";
-							_loc2_.position = (0 : UInt);
-							dispatchEvent(GameTransportEvent.dataEvent(_loc2_));
-
-						case "failed":
-							fail((ASCompat.toInt(_loc3_[1]) : UInt), _loc3_[2], element(_loc3_, 3), element(_loc3_, 4));
-
-						case "closed":
-							close();
-							dispatchEvent(GameTransportEvent.closedEvent(0, "", "server"));
-					}
-				}
-			} catch (__finallyError0:Dynamic) {
-				{
-					mDrainingReplies = false;
-				};
-				throw __finallyError0;
-			};
-			{
-				mDrainingReplies = false;
-			};
-		}
-	}
-
-	function onWorkerState(event:Event) {
-		if (!mFinished && mWorker.state == "terminated") {
-			onReply(null);
-			if (!mFinished && !mDrainingReplies && !mReplies.messageAvailable) {
-				fail((602 : UInt), "TLS worker stopped unexpectedly.");
-			}
-		}
-	}
-
-	function fail(code:UInt, text:String, certificateStatus:String = "", certificateDetail:String = "") {
+	function onData(event:ProgressEvent) {
 		if (mFinished) {
 			return;
 		}
+		var bytes = new ByteArray();
+		try {
+			mSocket.readBytes(bytes, 0, mSocket.bytesAvailable);
+		} catch (error:Dynamic) {
+			fail((602 : UInt), error.message);
+			return;
+		}
+		if (bytes.length > 0) {
+			bytes.endian = "littleEndian";
+			bytes.position = 0;
+			dispatchEvent(GameTransportEvent.dataEvent(bytes));
+		}
+	}
+
+	function onClose(event:Event) {
 		close();
-		dispatchEvent(GameTransportEvent.failedEvent(code, text, certificateStatus, certificateDetail));
+		dispatchEvent(GameTransportEvent.closedEvent(0, "", "server"));
+	}
+
+	function onIoError(event:IOErrorEvent) {
+		fail((602 : UInt), event.text);
+	}
+
+	function onSecurityError(event:SecurityErrorEvent) {
+		fail((603 : UInt), event.text);
+	}
+
+	function onCertificateError(event:SecurityErrorEvent) {
+		if (mEnforceServerCertificate) {
+			fail((603 : UInt), "Server certificate rejected: " + event.text);
+		} else if (event.cancelable) {
+			event.preventDefault();
+		}
+	}
+
+	function certificateStatus():String {
+		try {
+			if (mSocket != null) {
+				return Std.string(mSocket.serverCertificateStatus);
+			}
+		} catch (error:Dynamic) {}
+		return "";
+	}
+
+	function certificateDetail():String {
+		try {
+			var certificate = mSocket != null ? mSocket.serverCertificate : null;
+			if (certificate == null) {
+				return "";
+			}
+			return "CN=" + certificate.subject.commonName + " by CN=" + certificate.issuer.commonName + " valid "
+				+ day(certificate.validNotBefore) + ".." + day(certificate.validNotAfter);
+		} catch (error:Dynamic) {}
+		return "";
+	}
+
+	function fail(code:UInt, text:String) {
+		if (mFinished) {
+			return;
+		}
+		var status = certificateStatus();
+		var detail = certificateDetail();
+		close();
+		dispatchEvent(GameTransportEvent.failedEvent(code, text, status, detail));
 	}
 }
