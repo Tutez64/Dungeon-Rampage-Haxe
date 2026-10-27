@@ -369,6 +369,8 @@
     "SOCKET_CLOSE_60_TEXT": " \n \nThere is a lot of rampaging right now. \n \n  Our server is full. Come back shortly",
     "SOCKET_CLOSE_61_HEADER": "Maintenance!",
     "SOCKET_CLOSE_61_TEXT": " \nUnfortunately the server you were playing on has restarted.\n \nLaunch the game again to keep playing.",
+    "RECONNECTING": "Reconnecting…",
+    "RECONNECTING_DETAIL": "Reconnecting… #ATTEMPT · #ELAPSED s / #GRACE s",
     "TUTORIAL_MOVEMENT_TITLE": "HOW TO MOVE",
     "TUTORIAL_ATTACK_TITLE": "HOW TO ATTACK",
     "TUTORIAL_BUSTER_TITLE": "USE DUNGEON BUSTER!",
