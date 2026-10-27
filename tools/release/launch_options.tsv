@@ -11,5 +11,5 @@ quality-control-button	--quality-control-button	true	quality-control-button	true
 want-numbered-hud	--want-numbered-hud	false	want-numbered-hud	true
 want-hud-refresh-on-floor-transition	--want-hud-refresh-on-floor-transition	false	want-hud-refresh-on-floor-transition	true
 experimental-use-steam-input	--experimental-use-steam-input	false	experimental-use-steam-input	false
+experimental-websocket-reconnects	--experimental-websocket-reconnects	false	experimental-websocket-reconnects	false
 want-steam-achievements	--want-steam-achievements	false	want-steam-achievements	false
-use-fallback-socket-port	--use-fallback-socket-port	false	use-fallback-socket-port	true
