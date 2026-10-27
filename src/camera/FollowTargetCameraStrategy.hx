@@ -1,0 +1,62 @@
+package camera;
+
+import brain.camera.Camera;
+import brain.camera.CameraStrategy;
+import brain.clock.GameClock;
+import brain.facade.Facade;
+import brain.workLoop.Task;
+import brain.workLoop.WorkComponent;
+import flash.display.Sprite;
+import flash.geom.Vector3D;
+
+class FollowTargetCameraStrategy extends CameraStrategy {
+	var mFacade:Facade;
+
+	var mTarget:Sprite;
+
+	var mUpdateTask:Task;
+
+	var mCameraVel:Vector3D = new Vector3D();
+
+	var mForce:Float = 4;
+
+	var mMaxSpeed:Float = 20.833333333333332;
+
+	public function new(camera:Camera, target:Sprite) {
+		mTarget = target;
+		super(camera);
+	}
+
+	override public function destroy() {
+		stop();
+		super.destroy();
+		mTarget = null;
+		mFacade = null;
+	}
+
+	override public function start(workComponent:WorkComponent) {
+		if (mUpdateTask != null) {
+			mUpdateTask.destroy();
+		}
+		mUpdateTask = workComponent.doEveryFrame(update);
+	}
+
+	override public function stop() {
+		if (mUpdateTask != null) {
+			mUpdateTask.destroy();
+			mUpdateTask = null;
+		}
+	}
+
+	function update(gameClock:GameClock) {
+		mCameraVel = mCamera.getDeltaToPoint(mTarget.x, mTarget.y);
+		if (mCameraVel.lengthSquared > 0.5) {
+			mCamera.translateBy(mCameraVel.x, mCameraVel.y);
+		}
+		mCamera.update(gameClock);
+	}
+
+	public function changeTarget(newTarget:Sprite) {
+		mTarget = newTarget;
+	}
+}
