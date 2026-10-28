@@ -40,6 +40,8 @@ class ScriptTimeline {
 
 	var mLastExecutedFrame:Int = -1;
 
+	var mExecutingFrame:Int = -1;
+
 	var mFinishedFrame:Int = 0;
 
 	var mLoop:Bool = false;
@@ -371,6 +373,11 @@ class ScriptTimeline {
 	}
 
 	function gotoFrame(gotoFrame:Int) {
+		// At the official 24 Hz tick, a timeline advancing at least as many frames per tick as the goto jumps back resumed past
+		// the goto and played on: fast charge holds end that way, which lets other weapons attack while charged.
+		if (mPlaySpeed * mLogicalWorkComponent.gameClock.timeScale >= mExecutingFrame - gotoFrame) {
+			return;
+		}
 		mPlayHeadTime = gotoFrame;
 		mIsLooping = true;
 	}
@@ -404,6 +411,7 @@ class ScriptTimeline {
 		}
 		_loc3_ = (_loc2_ : Int);
 		while (_loc3_ <= mPlayHeadTime) {
+			mExecutingFrame = _loc3_;
 			processTimelineActions(_loc3_, gameClock);
 			mLastExecutedFrame = _loc3_;
 			_loc3_++;
