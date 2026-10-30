@@ -7,8 +7,8 @@ At tag time, copy these sections into the GitHub release notes under `Changelog`
 
 ### Fixed
 
-- Mods: `cast(e)` without a type now compiles, as an unsafe cast, instead of
-  failing with `Unexpected token ")"`.
+- Windows: F11 now switches to a window that fits the screen. On a 1920x1080 resolution and lower, the game
+  looked like it was still fullscreen, or zoomed in (#34).
 
 ### Improved
 
