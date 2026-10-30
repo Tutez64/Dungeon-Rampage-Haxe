@@ -3,7 +3,7 @@
   "name": "API tour",
   "version": "1.0.0",
   "author": "DRH",
-  "api": "1.0",
+  "api": "1.1",
   "entry": "Main",
   "dependencies": {}
 }

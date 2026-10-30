@@ -7,6 +7,7 @@ import mods.api.account.Account;
 import mods.api.account.OwnedHero;
 import mods.api.dungeon.Floor;
 import mods.api.dungeon.Hero;
+import mods.api.dungeon.Tile;
 import mods.api_tour.ui.Panel;
 
 /**
@@ -157,7 +158,52 @@ class Main extends Mod {
 		check("floorEnter: state.floor is this floor", ctx.state.floor == floor);
 		check("floorEnter: number >= 1", floor.number >= 1);
 		check("floorEnter: map set", floor.map != "");
-		ctx.log("floor " + floor.id + " #" + floor.number + " " + floor.map);
+		var tiles = floor.tiles;
+		check("floorEnter: tiles set, each with a category", tiles.length > 0 && Lambda.foreach(tiles, tile -> tile.id != "" && tile.category != ""));
+		check("floorEnter: tiles on the grid", Lambda.foreach(tiles, tile -> tile.x % Tile.SIZE == 0 && tile.y % Tile.SIZE == 0));
+		tiles.push(null);
+		check("floor.tiles is a copy", floor.tiles.length == tiles.length - 1);
+		var categories:Map<String, Int> = new Map();
+		for (tile in floor.tiles)
+			categories.set(tile.category, (categories.exists(tile.category) ? categories.get(tile.category) : 0) + 1);
+		check("floorEnter: tiles have four sides", Lambda.foreach(floor.tiles, tile -> tile.exits.length == 4));
+		ctx.log("floor " + floor.id + " #" + floor.number + " " + floor.map + ", tiles "
+			+ [for (category => count in categories) category + " " + count].join(", ") + ", one-sided exits " + oneSided(floor.tiles));
+		// Monsters come after the floor and its heroes.
+		haxe.Timer.delay(() -> checkMonsters(floor), 3000);
+	}
+
+	/** Open sides facing a tile whose own side is closed, or no tile. */
+	function oneSided(tiles:Array<Tile>):Int {
+		var at:Map<String, Tile> = new Map();
+		for (tile in tiles)
+			at.set(tile.x + "," + tile.y, tile);
+		var dx = [0, 1, 0, -1];
+		var dy = [-1, 0, 1, 0];
+		var count = 0;
+		for (tile in tiles)
+			for (side in 0...4) {
+				if (!tile.exits[side])
+					continue;
+				var other = at.get((tile.x + dx[side] * Tile.SIZE) + "," + (tile.y + dy[side] * Tile.SIZE));
+				if (other == null || !other.exits[(side + 2) % 4])
+					count++;
+			}
+		return count;
+	}
+
+	function checkMonsters(floor:Floor):Void {
+		if (ctx.state.floor != floor)
+			return;
+		var monsters = floor.monsters;
+		var tiles = floor.tiles;
+		check("monsters: some, a few seconds in", monsters.length > 0);
+		check("monsters: each on a tile of its floor", Lambda.foreach(monsters, monster -> Lambda.exists(tiles, tile -> tile.contains(monster.x, monster.y))));
+		check("monsters: ids unique", Lambda.count([for (monster in monsters) Std.string(monster.id) => true]) == monsters.length);
+		var big = [for (monster in monsters) if (monster.healthBar) monster.name];
+		ctx.log("floor " + floor.id + " monsters " + monsters.length + ", with a health bar: " + big.join(", "));
+		monsters.push(null);
+		check("floor.monsters is a copy", floor.monsters.indexOf(null) < 0);
 	}
 
 	function onFloorExit(floor:Floor):Void {
@@ -171,6 +217,7 @@ class Main extends Mod {
 		check("heroSpawned: after its floorEnter", ctx.state.floor != null);
 		check("heroSpawned: in state.heroes", ctx.state.heroes.indexOf(hero) >= 0);
 		check("heroSpawned: class and level set", hero.classId != 0 && hero.className != "" && hero.level > 0);
+		check("heroSpawned: on a tile of its floor", Lambda.exists(ctx.state.floor.tiles, tile -> tile.contains(hero.x, hero.y)));
 		var player = hero.player;
 		check("heroSpawned: player set", player != null);
 		if (player == null)
@@ -220,7 +267,8 @@ class Main extends Mod {
 		if (despawned.length == 0)
 			return;
 		check("heroDespawned: read empty after its handlers",
-			Lambda.foreach(despawned, hero -> hero.classId == 0 && hero.className == "" && hero.level == 0 && hero.weapons.length == 0));
+			Lambda.foreach(despawned, hero -> hero.classId == 0 && hero.className == "" && hero.level == 0 && hero.weapons.length == 0 && hero.x == 0
+				&& hero.y == 0));
 		despawned = [];
 	}
 
