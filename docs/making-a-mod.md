@@ -40,4 +40,4 @@ It runs the latest `api` of the major `mod.json` names. `api` is the version the
 
 1. Raise `version` in `mod.json` ([rules](modding.md#modjson)) and commit. Tag that commit `v<version>` and push the tag (`git tag v0.1.0`, `git push origin v0.1.0`): the release workflow drafts a GitHub release with the mod's zip and its index entry.
 2. Test that zip, `DRH-Launcher --run-mod <zip>`, then publish the release on GitHub.
-3. `DRH-Launcher --submit-mod <folder>` proposes it to the index. The first time, it opens the index's fork page: fork it, then run it again. It opens the pull request's page: create it. The index CI checks it, and a reviewer reads its diff against your previous version ([Index entry](modding.md#index-entry)).
+3. `DRH-Launcher --submit-mod <folder>` proposes it to the index. The first time, it opens the index's fork page: fork it, then run it again. It opens the pull request's page: create it. If you redo the release before it is merged, run it again: it updates the pull request. The index CI checks it, and a reviewer reads its diff against your previous version ([Index entry](modding.md#index-entry)).
