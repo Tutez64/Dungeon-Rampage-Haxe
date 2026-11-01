@@ -48,6 +48,7 @@ class Main extends Mod {
 		check("init: account empty", ctx.state.account == null);
 		check("init: no floor", ctx.state.floor == null);
 		check("init: no heroes", ctx.state.heroes.length == 0);
+		check("init: not in town", !ctx.state.inTown);
 		check("init: reads its own resources", sys.io.File.getContent(ctx.resources + "/tour.txt") == "api_tour\n");
 		sys.io.File.saveContent(ctx.data + "/tour.txt", "written");
 		check("init: writes in its data folder",
@@ -76,10 +77,13 @@ class Main extends Mod {
 			check("cancelled handler never ran", cancelledCalls == 0);
 			check("town: no floor", ctx.state.floor == null);
 			check("town: no players", ctx.state.players.length == 0);
+			check("town: inTown", ctx.state.inTown);
+			checkEquipPet();
 			checkDespawned();
 		});
 		ctx.onTownExit(function() {
 			check("townExit after ready", readySeen);
+			check("townExit: no longer inTown", !ctx.state.inTown);
 		});
 		// A closure run long after it was made, once per return to town. One made the same way logged
 		// a native handle instead of its message after a minute of play: its captures or its literal
@@ -115,6 +119,7 @@ class Main extends Mod {
 			checkInventory(account);
 		}
 		check("ready: no floor", ctx.state.floor == null);
+		check("ready: not in town yet", !ctx.state.inTown);
 		check("ready: view size set", ctx.viewWidth > 0 && ctx.viewHeight > 0);
 		var copy = ctx.state.heroes;
 		copy.push(null);
@@ -134,11 +139,27 @@ class Main extends Mod {
 		check("inventory: weapon limit set", inventory.weaponLimit > 0);
 		check("inventory: consumables have a name and a count", Lambda.foreach(inventory.consumables, stack -> stack.name != "" && stack.count > 0));
 		check("inventory: pets have a name", Lambda.foreach(inventory.pets, pet -> pet.name != ""));
+		var uids = [for (pet in inventory.pets) pet.uid];
+		for (hero in heroes)
+			for (pet in hero.pets)
+				uids.push(pet.uid);
+		check("inventory: pet uids set and unique", uids.indexOf(0) < 0 && Lambda.count([for (uid in uids) Std.string(uid) => true]) == uids.length);
 		stored.push(null);
 		check("inventory.weapons is a copy", inventory.weapons.length == stored.length - 1);
 		ctx.log("coins " + account.coins + ", gems " + account.gems + ", trophies " + account.trophies + ", " + heroes.length + " heroes, "
 			+ (stored.length - 1) + "/" + inventory.weaponLimit + " weapons stored, " + inventory.pets.length + " pets, "
 			+ inventory.consumables.length + " consumables");
+	}
+
+	/** Only the calls with nothing to do: one that moved a pet would change the account. */
+	function checkEquipPet():Void {
+		var account = ctx.state.account;
+		var hero = account == null ? null : activeHero(account);
+		if (hero == null)
+			return;
+		check("equipPet: no pet is nothing to do", !hero.equipPet(null));
+		if (hero.pets.length > 0)
+			check("equipPet: the pet the hero carries is nothing to do", !hero.equipPet(hero.pets[0]));
 	}
 
 	function activeHero(account:Account):Null<OwnedHero> {
@@ -158,6 +179,7 @@ class Main extends Mod {
 		check("floorEnter: state.floor is this floor", ctx.state.floor == floor);
 		check("floorEnter: number >= 1", floor.number >= 1);
 		check("floorEnter: map set", floor.map != "");
+		check("floorEnter: not in town", !ctx.state.inTown);
 		var tiles = floor.tiles;
 		check("floorEnter: tiles set, each with a category", tiles.length > 0 && Lambda.foreach(tiles, tile -> tile.id != "" && tile.category != ""));
 		check("floorEnter: tiles on the grid", Lambda.foreach(tiles, tile -> tile.x % Tile.SIZE == 0 && tile.y % Tile.SIZE == 0));
