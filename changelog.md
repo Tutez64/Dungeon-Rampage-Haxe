@@ -17,4 +17,6 @@ At tag time, copy these sections into the GitHub release notes under `Changelog`
 
 ### Improved
 
-- 
+- Internal: the IntelliJ project uses the Haxe plugin v2, and `Execute` runs `lime test` on `project.xml`. The
+  build steps register libhxcpp under its own name too, as the plugin looks for it: run
+  `haxelib dev libhxcpp submodules/libhxcpp` once.
