@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<module type="HAXE_MODULE" version="4">
+<module type="GENERAL_MODULE" version="4">
   <component name="HaxeModuleSettingsStorage">
     <option name="buildConfig" value="3" />
     <option name="flexSdkName" value="AIRSDK_51.3.3" />
     <option name="openFLPath" value="$MODULE_DIR$/project.xml" />
-    <option name="openFLTarget" value="Linux 64" />
+    <option name="openFLTarget" />
     <option name="outputFolder" value="$MODULE_DIR$/out/production/DungeonRampageHaxe" />
   </component>
   <component name="NewModuleRootManager" inherit-compiler-output="true">
@@ -20,80 +20,80 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="module-library" scope="PROVIDED">
-      <library name="Haxelib: steamwrap:1.0.0 [dev]">
+    <orderEntry type="module-library">
+      <library name="haxelib: steamwrap 1.0.0">
         <CLASSES>
-          <root url="file://$MODULE_DIR$/submodules/SteamWrap" />
+          <root url="file://$MODULE_DIR$/submodules/SteamWrap/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES>
-          <root url="file://$MODULE_DIR$/submodules/SteamWrap" />
+          <root url="file://$MODULE_DIR$/submodules/SteamWrap/" />
         </SOURCES>
       </library>
     </orderEntry>
-    <orderEntry type="module-library" scope="PROVIDED">
-      <library name="Haxelib: hxcpp:4.3.0 [dev]">
+    <orderEntry type="module-library">
+      <library name="haxelib: libhxcpp 6.0.0">
         <CLASSES>
-          <root url="file://$MODULE_DIR$/submodules/libhxcpp" />
+          <root url="file://$MODULE_DIR$/submodules/libhxcpp/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES>
-          <root url="file://$MODULE_DIR$/submodules/libhxcpp" />
+          <root url="file://$MODULE_DIR$/submodules/libhxcpp/" />
         </SOURCES>
       </library>
     </orderEntry>
-    <orderEntry type="module-library" scope="PROVIDED">
-      <library name="Haxelib: lime:8.4.0 [dev]">
+    <orderEntry type="module-library">
+      <library name="haxelib: lime 8.4.0">
         <CLASSES>
-          <root url="file://$MODULE_DIR$/submodules/lime/src" />
+          <root url="file://$MODULE_DIR$/submodules/lime/src/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES>
-          <root url="file://$MODULE_DIR$/submodules/lime/src" />
+          <root url="file://$MODULE_DIR$/submodules/lime/src/" />
         </SOURCES>
       </library>
     </orderEntry>
-    <orderEntry type="module-library" scope="PROVIDED">
-      <library name="Haxelib: swf:3.4.0 [dev]">
+    <orderEntry type="module-library">
+      <library name="haxelib: swf 3.4.0">
         <CLASSES>
-          <root url="file://$MODULE_DIR$/submodules/swf/src" />
+          <root url="file://$MODULE_DIR$/submodules/swf/src/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES>
-          <root url="file://$MODULE_DIR$/submodules/swf/src" />
+          <root url="file://$MODULE_DIR$/submodules/swf/src/" />
         </SOURCES>
       </library>
     </orderEntry>
-    <orderEntry type="module-library" scope="PROVIDED">
-      <library name="Haxelib: openfl:9.5.2 [dev]">
+    <orderEntry type="module-library">
+      <library name="haxelib: openfl 9.5.2">
         <CLASSES>
-          <root url="file://$MODULE_DIR$/submodules/openfl/src" />
+          <root url="file://$MODULE_DIR$/submodules/openfl/src/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES>
-          <root url="file://$MODULE_DIR$/submodules/openfl/src" />
+          <root url="file://$MODULE_DIR$/submodules/openfl/src/" />
         </SOURCES>
       </library>
     </orderEntry>
-    <orderEntry type="module-library" scope="PROVIDED">
-      <library name="Haxelib: hxscript:2.0.6 [dev]">
+    <orderEntry type="module-library">
+      <library name="haxelib: hxscript 2.0.6">
         <CLASSES>
-          <root url="file://$MODULE_DIR$/submodules/hxscript/src" />
+          <root url="file://$MODULE_DIR$/submodules/hxscript/src/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES>
-          <root url="file://$MODULE_DIR$/submodules/hxscript/src" />
+          <root url="file://$MODULE_DIR$/submodules/hxscript/src/" />
         </SOURCES>
       </library>
     </orderEntry>
-    <orderEntry type="module-library" scope="PROVIDED">
-      <library name="Haxelib: format:3.8.0">
+    <orderEntry type="module-library">
+      <library name="haxelib: format 3.8.0">
         <CLASSES>
-          <root url="file://$USER_HOME$/haxelib/format/3,8,0" />
+          <root url="file://$USER_HOME$/haxelib/format/3,8,0/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES>
-          <root url="file://$USER_HOME$/haxelib/format/3,8,0" />
+          <root url="file://$USER_HOME$/haxelib/format/3,8,0/" />
         </SOURCES>
       </library>
     </orderEntry>

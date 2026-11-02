@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="HaxeActiveBuildFiles">
+    <option name="activeFile" value="$PROJECT_DIR$/project.xml" />
+  </component>
+  <component name="HaxeEnvironments">
+    <option name="version" value="1" />
+    <option name="environments">
+      <list>
+        <ContainerEnvironment>
+          <option name="containerId" value="DungeonRampageHaxe" />
+          <option name="sdkName" value="Haxe 4.3.7" />
+          <option name="compileFilePath" value="$PROJECT_DIR$/project.xml" />
+          <option name="compileActionName" value="build" />
+        </ContainerEnvironment>
+      </list>
+    </option>
+  </component>
+  <component name="HaxeIdeOverrides">
+    <option name="version" value="1" />
+  </component>
+</project>
