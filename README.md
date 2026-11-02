@@ -106,11 +106,12 @@ haxelib dev lime submodules/lime
 haxelib dev openfl submodules/openfl
 haxelib dev swf submodules/swf
 haxelib dev steamwrap submodules/SteamWrap
+haxelib dev libhxcpp submodules/libhxcpp
 haxelib dev hxcpp submodules/libhxcpp
 haxelib dev hxscript submodules/hxscript
 ```
 
-libhxcpp is registered as `hxcpp`, which is what `haxelib run libhxcpp setup` does.
+libhxcpp is registered under its own name and as `hxcpp`, as its setup does.
 
 ### Rebuild helper tools
 
