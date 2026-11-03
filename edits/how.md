@@ -20,7 +20,7 @@ The script:
 2. Replaces `DbConfiguration/` and `Resources/` with the decompiled `data/` copies
 3. Extracts `library.swf` from that ANE
 4. Decompiles it with FFDec into a temporary folder (the ANE ActionScript is not part of the game SWF)
-5. Runs [ax4](https://github.com/Tutez64/ax4) from `submodules/ax4` with `edits/conversion/config.json`, after building its `converter.jar`
+5. Runs [ax4](https://github.com/Tutez64/ax4) from `submodules/ax4` with `edits/conversion/config.json`, after building its `converter.jar`. Besides `src/`, it converts `src-bytecode/` (the classes the decompiled repo links from the official bytecode) and gives ax4 their types from `lib/bytecode.swc`
 6. Moves `com.amanitadesign` to `src-steam/` (C++ classpath only)
 
 Useful options: `--prepare-only`, `--keep-tmp`, `--no-build-ax4`.

@@ -346,9 +346,20 @@ function Install-AsTree([string]$ExportDir, [string]$Dest) {
 function Write-RuntimeConfig([string]$DecompiledAbs) {
     $cfg = Get-Content -LiteralPath $Template -Raw | ConvertFrom-Json
     $gameSrcRel = Get-RelativePath (Join-Path $DecompiledAbs "src") $Root
-    $cfg.src = @($gameSrcRel, (Get-RelativePath $AneSrc $Root))
+    $cfg.src = @($gameSrcRel)
+    # Classes the decompiled repo links from the official bytecode: their sources are
+    # in src-bytecode/, and lib/bytecode.swc gives ax4 their types.
+    $bytecodeSrc = Join-Path $DecompiledAbs "src-bytecode"
+    if (Test-Path -LiteralPath $bytecodeSrc) {
+        $cfg.src += Get-RelativePath $bytecodeSrc $Root
+    }
+    $cfg.src += Get-RelativePath $AneSrc $Root
     $cfg.hxout = "src"
     $cfg.swc = @(Get-RelativePath $AirglobalTmp $Root)
+    $bytecodeSwc = Join-Path $DecompiledAbs "lib\bytecode.swc"
+    if (Test-Path -LiteralPath $bytecodeSwc) {
+        $cfg.swc += Get-RelativePath $bytecodeSwc $Root
+    }
 
     $json = $cfg | ConvertTo-Json -Depth 10
     # Windows PowerShell 5.1 utf8 encoding writes a BOM; Haxe JsonParser rejects it.

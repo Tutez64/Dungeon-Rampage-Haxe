@@ -397,10 +397,16 @@ install_as_tree() {
 write_runtime_config() {
   [[ -f "$TEMPLATE" ]] || die "missing $TEMPLATE"
   # Same as convert.ps1: keep committed flags, rewrite only path fields.
-  export DRH_GAME_SRC DRH_ANE_SRC DRH_AIRGLOBAL
+  export DRH_GAME_SRC DRH_BYTECODE_SRC DRH_ANE_SRC DRH_AIRGLOBAL DRH_BYTECODE_SWC
   DRH_GAME_SRC="$(relpath "$DECOMPILED_ABS/src" "$ROOT")"
   DRH_ANE_SRC="$(relpath "$ANE_SRC" "$ROOT")"
   DRH_AIRGLOBAL="$(relpath "$AIRGLOBAL_TMP" "$ROOT")"
+  # Classes the decompiled repo links from the official bytecode: their sources are
+  # in src-bytecode/, and lib/bytecode.swc gives ax4 their types.
+  DRH_BYTECODE_SRC=""
+  [[ -d "$DECOMPILED_ABS/src-bytecode" ]] && DRH_BYTECODE_SRC="$(relpath "$DECOMPILED_ABS/src-bytecode" "$ROOT")"
+  DRH_BYTECODE_SWC=""
+  [[ -f "$DECOMPILED_ABS/lib/bytecode.swc" ]] && DRH_BYTECODE_SWC="$(relpath "$DECOMPILED_ABS/lib/bytecode.swc" "$ROOT")"
   awk '
     function esc(s, t) {
       t = s
@@ -412,6 +418,8 @@ write_runtime_config() {
       game = esc(ENVIRON["DRH_GAME_SRC"])
       ane = esc(ENVIRON["DRH_ANE_SRC"])
       air = esc(ENVIRON["DRH_AIRGLOBAL"])
+      bytecodeSrc = esc(ENVIRON["DRH_BYTECODE_SRC"])
+      bytecodeSwc = esc(ENVIRON["DRH_BYTECODE_SWC"])
     }
     {
       if ($0 ~ /"hxout"/) {
@@ -422,6 +430,7 @@ write_runtime_config() {
       if ($0 ~ /"src"[[:space:]]*:/) {
         print "  \"src\": ["
         print "    \"" game "\","
+        if (bytecodeSrc != "") print "    \"" bytecodeSrc "\","
         print "    \"" ane "\""
         print "  ],"
         skip_src = 1
@@ -431,11 +440,20 @@ write_runtime_config() {
         if ($0 ~ /]/) skip_src = 0
         next
       }
-      if ($0 ~ /"swc"[[:space:]]*:/) { in_swc = 1; print; next }
-      if (in_swc && $0 ~ /"[^"]*"/ && $0 !~ /"swc"/) {
-        sub(/"[^"]*"/, "\"" air "\"")
-        in_swc = 0
-        print
+      if ($0 ~ /"swc"[[:space:]]*:/) {
+        print "  \"swc\": ["
+        if (bytecodeSwc != "") {
+          print "    \"" air "\","
+          print "    \"" bytecodeSwc "\""
+        } else {
+          print "    \"" air "\""
+        }
+        print "  ],"
+        skip_swc = 1
+        next
+      }
+      if (skip_swc) {
+        if ($0 ~ /]/) skip_swc = 0
         next
       }
       print
