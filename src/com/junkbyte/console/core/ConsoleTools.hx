@@ -136,7 +136,7 @@ class ConsoleTools extends ConsoleCore {
 
 	public function explode(obj:ASAny, depth:Int = 3, p:Int = 9):String {
 		var _temp_1:ASAny;
-		var _loc9_ = 0;
+		var _loc9_:ASAny = 0;
 		var _loc11_ = 0;
 		var _loc12_:ASAny = ASCompat.asXML(null);
 		var _loc13_ = ASCompat.asString(null);
@@ -165,8 +165,8 @@ class ConsoleTools extends ConsoleCore {
 		var _loc8_ = _loc6_.child("accessor");
 		_loc9_ = 0;
 		var _loc10_ = _loc8_.length();
-		while (_loc9_ < _loc10_) {
-			_loc11_ = _loc9_++;
+		while (ASCompat.toNumber(_loc9_) < _loc10_) {
+			_loc11_ = ASCompat.floatToInt(((_loc9_ = ASCompat.toNumber(_loc9_) + 1) - 1));
 			_loc12_ = _loc8_[_loc11_];
 			_loc13_ = Std.string(_loc12_.attribute("name"));
 			if (Std.string(_loc12_.attribute("access")) != "writeonly") {
@@ -183,8 +183,8 @@ class ConsoleTools extends ConsoleCore {
 		_loc8_ = _loc6_.child("variable");
 		_loc9_ = 0;
 		_loc10_ = _loc8_.length();
-		while (_loc9_ < _loc10_) {
-			_loc11_ = _loc9_++;
+		while (ASCompat.toNumber(_loc9_) < _loc10_) {
+			_loc11_ = ASCompat.floatToInt(((_loc9_ = ASCompat.toNumber(_loc9_) + 1) - 1));
 			_loc7_.push(stepExp(obj, Std.string(_loc8_[_loc11_].attribute("name")), depth, p));
 		}
 		try {
@@ -193,14 +193,14 @@ class ConsoleTools extends ConsoleCore {
 			_loc14_ = obj;
 			if (checkNullIteratee(_loc14_))
 				for (_tmp_ in _loc14_.___keys()) {
-					_loc9_ = ASCompat.toInt(_tmp_);
+					_loc9_ = _tmp_;
 					_loc16_.push(_loc9_);
 				}
 			_loc15_ = _loc16_;
 			_loc9_ = 0;
-			while (_loc9_ < ASCompat.toInt(_loc15_.length)) {
-				_loc14_ = _loc15_[_loc9_];
-				_loc9_++;
+			while (ASCompat.toNumber(_loc9_) < ASCompat.toInt(_loc15_.length)) {
+				_loc14_ = _loc15_[ASCompat.toInt(_loc9_)];
+				_loc9_ = ASCompat.toInt(_loc9_) + 1;
 				_loc7_.push(stepExp(obj, _loc14_, depth, p));
 			}
 		} catch (_loc_e_:ASAny) {

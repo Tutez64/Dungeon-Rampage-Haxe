@@ -31,12 +31,12 @@ class Map {
 		}
 		_loc2_ = 0;
 		_loc4_ = _items;
-		var _loc6_ = 0;
+		var _loc6_:ASAny = 0;
 		var _loc5_:Array<ASAny> = [];
 		_loc7_ = _loc4_;
 		if (checkNullIteratee(_loc7_))
 			for (_tmp_ in _loc7_.___keys()) {
-				_loc6_ = ASCompat.toInt(_tmp_);
+				_loc6_ = _tmp_;
 				_loc5_.push(_loc6_);
 			}
 		_loc3_ = _loc5_;
@@ -118,12 +118,12 @@ class Map {
 		}
 		_loc2_ = 0;
 		_loc4_ = _items;
-		var _loc7_ = 0;
+		var _loc7_:ASAny = 0;
 		var _loc6_:Array<ASAny> = [];
 		_loc5_ = _loc4_;
 		if (checkNullIteratee(_loc5_))
 			for (_tmp_ in _loc5_.___keys()) {
-				_loc7_ = ASCompat.toInt(_tmp_);
+				_loc7_ = _tmp_;
 				_loc6_.push(_loc7_);
 			}
 		_loc3_ = _loc6_;
@@ -148,12 +148,12 @@ class Map {
 		var _loc1_ = _stringMap.keys();
 		var _loc2_ = 0;
 		var _loc3_ = _keys;
-		var _loc6_ = 0;
+		var _loc6_:ASAny = 0;
 		var _loc5_:Array<ASAny> = [];
 		_loc7_ = _loc3_;
 		if (checkNullIteratee(_loc7_))
 			for (_tmp_ in _loc7_.___keys()) {
-				_loc6_ = ASCompat.toInt(_tmp_);
+				_loc6_ = _tmp_;
 				_loc5_.push(_loc6_);
 			}
 		var _loc4_ = _loc5_;
@@ -200,12 +200,12 @@ class Map {
 		}
 		_loc2_ = 0;
 		_loc4_ = _items;
-		var _loc7_ = 0;
+		var _loc7_:ASAny = 0;
 		var _loc6_:Array<ASAny> = [];
 		_loc5_ = _loc4_;
 		if (checkNullIteratee(_loc5_))
 			for (_tmp_ in _loc5_.___keys()) {
-				_loc7_ = ASCompat.toInt(_tmp_);
+				_loc7_ = _tmp_;
 				_loc6_.push(_loc7_);
 			}
 		_loc3_ = _loc6_;

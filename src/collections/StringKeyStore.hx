@@ -43,10 +43,10 @@ class StringKeyStore {
 
 	public function keys():Array<ASAny> {
 		var _loc3_ = (ASCompat.dynamicAs(null, Array) : Array<ASAny>);
-		var _loc4_ = 0;
+		var _loc4_:ASAny = 0;
 		var _loc5_:ASAny = null;
 		var _loc6_ = (ASCompat.dynamicAs(null, Array) : Array<ASAny>);
-		var _loc7_ = 0;
+		var _loc7_:ASAny = 0;
 		var _loc8_:ASAny = null;
 		var _loc1_:ASAny = _main;
 		_loc4_ = 0;
@@ -54,7 +54,7 @@ class StringKeyStore {
 		_loc5_ = _loc1_;
 		if (checkNullIteratee(_loc5_))
 			for (_tmp_ in _loc5_.___keys()) {
-				_loc4_ = ASCompat.toInt(_tmp_);
+				_loc4_ = _tmp_;
 				_loc3_.push(_loc4_);
 			}
 		var _loc2_ = _loc3_;
@@ -66,13 +66,13 @@ class StringKeyStore {
 			_loc8_ = _loc5_;
 			if (checkNullIteratee(_loc8_))
 				for (_tmp_ in _loc8_.___keys()) {
-					_loc7_ = ASCompat.toInt(_tmp_);
+					_loc7_ = _tmp_;
 					_loc6_.push(_loc7_);
 				}
 			_loc3_ = _loc6_;
-			while (_loc4_ < ASCompat.toInt(_loc3_.length)) {
-				_loc8_ = _loc3_[_loc4_];
-				_loc4_++;
+			while (ASCompat.toNumber(_loc4_) < ASCompat.toInt(_loc3_.length)) {
+				_loc8_ = _loc3_[ASCompat.toInt(_loc4_)];
+				_loc4_ = ASCompat.toInt(_loc4_) + 1;
 				_loc2_.push(ASCompat.unescape(_loc8_));
 			}
 		}

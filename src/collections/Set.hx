@@ -28,12 +28,12 @@ class Set {
 		}
 		_loc2_ = 0;
 		_loc4_ = _items;
-		var _loc6_ = 0;
+		var _loc6_:ASAny = 0;
 		var _loc5_:Array<ASAny> = [];
 		_loc7_ = _loc4_;
 		if (checkNullIteratee(_loc7_))
 			for (_tmp_ in _loc7_.___keys()) {
-				_loc6_ = ASCompat.toInt(_tmp_);
+				_loc6_ = _tmp_;
 				_loc5_.push(_loc6_);
 			}
 		_loc3_ = _loc5_;

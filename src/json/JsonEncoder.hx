@@ -21,7 +21,7 @@ class JsonEncoder {
 	public static function memberNames(o:ASAny, classInfo:compat.XML, plainObject:Bool):Array<ASAny> {
 		var _loc5_ = (ASCompat.dynamicAs(null, Array) : Array<ASAny>);
 		var _loc6_ = (ASCompat.dynamicAs(null, Array) : Array<ASAny>);
-		var _loc7_ = 0;
+		var _loc7_:ASAny = 0;
 		var _loc8_:ASAny = null;
 		var _loc9_ = ASCompat.asXMLList(null);
 		var _loc10_ = 0;
@@ -35,22 +35,22 @@ class JsonEncoder {
 			_loc8_ = o;
 			if (checkNullIteratee(_loc8_))
 				for (_tmp_ in _loc8_.___keys()) {
-					_loc7_ = ASCompat.toInt(_tmp_);
+					_loc7_ = _tmp_;
 					_loc6_.push(_loc7_);
 				}
 			_loc5_ = _loc6_;
 			_loc7_ = 0;
-			while (_loc7_ < ASCompat.toInt(_loc5_.length)) {
-				_loc8_ = _loc5_[_loc7_];
-				_loc7_++;
+			while (ASCompat.toNumber(_loc7_) < ASCompat.toInt(_loc5_.length)) {
+				_loc8_ = _loc5_[ASCompat.toInt(_loc7_)];
+				_loc7_ = ASCompat.toInt(_loc7_) + 1;
 				_loc4_.push(ASCompat.toString(_loc8_));
 			}
 		} else {
 			_loc9_ = classInfo.descendants("*");
 			_loc7_ = 0;
 			_loc10_ = ASCompat.toInt(_loc9_.length());
-			while (_loc7_ < _loc10_) {
-				_loc11_ = _loc7_++;
+			while (ASCompat.toNumber(_loc7_) < _loc10_) {
+				_loc11_ = ASCompat.floatToInt(((_loc7_ = ASCompat.toNumber(_loc7_) + 1) - 1));
 				_loc12_ = _loc9_[_loc11_];
 				_loc13_ = ASCompat.toString(_loc12_.name());
 				if (_loc13_ == "variable" || _loc13_ == "accessor") {
