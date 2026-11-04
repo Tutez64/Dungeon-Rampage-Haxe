@@ -744,6 +744,9 @@ function Invoke-Import {
     $current = (git branch --show-current).Trim()
     if ($current -ne "master") { Invoke-Git checkout master }
     $source = (git rev-parse --abbrev-ref edits/latest).Trim()
+    # checkout adds and updates, but keeps what edits/latest no longer has (a class the game dropped)
+    # forced: the pair's files are replaced by edits/latest's whatever their changes
+    Invoke-Git rm -r -q -f --ignore-unmatch -- @PairPaths
     Invoke-Git checkout edits/latest -- @PairPaths
     Invoke-Git commit -m "Refresh src from $source"
 }

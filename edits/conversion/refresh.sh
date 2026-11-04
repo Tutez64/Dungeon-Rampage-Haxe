@@ -804,6 +804,9 @@ cmd_import() {
   current="$(git branch --show-current)"
   [[ "$current" == master ]] || git checkout master
   source="$(git rev-parse --abbrev-ref edits/latest)"
+  # checkout adds and updates, but keeps what edits/latest no longer has (a class the game dropped)
+  # forced: the pair's files are replaced by edits/latest's whatever their changes
+  git rm -r -q -f --ignore-unmatch -- "${PAIR_PATHS[@]}"
   git checkout edits/latest -- "${PAIR_PATHS[@]}"
   git commit -m "Refresh src from ${source}"
 }
