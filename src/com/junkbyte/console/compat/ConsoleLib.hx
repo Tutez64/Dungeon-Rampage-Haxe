@@ -8,7 +8,7 @@ class ConsoleLib {
 	}
 
 	public static function getDefinitionByName(name:String):ASAny {
-		return Type.resolveClass(name);
+		return ASCompat.getDefinitionByName(name);
 	}
 
 	public static function isNaN(f:Float):Bool {

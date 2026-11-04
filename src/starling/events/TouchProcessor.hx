@@ -500,7 +500,7 @@ class TouchProcessor {
 		var _loc3_:ASObject = null;
 		var _loc2_:ASObject = null;
 		try {
-			_loc3_ = Type.resolveClass("flash.desktop::NativeApplication");
+			_loc3_ = ASCompat.getDefinitionByName("flash.desktop::NativeApplication");
 			_loc2_ = _loc3_["nativeApplication"];
 			if (enable) {
 				_loc2_.addEventListener("deactivate", onInterruption, false, 0, true);

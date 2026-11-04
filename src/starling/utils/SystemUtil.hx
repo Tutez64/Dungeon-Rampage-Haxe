@@ -40,7 +40,7 @@ class SystemUtil {
 		sPlatform = Capabilities.version.substr(0, 3);
 		sVersion = Capabilities.version.substr(4);
 		try {
-			_loc4_ = Type.resolveClass("flash.desktop::NativeApplication");
+			_loc4_ = ASCompat.getDefinitionByName("flash.desktop::NativeApplication");
 			_loc3_ = ASCompat.dynamicAs(_loc4_["nativeApplication"], EventDispatcher);
 			_loc3_.addEventListener("activate", onActivate, false, 0, true);
 			_loc3_.addEventListener("deactivate", onDeactivate, false, 0, true);

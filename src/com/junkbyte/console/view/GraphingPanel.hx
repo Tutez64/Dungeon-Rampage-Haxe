@@ -108,7 +108,7 @@ class GraphingPanel extends ConsolePanel {
 				_loc1_ += "no input";
 			} else if (_type == "fpsPanel") {
 				_loc3_ = _interest.avg;
-				_loc1_ += Std.string(_loc3_.toFixed(1));
+				_loc1_ += Std.string(ASCompat.callNumberMethod(_loc3_, "toFixed", 1));
 			} else if (_type == "memoryPanel") {
 				_loc1_ += _interest.v + "mb";
 			}

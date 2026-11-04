@@ -60,7 +60,7 @@ class SpriteSheetAsset extends Asset {
 			_loc4_ = 0;
 			while ((_loc4_ : UInt) < mNumFramesX) {
 				_loc7_ = basename + "_" + Std.string(_loc6_) + "_" + Std.string(_loc4_) + ".png";
-				_loc5_ = Type.resolveClass(_loc7_);
+				_loc5_ = ASCompat.getDefinitionByName(_loc7_);
 				mFrames[_loc10_] = ASCompat.coerce(ASCompat.createInstance(_loc5_, []), flash.display.BitmapData);
 				mCenters[_loc10_] = new Point(mFrameWidth * 0.5 - ASCompat.toNumberField(ASCompat.dynGetIndex(dict.offsets[_loc6_], _loc4_), "y"),
 					mFrameHeight * 0.5 - ASCompat.toNumberField(ASCompat.dynGetIndex(dict.offsets[_loc6_], _loc4_), "x"));
