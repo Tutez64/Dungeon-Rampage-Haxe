@@ -535,7 +535,7 @@ class LoadingPrewarm {
 
 	function addAttack(attackConstant:String, heroSide:Bool) {
 		var _loc4_:ASObject;
-		var __ax4_iter_60:Array<ASAny>;
+		var __ax4_iter_60:ASAny;
 		var _loc3_:String = null;
 		if (!ASCompat.stringAsBool(attackConstant)) {
 			return;
@@ -558,7 +558,7 @@ class LoadingPrewarm {
 			return;
 		}
 		var _loc7_:ASObject;
-		final __ax4_iter_59:Array<ASAny> = _loc6_.frames;
+		final __ax4_iter_59:ASAny = _loc6_.frames;
 		if (checkNullIteratee(__ax4_iter_59))
 			for (_tmp_ in __ax4_iter_59) {
 				_loc7_ = _tmp_;

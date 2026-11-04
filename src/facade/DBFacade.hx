@@ -696,7 +696,7 @@ class DBFacade extends Facade {
 
 	function libraryFinishedLoading(libraryJson:JsonAsset) {
 		var _loc2_:ASObject;
-		var __ax4_iter_83:Array<ASAny>;
+		var __ax4_iter_83:ASAny;
 		Logger.info("libraryFinishedLoading");
 		this.loadingBarTick();
 		mLibraryJsonLoaded = true;
@@ -758,7 +758,7 @@ class DBFacade extends Facade {
 		mGameMasterJsonLoaded = true;
 		var _loc3_ = false;
 		var _loc2_:ASObject;
-		final __ax4_iter_84:Array<ASAny> = mGameMasterJson.Hero;
+		final __ax4_iter_84:ASAny = mGameMasterJson.Hero;
 		if (checkNullIteratee(__ax4_iter_84))
 			for (_tmp_ in __ax4_iter_84) {
 				_loc2_ = _tmp_;

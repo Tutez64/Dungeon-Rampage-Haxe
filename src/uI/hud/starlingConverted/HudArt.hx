@@ -1285,7 +1285,7 @@ class HudArt {
 
 	static function releaseLease(lease:ASObject) {
 		var _loc2_:ArtNode = null;
-		final __ax4_iter_277:Array<ASAny> = lease.art;
+		final __ax4_iter_277:ASAny = lease.art;
 		if (checkNullIteratee(__ax4_iter_277))
 			for (_tmp_ in __ax4_iter_277) {
 				_loc2_ = ASCompat.coerce(_tmp_, uI.hud.starlingConverted.ArtNode);

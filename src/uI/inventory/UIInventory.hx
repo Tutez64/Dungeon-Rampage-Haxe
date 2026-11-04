@@ -863,11 +863,11 @@ class UIInventory {
 	}
 
 	function checkIfRevealedWeaponExists():InventoryBaseInfo {
-		var __ax4_iter_353:Array<ASAny>;
+		var __ax4_iter_353:ASAny;
 		var _loc10_:Int;
 		var _loc9_:Vector<GMOfferDetail>;
 		var _loc2_:GMOfferDetail;
-		var __ax4_iter_354:Array<ASAny>;
+		var __ax4_iter_354:ASAny;
 		var _loc6_:InventoryBaseInfo = null;
 		var _loc1_:GMWeaponItem = null;
 		var _loc4_ = (0 : UInt);

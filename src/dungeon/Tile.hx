@@ -125,7 +125,7 @@ class Tile extends FloorObject {
 		var _loc10_:RectangleNavCollider = null;
 		var _loc8_:Array<ASAny> = [];
 		var _loc12_:ASObject;
-		final __ax4_iter_440:Array<ASAny> = tileJson.LEObjects;
+		final __ax4_iter_440:ASAny = tileJson.LEObjects;
 		if (checkNullIteratee(__ax4_iter_440))
 			for (_tmp_ in __ax4_iter_440) {
 				_loc12_ = _tmp_;

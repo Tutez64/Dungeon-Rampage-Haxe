@@ -127,13 +127,13 @@ class TileFactory {
 		addToGrid(_loc8_);
 		tileInitialized(_loc8_);
 		buildBackground(_loc7_.LEBackground, _loc8_, distributedDungeonFloor);
-		final __ax4_iter_443:Array<ASAny> = _loc7_.LEObjects;
+		final __ax4_iter_443:ASAny = _loc7_.LEObjects;
 		if (checkNullIteratee(__ax4_iter_443))
 			for (_tmp_ in __ax4_iter_443) {
 				_loc6_ = _tmp_;
 				buildingProp(_loc6_, _loc8_, distributedDungeonFloor);
 			}
-		final __ax4_iter_444:Array<ASAny> = _loc7_.LETriggers;
+		final __ax4_iter_444:ASAny = _loc7_.LETriggers;
 		if (checkNullIteratee(__ax4_iter_444))
 			for (_tmp_ in __ax4_iter_444) {
 				_loc6_ = _tmp_;

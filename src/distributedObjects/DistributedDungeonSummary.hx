@@ -3431,8 +3431,8 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 	}
 
 	function setupMenuNavigation() {
-		var __ax4_iter_315:Array<ASAny>;
-		var __ax4_iter_316:Array<ASAny>;
+		var __ax4_iter_315:ASAny;
+		var __ax4_iter_316:ASAny;
 		var _loc12_ = 0;
 		var _loc13_:UIObject = null;
 		var _loc16_ = 0;

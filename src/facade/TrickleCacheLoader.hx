@@ -255,7 +255,7 @@ class TrickleCacheLoader {
 		};
 		var addAttack:ASFunction = function(param1:gameMasterDictionary.GMAttack) {
 			var _loc3_:ASObject;
-			var __ax4_iter_75:Array<ASAny>;
+			var __ax4_iter_75:ASAny;
 			var _loc4_:GMProjectile = null;
 			if (param1 == null) {
 				return;
@@ -271,7 +271,7 @@ class TrickleCacheLoader {
 				return;
 			}
 			var _loc5_:ASObject;
-			final __ax4_iter_74:Array<ASAny> = _loc2_.frames;
+			final __ax4_iter_74:ASAny = _loc2_.frames;
 			if (checkNullIteratee(__ax4_iter_74))
 				for (_tmp_ in __ax4_iter_74) {
 					_loc5_ = _tmp_;

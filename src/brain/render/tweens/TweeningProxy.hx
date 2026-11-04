@@ -184,7 +184,7 @@ class TweeningProxy {
 
 	public function createTimeline(vars:ASObject = null):TweenHandle {
 		var _loc2_:ASObject;
-		var __ax4_iter_411:Array<ASAny>;
+		var __ax4_iter_411:ASAny;
 		var _loc7_:String = null;
 		var _loc5_ = Math.NaN;
 		var _loc6_ = Math.NaN;

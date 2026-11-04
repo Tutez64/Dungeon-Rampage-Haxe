@@ -61,7 +61,7 @@ class HudIconBake {
 		var _loc4_:String = null;
 		sLoaded = done;
 		var _loc6_:ASObject = facade.gameMaster;
-		final __ax4_iter_178:Array<ASAny> = _loc6_.Stackables;
+		final __ax4_iter_178:ASAny = _loc6_.Stackables;
 		if (checkNullIteratee(__ax4_iter_178))
 			for (_tmp_ in __ax4_iter_178) {
 				_loc5_ = _tmp_;
@@ -71,7 +71,7 @@ class HudIconBake {
 					add(_loc5_.UISwfFilepath, _loc5_.IconName, 0.6, false, true, "consumables_01.graphic");
 				}
 			}
-		final __ax4_iter_179:Array<ASAny> = _loc6_.Buffs;
+		final __ax4_iter_179:ASAny = _loc6_.Buffs;
 		if (checkNullIteratee(__ax4_iter_179))
 			for (_tmp_ in __ax4_iter_179) {
 				_loc5_ = _tmp_;
@@ -79,7 +79,7 @@ class HudIconBake {
 					add(_loc5_.IconSwf, _loc5_.IconName, 0.75, false, false, "buff_cooldown_icon.graphic");
 				}
 			}
-		final __ax4_iter_180:Array<ASAny> = _loc6_.Npcs;
+		final __ax4_iter_180:ASAny = _loc6_.Npcs;
 		if (checkNullIteratee(__ax4_iter_180))
 			for (_tmp_ in __ax4_iter_180) {
 				_loc5_ = _tmp_;
@@ -91,7 +91,7 @@ class HudIconBake {
 				}
 			}
 		var _loc8_:ASObject = _loc6_.getSkinByType(facade.dbAccountInfo.activeAvatarSkinId);
-		final __ax4_iter_181:Array<ASAny> = _loc6_.Skins;
+		final __ax4_iter_181:ASAny = _loc6_.Skins;
 		if (checkNullIteratee(__ax4_iter_181))
 			for (_tmp_ in __ax4_iter_181) {
 				_loc5_ = _tmp_;
@@ -100,7 +100,7 @@ class HudIconBake {
 		if (_loc8_ != null) {
 			add(_loc8_.UISwfFilepath, _loc8_.IconName, 1, false, false, "UI_profile.avatar", true);
 		}
-		final __ax4_iter_182:Array<ASAny> = _loc6_.DungeonModifiers;
+		final __ax4_iter_182:ASAny = _loc6_.DungeonModifiers;
 		if (checkNullIteratee(__ax4_iter_182))
 			for (_tmp_ in __ax4_iter_182) {
 				_loc5_ = _tmp_;

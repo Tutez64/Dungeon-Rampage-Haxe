@@ -1323,7 +1323,7 @@ class HudArtConverter {
 	}
 
 	function bakeSamples(node:ArtNode) {
-		var __ax4_iter_252:Array<ASAny>;
+		var __ax4_iter_252:ASAny;
 		var child:ArtNode;
 		var sample:ASObject;
 		var frame:ArtFrame;

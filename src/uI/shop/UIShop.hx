@@ -867,7 +867,7 @@ class UIShop {
 	}
 
 	function filterOffers() {
-		var __ax4_iter_432:Array<ASAny>;
+		var __ax4_iter_432:ASAny;
 		var _loc10_:String = null;
 		var _loc1_:Vector<GMOffer> = /*undefined*/ null;
 		var _loc2_:GMOffer = null;

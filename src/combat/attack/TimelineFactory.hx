@@ -29,7 +29,7 @@ class TimelineFactory {
 		var _loc5_ = 0;
 		mSecurityValue = 0;
 		var _loc4_:ASObject;
-		final __ax4_iter_29:Array<ASAny> = jsonAsset.json.attacks;
+		final __ax4_iter_29:ASAny = jsonAsset.json.attacks;
 		if (checkNullIteratee(__ax4_iter_29))
 			for (_tmp_ in __ax4_iter_29) {
 				_loc4_ = _tmp_;

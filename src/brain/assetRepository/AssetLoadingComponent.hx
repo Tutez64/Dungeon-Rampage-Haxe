@@ -138,9 +138,9 @@ class AssetLoadingComponent extends Component {
 
 	static function rootClipLabels(folder:File):ASObject {
 		var _loc8_:ASObject;
-		var __ax4_iter_377:Array<ASAny>;
+		var __ax4_iter_377:ASAny;
 		var _loc11_:ASObject;
-		var __ax4_iter_378:Array<ASAny>;
+		var __ax4_iter_378:ASAny;
 		var _loc9_:ASObject = null;
 		var _loc5_:File = null;
 		var _loc4_:FileStream = null;
@@ -1390,7 +1390,7 @@ class AssetLoadingComponent extends Component {
 		}
 		var _loc3_:String = null;
 		var _loc2_:String;
-		final __ax4_iter_397:Array<ASAny> = mAtlasOwners[atlasName];
+		final __ax4_iter_397:ASAny = mAtlasOwners[atlasName];
 		if (checkNullIteratee(__ax4_iter_397))
 			for (_tmp_ in __ax4_iter_397) {
 				_loc2_ = _tmp_;

@@ -130,7 +130,7 @@ class WeaponGameObject extends GameObject {
 
 	function preloadProjectileAssetsForAttack(gmAttack:GMAttack) {
 		var _loc2_:ASObject;
-		var __ax4_iter_334:Array<ASAny>;
+		var __ax4_iter_334:ASAny;
 		var _loc3_:GMProjectile = null;
 		if (ASCompat.stringAsBool(gmAttack.Projectile)) {
 			_loc3_ = ASCompat.coerce(mDBFacade.gameMaster.projectileByConstant.itemFor(gmAttack.Projectile), gameMasterDictionary.GMProjectile);
@@ -147,7 +147,7 @@ class WeaponGameObject extends GameObject {
 			return;
 		}
 		var _loc5_:ASObject;
-		final __ax4_iter_333:Array<ASAny> = _loc4_.frames;
+		final __ax4_iter_333:ASAny = _loc4_.frames;
 		if (checkNullIteratee(__ax4_iter_333))
 			for (_tmp_ in __ax4_iter_333) {
 				_loc5_ = _tmp_;

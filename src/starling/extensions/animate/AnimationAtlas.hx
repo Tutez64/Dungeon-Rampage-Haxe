@@ -295,7 +295,7 @@ class AnimationAtlas {
 
 	function parseData(data:ASObject) {
 		var _loc3_:ASObject;
-		var __ax4_iter_507:Array<ASAny>;
+		var __ax4_iter_507:ASAny;
 		var _loc5_:Array<ASAny> = null;
 		var _loc6_:String = null;
 		var _loc2_:ASObject = data.metadata;
@@ -316,7 +316,7 @@ class AnimationAtlas {
 		}
 		_symbolData = new ASDictionary<ASAny, ASAny>();
 		var _loc4_:ASObject;
-		final __ax4_iter_505:Array<ASAny> = data.symbolDictionary.symbols;
+		final __ax4_iter_505:ASAny = data.symbolDictionary.symbols;
 		if (checkNullIteratee(__ax4_iter_505))
 			for (_tmp_ in __ax4_iter_505) {
 				_loc4_ = _tmp_;
@@ -331,7 +331,7 @@ class AnimationAtlas {
 		};
 		_labelSymbols = new ASDictionary<ASAny, ASAny>();
 		var _loc7_:ASObject;
-		final __ax4_iter_506:Array<ASAny> = _loc8_.timeline.layers;
+		final __ax4_iter_506:ASAny = _loc8_.timeline.layers;
 		if (checkNullIteratee(__ax4_iter_506))
 			for (_tmp_ in __ax4_iter_506) {
 				_loc7_ = _tmp_;

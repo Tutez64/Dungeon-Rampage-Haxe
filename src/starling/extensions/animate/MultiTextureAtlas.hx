@@ -57,7 +57,7 @@ class MultiTextureAtlas extends TextureAtlas {
 		var _loc5_ = new Vector<String>((0 : UInt));
 		var _loc7_ = Pool.getRectangle();
 		var _loc8_:ASObject;
-		final __ax4_iter_508:Array<ASAny> = data.ATLAS.SPRITES;
+		final __ax4_iter_508:ASAny = data.ATLAS.SPRITES;
 		if (checkNullIteratee(__ax4_iter_508))
 			for (_tmp_ in __ax4_iter_508) {
 				_loc8_ = _tmp_;
@@ -81,7 +81,7 @@ class MultiTextureAtlas extends TextureAtlas {
 			return;
 		}
 		var _loc2_:String;
-		final __ax4_iter_509:Array<ASAny> = _loc4_.names;
+		final __ax4_iter_509:ASAny = _loc4_.names;
 		if (checkNullIteratee(__ax4_iter_509))
 			for (_tmp_ in __ax4_iter_509) {
 				_loc2_ = _tmp_;
