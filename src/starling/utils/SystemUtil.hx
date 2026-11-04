@@ -54,6 +54,11 @@ class SystemUtil {
 			sAIR = true;
 		} catch (e:Dynamic) {
 			sAIR = false;
+			#if cpp
+			// no AIR descriptor: the window lime created has the depth and stencil buffers it asked for
+			var attributes = lime.app.Application.current.window.context.attributes;
+			sSupportsDepthAndStencil = attributes.depth != false && attributes.stencil != false;
+			#end
 		}
 	}
 
