@@ -80,6 +80,9 @@ class MainPanel extends ConsolePanel {
 
 	public var _filterRegExp:EReg;
 
+	// what String(_filterRegExp.r) printed on flash, as EReg's RegExp only exists there
+	var _filterRegExpSource:String;
+
 	public var _extraMenus:IMap<ASAny, ASAny>;
 
 	public var _enteringLogin:Bool = false;
@@ -720,6 +723,7 @@ class MainPanel extends ConsolePanel {
 		if (expstr != null && expstr != "") {
 			_filterText = null;
 			_filterRegExp = new EReg(LogReferences.EscHTML(expstr), "gi");
+			_filterRegExpSource = "/" + LogReferences.EscHTML(expstr) + "/gi";
 			startFilter();
 		} else {
 			endFilter();
@@ -867,7 +871,7 @@ class MainPanel extends ConsolePanel {
 		} else if (_loc3_ == "channel_" + "C") {
 			_loc3_ = "Console\'s channel::Logs generated from Console";
 		} else if (_loc3_ == "channel_" + "~") {
-			_loc3_ = _filterRegExp != null ? ConsoleLib.string(_filterRegExp.r) : _filterText;
+			_loc3_ = _filterRegExp != null ? _filterRegExpSource : _filterText;
 			_loc3_ = "Filtering channel" + "::*" + _loc3_ + "*";
 		} else if (_loc3_ == "channel_" + "⌂") {
 			_loc3_ = "Inspecting channel";

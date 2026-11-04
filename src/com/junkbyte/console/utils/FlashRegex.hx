@@ -24,7 +24,8 @@ class FlashRegex {
 
 	public static function split(text:String, regex:EReg):Array<ASAny> {
 		var _loc3_ = text;
-		return ASCompat.coerce(regex.r.split(_loc3_), Array);
+		// EReg's flash RegExp (r) only exists on flash
+		return cast regex.split(_loc3_);
 	}
 
 	public static function exec(text:String, regex:EReg, lastIndex:Int = 0):RegexResult {
