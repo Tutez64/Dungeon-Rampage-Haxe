@@ -45,7 +45,7 @@ class FRESteamWorks extends EventDispatcher {
 		_ExtensionContext.addEventListener("status", handleStatusEvent);
 		#elseif (cpp && !air)
 		Steam.whenGetAuthTicketForWebApiResponse = function(success:Bool, _handle:Int, responseCode:Int):Void {
-			var ev = new SteamEvent(SteamEvent.STEAM_RESPONSE, 27, responseCode);
+			var ev = new SteamEvent(SteamEvent.STEAM_RESPONSE, SteamConstants.RESPONSE_OnGetAuthTicketForWebApiResponse, responseCode);
 			dispatchEvent(ev);
 		};
 		#end
