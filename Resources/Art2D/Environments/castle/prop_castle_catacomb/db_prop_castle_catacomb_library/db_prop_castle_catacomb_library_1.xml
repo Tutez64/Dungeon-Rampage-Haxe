@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with TexturePacker https://www.codeandweb.com/texturepacker -->
+<!-- $TexturePacker:SmartUpdate:1ef6fa58f200b9548692ebd0f25f66be:b6405608e5bf7c15177d213d09493526:445995b9bf3e75af3569f0696620171a$ -->
+<TextureAtlas imagePath="db_prop_castle_catacomb_library_1.atf" width="2048" height="2048">
+    <SubTexture name="db_prop_castle_catacomb_cave" x="1268" y="228" width="584" height="532" frameX="0" frameY="0" frameWidth="586" frameHeight="532"/>
+    <SubTexture name="db_prop_castle_catacomb_deco_groundCrack_B" x="1630" y="1230" width="405" height="250" frameX="-7" frameY="-16" frameWidth="422" frameHeight="288"/>
+    <SubTexture name="db_prop_castle_catacomb_ground_bigRock_C" x="8" y="349" width="542" height="539" frameX="0" frameY="-1" frameWidth="550" frameHeight="546"/>
+    <SubTexture name="db_prop_castle_catacomb_ground_bigRock_D" x="638" y="347" width="573" height="532" frameX="0" frameY="-2" frameWidth="586" frameHeight="566"/>
+    <SubTexture name="db_prop_castle_catacomb_ground_debris_A" x="824" y="1775" rotated="true" width="163" height="197" frameX="-7" frameY="-16" frameWidth="220" frameHeight="198"/>
+    <SubTexture name="db_prop_castle_catacomb_ground_debris_B" x="874" y="1111" rotated="true" width="145" height="290" frameX="-11" frameY="-34" frameWidth="312" frameHeight="194"/>
+    <SubTexture name="db_prop_castle_catacomb_ground_floorspikes" x="1207" y="1008" width="440" height="167" frameX="-12" frameY="-1" frameWidth="464" frameHeight="182"/>
+    <SubTexture name="db_prop_castle_catacomb_ground_rock_B" x="1655" y="1035" width="325" height="187" frameX="-1" frameY="-8" frameWidth="340" frameHeight="208"/>
+    <SubTexture name="db_prop_castle_catacomb_smash_barrelDouble" x="1744" y="830" rotated="true" width="293" height="197" frameX="-22" frameY="-6" frameWidth="234" frameHeight="340"/>
+    <SubTexture name="db_prop_castle_catacomb_smash_spikes_A" x="1029" y="1097" width="169" height="281" frameX="-24" frameY="-16" frameWidth="204" frameHeight="314"/>
+    <SubTexture name="db_prop_castle_catacomb_smash_spikes_B" x="430" y="1114" width="119" height="230" frameX="-18" frameY="-12" frameWidth="164" frameHeight="274"/>
+    <SubTexture name="db_prop_castle_catacomb_smash_spikes_C" x="8" y="1760" width="157" height="277" frameX="-17" frameY="-4" frameWidth="192" frameHeight="312"/>
+    <SubTexture name="db_prop_castle_catacomb_smash_tombstone_B" x="314" y="1515" width="209" height="237" frameX="-21" frameY="-17" frameWidth="242" frameHeight="298"/>
+    <SubTexture name="db_prop_castle_catacomb_smash_tombstone_C" x="531" y="1578" rotated="true" width="288" height="189" frameX="-40" frameY="-9" frameWidth="246" frameHeight="340"/>
+    <SubTexture name="db_prop_castle_catacomb_smash_tombstone_D" x="558" y="1111" rotated="true" width="308" height="206" frameX="-27" frameY="-5" frameWidth="254" frameHeight="354"/>
+    <SubTexture name="db_prop_castle_catacomb_smash_woodenBox" x="1024" y="1589" rotated="true" width="143" height="144" frameX="-17" frameY="-12" frameWidth="182" frameHeight="186"/>
+    <SubTexture name="db_prop_castle_catacomb_spikesTrap" x="827" y="1612" rotated="true" width="189" height="149" frameX="-15" frameY="-11" frameWidth="176" frameHeight="208"/>
+    <SubTexture name="db_prop_castle_catacomb_tomb_B" x="557" y="1325" width="306" height="245" frameX="-28" frameY="-25" frameWidth="360" frameHeight="322"/>
+    <SubTexture name="db_prop_castle_catacomb_tower_A" x="558" y="887" rotated="true" width="463" height="216" frameX="-7" frameY="-22" frameWidth="236" frameHeight="496"/>
+    <SubTexture name="db_prop_castle_catacomb_tower_B" x="1268" y="8" rotated="true" width="589" height="212" frameX="-16" frameY="-13" frameWidth="248" frameHeight="616"/>
+    <SubTexture name="db_prop_castle_catacomb_tower_C" x="1206" y="1183" rotated="true" width="416" height="240" frameX="-3" frameY="-9" frameWidth="248" frameHeight="440"/>
+    <SubTexture name="db_prop_castle_catacomb_trap_statueSkeleton" x="1219" y="768" rotated="true" width="517" height="232" frameX="-41" frameY="-14" frameWidth="282" frameHeight="570"/>
+    <SubTexture name="db_prop_castle_catacomb_trap_tomb_01" x="8" y="1169" rotated="true" width="304" height="192"/>
+    <SubTexture name="db_prop_castle_catacomb_trap_tomb_02" x="8" y="1572" rotated="true" width="298" height="150"/>
+    <SubTexture name="db_prop_castle_catacomb_wall_G" x="1027" y="1386" width="165" height="195" frameX="-5" frameY="-23" frameWidth="188" frameHeight="238"/>
+    <SubTexture name="db_prop_castle_catacomb_wall_I" x="8" y="1369" width="298" height="195" frameX="-18" frameY="-18" frameWidth="336" frameHeight="238"/>
+    <SubTexture name="db_prop_castle_catacomb_wall_secret" x="638" y="8" width="622" height="331" frameX="-28" frameY="-26" frameWidth="680" frameHeight="420"/>
+    <SubTexture name="db_prop_castle_catacomb_wall_secret_off" x="8" y="8" width="622" height="333" frameX="-30" frameY="-18" frameWidth="654" frameHeight="386"/>
+    <SubTexture name="db_props_castle_catacomb_deco_bloodSplat_A" x="662" y="1775" rotated="true" width="154" height="204"/>
+    <SubTexture name="db_props_castle_catacomb_deco_bloodSplat_B" x="430" y="896" rotated="true" width="120" height="210"/>
+    <SubTexture name="db_props_castle_catacomb_deco_bloodSplat_D" x="995" y="1769" rotated="true" width="112" height="186"/>
+    <SubTexture name="db_props_castle_catacomb_deco_deadGladiator_E" x="1029" y="887" rotated="true" width="170" height="202" frameX="0" frameY="0" frameWidth="202" frameHeight="172"/>
+    <SubTexture name="db_props_castle_catacomb_deco_deadGladiator_F" x="1860" y="535" rotated="true" width="171" height="287" frameX="-1" frameY="0" frameWidth="288" frameHeight="176"/>
+    <SubTexture name="db_props_castle_catacomb_deco_deadGladiator_G" x="302" y="1760" rotated="true" width="188" height="272"/>
+    <SubTexture name="shadow_circle_s131x169_b13" x="871" y="1409" rotated="true" width="145" height="195" frameX="-25" frameY="-21" frameWidth="256" frameHeight="256"/>
+    <SubTexture name="shadow_circle_s161x190_b13" x="320" y="1352" width="228" height="155" frameX="-25" frameY="-21" frameWidth="512" frameHeight="256"/>
+    <SubTexture name="shadow_circle_s168x192_b13" x="498" y="1775" rotated="true" width="156" height="236" frameX="-25" frameY="-21" frameWidth="512" frameHeight="256"/>
+    <SubTexture name="shadow_circle_s186x235_b13" x="1860" y="273" rotated="true" width="177" height="254" frameX="-25" frameY="-21" frameWidth="512" frameHeight="256"/>
+    <SubTexture name="shadow_circle_s188x227_b13" x="1865" y="8" rotated="true" width="173" height="257" frameX="-25" frameY="-21" frameWidth="512" frameHeight="256"/>
+    <SubTexture name="shadow_square01_s159x144_b13" x="173" y="1760" rotated="true" width="121" height="273" frameX="-29" frameY="-21" frameWidth="512" frameHeight="256"/>
+    <SubTexture name="shadow_square02_s100x100_b13" x="8" y="896" width="414" height="265" frameX="-31" frameY="-25" frameWidth="512" frameHeight="512"/>
+</TextureAtlas>

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with TexturePacker https://www.codeandweb.com/texturepacker -->
+<!-- $TexturePacker:SmartUpdate:7856fc617e925ac7bbf6a7ba16bb7005:dcc62f1a4fd5f27644fd0e3c1f3ba889:f9b36cad834826f29e6e6837f3142d29$ -->
+<TextureAtlas imagePath="db_grd_castle_prison_library_1.atf" width="2048" height="4096">
+    <SubTexture name="db_grd_castle_prison_1101" x="12" y="12" width="900" height="900"/>
+    <SubTexture name="db_grd_castle_prison_1110" x="928" y="12" width="900" height="900"/>
+    <SubTexture name="db_grd_castle_prison_1111_A" x="12" y="928" width="900" height="900"/>
+    <SubTexture name="db_grd_castle_prison_1111_B" x="928" y="928" width="900" height="900"/>
+    <SubTexture name="db_grd_castle_prison_2000" x="12" y="1844" width="900" height="900"/>
+    <SubTexture name="db_grd_castle_prison_2010_B" x="928" y="1844" width="900" height="900"/>
+    <SubTexture name="db_grd_castle_prison_5555_squareSolid" x="12" y="2760" width="900" height="900"/>
+    <SubTexture name="db_grd_castle_prison_filler" x="928" y="2760" width="900" height="900"/>
+</TextureAtlas>

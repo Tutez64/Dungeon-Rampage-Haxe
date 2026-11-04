@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with TexturePacker https://www.codeandweb.com/texturepacker -->
+<!-- $TexturePacker:SmartUpdate:047c14a56550fd62762d94c04c6967a0:87c1141bafb190e7c1b35240b28c6d14:deba9fec4807aed935dd1bd45351b62a$ -->
+<TextureAtlas imagePath="db_prop_jurassic_dino_library_0.atf" width="4096" height="4096">
+    <SubTexture name="db_prop_jurassic_dino_deco_brokenAxe" x="3966" y="3486" width="94" height="91" frameX="0" frameY="-2" frameWidth="96" frameHeight="94"/>
+    <SubTexture name="db_prop_jurassic_dino_deco_brokenHelmet_A" x="3966" y="3375" width="122" height="103" frameX="-2" frameY="0" frameWidth="138" frameHeight="104"/>
+    <SubTexture name="db_prop_jurassic_dino_deco_brokenShield_A" x="3946" y="1679" rotated="true" width="129" height="157" frameX="0" frameY="-1" frameWidth="166" frameHeight="130"/>
+    <SubTexture name="db_prop_jurassic_dino_deco_brokenShield_C" x="3946" y="1185" rotated="true" width="133" height="160" frameX="-3" frameY="-1" frameWidth="164" frameHeight="136"/>
+    <SubTexture name="db_prop_jurassic_dino_deco_brokenSword_B" x="3946" y="1844" width="74" height="106" frameX="0" frameY="0" frameWidth="80" frameHeight="110"/>
+    <SubTexture name="db_prop_jurassic_dino_deco_grass_F" x="1962" y="4000" rotated="true" width="62" height="88" frameX="0" frameY="-1" frameWidth="88" frameHeight="64"/>
+    <SubTexture name="db_prop_jurassic_dino_deco_rock_A" x="1826" y="4000" width="128" height="88" frameX="0" frameY="-2" frameWidth="128" frameHeight="90"/>
+    <SubTexture name="db_prop_jurassic_dino_deco_rock_B" x="2032" y="4000" width="89" height="50" frameX="0" frameY="0" frameWidth="92" frameHeight="60"/>
+    <SubTexture name="db_prop_jurassic_dino_deco_rock_C" x="3946" y="627" width="142" height="119" frameX="0" frameY="-2" frameWidth="142" frameHeight="126"/>
+    <SubTexture name="db_prop_jurassic_dino_exitgate_door" x="3643" y="2454" rotated="true" width="406" height="719" frameX="-4" frameY="-7" frameWidth="730" frameHeight="414"/>
+    <SubTexture name="db_prop_jurassic_dino_ground_rock_B" x="1826" y="2244" width="270" height="170" frameX="-5" frameY="-2" frameWidth="278" frameHeight="172"/>
+    <SubTexture name="db_prop_jurassic_dino_smash_bones_A" x="3946" y="8" width="142" height="262" frameX="-37" frameY="-8" frameWidth="216" frameHeight="318"/>
+    <SubTexture name="db_prop_jurassic_dino_smash_kingstatue" x="3946" y="278" width="137" height="341" frameX="-8" frameY="-6" frameWidth="148" frameHeight="354"/>
+    <SubTexture name="db_prop_jurassic_dino_smash_sign_A" x="3946" y="976" width="104" height="201" frameX="0" frameY="-2" frameWidth="106" frameHeight="204"/>
+    <SubTexture name="db_prop_jurassic_dino_smash_skull_C" x="3643" y="3820" width="338" height="232" frameX="-6" frameY="0" frameWidth="346" frameHeight="234"/>
+    <SubTexture name="db_prop_jurassic_dino_trap_trigger" x="3946" y="1516" rotated="true" width="132" height="155" frameX="-8" frameY="-36" frameWidth="178" frameHeight="174"/>
+    <SubTexture name="db_prop_jurassic_dino_trap_trigger_off" x="3946" y="1353" rotated="true" width="140" height="155" frameX="-8" frameY="-28" frameWidth="178" frameHeight="174"/>
+    <SubTexture name="db_prop_jurassic_dino_wall_B" x="3643" y="3181" rotated="true" width="315" height="631" frameX="-11" frameY="-4" frameWidth="646" frameHeight="328"/>
+    <SubTexture name="db_prop_jurassic_dino_wall_E" x="2129" y="1826" width="1809" height="620"/>
+    <SubTexture name="db_prop_jurassic_dino_wall_F" x="8" y="2244" width="1810" height="1810"/>
+    <SubTexture name="db_prop_jurassic_dino_wall_G" x="1826" y="3710" width="1809" height="282"/>
+    <SubTexture name="db_prop_jurassic_dino_wall_H" x="1826" y="2454" width="1809" height="620" frameX="0" frameY="-16" frameWidth="1809" frameHeight="636"/>
+    <SubTexture name="db_prop_jurassic_dino_wall_I" x="1826" y="3082" width="1809" height="620"/>
+    <SubTexture name="db_prop_jurassic_dino_wall_L" x="2129" y="8" width="1809" height="1810"/>
+    <SubTexture name="db_prop_nordic_flame001" x="3946" y="754" width="128" height="214" frameX="-49" frameY="-48" frameWidth="238" frameHeight="298"/>
+    <SubTexture name="dp_prop_jurassic_dino_filler_B" x="8" y="8" width="2113" height="2228" frameX="-4" frameY="-4" frameWidth="2126" frameHeight="2270"/>
+    <SubTexture name="shadow_circle_m180_48_-27_102_b13" x="3966" y="3181" rotated="true" width="122" height="186" frameX="-32" frameY="-32" frameWidth="256" frameHeight="256"/>
+</TextureAtlas>

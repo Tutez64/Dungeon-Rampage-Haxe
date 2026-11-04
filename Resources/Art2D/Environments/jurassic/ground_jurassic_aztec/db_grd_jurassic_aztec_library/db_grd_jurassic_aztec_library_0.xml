@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with TexturePacker https://www.codeandweb.com/texturepacker -->
+<!-- $TexturePacker:SmartUpdate:3cfdb2e88dde4fb284ca01fdfc2d8d11:0407b1bad04dabb1362e9eecb5e18d89:7a4c6894f81ecc19f7865020d07b3a07$ -->
+<TextureAtlas imagePath="db_grd_jurassic_aztec_library_0.atf" width="1024" height="2048">
+    <SubTexture name="db_grd_jurassic_aztec_5555_squareSolid" x="12" y="12" width="900" height="900"/>
+    <SubTexture name="db_grd_jurassic_aztec_filler" x="12" y="928" width="900" height="900"/>
+</TextureAtlas>

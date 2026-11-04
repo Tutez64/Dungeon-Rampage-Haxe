@@ -1,0 +1,50 @@
+{
+"AN":{
+"N":"db_prop_jurassic_aztec_library",
+"SN":"trap/db_prop_jurassic_aztec_trap_spears_off",
+"TL":{
+"L":[
+{
+"LN":"Layer 1",
+"FR":[
+{
+"I":0,
+"DU":1,
+"E":[
+{"SI":{
+"SN":"SVG/db_prop_jurassic_aztec_trap_spearHole",
+"FF":0,
+"ST":"G",
+"TRP":{"x":28,"y":24},
+"LP":"LP",
+"MX":[1,0,0,1,-28,-24]
+}}]}
+]}
+]}},
+"SD":{
+"S":[
+{
+"SN":"SVG/db_prop_jurassic_aztec_trap_spearHole",
+"TL":{
+"L":[
+{"LN":"Layer 1",
+"FR":[
+{"I":0,
+"DU":1,
+"E":[
+{"ASI":{
+"MX":[0.5,0,0,0.5,0.6,0.25],
+"N":"0"
+}}]}]}]}}
+]},
+"MD":{
+"V":"BTA 1.3.0",
+"FLV":"Adobe Animate 24 (WIN 24.0.15.5)",
+"N":"db_prop_jurassic_aztec_library",
+"BGC":"#CCCCCC",
+"W":760,
+"H":600,
+"ASV":3,
+"SMC":1,
+"FRT":24
+}}

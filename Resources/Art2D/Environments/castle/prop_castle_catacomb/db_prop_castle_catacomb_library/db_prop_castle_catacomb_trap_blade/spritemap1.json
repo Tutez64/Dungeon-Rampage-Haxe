@@ -1,0 +1,15 @@
+{"ATLAS":{"SPRITES":[
+{"SPRITE":{"name":"0","x":2,"y":2,"w":972,"h":587,"rotated":false}},
+{"SPRITE":{"name":"1","x":626,"y":590,"w":135,"h":68,"rotated":false}},
+{"SPRITE":{"name":"2","x":408,"y":590,"w":217,"h":68,"rotated":false}},
+{"SPRITE":{"name":"3","x":762,"y":590,"w":130,"h":68,"rotated":false}},
+{"SPRITE":{"name":"4","x":2,"y":590,"w":405,"h":250,"rotated":false}}]},
+"meta":{
+"app":"Adobe Animate (Better TA Extension)",
+"version":"24.0.15.5",
+"image":"spritemap1.atf",
+"format":"RGBA8888",
+"size":{"w":1024,"h":1024},
+"resolution":"2"
+}
+}

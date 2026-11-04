@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with TexturePacker https://www.codeandweb.com/texturepacker -->
+<!-- $TexturePacker:SmartUpdate:72826a805de5c0b9a6605f3f237ef23f:2cc45072d471e684699bac1f15a699ed:7f690ae43280e00af4c6d30ab22b26eb$ -->
+<TextureAtlas imagePath="db_grd_jurassic_dino_library_0.atf" width="1024" height="2048">
+    <SubTexture name="db_grd_jurassic_dino_5555_squareSolid" x="12" y="12" width="900" height="900"/>
+    <SubTexture name="db_grd_jurassic_dino_filler" x="12" y="928" width="900" height="900"/>
+</TextureAtlas>

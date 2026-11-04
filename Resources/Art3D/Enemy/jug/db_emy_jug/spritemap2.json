@@ -1,0 +1,227 @@
+{
+ "ATLAS": {
+  "SPRITES": [
+   {
+    "SPRITE": {
+     "name": "22",
+     "x": 1490,
+     "y": 1,
+     "w": 361,
+     "h": 345,
+     "rotated": false
+    }
+   },
+   {
+    "SPRITE": {
+     "name": "23",
+     "x": 1,
+     "y": 1056,
+     "w": 361,
+     "h": 324,
+     "rotated": false
+    }
+   },
+   {
+    "SPRITE": {
+     "name": "24",
+     "x": 377,
+     "y": 730,
+     "w": 318,
+     "h": 386,
+     "rotated": false
+    }
+   },
+   {
+    "SPRITE": {
+     "name": "25",
+     "x": 759,
+     "y": 346,
+     "w": 361,
+     "h": 345,
+     "rotated": false
+    }
+   },
+   {
+    "SPRITE": {
+     "name": "26",
+     "x": 399,
+     "y": 355,
+     "w": 331,
+     "h": 374,
+     "rotated": false
+    }
+   },
+   {
+    "SPRITE": {
+     "name": "27",
+     "x": 1,
+     "y": 1751,
+     "w": 368,
+     "h": 278,
+     "rotated": true
+    }
+   },
+   {
+    "SPRITE": {
+     "name": "28",
+     "x": 1,
+     "y": 1,
+     "w": 397,
+     "h": 391,
+     "rotated": false
+    }
+   },
+   {
+    "SPRITE": {
+     "name": "29",
+     "x": 1,
+     "y": 393,
+     "w": 374,
+     "h": 331,
+     "rotated": true
+    }
+   },
+   {
+    "SPRITE": {
+     "name": "30",
+     "x": 1,
+     "y": 725,
+     "w": 375,
+     "h": 330,
+     "rotated": true
+    }
+   },
+   {
+    "SPRITE": {
+     "name": "31",
+     "x": 1452,
+     "y": 347,
+     "w": 365,
+     "h": 320,
+     "rotated": false
+    }
+   },
+   {
+    "SPRITE": {
+     "name": "32",
+     "x": 1452,
+     "y": 668,
+     "w": 439,
+     "h": 263,
+     "rotated": true
+    }
+   },
+   {
+    "SPRITE": {
+     "name": "33",
+     "x": 1121,
+     "y": 346,
+     "w": 330,
+     "h": 375,
+     "rotated": false
+    }
+   },
+   {
+    "SPRITE": {
+     "name": "103",
+     "x": 696,
+     "y": 1039,
+     "w": 335,
+     "h": 327,
+     "rotated": true
+    }
+   },
+   {
+    "SPRITE": {
+     "name": "104",
+     "x": 363,
+     "y": 1117,
+     "w": 286,
+     "h": 363,
+     "rotated": false
+    }
+   },
+   {
+    "SPRITE": {
+     "name": "105",
+     "x": 370,
+     "y": 1481,
+     "w": 293,
+     "h": 341,
+     "rotated": false
+    }
+   },
+   {
+    "SPRITE": {
+     "name": "106",
+     "x": 1126,
+     "y": 1,
+     "w": 363,
+     "h": 344,
+     "rotated": true
+    }
+   },
+   {
+    "SPRITE": {
+     "name": "107",
+     "x": 731,
+     "y": 692,
+     "w": 356,
+     "h": 346,
+     "rotated": false
+    }
+   },
+   {
+    "SPRITE": {
+     "name": "108",
+     "x": 1088,
+     "y": 722,
+     "w": 361,
+     "h": 319,
+     "rotated": true
+    }
+   },
+   {
+    "SPRITE": {
+     "name": "109",
+     "x": 759,
+     "y": 1,
+     "w": 366,
+     "h": 344,
+     "rotated": true
+    }
+   },
+   {
+    "SPRITE": {
+     "name": "110",
+     "x": 1,
+     "y": 1381,
+     "w": 281,
+     "h": 369,
+     "rotated": false
+    }
+   },
+   {
+    "SPRITE": {
+     "name": "111",
+     "x": 399,
+     "y": 1,
+     "w": 359,
+     "h": 353,
+     "rotated": false
+    }
+   }
+  ]
+ },
+ "meta": {
+  "app": "TA_3DPipeline",
+  "version": "1.0.0",
+  "image": "spritemap2.atf",
+  "format": "RGBA8888",
+  "size": {
+   "w": 2048,
+   "h": 2048
+  },
+  "resolution": "1"
+ }
+}

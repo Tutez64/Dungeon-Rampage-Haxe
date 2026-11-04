@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with TexturePacker https://www.codeandweb.com/texturepacker -->
+<!-- $TexturePacker:SmartUpdate:147a3669aca7212e182e54a0f629fa97:17d775706b24f8b4ee00a8a99009ff37:5a5997f4517936ac65b652df92faa3b5$ -->
+<TextureAtlas imagePath="db_grd_jurassic_tribal_library_0.atf" width="2048" height="4096">
+    <SubTexture name="db_grd_jurassic_tribal_5555_squareSolid" x="12" y="12" width="900" height="900"/>
+    <SubTexture name="db_grd_jurassic_tribal_boss_filler" x="928" y="12" width="900" height="900"/>
+    <SubTexture name="db_grd_jurassic_tribal_boss_floor_A" x="12" y="928" width="900" height="900"/>
+    <SubTexture name="db_grd_jurassic_tribal_boss_floor_B" x="928" y="928" width="900" height="900"/>
+    <SubTexture name="db_grd_jurassic_tribal_boss_floor_C" x="12" y="1844" width="900" height="900"/>
+    <SubTexture name="db_grd_jurassic_tribal_boss_floor_D" x="928" y="1844" width="900" height="900"/>
+    <SubTexture name="db_grd_jurassic_tribal_filler" x="12" y="2760" width="900" height="900"/>
+</TextureAtlas>

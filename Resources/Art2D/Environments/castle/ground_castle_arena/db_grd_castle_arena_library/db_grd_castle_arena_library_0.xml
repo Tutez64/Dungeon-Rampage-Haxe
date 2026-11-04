@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with TexturePacker https://www.codeandweb.com/texturepacker -->
+<!-- $TexturePacker:SmartUpdate:a278f7a25c3280b0dda18135d21188ce:c43bb34852ccda28d47194f67ff5d6fc:70656a29f76e79ddb603cd1f39c8eb21$ -->
+<TextureAtlas imagePath="db_grd_castle_arena_library_0.atf" width="4096" height="4096">
+    <SubTexture name="db_grd_castle_arena_0505" x="12" y="12" width="900" height="900"/>
+    <SubTexture name="db_grd_castle_arena_0555" x="12" y="928" width="900" height="900"/>
+    <SubTexture name="db_grd_castle_arena_5050" x="12" y="1844" width="900" height="900"/>
+    <SubTexture name="db_grd_castle_arena_5055" x="12" y="2760" width="900" height="900"/>
+    <SubTexture name="db_grd_castle_arena_5505" x="928" y="12" width="900" height="900"/>
+    <SubTexture name="db_grd_castle_arena_5550" x="1844" y="12" width="900" height="900"/>
+    <SubTexture name="db_grd_castle_arena_5555" x="2760" y="12" width="900" height="900"/>
+    <SubTexture name="db_grd_castle_arena_5555_squareSolid" x="928" y="928" width="900" height="900"/>
+    <SubTexture name="db_grd_castle_arena_corner" x="928" y="1844" width="900" height="900"/>
+    <SubTexture name="db_grd_castle_arena_cornerA" x="928" y="2760" width="900" height="900"/>
+    <SubTexture name="db_grd_castle_arena_cornerB" x="1844" y="928" width="900" height="900"/>
+    <SubTexture name="db_grd_castle_arena_cornerC" x="2760" y="928" width="900" height="900"/>
+    <SubTexture name="db_grd_castle_arena_exitroom_floor" x="1844" y="1844" width="900" height="900"/>
+    <SubTexture name="db_grd_castle_arena_filler" x="1844" y="2760" width="900" height="900"/>
+</TextureAtlas>

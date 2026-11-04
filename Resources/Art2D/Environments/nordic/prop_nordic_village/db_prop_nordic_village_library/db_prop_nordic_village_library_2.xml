@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with TexturePacker https://www.codeandweb.com/texturepacker -->
+<!-- $TexturePacker:SmartUpdate:97cbe4cd863e6942293479257353468f:4337b12c88949dedb07e84b198be4c66:98b2fcdf0e1427b769461f02d0117d88$ -->
+<TextureAtlas imagePath="db_prop_nordic_village_library_2.atf" width="4096" height="4096">
+    <SubTexture name="db_prop_nordic_village_cave_back" x="1283" y="1198" width="507" height="474" frameX="-1" frameY="0" frameWidth="508" frameHeight="498"/>
+    <SubTexture name="db_prop_nordic_village_deco_bricks" x="8" y="2668" width="296" height="184" frameX="-5" frameY="-8" frameWidth="308" frameHeight="196"/>
+    <SubTexture name="db_prop_nordic_village_deco_crack_A" x="1250" y="2100" width="348" height="296" frameX="0" frameY="-6" frameWidth="348" frameHeight="308"/>
+    <SubTexture name="db_prop_nordic_village_deco_crack_B" x="1798" y="1549" width="404" height="251" frameX="0" frameY="-1" frameWidth="412" frameHeight="274"/>
+    <SubTexture name="db_prop_nordic_village_deco_rock_B" x="3308" y="1038" width="313" height="185" frameX="-9" frameY="0" frameWidth="334" frameHeight="198"/>
+    <SubTexture name="db_prop_nordic_village_ground_stump" x="1015" y="2177" width="226" height="218" frameX="-18" frameY="-37" frameWidth="298" frameHeight="272"/>
+    <SubTexture name="db_prop_nordic_village_ground_tree_B" x="3642" y="8" rotated="true" width="444" height="308" frameX="0" frameY="-4" frameWidth="310" frameHeight="448"/>
+    <SubTexture name="db_prop_nordic_village_smash_barrelDouble" x="617" y="2451" rotated="true" width="304" height="211" frameX="-2" frameY="0" frameWidth="228" frameHeight="326"/>
+    <SubTexture name="db_prop_nordic_village_smash_cookingPot" x="2260" y="1284" rotated="true" width="365" height="354" frameX="-1" frameY="-1" frameWidth="358" frameHeight="366"/>
+    <SubTexture name="db_prop_nordic_village_smash_house_A" x="654" y="632" rotated="true" width="621" height="599" frameX="-25" frameY="-3" frameWidth="670" frameHeight="694"/>
+    <SubTexture name="db_prop_nordic_village_smash_house_B" x="2637" y="1268" rotated="true" width="638" height="513" frameX="-1" frameY="-1" frameWidth="520" frameHeight="640"/>
+    <SubTexture name="db_prop_nordic_village_smash_house_C" x="8" y="1775" rotated="true" width="601" height="597" frameX="0" frameY="-1" frameWidth="600" frameHeight="602"/>
+    <SubTexture name="db_prop_nordic_village_smash_house_D" x="630" y="1239" width="612" height="589" frameX="0" frameY="-3" frameWidth="614" frameHeight="592"/>
+    <SubTexture name="db_prop_nordic_village_smash_house_E" x="8" y="632" rotated="true" width="638" height="513" frameX="-1" frameY="-1" frameWidth="520" frameHeight="640"/>
+    <SubTexture name="db_prop_nordic_village_smash_shipPost" x="3308" y="623" width="326" height="407" frameX="-1" frameY="-1" frameWidth="328" frameHeight="408"/>
+    <SubTexture name="db_prop_nordic_village_smash_shipWheel" x="321" y="2632" width="265" height="199" frameX="0" frameY="0" frameWidth="266" frameHeight="200"/>
+    <SubTexture name="db_prop_nordic_village_smash_shipWreck" x="3620" y="1565" rotated="true" width="467" height="584" frameX="-13" frameY="0" frameWidth="600" frameHeight="482"/>
+    <SubTexture name="db_prop_nordic_village_smash_skullpile" x="8" y="2380" width="305" height="280" frameX="-5" frameY="-5" frameWidth="314" frameHeight="290"/>
+    <SubTexture name="db_prop_nordic_village_smash_spikes_B" x="594" y="2670" rotated="true" width="260" height="167" frameX="0" frameY="-3" frameWidth="168" frameHeight="264"/>
+    <SubTexture name="db_prop_nordic_village_smash_stable_A" x="1798" y="1284" width="454" height="257" frameX="0" frameY="0" frameWidth="468" frameHeight="284"/>
+    <SubTexture name="db_prop_nordic_village_smash_weaponPile" x="3308" y="1231" rotated="true" width="306" height="283" frameX="-3" frameY="0" frameWidth="288" frameHeight="306"/>
+    <SubTexture name="db_prop_nordic_village_smash_weaponRack_A" x="1655" y="1808" width="392" height="354" frameX="-4" frameY="-4" frameWidth="398" frameHeight="358"/>
+    <SubTexture name="db_prop_nordic_village_smash_weaponRack_B" x="3283" y="1522" width="329" height="342" frameX="-3" frameY="-3" frameWidth="338" frameHeight="348"/>
+    <SubTexture name="db_prop_nordic_village_smash_weaponRack_C" x="617" y="2069" width="390" height="374" frameX="-62" frameY="-43" frameWidth="534" frameHeight="526"/>
+    <SubTexture name="db_prop_nordic_village_tower_A" x="1250" y="1680" rotated="true" width="397" height="246" frameX="0" frameY="0" frameWidth="250" frameHeight="446"/>
+    <SubTexture name="db_prop_nordic_village_tower_B" x="3642" y="872" rotated="true" width="406" height="194" frameX="-9" frameY="0" frameWidth="226" frameHeight="450"/>
+    <SubTexture name="db_prop_nordic_village_tower_C" x="617" y="1836" rotated="true" width="391" height="225" frameX="-15" frameY="0" frameWidth="260" frameHeight="442"/>
+    <SubTexture name="db_prop_nordic_village_tower_D" x="2210" y="1646" rotated="true" width="400" height="220" frameX="-9" frameY="-20" frameWidth="258" frameHeight="442"/>
+    <SubTexture name="db_prop_nordic_village_tower_E" x="3629" y="1074" rotated="true" width="456" height="242" frameX="-17" frameY="0" frameWidth="260" frameHeight="476"/>
+    <SubTexture name="db_prop_nordic_village_tower_F" x="3622" y="1324" rotated="true" width="456" height="233" frameX="-18" frameY="0" frameWidth="260" frameHeight="484"/>
+    <SubTexture name="db_prop_nordic_village_trap_spears" x="321" y="2380" width="288" height="244"/>
+    <SubTexture name="db_prop_nordic_village_wall_D" x="1250" y="1934" width="352" height="158"/>
+    <SubTexture name="db_prop_nordic_village_wall_I" x="8" y="8" width="1809" height="616"/>
+    <SubTexture name="db_prop_nordic_village_wall_L" x="1825" y="8" width="1809" height="607" frameX="0" frameY="-4" frameWidth="1809" frameHeight="611"/>
+    <SubTexture name="db_prop_nordic_village_wall_O" x="1283" y="632" rotated="true" width="534" height="558" frameX="0" frameY="-1" frameWidth="559" frameHeight="535"/>
+    <SubTexture name="db_prop_nordic_village_wall_P" x="2637" y="623" width="663" height="637" frameX="0" frameY="-3" frameWidth="668" frameHeight="640"/>
+    <SubTexture name="db_prop_nordic_village_wall_S" x="8" y="1153" width="614" height="614"/>
+    <SubTexture name="db_prop_nordic_village_wall_T" x="1825" y="623" width="804" height="653" frameX="0" frameY="-1" frameWidth="804" frameHeight="654"/>
+    <SubTexture name="db_prop_nordic_village_wall_V" x="312" y="2839" width="248" height="247" frameX="0" frameY="-1" frameWidth="248" frameHeight="248"/>
+    <SubTexture name="shadow_img_copy_2_s100x100_b12" x="1015" y="2403" rotated="true" width="219" height="332" frameX="-23" frameY="-19" frameWidth="512" frameHeight="512"/>
+    <SubTexture name="shadow_smash_house_A_m62_-8_9_71_b13" x="3642" y="637" width="438" height="227" frameX="-30" frameY="-38" frameWidth="512" frameHeight="512"/>
+    <SubTexture name="shadow_smash_house_B_s100x100_b13q1" x="3642" y="324" width="443" height="305" frameX="-13" frameY="-13" frameWidth="512" frameHeight="512"/>
+    <SubTexture name="shadow_smash_shipWreck_s100x100_b8" x="1016" y="1836" rotated="true" width="226" height="333" frameX="-19" frameY="-17" frameWidth="512" frameHeight="512"/>
+</TextureAtlas>

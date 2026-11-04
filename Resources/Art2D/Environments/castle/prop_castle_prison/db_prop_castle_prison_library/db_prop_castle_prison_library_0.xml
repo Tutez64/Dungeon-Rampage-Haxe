@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with TexturePacker https://www.codeandweb.com/texturepacker -->
+<!-- $TexturePacker:SmartUpdate:d0b8554bc541a2bcd1bf53b47a469004:d1e2430fe8c53398da9fbb5147dc83d8:6f4ef91c6a78592770b8bee9ebcfb7bf$ -->
+<TextureAtlas imagePath="db_prop_castle_prison_library_0.atf" width="4096" height="4096">
+    <SubTexture name="db_prop_castle_prison_arch_A" x="2500" y="3525" rotated="true" width="418" height="553" frameX="-4" frameY="-5" frameWidth="558" frameHeight="432"/>
+    <SubTexture name="db_prop_castle_prison_arch_B" x="2926" y="3525" rotated="true" width="418" height="553" frameX="-4" frameY="-5" frameWidth="558" frameHeight="432"/>
+    <SubTexture name="db_prop_castle_prison_arch_C" x="2500" y="8" width="891" height="420" frameX="-2" frameY="-1" frameWidth="896" frameHeight="432"/>
+    <SubTexture name="db_prop_castle_prison_arch_D" x="2985" y="3099" width="891" height="418" frameX="0" frameY="-5" frameWidth="892" frameHeight="432"/>
+    <SubTexture name="db_prop_castle_prison_deco_bloodSplat_A" x="3884" y="3275" width="204" height="154"/>
+    <SubTexture name="db_prop_castle_prison_deco_bloodSplat_C" x="1029" y="3900" rotated="true" width="124" height="182"/>
+    <SubTexture name="db_prop_castle_prison_deco_bloodSplat_D" x="551" y="3900" rotated="true" width="113" height="187" frameX="0" frameY="0" frameWidth="188" frameHeight="114"/>
+    <SubTexture name="db_prop_castle_prison_deco_bucket" x="2405" y="170" width="85" height="106" frameX="-5" frameY="-1" frameWidth="94" frameHeight="112"/>
+    <SubTexture name="db_prop_castle_prison_deco_chains_A" x="1294" y="3900" rotated="true" width="312" height="177" frameX="-8" frameY="-3" frameWidth="190" frameHeight="328"/>
+    <SubTexture name="db_prop_castle_prison_deco_deadGladiator_E" x="3884" y="3437" width="202" height="170" frameX="0" frameY="0" frameWidth="202" frameHeight="174"/>
+    <SubTexture name="db_prop_castle_prison_deco_deadGladiator_F" x="3916" y="2250" rotated="true" width="171" height="287" frameX="-1" frameY="0" frameWidth="290" frameHeight="176"/>
+    <SubTexture name="db_prop_castle_prison_deco_deadGladiator_G" x="8" y="3900" width="272" height="188"/>
+    <SubTexture name="db_prop_castle_prison_deco_keys_A" x="2405" y="8" rotated="true" width="86" height="65" frameX="-1" frameY="0" frameWidth="68" frameHeight="88"/>
+    <SubTexture name="db_prop_castle_prison_deco_keys_B" x="2404" y="81" width="88" height="81" frameX="-2" frameY="-2" frameWidth="92" frameHeight="86"/>
+    <SubTexture name="db_prop_castle_prison_deco_keys_C" x="3333" y="436" rotated="true" width="58" height="96" frameX="-3" frameY="0" frameWidth="102" frameHeight="58"/>
+    <SubTexture name="db_prop_castle_prison_deco_lock" x="3757" y="3525" rotated="true" width="73" height="81" frameX="-1" frameY="0" frameWidth="84" frameHeight="74"/>
+    <SubTexture name="db_prop_castle_prison_deco_platesmugs_A" x="2985" y="2540" width="278" height="116" frameX="-3" frameY="-3" frameWidth="284" frameHeight="122"/>
+    <SubTexture name="db_prop_castle_prison_deco_platesmugs_B" x="2985" y="2664" width="276" height="153" frameX="-6" frameY="-6" frameWidth="286" frameHeight="162"/>
+    <SubTexture name="db_prop_castle_prison_deco_puddle" x="3973" y="1283" rotated="true" width="114" height="164" frameX="0" frameY="-2" frameWidth="164" frameHeight="118"/>
+    <SubTexture name="db_prop_castle_prison_deco_rubble" x="3891" y="2545" width="190" height="164" frameX="-11" frameY="-2" frameWidth="214" frameHeight="182"/>
+    <SubTexture name="db_prop_castle_prison_deco_soap" x="3052" y="2041" width="94" height="61" frameX="-6" frameY="-9" frameWidth="112" frameHeight="82"/>
+    <SubTexture name="db_prop_castle_prison_entrancegate" x="1998" y="3162" rotated="true" width="494" height="922" frameX="-2" frameY="-39" frameWidth="924" frameHeight="536"/>
+    <SubTexture name="db_prop_castle_prison_exit_B" x="3352" y="3525" rotated="true" width="397" height="553" frameX="-4" frameY="-5" frameWidth="558" frameHeight="432"/>
+    <SubTexture name="db_prop_castle_prison_exit_C" x="2398" y="1026" width="891" height="395" frameX="-2" frameY="-1" frameWidth="896" frameHeight="432"/>
+    <SubTexture name="db_prop_castle_prison_ground_bonepit" x="2971" y="1899" width="292" height="134" frameX="-9" frameY="-11" frameWidth="306" frameHeight="148"/>
+    <SubTexture name="db_prop_castle_prison_ground_jail" x="2405" y="2545" width="572" height="588" frameX="0" frameY="-2" frameWidth="582" frameHeight="610"/>
+    <SubTexture name="db_prop_castle_prison_jail_back" x="1789" y="859" width="601" height="563" frameX="0" frameY="-11" frameWidth="610" frameHeight="586"/>
+    <SubTexture name="db_prop_castle_prison_jail_front" x="2386" y="1430" width="577" height="529" frameX="-1" frameY="-1" frameWidth="610" frameHeight="564"/>
+    <SubTexture name="db_prop_castle_prison_smash_barrelRack" x="672" y="3900" width="193" height="186" frameX="-19" frameY="-18" frameWidth="226" frameHeight="242"/>
+    <SubTexture name="db_prop_castle_prison_smash_bed" x="3757" y="3615" width="329" height="266" frameX="-6" frameY="-5" frameWidth="346" frameHeight="290"/>
+    <SubTexture name="db_prop_castle_prison_smash_tablePoker" x="2985" y="2825" rotated="true" width="258" height="266" frameX="-22" frameY="-9" frameWidth="306" frameHeight="298"/>
+    <SubTexture name="db_prop_castle_prison_smash_torturechair" x="3891" y="2717" width="174" height="261" frameX="-8" frameY="-2" frameWidth="184" frameHeight="282"/>
+    <SubTexture name="db_prop_castle_prison_smash_weaponRack_A" x="2971" y="1429" rotated="true" width="312" height="195" frameX="-41" frameY="-18" frameWidth="294" frameHeight="374"/>
+    <SubTexture name="db_prop_castle_prison_smash_weaponRack_B" x="2711" y="436" width="216" height="291" frameX="-36" frameY="-24" frameWidth="288" frameHeight="374"/>
+    <SubTexture name="db_prop_castle_prison_smash_weapontable" x="288" y="3900" width="255" height="188" frameX="-17" frameY="-3" frameWidth="284" frameHeight="216"/>
+    <SubTexture name="db_prop_castle_prison_tower_C" x="1789" y="8" rotated="true" width="607" height="278" frameX="0" frameY="-37" frameWidth="286" frameHeight="648"/>
+    <SubTexture name="db_prop_castle_prison_trap_barrel_detailA" x="4009" y="885" width="79" height="100" frameX="-1" frameY="-2" frameWidth="82" frameHeight="102"/>
+    <SubTexture name="db_prop_castle_prison_trap_barrel_detailB" x="1941" y="3762" rotated="true" width="34" height="33" frameX="-2" frameY="-5" frameWidth="38" frameHeight="45"/>
+    <SubTexture name="db_prop_castle_prison_trap_emitter_arrow_down" x="3916" y="2109" rotated="true" width="172" height="133" frameX="0" frameY="0" frameWidth="134" frameHeight="172"/>
+    <SubTexture name="db_prop_castle_prison_trap_emitter_arrow_up" x="1765" y="3762" rotated="true" width="168" height="128" frameX="-1" frameY="-2" frameWidth="130" frameHeight="170"/>
+    <SubTexture name="db_prop_castle_prison_trap_ironmaiden" x="2500" y="3141" rotated="true" width="404" height="367" frameX="-10" frameY="-1" frameWidth="378" frameHeight="430"/>
+    <SubTexture name="db_prop_castle_prison_trap_trigger" x="3107" y="2404" width="148" height="126" frameX="-14" frameY="-36" frameWidth="178" frameHeight="174"/>
+    <SubTexture name="db_prop_castle_prison_wall_A" x="3269" y="2743" width="612" height="348" frameX="0" frameY="-2" frameWidth="612" frameHeight="366"/>
+    <SubTexture name="db_prop_castle_prison_wall_B" x="3271" y="2382" width="612" height="353" frameX="0" frameY="-2" frameWidth="612" frameHeight="366"/>
+    <SubTexture name="db_prop_castle_prison_wall_C" x="2711" y="735" width="614" height="283" frameX="-3" frameY="0" frameWidth="620" frameHeight="316"/>
+    <SubTexture name="db_prop_castle_prison_wall_E" x="2405" y="2262" rotated="true" width="858" height="134" frameX="-5" frameY="0" frameWidth="144" frameHeight="864"/>
+    <SubTexture name="db_prop_castle_prison_wall_F" x="3297" y="1243" width="668" height="343" frameX="-1" frameY="-86" frameWidth="670" frameHeight="432"/>
+    <SubTexture name="db_prop_castle_prison_wall_G" x="3333" y="885" width="668" height="350" frameX="-3" frameY="-56" frameWidth="676" frameHeight="432"/>
+    <SubTexture name="db_prop_castle_prison_wall_H" x="3271" y="1924" rotated="true" width="637" height="450" frameX="-9" frameY="0" frameWidth="468" frameHeight="646"/>
+    <SubTexture name="db_prop_castle_prison_wall_J" x="3757" y="3889" width="127" height="198" frameX="0" frameY="-87" frameWidth="132" frameHeight="288"/>
+    <SubTexture name="db_prop_castle_prison_wall_K" x="2497" y="436" rotated="true" width="206" height="576" frameX="0" frameY="-5" frameWidth="576" frameHeight="214"/>
+    <SubTexture name="db_prop_castle_prison_wall_L" x="3889" y="2986" rotated="true" width="198" height="281" frameX="0" frameY="-1" frameWidth="288" frameHeight="204"/>
+    <SubTexture name="db_prop_castle_prison_wall_M" x="2405" y="1967" rotated="true" width="558" height="140" frameX="0" frameY="-1" frameWidth="146" frameHeight="568"/>
+    <SubTexture name="db_prop_castle_prison_wall_N" x="1789" y="582" width="602" height="269" frameX="0" frameY="0" frameWidth="602" frameHeight="274"/>
+    <SubTexture name="db_prop_castle_prison_wall_Q" x="2405" y="2115" rotated="true" width="858" height="139" frameX="0" frameY="0" frameWidth="144" frameHeight="864"/>
+    <SubTexture name="db_prop_castle_prison_wall_secret" x="3291" y="1594" width="667" height="322" frameX="-1" frameY="-6" frameWidth="670" frameHeight="352"/>
+    <SubTexture name="db_prop_prison_exitgate" x="1765" y="1976" rotated="true" width="632" height="1178" frameX="-3" frameY="-3" frameWidth="1182" frameHeight="674"/>
+    <SubTexture name="db_prop_prison_exitgate_door" x="3399" y="402" width="680" height="325" frameX="0" frameY="0" frameWidth="680" frameHeight="330"/>
+    <SubTexture name="db_prop_prison_filler_A" x="8" y="1976" width="1749" height="1916" frameX="-9" frameY="-9" frameWidth="1804" frameHeight="1976"/>
+    <SubTexture name="db_prop_prison_filler_B" x="8" y="8" width="1773" height="1960" frameX="0" frameY="-35" frameWidth="1796" frameHeight="1998"/>
+    <SubTexture name="db_prop_prison_filler_skull_A" x="3892" y="3889" width="166" height="127" frameX="0" frameY="-11" frameWidth="182" frameHeight="140"/>
+    <SubTexture name="db_prop_prison_filler_skull_B" x="2867" y="2404" width="232" height="128" frameX="-9" frameY="-20" frameWidth="248" frameHeight="148"/>
+    <SubTexture name="db_prop_prison_filler_skull_E" x="2569" y="2404" width="290" height="130" frameX="-42" frameY="-6" frameWidth="338" frameHeight="140"/>
+    <SubTexture name="db_prop_prison_filler_skull_G" x="2971" y="2041" width="73" height="65" frameX="0" frameY="-23" frameWidth="78" frameHeight="92"/>
+    <SubTexture name="db_prop_prison_filler_skull_H" x="4009" y="1141" width="77" height="63" frameX="0" frameY="-13" frameWidth="80" frameHeight="78"/>
+    <SubTexture name="db_prop_prison_filler_skull_I" x="4009" y="1066" width="77" height="67" frameX="0" frameY="-7" frameWidth="78" frameHeight="78"/>
+    <SubTexture name="db_prop_prison_filler_skull_J" x="3154" y="2041" width="72" height="60" frameX="-2" frameY="-33" frameWidth="84" frameHeight="96"/>
+    <SubTexture name="db_prop_prison_filler_skull_K" x="4009" y="1212" width="76" height="63" frameX="-2" frameY="-16" frameWidth="86" frameHeight="80"/>
+    <SubTexture name="db_prop_prison_filler_skull_L" x="4009" y="993" width="79" height="65" frameX="-6" frameY="-29" frameWidth="90" frameHeight="94"/>
+    <SubTexture name="db_prop_prison_filler_spike_A" x="1765" y="3508" width="222" height="246" frameX="-1" frameY="0" frameWidth="248" frameHeight="266"/>
+    <SubTexture name="db_prop_prison_filler_spike_B" x="2971" y="1632" rotated="true" width="309" height="259" frameX="-3" frameY="0" frameWidth="282" frameHeight="314"/>
+    <SubTexture name="db_prop_prison_filler_tower_A" x="1789" y="294" rotated="true" width="602" height="280" frameX="0" frameY="-37" frameWidth="286" frameHeight="648"/>
+    <SubTexture name="db_prop_prison_filler_tower_C" x="2935" y="436" rotated="true" width="389" height="258" frameX="0" frameY="-5" frameWidth="268" frameHeight="408"/>
+    <SubTexture name="db_prop_prison_spikesTrap_off" x="2405" y="2404" width="156" height="131" frameX="-17" frameY="-77" frameWidth="192" frameHeight="224"/>
+    <SubTexture name="db_prop_prison_wall_diagonal_C" x="1789" y="1430" width="589" height="536" frameX="-2" frameY="-2" frameWidth="614" frameHeight="544"/>
+    <SubTexture name="shadow_exit" x="3399" y="8" width="682" height="386"/>
+    <SubTexture name="shadow_img_s46x39_b13" x="1161" y="3900" rotated="true" width="125" height="180" frameX="-26" frameY="-21" frameWidth="256" frameHeight="256"/>
+    <SubTexture name="shadow_img_s47x53_b13" x="873" y="3900" rotated="true" width="148" height="185" frameX="-25" frameY="-20" frameWidth="256" frameHeight="256"/>
+    <SubTexture name="shadow_img_s100x100_b13" x="1765" y="3162" rotated="true" width="224" height="338" frameX="-23" frameY="-20" frameWidth="512" frameHeight="512"/>
+    <SubTexture name="shadow_img_s240x64_b8" x="3333" y="735" width="706" height="142" frameX="-21" frameY="-17" frameWidth="1024" frameHeight="256"/>
+    <SubTexture name="shadow_img_s252x27_b8" x="2405" y="284" rotated="true" width="84" height="734" frameX="-23" frameY="-16" frameWidth="1024" frameHeight="128"/>
+    <SubTexture name="shadow_ironmaiden_s100x100_b13" x="1614" y="3900" width="376" height="175" frameX="-25" frameY="-22" frameWidth="512" frameHeight="256"/>
+    <SubTexture name="shadow_prison_wall_A_s100x100_b8" x="3973" y="1455" rotated="true" width="113" height="646" frameX="-18" frameY="-16" frameWidth="1024" frameHeight="256"/>
+</TextureAtlas>

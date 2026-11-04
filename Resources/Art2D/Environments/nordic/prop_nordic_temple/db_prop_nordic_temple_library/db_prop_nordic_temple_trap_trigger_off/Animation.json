@@ -1,0 +1,50 @@
+{
+"AN":{
+"N":"db_prop_nordic_temple_library",
+"SN":"trigger/db_prop_nordic_temple_trap_trigger_off",
+"TL":{
+"L":[
+{
+"LN":"Layer 1",
+"FR":[
+{
+"I":0,
+"DU":1,
+"E":[
+{"SI":{
+"SN":"SVG/db_prop_nordic_temple_trigger_off",
+"FF":0,
+"ST":"G",
+"TRP":{"x":48.1,"y":48.3},
+"LP":"LP",
+"MX":[1,0,0,1,-48.1,-48.3]
+}}]}
+]}
+]}},
+"SD":{
+"S":[
+{
+"SN":"SVG/db_prop_nordic_temple_trigger_off",
+"TL":{
+"L":[
+{"LN":"Layer 1",
+"FR":[
+{"I":0,
+"DU":1,
+"E":[
+{"ASI":{
+"MX":[0.5,0,0,0.5,18.05,-0.2],
+"N":"0"
+}}]}]}]}}
+]},
+"MD":{
+"V":"BTA 1.3.0",
+"FLV":"Adobe Animate 24 (WIN 24.0.15.5)",
+"N":"db_prop_nordic_temple_library",
+"BGC":"#CCCCCC",
+"W":760,
+"H":600,
+"ASV":3,
+"SMC":1,
+"FRT":24
+}}

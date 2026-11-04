@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with TexturePacker https://www.codeandweb.com/texturepacker -->
+<!-- $TexturePacker:SmartUpdate:8684a37973a6037da986689b660cc06d:25fb682b27a5e8d61af31d944b62211f:467ea565b4c6cf78186bb7dfc6a9298d$ -->
+<TextureAtlas imagePath="db_prop_castle_arena_library_1.atf" width="2048" height="4096">
+    <SubTexture name="db_prop_castle_arena_arch_C" x="1496" y="1172" width="534" height="354" frameX="-17" frameY="-14" frameWidth="572" frameHeight="380"/>
+    <SubTexture name="db_prop_castle_arena_arch_D" x="1431" y="1875" width="533" height="356" frameX="-13" frameY="-12" frameWidth="584" frameHeight="368"/>
+    <SubTexture name="db_prop_castle_arena_brokenHelmet_A" x="519" y="1735" rotated="true" width="99" height="122" frameX="-5" frameY="0" frameWidth="138" frameHeight="104"/>
+    <SubTexture name="db_prop_castle_arena_brokenShield_A" x="819" y="3279" width="156" height="128" frameX="0" frameY="-1" frameWidth="166" frameHeight="130"/>
+    <SubTexture name="db_prop_castle_arena_brokenShield_C" x="1588" y="2710" rotated="true" width="130" height="159" frameX="0" frameY="-1" frameWidth="164" frameHeight="136"/>
+    <SubTexture name="db_prop_castle_arena_deco_brick_A" x="282" y="2996" width="262" height="179" frameX="-12" frameY="-14" frameWidth="292" frameHeight="208"/>
+    <SubTexture name="db_prop_castle_arena_deco_brick_B" x="1506" y="2877" rotated="true" width="204" height="222" frameX="-16" frameY="-21" frameWidth="256" frameHeight="240"/>
+    <SubTexture name="db_prop_castle_arena_deco_cobble_A" x="270" y="3183" rotated="true" width="245" height="218" frameX="-19" frameY="-29" frameWidth="248" frameHeight="288"/>
+    <SubTexture name="db_prop_castle_arena_deco_cobble_B" x="1168" y="2773" width="330" height="259" frameX="-14" frameY="-21" frameWidth="356" frameHeight="292"/>
+    <SubTexture name="db_prop_castle_arena_deco_cobble_C" x="1231" y="2487" width="349" height="278" frameX="-19" frameY="-22" frameWidth="388" frameHeight="320"/>
+    <SubTexture name="db_prop_castle_arena_deco_crack_A" x="1726" y="2673" rotated="true" width="300" height="348" frameX="-8" frameY="-24" frameWidth="392" frameHeight="356"/>
+    <SubTexture name="db_prop_castle_arena_deco_crack_A_s45x54_t000000x50" x="654" y="2730" rotated="true" width="163" height="159" frameX="-3" frameY="-4" frameWidth="256" frameHeight="256"/>
+    <SubTexture name="db_prop_castle_arena_deco_crack_B" x="1632" y="8" width="404" height="255" frameX="-17" frameY="-21" frameWidth="444" frameHeight="300"/>
+    <SubTexture name="db_prop_castle_arena_deco_crack_C" x="1471" y="1534" width="547" height="333" frameX="-19" frameY="-36" frameWidth="596" frameHeight="388"/>
+    <SubTexture name="db_prop_castle_arena_deco_ground_A" x="552" y="3106" width="259" height="249" frameX="-21" frameY="-20" frameWidth="308" frameHeight="288"/>
+    <SubTexture name="db_prop_castle_arena_deco_ground_B" x="843" y="2312" rotated="true" width="380" height="364" frameX="-10" frameY="-10" frameWidth="384" frameHeight="400"/>
+    <SubTexture name="db_prop_castle_arena_deco_rock_B" x="648" y="1347" rotated="true" width="191" height="324" frameX="-1" frameY="-4" frameWidth="340" frameHeight="200"/>
+    <SubTexture name="db_prop_castle_arena_deco_rock_C" x="1972" y="2007" rotated="true" width="59" height="73" frameX="-3" frameY="-13" frameWidth="88" frameHeight="80"/>
+    <SubTexture name="db_prop_castle_arena_deco_rock_D" x="1972" y="1875" rotated="true" width="68" height="124" frameX="-1" frameY="-4" frameWidth="136" frameHeight="80"/>
+    <SubTexture name="db_prop_castle_arena_filler_tree_A" x="8" y="809" rotated="true" width="632" height="303" frameX="0" frameY="-26" frameWidth="318" frameHeight="676"/>
+    <SubTexture name="db_prop_castle_arena_filler_tree_C" x="8" y="1120" rotated="true" width="632" height="303" frameX="0" frameY="-12" frameWidth="318" frameHeight="646"/>
+    <SubTexture name="db_prop_castle_arena_filler_tree_D" x="8" y="1431" rotated="true" width="619" height="296" frameX="-6" frameY="-16" frameWidth="318" frameHeight="640"/>
+    <SubTexture name="db_prop_castle_arena_filler_tree_E" x="1594" y="353" width="427" height="612" frameX="-16" frameY="-24" frameWidth="454" frameHeight="650"/>
+    <SubTexture name="db_prop_castle_arena_ground_weaponwall" x="442" y="2444" rotated="true" width="377" height="278" frameX="0" frameY="-10" frameWidth="286" frameHeight="394"/>
+    <SubTexture name="db_prop_castle_arena_jail_gate" x="648" y="1137" width="192" height="202" frameX="-145" frameY="-328" frameWidth="480" frameHeight="570"/>
+    <SubTexture name="db_prop_castle_arena_smash_barrelRack_A" x="1506" y="3107" width="202" height="186" frameX="-10" frameY="-18" frameWidth="226" frameHeight="242"/>
+    <SubTexture name="db_prop_castle_arena_smash_barrelRack_B" x="1746" y="2239" rotated="true" width="294" height="201" frameX="-11" frameY="-18" frameWidth="226" frameHeight="350"/>
+    <SubTexture name="db_prop_castle_arena_smash_brickPile" x="1328" y="2239" rotated="true" width="410" height="240" frameX="-16" frameY="-82" frameWidth="264" frameHeight="528"/>
+    <SubTexture name="db_prop_castle_arena_smash_chair" x="709" y="561" width="138" height="216" frameX="-16" frameY="-57" frameWidth="196" frameHeight="298"/>
+    <SubTexture name="db_prop_castle_arena_smash_debris" x="825" y="2850" rotated="true" width="266" height="258" frameX="-15" frameY="-13" frameWidth="298" frameHeight="308"/>
+    <SubTexture name="db_prop_castle_arena_smash_flag" x="8" y="3358" rotated="true" width="244" height="122" frameX="-11" frameY="-16" frameWidth="152" frameHeight="286"/>
+    <SubTexture name="db_prop_castle_arena_smash_headchopper" x="8" y="3182" width="254" height="168" frameX="-31" frameY="-12" frameWidth="312" frameHeight="212"/>
+    <SubTexture name="db_prop_castle_arena_smash_kingstatue" x="709" y="785" width="133" height="344" frameX="-31" frameY="-12" frameWidth="196" frameHeight="372"/>
+    <SubTexture name="db_prop_castle_arena_smash_statueLion" x="519" y="1983" rotated="true" width="319" height="184" frameX="-26" frameY="-30" frameWidth="242" frameHeight="400"/>
+    <SubTexture name="db_prop_castle_arena_smash_table_B" x="380" y="2730" width="266" height="258" frameX="-22" frameY="-9" frameWidth="306" frameHeight="298"/>
+    <SubTexture name="db_prop_castle_arena_smash_table_C" x="8" y="2942" width="266" height="232" frameX="-20" frameY="-34" frameWidth="304" frameHeight="298"/>
+    <SubTexture name="db_prop_castle_arena_smash_weaponRack_B" x="1746" y="2448" rotated="true" width="291" height="217" frameX="-36" frameY="-24" frameWidth="288" frameHeight="374"/>
+    <SubTexture name="db_prop_castle_arena_tower_B" x="846" y="2102" rotated="true" width="474" height="202" frameX="-12" frameY="-25" frameWidth="228" frameHeight="536"/>
+    <SubTexture name="db_prop_castle_arena_tower_C" x="827" y="2684" rotated="true" width="333" height="158" frameX="-4" frameY="-16" frameWidth="168" frameHeight="354"/>
+    <SubTexture name="db_prop_castle_arena_tower_D" x="847" y="1860" rotated="true" width="576" height="234" frameX="-16" frameY="-13" frameWidth="264" frameHeight="608"/>
+    <SubTexture name="db_prop_castle_arena_tower_F" x="1550" y="973" rotated="true" width="477" height="191" frameX="-14" frameY="-24" frameWidth="222" frameHeight="524"/>
+    <SubTexture name="db_prop_castle_arena_tower_G" x="8" y="2207" rotated="true" width="467" height="170" frameX="-13" frameY="-28" frameWidth="204" frameHeight="526"/>
+    <SubTexture name="db_prop_castle_arena_tower_H" x="1718" y="3029" rotated="true" width="272" height="260" frameX="-2" frameY="-48" frameWidth="264" frameHeight="346"/>
+    <SubTexture name="db_prop_castle_arena_tower_I" x="519" y="2175" rotated="true" width="316" height="261" frameX="-2" frameY="-10" frameWidth="264" frameHeight="364"/>
+    <SubTexture name="db_prop_castle_arena_wall_C" x="1328" y="3169" width="168" height="188" frameX="0" frameY="-24" frameWidth="176" frameHeight="222"/>
+    <SubTexture name="db_prop_castle_arena_wall_E" x="847" y="1664" rotated="true" width="590" height="188" frameX="-11" frameY="-51" frameWidth="204" frameHeight="668"/>
+    <SubTexture name="db_prop_castle_arena_wall_F" x="850" y="1023" width="638" height="343" frameX="-7" frameY="-26" frameWidth="672" frameHeight="386"/>
+    <SubTexture name="db_prop_castle_gate_A_frame" x="855" y="719" width="687" height="296" frameX="-50" frameY="-46" frameWidth="784" frameHeight="372"/>
+    <SubTexture name="db_prop_castle_movableGate_arch" x="8" y="8" width="854" height="545" frameX="-14" frameY="-22" frameWidth="888" frameHeight="584"/>
+    <SubTexture name="db_prop_castle_movableGate_door" x="847" y="1374" width="616" height="282" frameX="-131" frameY="-278" frameWidth="888" frameHeight="584"/>
+    <SubTexture name="db_prop_jurassic_cage" x="8" y="1735" rotated="true" width="503" height="464" frameX="-19" frameY="-1" frameWidth="502" frameHeight="542"/>
+    <SubTexture name="shadow_gate_A" x="8" y="561" width="693" height="240" frameX="0" frameY="0" frameWidth="1024" frameHeight="256"/>
+    <SubTexture name="shadow_gate_s100x100_b4" x="870" y="458" width="712" height="253" frameX="-14" frameY="-13" frameWidth="1024" frameHeight="512"/>
+    <SubTexture name="shadow_gate_s100x100_b13" x="870" y="8" width="754" height="286" frameX="-21" frameY="-20" frameWidth="1024" frameHeight="512"/>
+    <SubTexture name="shadow_img_m52_-16_16_52_b13" x="654" y="2897" rotated="true" width="157" height="201" frameX="-37" frameY="-38" frameWidth="512" frameHeight="256"/>
+    <SubTexture name="shadow_img_s45x45_b10" x="1328" y="3040" width="170" height="121" frameX="-21" frameY="-19" frameWidth="256" frameHeight="256"/>
+    <SubTexture name="shadow_img_s56x55_b14" x="819" y="3116" width="215" height="155" frameX="-26" frameY="-22" frameWidth="512" frameHeight="256"/>
+    <SubTexture name="shadow_img_s60x89_b10" x="1042" y="3229" width="214" height="191" frameX="-21" frameY="-18" frameWidth="256" frameHeight="256"/>
+    <SubTexture name="shadow_img_s62x51_b10" x="1588" y="2487" rotated="true" width="130" height="215" frameX="-22" frameY="-19" frameWidth="512" frameHeight="256"/>
+    <SubTexture name="shadow_img_s100x100_b20" x="8" y="2678" width="364" height="256" frameX="-30" frameY="-24" frameWidth="512" frameHeight="512"/>
+    <SubTexture name="shadow_img_s131x139_b13" x="8" y="2385" width="426" height="285" frameX="-23" frameY="-21" frameWidth="512" frameHeight="512"/>
+    <SubTexture name="shadow_img_s244x67_b8" x="870" y="302" width="716" height="148" frameX="-22" frameY="-16" frameWidth="1024" frameHeight="256"/>
+    <SubTexture name="shadow_s405x48_b13" x="1632" y="271" width="383" height="74" frameX="-35" frameY="-20" frameWidth="512" frameHeight="128"/>
+    <SubTexture name="Square_Shadow01_s126x237_b8" x="1099" y="3040" width="221" height="181" frameX="-21" frameY="-18" frameWidth="512" frameHeight="256"/>
+    <SubTexture name="Square_Shadow02_m127_-9_9_124_b8" x="635" y="1679" rotated="true" width="204" height="296" frameX="-28" frameY="-30" frameWidth="512" frameHeight="512"/>
+</TextureAtlas>

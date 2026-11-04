@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with TexturePacker https://www.codeandweb.com/texturepacker -->
+<!-- $TexturePacker:SmartUpdate:4adace190d4c8a78d0908a62ba5e066d:d586f9eeb11b4cb0ca4b977ca2f7b10d:3514da66a97e70be7fae5e2683abbadd$ -->
+<TextureAtlas imagePath="db_prop_jurassic_tribal_library_4.atf" width="2048" height="2048">
+    <SubTexture name="db_prop_jurassic_tribal_arch_A" x="891" y="8" width="874" height="503" frameX="-5" frameY="-2" frameWidth="884" frameHeight="542"/>
+    <SubTexture name="db_prop_jurassic_tribal_boss_ground_burn" x="824" y="1151" rotated="true" width="154" height="203" frameX="-16" frameY="-2" frameWidth="224" frameHeight="158"/>
+    <SubTexture name="db_prop_jurassic_tribal_boss_ground_rock_B" x="1153" y="1302" width="190" height="186"/>
+    <SubTexture name="db_prop_jurassic_tribal_boss_ground_rock_K" x="1749" y="658" rotated="true" width="246" height="234"/>
+    <SubTexture name="db_prop_jurassic_tribal_boss_wall_F" x="1700" y="900" rotated="true" width="214" height="440" frameX="-23" frameY="0" frameWidth="554" frameHeight="214"/>
+    <SubTexture name="db_prop_jurassic_tribal_boss_wall_J" x="1473" y="519" width="268" height="164"/>
+    <SubTexture name="db_prop_jurassic_tribal_cave_back" x="8" y="1348" rotated="true" width="595" height="612" frameX="0" frameY="-1" frameWidth="612" frameHeight="596"/>
+    <SubTexture name="db_prop_jurassic_tribal_deco_bush_A" x="1153" y="1139" width="195" height="155" frameX="0" frameY="-12" frameWidth="204" frameHeight="178"/>
+    <SubTexture name="db_prop_jurassic_tribal_entrance" x="8" y="494" width="809" height="464" frameX="-1" frameY="-1" frameWidth="810" frameHeight="466"/>
+    <SubTexture name="db_prop_jurassic_tribal_groundBurn" x="824" y="1151" rotated="true" width="154" height="203" frameX="-16" frameY="-2" frameWidth="224" frameHeight="158"/>
+    <SubTexture name="db_prop_jurassic_tribal_logtrap" x="8" y="8" width="875" height="478" frameX="-2" frameY="-1" frameWidth="882" frameHeight="512"/>
+    <SubTexture name="db_prop_jurassic_tribal_smash_hut" x="611" y="1458" rotated="true" width="506" height="580" frameX="-1" frameY="-1" frameWidth="584" frameHeight="534"/>
+    <SubTexture name="db_prop_jurassic_tribal_smash_tiki_B" x="1773" y="460" rotated="true" width="247" height="190" frameX="-48" frameY="-2" frameWidth="288" frameHeight="332"/>
+    <SubTexture name="db_prop_jurassic_tribal_smash_vase_C" x="1356" y="1151" rotated="true" width="194" height="160" frameX="0" frameY="-1" frameWidth="162" frameHeight="226"/>
+    <SubTexture name="db_prop_jurassic_tribal_trap_flame_B_top" x="1351" y="1319" width="152" height="150" frameX="0" frameY="0" frameWidth="154" frameHeight="150"/>
+    <SubTexture name="db_prop_jurassic_tribal_trap_spikes" x="986" y="1151" width="159" height="195" frameX="-18" frameY="-17" frameWidth="192" frameHeight="224"/>
+    <SubTexture name="db_prop_jurassic_tribal_wall_O" x="1473" y="691" rotated="true" width="219" height="452" frameX="0" frameY="-1" frameWidth="462" frameHeight="228"/>
+    <SubTexture name="db_prop_jurassic_tribal_wall_P" x="1773" y="8" rotated="true" width="264" height="190" frameX="0" frameY="-1" frameWidth="190" frameHeight="266"/>
+    <SubTexture name="db_prop_jurassic_tribal_wall_Q" x="1773" y="206" width="247" height="246" frameX="0" frameY="-13" frameWidth="263" frameHeight="259"/>
+    <SubTexture name="db_prop_jurassic_tribal_wall_V" x="825" y="519" rotated="true" width="640" height="612" frameX="0" frameY="-3" frameWidth="627" frameHeight="643"/>
+    <SubTexture name="shadow_circle_s267x168_b13" x="611" y="966" rotated="true" width="205" height="484" frameX="-25" frameY="-21" frameWidth="1024" frameHeight="256"/>
+</TextureAtlas>

@@ -1,0 +1,12 @@
+{"ATLAS":{"SPRITES":[
+{"SPRITE":{"name":"0","x":158,"y":2,"w":42,"h":78,"rotated":true}},
+{"SPRITE":{"name":"1","x":2,"y":2,"w":155,"h":131,"rotated":false}}]},
+"meta":{
+"app":"Adobe Animate (Better TA Extension)",
+"version":"24.0.15.5",
+"image":"spritemap1.atf",
+"format":"RGBA8888",
+"size":{"w":256,"h":256},
+"resolution":"2"
+}
+}

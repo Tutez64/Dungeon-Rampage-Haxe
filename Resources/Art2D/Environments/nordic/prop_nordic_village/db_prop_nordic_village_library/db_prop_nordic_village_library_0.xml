@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with TexturePacker https://www.codeandweb.com/texturepacker -->
+<!-- $TexturePacker:SmartUpdate:97cbe4cd863e6942293479257353468f:4337b12c88949dedb07e84b198be4c66:98b2fcdf0e1427b769461f02d0117d88$ -->
+<TextureAtlas imagePath="db_prop_nordic_village_library_0.atf" width="4096" height="4096">
+    <SubTexture name="db_prop_nordic_village_deco_helmet_B" x="1692" y="3942" width="153" height="124" frameX="-1" frameY="0" frameWidth="156" frameHeight="124"/>
+    <SubTexture name="db_prop_nordic_village_deco_rock_E" x="1853" y="3942" rotated="true" width="86" height="128"/>
+    <SubTexture name="db_prop_nordic_village_deco_shield_A" x="976" y="3942" width="184" height="89" frameX="-16" frameY="-1" frameWidth="200" frameHeight="90"/>
+    <SubTexture name="db_prop_nordic_village_deco_shield_B" x="1168" y="3942" width="176" height="108" frameX="-2" frameY="0" frameWidth="178" frameHeight="108"/>
+    <SubTexture name="db_prop_nordic_village_exit_B02" x="3777" y="1825" rotated="true" width="304" height="694"/>
+    <SubTexture name="db_prop_nordic_village_filler_A" x="8" y="2003" rotated="true" width="1944" height="1931" frameX="-1" frameY="-3" frameWidth="1936" frameHeight="1948"/>
+    <SubTexture name="db_prop_nordic_village_filler_B" x="8" y="8" width="1940" height="1987" frameX="-1" frameY="-4" frameWidth="1944" frameHeight="2004"/>
+    <SubTexture name="db_prop_nordic_village_ground_snow_B" x="1960" y="3834" width="709" height="233" frameX="-1" frameY="-21" frameWidth="712" frameHeight="256"/>
+    <SubTexture name="db_prop_nordic_village_smash_spikes_C" x="2677" y="3834" width="124" height="221" frameX="0" frameY="-3" frameWidth="124" frameHeight="226"/>
+    <SubTexture name="db_prop_nordic_village_smash_stable_B" x="3777" y="3209" rotated="true" width="310" height="391" frameX="-11" frameY="0" frameWidth="402" frameHeight="328"/>
+    <SubTexture name="db_prop_nordic_village_smash_table" x="3633" y="3642" width="438" height="375" frameX="0" frameY="-2" frameWidth="438" frameHeight="378"/>
+    <SubTexture name="db_prop_nordic_village_trap_barrel_03" x="1529" y="3942" rotated="true" width="155" height="122" frameX="0" frameY="0" frameWidth="128" frameHeight="256"/>
+    <SubTexture name="db_prop_nordic_village_trap_barrel_snow" x="3633" y="4025" width="162" height="34"/>
+    <SubTexture name="db_prop_nordic_village_trap_spikes" x="1352" y="3942" rotated="true" width="169" height="146" frameX="0" frameY="0" frameWidth="146" frameHeight="170"/>
+    <SubTexture name="db_prop_nordic_village_wall_B" x="1960" y="3642" rotated="true" width="875" height="184" frameX="0" frameY="0" frameWidth="202" frameHeight="900"/>
+    <SubTexture name="db_prop_nordic_village_wall_F" x="1956" y="8" width="1809" height="1809"/>
+    <SubTexture name="db_prop_nordic_village_wall_J" x="3773" y="8" rotated="true" width="250" height="1809"/>
+    <SubTexture name="db_prop_nordic_village_wall_K" x="1960" y="1825" width="1809" height="1809"/>
+    <SubTexture name="shadow_a_m-86_0_27_100_b13" x="523" y="3942" width="219" height="123" frameX="-31" frameY="-20" frameWidth="512" frameHeight="256"/>
+    <SubTexture name="shadow_a_m86_0_-27_100_b13" x="750" y="3942" width="218" height="123" frameX="-34" frameY="-20" frameWidth="512" frameHeight="256"/>
+    <SubTexture name="shadow_a_s242x64_b13" x="8" y="3942" width="507" height="102" frameX="-27" frameY="-20" frameWidth="1024" frameHeight="256"/>
+    <SubTexture name="shadow_exit" x="2843" y="3642" width="782" height="396"/>
+    <SubTexture name="shadow_smash_house_A_s100x100_b13" x="3777" y="2527" rotated="true" width="287" height="674" frameX="-27" frameY="-23" frameWidth="1024" frameHeight="512"/>
+</TextureAtlas>

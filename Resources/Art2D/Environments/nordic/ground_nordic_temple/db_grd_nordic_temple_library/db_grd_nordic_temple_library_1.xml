@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with TexturePacker https://www.codeandweb.com/texturepacker -->
+<!-- $TexturePacker:SmartUpdate:e9610ae16305469182391ec3846cf033:38a3e45a5cfb112ba4fb1d33bbdfb12b:84e0f9033f7768404e1b958023c3d793$ -->
+<TextureAtlas imagePath="db_grd_nordic_temple_library_1.atf" width="4096" height="4096">
+    <SubTexture name="db_grd_nordic_temple_1001" x="12" y="12" width="900" height="900"/>
+    <SubTexture name="db_grd_nordic_temple_1010" x="12" y="928" width="900" height="900"/>
+    <SubTexture name="db_grd_nordic_temple_1011" x="12" y="1844" width="900" height="900"/>
+    <SubTexture name="db_grd_nordic_temple_1020" x="12" y="2760" width="900" height="900"/>
+    <SubTexture name="db_grd_nordic_temple_1100" x="928" y="12" width="900" height="900"/>
+    <SubTexture name="db_grd_nordic_temple_1111_A" x="1844" y="12" width="900" height="900"/>
+    <SubTexture name="db_grd_nordic_temple_1111_B" x="2760" y="12" width="900" height="900"/>
+    <SubTexture name="db_grd_nordic_temple_2000" x="928" y="928" width="900" height="900"/>
+    <SubTexture name="db_grd_nordic_temple_2010" x="928" y="1844" width="900" height="900"/>
+    <SubTexture name="db_grd_nordic_temple_2020" x="928" y="2760" width="900" height="900"/>
+    <SubTexture name="db_grd_nordic_temple_2200" x="1844" y="928" width="900" height="900"/>
+    <SubTexture name="db_grd_nordic_temple_5555_squareSolid" x="2760" y="928" width="900" height="900"/>
+    <SubTexture name="db_grd_nordic_temple_filler" x="1844" y="1844" width="900" height="900"/>
+</TextureAtlas>

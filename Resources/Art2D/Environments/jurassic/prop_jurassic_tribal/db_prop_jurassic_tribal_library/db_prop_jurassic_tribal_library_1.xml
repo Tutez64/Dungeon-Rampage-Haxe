@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with TexturePacker https://www.codeandweb.com/texturepacker -->
+<!-- $TexturePacker:SmartUpdate:4adace190d4c8a78d0908a62ba5e066d:d586f9eeb11b4cb0ca4b977ca2f7b10d:3514da66a97e70be7fae5e2683abbadd$ -->
+<TextureAtlas imagePath="db_prop_jurassic_tribal_library_1.atf" width="4096" height="4096">
+    <SubTexture name="db_prop_jurassic_tribal_boss_arch_B" x="3076" y="1954" width="926" height="464" frameX="-15" frameY="0" frameWidth="954" frameHeight="464"/>
+    <SubTexture name="db_prop_jurassic_tribal_boss_deco_grass_A" x="4008" y="2896" rotated="true" width="60" height="86"/>
+    <SubTexture name="db_prop_jurassic_tribal_boss_deco_grass_B" x="4030" y="1371" width="58" height="65" frameX="0" frameY="-1" frameWidth="58" frameHeight="66"/>
+    <SubTexture name="db_prop_jurassic_tribal_boss_deco_grass_D" x="4030" y="1611" rotated="true" width="55" height="86" frameX="0" frameY="-1" frameWidth="86" frameHeight="56"/>
+    <SubTexture name="db_prop_jurassic_tribal_boss_deco_grass_E" x="2992" y="2274" rotated="true" width="66" height="92" frameX="-1" frameY="-4" frameWidth="94" frameHeight="72"/>
+    <SubTexture name="db_prop_jurassic_tribal_boss_deco_grass_G" x="3861" y="2426" rotated="true" width="139" height="294" frameX="-1" frameY="-7" frameWidth="298" frameHeight="146"/>
+    <SubTexture name="db_prop_jurassic_tribal_boss_filler_A" x="1975" y="2426" rotated="true" width="1878" height="924" frameX="-15" frameY="-2" frameWidth="1004" frameHeight="1880"/>
+    <SubTexture name="db_prop_jurassic_tribal_boss_filler_B" x="8" y="8" width="1117" height="2032" frameX="-7" frameY="0" frameWidth="1202" frameHeight="2032"/>
+    <SubTexture name="db_prop_jurassic_tribal_boss_ground_rock_A" x="3861" y="3230" width="164" height="116"/>
+    <SubTexture name="db_prop_jurassic_tribal_boss_ground_rock_E" x="2512" y="2001" rotated="true" width="320" height="409" frameX="0" frameY="0" frameWidth="442" frameHeight="320"/>
+    <SubTexture name="db_prop_jurassic_tribal_boss_ground_rock_J" x="3829" y="3701" rotated="true" width="258" height="252"/>
+    <SubTexture name="db_prop_jurassic_tribal_boss_wall_D" x="4030" y="1705" width="54" height="338"/>
+    <SubTexture name="db_prop_jurassic_tribal_deco_arrow_A" x="4010" y="2274" rotated="true" width="75" height="62" frameX="-5" frameY="-4" frameWidth="70" frameHeight="86"/>
+    <SubTexture name="db_prop_jurassic_tribal_deco_brokenSword_A" x="4010" y="2051" width="78" height="106" frameX="0" frameY="0" frameWidth="84" frameHeight="124"/>
+    <SubTexture name="db_prop_jurassic_tribal_deco_bush_B" x="2840" y="2001" width="228" height="165" frameX="0" frameY="-15" frameWidth="248" frameHeight="180"/>
+    <SubTexture name="db_prop_jurassic_tribal_deco_grass_A" x="4033" y="3230" rotated="true" width="53" height="92" frameX="0" frameY="-1" frameWidth="92" frameHeight="54"/>
+    <SubTexture name="db_prop_jurassic_tribal_deco_grass_B" x="4030" y="1444" width="58" height="65" frameX="0" frameY="-3" frameWidth="58" frameHeight="74"/>
+    <SubTexture name="db_prop_jurassic_tribal_deco_grass_C" x="4010" y="2344" rotated="true" width="70" height="82" frameX="-1" frameY="0" frameWidth="86" frameHeight="70"/>
+    <SubTexture name="db_prop_jurassic_tribal_deco_grass_D" x="4030" y="1517" rotated="true" width="57" height="86" frameX="0" frameY="0" frameWidth="88" frameHeight="58"/>
+    <SubTexture name="db_prop_jurassic_tribal_deco_grass_E" x="4009" y="3961" rotated="true" width="66" height="92" frameX="-1" frameY="-4" frameWidth="94" frameHeight="72"/>
+    <SubTexture name="db_prop_jurassic_tribal_deco_grass_F" x="4008" y="2801" rotated="true" width="62" height="87" frameX="0" frameY="-1" frameWidth="88" frameHeight="64"/>
+    <SubTexture name="db_prop_jurassic_tribal_deco_grass_H" x="3861" y="2728" rotated="true" width="139" height="294" frameX="-1" frameY="-7" frameWidth="298" frameHeight="146"/>
+    <SubTexture name="db_prop_jurassic_tribal_deco_rock_C" x="2992" y="2174" rotated="true" width="67" height="92" frameX="0" frameY="0" frameWidth="92" frameHeight="72"/>
+    <SubTexture name="db_prop_jurassic_tribal_deco_rock_D" x="4008" y="2434" rotated="true" width="80" height="134" frameX="-8" frameY="-18" frameWidth="144" frameHeight="110"/>
+    <SubTexture name="db_prop_jurassic_tribal_deco_rock_E" x="4008" y="2672" rotated="true" width="79" height="121" frameX="0" frameY="0" frameWidth="128" frameHeight="86"/>
+    <SubTexture name="db_prop_jurassic_tribal_deco_skull_A" x="4010" y="2165" rotated="true" width="77" height="101" frameX="-6" frameY="-2" frameWidth="112" frameHeight="98"/>
+    <SubTexture name="db_prop_jurassic_tribal_deco_skull_E" x="4008" y="2576" rotated="true" width="80" height="88" frameX="0" frameY="-1" frameWidth="90" frameHeight="88"/>
+    <SubTexture name="db_prop_jurassic_tribal_exit" x="1975" y="3358" width="1189" height="729" frameX="-1" frameY="0" frameWidth="1192" frameHeight="752"/>
+    <SubTexture name="db_prop_jurassic_tribal_filler_A" x="8" y="2048" rotated="true" width="1959" height="2005" frameX="-23" frameY="-27" frameWidth="2064" frameHeight="1990"/>
+    <SubTexture name="db_prop_jurassic_tribal_filler_B" x="1133" y="8" width="1935" height="1985" frameX="-11" frameY="-27" frameWidth="1968" frameHeight="2016"/>
+    <SubTexture name="db_prop_jurassic_tribal_ground_bridge_back" x="3076" y="990" width="961" height="373" frameX="0" frameY="0" frameWidth="962" frameHeight="374"/>
+    <SubTexture name="db_prop_jurassic_tribal_ground_bridge_front" x="3172" y="3358" width="916" height="335" frameX="-4" frameY="-2" frameWidth="922" frameHeight="354"/>
+    <SubTexture name="db_prop_jurassic_tribal_smash_hut_C" x="1975" y="2001" rotated="true" width="529" height="414" frameX="-21" frameY="-1" frameWidth="436" frameHeight="542"/>
+    <SubTexture name="db_prop_jurassic_tribal_smash_pot" x="3395" y="3701" rotated="true" width="426" height="377" frameX="0" frameY="-1" frameWidth="380" frameHeight="428"/>
+    <SubTexture name="db_prop_jurassic_tribal_smash_skull" x="3861" y="3030" rotated="true" width="224" height="192" frameX="-2" frameY="0" frameWidth="196" frameHeight="226"/>
+    <SubTexture name="db_prop_jurassic_tribal_smash_vase_A" x="3829" y="3961" rotated="true" width="172" height="124" frameX="-3" frameY="-1" frameWidth="136" frameHeight="204"/>
+    <SubTexture name="db_prop_jurassic_tribal_trap_spear" x="2840" y="2174" width="144" height="240"/>
+    <SubTexture name="db_prop_jurassic_tribal_wall_W" x="3076" y="8" width="993" height="974" frameX="0" frameY="0" frameWidth="994" frameHeight="974"/>
+    <SubTexture name="Shadow_BigTree_s100x100_b13" x="3076" y="1371" width="946" height="424" frameX="-24" frameY="-22" frameWidth="1024" frameHeight="512"/>
+    <SubTexture name="shadow_circle_m215_24_-22_202_b8" x="3172" y="3701" rotated="true" width="215" height="384" frameX="-28" frameY="-33" frameWidth="512" frameHeight="512"/>
+    <SubTexture name="shadow_circle_s562x121_b8" x="3076" y="1803" width="939" height="143" frameX="-20" frameY="-16" frameWidth="1024" frameHeight="256"/>
+</TextureAtlas>

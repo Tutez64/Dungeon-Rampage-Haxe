@@ -1,0 +1,317 @@
+{
+ "ATLAS": {
+  "SPRITES": [
+   {
+    "SPRITE": {
+     "name": "50",
+     "x": 2478,
+     "y": 555,
+     "w": 563,
+     "h": 522,
+     "rotated": false
+    }
+   },
+   {
+    "SPRITE": {
+     "name": "51",
+     "x": 645,
+     "y": 505,
+     "w": 636,
+     "h": 504,
+     "rotated": false
+    }
+   },
+   {
+    "SPRITE": {
+     "name": "52",
+     "x": 3079,
+     "y": 548,
+     "w": 561,
+     "h": 528,
+     "rotated": false
+    }
+   },
+   {
+    "SPRITE": {
+     "name": "53",
+     "x": 1,
+     "y": 1035,
+     "w": 474,
+     "h": 643,
+     "rotated": true
+    }
+   },
+   {
+    "SPRITE": {
+     "name": "54",
+     "x": 1282,
+     "y": 545,
+     "w": 594,
+     "h": 524,
+     "rotated": true
+    }
+   },
+   {
+    "SPRITE": {
+     "name": "55",
+     "x": 2439,
+     "y": 1078,
+     "w": 572,
+     "h": 496,
+     "rotated": false
+    }
+   },
+   {
+    "SPRITE": {
+     "name": "56",
+     "x": 617,
+     "y": 1010,
+     "w": 593,
+     "h": 524,
+     "rotated": true
+    }
+   },
+   {
+    "SPRITE": {
+     "name": "57",
+     "x": 2439,
+     "y": 1575,
+     "w": 537,
+     "h": 519,
+     "rotated": false
+    }
+   },
+   {
+    "SPRITE": {
+     "name": "58",
+     "x": 1,
+     "y": 515,
+     "w": 615,
+     "h": 519,
+     "rotated": false
+    }
+   },
+   {
+    "SPRITE": {
+     "name": "59",
+     "x": 1,
+     "y": 1679,
+     "w": 466,
+     "h": 563,
+     "rotated": false
+    }
+   },
+   {
+    "SPRITE": {
+     "name": "60",
+     "x": 1888,
+     "y": 1,
+     "w": 615,
+     "h": 518,
+     "rotated": false
+    }
+   },
+   {
+    "SPRITE": {
+     "name": "61",
+     "x": 1211,
+     "y": 1070,
+     "w": 550,
+     "h": 524,
+     "rotated": true
+    }
+   },
+   {
+    "SPRITE": {
+     "name": "116",
+     "x": 476,
+     "y": 1535,
+     "w": 564,
+     "h": 509,
+     "rotated": false
+    }
+   },
+   {
+    "SPRITE": {
+     "name": "117",
+     "x": 3042,
+     "y": 1077,
+     "w": 559,
+     "h": 513,
+     "rotated": false
+    }
+   },
+   {
+    "SPRITE": {
+     "name": "118",
+     "x": 1,
+     "y": 1,
+     "w": 643,
+     "h": 513,
+     "rotated": false
+    }
+   },
+   {
+    "SPRITE": {
+     "name": "119",
+     "x": 458,
+     "y": 2535,
+     "w": 452,
+     "h": 536,
+     "rotated": false
+    }
+   },
+   {
+    "SPRITE": {
+     "name": "120",
+     "x": 1,
+     "y": 2243,
+     "w": 456,
+     "h": 538,
+     "rotated": false
+    }
+   },
+   {
+    "SPRITE": {
+     "name": "121",
+     "x": 468,
+     "y": 2045,
+     "w": 524,
+     "h": 489,
+     "rotated": true
+    }
+   },
+   {
+    "SPRITE": {
+     "name": "122",
+     "x": 3079,
+     "y": 1,
+     "w": 558,
+     "h": 546,
+     "rotated": false
+    }
+   },
+   {
+    "SPRITE": {
+     "name": "123",
+     "x": 1888,
+     "y": 520,
+     "w": 589,
+     "h": 536,
+     "rotated": false
+    }
+   },
+   {
+    "SPRITE": {
+     "name": "124",
+     "x": 2504,
+     "y": 1,
+     "w": 574,
+     "h": 553,
+     "rotated": false
+    }
+   },
+   {
+    "SPRITE": {
+     "name": "125",
+     "x": 1762,
+     "y": 1576,
+     "w": 540,
+     "h": 516,
+     "rotated": false
+    }
+   },
+   {
+    "SPRITE": {
+     "name": "126",
+     "x": 1568,
+     "y": 2093,
+     "w": 541,
+     "h": 506,
+     "rotated": false
+    }
+   },
+   {
+    "SPRITE": {
+     "name": "127",
+     "x": 645,
+     "y": 1,
+     "w": 645,
+     "h": 503,
+     "rotated": false
+    }
+   },
+   {
+    "SPRITE": {
+     "name": "128",
+     "x": 3602,
+     "y": 1077,
+     "w": 487,
+     "h": 531,
+     "rotated": false
+    }
+   },
+   {
+    "SPRITE": {
+     "name": "129",
+     "x": 3641,
+     "y": 1,
+     "w": 438,
+     "h": 596,
+     "rotated": false
+    }
+   },
+   {
+    "SPRITE": {
+     "name": "130",
+     "x": 993,
+     "y": 2120,
+     "w": 540,
+     "h": 450,
+     "rotated": true
+    }
+   },
+   {
+    "SPRITE": {
+     "name": "131",
+     "x": 1041,
+     "y": 1595,
+     "w": 526,
+     "h": 524,
+     "rotated": true
+    }
+   },
+   {
+    "SPRITE": {
+     "name": "132",
+     "x": 1877,
+     "y": 1057,
+     "w": 561,
+     "h": 518,
+     "rotated": true
+    }
+   },
+   {
+    "SPRITE": {
+     "name": "133",
+     "x": 1291,
+     "y": 1,
+     "w": 596,
+     "h": 543,
+     "rotated": false
+    }
+   }
+  ]
+ },
+ "meta": {
+  "app": "TA_3DPipeline",
+  "version": "1.0.0",
+  "image": "spritemap3.atf",
+  "format": "RGBA8888",
+  "size": {
+   "w": 4096,
+   "h": 4096
+  },
+  "resolution": "1"
+ }
+}

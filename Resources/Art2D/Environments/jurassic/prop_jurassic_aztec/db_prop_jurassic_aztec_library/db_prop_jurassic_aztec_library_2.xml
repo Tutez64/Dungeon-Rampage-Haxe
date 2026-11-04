@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with TexturePacker https://www.codeandweb.com/texturepacker -->
+<!-- $TexturePacker:SmartUpdate:9dfe4ce2f0e6f4d94a3349aa59b0b86a:82c463faa5180ecd5e7c83b471caa07e:17adebbb2c70ed9b90350ddb128f3f81$ -->
+<TextureAtlas imagePath="db_prop_jurassic_aztec_library_2.atf" width="4096" height="4096">
+    <SubTexture name="db_prop_jurassic_aztec_arch_A" x="1986" y="8" width="944" height="571" frameX="0" frameY="-4" frameWidth="944" frameHeight="578"/>
+    <SubTexture name="db_prop_jurassic_aztec_arch_B" x="2945" y="8" width="952" height="563" frameX="-14" frameY="-9" frameWidth="976" frameHeight="572"/>
+    <SubTexture name="db_prop_jurassic_aztec_deco_arrow_C" x="8" y="3985" rotated="true" width="81" height="95" frameX="0" frameY="-8" frameWidth="102" frameHeight="96"/>
+    <SubTexture name="db_prop_jurassic_aztec_deco_bloodSplat_D" x="1825" y="372" rotated="true" width="112" height="186"/>
+    <SubTexture name="db_prop_jurassic_aztec_deco_brokenAxe" x="97" y="3985" rotated="true" width="91" height="94" frameX="0" frameY="-2" frameWidth="96" frameHeight="94"/>
+    <SubTexture name="db_prop_jurassic_aztec_deco_bush_A" x="1960" y="3034" rotated="true" width="164" height="196" frameX="0" frameY="-12" frameWidth="204" frameHeight="178"/>
+    <SubTexture name="db_prop_jurassic_aztec_deco_bush_B" x="1787" y="3034" rotated="true" width="165" height="225" frameX="0" frameY="-15" frameWidth="248" frameHeight="180"/>
+    <SubTexture name="db_prop_jurassic_aztec_deco_crack_C" x="184" y="3642" width="547" height="332" frameX="-9" frameY="-10" frameWidth="560" frameHeight="352"/>
+    <SubTexture name="db_prop_jurassic_aztec_deco_debris_B" x="1137" y="3034" rotated="true" width="155" height="294" frameX="0" frameY="0" frameWidth="294" frameHeight="158"/>
+    <SubTexture name="db_prop_jurassic_aztec_deco_rock_B" x="1987" y="1069" width="329" height="188" frameX="0" frameY="0" frameWidth="330" frameHeight="188"/>
+    <SubTexture name="db_prop_jurassic_aztec_deco_skull_B" x="196" y="3982" rotated="true" width="91" height="94" frameX="-1" frameY="-7" frameWidth="106" frameHeight="106"/>
+    <SubTexture name="db_prop_jurassic_aztec_gate_that_opens" x="2938" y="579" width="1148" height="707" frameX="-1" frameY="-1" frameWidth="1160" frameHeight="722"/>
+    <SubTexture name="db_prop_jurassic_aztec_ground_altar" x="2326" y="1574" width="548" height="723" frameX="0" frameY="-1" frameWidth="548" frameHeight="724"/>
+    <SubTexture name="db_prop_jurassic_aztec_ground_bridge_A" x="263" y="1825" width="866" height="1527" frameX="-2" frameY="-4" frameWidth="870" frameHeight="1532"/>
+    <SubTexture name="db_prop_jurassic_aztec_ground_entrance" x="2945" y="3172" rotated="true" width="502" height="830" frameX="0" frameY="-4" frameWidth="830" frameHeight="508"/>
+    <SubTexture name="db_prop_jurassic_aztec_ground_exit" x="2908" y="1294" width="1147" height="706" frameX="-1" frameY="-1" frameWidth="1160" frameHeight="722"/>
+    <SubTexture name="db_prop_jurassic_aztec_ground_jail_C" x="2326" y="1061" rotated="true" width="574" height="505" frameX="0" frameY="-4" frameWidth="508" frameHeight="578"/>
+    <SubTexture name="db_prop_jurassic_aztec_ground_plant_D" x="512" y="3360" width="218" height="165" frameX="0" frameY="-1" frameWidth="218" frameHeight="170"/>
+    <SubTexture name="db_prop_jurassic_aztec_ground_plant_G" x="1551" y="3034" width="228" height="239" frameX="0" frameY="0" frameWidth="256" frameHeight="260"/>
+    <SubTexture name="db_prop_jurassic_aztec_ground_pond_A" x="2326" y="587" width="588" height="466" frameX="0" frameY="-2" frameWidth="588" frameHeight="468"/>
+    <SubTexture name="db_prop_jurassic_aztec_ground_pyramid_A" x="3015" y="2552" rotated="true" width="505" height="526" frameX="0" frameY="-14" frameWidth="526" frameHeight="536"/>
+    <SubTexture name="db_prop_jurassic_aztec_ground_spawner_A_front" x="1825" y="587" width="477" height="474" frameX="-1" frameY="-3" frameWidth="478" frameHeight="478"/>
+    <SubTexture name="db_prop_jurassic_aztec_ground_spawner_B_front" x="2946" y="2008" width="494" height="536" frameX="-10" frameY="-15" frameWidth="506" frameHeight="552"/>
+    <SubTexture name="db_prop_jurassic_aztec_smash_statue_C" x="8" y="3642" width="168" height="335" frameX="-8" frameY="-3" frameWidth="180" frameHeight="358"/>
+    <SubTexture name="db_prop_jurassic_aztec_smash_weaponTable" x="263" y="3360" width="241" height="255" frameX="-9" frameY="-12" frameWidth="252" frameHeight="286"/>
+    <SubTexture name="db_prop_jurassic_aztec_trap_arrow_front" x="3905" y="172" width="172" height="171" frameX="0" frameY="-1" frameWidth="174" frameHeight="172"/>
+    <SubTexture name="db_prop_jurassic_aztec_trap_arrow_side" x="1825" y="8" rotated="true" width="152" height="163" frameX="-4" frameY="-2" frameWidth="172" frameHeight="154"/>
+    <SubTexture name="db_prop_jurassic_aztec_trap_cage_A" x="1825" y="1294" width="493" height="522" frameX="-2" frameY="-1" frameWidth="496" frameHeight="524"/>
+    <SubTexture name="db_prop_jurassic_aztec_trap_crusher" x="1986" y="2448" width="952" height="537" frameX="-14" frameY="-9" frameWidth="976" frameHeight="572"/>
+    <SubTexture name="db_prop_jurassic_aztec_trap_flame_front" x="3448" y="2345" width="156" height="160" frameX="-1" frameY="-1" frameWidth="158" frameHeight="162"/>
+    <SubTexture name="db_prop_jurassic_aztec_trap_spikes" x="1825" y="1069" width="154" height="193" frameX="-4" frameY="-1" frameWidth="162" frameHeight="194"/>
+    <SubTexture name="db_prop_jurassic_aztec_wall_A" x="1986" y="1824" rotated="true" width="330" height="616" frameX="0" frameY="-5" frameWidth="616" frameHeight="340"/>
+    <SubTexture name="db_prop_jurassic_aztec_wall_C2" x="3455" y="2008" width="616" height="329" frameX="0" frameY="-2" frameWidth="616" frameHeight="334"/>
+    <SubTexture name="db_prop_jurassic_aztec_wall_E" x="2132" y="2993" rotated="true" width="875" height="171" frameX="-2" frameY="0" frameWidth="186" frameHeight="876"/>
+    <SubTexture name="db_prop_jurassic_aztec_wall_F" x="3905" y="351" rotated="true" width="172" height="156" frameX="0" frameY="-1" frameWidth="158" frameHeight="178"/>
+    <SubTexture name="db_prop_jurassic_aztec_wall_G" x="3905" y="8" rotated="true" width="174" height="156" frameX="0" frameY="-1" frameWidth="156" frameHeight="176"/>
+    <SubTexture name="db_prop_jurassic_aztec_wall_J" x="8" y="1825" rotated="true" width="247" height="1809" frameX="0" frameY="-11" frameWidth="1809" frameHeight="258"/>
+    <SubTexture name="db_prop_jurassic_aztec_wall_P" x="8" y="8" width="1809" height="1809"/>
+    <SubTexture name="db_prop_jurassic_aztec_wall_S" x="1300" y="3034" rotated="true" width="243" height="247" frameX="-11" frameY="-7" frameWidth="258" frameHeight="250"/>
+    <SubTexture name="db_prop_jurassic_aztec_wall_T" x="2121" y="3238" width="816" height="848" frameX="-33" frameY="-25" frameWidth="849" frameHeight="873"/>
+    <SubTexture name="db_prop_jurassic_aztec_wall_U" x="739" y="3360" width="607" height="727" frameX="-65" frameY="-13" frameWidth="672" frameHeight="740"/>
+    <SubTexture name="db_prop_jurassic_aztec_wall_V" x="1137" y="1825" width="841" height="1201" frameX="0" frameY="-9" frameWidth="841" frameHeight="1210"/>
+    <SubTexture name="db_prop_jurassic_aztec_wall_W" x="1354" y="3289" width="759" height="792" frameX="-1" frameY="0" frameWidth="760" frameHeight="792"/>
+    <SubTexture name="shadow_circle01_s100x100_b13" x="1825" y="179" rotated="true" width="151" height="185" frameX="-25" frameY="-22" frameWidth="256" frameHeight="256"/>
+    <SubTexture name="shadow_exit" x="3612" y="2345" rotated="true" width="326" height="654"/>
+</TextureAtlas>

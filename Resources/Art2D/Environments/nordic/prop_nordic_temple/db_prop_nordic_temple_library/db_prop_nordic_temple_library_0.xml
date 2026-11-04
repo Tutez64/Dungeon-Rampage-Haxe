@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with TexturePacker https://www.codeandweb.com/texturepacker -->
+<!-- $TexturePacker:SmartUpdate:041bb6da43ac3911a6661cf575244d0c:d134e1db69e051b421cbb0df2a381561:e7af16fa2bc02271f9efe5f2d705dcc1$ -->
+<TextureAtlas imagePath="db_prop_nordic_temple_library_0.atf" width="4096" height="4096">
+    <SubTexture name="db_prop_nordic_temple_arch_B" x="2901" y="2424" rotated="true" width="638" height="1060"/>
+    <SubTexture name="db_prop_nordic_temple_deco_axe" x="2357" y="1978" rotated="true" width="112" height="137" frameX="0" frameY="0" frameWidth="146" frameHeight="120"/>
+    <SubTexture name="db_prop_nordic_temple_deco_crack_A" x="3131" y="1978" width="272" height="124" frameX="-6" frameY="0" frameWidth="278" frameHeight="124"/>
+    <SubTexture name="db_prop_nordic_temple_deco_helmet_A" x="3411" y="1978" width="153" height="124" frameX="-1" frameY="0" frameWidth="156" frameHeight="124"/>
+    <SubTexture name="db_prop_nordic_temple_deco_helmet_B" x="2972" y="1978" width="151" height="126" frameX="-18" frameY="-2" frameWidth="220" frameHeight="174"/>
+    <SubTexture name="db_prop_nordic_temple_deco_rune_A" x="3656" y="1619" rotated="true" width="227" height="496" frameX="-16" frameY="-15" frameWidth="546" frameHeight="274"/>
+    <SubTexture name="db_prop_nordic_temple_deco_shield_B" x="3811" y="3887" rotated="true" width="112" height="199" frameX="-21" frameY="-14" frameWidth="226" frameHeight="142"/>
+    <SubTexture name="db_prop_nordic_temple_deco_signil_B" x="3801" y="3082" rotated="true" width="286" height="345" frameX="0" frameY="-4" frameWidth="356" frameHeight="296"/>
+    <SubTexture name="db_prop_nordic_temple_deco_sword" x="3931" y="3887" rotated="true" width="148" height="158" frameX="-18" frameY="0" frameWidth="186" frameHeight="186"/>
+    <SubTexture name="db_prop_nordic_temple_filler_B" x="8" y="8" width="1824" height="2116"/>
+    <SubTexture name="db_prop_nordic_temple_filler_C" x="1840" y="8" width="1808" height="1962"/>
+    <SubTexture name="db_prop_nordic_temple_filler_D" x="8" y="2132" width="1834" height="1946"/>
+    <SubTexture name="db_prop_nordic_temple_filler_rock_A" x="3811" y="3685" rotated="true" width="272" height="194"/>
+    <SubTexture name="db_prop_nordic_temple_filler_rock_C" x="3656" y="1097" width="404" height="348"/>
+    <SubTexture name="db_prop_nordic_temple_icecave" x="2142" y="2424" rotated="true" width="751" height="1065" frameX="-6" frameY="-5" frameWidth="1074" frameHeight="756"/>
+    <SubTexture name="db_prop_nordic_temple_smash_kingStatue" x="1840" y="1978" rotated="true" width="351" height="141" frameX="0" frameY="0" frameWidth="150" frameHeight="356"/>
+    <SubTexture name="db_prop_nordic_temple_smash_statue_hel_D" x="3191" y="3685" width="188" height="400" frameX="0" frameY="0" frameWidth="188" frameHeight="408"/>
+    <SubTexture name="db_prop_nordic_temple_smash_statue_helLighted_D" x="3615" y="3685" width="188" height="399" frameX="0" frameY="0" frameWidth="188" frameHeight="418"/>
+    <SubTexture name="db_prop_nordic_temple_smash_statue_valkyrie" x="3656" y="8" rotated="true" width="428" height="335" frameX="-24" frameY="-1" frameWidth="360" frameHeight="450"/>
+    <SubTexture name="db_prop_nordic_temple_smash_statue_valkyrieLighted" x="3656" y="351" rotated="true" width="428" height="334" frameX="-21" frameY="-1" frameWidth="356" frameHeight="450"/>
+    <SubTexture name="db_prop_nordic_temple_smash_tablet_6" x="3891" y="1619" rotated="true" width="197" height="221" frameX="-54" frameY="-64" frameWidth="348" frameHeight="352"/>
+    <SubTexture name="db_prop_nordic_temple_tower_A" x="3547" y="3082" width="246" height="397" frameX="0" frameY="0" frameWidth="260" frameHeight="456"/>
+    <SubTexture name="db_prop_nordic_temple_tower_B" x="3656" y="693" rotated="true" width="406" height="194" frameX="-9" frameY="0" frameWidth="234" frameHeight="460"/>
+    <SubTexture name="db_prop_nordic_temple_tower_D" x="3656" y="895" rotated="true" width="406" height="194" frameX="-9" frameY="0" frameWidth="236" frameHeight="452"/>
+    <SubTexture name="db_prop_nordic_temple_tower_E" x="3387" y="3685" width="220" height="399" frameX="-16" frameY="0" frameWidth="266" frameHeight="448"/>
+    <SubTexture name="db_prop_nordic_temple_tower_I" x="1850" y="2127" width="284" height="1929" frameX="0" frameY="0" frameWidth="292" frameHeight="1974"/>
+    <SubTexture name="db_prop_nordic_temple_tower_J" x="2142" y="2127" rotated="true" width="1916" height="289" frameX="0" frameY="0" frameWidth="296" frameHeight="1922"/>
+    <SubTexture name="db_prop_nordic_temple_trap_barrel_03" x="2477" y="1978" rotated="true" width="171" height="127" frameX="0" frameY="0" frameWidth="128" frameHeight="256"/>
+    <SubTexture name="db_prop_nordic_temple_trap_cage_A" x="2520" y="3497" width="663" height="584" frameX="-1" frameY="0" frameWidth="664" frameHeight="584"/>
+    <SubTexture name="db_prop_nordic_temple_trap_statue_loki" x="2142" y="3497" width="370" height="585" frameX="-1" frameY="-1" frameWidth="382" frameHeight="628"/>
+    <SubTexture name="db_prop_nordic_temple_trap_statue_thor" x="3547" y="2424" width="524" height="650" frameX="-5" frameY="-4" frameWidth="544" frameHeight="664"/>
+    <SubTexture name="db_prop_nordic_temple_wall_B" x="3191" y="3492" rotated="true" width="881" height="185" frameX="0" frameY="0" frameWidth="202" frameHeight="900"/>
+    <SubTexture name="db_prop_nordic_temple_wall_D" x="3656" y="1453" width="403" height="158" frameX="-24" frameY="0" frameWidth="462" frameHeight="202"/>
+    <SubTexture name="db_prop_nordic_temple_wall_E" x="3891" y="1848" width="194" height="182" frameX="-17" frameY="0" frameWidth="246" frameHeight="202"/>
+    <SubTexture name="db_prop_nordic_trap_spike" x="2199" y="1978" rotated="true" width="150" height="138" frameX="0" frameY="-6" frameWidth="138" frameHeight="156"/>
+    <SubTexture name="shadow_s298x298_b13" x="2656" y="1978" width="308" height="126" frameX="-26" frameY="-21" frameWidth="512" frameHeight="256"/>
+</TextureAtlas>

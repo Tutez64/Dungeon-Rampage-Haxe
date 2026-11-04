@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with TexturePacker https://www.codeandweb.com/texturepacker -->
+<!-- $TexturePacker:SmartUpdate:bbb8ed002b03693f379893127faac10d:973e1f1fff0d6cb2eac72a40cc7e3525:21c1a05917ac8323325ba78bec6636c0$ -->
+<TextureAtlas imagePath="db_prop_shared_library_0.atf" width="1024" height="1024">
+    <SubTexture name="db_prop_shared_manacles_A" x="781" y="547" width="182" height="99" frameX="0" frameY="-2" frameWidth="184" frameHeight="112"/>
+    <SubTexture name="db_prop_shared_manacles_B" x="287" y="449" width="163" height="122" frameX="0" frameY="0" frameWidth="180" frameHeight="130"/>
+    <SubTexture name="db_prop_shared_manacles_C" x="184" y="346" rotated="true" width="95" height="160" frameX="-16" frameY="-13" frameWidth="190" frameHeight="116"/>
+    <SubTexture name="db_prop_shared_manacles_D" x="789" y="430" width="184" height="109" frameX="-8" frameY="-14" frameWidth="204" frameHeight="128"/>
+    <SubTexture name="db_props_shared_bloodSplat_A" x="860" y="8" rotated="true" width="154" height="204"/>
+    <SubTexture name="db_props_shared_bloodSplat_B" x="288" y="321" width="211" height="120"/>
+    <SubTexture name="db_props_shared_bloodSplat_C" x="591" y="440" width="182" height="124"/>
+    <SubTexture name="db_props_shared_bloodSplat_D" x="594" y="319" width="187" height="113"/>
+    <SubTexture name="db_props_shared_deadGladiator_E" x="842" y="220" rotated="true" width="173" height="202"/>
+    <SubTexture name="db_props_shared_deadGladiator_F" x="305" y="8" width="288" height="176" frameX="0" frameY="0" frameWidth="289" frameHeight="176"/>
+    <SubTexture name="db_props_shared_deadGladiator_G" x="8" y="150" width="272" height="188"/>
+    <SubTexture name="db_props_shared_skeleton_A" x="8" y="507" width="168" height="130" frameX="0" frameY="-15" frameWidth="170" frameHeight="152"/>
+    <SubTexture name="db_props_shared_skeleton_B" x="601" y="177" width="233" height="134" frameX="-18" frameY="-24" frameWidth="264" frameHeight="170"/>
+    <SubTexture name="db_props_shared_skeleton_C" x="8" y="346" width="168" height="153" frameX="-40" frameY="-4" frameWidth="212" frameHeight="164"/>
+    <SubTexture name="db_props_shared_skeleton_D" x="288" y="192" width="213" height="121" frameX="-12" frameY="-5" frameWidth="232" frameHeight="140"/>
+    <SubTexture name="db_props_shared_skeleton_E" x="8" y="8" width="289" height="134" frameX="-18" frameY="-2" frameWidth="312" frameHeight="156"/>
+    <SubTexture name="db_props_shared_skeleton_F" x="601" y="8" width="251" height="161" frameX="-29" frameY="-23" frameWidth="286" frameHeight="186"/>
+    <SubTexture name="db_props_shared_skull_A" x="509" y="192" width="80" height="67" frameX="0" frameY="-7" frameWidth="86" frameHeight="78"/>
+    <SubTexture name="db_props_shared_skull_B" x="507" y="411" width="76" height="65" frameX="-2" frameY="-12" frameWidth="82" frameHeight="78"/>
+    <SubTexture name="db_props_shared_skull_C" x="458" y="484" width="69" height="59" frameX="0" frameY="-15" frameWidth="72" frameHeight="78"/>
+    <SubTexture name="db_props_shared_skull_D" x="509" y="267" width="77" height="68" frameX="0" frameY="-7" frameWidth="78" frameHeight="78"/>
+    <SubTexture name="db_props_shared_skull_E" x="507" y="343" width="77" height="60" frameX="0" frameY="-13" frameWidth="80" frameHeight="78"/>
+    <SubTexture name="db_props_shared_skull_F" x="184" y="514" width="75" height="66" frameX="0" frameY="-9" frameWidth="80" frameHeight="78"/>
+</TextureAtlas>

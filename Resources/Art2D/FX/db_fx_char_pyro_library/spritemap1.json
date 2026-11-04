@@ -1,0 +1,23 @@
+{"ATLAS":{"SPRITES":[
+{"SPRITE":{"name":"0","x":2,"y":2,"w":1515,"h":1396,"rotated":false}},
+{"SPRITE":{"name":"33","x":2590,"y":2529,"w":918,"h":791,"rotated":false}},
+{"SPRITE":{"name":"34","x":2834,"y":1725,"w":931,"h":803,"rotated":false}},
+{"SPRITE":{"name":"35","x":2964,"y":891,"w":965,"h":833,"rotated":false}},
+{"SPRITE":{"name":"36","x":2964,"y":2,"w":1030,"h":888,"rotated":false}},
+{"SPRITE":{"name":"37","x":1452,"y":2379,"w":1137,"h":980,"rotated":false}},
+{"SPRITE":{"name":"38","x":1518,"y":1246,"w":1315,"h":1132,"rotated":false}},
+{"SPRITE":{"name":"39","x":2,"y":1399,"w":1449,"h":1247,"rotated":false}},
+{"SPRITE":{"name":"40","x":1518,"y":2,"w":1445,"h":1243,"rotated":false}},
+{"SPRITE":{"name":"41","x":2,"y":2647,"w":1441,"h":1239,"rotated":false}},
+{"SPRITE":{"name":"42","x":1960,"y":3360,"w":439,"h":366,"rotated":false}},
+{"SPRITE":{"name":"43","x":2,"y":3887,"w":4,"h":4,"rotated":false}},
+{"SPRITE":{"name":"44","x":1444,"y":3360,"w":515,"h":476,"rotated":false}}]},
+"meta":{
+"app":"Adobe Animate (Better TA Extension)",
+"version":"24.0.15.5",
+"image":"spritemap1.atf",
+"format":"RGBA8888",
+"size":{"w":4096,"h":4096},
+"resolution":"1"
+}
+}

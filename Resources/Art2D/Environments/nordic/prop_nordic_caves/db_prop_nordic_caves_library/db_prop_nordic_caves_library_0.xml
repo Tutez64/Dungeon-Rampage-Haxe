@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with TexturePacker https://www.codeandweb.com/texturepacker -->
+<!-- $TexturePacker:SmartUpdate:24295b3387f69b2e668af8f99aa4b228:a5b0e1af9a63b529ba59d4eb1396d008:1b7985c873416467e4b58857a343cfc7$ -->
+<TextureAtlas imagePath="db_prop_nordic_caves_library_0.atf" width="4096" height="4096">
+    <SubTexture name="db_prop_nordic_cave_9_tower_filler" x="8" y="8" width="203" height="2074" frameX="-8" frameY="-10" frameWidth="216" frameHeight="2088"/>
+    <SubTexture name="db_prop_nordic_cave_arch_A" x="2573" y="3047" rotated="true" width="596" height="1040" frameX="-3" frameY="-2" frameWidth="1048" frameHeight="602"/>
+    <SubTexture name="db_prop_nordic_cave_deco_pit_B" x="1892" y="1984" rotated="true" width="173" height="373" frameX="-3" frameY="-5" frameWidth="376" frameHeight="178"/>
+    <SubTexture name="db_prop_nordic_cave_deco_shield_A" x="219" y="1984" width="184" height="89" frameX="-16" frameY="-1" frameWidth="200" frameHeight="90"/>
+    <SubTexture name="db_prop_nordic_cave_deco_shield_B" x="1892" y="3980" width="177" height="108" frameX="-1" frameY="0" frameWidth="178" frameHeight="108"/>
+    <SubTexture name="db_prop_nordic_cave_exitgate" x="3335" y="1862" rotated="true" width="753" height="1254" frameX="0" frameY="0" frameWidth="1254" frameHeight="800"/>
+    <SubTexture name="db_prop_nordic_cave_exitgate_door" x="2573" y="2660" width="741" height="379" frameX="0" frameY="-3" frameWidth="744" frameHeight="382"/>
+    <SubTexture name="db_prop_nordic_cave_frozenCrazed_yeti" x="2223" y="2660" rotated="true" width="342" height="439" frameX="0" frameY="-1" frameWidth="442" frameHeight="344"/>
+    <SubTexture name="db_prop_nordic_cave_ground_frozenSkeleton_C" x="3559" y="3516" width="521" height="390" frameX="-2" frameY="-3" frameWidth="526" frameHeight="450"/>
+    <SubTexture name="db_prop_nordic_cave_ground_rockDebrisPile" x="2073" y="8" width="1518" height="962"/>
+    <SubTexture name="db_prop_nordic_cave_ground_rockFrozen_A" x="2073" y="978" width="1426" height="850"/>
+    <SubTexture name="db_prop_nordic_cave_ground_rockFrozen_C" x="2073" y="1836" width="1254" height="816"/>
+    <SubTexture name="db_prop_nordic_cave_ground_spikes_A" x="3559" y="3914" rotated="true" width="260" height="167" frameX="0" frameY="-3" frameWidth="168" frameHeight="264"/>
+    <SubTexture name="db_prop_nordic_cave_ground_spikes_C" x="3477" y="3124" width="163" height="216" frameX="-11" frameY="-1" frameWidth="178" frameHeight="218"/>
+    <SubTexture name="db_prop_nordic_cave_pillar_T_frozen" x="3177" y="3352" rotated="true" width="374" height="706" frameX="0" frameY="0" frameWidth="706" frameHeight="378"/>
+    <SubTexture name="db_prop_nordic_cave_shield01" x="411" y="1984" width="183" height="89" frameX="-16" frameY="-1" frameWidth="200" frameHeight="90"/>
+    <SubTexture name="db_prop_nordic_cave_smash_statue_ice_dragon_a" x="3599" y="928" rotated="true" width="482" height="294"/>
+    <SubTexture name="db_prop_nordic_cave_smash_statue_ice_dragon_b" x="1892" y="2660" width="323" height="450" frameX="0" frameY="-2" frameWidth="324" frameHeight="456"/>
+    <SubTexture name="db_prop_nordic_cave_smash_tower_C" x="3599" y="454" width="486" height="466"/>
+    <SubTexture name="db_prop_nordic_cave_snow_H" x="3335" y="3124" rotated="true" width="134" height="217"/>
+    <SubTexture name="db_prop_nordic_cave_snow_I" x="3177" y="3047" rotated="true" width="150" height="297"/>
+    <SubTexture name="db_prop_nordic_cave_snowPile_C" x="2077" y="3980" width="216" height="105"/>
+    <SubTexture name="db_prop_nordic_cave_stonePost" x="2394" y="3107" rotated="true" width="171" height="144" frameX="0" frameY="-20" frameWidth="176" frameHeight="220"/>
+    <SubTexture name="db_prop_nordic_cave_thorCave_front" x="3507" y="1230" width="560" height="624" frameX="0" frameY="-32" frameWidth="560" frameHeight="656"/>
+    <SubTexture name="db_prop_nordic_cave_tower_A" x="3599" y="8" rotated="true" width="487" height="438" frameX="-2" frameY="-3" frameWidth="444" frameHeight="494"/>
+    <SubTexture name="db_prop_nordic_cave_tower_B" x="3648" y="3124" rotated="true" width="437" height="384" frameX="0" frameY="-3" frameWidth="388" frameHeight="450"/>
+    <SubTexture name="db_prop_nordic_cave_tower_E" x="2394" y="3604" width="143" height="366" frameX="-8" frameY="-10" frameWidth="156" frameHeight="380"/>
+    <SubTexture name="db_prop_nordic_cave_trap_barrel_03" x="2394" y="3259" rotated="true" width="171" height="127" frameX="0" frameY="0" frameWidth="128" frameHeight="256"/>
+    <SubTexture name="db_prop_nordic_cave_trap_emitter" x="2301" y="3980" width="196" height="100" frameX="-17" frameY="-10" frameWidth="216" frameHeight="112"/>
+    <SubTexture name="db_prop_nordic_cave_wall_E" x="3827" y="3914" rotated="true" width="257" height="156" frameX="0" frameY="-1" frameWidth="156" frameHeight="258"/>
+    <SubTexture name="db_prop_nordic_caves_filler_A" x="219" y="8" width="1846" height="1968"/>
+    <SubTexture name="db_prop_nordic_caves_filler_B" x="8" y="2090" width="1876" height="1968"/>
+    <SubTexture name="db_props_nordic_cave_deco_deadGladiator_E" x="2394" y="3394" rotated="true" width="170" height="202" frameX="0" frameY="0" frameWidth="202" frameHeight="172"/>
+    <SubTexture name="db_props_nordic_cave_deco_deadGladiator_F" x="1892" y="2365" rotated="true" width="171" height="287" frameX="-1" frameY="0" frameWidth="288" frameHeight="176"/>
+    <SubTexture name="shadow_exit" x="1892" y="3124" rotated="true" width="494" height="848"/>
+</TextureAtlas>

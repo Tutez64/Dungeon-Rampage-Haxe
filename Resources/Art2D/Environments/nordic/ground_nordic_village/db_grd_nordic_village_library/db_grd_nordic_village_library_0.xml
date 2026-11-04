@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with TexturePacker https://www.codeandweb.com/texturepacker -->
+<!-- $TexturePacker:SmartUpdate:cf4684c546d90935545f6b305125ef10:b157061b45bfb75dcf57650eee46145d:1986eff0d0dffab2892e39b63fc2e7a2$ -->
+<TextureAtlas imagePath="db_grd_nordic_village_library_0.atf" width="1024" height="2048">
+    <SubTexture name="db_grd_nordic_village_5555_squareSolid" x="12" y="12" width="900" height="900"/>
+    <SubTexture name="db_grd_nordic_village_filler" x="12" y="928" width="900" height="900"/>
+</TextureAtlas>

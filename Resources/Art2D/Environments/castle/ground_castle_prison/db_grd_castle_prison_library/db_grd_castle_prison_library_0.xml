@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with TexturePacker https://www.codeandweb.com/texturepacker -->
+<!-- $TexturePacker:SmartUpdate:7856fc617e925ac7bbf6a7ba16bb7005:dcc62f1a4fd5f27644fd0e3c1f3ba889:f9b36cad834826f29e6e6837f3142d29$ -->
+<TextureAtlas imagePath="db_grd_castle_prison_library_0.atf" width="4096" height="4096">
+    <SubTexture name="db_grd_castle_prison_0001" x="12" y="12" width="900" height="900"/>
+    <SubTexture name="db_grd_castle_prison_0002" x="12" y="928" width="900" height="900"/>
+    <SubTexture name="db_grd_castle_prison_0010" x="12" y="1844" width="900" height="900"/>
+    <SubTexture name="db_grd_castle_prison_0011" x="12" y="2760" width="900" height="900"/>
+    <SubTexture name="db_grd_castle_prison_0022" x="928" y="12" width="900" height="900"/>
+    <SubTexture name="db_grd_castle_prison_0100" x="1844" y="12" width="900" height="900"/>
+    <SubTexture name="db_grd_castle_prison_0102_A" x="2760" y="12" width="900" height="900"/>
+    <SubTexture name="db_grd_castle_prison_0110" x="928" y="928" width="900" height="900"/>
+    <SubTexture name="db_grd_castle_prison_0111" x="928" y="1844" width="900" height="900"/>
+    <SubTexture name="db_grd_castle_prison_0201_A" x="928" y="2760" width="900" height="900"/>
+    <SubTexture name="db_grd_castle_prison_0201_B" x="1844" y="928" width="900" height="900"/>
+    <SubTexture name="db_grd_castle_prison_0220" x="2760" y="928" width="900" height="900"/>
+    <SubTexture name="db_grd_castle_prison_1000" x="1844" y="1844" width="900" height="900"/>
+    <SubTexture name="db_grd_castle_prison_1001" x="1844" y="2760" width="900" height="900"/>
+    <SubTexture name="db_grd_castle_prison_1010" x="2760" y="1844" width="900" height="900"/>
+    <SubTexture name="db_grd_castle_prison_1100" x="2760" y="2760" width="900" height="900"/>
+</TextureAtlas>

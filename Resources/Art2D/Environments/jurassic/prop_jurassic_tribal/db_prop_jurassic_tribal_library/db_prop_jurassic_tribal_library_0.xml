@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with TexturePacker https://www.codeandweb.com/texturepacker -->
+<!-- $TexturePacker:SmartUpdate:4adace190d4c8a78d0908a62ba5e066d:d586f9eeb11b4cb0ca4b977ca2f7b10d:3514da66a97e70be7fae5e2683abbadd$ -->
+<TextureAtlas imagePath="db_prop_jurassic_tribal_library_0.atf" width="4096" height="4096">
+    <SubTexture name="db_prop_jurassic_dinostructure" x="3688" y="3612" width="385" height="365" frameX="-6" frameY="-1" frameWidth="396" frameHeight="386"/>
+    <SubTexture name="db_prop_jurassic_tribal_arch_C" x="3375" y="3046" width="686" height="558" frameX="0" frameY="0" frameWidth="686" frameHeight="566"/>
+    <SubTexture name="db_prop_jurassic_tribal_boss_ground_lava_A" x="3375" y="2232" width="710" height="806" frameX="0" frameY="0" frameWidth="710" frameHeight="824"/>
+    <SubTexture name="db_prop_jurassic_tribal_boss_ground_rock_I" x="8" y="8" width="4050" height="2216"/>
+    <SubTexture name="db_prop_jurassic_tribal_deco_rock_B" x="3688" y="3985" width="226" height="103" frameX="-5" frameY="0" frameWidth="236" frameHeight="108"/>
+    <SubTexture name="db_prop_jurassic_tribal_wall_D" x="2749" y="2232" rotated="true" width="618" height="1820" frameX="0" frameY="-5" frameWidth="1820" frameHeight="623"/>
+    <SubTexture name="db_prop_jurassic_tribal_wall_E" x="635" y="2232" rotated="true" width="279" height="1821"/>
+    <SubTexture name="db_prop_jurassic_tribal_wall_F" x="8" y="2232" rotated="true" width="619" height="1827" frameX="0" frameY="-12" frameWidth="1827" frameHeight="631"/>
+    <SubTexture name="db_prop_jurassic_tribal_wall_H" x="922" y="2232" rotated="true" width="1819" height="1820"/>
+    <SubTexture name="shadow_circle_m67_2_-1_62_b10" x="3922" y="3985" width="149" height="101" frameX="-22" frameY="-19" frameWidth="256" frameHeight="256"/>
+    <SubTexture name="shadow_square_s100x100_b13" x="3375" y="3612" rotated="true" width="305" height="469" frameX="-32" frameY="-25" frameWidth="1024" frameHeight="512"/>
+</TextureAtlas>

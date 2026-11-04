@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with TexturePacker https://www.codeandweb.com/texturepacker -->
+<!-- $TexturePacker:SmartUpdate:09940b940ade2d34026529245b796c65:737d858df078b006f7604ef6db6ccb04:c7b53d4fd76affea092195bb132a5837$ -->
+<TextureAtlas imagePath="db_grd_nordic_caves_library_1.atf" width="4096" height="4096">
+    <SubTexture name="db_grd_nordic_caves_5050_A" x="12" y="12" width="900" height="900"/>
+    <SubTexture name="db_grd_nordic_caves_5055" x="12" y="928" width="900" height="900"/>
+    <SubTexture name="db_grd_nordic_caves_5500" x="12" y="1844" width="900" height="900"/>
+    <SubTexture name="db_grd_nordic_caves_5505" x="12" y="2760" width="900" height="900"/>
+    <SubTexture name="db_grd_nordic_caves_5555" x="928" y="12" width="900" height="900"/>
+    <SubTexture name="db_grd_nordic_caves_5555_squareSolid" x="1844" y="12" width="900" height="900"/>
+    <SubTexture name="db_grd_nordic_caves_15000" x="2760" y="12" width="900" height="900"/>
+    <SubTexture name="db_grd_nordic_caves_015015" x="928" y="928" width="900" height="900"/>
+    <SubTexture name="db_grd_nordic_caves_15050" x="928" y="1844" width="900" height="900"/>
+    <SubTexture name="db_grd_nordic_caves_015150" x="928" y="2760" width="900" height="900"/>
+    <SubTexture name="db_grd_nordic_caves_50150" x="1844" y="928" width="900" height="900"/>
+    <SubTexture name="db_grd_nordic_caves_150015" x="2760" y="928" width="900" height="900"/>
+    <SubTexture name="db_grd_nordic_caves_150150" x="1844" y="1844" width="900" height="900"/>
+    <SubTexture name="db_grd_nordic_caves_151500" x="1844" y="2760" width="900" height="900"/>
+    <SubTexture name="db_grd_nordic_caves_0151515" x="2760" y="1844" width="900" height="900"/>
+    <SubTexture name="db_grd_nordic_caves_exitroom_floor" x="2760" y="2760" width="900" height="900"/>
+</TextureAtlas>
