@@ -8,6 +8,9 @@ import flash.geom.Matrix;
 import flash.geom.Rectangle;
 import flash.utils.ByteArray;
 
+#if cpp
+@:access(openfl.display.DisplayObject)
+#end
 class TimelineMasks {
 	static var sSymbols:ASObject;
 
@@ -26,6 +29,11 @@ class TimelineMasks {
 	public function new() {}
 
 	public static function register(asset:SwfAsset) {
+		#if cpp
+		// The preprocessed SWF libraries have no raw SWF bytes to read: isMask and clip read the
+		// clipping layers OpenFL applies to the timeline instead.
+		return;
+		#end
 		if (ASCompat.toBool(sLoaded[asset.root])) {
 			return;
 		}
@@ -61,12 +69,28 @@ class TimelineMasks {
 	}
 
 	@:allow(uI.hud.starlingConverted) static function isMask(parent:DisplayObjectContainer, child:DisplayObject):Bool {
+		#if cpp
+		for (i in 0...parent.numChildren) {
+			if (parent.getChildAt(i).clippingLayer == child) {
+				return true;
+			}
+		}
+		return false;
+		#end
 		var _loc4_ = placements(parent, definition(parent));
 		var _loc3_ = parent.getChildIndex(child);
 		return _loc4_ != null && _loc3_ < _loc4_.length && ASCompat.toNumberField(_loc4_[_loc3_], "clip") > 0;
 	}
 
 	@:allow(uI.hud.starlingConverted) static function clip(parent:DisplayObjectContainer, child:DisplayObject):Rectangle {
+		#if cpp
+		var layer = child.clippingLayer;
+		if (layer == null || layer.parent != parent) {
+			return null;
+		}
+		var layerMatrix = layer.transform.matrix;
+		return layerMatrix.b != 0 || layerMatrix.c != 0 ? null : layer.getBounds(parent);
+		#end
 		var _loc7_:ASObject = null;
 		var _loc5_:Rectangle = null;
 		var _loc3_:Rectangle = null;
