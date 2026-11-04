@@ -7,15 +7,19 @@ import actor.player.InputController;
 import box2D.dynamics.B2Body;
 import brain.clock.GameClock;
 import brain.event.EventComponent;
+import brain.event.EventListeners;
 import brain.logger.Logger;
-import brain.render.Layer;
 import brain.utils.MemoryTracker;
 import brain.workLoop.Task;
 import camera.FollowTargetCameraStrategy;
+import collections.IMapIterator;
+import collections.Map;
+import collections.Set;
 import combat.attack.PlayerOwnerAttackController;
 import combat.attack.TavernPlayerOwnerAttackController;
 import combat.weapon.WeaponController;
 import combat.weapon.WeaponGameObject;
+import dBGlobals.DBGlobal;
 import dungeon.NavCollider;
 import dungeon.Tile;
 import events.HpEvent;
@@ -24,17 +28,17 @@ import facade.DBFacade;
 import dr_floor.FloorObject;
 import dr_floor.FloorView;
 import gameMasterDictionary.GMAttack;
+import gameMasterDictionary.GMMapNode;
 import generatedCode.AttackChoreography;
 import generatedCode.CombatResult;
 import generatedCode.HeroGameObjectOwnerNetworkComponent;
 import generatedCode.IHeroGameObjectOwner;
+import steamInput.UnboundActionEvent;
+import uI.cursor.UIMouseCursors;
 import flash.events.Event;
 import flash.events.KeyboardEvent;
 import flash.geom.Rectangle;
 import flash.geom.Vector3D;
-import org.as3commons.collections.Map;
-import org.as3commons.collections.Set;
-import org.as3commons.collections.framework.IMapIterator;
 
 class HeroGameObjectOwner extends HeroGameObject implements IHeroGameObjectOwner {
 	public static inline final BROADCAST_INTERVAL:Float = 0.2;
@@ -50,8 +54,6 @@ class HeroGameObjectOwner extends HeroGameObject implements IHeroGameObjectOwner
 	public static var HERO_OWNER_READY:String = "HERO_OWNER_READY";
 
 	public static var currentHeroOwnerId:UInt = (0 : UInt);
-
-	static inline final FOLLOW_NEXT_ALLY_KEYCODE = 32;
 
 	var mBroadcastTask:Task;
 
@@ -139,7 +141,7 @@ class HeroGameObjectOwner extends HeroGameObject implements IHeroGameObjectOwner
 	}
 
 	override public function addNavCollision(value:NavCollider) {
-		value.type = B2Body.b2_dynamicBody;
+		value.type = (B2Body.b2_dynamicBody : UInt);
 		super.addNavCollision(value);
 	}
 
@@ -154,15 +156,15 @@ class HeroGameObjectOwner extends HeroGameObject implements IHeroGameObjectOwner
 	override function initializeToFirstValidWeapon() {
 		var _loc3_:WeaponController = null;
 		var _loc1_:WeaponGameObject = null;
-		var _loc2_ = 0;
+		var _loc2_ = (0 : UInt);
 		if (weaponControllers.length > 0) {
-			_loc2_ = 0;
-			while (_loc2_ < weaponControllers.length) {
-				_loc3_ = weaponControllers[_loc2_];
+			_loc2_ = (0 : UInt);
+			while (_loc2_ < (weaponControllers.length:UInt)) {
+				_loc3_ = weaponControllers[(_loc2_ : Int)];
 				if (_loc3_ != null) {
 					_loc1_ = _loc3_.weapon;
 					if (_loc1_ != null) {
-						mCurrentWeaponIndex = _loc2_;
+						mCurrentWeaponIndex = (_loc2_ : Int);
 						this.currentWeapon = _loc1_;
 						return;
 					}
@@ -203,7 +205,7 @@ class HeroGameObjectOwner extends HeroGameObject implements IHeroGameObjectOwner
 		actorClickedToAttack = null;
 		mPreRenderWorkComponent.doEveryFrame(this.doVisibility);
 		mDBFacade.hud.initializeHud(this);
-		mDBFacade.stageRef.addEventListener("keyDown", this.debugKey, false, 0, true);
+		EventListeners.add(mDBFacade.stageRef, "keyDown", this.debugKey, false, 0, true);
 		Logger.debug(" Sending HERO_OWNER_READY ");
 		mEventComponent.dispatchEvent(new Event(HERO_OWNER_READY));
 		if (this.actorData.movment > 250) {
@@ -212,31 +214,14 @@ class HeroGameObjectOwner extends HeroGameObject implements IHeroGameObjectOwner
 	}
 
 	function debugKey(event:KeyboardEvent) {
-		var _loc7_:Layer = null;
-		var _loc3_ = false;
-		var _loc2_:IMapIterator = null;
-		var _loc5_:HeroGameObject = null;
-		var _loc8_ = mDBFacade.dbConfigManager.getConfigString("test_effect_swf", "");
-		var _loc6_ = mDBFacade.dbConfigManager.getConfigString("test_effect_name", "");
-		var _loc4_:FloorObject = this;
-		switch (event.keyCode) {
-			case 98:
-				_loc7_ = mDBFacade.sceneGraphManager.getLayer(50);
-				_loc3_ = !_loc7_.visible;
-				_loc7_.visible = _loc3_;
-				if (actorNametag != null) {
-					actorNametag.visible = _loc3_;
-				}
-				_loc2_ = ASCompat.reinterpretAs(distributedDungeonFloor.remoteHeroes.iterator(), IMapIterator);
-				while (_loc2_.hasNext()) {
-					_loc5_ = ASCompat.coerce(_loc2_.next(), distributedObjects.HeroGameObject);
-					_loc5_.actorNametag.visible = _loc3_;
-				}
-
-			case 69:
-				if (ASCompat.stringAsBool(_loc8_) && ASCompat.stringAsBool(_loc6_) && distributedDungeonFloor != null) {
-					distributedDungeonFloor.effectManager.playEffect(DBFacade.buildFullDownloadPath(_loc8_), _loc6_,
-						new Vector3D(Math.random() * 100, Math.random() * 100, 0), _loc4_);
+		var _loc4_ = mDBFacade.dbConfigManager.getConfigString("test_effect_swf", "");
+		var _loc3_ = mDBFacade.dbConfigManager.getConfigString("test_effect_name", "");
+		var _loc2_:FloorObject = this;
+		switch (event.keyCode - 69) {
+			case 0:
+				if (ASCompat.stringAsBool(_loc4_) && ASCompat.stringAsBool(_loc3_) && distributedDungeonFloor != null) {
+					distributedDungeonFloor.effectManager.playEffect(DBFacade.buildFullDownloadPath(_loc4_), _loc3_,
+						new Vector3D(Math.random() * 100, Math.random() * 100, 0), _loc2_);
 				}
 		}
 	}
@@ -248,18 +233,18 @@ class HeroGameObjectOwner extends HeroGameObject implements IHeroGameObjectOwner
 	}
 
 	function doVisibility(gameClock:GameClock) {
-		var __ax4_iter_217:Vector<Tile>;
+		var __ax4_iter_302:Vector<Tile>;
 		var _loc3_:Rectangle = null;
 		var _loc2_:Vector<Tile> = /*undefined*/ null;
 		var _loc4_:Tile = null;
 		if (mDistributedDungeonFloor != null && mDistributedDungeonFloor.tileGrid != null) {
 			_loc3_ = mFacade.camera.visibleRectangle;
 			_loc2_ = mDistributedDungeonFloor.tileGrid.getVisibleTiles(_loc3_);
-			__ax4_iter_217 = mVisibleTiles;
-			if (checkNullIteratee(__ax4_iter_217))
-				for (_tmp_ in __ax4_iter_217) {
+			__ax4_iter_302 = mVisibleTiles;
+			if (checkNullIteratee(__ax4_iter_302))
+				for (_tmp_ in __ax4_iter_302) {
 					_loc4_ = _tmp_;
-					if (ASCompat.toNumber(_loc2_.indexOf(_loc4_)) < 0) {
+					if (_loc2_.indexOf(_loc4_) < 0) {
 						_loc4_.removeFromStage();
 					}
 				}
@@ -277,7 +262,7 @@ class HeroGameObjectOwner extends HeroGameObject implements IHeroGameObjectOwner
 	@:isVar var canMoveXY(get, never):Bool;
 
 	function get_canMoveXY():Bool {
-		return this.mMovementController.canMoveXY && !mFacade.inputManager.check(16);
+		return this.mMovementController.canMoveXY && !mDBFacade.keyBindings.isDown("holdInPlace");
 	}
 
 	@:isVar public var inputVelocity(never, set):Vector3D;
@@ -324,7 +309,7 @@ class HeroGameObjectOwner extends HeroGameObject implements IHeroGameObjectOwner
 			mPlayerOwnerAttackController.destroy();
 		}
 		super.setupWeapons();
-		var _loc1_ = mDistributedDungeonFloor.gmMapNode.NodeType == "TAVERN";
+		var _loc1_ = mDistributedDungeonFloor.gmMapNode.NodeType == GMMapNode.TAVERN_NODE_TYPE;
 		if (_loc1_) {
 			mPlayerOwnerAttackController = new TavernPlayerOwnerAttackController(this, mHeroView, mDBFacade);
 			MemoryTracker.track(mPlayerOwnerAttackController, "TavernPlayerOwnerAttackController - created in HeroGameObjectOwner.setupWeapons()");
@@ -332,6 +317,7 @@ class HeroGameObjectOwner extends HeroGameObject implements IHeroGameObjectOwner
 			mPlayerOwnerAttackController = new PlayerOwnerAttackController(this, mHeroView, mDBFacade);
 			MemoryTracker.track(mPlayerOwnerAttackController, "PlayerOwnerAttackController - created in HeroGameObjectOwner.setupWeapons()");
 		}
+		UIMouseCursors.setDefault(mDBFacade, "ARROW");
 		initializeToFirstValidWeapon();
 	}
 
@@ -380,9 +366,9 @@ class HeroGameObjectOwner extends HeroGameObject implements IHeroGameObjectOwner
 
 	public function doAttackOnHit(newAttack:String, weaponFromAttack:WeaponGameObject) {
 		var _loc3_:WeaponController;
-		final __ax4_iter_218 = weaponControllers;
-		if (checkNullIteratee(__ax4_iter_218))
-			for (_tmp_ in __ax4_iter_218) {
+		final __ax4_iter_303 = weaponControllers;
+		if (checkNullIteratee(__ax4_iter_303))
+			for (_tmp_ in __ax4_iter_303) {
 				_loc3_ = _tmp_;
 				if (_loc3_ != null && _loc3_.weapon == weaponFromAttack) {
 					_loc3_.queueAttack(newAttack);
@@ -455,7 +441,9 @@ class HeroGameObjectOwner extends HeroGameObject implements IHeroGameObjectOwner
 	}
 
 	override public function destroy() {
-		mDBFacade.stageRef.removeEventListener("keyDown", this.debugKey);
+		stopDeathCamInput();
+		UIMouseCursors.setDefault(mDBFacade, "ARROW");
+		EventListeners.remove(mDBFacade.stageRef, "keyDown", this.debugKey);
 		if (mPlayerOwnerAttackController != null) {
 			mPlayerOwnerAttackController.destroy();
 		}
@@ -494,14 +482,8 @@ class HeroGameObjectOwner extends HeroGameObject implements IHeroGameObjectOwner
 	}
 
 	public function attemptRevive(revivee:HeroGameObject) {
-		var _loc2_ = 0;
 		mCurrentAttemptedRevivee = revivee;
-		if (mDBFacade.dbConfigManager.getConfigBoolean("use_long_revive", true)) {
-			_loc2_ = 910900;
-		} else {
-			_loc2_ = 910901;
-		}
-		attack((_loc2_ : UInt), revivee, 1, mAttemptReviveScript, this.stateMachine.enterNavigationState, sendStopChoreography);
+		attack((910900 : UInt), revivee, 1, mAttemptReviveScript, this.stateMachine.enterNavigationState, sendStopChoreography);
 	}
 
 	public function proposeCombatResults(combatResults:Vector<CombatResult>) {
@@ -511,9 +493,17 @@ class HeroGameObjectOwner extends HeroGameObject implements IHeroGameObjectOwner
 	}
 
 	public function proposeRevive() {
+		var _loc1_:DistributedDungionArea = null;
 		if (mCurrentAttemptedRevivee != null && mCurrentAttemptedRevivee.isInReviveState()) {
 			if (mHeroGameObjectOwnerNetworkComponent != null) {
 				mHeroGameObjectOwnerNetworkComponent.send_ProposeRevive(mCurrentAttemptedRevivee.id);
+				_loc1_ = ASCompat.coerce(mDistributedDungeonFloor != null ? ASCompat.reinterpretAs(mDistributedDungeonFloor.parentArea,
+					DistributedDungionArea) : null,
+					distributedObjects.DistributedDungionArea);
+				if (_loc1_ != null) {
+					mDBFacade.steamAchievementsHelper.setHighestStatValueAchieved(_loc1_.countTeammateRevive(), "MOST_REVIVES_IN_DUNGEON");
+				}
+				mDBFacade.steamAchievementsHelper.addValueToStatInt(1, "TEAMMATES_REVIVED");
 			}
 		}
 	}
@@ -529,22 +519,22 @@ class HeroGameObjectOwner extends HeroGameObject implements IHeroGameObjectOwner
 		var __tmpIncObj0:ASAny;
 		var _loc6_:Map = null;
 		var _loc5_:Array<ASAny> = null;
-		var _loc7_ = 0;
+		var _loc7_ = (0 : UInt);
 		var _loc3_:StackableInfo = null;
-		var _loc4_ = 0;
+		var _loc4_ = (0 : UInt);
 		if (yesno != 0) {
 			_loc6_ = mDBFacade.dbAccountInfo.inventoryInfo.stackables;
 			_loc5_ = _loc6_.keysToArray();
-			_loc7_ = 60001;
+			_loc7_ = DBGlobal.RESSURECTION_POTION_STACK_ID;
 			if (isParty != 0) {
-				_loc7_ = 60018;
+				_loc7_ = DBGlobal.PARTYBOMB_POTION_STACK_ID;
 			}
 			if (checkNullIteratee(_loc5_))
 				for (_tmp_ in _loc5_) {
 					_loc8_ = (ASCompat.toInt(_tmp_) : UInt);
 					_loc3_ = ASCompat.coerce(_loc6_.itemFor(_loc8_), account.StackableInfo);
-					if (_loc3_.gmId == (_loc7_ : UInt)) {
-						_loc4_ = ASCompat.toInt(_loc6_.itemFor(_loc8_).count);
+					if (_loc3_.gmId == _loc7_) {
+						_loc4_ = (ASCompat.toInt(_loc6_.itemFor(_loc8_).count) : UInt);
 						__tmpIncObj0 = _loc6_.itemFor(_loc8_);
 						__tmpIncObj0.count = __tmpIncObj0.count - 1;
 					}
@@ -642,17 +632,25 @@ class HeroGameObjectOwner extends HeroGameObject implements IHeroGameObjectOwner
 
 	public function startDeathCamInput() {
 		mSelectedTargets = new Map();
-		mDBFacade.stageRef.addEventListener("keyDown", checkDeathCamKeyEvent);
+		EventListeners.add(mDBFacade.stageRef, "keyDown", checkDeathCamKeyEvent);
+		EventListeners.add(mDBFacade.stageRef, "UnboundActionEvent.PRESSED", checkDeathCamUnboundEvent);
 	}
 
 	function checkDeathCamKeyEvent(kEvt:KeyboardEvent) {
-		if (kEvt.keyCode == 32) {
+		if (mDBFacade.keyBindings.matches("reviveAlly", (kEvt.keyCode : Int))) {
+			followNextAlly();
+		}
+	}
+
+	function checkDeathCamUnboundEvent(event:UnboundActionEvent) {
+		if (event.actionName == "revive_ally") {
 			followNextAlly();
 		}
 	}
 
 	public function stopDeathCamInput() {
-		mDBFacade.stageRef.removeEventListener("keyDown", checkDeathCamKeyEvent);
+		EventListeners.remove(mDBFacade.stageRef, "keyDown", checkDeathCamKeyEvent);
+		EventListeners.remove(mDBFacade.stageRef, "UnboundActionEvent.PRESSED", checkDeathCamUnboundEvent);
 		if (mSelectedTargets != null) {
 			mSelectedTargets.clear();
 		}
@@ -688,6 +686,8 @@ class HeroGameObjectOwner extends HeroGameObject implements IHeroGameObjectOwner
 	}
 
 	public function resetCamera() {
-		mFollowCamera.changeTarget(mHeroView.root);
+		if (mFollowCamera != null) {
+			mFollowCamera.changeTarget(mHeroView.root);
+		}
 	}
 }

@@ -1,8 +1,8 @@
 package brain.assetRepository;
 
+import collections.IMapIterator;
+import collections.Map;
 import flash.utils.*;
-import org.as3commons.collections.Map;
-import org.as3commons.collections.framework.IMapIterator;
 
 /*internal*/
 final class AssetCache {
@@ -39,7 +39,7 @@ final class AssetCache {
 	public function removeCacheForSpriteSheetAssets() {
 		var _loc2_:SpriteSheetAsset = null;
 		var _loc3_:String = null;
-		var _loc5_ = 0;
+		var _loc5_ = (0 : UInt);
 		var _loc6_ = new Map();
 		var _loc4_ = new Vector<String>();
 		var _loc1_ = ASCompat.reinterpretAs(mCachedAssets.iterator(), IMapIterator);
@@ -54,9 +54,9 @@ final class AssetCache {
 				_loc6_.add(ASCompat.asString(_loc1_.key), _loc1_.current);
 			}
 		}
-		_loc5_ = 0;
-		while (_loc5_ < _loc4_.length) {
-			_loc3_ = _loc4_[_loc5_];
+		_loc5_ = (0 : UInt);
+		while (_loc5_ < (_loc4_.length:UInt)) {
+			_loc3_ = _loc4_[(_loc5_ : Int)];
 			if (_loc6_.hasKey(_loc3_)) {
 				_loc6_.removeKey(_loc3_);
 			}

@@ -35,9 +35,9 @@ class SessionTransport extends EventDispatcher implements IGameTransport {
 
 	static inline final SILENCE_TICK_MILLISECONDS = 1000;
 
-	static final BACKOFF_MILLISECONDS:Array<ASAny> = [1000, 2000, 4000, 8000, 10000];
+	static var BACKOFF_MILLISECONDS:Array<ASAny>;
 
-	static final JITTER_FRACTIONS:Array<ASAny> = [0, 0, 0.1, 0.25, 0.25];
+	static var JITTER_FRACTIONS:Array<ASAny>;
 
 	var mBaseUrl:String;
 
@@ -255,11 +255,11 @@ class SessionTransport extends EventDispatcher implements IGameTransport {
 						return;
 					};
 				};
-			} catch (__finallyError1:Dynamic) {
+			} catch (__finallyError0:Dynamic) {
 				{
 					mInsideConnect = false;
 				};
-				throw __finallyError1;
+				throw __finallyError0;
 			};
 			{
 				mInsideConnect = false;
@@ -877,5 +877,10 @@ class SessionTransport extends EventDispatcher implements IGameTransport {
 			return;
 		}
 		dispatchEvent(event);
+	}
+
+	static function __init__() {
+		BACKOFF_MILLISECONDS = [1000, 2000, 4000, 8000, 10000];
+		JITTER_FRACTIONS = [0, 0, 0.1, 0.25, 0.25];
 	}
 }

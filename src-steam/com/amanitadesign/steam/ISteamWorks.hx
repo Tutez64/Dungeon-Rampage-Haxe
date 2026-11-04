@@ -11,6 +11,10 @@ interface ISteamWorks extends IEventDispatcher {
 
 	function addOverlayWorkaround(container:DisplayObjectContainer, alwaysVisible:Bool = false, color:UInt = (0 : UInt)):Void;
 
+	function getGlyphSVGForActionOrigin(eOrigin:String, flags:Int):String;
+
+	function getGlyphPNGForActionOrigin(eOrigin:String, eSize:Int, flags:Int):String;
+
 	function runCallbacks():Bool;
 
 	function getUserID():String;
@@ -36,8 +40,6 @@ interface ISteamWorks extends IEventDispatcher {
 	function getSecondsSinceAppActive():UInt;
 
 	function getEarliestPurchaseUnixTime(appID:String):UInt;
-
-	function requestStats():Bool;
 
 	function setAchievement(name:String):Bool;
 
@@ -274,7 +276,59 @@ interface ISteamWorks extends IEventDispatcher {
 
 	function microTxnResult():MicroTxnAuthorizationResponse;
 
+	function inputInit():Bool;
+
+	function setInputActionManifestFilePath(inputActionManifestAbsolutePath:String):Bool;
+
+	function getControllerForGamepadIndex(index:Int):String;
+
+	function showBindingPanel(inputHandle:String):Bool;
+
+	function getActionSetHandle(actionSetName:String):String;
+
+	function getDigitalActionHandle(actionName:String):String;
+
+	function getAnalogActionHandle(actionName:String):String;
+
+	function getDigitalActionButtonState(inputHandle:String, actionHandle:String):Bool;
+
+	function getDigitalActionButtonActive(inputHandle:String, actionHandle:String):Bool;
+
+	function getAnalogActionData(inputHandle:String, actionHandle:String):InputAnalogActionData;
+
+	function runFrame():Bool;
+
+	function getConnectedControllers():Array<ASAny>;
+
+	function activateActionSet(inputHandle:String, actionSetHandle:String):Bool;
+
+	function getHandleAllControllers():String;
+
+	function getDigitalActionOrigins(inputHandle:String, actionSetHandle:String, digitalActionHandle:String):Array<ASAny>;
+
+	function getAnalogActionOrigins(inputHandle:String, actionSetHandle:String, analogActionHandle:String):Array<ASAny>;
+
+	function getStringForActionOrigin(eOrigin:String):String;
+
+	function showGamepadTextInput(eInputMode:Int, eLineInputMode:Int, pchDescription:String, unCharMax:Int, pchExistingText:String):Bool;
+
+	function showFloatingGamepadTextInput(eKeyboardMode:Int, nTextFieldXPosition:Int, nTextFieldYPosition:Int, nTextFieldWidth:Int, nTextFieldHeight:Int):Bool;
+
+	function setLEDColor(inputHandle:String, colorR:Int, colorG:Int, colorB:Int, flags:UInt):Bool;
+
+	function triggerVibration(inputHandle:String, leftSpeed:UInt, rightSpeed:UInt):Bool;
+
+	function getInputTypeForHandle(inputHandle:String):Int;
+
+	function translateActionOrigin(destinationInputType:Int, sourceOrigin:String):String;
+
+	function steamInputShutdown():Bool;
+
+	function dismissFloatingGamepadTextInput():Bool;
+
 	function getEnv(name:String):String;
 
 	function setEnv(name:String, value:String):Bool;
+
+	function getLaunchQueryParam(key:String):String;
 }

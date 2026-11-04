@@ -1,20 +1,19 @@
 package distributedObjects;
 
-import actor.ActorGameObject;
 import brain.event.EventComponent;
 import brain.logger.Logger;
 import brain.sceneGraph.SceneGraphComponent;
 import events.CacheLoadRequestNpcEvent;
 import facade.DBFacade;
-import gameMasterDictionary.GMAttack;
 import generatedCode.DistributedDungionAreaNetworkComponent;
 import generatedCode.IDistributedDungionArea;
 import generatedCode.InfiniteRewardData;
-import generatedCode.WeaponDetails;
 import generatedCode.Swrapper;
 
 class DistributedDungionArea extends Area implements IDistributedDungionArea {
 	var mNetworkComponent:DistributedDungionAreaNetworkComponent;
+
+	var mTeammateRevivesThisDungeon:Int = 0;
 
 	var mTileLibrary:Vector<String>;
 
@@ -44,11 +43,11 @@ class DistributedDungionArea extends Area implements IDistributedDungionArea {
 	@:isVar public var cacheSWC(never, set):Vector<Swrapper>;
 
 	public function set_cacheSWC(val:Vector<Swrapper>):Vector<Swrapper> {
-		var _loc2_ = 0;
+		var _loc2_ = (0 : UInt);
 		mCacheSfc = new Vector<String>();
-		_loc2_ = 0;
-		while (_loc2_ < val.length) {
-			mCacheSfc.push(DBFacade.buildFullDownloadPath(val[_loc2_].fileName));
+		_loc2_ = (0 : UInt);
+		while (_loc2_ < (val.length:UInt)) {
+			mCacheSfc.push(DBFacade.buildFullDownloadPath(val[(_loc2_ : Int)].fileName));
 			_loc2_++;
 		}
 		return val;
@@ -63,30 +62,17 @@ class DistributedDungionArea extends Area implements IDistributedDungionArea {
 	}
 
 	public function tileLibrary(val:Vector<Swrapper>) {
-		var _loc2_ = 0;
+		var _loc2_ = (0 : UInt);
 		mTileLibrary = new Vector<String>();
-		_loc2_ = 0;
-		while (_loc2_ < val.length) {
-			mTileLibrary.push(val[_loc2_].fileName);
+		_loc2_ = (0 : UInt);
+		while (_loc2_ < (val.length:UInt)) {
+			mTileLibrary.push(val[(_loc2_ : Int)].fileName);
 			_loc2_++;
 		}
 	}
 
-	public function calculateNetAttackDamage(attacker:ActorGameObject, target:ActorGameObject, attack:GMAttack, weapon:WeaponDetails):Float {
-		var _loc6_ = Math.NaN;
-		var _loc7_ = Math.NaN;
-		var _loc5_:Float = 0;
-		if (attack.StatOffsets != null) {
-			_loc6_ = (weapon.power * mDBFacade.gameMaster.stat_BonusMultiplier.values[ASCompat.floatToInt(attack.StatOffsets.offence)]
-				+
-				attacker.stats.values[ASCompat.floatToInt(attack.StatOffsets.offence)]) * ASCompat.toNumber((attacker.buffHandler.multiplier : ASAny)[attack.StatOffsets.offence]);
-			_loc6_ = _loc6_ * attack.DamageMod;
-			_loc7_ = target.stats.values[ASCompat.floatToInt(attack.StatOffsets.defence)] * ASCompat.toNumber((target.buffHandler.multiplier : ASAny)[attack.StatOffsets.defence]);
-			_loc5_ = _loc6_ + _loc7_;
-		} else {
-			_loc5_ = weapon.power * attack.DamageMod;
-		}
-		return _loc5_;
+	public function countTeammateRevive():Int {
+		return ++mTeammateRevivesThisDungeon;
 	}
 
 	public function floorReward(mapReward:UInt) {}

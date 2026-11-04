@@ -9,11 +9,11 @@ class ShieldWeaponController extends WeaponController {
 	}
 
 	override public function onWeaponDown(autoAim:Bool = true) {
-		var _loc2_ = 0;
+		var _loc2_ = (0 : UInt);
 		if (!mWeaponDownActive) {
-			_loc2_ = (this.getNextAttackId() : Int);
+			_loc2_ = this.getNextAttackId();
 			mWeaponDownActive = true;
-			attack((_loc2_ : UInt), false);
+			attack(_loc2_, false);
 		}
 	}
 

@@ -8,11 +8,11 @@ import networkCode.DcNetworkPacket;
 class DistributedBuffGameObjectNetworkComponent extends DcNetworkClass implements DcNetworkInterface {
 	var the_instance:DistributedBuffGameObject;
 
-	public static inline final FLID_type = (292 : UInt);
+	public static inline final FLID_type = (301 : UInt);
 
-	public static inline final FLID_effectedActor = (293 : UInt);
+	public static inline final FLID_effectedActor = (302 : UInt);
 
-	public static inline final FLID_attackerActor = (294 : UInt);
+	public static inline final FLID_attackerActor = (303 : UInt);
 
 	public function new(Inst:DistributedBuffGameObject, gs:GeneratedDcSocket, id:UInt) {
 		super(Inst, gs, id);
@@ -29,7 +29,7 @@ class DistributedBuffGameObjectNetworkComponent extends DcNetworkClass implement
 	}
 
 	override public function recvById(packet:DcNetworkPacket, fieldid:UInt) {
-		switch (fieldid - 292) {
+		switch (fieldid - 301) {
 			case 0:
 				recv_type(packet);
 

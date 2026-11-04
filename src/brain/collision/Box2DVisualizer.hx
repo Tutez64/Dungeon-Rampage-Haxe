@@ -42,7 +42,7 @@ class Box2DVisualizer {
 		mDebugDraw.SetFillAlpha(0.5);
 		mDebugDraw.SetLineThickness(1);
 		if (mWantAllCollisions || mWantNavigationCollisions) {
-			mDebugDraw.SetFlags(((B2DebugDraw.e_shapeBit : Int) | (B2DebugDraw.e_jointBit : Int) | (B2DebugDraw.e_controllerBit : Int) | (B2DebugDraw.e_aabbBit : Int) | (B2DebugDraw.e_pairBit : Int) | (B2DebugDraw.e_centerOfMassBit : Int) : UInt));
+			mDebugDraw.SetFlags(B2DebugDraw.e_shapeBit | B2DebugDraw.e_jointBit | B2DebugDraw.e_controllerBit | B2DebugDraw.e_aabbBit | B2DebugDraw.e_pairBit | B2DebugDraw.e_centerOfMassBit);
 		}
 		mB2World.SetDebugDraw(mDebugDraw);
 		mRootSprite.x = 0;

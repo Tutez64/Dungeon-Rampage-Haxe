@@ -5,9 +5,9 @@ import brain.facade.Facade;
 import brain.logger.Logger;
 import brain.utils.MemoryTracker;
 import brain.utils.Receipt;
+import collections.IMapIterator;
+import collections.Map;
 import flash.events.Event;
-import org.as3commons.collections.Map;
-import org.as3commons.collections.framework.IMapIterator;
 
 class EventComponent extends Component {
 	var mRegisteredListeners:Map = new Map();
@@ -21,7 +21,7 @@ class EventComponent extends Component {
 		var _loc4_:Receipt = null;
 		var _loc3_ = mRegisteredListeners.add(eventName, callback);
 		if (_loc3_) {
-			mFacade.eventManager.addEventListener(eventName, callback);
+			EventListeners.add(mFacade.eventManager, eventName, callback);
 			_loc4_ = new Receipt(removeListener);
 			MemoryTracker.track(_loc4_, "Receipt - EventComponent listener: " + eventName, "brain");
 			return _loc4_;
@@ -35,7 +35,7 @@ class EventComponent extends Component {
 		if (_loc2_ == null) {
 			return;
 		}
-		mFacade.eventManager.removeEventListener(eventName, _loc2_);
+		EventListeners.remove(mFacade.eventManager, eventName, _loc2_);
 	}
 
 	public function dispatchEvent(eventObj:Event) {
@@ -55,7 +55,7 @@ class EventComponent extends Component {
 		while (_loc1_.hasNext()) {
 			_loc3_ = ASCompat.coerceFunction(_loc1_.next());
 			_loc2_ = _loc1_.key;
-			mFacade.eventManager.removeEventListener(_loc2_, _loc3_);
+			EventListeners.remove(mFacade.eventManager, _loc2_, _loc3_);
 		}
 		mRegisteredListeners.clear();
 	}

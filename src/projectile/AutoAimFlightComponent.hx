@@ -7,6 +7,7 @@ import box2D.common.math.B2Vec2;
 import box2D.dynamics.B2Fixture;
 import brain.utils.GeometryUtil;
 import combat.CombatGameObject;
+import dBGlobals.DBGlobal;
 import distributedObjects.DistributedDungeonFloor;
 import dungeon.NavCollider;
 import facade.DBFacade;
@@ -102,10 +103,12 @@ class AutoAimFlightComponent extends FlightComponent {
 		if (mCurrentTarget == null) {
 			return true;
 		}
-		if (mCurrentTarget.team == 1 && newTarget.team != 1) {
+		if ((mCurrentTarget.team : UInt) == DBGlobal.TEAM_ENVIRONMENT && (newTarget.team : UInt) != DBGlobal.TEAM_ENVIRONMENT) {
 			return true;
 		}
-		if (mCurrentTarget.team != 1 && newTarget.team != 1 || mCurrentTarget.team == 1 && newTarget.team == 1) {
+		if ((mCurrentTarget.team : UInt) != DBGlobal.TEAM_ENVIRONMENT
+			&& (newTarget.team : UInt) != DBGlobal.TEAM_ENVIRONMENT
+				|| (mCurrentTarget.team : UInt) == DBGlobal.TEAM_ENVIRONMENT && (newTarget.team : UInt) == DBGlobal.TEAM_ENVIRONMENT) {
 			_loc2_ = calculateTargetScore(newTarget);
 			if (_loc2_ > mBestDotProduct) {
 				return true;

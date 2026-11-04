@@ -6,14 +6,15 @@ import box2D.common.math.B2Transform;
 import box2D.common.math.B2Vec2;
 import box2D.dynamics.B2Fixture;
 import brain.utils.MemoryTracker;
+import collections.Set;
 import combat.CombatGameObject;
 import combat.weapon.WeaponGameObject;
+import dBGlobals.DBGlobal;
 import distributedObjects.DistributedDungeonFloor;
 import distributedObjects.NPCGameObject;
 import dungeon.NavCollider;
 import facade.DBFacade;
 import flash.geom.Vector3D;
-import org.as3commons.collections.Set;
 
 class ChainProjectileGameObject extends ProjectileGameObject {
 	static inline final DEFAULT_CHAIN_CHECK_DISTANCE:Float = 300;
@@ -38,10 +39,10 @@ class ChainProjectileGameObject extends ProjectileGameObject {
 
 	var mActorJustHit:ActorGameObject;
 
-	public function new(dbFacade:DBFacade, actorId:UInt, actorTeam:UInt, attackType:UInt, weapon:WeaponGameObject, distDungeonfloor:DistributedDungeonFloor,
+	public function new(dbFacade:DBFacade, actorId:UInt, actorTeam:UInt, attackType:UInt, weapon:WeaponGameObject, distDungeonFloor:DistributedDungeonFloor,
 			position:Vector3D, directionVector:Vector3D, visualOffset:Vector3D, range:Float = 0, currentChain:UInt = (0 : UInt), ignoreList:Set = null,
 			effectObject:ASObject = null, combatResultCallback:ASFunction = null, autoAim:Bool = true, dontRotate:Bool = false) {
-		super(dbFacade, actorId, actorTeam, attackType, weapon, distDungeonfloor, position, directionVector, visualOffset, range, effectObject,
+		super(dbFacade, actorId, actorTeam, attackType, weapon, distDungeonFloor, position, directionVector, visualOffset, range, effectObject,
 			combatResultCallback, autoAim, dontRotate, currentChain);
 		mNumChains = currentChain;
 		if (ignoreList == null) {
@@ -92,7 +93,7 @@ class ChainProjectileGameObject extends ProjectileGameObject {
 			if (mFlightComponent.isTargetableTeam((_loc4_.team : UInt))) {
 				if (!CombatGameObject.didAttackGoThroughWall(mDBFacade, mB2Body.GetPosition(), _loc4_, NavCollider.convertToB2Vec2(_loc4_.worldCenter),
 					mDistributedDungeonFloor)) {
-					if (_loc4_.team == 1) {
+					if ((_loc4_.team : UInt) == DBGlobal.TEAM_ENVIRONMENT) {
 						mEnvironmentTargets.push(_loc4_);
 					} else {
 						mEnemyTargets.push(_loc4_);
@@ -126,13 +127,13 @@ class ChainProjectileGameObject extends ProjectileGameObject {
 	}
 
 	function processNewChains(targets:Vector<NPCGameObject>) {
-		var _loc2_ = 0;
-		_loc2_ = 0;
-		while (_loc2_ < targets.length) {
+		var _loc2_ = (0 : UInt);
+		_loc2_ = (0 : UInt);
+		while (_loc2_ < (targets.length:UInt)) {
 			if (mNumBranches >= mMaxBranches) {
 				return;
 			}
-			shootNewChain(targets[_loc2_]);
+			shootNewChain(targets[(_loc2_ : Int)]);
 			_loc2_++;
 		}
 	}

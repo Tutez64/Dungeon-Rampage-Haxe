@@ -7,7 +7,9 @@ import brain.uI.UIButton;
 import brain.uI.UIObject;
 import brain.uI.UIScrollPane;
 import brain.uI.UISlider;
+import brain.utils.TextUtil;
 import brain.jsonRPC.JSONRPCService;
+import collections.Map;
 import facade.DBFacade;
 import facade.GameMasterLocale;
 import facade.Locale;
@@ -17,7 +19,6 @@ import gameMasterDictionary.GMDungeonModifier;
 import gameMasterDictionary.GMInfiniteDungeon;
 import uI.map.UIMapBattlePopup;
 import flash.display.MovieClip;
-import org.as3commons.collections.Map;
 
 class II_UIMapBattlePopup extends UIMapBattlePopup {
 	static inline final SWF_PATH = "Resources/Art2D/UI/db_UI_screens.swf";
@@ -79,8 +80,8 @@ class II_UIMapBattlePopup extends UIMapBattlePopup {
 		var friendsKeyArray:Array<ASAny>;
 		var key:UInt;
 		super.setupUI(swfAsset, titleText, content, allowClose, closeCallback);
-		ASCompat.setProperty((mPopup : ASAny).label_killSwitch, "text", Locale.getString("KILL_SWITCH"));
-		ASCompat.setProperty((mPopup : ASAny).label_weeklyTopScores, "text", Locale.getString("II_WEEKLY_FRIENDS_SCORES"));
+		Locale.setText(ASCompat.coerce((mPopup : ASAny).label_killSwitch, flash.text.TextField), "KILL_SWITCH");
+		Locale.setText(ASCompat.coerce((mPopup : ASAny).label_weeklyTopScores, flash.text.TextField), "II_WEEKLY_FRIENDS_SCORES");
 		mFloorModifierLabels = new Vector<UIObject>();
 		i = 0;
 		while (i < 4) {
@@ -143,7 +144,7 @@ class II_UIMapBattlePopup extends UIMapBattlePopup {
 			gameMasterDictionary.GMInfiniteDungeon);
 		_loc3_ = 0;
 		while (_loc3_ < _loc2_.modifiers.length) {
-			ASCompat.setProperty((mFloorModifierLabels[_loc3_].root : ASAny).label_floor_modifier, "text",
+			TextUtil.setText(ASCompat.coerce((mFloorModifierLabels[_loc3_].root : ASAny).label_floor_modifier, flash.text.TextField),
 				Locale.getString("BATTLE_POP_UP_II_FLOOR:") + Std.string(_loc5_.DModFloorStart[_loc3_]));
 			_loc3_++;
 		}
@@ -211,9 +212,9 @@ class II_UIMapBattlePopup extends UIMapBattlePopup {
 		}
 		var _loc5_ = 0;
 		var _loc6_:Int;
-		final __ax4_iter_35 = _loc11_.RewardFloors;
-		if (checkNullIteratee(__ax4_iter_35))
-			for (_tmp_ in __ax4_iter_35) {
+		final __ax4_iter_362 = _loc11_.RewardFloors;
+		if (checkNullIteratee(__ax4_iter_362))
+			for (_tmp_ in __ax4_iter_362) {
 				_loc6_ = (_tmp_ : Int);
 				_loc1_ = 0;
 				if (_loc2_ > _loc6_) {
@@ -247,17 +248,17 @@ class II_UIMapBattlePopup extends UIMapBattlePopup {
 	}
 
 	function onReceivedTopScores(result:ASAny) {
-		if (result == false) {
+		if (!ASCompat.toBool(result)) {
 			return;
 		}
 		mTopTwentyScores.add(mCurrentDungeon.Id, new II_ChampionsboardListPerNode(result));
 	}
 
 	function switchChampionsBoardType() {
+		var _loc3_ = 0;
 		var _loc1_:II_ChampionsboardListPerNode = null;
 		var _loc2_:II_ChampionsboardTopScore = null;
 		mSlider.valueWithCallback = 0;
-		var _loc3_ = 0;
 		if (mIsChampionsBoardFriends) {
 			_loc3_ = 0;
 			while (_loc3_ < mChampionsboardTopSlots.length) {
@@ -297,8 +298,8 @@ class II_UIMapBattlePopup extends UIMapBattlePopup {
 				}
 			}
 		}
-		ASCompat.setProperty((mPopup : ASAny).label_weeklyTopScores, "text", Locale.getString("II_WEEKLY_FRIENDS_SCORES"));
-		mTopScoresBtn.label.text = Locale.getString("II_FRIENDS_SCORES");
+		Locale.setText(ASCompat.coerce((mPopup : ASAny).label_weeklyTopScores, flash.text.TextField), "II_WEEKLY_FRIENDS_SCORES");
+		Locale.setText(mTopScoresBtn.label, "II_FRIENDS_SCORES");
 	}
 
 	function sortFriends(f1:FriendInfo, f2:FriendInfo):Int {
@@ -308,9 +309,9 @@ class II_UIMapBattlePopup extends UIMapBattlePopup {
 	function lateLoadForModifier(index:UInt, gmDungeonModifer:GMDungeonModifier):ASFunction {
 		return function(param1:SwfAsset) {
 			var _loc2_:MovieClip = null;
-			var __tmpAssignObj0:ASAny = (mFloorModifierLabels[(index : Int)].root : ASAny).label_floor_modifier;
-			ASCompat.setProperty(__tmpAssignObj0, "text",
-				Std.string(__tmpAssignObj0.text) + "\n" + GameMasterLocale.getGameMasterSubString("DUNGEON_MODIFIER_NAME", gmDungeonModifer.Constant));
+			TextUtil.setText(ASCompat.coerce((mFloorModifierLabels[(index : Int)].root : ASAny).label_floor_modifier, flash.text.TextField),
+				Std.string((mFloorModifierLabels[(index : Int)].root : ASAny).label_floor_modifier.text) + "\n" +
+				GameMasterLocale.getGameMasterSubString("DUNGEON_MODIFIER_NAME", gmDungeonModifer.Constant));
 			var _loc3_ = param1.getClass(gmDungeonModifer.IconName);
 			if (_loc3_ != null) {
 				_loc2_ = ASCompat.dynamicAs(ASCompat.createInstance(_loc3_, []), MovieClip);
@@ -320,15 +321,15 @@ class II_UIMapBattlePopup extends UIMapBattlePopup {
 				}
 				(mFloorModifierLabels[(index : Int)].root : ASAny).floor_modifier_icon.addChild(_loc2_);
 			}
-			ASCompat.setProperty((mFloorModifierLabels[(index : Int)].tooltip : ASAny).title_label, "text",
+			TextUtil.setText(ASCompat.coerce((mFloorModifierLabels[(index : Int)].tooltip : ASAny).title_label, flash.text.TextField),
 				GameMasterLocale.getGameMasterSubString("DUNGEON_MODIFIER_NAME", gmDungeonModifer.Constant));
-			ASCompat.setProperty((mFloorModifierLabels[(index : Int)].tooltip : ASAny).description_label, "text",
+			TextUtil.setText(ASCompat.coerce((mFloorModifierLabels[(index : Int)].tooltip : ASAny).description_label, flash.text.TextField),
 				GameMasterLocale.getGameMasterSubString("DUNGEON_MODIFIER_DESCRIPTION", gmDungeonModifer.Constant));
 		};
 	}
 
 	override public function destroy() {
-		var __ax4_iter_36:Vector<II_UIChampionsboardSlot>;
+		var __ax4_iter_363:Vector<II_UIChampionsboardSlot>;
 		var _loc1_:II_UIChampionsboardSlot = null;
 		mScrollPane.destroy();
 		mSlider.destroy();
@@ -339,9 +340,9 @@ class II_UIMapBattlePopup extends UIMapBattlePopup {
 		mSliderUpButton = null;
 		mSliderDownButton = null;
 		if (mChampionsboardFriendSlots != null) {
-			__ax4_iter_36 = mChampionsboardFriendSlots;
-			if (checkNullIteratee(__ax4_iter_36))
-				for (_tmp_ in __ax4_iter_36) {
+			__ax4_iter_363 = mChampionsboardFriendSlots;
+			if (checkNullIteratee(__ax4_iter_363))
+				for (_tmp_ in __ax4_iter_363) {
 					_loc1_ = _tmp_;
 					_loc1_.destroy();
 				}

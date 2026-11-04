@@ -10,10 +10,6 @@ import uI.inventory.chests.ChestRevealPopUp;
 import uI.popup.DBUIConfirmChestPurchasePopup;
 
 class UIChestOffer extends UIShopBundleOffer {
-	static inline final TOWN_PATH = "Resources/Art2D/UI/db_UI_town.swf";
-
-	static inline final CHEST_SHOP_POPUP_CLASS = "chest_shop_popup";
-
 	var mConfirmPurchaseChestPopup:DBUIConfirmChestPurchasePopup;
 
 	var mGMChest:GMChest;
@@ -30,18 +26,8 @@ class UIChestOffer extends UIShopBundleOffer {
 		if (mGMChest == null) {
 			Logger.error("Unable to find GMChest for chestId: " + this.offer.Details[0].ChestId);
 		}
-		mAssetLoadingComponent.getSwfAsset(DBFacade.buildFullDownloadPath("Resources/Art2D/UI/db_UI_town.swf"),
-			function(param1:brain.assetRepository.SwfAsset) {
-				var _loc2_ = param1.getClass("chest_shop_popup");
-				if (_loc2_ == null) {
-					Logger.error("Unable to find class: chest_shop_popup in: Resources/Art2D/UI/db_UI_town.swf");
-					return;
-				}
-				mConfirmPurchaseChestPopup = new DBUIConfirmChestPurchasePopup(mDBFacade,
-					ASCompat.coerce(ASCompat.createInstance(_loc2_, []), flash.display.MovieClip), purchaseChest, close, offer, mSelectedAvatarInfo.skinId,
-					true, null);
-				MemoryTracker.track(mConfirmPurchaseChestPopup, "DBUIConfirmChestPurchasePopup - created in UIChestOffer.buyButtonCallback()");
-			});
+		mConfirmPurchaseChestPopup = new DBUIConfirmChestPurchasePopup(mDBFacade, purchaseChest, close, offer, mSelectedAvatarInfo.skinId, true, null);
+		MemoryTracker.track(mConfirmPurchaseChestPopup, "DBUIConfirmChestPurchasePopup - created in UIChestOffer.buyButtonCallback()");
 	}
 
 	function purchaseChest() {

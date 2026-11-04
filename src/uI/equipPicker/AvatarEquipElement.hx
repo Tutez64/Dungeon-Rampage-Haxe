@@ -9,6 +9,7 @@ import brain.uI.UIObject;
 import dBGlobals.DBGlobal;
 import facade.DBFacade;
 import uI.inventory.UIWeaponTooltip;
+import flash.display.DisplayObject;
 import flash.display.MovieClip;
 import flash.geom.Point;
 
@@ -35,21 +36,24 @@ class AvatarEquipElement extends UIButton {
 
 	var mEquipResponseCallback:ASFunction;
 
-	var mClickedEquipedWeaponCallback:ASFunction;
+	var mClickedEquippedWeaponCallback:ASFunction;
 
 	var mAllowEquipmentSwapping:Bool = false;
 
+	var mKeyLabel:String;
+
 	public function new(dbFacade:DBFacade, keyLabel:String, root:MovieClip, tooltipClass:Dynamic, unequipCallback:ASFunction, handleDropCallback:ASFunction,
-			equipSlot:UInt, clickedEquipedWeaponCallback:ASFunction = null, equipResponseCallback:ASFunction = null, allowEquipmentSwapping:Bool = false) {
+			equipSlot:UInt, clickedEquippedWeaponCallback:ASFunction = null, equipResponseCallback:ASFunction = null, allowEquipmentSwapping:Bool = false) {
 		super(dbFacade, root);
-		this.label.text = keyLabel;
+		mKeyLabel = keyLabel;
+		this.label.text = mKeyLabel;
 		this.rolloverFilter = DBGlobal.UI_ROLLOVER_FILTER;
 		mDBFacade = dbFacade;
 		mUnequipCallback = unequipCallback;
 		mHandleDropCallback = handleDropCallback;
 		mEquipSlot = equipSlot;
 		mEquipResponseCallback = equipResponseCallback;
-		mClickedEquipedWeaponCallback = clickedEquipedWeaponCallback;
+		mClickedEquippedWeaponCallback = clickedEquippedWeaponCallback;
 		mAllowEquipmentSwapping = allowEquipmentSwapping;
 		draggable = false;
 		mContainerHeight = (ASCompat.toInt((mRoot : ASAny).frame.height) : UInt);
@@ -118,8 +122,8 @@ class AvatarEquipElement extends UIButton {
 
 	function setupClickedCallback() {
 		this.releaseCallbackThis = function(param1:UIButton) {
-			if (mClickedEquipedWeaponCallback != null) {
-				mClickedEquipedWeaponCallback(param1);
+			if (mClickedEquippedWeaponCallback != null) {
+				mClickedEquippedWeaponCallback(param1);
 			}
 		};
 	}
@@ -192,5 +196,15 @@ class AvatarEquipElement extends UIButton {
 
 	public function deselect() {
 		ASCompat.setProperty((this.root : ASAny).selected, "visible", false);
+	}
+
+	public function setLabelAsText() {
+		this.label.visible = true;
+		this.label.text = mKeyLabel;
+	}
+
+	public function setLabelAsControllerGlyph(controllerGlyph:DisplayObject) {
+		this.label.visible = false;
+		root.addChild(controllerGlyph);
 	}
 }

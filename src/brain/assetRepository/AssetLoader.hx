@@ -1,16 +1,18 @@
 package brain.assetRepository;
 
+import brain.event.EventListeners;
 import brain.facade.Facade;
 import brain.logger.Logger;
+import collections.Set;
 import flash.display.Loader;
 import flash.display.LoaderInfo;
 import flash.events.Event;
 import flash.events.EventDispatcher;
 import flash.events.SecurityErrorEvent;
+import flash.filesystem.File;
 import flash.net.URLLoader;
 import flash.net.URLRequest;
 import flash.system.LoaderContext;
-import org.as3commons.collections.Set;
 
 class AssetLoader {
 	static var mTrackedLoadsCallback:ASFunction = null;
@@ -52,6 +54,10 @@ class AssetLoader {
 		mUseLoader = useLoader;
 		mURLDataFormat = urlDataFormat;
 		loadAsset(facade, mAssetLoaderInfo.getRawAssetPath(), mAssetLoaderInfo.useCache);
+	}
+
+	public static function resolveFile(relative:String):File {
+		return ASCompat.thisOrDefault(TestResourceLocator.file(relative), File.applicationDirectory.resolvePath(relative));
 	}
 
 	public static function startTrackingLoads(trackedLoadsCallback:ASFunction) {
@@ -102,9 +108,9 @@ class AssetLoader {
 		mBytesLoaded = (0 : UInt);
 		mBytesTotal = (0 : UInt);
 		var _loc1_:Loader;
-		final __ax4_iter_66 = mloadersets;
-		if (checkNullIteratee(__ax4_iter_66))
-			for (_tmp_ in __ax4_iter_66) {
+		final __ax4_iter_400 = mloadersets;
+		if (checkNullIteratee(__ax4_iter_400))
+			for (_tmp_ in __ax4_iter_400) {
 				_loc1_ = _tmp_;
 				mBytesLoaded += _loc1_.contentLoaderInfo.bytesLoaded;
 				mBytesTotal += _loc1_.contentLoaderInfo.bytesTotal;
@@ -153,21 +159,23 @@ class AssetLoader {
 			}
 			Logger.info("Loader.load: " + _loc4_.url + " useCache: " + Std.string(useCache));
 			mEventForLoader = mLoader.contentLoaderInfo;
-			mEventForLoader.addEventListener("complete", loadComplete);
-			mEventForLoader.addEventListener("ioError", handleIOError);
-			mEventForLoader.addEventListener("securityError", handleSecurityError);
+			EventListeners.add(mEventForLoader, "complete", loadComplete);
+			EventListeners.add(mEventForLoader, "ioError", handleIOError);
+			EventListeners.add(mEventForLoader, "securityError", handleSecurityError);
 			_loc5_ = new LoaderContext(true);
 			_loc5_.checkPolicyFile = true;
-			mLoader.load(_loc4_, _loc5_);
+			if (!TestResourceLocator.loadBytes(mLoader, assetPath, _loc5_)) {
+				mLoader.load(_loc4_, _loc5_);
+			}
 			if (mCollectingTrackLoads) {
 				mloadersets.push(mLoader);
 			}
 		} else {
 			mUrlLoader = new URLLoader();
 			mEventForLoader = mUrlLoader;
-			mEventForLoader.addEventListener("complete", urlLoadComplete);
-			mEventForLoader.addEventListener("ioError", handleIOErrorUrl);
-			mEventForLoader.addEventListener("securityError", handleSecurityError);
+			EventListeners.add(mEventForLoader, "complete", urlLoadComplete);
+			EventListeners.add(mEventForLoader, "ioError", handleIOErrorUrl);
+			EventListeners.add(mEventForLoader, "securityError", handleSecurityError);
 			mUrlLoader.dataFormat = mURLDataFormat;
 			if (mCollectingTrackLoads) {
 				mTrackedLoads.add(mAssetLoaderInfo.getRawAssetPath());
@@ -185,9 +193,9 @@ class AssetLoader {
 		var _loc2_:Asset = null;
 		Logger.info("Loader.loadComplete: " + Std.string(event.target.url));
 		var _loc3_ = cast(event.target, LoaderInfo).loader;
-		_loc3_.contentLoaderInfo.removeEventListener("complete", loadComplete);
-		_loc3_.contentLoaderInfo.removeEventListener("ioError", handleIOError);
-		_loc3_.contentLoaderInfo.removeEventListener("securityError", handleSecurityError);
+		EventListeners.remove(_loc3_.contentLoaderInfo, "complete", loadComplete);
+		EventListeners.remove(_loc3_.contentLoaderInfo, "ioError", handleIOError);
+		EventListeners.remove(_loc3_.contentLoaderInfo, "securityError", handleSecurityError);
 		mLoader = null;
 		var _loc4_ = mAssetLoaderInfo;
 		try {
@@ -207,9 +215,9 @@ class AssetLoader {
 		var _loc2_:Asset = null;
 		var _loc3_ = cast(event.target, URLLoader);
 		Logger.info("Loader.urlLoadComplete: " + mAssetLoaderInfo.getRawAssetPath() + " dataFormat: " + _loc3_.dataFormat);
-		_loc3_.removeEventListener("complete", urlLoadComplete);
-		_loc3_.removeEventListener("ioError", handleIOError);
-		_loc3_.removeEventListener("securityError", handleSecurityError);
+		EventListeners.remove(_loc3_, "complete", urlLoadComplete);
+		EventListeners.remove(_loc3_, "ioError", handleIOError);
+		EventListeners.remove(_loc3_, "securityError", handleSecurityError);
 		mUrlLoader = null;
 		var _loc4_ = mAssetLoaderInfo;
 		try {
@@ -228,9 +236,9 @@ class AssetLoader {
 	function handleIOError(event:Event) {
 		var AssetString:String;
 		var loader = cast(event.target, LoaderInfo).loader;
-		loader.contentLoaderInfo.removeEventListener("complete", loadComplete);
-		loader.contentLoaderInfo.removeEventListener("ioError", handleIOError);
-		loader.contentLoaderInfo.removeEventListener("securityError", handleSecurityError);
+		EventListeners.remove(loader.contentLoaderInfo, "complete", loadComplete);
+		EventListeners.remove(loader.contentLoaderInfo, "ioError", handleIOError);
+		EventListeners.remove(loader.contentLoaderInfo, "securityError", handleSecurityError);
 		mLoader = null;
 		updateTrackingLoad(mAssetLoaderInfo.getRawAssetPath());
 		AssetString = mAssetLoaderInfo.getRawAssetPath();
@@ -244,9 +252,9 @@ class AssetLoader {
 
 	function handleIOErrorUrl(event:Event) {
 		var loader = cast(event.target, URLLoader);
-		loader.removeEventListener("complete", loadComplete);
-		loader.removeEventListener("ioError", handleIOErrorUrl);
-		loader.removeEventListener("securityError", handleSecurityError);
+		EventListeners.remove(loader, "complete", loadComplete);
+		EventListeners.remove(loader, "ioError", handleIOErrorUrl);
+		EventListeners.remove(loader, "securityError", handleSecurityError);
 		mUrlLoader = null;
 		updateTrackingLoad(mAssetLoaderInfo.getRawAssetPath());
 		if (mFacade.gameClock.frame > 1) {
@@ -279,17 +287,21 @@ class AssetLoader {
 
 	public function destroy() {
 		if (mEventForLoader != null) {
-			mEventForLoader.removeEventListener("complete", urlLoadComplete);
-			mEventForLoader.removeEventListener("ioError", handleIOErrorUrl);
-			mEventForLoader.removeEventListener("securityError", handleSecurityError);
-			mEventForLoader.removeEventListener("complete", loadComplete);
+			EventListeners.remove(mEventForLoader, "complete", urlLoadComplete);
+			EventListeners.remove(mEventForLoader, "ioError", handleIOErrorUrl);
+			EventListeners.remove(mEventForLoader, "securityError", handleSecurityError);
+			EventListeners.remove(mEventForLoader, "complete", loadComplete);
 		}
 		if (mUrlLoader != null) {
-			mUrlLoader.close();
+			try {
+				mUrlLoader.close();
+			} catch (urlCloseError:Dynamic) {}
 			mUrlLoader = null;
 		}
 		if (mLoader != null) {
-			mLoader.close();
+			try {
+				mLoader.close();
+			} catch (loaderCloseError:Dynamic) {}
 			mLoader = null;
 		}
 		mAssetLoaderInfo = null;

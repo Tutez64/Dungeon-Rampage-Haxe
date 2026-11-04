@@ -2,6 +2,8 @@ package uI.popup;
 
 import brain.assetRepository.SwfAsset;
 import brain.uI.UIButton;
+import brain.uI.UIObject;
+import brain.utils.TextUtil;
 import brain.jsonRPC.JSONRPCService;
 import dBGlobals.DBGlobal;
 import events.FriendSummaryNewsFeedEvent;
@@ -49,6 +51,8 @@ class UIReportPopup extends DBUIPopup {
 
 	var mSuccessCallback:ASFunction;
 
+	var mClosedCallback:ASFunction;
+
 	var mMatchPlayers:Array<ASAny>;
 
 	var mPersonName:String;
@@ -56,7 +60,7 @@ class UIReportPopup extends DBUIPopup {
 	var mSelectedButtonValuesArray:Array<ASAny>;
 
 	public function new(dbFacade:DBFacade, personName:String, personId:UInt, matchPlayers:Array<ASAny>, reportedCallback:ASFunction,
-			successCallback:ASFunction) {
+			successCallback:ASFunction, closedCallback:ASFunction = null) {
 		mSelectedButtonValuesArray = [];
 		var titleText = Locale.getString("REPORT") + " " + personName + "?";
 		var contentText = Locale.getString("VICTORY_SCREEN_REPORT_POPUP_MESSAGE_01") + personName + Locale.getString("VICTORY_SCREEN_REPORT_POPUP_MESSAGE_02");
@@ -73,7 +77,8 @@ class UIReportPopup extends DBUIPopup {
 		mMatchPlayers = matchPlayers;
 		mPersonName = personName;
 		mSuccessCallback = successCallback;
-		super(dbFacade, titleText, contentText, true, true, null, false);
+		mClosedCallback = closedCallback;
+		super(dbFacade, "DUNGEON_SUMMARY_REPORT_PLAYER", titleText, contentText);
 	}
 
 	public function reportPlayer(personId:UInt, personName:String) {
@@ -124,7 +129,12 @@ class UIReportPopup extends DBUIPopup {
 		mRightCallback = null;
 		mSuccessCallback = null;
 		mDungeonReport = null;
+		var _loc1_ = mClosedCallback;
+		mClosedCallback = null;
 		super.destroy();
+		if (_loc1_ != null) {
+			_loc1_();
+		}
 	}
 
 	override function setupUI(swfAsset:SwfAsset, titleText:String, content:ASAny, allowClose:Bool, closeCallback:ASFunction) {
@@ -134,18 +144,21 @@ class UIReportPopup extends DBUIPopup {
 		tf.color = FriendSummaryNewsFeedEvent.FRIEND_NAME_HIGHLIGHT_COLOR;
 		super.colorizeMessage(tf, Locale.getString("VICTORY_SCREEN_REPORT_POPUP_MESSAGE_01").length,
 			Locale.getString("VICTORY_SCREEN_REPORT_POPUP_MESSAGE_01").length + mPersonName.length);
-		ASCompat.setProperty((mPopup : ASAny).check_button_a_label, "text", check_button_label_a);
+		TextUtil.setText(ASCompat.coerce((mPopup : ASAny).check_button_a_label, flash.text.TextField), check_button_label_a);
 		check_button_a = new UIButton(mDBFacade, ASCompat.coerce((mPopup : ASAny).check_button_a, flash.display.MovieClip));
+		check_button_a.rolloverFilter = DBGlobal.UI_ROLLOVER_FILTER;
 		check_button_a.releaseCallback = function() {
 			checkButtonCallback(check_button_a, check_button_a_value);
 		};
-		ASCompat.setProperty((mPopup : ASAny).check_button_b_label, "text", check_button_label_b);
+		TextUtil.setText(ASCompat.coerce((mPopup : ASAny).check_button_b_label, flash.text.TextField), check_button_label_b);
 		check_button_b = new UIButton(mDBFacade, ASCompat.coerce((mPopup : ASAny).check_button_b, flash.display.MovieClip));
+		check_button_b.rolloverFilter = DBGlobal.UI_ROLLOVER_FILTER;
 		check_button_b.releaseCallback = function() {
 			checkButtonCallback(check_button_b, check_button_b_value);
 		};
-		ASCompat.setProperty((mPopup : ASAny).check_button_c_label, "text", check_button_label_c);
+		TextUtil.setText(ASCompat.coerce((mPopup : ASAny).check_button_c_label, flash.text.TextField), check_button_label_c);
 		check_button_c = new UIButton(mDBFacade, ASCompat.coerce((mPopup : ASAny).check_button_c, flash.display.MovieClip));
+		check_button_c.rolloverFilter = DBGlobal.UI_ROLLOVER_FILTER;
 		check_button_c.releaseCallback = function() {
 			checkButtonCallback(check_button_c, check_button_c_value);
 		};
@@ -153,7 +166,7 @@ class UIReportPopup extends DBUIPopup {
 			ASCompat.setProperty((mPopup : ASAny).left_button, "visible", true);
 			mLeftButton = new UIButton(mDBFacade, ASCompat.coerce((mPopup : ASAny).left_button, flash.display.MovieClip));
 			mLeftButton.rolloverFilter = DBGlobal.UI_ROLLOVER_FILTER;
-			mLeftButton.label.text = mLeftButtonLabelText;
+			TextUtil.setText(mLeftButton.label, mLeftButtonLabelText);
 			mLeftButton.releaseCallback = function() {
 				close(mLeftCallback);
 			};
@@ -164,7 +177,7 @@ class UIReportPopup extends DBUIPopup {
 			ASCompat.setProperty((mPopup : ASAny).right_button, "visible", true);
 			mRightButton = new UIButton(mDBFacade, ASCompat.coerce((mPopup : ASAny).right_button, flash.display.MovieClip));
 			mRightButton.rolloverFilter = DBGlobal.UI_ROLLOVER_FILTER;
-			mRightButton.label.text = mRightButtonLabelText;
+			TextUtil.setText(mRightButton.label, mRightButtonLabelText);
 			mRightButton.releaseCallback = function() {
 				close(mRightCallback);
 			};
@@ -172,6 +185,27 @@ class UIReportPopup extends DBUIPopup {
 		} else {
 			ASCompat.setProperty((mPopup : ASAny).right_button, "visible", false);
 		}
+	}
+
+	override function setupMenuNavigation() {
+		check_button_a.isAbove(check_button_b);
+		check_button_b.isAbove(check_button_c);
+		if (mCloseButton != null) {
+			mCloseButton.isAbove(check_button_a);
+			mCloseButton.isToTheLeftOf(check_button_a);
+		}
+		var _loc1_ = mLeftButton != null ? mLeftButton : mRightButton;
+		if (_loc1_ != null) {
+			check_button_c.isAbove(_loc1_);
+		}
+		if (mLeftButton != null && mRightButton != null) {
+			mLeftButton.isToTheLeftOf(mRightButton);
+			mRightButton.upNavigation = check_button_c;
+		}
+	}
+
+	override function getInitialFocusedNavigationObject():UIObject {
+		return check_button_a;
 	}
 
 	function checkButtonCallback(button:UIButton, buttonValueString:String) {

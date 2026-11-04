@@ -11,11 +11,12 @@ class GenericNewsFeedEvent extends Event {
 
 	var mPicSwfClassName:String;
 
-	public function new(type:String, message:String, picSwfLocation:String = "", picSwfClassName:String = "", bubbles:Bool = false, cancelable:Bool = false) {
+	public function new(genericNewsFeedEventType:String, message:String, picSwfLocation:String = "", picSwfClassName:String = "", bubbles:Bool = false,
+			cancelable:Bool = false) {
 		mMessage = message;
 		mPicSwfLocation = picSwfLocation;
 		mPicSwfClassName = picSwfClassName;
-		super(type, bubbles, cancelable);
+		super(genericNewsFeedEventType, bubbles, cancelable);
 	}
 
 	@:isVar public var message(get, never):String;

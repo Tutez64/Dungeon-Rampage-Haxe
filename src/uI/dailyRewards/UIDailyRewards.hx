@@ -2,11 +2,15 @@ package uI.dailyRewards;
 
 import brain.assetRepository.SwfAsset;
 import brain.clock.GameClock;
+import brain.event.EventListeners;
 import brain.logger.Logger;
 import brain.render.MovieClipRenderController;
 import brain.sound.SoundAsset;
 import brain.uI.UIButton;
+import brain.utils.TextUtil;
+import brain.utils.Timers;
 import brain.jsonRPC.JSONRPCService;
+import dBGlobals.DBGlobal;
 import facade.DBFacade;
 import facade.Locale;
 import gameMasterDictionary.GMOffer;
@@ -19,7 +23,6 @@ import flash.events.Event;
 import flash.events.TimerEvent;
 import flash.filters.ColorMatrixFilter;
 import flash.filters.GlowFilter;
-import flash.text.TextFormat;
 import flash.utils.Timer;
 
 class UIDailyRewards extends DBUIPopup {
@@ -173,27 +176,24 @@ class UIDailyRewards extends DBUIPopup {
 
 	public function new(dbFacade:DBFacade, closeCallback:ASFunction, forceOpen:Bool) {
 		mForceOpen = forceOpen;
-		super(dbFacade, "", null, true, true, function() {
+		super(dbFacade, "", "", null, true, true, function() {
 			if (closeCallback != null) {
 				closeCallback();
 			}
-		}, false, ASCompat.stringAsBool("DAILY_LOGIN_POPUP"));
+		}, false);
 		mDBFacade = dbFacade;
 		mCloseCallback = closeCallback;
 		mPopup.visible = false;
 		mSoundComponent = new DBSoundComponent(mDBFacade);
-		mAssetLoadingComponent.getSoundAsset(DBFacade.buildFullDownloadPath("Resources/Audio/soundEffects.swf"), "ExpCollectSound",
-			function(param1:SoundAsset) {
-				mSoundGoldPlunk = param1;
-			});
-		mAssetLoadingComponent.getSoundAsset(DBFacade.buildFullDownloadPath("Resources/Audio/soundEffects.swf"), "TEMP_DooberGoldLarge1",
-			function(param1:SoundAsset) {
-				mSoundGoldStart = param1;
-			});
-		mAssetLoadingComponent.getSoundAsset(DBFacade.buildFullDownloadPath("Resources/Audio/soundEffects.swf"), "DailyRewardShred",
-			function(param1:SoundAsset) {
-				mSoundBox = param1;
-			});
+		mAssetLoadingComponent.getSoundAsset(DBFacade.buildFullDownloadPath(DBGlobal.SFX_PATH), "ExpCollectSound", function(param1:SoundAsset) {
+			mSoundGoldPlunk = param1;
+		});
+		mAssetLoadingComponent.getSoundAsset(DBFacade.buildFullDownloadPath(DBGlobal.SFX_PATH), "TEMP_DooberGoldLarge1", function(param1:SoundAsset) {
+			mSoundGoldStart = param1;
+		});
+		mAssetLoadingComponent.getSoundAsset(DBFacade.buildFullDownloadPath(DBGlobal.SFX_PATH), "DailyRewardShred", function(param1:SoundAsset) {
+			mSoundBox = param1;
+		});
 		mAssetLoadingComponent.getSwfAsset(DBFacade.buildFullDownloadPath("Resources/Art2D/UI/db_UI_daily_reward.swf"), dailyRewardPopupLoaded);
 	}
 
@@ -203,8 +203,8 @@ class UIDailyRewards extends DBUIPopup {
 			mGoldEndY = ASCompat.floatToInt(mDailyRewardGoldPopup.y + 40);
 			mDailyRewardGoldPopup.y = mGoldStartY;
 			mWindowGoldDisplayed = true;
-			mGoldSlideTimer = new Timer(16);
-			mGoldSlideTimer.addEventListener("timer", goldSlideTimerTick);
+			mGoldSlideTimer = Timers.create(16, 0, "UIDailyRewards.mGoldSlideTimer");
+			EventListeners.add(mGoldSlideTimer, "timer", goldSlideTimerTick);
 			mDailyRewardGoldPopup.alpha = 0;
 			mGoldSlideTimer.start();
 			mDBFacade.mInDailyReward = true;
@@ -217,7 +217,7 @@ class UIDailyRewards extends DBUIPopup {
 		if (mDailyRewardGoldPopup.y <= mGoldEndY) {
 			mDailyRewardGoldPopup.alpha = 1;
 			mDailyRewardGoldPopup.y = mGoldEndY;
-			mGoldSlideTimer.removeEventListener("timer", goldSlideTimerTick);
+			EventListeners.remove(mGoldSlideTimer, "timer", goldSlideTimerTick);
 			mGoldSlideTimer.stop();
 			startGoldCount();
 		}
@@ -227,8 +227,8 @@ class UIDailyRewards extends DBUIPopup {
 		mCountGold = 0;
 		mCountCrew = 0;
 		var _loc1_ = ASCompat.floatToInt(10 / ASCompat.toNumber(mRewardInfo[1]) + 2);
-		mGoldCountTimer = new Timer(50);
-		mGoldCountTimer.addEventListener("timer", goldCountTimerTick);
+		mGoldCountTimer = Timers.create(50, 0, "UIDailyRewards.mGoldCountTimer");
+		EventListeners.add(mGoldCountTimer, "timer", goldCountTimerTick);
 		mGoldCountTotal = ASCompat.floatToInt(ASCompat.toNumber(ASCompat.dynGetIndex(mRewardInfo[2],
 			ASCompat.toNumber(mRewardInfo[0]) - 1)) * ASCompat.toNumber(mRewardInfo[1]));
 		mGoldPerCount = ASCompat.floatToInt(5 + 0.5 * (mGoldCountTotal / 30));
@@ -246,12 +246,12 @@ class UIDailyRewards extends DBUIPopup {
 	function goldCountTimerTick(event:TimerEvent) {
 		var _loc2_:GlowFilter = null;
 		if (mDBFacade == null) {
-			mGoldCountTimer.removeEventListener("timer", goldCountTimerTick);
+			EventListeners.remove(mGoldCountTimer, "timer", goldCountTimerTick);
 			mGoldCountTimer.stop();
 			return;
 		}
 		mCountGold += mGoldPerCount;
-		ASCompat.setProperty((mDailyRewardGoldPopup : ASAny).label_number, "text", mCountGold);
+		ASCompat.setProperty((mDailyRewardGoldPopup : ASAny).label_number, "text", Std.string(mCountGold));
 		if (mCountGold >= mGoldPerCrew * (mCountCrew + 1) && mCountCrew < ASCompat.toNumber(mRewardInfo[1]) - 1) {
 			if (mSoundGoldPlunk != null) {
 				mSoundComponent.playSfxOneShot(mSoundGoldPlunk);
@@ -260,20 +260,21 @@ class UIDailyRewards extends DBUIPopup {
 				mSoundComponent.playSfxOneShot(mSoundGoldStart);
 			}
 			mCountCrew += 1;
-			ASCompat.setProperty((mDailyRewardGoldPopup : ASAny).crewBonus_anim.crewBonus.header_crew_bonus_number, "text", mCountCrew);
+			TextUtil.setText(ASCompat.coerce((mDailyRewardGoldPopup : ASAny).crewBonus_anim.crewBonus.header_crew_bonus_number, flash.text.TextField),
+				Std.string(mCountCrew), 0.73);
 			_loc2_ = new GlowFilter((16777215 : UInt), 1, 5, 5, 1, 1, false, false);
 			_loc2_.quality = 2;
 			ASCompat.setProperty((mDailyRewardGoldPopup : ASAny).label_number, "filters", [_loc2_]);
 			ASCompat.setProperty((mDailyRewardGoldPopup : ASAny).crewBonus_anim.crewBonus.header_crew_bonus_number, "filters", [_loc2_]);
-			mGoldDarkTimer = new Timer(100);
-			mGoldDarkTimer.addEventListener("timer", darkenGoldText);
+			mGoldDarkTimer = Timers.create(100, 0, "UIDailyRewards.mGoldDarkTimer");
+			EventListeners.add(mGoldDarkTimer, "timer", darkenGoldText);
 			mGoldDarkTimer.start();
 		}
 		if (mCountGold >= mGoldCountTotal) {
-			ASCompat.setProperty((mDailyRewardGoldPopup : ASAny).label_number, "text", mGoldCountTotal);
-			ASCompat.setProperty((mDailyRewardGoldPopup : ASAny).crewBonus_anim.crewBonus.header_crew_bonus_number, "text",
-				ASCompat.toNumber(mRewardInfo[1]) - 1);
-			mGoldCountTimer.removeEventListener("timer", goldCountTimerTick);
+			TextUtil.setText(ASCompat.coerce((mDailyRewardGoldPopup : ASAny).label_number, flash.text.TextField), Std.string(mGoldCountTotal));
+			TextUtil.setText(ASCompat.coerce((mDailyRewardGoldPopup : ASAny).crewBonus_anim.crewBonus.header_crew_bonus_number, flash.text.TextField),
+				Std.string(ASCompat.toNumber(mRewardInfo[1]) - 1), 0.73);
+			EventListeners.remove(mGoldCountTimer, "timer", goldCountTimerTick);
 			mGoldCountTimer.stop();
 			startMysterySlide();
 		}
@@ -287,7 +288,7 @@ class UIDailyRewards extends DBUIPopup {
 		_loc2_.quality = 2;
 		ASCompat.setProperty((mDailyRewardGoldPopup : ASAny).label_number, "filters", [_loc2_]);
 		ASCompat.setProperty((mDailyRewardGoldPopup : ASAny).crewBonus_anim.crewBonus.header_crew_bonus_number, "filters", [_loc2_]);
-		mGoldDarkTimer.removeEventListener("timer", goldCountTimerTick);
+		EventListeners.remove(mGoldDarkTimer, "timer", goldCountTimerTick);
 		mGoldDarkTimer.stop();
 	}
 
@@ -298,8 +299,8 @@ class UIDailyRewards extends DBUIPopup {
 		}
 		mMysteryEndY = ASCompat.floatToInt(mDailyRewardMysteryBoxPopup.y + 40);
 		mDailyRewardMysteryBoxPopup.y = mMysteryStartY;
-		mMysterySlideTimer = new Timer(16);
-		mMysterySlideTimer.addEventListener("timer", mysterySlideTimerTick);
+		mMysterySlideTimer = Timers.create(16, 0, "UIDailyRewards.mMysterySlideTimer");
+		EventListeners.add(mMysterySlideTimer, "timer", mysterySlideTimerTick);
 		mDailyRewardMysteryBoxPopup.alpha = 0;
 		mMysterySlideTimer.start();
 	}
@@ -309,17 +310,17 @@ class UIDailyRewards extends DBUIPopup {
 		mDailyRewardMysteryBoxPopup.y -= 5 + 0.1 * Math.abs(mDailyRewardMysteryBoxPopup.y - mMysteryEndY);
 		if (mDailyRewardMysteryBoxPopup.y <= mMysteryEndY) {
 			mDailyRewardMysteryBoxPopup.y = mMysteryEndY;
-			mMysterySlideTimer.removeEventListener("timer", mysterySlideTimerTick);
+			EventListeners.remove(mMysterySlideTimer, "timer", mysterySlideTimerTick);
 			mMysterySlideTimer.stop();
 			mDailyRewardMysteryBoxPopup.alpha = 1;
 		}
 	}
 
 	function startBoxFade() {
-		mMysteryFadeTimer = new Timer(16);
+		mMysteryFadeTimer = Timers.create(16, 0, "UIDailyRewards.mMysteryFadeTimer");
 		mBoxAlpha = 1;
 		mRewardAlpha = 0;
-		mMysteryFadeTimer.addEventListener("timer", mysteryFadeTimerTick);
+		EventListeners.add(mMysteryFadeTimer, "timer", mysteryFadeTimerTick);
 		mMysteryFadeTimer.start();
 	}
 
@@ -350,7 +351,7 @@ class UIDailyRewards extends DBUIPopup {
 				_loc2_++;
 			}
 		} else {
-			mMysteryFadeTimer.removeEventListener("timer", mysteryFadeTimerTick);
+			EventListeners.remove(mMysteryFadeTimer, "timer", mysteryFadeTimerTick);
 			mMysteryFadeTimer.stop();
 			ASCompat.setProperty(mBoxArray[0], "visible", false);
 			ASCompat.setProperty(mBoxArray[1], "visible", false);
@@ -363,6 +364,7 @@ class UIDailyRewards extends DBUIPopup {
 		var popupGoldClass:Dynamic;
 		var popupMysteryBoxClass:Dynamic;
 		var slotMovieClass:Dynamic;
+		var crewTooltip:MovieClip;
 		if (mDBFacade == null) {
 			return;
 		}
@@ -377,16 +379,16 @@ class UIDailyRewards extends DBUIPopup {
 		mCrewBonusController.loop = false;
 		mCrewBonusController.stop();
 		ASCompat.setProperty((mDailyRewardGoldPopup : ASAny).crewBonus_anim, "visible", false);
-		ASCompat.setProperty((mDailyRewardGoldPopup : ASAny).title_label, "text", Locale.getString("DAILY_REWARDS_POPUP_TITLE"));
-		ASCompat.setProperty((mDailyRewardGoldPopup : ASAny).label_message1, "text", Locale.getString("DAILY_REWARDS_WELCOME"));
-		ASCompat.setProperty((mDailyRewardGoldPopup : ASAny).checkbox01.label_day, "text", Locale.getString("DAILY_REWARDS_DAY1"));
-		ASCompat.setProperty((mDailyRewardGoldPopup : ASAny).checkbox02.label_day, "text", Locale.getString("DAILY_REWARDS_DAY2"));
-		ASCompat.setProperty((mDailyRewardGoldPopup : ASAny).checkbox03.label_day, "text", Locale.getString("DAILY_REWARDS_DAY3"));
+		Locale.setText(ASCompat.coerce((mDailyRewardGoldPopup : ASAny).title_label, flash.text.TextField), "DAILY_REWARDS_POPUP_TITLE");
+		Locale.setText(ASCompat.coerce((mDailyRewardGoldPopup : ASAny).label_message1, flash.text.TextField), "DAILY_REWARDS_WELCOME");
+		Locale.setText(ASCompat.coerce((mDailyRewardGoldPopup : ASAny).checkbox01.label_day, flash.text.TextField), "DAILY_REWARDS_DAY1");
+		Locale.setText(ASCompat.coerce((mDailyRewardGoldPopup : ASAny).checkbox02.label_day, flash.text.TextField), "DAILY_REWARDS_DAY2");
+		Locale.setText(ASCompat.coerce((mDailyRewardGoldPopup : ASAny).checkbox03.label_day, flash.text.TextField), "DAILY_REWARDS_DAY3");
 		ASCompat.setProperty((mDailyRewardGoldPopup : ASAny).crewBonus_anim.crewBonus.header_crew_bonus_number, "text", "");
-		ASCompat.setProperty((mDailyRewardGoldPopup : ASAny).crewBonus_anim.crewBonus.tooltip.title_label, "text",
-			Locale.getString("TEAM_BONUS_TOOLTIP_TITLE"));
-		ASCompat.setProperty((mDailyRewardGoldPopup : ASAny).crewBonus_anim.crewBonus.tooltip.description_label, "text",
-			Locale.getString("TEAM_BONUS_TOOLTIP_DESCRIPTION"));
+		Locale.setText(ASCompat.coerce((mDailyRewardGoldPopup : ASAny).crewBonus_anim.crewBonus.tooltip.title_label, flash.text.TextField),
+			"TEAM_BONUS_TOOLTIP_TITLE");
+		Locale.setText(ASCompat.coerce((mDailyRewardGoldPopup : ASAny).crewBonus_anim.crewBonus.tooltip.description_label, flash.text.TextField),
+			"TEAM_BONUS_TOOLTIP_DESCRIPTION");
 		ASCompat.setProperty((mDailyRewardGoldPopup : ASAny).inv_empty_slot01.coin, "visible", false);
 		ASCompat.setProperty((mDailyRewardGoldPopup : ASAny).inv_empty_slot02.coin, "visible", false);
 		ASCompat.setProperty((mDailyRewardGoldPopup : ASAny).inv_empty_slot03.coin, "visible", false);
@@ -397,17 +399,19 @@ class UIDailyRewards extends DBUIPopup {
 		ASCompat.setProperty((mDailyRewardGoldPopup : ASAny).label_number02, "visible", false);
 		ASCompat.setProperty((mDailyRewardGoldPopup : ASAny).label_number03, "visible", false);
 		ASCompat.setProperty((mDailyRewardGoldPopup : ASAny).label_number, "visible", false);
-		mDailyRewardGoldPopup.scaleX = mDailyRewardGoldPopup.scaleY = 1.8;
+		mDailyRewardGoldPopup.scaleX = mDailyRewardGoldPopup.scaleY = DBGlobal.UI_16_TO_9_PORT_OBJECT_SCALE;
 		mDailyRewardGoldPopup.x = 250;
-		mDailyRewardMysteryBoxPopup.scaleX = mDailyRewardMysteryBoxPopup.scaleY = 1.8;
+		mDailyRewardMysteryBoxPopup.scaleX = mDailyRewardMysteryBoxPopup.scaleY = DBGlobal.UI_16_TO_9_PORT_OBJECT_SCALE;
 		mDailyRewardMysteryBoxPopup.x = 962;
 		mDailyRewardMysteryBoxPopup.y = mDailyRewardGoldPopup.height + 26;
-		ASCompat.setProperty((mDailyRewardMysteryBoxPopup : ASAny).button_accept.label, "text", Locale.getString("DAILY_REWARDS_ACCEPT"));
-		ASCompat.setProperty((mDailyRewardMysteryBoxPopup : ASAny).button_replay.label, "text", Locale.getString("DAILY_REWARDS_REPLAY"));
-		ASCompat.setProperty((mDailyRewardMysteryBoxPopup : ASAny).label_message2, "text", Locale.getString("DAILY_REWARDS_SELECT"));
-		ASCompat.setProperty((mDailyRewardMysteryBoxPopup : ASAny).label_message3, "text", Locale.getString("DAILY_REWARDS_COMEBACK"));
-		ASCompat.setProperty((mDailyRewardGoldPopup : ASAny).crewBonus_anim.crewBonus.plus, "text", Locale.getString("DAILY_REWARDS_WITH"));
-		ASCompat.setProperty((mDailyRewardGoldPopup : ASAny).label_dailybonus, "text", Locale.getString("DAILY_REWARDS_BONUS"));
+		Locale.setText(ASCompat.coerce((mDailyRewardMysteryBoxPopup : ASAny).button_accept.label, flash.text.TextField), "DAILY_REWARDS_ACCEPT");
+		Locale.setText(ASCompat.coerce((mDailyRewardMysteryBoxPopup : ASAny).button_replay.label, flash.text.TextField), "DAILY_REWARDS_REPLAY");
+		Locale.setText(ASCompat.coerce((mDailyRewardMysteryBoxPopup : ASAny).label_message2, flash.text.TextField), "DAILY_REWARDS_SELECT");
+		Locale.setText(ASCompat.coerce((mDailyRewardMysteryBoxPopup : ASAny).label_message3, flash.text.TextField), "DAILY_REWARDS_COMEBACK", null, 1.55);
+		TextUtil.fitToField(ASCompat.coerce((mDailyRewardMysteryBoxPopup : ASAny).label_message3, flash.text.TextField));
+		TextUtil.fitToField(ASCompat.coerce((mDailyRewardMysteryBoxPopup : ASAny).label_remaining, flash.text.TextField));
+		Locale.setText(ASCompat.coerce((mDailyRewardGoldPopup : ASAny).crewBonus_anim.crewBonus.plus, flash.text.TextField), "DAILY_REWARDS_WITH");
+		Locale.setText(ASCompat.coerce((mDailyRewardGoldPopup : ASAny).label_dailybonus, flash.text.TextField), "DAILY_REWARDS_BONUS");
 		mAcceptButton = new UIButton(mDBFacade, ASCompat.coerce((mDailyRewardMysteryBoxPopup : ASAny).button_accept, flash.display.MovieClip));
 		mReplayButton = new UIButton(mDBFacade, ASCompat.coerce((mDailyRewardMysteryBoxPopup : ASAny).button_replay, flash.display.MovieClip));
 		ASCompat.setProperty((mDailyRewardMysteryBoxPopup : ASAny).button_replay.l_numberabel, "text", "");
@@ -415,6 +419,10 @@ class UIDailyRewards extends DBUIPopup {
 		mExitButton.releaseCallback = function() {
 			exitButtonPushed();
 		};
+		crewTooltip = ASCompat.coerce((mDailyRewardGoldPopup : ASAny).crewBonus_anim.crewBonus.tooltip, flash.display.MovieClip);
+		if (crewTooltip != null && crewTooltip.width < 300) {
+			crewTooltip.scaleX = crewTooltip.scaleY = DBGlobal.UI_16_TO_9_PORT_OBJECT_SCALE;
+		}
 		mCrewButton = new UIButton(mDBFacade, ASCompat.coerce((mDailyRewardGoldPopup : ASAny).crewBonus_anim.crewBonus, flash.display.MovieClip));
 		mReplayButton.isToTheLeftOf(mAcceptButton);
 		mReplayButton.upNavigation = mExitButton;
@@ -446,7 +454,7 @@ class UIDailyRewards extends DBUIPopup {
 		ASCompat.setProperty((mDailyRewardMysteryBoxPopup : ASAny).label_message3, "visible", false);
 		ASCompat.setProperty((mDailyRewardMysteryBoxPopup : ASAny).timer_clock, "visible", false);
 		if (mCountdownTimer != null) {
-			mCountdownTimer.removeEventListener("timer", timerTick);
+			EventListeners.remove(mCountdownTimer, "timer", timerTick);
 			mCountdownTimer.stop();
 			mCountdownTimer = null;
 		}
@@ -473,8 +481,8 @@ class UIDailyRewards extends DBUIPopup {
 		mTimerTargetDate = GameClock.getWebServerDate();
 		ASCompat.ASDate.setTime(mTimerTargetDate, mTimerTargetDate.getTime() + 1000 * secondsToGo);
 		ASCompat.setProperty((mDailyRewardMysteryBoxPopup : ASAny).label_timer, "text", "");
-		mCountdownTimer = new Timer(1000);
-		mCountdownTimer.addEventListener("timer", timerTick);
+		mCountdownTimer = Timers.create(1000, 0, "UIDailyRewards.mCountdownTimer");
+		EventListeners.add(mCountdownTimer, "timer", timerTick);
 		mCountdownTimer.start();
 		mAcceptButton.visible = true;
 		mReplayButton.visible = true;
@@ -497,10 +505,6 @@ class UIDailyRewards extends DBUIPopup {
 		} else {
 			mDBFacade.metrics.log("DailyRewardsHitReplay");
 			resetMysteryBox(true);
-			if (mDBFacade.steamAchievementsManager != null) {
-				mDBFacade.steamAchievementsManager.addToStatInt("REROLL_DAILY_REWARD_STAT", 1);
-				mDBFacade.steamAchievementsManager.setAchievement("REROLL_DAILY_REWARD");
-			}
 		}
 	}
 
@@ -513,7 +517,7 @@ class UIDailyRewards extends DBUIPopup {
 		var _loc3_ = ASCompat.floatToInt(mTimerTargetDate.getSeconds() - _loc6_.getSeconds());
 		var _loc5_ = ASCompat.floatToInt(mTimerTargetDate.getMinutes() - _loc6_.getMinutes());
 		var _loc4_ = ASCompat.floatToInt(mTimerTargetDate.getHours() - _loc6_.getHours());
-		ASCompat.setProperty((mDailyRewardMysteryBoxPopup : ASAny).label_timer, "text",
+		TextUtil.setText(ASCompat.coerce((mDailyRewardMysteryBoxPopup : ASAny).label_timer, flash.text.TextField),
 			Std.string(_loc7_.getHours())
 			+ ":"
 			+ zeroPad(ASCompat.floatToInt(_loc7_.getMinutes()), 2)
@@ -557,11 +561,12 @@ class UIDailyRewards extends DBUIPopup {
 		mBoxButton2.root.filters = null;
 		ASCompat.setProperty((mDailyRewardMysteryBoxPopup : ASAny).label_message3, "visible", false);
 		ASCompat.setProperty((mDailyRewardMysteryBoxPopup : ASAny).timer_clock, "visible", false);
-		ASCompat.setProperty((mDailyRewardMysteryBoxPopup : ASAny).label_message2, "text", Locale.getString("DAILY_REWARDS_SELECT"));
+		Locale.setText(ASCompat.coerce((mDailyRewardMysteryBoxPopup : ASAny).label_message2, flash.text.TextField), "DAILY_REWARDS_SELECT");
 		mRewardIcon0 = null;
 		mRewardIcon1 = null;
 		mRewardIcon2 = null;
 		mDBFacade.menuNavigationController.setFocusedUiObject(mBoxButton0);
+		hilightButton(mBoxButton0);
 	}
 
 	function exitButtonPushed() {
@@ -681,6 +686,24 @@ class UIDailyRewards extends DBUIPopup {
 		mBoxButton2.rollOutCallback = function() {
 			unhilightButton(mBoxButton2);
 		};
+		mBoxButton0.navigationSelectedInteraction = function() {
+			hilightButton(mBoxButton0);
+		};
+		mBoxButton1.navigationSelectedInteraction = function() {
+			hilightButton(mBoxButton1);
+		};
+		mBoxButton2.navigationSelectedInteraction = function() {
+			hilightButton(mBoxButton2);
+		};
+		mBoxButton0.navigationSetToUnselectedInteraction = function() {
+			unhilightButton(mBoxButton0);
+		};
+		mBoxButton1.navigationSetToUnselectedInteraction = function() {
+			unhilightButton(mBoxButton1);
+		};
+		mBoxButton2.navigationSetToUnselectedInteraction = function() {
+			unhilightButton(mBoxButton2);
+		};
 		mBoxButton0.enabled = true;
 		mBoxButton1.enabled = true;
 		mBoxButton2.enabled = true;
@@ -693,6 +716,7 @@ class UIDailyRewards extends DBUIPopup {
 		mBoxButton2.upNavigation = mExitButton;
 		mExitButton.downNavigation = mBoxButton0;
 		mDBFacade.menuNavigationController.setFocusedUiObject(mBoxButton0);
+		hilightButton(mBoxButton0);
 		ASCompat.setProperty((mDailyRewardMysteryBoxPopup : ASAny).inv_empty_slot_storage_box01.storage_box, "visible", false);
 		ASCompat.setProperty((mDailyRewardMysteryBoxPopup : ASAny).inv_empty_slot_storage_box02.storage_box, "visible", false);
 		ASCompat.setProperty((mDailyRewardMysteryBoxPopup : ASAny).inv_empty_slot_storage_box03.storage_box, "visible", false);
@@ -734,18 +758,21 @@ class UIDailyRewards extends DBUIPopup {
 		ASCompat.setProperty((mDailyRewardGoldPopup : ASAny).label_number02, "visible", true);
 		ASCompat.setProperty((mDailyRewardGoldPopup : ASAny).label_number03, "visible", true);
 		ASCompat.setProperty((mDailyRewardGoldPopup : ASAny).label_number, "visible", true);
-		ASCompat.setProperty((mDailyRewardGoldPopup : ASAny).label_number01, "text", baseValue[0]);
-		ASCompat.setProperty((mDailyRewardGoldPopup : ASAny).label_number02, "text", baseValue[1]);
-		ASCompat.setProperty((mDailyRewardGoldPopup : ASAny).label_number03, "text", baseValue[2]);
+		TextUtil.setText(ASCompat.coerce((mDailyRewardGoldPopup : ASAny).label_number01, flash.text.TextField), ASCompat.toString(baseValue[0]));
+		TextUtil.setText(ASCompat.coerce((mDailyRewardGoldPopup : ASAny).label_number02, flash.text.TextField), ASCompat.toString(baseValue[1]));
+		TextUtil.setText(ASCompat.coerce((mDailyRewardGoldPopup : ASAny).label_number03, flash.text.TextField), ASCompat.toString(baseValue[2]));
 		mCostPlay = costPlay;
-		ASCompat.setProperty((mDailyRewardMysteryBoxPopup : ASAny).button_replay.l_numberabel, "text", costPlay);
+		TextUtil.setText(ASCompat.coerce((mDailyRewardMysteryBoxPopup : ASAny).button_replay.l_numberabel, flash.text.TextField), Std.string(costPlay));
 		if (secondsUntilNextReward > 0 && 1 != 0) {
 			mSkipGoldCount = true;
-			ASCompat.setProperty((mDailyRewardGoldPopup : ASAny).label_number, "text", ASCompat.toNumber(baseValue[concurrentDays - 1]) * numHeros);
-			ASCompat.setProperty((mDailyRewardGoldPopup : ASAny).crewBonus_anim.crewBonus.header_crew_bonus_number, "text", Std.string((numHeros - 1)));
+			TextUtil.setText(ASCompat.coerce((mDailyRewardGoldPopup : ASAny).label_number, flash.text.TextField),
+				Std.string(ASCompat.toNumber(baseValue[concurrentDays - 1]) * numHeros));
+			TextUtil.setText(ASCompat.coerce((mDailyRewardGoldPopup : ASAny).crewBonus_anim.crewBonus.header_crew_bonus_number, flash.text.TextField),
+				Std.string((numHeros - 1)), 0.73);
 		} else {
-			ASCompat.setProperty((mDailyRewardGoldPopup : ASAny).label_number, "text", 0);
-			ASCompat.setProperty((mDailyRewardGoldPopup : ASAny).crewBonus_anim.crewBonus.header_crew_bonus_number, "text", 0);
+			TextUtil.setText(ASCompat.coerce((mDailyRewardGoldPopup : ASAny).label_number, flash.text.TextField), "0");
+			TextUtil.setText(ASCompat.coerce((mDailyRewardGoldPopup : ASAny).crewBonus_anim.crewBonus.header_crew_bonus_number, flash.text.TextField), "0",
+				0.73);
 		}
 		ASCompat.setProperty((mDailyRewardGoldPopup : ASAny).crewBonus_anim, "visible", true);
 		mCrewBonusController.play();
@@ -802,10 +829,12 @@ class UIDailyRewards extends DBUIPopup {
 
 	function requestDailyRewards(boxPicked:Int) {
 		var requestFunc:ASFunction;
+		var paidReplay:Bool;
 		mBoxButton0.enabled = false;
 		mBoxButton1.enabled = false;
 		mBoxButton2.enabled = false;
 		requestFunc = JSONRPCService.getFunction("RequestRedeemDailyRewards", mDBFacade.rpcRoot + "store");
+		paidReplay = mPaytoReplay;
 		requestFunc(mDBFacade.dbAccountInfo.id, mDBFacade.validationToken, boxPicked, mPaytoReplay, mDBFacade.demographics, function(param1:Array<ASAny>) {
 			var _loc2_:Array<ASAny> = null;
 			Logger.info("UIDailyRewards: success - Redeemed Daily Reward: " + param1 + " Picked:" + boxPicked);
@@ -814,6 +843,10 @@ class UIDailyRewards extends DBUIPopup {
 				displayRewards(boxPicked, _loc2_, ASCompat.toInt(param1[2]), false);
 			} else {
 				displayRewards(boxPicked, ASCompat.coerce(param1[0], Array), ASCompat.toInt(param1[2]), ASCompat.toBool(param1[3]));
+				if (paidReplay && mDBFacade != null) {
+					mDBFacade.steamAchievementsHelper.addValueToStatInt(1, "DAILY_REWARDS_REROLLED");
+					mDBFacade.steamAchievementsHelper.unlockAchievement("REROLL_DAILY_REWARD");
+				}
 				mDBFacade.dbAccountInfo.parseResponse(param1[1]);
 			}
 		}, function(param1:Error) {
@@ -833,8 +866,8 @@ class UIDailyRewards extends DBUIPopup {
 		mNoRoomInStorageForReward = gotRefund;
 		mDisplayOffers = new Vector<GMOffer>();
 		if (ASCompat.toNumber(rewards[0]) == 0) {
-			ASCompat.setProperty((mDailyRewardMysteryBoxPopup : ASAny).label_message2, "text", Locale.getString("DAILY_REWARDS_ALREADY"));
-			ASCompat.setProperty((mDailyRewardGoldPopup : ASAny).label_message1, "text", Locale.getString("DAILY_REWARDS_ALREADY_GOLD"));
+			Locale.setText(ASCompat.coerce((mDailyRewardMysteryBoxPopup : ASAny).label_message2, flash.text.TextField), "DAILY_REWARDS_ALREADY");
+			Locale.setText(ASCompat.coerce((mDailyRewardGoldPopup : ASAny).label_message1, flash.text.TextField), "DAILY_REWARDS_ALREADY_GOLD");
 			startTimer(timeToNext);
 			return;
 		}
@@ -922,10 +955,8 @@ class UIDailyRewards extends DBUIPopup {
 			}
 			mRewardArray = [mRewardIcon0, mRewardIcon1, mRewardIcon2];
 		}
-		ASCompat.setProperty((mDailyRewardMysteryBoxPopup : ASAny).label_message2, "text", Locale.getString("DAILY_REWARDS_YOU_GOT"));
-		if (mDBFacade.steamAchievementsManager != null) {
-			mDBFacade.steamAchievementsManager.setAchievement("COLLECT_DAILY_REWARD");
-		}
+		Locale.setText(ASCompat.coerce((mDailyRewardMysteryBoxPopup : ASAny).label_message2, flash.text.TextField), "DAILY_REWARDS_YOU_GOT");
+		mDBFacade.steamAchievementsHelper.unlockAchievement("COLLECT_DAILY_REWARD");
 	}
 
 	public function desaturate(obj:DisplayObject) {
@@ -961,7 +992,6 @@ class UIDailyRewards extends DBUIPopup {
 	}
 
 	function finalRewardReveal(rewardIndex:Int, timeToNext:Int) {
-		var _loc4_:TextFormat = null;
 		var _loc3_ = 0;
 		_loc3_ = 0;
 		while (_loc3_ < 3) {
@@ -977,13 +1007,10 @@ class UIDailyRewards extends DBUIPopup {
 		mSlotMovie.visible = false;
 		startBoxFade();
 		if (mNoRoomInStorageForReward) {
-			ASCompat.setProperty((mDailyRewardMysteryBoxPopup : ASAny).label_message2, "text",
+			TextUtil.setText(ASCompat.coerce((mDailyRewardMysteryBoxPopup : ASAny).label_message2, flash.text.TextField),
 				Locale.getString("DAILY_REWARDS_YOU_GOT_REFUND") + mRewardName.toUpperCase() + Locale.getString("DAILY_REWARDS_STORAGE_FULL"));
-			_loc4_ = new TextFormat();
-			_loc4_.size = 14;
-			(mDailyRewardMysteryBoxPopup : ASAny).label_message2.setTextFormat(_loc4_);
 		} else {
-			ASCompat.setProperty((mDailyRewardMysteryBoxPopup : ASAny).label_message2, "text",
+			TextUtil.setText(ASCompat.coerce((mDailyRewardMysteryBoxPopup : ASAny).label_message2, flash.text.TextField),
 				Locale.getString("DAILY_REWARDS_YOU_GOT") + mRewardName.toUpperCase());
 		}
 		mTimeToNext = timeToNext;

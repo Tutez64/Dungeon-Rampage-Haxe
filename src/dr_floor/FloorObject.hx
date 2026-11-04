@@ -5,6 +5,7 @@ import box2D.dynamics.B2FilterData;
 import brain.gameObject.GameObject;
 import brain.logger.Logger;
 import brain.utils.MemoryTracker;
+import dBGlobals.DBGlobal;
 import distributedObjects.DistributedDungeonFloor;
 import dungeon.NavCollider;
 import dungeon.Tile;
@@ -71,7 +72,7 @@ class FloorObject extends GameObject {
 
 	function updateTile() {
 		if (mDistributedDungeonFloor != null) {
-			this.tile = mDistributedDungeonFloor.tileGrid.getTileAtPosition(this.position);
+			this.tile = mDistributedDungeonFloor.tileGrid.getTileAtPosition(mPosition);
 		}
 	}
 
@@ -113,9 +114,9 @@ class FloorObject extends GameObject {
 
 	public function removeNavColliders() {
 		var _loc1_:NavCollider;
-		final __ax4_iter_214 = mNavCollisions;
-		if (checkNullIteratee(__ax4_iter_214))
-			for (_tmp_ in __ax4_iter_214) {
+		final __ax4_iter_525 = mNavCollisions;
+		if (checkNullIteratee(__ax4_iter_525))
+			for (_tmp_ in __ax4_iter_525) {
 				_loc1_ = _tmp_;
 				_loc1_.destroy();
 			}
@@ -126,9 +127,9 @@ class FloorObject extends GameObject {
 
 	public function set_navCollidersActive(value:Bool):Bool {
 		var _loc2_:NavCollider;
-		final __ax4_iter_215 = mNavCollisions;
-		if (checkNullIteratee(__ax4_iter_215))
-			for (_tmp_ in __ax4_iter_215) {
+		final __ax4_iter_526 = mNavCollisions;
+		if (checkNullIteratee(__ax4_iter_526))
+			for (_tmp_ in __ax4_iter_526) {
 				_loc2_ = _tmp_;
 				_loc2_.active = value;
 			}
@@ -162,6 +163,30 @@ class FloorObject extends GameObject {
 			return mPosition.clone();
 		}
 		return null;
+	}
+
+	@:isVar public var hasPosition(get, never):Bool;
+
+	public function get_hasPosition():Bool {
+		return mPosition != null;
+	}
+
+	@:isVar public var positionX(get, never):Float;
+
+	public function get_positionX():Float {
+		return mPosition.x;
+	}
+
+	@:isVar public var positionY(get, never):Float;
+
+	public function get_positionY():Float {
+		return mPosition.y;
+	}
+
+	@:isVar public var positionZ(get, never):Float;
+
+	public function get_positionZ():Float {
+		return mPosition.z;
 	}
 
 	function set_position(pos:Vector3D):Vector3D {
@@ -204,7 +229,7 @@ class FloorObject extends GameObject {
 	}
 
 	function processJsonNavCollisions(navCollisions:Array<ASAny>, addFunc:ASFunction) {
-		var _loc7_:ASAny = null;
+		var _loc7_:ASObject = null;
 		var _loc3_:Vector3D = null;
 		var _loc9_:Vector3D = null;
 		var _loc8_:Vector3D = null;
@@ -226,9 +251,9 @@ class FloorObject extends GameObject {
 				_loc6_.appendTranslation(ASCompat.toNumberField(_loc7_, "x"), ASCompat.toNumberField(_loc7_, "y"), 0);
 				_loc6_.append(_loc10_);
 				_loc4_ = _loc6_.decompose();
-				_loc3_ = ASCompat.coerce(_loc4_[0], flash.geom.Vector3D);
-				_loc9_ = ASCompat.coerce(_loc4_[1], flash.geom.Vector3D);
-				_loc8_ = ASCompat.coerce(_loc4_[2], flash.geom.Vector3D);
+				_loc3_ = _loc4_[0];
+				_loc9_ = _loc4_[1];
+				_loc8_ = _loc4_[2];
 				_loc5_ = NavCollider.buildNavColliderFromJson(mDBFacade, _loc7_, this, _loc3_, _loc9_.z, _loc8_, this.mDistributedDungeonFloor.box2DWorld,
 					mFilter);
 				if (_loc5_ != null) {
@@ -240,7 +265,7 @@ class FloorObject extends GameObject {
 
 	function buildFilter():B2FilterData {
 		var _loc1_ = new B2FilterData();
-		_loc1_.categoryBits = (1 : UInt);
+		_loc1_.categoryBits = (DBGlobal.B2D_ENVIRONMENT_MASK : Int);
 		return _loc1_;
 	}
 
@@ -251,9 +276,9 @@ class FloorObject extends GameObject {
 		mTile = null;
 		mDistributedDungeonFloor = null;
 		var _loc1_:NavCollider;
-		final __ax4_iter_216 = mNavCollisions;
-		if (checkNullIteratee(__ax4_iter_216))
-			for (_tmp_ in __ax4_iter_216) {
+		final __ax4_iter_527 = mNavCollisions;
+		if (checkNullIteratee(__ax4_iter_527))
+			for (_tmp_ in __ax4_iter_527) {
 				_loc1_ = _tmp_;
 				_loc1_.destroy();
 			}

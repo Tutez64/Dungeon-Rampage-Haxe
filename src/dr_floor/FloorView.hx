@@ -14,9 +14,9 @@ class FloorView extends View {
 
 	var mDBFacade:DBFacade;
 
-	public function new(facade:DBFacade, floorObject:FloorObject) {
+	public function new(facade:DBFacade, floorObject:FloorObject, category:String = "brain") {
 		mDBFacade = facade;
-		super(facade);
+		super(facade, category);
 		mParentFloorObject = floorObject;
 	}
 
@@ -31,9 +31,9 @@ class FloorView extends View {
 	override public function set_position(pos:Vector3D):Vector3D {
 		super.position = pos;
 		var _loc2_:NavCollider;
-		final __ax4_iter_213 = mParentFloorObject.navCollisions;
-		if (checkNullIteratee(__ax4_iter_213))
-			for (_tmp_ in __ax4_iter_213) {
+		final __ax4_iter_524 = mParentFloorObject.navCollisions;
+		if (checkNullIteratee(__ax4_iter_524))
+			for (_tmp_ in __ax4_iter_524) {
 				_loc2_ = _tmp_;
 				_loc2_.position = pos;
 			}

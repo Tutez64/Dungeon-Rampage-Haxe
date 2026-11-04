@@ -5,31 +5,31 @@ import box2D.common.math.B2Transform;
 import box2D.common.B2Settings;
 
 class B2TimeOfImpact {
-	static var b2_toiCalls:Int = 0;
+	public static var b2_toiCalls:Int = 0;
 
-	static var b2_toiIters:Int = 0;
+	public static var b2_toiIters:Int = 0;
 
-	static var b2_toiMaxIters:Int = 0;
+	public static var b2_toiMaxIters:Int = 0;
 
-	static var b2_toiRootIters:Int = 0;
+	public static var b2_toiRootIters:Int = 0;
 
-	static var b2_toiMaxRootIters:Int = 0;
+	public static var b2_toiMaxRootIters:Int = 0;
 
-	static var s_cache:B2SimplexCache = new B2SimplexCache();
+	public static var s_cache:B2SimplexCache = new B2SimplexCache();
 
-	static var s_distanceInput:B2DistanceInput = new B2DistanceInput();
+	public static var s_distanceInput:B2DistanceInput = new B2DistanceInput();
 
-	static var s_xfA:B2Transform = new B2Transform();
+	public static var s_xfA:B2Transform = new B2Transform();
 
-	static var s_xfB:B2Transform = new B2Transform();
+	public static var s_xfB:B2Transform = new B2Transform();
 
-	static var s_fcn:B2SeparationFunction = new B2SeparationFunction();
+	public static var s_fcn:B2SeparationFunction = new B2SeparationFunction();
 
-	static var s_distanceOutput:B2DistanceOutput = new B2DistanceOutput();
+	public static var s_distanceOutput:B2DistanceOutput = new B2DistanceOutput();
 
 	public function new() {}
 
-	public static function TimeOfImpact(input:B2TOIInput):Float {
+	public static function timeOfImpact(input:B2TOIInput):Float {
 		var _loc12_ = Math.NaN;
 		var _loc13_ = Math.NaN;
 		var _loc14_ = Math.NaN;
@@ -39,7 +39,7 @@ class B2TimeOfImpact {
 		var _loc18_ = 0;
 		var _loc19_ = Math.NaN;
 		var _loc20_ = Math.NaN;
-		++b2_toiCalls;
+		++B2TimeOfImpact.b2_toiCalls;
 		var _loc2_ = input.proxyA;
 		var _loc3_ = input.proxyB;
 		var _loc4_ = input.sweepA;
@@ -52,31 +52,31 @@ class B2TimeOfImpact {
 		var _loc9_ = 1000;
 		var _loc10_ = 0;
 		var _loc11_:Float = 0;
-		s_cache.count = (0 : UInt);
-		s_distanceInput.useRadii = false;
+		B2TimeOfImpact.s_cache.count = 0;
+		B2TimeOfImpact.s_distanceInput.useRadii = false;
 		do {
-			_loc4_.GetTransform(s_xfA, _loc8_);
-			_loc5_.GetTransform(s_xfB, _loc8_);
-			s_distanceInput.proxyA = _loc2_;
-			s_distanceInput.proxyB = _loc3_;
-			s_distanceInput.transformA = s_xfA;
-			s_distanceInput.transformB = s_xfB;
-			B2Distance.Distance(s_distanceOutput, s_cache, s_distanceInput);
-			if (s_distanceOutput.distance <= 0) {
+			_loc4_.getTransform(B2TimeOfImpact.s_xfA, _loc8_);
+			_loc5_.getTransform(B2TimeOfImpact.s_xfB, _loc8_);
+			B2TimeOfImpact.s_distanceInput.proxyA = _loc2_;
+			B2TimeOfImpact.s_distanceInput.proxyB = _loc3_;
+			B2TimeOfImpact.s_distanceInput.transformA = B2TimeOfImpact.s_xfA;
+			B2TimeOfImpact.s_distanceInput.transformB = B2TimeOfImpact.s_xfB;
+			B2Distance.distance(B2TimeOfImpact.s_distanceOutput, B2TimeOfImpact.s_cache, B2TimeOfImpact.s_distanceInput);
+			if (B2TimeOfImpact.s_distanceOutput.distance <= 0) {
 				_loc8_ = 1;
 				break;
 			}
-			s_fcn.Initialize(s_cache, _loc2_, s_xfA, _loc3_, s_xfB);
-			_loc12_ = s_fcn.Evaluate(s_xfA, s_xfB);
+			B2TimeOfImpact.s_fcn.initialize(B2TimeOfImpact.s_cache, _loc2_, B2TimeOfImpact.s_xfA, _loc3_, B2TimeOfImpact.s_xfB);
+			_loc12_ = B2TimeOfImpact.s_fcn.evaluate(B2TimeOfImpact.s_xfA, B2TimeOfImpact.s_xfB);
 			if (_loc12_ <= 0) {
 				_loc8_ = 1;
 				break;
 			}
 			if (_loc10_ == 0) {
 				if (_loc12_ > _loc6_) {
-					_loc11_ = B2Math.Max(_loc6_ - _loc7_, 0.75 * _loc6_);
+					_loc11_ = B2Math.max(_loc6_ - _loc7_, 0.75 * _loc6_);
 				} else {
-					_loc11_ = B2Math.Max(_loc12_ - _loc7_, 0.02 * _loc6_);
+					_loc11_ = B2Math.max(_loc12_ - _loc7_, 0.02 * _loc6_);
 				}
 			}
 			if (_loc12_ - _loc11_ < 0.5 * _loc7_) {
@@ -89,9 +89,9 @@ class B2TimeOfImpact {
 			_loc14_ = _loc8_;
 			_loc15_ = 1;
 			_loc16_ = _loc12_;
-			_loc4_.GetTransform(s_xfA, _loc15_);
-			_loc5_.GetTransform(s_xfB, _loc15_);
-			_loc17_ = s_fcn.Evaluate(s_xfA, s_xfB);
+			_loc4_.getTransform(B2TimeOfImpact.s_xfA, _loc15_);
+			_loc5_.getTransform(B2TimeOfImpact.s_xfB, _loc15_);
+			_loc17_ = B2TimeOfImpact.s_fcn.evaluate(B2TimeOfImpact.s_xfA, B2TimeOfImpact.s_xfB);
 			if (_loc17_ >= _loc11_) {
 				_loc8_ = 1;
 				break;
@@ -103,10 +103,10 @@ class B2TimeOfImpact {
 				} else {
 					_loc19_ = 0.5 * (_loc14_ + _loc15_);
 				}
-				_loc4_.GetTransform(s_xfA, _loc19_);
-				_loc5_.GetTransform(s_xfB, _loc19_);
-				_loc20_ = s_fcn.Evaluate(s_xfA, s_xfB);
-				if (B2Math.Abs(_loc20_ - _loc11_) < 0.025 * _loc7_) {
+				_loc4_.getTransform(B2TimeOfImpact.s_xfA, _loc19_);
+				_loc5_.getTransform(B2TimeOfImpact.s_xfB, _loc19_);
+				_loc20_ = B2TimeOfImpact.s_fcn.evaluate(B2TimeOfImpact.s_xfA, B2TimeOfImpact.s_xfB);
+				if (B2Math.abs(_loc20_ - _loc11_) < 0.025 * _loc7_) {
 					_loc13_ = _loc19_;
 					break;
 				}
@@ -118,17 +118,21 @@ class B2TimeOfImpact {
 					_loc17_ = _loc20_;
 				}
 				_loc18_++;
-				++b2_toiRootIters;
+				++B2TimeOfImpact.b2_toiRootIters;
 			} while (_loc18_ != 50);
-			b2_toiMaxRootIters = ASCompat.floatToInt(B2Math.Max(b2_toiMaxRootIters, _loc18_));
+			B2TimeOfImpact.b2_toiMaxRootIters = ASCompat.floatToInt(B2Math.max(B2TimeOfImpact.b2_toiMaxRootIters, _loc18_));
 			if (_loc13_ < (1 + 100 * ASCompat.MIN_FLOAT) * _loc8_) {
 				break;
 			}
 			_loc8_ = _loc13_;
 			_loc10_++;
-			++b2_toiIters;
+			++B2TimeOfImpact.b2_toiIters;
 		} while (_loc10_ != _loc9_);
-		b2_toiMaxIters = ASCompat.floatToInt(B2Math.Max(b2_toiMaxIters, _loc10_));
+		B2TimeOfImpact.b2_toiMaxIters = ASCompat.floatToInt(B2Math.max(B2TimeOfImpact.b2_toiMaxIters, _loc10_));
 		return _loc8_;
+	}
+
+	public static function TimeOfImpact(input:B2TOIInput):Float {
+		return B2TimeOfImpact.timeOfImpact(input);
 	}
 }

@@ -186,8 +186,6 @@ class SteamIdConverter {
 	public static function subtractDecimalStrings(str1:String, str2:String):String {
 		var _loc9_ = 0;
 		var _loc4_ = 0;
-		_loc9_ = 0;
-		_loc4_ = 0;
 		var _loc3_ = "";
 		var _loc5_ = str1.length;
 		var _loc6_ = str2.length;

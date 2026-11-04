@@ -3,11 +3,13 @@ package uI.popup;
 import account.StackableInfo;
 import brain.assetRepository.SwfAsset;
 import brain.uI.UIObject;
+import brain.utils.TextUtil;
+import collections.IMapIterator;
+import dBGlobals.DBGlobal;
 import facade.DBFacade;
 import facade.GameMasterLocale;
 import gameMasterDictionary.GMStackable;
 import flash.display.MovieClip;
-import org.as3commons.collections.framework.IMapIterator;
 
 class UIVictoryBoosterPopup extends DBUIPopup {
 	static inline final SWF_PATH = "Resources/Art2D/UI/db_UI_score_report.swf";
@@ -23,21 +25,7 @@ class UIVictoryBoosterPopup extends DBUIPopup {
 	var mGoldObject:UIObject;
 
 	public function new(dbFacade:DBFacade, titleText:String = "", content:ASAny = null, allowClose:Bool = true, closeCallback:ASFunction = null) {
-		var _loc6_:StackableInfo = null;
-		var _loc7_:GMStackable = null;
-		var _loc8_ = ASCompat.reinterpretAs(dbFacade.dbAccountInfo.inventoryInfo.stackables.iterator(), IMapIterator);
-		while (_loc8_.hasNext()) {
-			_loc6_ = ASCompat.coerce(_loc8_.next(), account.StackableInfo);
-			if (_loc6_.isEquipped) {
-				_loc7_ = _loc6_.gmStackable;
-				if (_loc7_.ExpMult > 0) {
-					expStack = _loc7_;
-				} else if (_loc7_.GoldMult > 0) {
-					goldStack = _loc7_;
-				}
-			}
-		}
-		super(dbFacade, titleText, content, allowClose, false, closeCallback);
+		super(dbFacade, "VICTORY_BOOSTER_POPUP", titleText, content, allowClose, false, closeCallback);
 		if (mCurtainActive) {
 			removeCurtain();
 		}
@@ -52,8 +40,9 @@ class UIVictoryBoosterPopup extends DBUIPopup {
 	}
 
 	override function setupUI(swfAsset:SwfAsset, titleText:String, content:ASAny, allowClose:Bool, closeCallback:ASFunction) {
+		findEquippedBoosters();
 		super.setupUI(swfAsset, titleText, content, allowClose, closeCallback);
-		mPopup.visible = false;
+		mPopup.visible = true;
 		ASCompat.setProperty((mPopup : ASAny).potion_slot_A, "visible", false);
 		ASCompat.setProperty((mPopup : ASAny).potion_slot_B, "visible", false);
 		ASCompat.setProperty((mPopup : ASAny).star, "visible", false);
@@ -67,6 +56,23 @@ class UIVictoryBoosterPopup extends DBUIPopup {
 		});
 	}
 
+	function findEquippedBoosters() {
+		var _loc1_:StackableInfo = null;
+		var _loc2_:GMStackable = null;
+		var _loc3_ = ASCompat.reinterpretAs(mDBFacade.dbAccountInfo.inventoryInfo.stackables.iterator(), IMapIterator);
+		while (_loc3_.hasNext()) {
+			_loc1_ = ASCompat.coerce(_loc3_.next(), account.StackableInfo);
+			if (_loc1_.isEquipped) {
+				_loc2_ = _loc1_.gmStackable;
+				if (_loc2_.ExpMult > 0) {
+					expStack = _loc2_;
+				} else if (_loc2_.GoldMult > 0) {
+					goldStack = _loc2_;
+				}
+			}
+		}
+	}
+
 	function setupStackIcons(swfAsset:SwfAsset) {
 		var _loc3_:Dynamic = null;
 		var _loc2_:MovieClip = null;
@@ -74,12 +80,12 @@ class UIVictoryBoosterPopup extends DBUIPopup {
 			mExpObject = new UIObject(mDBFacade, ASCompat.coerce((mPopup : ASAny).potion_slot_A, flash.display.MovieClip), 105);
 			_loc3_ = swfAsset.getClass(expStack.IconName);
 			_loc2_ = ASCompat.coerce(ASCompat.createInstance(_loc3_, []), flash.display.MovieClip);
-			_loc2_.scaleX = _loc2_.scaleY = 72 / 100;
+			_loc2_.scaleX = _loc2_.scaleY = 72 / DBGlobal.WEAPON_ICON_NATIVE_SIZE;
 			_loc2_.y -= 8;
 			mExpObject.root.addChild(_loc2_);
-			ASCompat.setProperty((mExpObject.tooltip : ASAny).title_label, "text",
+			TextUtil.setText(ASCompat.coerce((mExpObject.tooltip : ASAny).title_label, flash.text.TextField),
 				GameMasterLocale.getGameMasterSubString("STACKABLE_NAME", expStack.Constant).toUpperCase());
-			ASCompat.setProperty((mExpObject.tooltip : ASAny).description_label, "text",
+			TextUtil.setText(ASCompat.coerce((mExpObject.tooltip : ASAny).description_label, flash.text.TextField),
 				GameMasterLocale.getGameMasterSubString("STACKABLE_DESCRIPTION", expStack.Constant));
 			mPopup.visible = true;
 			ASCompat.setProperty((mPopup : ASAny).potion_slot_A, "visible", true);
@@ -90,12 +96,12 @@ class UIVictoryBoosterPopup extends DBUIPopup {
 			mGoldObject = new UIObject(mDBFacade, ASCompat.coerce((mPopup : ASAny).potion_slot_B, flash.display.MovieClip));
 			_loc3_ = swfAsset.getClass(goldStack.IconName);
 			_loc2_ = ASCompat.coerce(ASCompat.createInstance(_loc3_, []), flash.display.MovieClip);
-			_loc2_.scaleX = _loc2_.scaleY = 72 / 100;
+			_loc2_.scaleX = _loc2_.scaleY = 72 / DBGlobal.WEAPON_ICON_NATIVE_SIZE;
 			_loc2_.y -= 8;
 			mGoldObject.root.addChild(_loc2_);
-			ASCompat.setProperty((mGoldObject.tooltip : ASAny).title_label, "text",
+			TextUtil.setText(ASCompat.coerce((mGoldObject.tooltip : ASAny).title_label, flash.text.TextField),
 				GameMasterLocale.getGameMasterSubString("STACKABLE_NAME", goldStack.Constant).toUpperCase());
-			ASCompat.setProperty((mGoldObject.tooltip : ASAny).description_label, "text",
+			TextUtil.setText(ASCompat.coerce((mGoldObject.tooltip : ASAny).description_label, flash.text.TextField),
 				GameMasterLocale.getGameMasterSubString("STACKABLE_DESCRIPTION", goldStack.Constant));
 			mPopup.visible = true;
 			ASCompat.setProperty((mPopup : ASAny).potion_slot_B, "visible", true);
@@ -105,11 +111,11 @@ class UIVictoryBoosterPopup extends DBUIPopup {
 	}
 
 	public function setExp(value:Int) {
-		ASCompat.setProperty((mPopup : ASAny).text_value_slot_A, "text", "+" + Std.string(value));
+		TextUtil.setText(ASCompat.coerce((mPopup : ASAny).text_value_slot_A, flash.text.TextField), "+" + Std.string(value));
 	}
 
 	public function setGold(value:Int) {
-		ASCompat.setProperty((mPopup : ASAny).text_value_slot_B, "text", "+" + Std.string(value));
+		TextUtil.setText(ASCompat.coerce((mPopup : ASAny).text_value_slot_B, flash.text.TextField), "+" + Std.string(value));
 	}
 
 	override public function destroy() {

@@ -2,16 +2,16 @@ package uI.friendManager.states;
 
 import account.FriendInfo;
 import account.StoreServicesController;
-import brain.logger.Logger;
 import brain.uI.UIButton;
+import brain.uI.UIObject;
 import brain.utils.MemoryTracker;
 import brain.jsonRPC.JSONRPCService;
+import dBGlobals.DBGlobal;
 import facade.DBFacade;
 import facade.Locale;
 import town.TownStateMachine;
 import uI.friendManager.FriendPopulater;
 import uI.friendManager.UIFriendManager;
-import uI.popup.DBUIOneButtonPopup;
 import uI.popup.DBUITwoButtonPopup;
 
 class UIFriends extends UIFMState {
@@ -34,12 +34,6 @@ class UIFriends extends UIFMState {
 	var mRemoveFriendsPopUp:DBUITwoButtonPopup;
 
 	var mSelectedDRFriends:Array<ASAny> = [];
-
-	var mSelectedFBFriends:Array<ASAny> = [];
-
-	var mSelectedKGFriends:Array<ASAny> = [];
-
-	var mFBRemoveFriendPopup:DBUIOneButtonPopup;
 
 	public function new(uiFriendManager:UIFriendManager, dbFacade:DBFacade, townStateMachine:TownStateMachine) {
 		super(dbFacade, uiFriendManager, townStateMachine);
@@ -75,26 +69,26 @@ class UIFriends extends UIFMState {
 
 	function refresh(list:Array<ASAny>) {
 		var _loc3_ = false;
-		var _loc4_ = 0;
+		var _loc4_ = (0 : UInt);
 		var _loc2_:UInt;
 		if (checkNullIteratee(list))
 			for (_tmp_ in list) {
 				_loc2_ = (ASCompat.toInt(_tmp_) : UInt);
 				_loc3_ = false;
-				_loc4_ = 0;
-				while (_loc4_ < mTownStateMachine.leaderboard.onlineFriends.length) {
-					if (mTownStateMachine.leaderboard.onlineFriends[_loc4_].id == _loc2_) {
-						mTownStateMachine.leaderboard.onlineFriends.splice(_loc4_, (1 : UInt));
+				_loc4_ = (0 : UInt);
+				while (_loc4_ < (mTownStateMachine.leaderboard.onlineFriends.length:UInt)) {
+					if (mTownStateMachine.leaderboard.onlineFriends[(_loc4_ : Int)].id == _loc2_) {
+						mTownStateMachine.leaderboard.onlineFriends.splice((_loc4_ : Int), (1 : UInt));
 						_loc3_ = true;
 						break;
 					}
 					_loc4_++;
 				}
 				if (!_loc3_) {
-					_loc4_ = 0;
-					while (_loc4_ < mTownStateMachine.leaderboard.offlineFriends.length) {
-						if (mTownStateMachine.leaderboard.offlineFriends[_loc4_].id == _loc2_) {
-							mTownStateMachine.leaderboard.offlineFriends.splice(_loc4_, (1 : UInt));
+					_loc4_ = (0 : UInt);
+					while (_loc4_ < (mTownStateMachine.leaderboard.offlineFriends.length:UInt)) {
+						if (mTownStateMachine.leaderboard.offlineFriends[(_loc4_ : Int)].id == _loc2_) {
+							mTownStateMachine.leaderboard.offlineFriends.splice((_loc4_ : Int), (1 : UInt));
 							_loc3_ = true;
 							break;
 						}
@@ -125,12 +119,24 @@ class UIFriends extends UIFMState {
 		mFriendPopulater = new FriendPopulater(mDBFacade, mTownStateMachine, mListOfFriends, mUIFriendManager);
 		mRemoveButton = createButton("friend_management_button_grey", Locale.getString("REMOVE"), 800, 1000, removeFriendsConfirmation);
 		mGiftButton = createButton("friend_management_button", Locale.getString("GIFT"), 1075, 1000, giftButtonCallback);
+		setupMenuNavigation();
+	}
+
+	function setupMenuNavigation() {
+		mRemoveButton.rolloverFilter = DBGlobal.UI_ROLLOVER_FILTER;
+		mGiftButton.rolloverFilter = DBGlobal.UI_ROLLOVER_FILTER;
+		mRemoveButton.isToTheLeftOf(mGiftButton);
+		mFriendPopulater.setupMenuNavigation(mUIFriendManager.currentTabButton, mRemoveButton, mGiftButton);
+	}
+
+	override public function getFirstNavigationUIObject():UIObject {
+		return mFriendPopulater.getFirstNavigationUIObject();
 	}
 
 	function removeFriendsConfirmation() {
-		mRemoveFriendsPopUp = new DBUITwoButtonPopup(mDBFacade, Locale.getString("REMOVE_FRIEND_POPUP_TITLE"), Locale.getString("REMOVE_FRIEND_POPUP_DESC"),
-			Locale.getString("REMOVE_FRIEND_POPUP_CANCEL"), closeRemoveFriendsPopUp, Locale.getString("REMOVE_FRIEND_POPUP_CONFIRM"), removeButtonCallback,
-			true, null);
+		mRemoveFriendsPopUp = new DBUITwoButtonPopup(mDBFacade, "REMOVE_FRIEND_POPUP", Locale.getString("REMOVE_FRIEND_POPUP_TITLE"),
+			Locale.getString("REMOVE_FRIEND_POPUP_DESC"), Locale.getString("REMOVE_FRIEND_POPUP_CANCEL"), closeRemoveFriendsPopUp,
+			Locale.getString("REMOVE_FRIEND_POPUP_CONFIRM"), removeButtonCallback);
 		MemoryTracker.track(mRemoveFriendsPopUp, "DBUITwoButtonPopup - created in UIFriends.removeFriendsConfirmation()");
 	}
 
@@ -145,114 +151,50 @@ class UIFriends extends UIFMState {
 		var rpcFunc:ASFunction;
 		var idx:UInt;
 		mSelectedDRFriends.splice(0, (mSelectedDRFriends.length : UInt));
-		mSelectedFBFriends.splice(0, (mSelectedFBFriends.length : UInt));
-		mSelectedKGFriends.splice(0, (mSelectedKGFriends.length : UInt));
-		final __ax4_iter_198 = mFriendPopulater.getSelectedToggles();
-		if (checkNullIteratee(__ax4_iter_198))
-			for (_tmp_ in __ax4_iter_198) {
+		final __ax4_iter_290 = mFriendPopulater.getSelectedToggles();
+		if (checkNullIteratee(__ax4_iter_290))
+			for (_tmp_ in __ax4_iter_290) {
 				idx = (ASCompat.toInt(_tmp_) : UInt);
-				if (mListOfFriends[(idx : Int)].isDRFriend) {
-					mSelectedDRFriends.push(mListOfFriends[(idx : Int)].id);
-				} else if (mListOfFriends[(idx : Int)].facebookId != null && mListOfFriends[(idx : Int)].facebookId != "") {
-					mSelectedFBFriends.push(mListOfFriends[(idx : Int)].id);
-				} else if (mListOfFriends[(idx : Int)].kongregateId != null && mListOfFriends[(idx : Int)].kongregateId != "") {
-					mSelectedKGFriends.push(mListOfFriends[(idx : Int)].id);
-				}
+				mSelectedDRFriends.push(mListOfFriends[(idx : Int)].id);
 			}
 		if (mSelectedDRFriends.length > 0) {
 			rpcFunc = JSONRPCService.getFunction("DRFriendRemove", mDBFacade.rpcRoot + "friendrequests");
 			rpcFunc(mDBFacade.accountId, mSelectedDRFriends, mDBFacade.validationToken, function(param1:ASAny) {
-				var _loc2_ = 0;
+				var _loc2_ = (0 : UInt);
 				refresh(mSelectedDRFriends);
 				mDBFacade.dbAccountInfo.removeFriendCallback(param1);
 				mTownStateMachine.leaderboard.refreshLeaderboard();
-				_loc2_ = 0;
-				while (_loc2_ < mSelectedDRFriends.length) {
-					mDBFacade.metrics.log("DRFriendRemove", {"friendId": Std.string(mSelectedDRFriends[_loc2_])});
+				_loc2_ = (0 : UInt);
+				while (_loc2_ < (mSelectedDRFriends.length:UInt)) {
+					mDBFacade.metrics.log("DRFriendRemove", {"friendId": Std.string(mSelectedDRFriends[(_loc2_ : Int)])});
 					_loc2_++;
 				}
 			});
 		}
-		if (mSelectedFBFriends.length > 0) {
-			mFBRemoveFriendPopup = new DBUIOneButtonPopup(mDBFacade, Locale.getString("LEADERBOARD_FB_REMOVE_FRIEND_POPUP_TITLE"),
-				Locale.getString("LEADERBOARD_FB_REMOVE_FRIEND_POPUP_DESC"), Locale.getString("OK"), null);
-			MemoryTracker.track(mFBRemoveFriendPopup, "DBUIOneButtonPopup - created in UIFriends.removeButtonCallback()");
-		} else if (mSelectedKGFriends.length > 0) {
-			mFBRemoveFriendPopup = new DBUIOneButtonPopup(mDBFacade, Locale.getString("LEADERBOARD_KG_REMOVE_FRIEND_POPUP_TITLE"),
-				Locale.getString("LEADERBOARD_KG_REMOVE_FRIEND_POPUP_DESC"), Locale.getString("OK"), null);
-			MemoryTracker.track(mFBRemoveFriendPopup, "DBUIOneButtonPopup - created in UIFriends.removeButtonCallback()");
-		}
 	}
 
 	function giftButtonCallback() {
-		var newFriendsFound:Bool;
-		var idx:UInt;
-		if (mDBFacade.dbConfigManager.getConfigBoolean("FUFB", false)) {
-			mGiftButton.releaseCallback = function() {
-				mDBFacade.errorPopup("GIFTING CURRENTLY DISABLED", "Sorry for the inconvenience, we are looking into resolving the issue.");
-			};
-			return;
-		}
-		newFriendsFound = false;
-		final __ax4_iter_199 = mFriendPopulater.getSelectedToggles();
-		if (checkNullIteratee(__ax4_iter_199))
-			for (_tmp_ in __ax4_iter_199) {
-				idx = (ASCompat.toInt(_tmp_) : UInt);
-				if (mDBFacade.dbAccountInfo.giftExcludeIds.indexOf(mListOfFriends[(idx : Int)].excludeId) < 0) {
-					newFriendsFound = true;
+		var _loc1_ = false;
+		var _loc2_:UInt;
+		final __ax4_iter_291 = mFriendPopulater.getSelectedToggles();
+		if (checkNullIteratee(__ax4_iter_291))
+			for (_tmp_ in __ax4_iter_291) {
+				_loc2_ = (ASCompat.toInt(_tmp_) : UInt);
+				if (mDBFacade.dbAccountInfo.giftExcludeIds.indexOf(mListOfFriends[(_loc2_ : Int)].excludeId) < 0) {
+					_loc1_ = true;
 				}
 			}
-		if (newFriendsFound) {
-			StoreServicesController.showGiftPage(mDBFacade, sendGifts);
-		}
-	}
-
-	function sendGifts(offerName:String, offerId:UInt) {
-		if (mDBFacade.isFacebookPlayer) {
-			fbGiftFlow(offerName, offerId);
-		} else if (mDBFacade.isDRPlayer) {
-			if (ASCompat.stringAsBool(mDBFacade.facebookController.accessToken)) {
-				fbGiftFlow(offerName, offerId);
-			} else {
-				drGiftFlow(offerName, offerId);
-			}
-		} else if (mDBFacade.isKongregatePlayer) {
-			kongGiftFlow(offerName, offerId);
-		} else {
-			Logger.warn("What kind of player are you??? ");
-		}
-	}
-
-	function fbGiftFlow(offerName:String, offerId:UInt) {
-		var _loc3_:Array<ASAny> = [];
-		var _loc4_:Array<ASAny> = [];
-		var _loc5_:UInt;
-		final __ax4_iter_200 = mFriendPopulater.getSelectedToggles();
-		if (checkNullIteratee(__ax4_iter_200))
-			for (_tmp_ in __ax4_iter_200) {
-				_loc5_ = (ASCompat.toInt(_tmp_) : UInt);
-				if (mDBFacade.dbAccountInfo.giftExcludeIds.indexOf(mListOfFriends[(_loc5_ : Int)].excludeId) < 0) {
-					if (mListOfFriends[(_loc5_ : Int)].isDRFriend) {
-						_loc4_.push(_loc5_);
-					} else {
-						_loc3_.push(_loc5_);
-					}
-				}
-			}
-		if (_loc3_.length > 0) {
-			sendFacebookGift(offerName, offerId, _loc3_);
-		}
-		if (_loc4_.length > 0) {
-			sendDRComGift(offerName, offerId, _loc4_);
+		if (_loc1_) {
+			StoreServicesController.showGiftPage(mDBFacade, drGiftFlow);
 		}
 	}
 
 	function drGiftFlow(offerName:String, offerId:UInt) {
 		var _loc3_:Array<ASAny> = [];
 		var _loc4_:UInt;
-		final __ax4_iter_201 = mFriendPopulater.getSelectedToggles();
-		if (checkNullIteratee(__ax4_iter_201))
-			for (_tmp_ in __ax4_iter_201) {
+		final __ax4_iter_292 = mFriendPopulater.getSelectedToggles();
+		if (checkNullIteratee(__ax4_iter_292))
+			for (_tmp_ in __ax4_iter_292) {
 				_loc4_ = (ASCompat.toInt(_tmp_) : UInt);
 				if (mDBFacade.dbAccountInfo.giftExcludeIds.indexOf(mListOfFriends[(_loc4_ : Int)].excludeId) < 0) {
 					_loc3_.push(_loc4_);
@@ -261,43 +203,6 @@ class UIFriends extends UIFMState {
 		if (_loc3_.length > 0) {
 			sendDRComGift(offerName, offerId, _loc3_);
 		}
-	}
-
-	function kongGiftFlow(offerName:String, offerId:UInt) {
-		var _loc4_:Array<ASAny> = [];
-		var _loc3_:Array<ASAny> = [];
-		var _loc5_:UInt;
-		final __ax4_iter_202 = mFriendPopulater.getSelectedToggles();
-		if (checkNullIteratee(__ax4_iter_202))
-			for (_tmp_ in __ax4_iter_202) {
-				_loc5_ = (ASCompat.toInt(_tmp_) : UInt);
-				if (mDBFacade.dbAccountInfo.giftExcludeIds.indexOf(mListOfFriends[(_loc5_ : Int)].excludeId) < 0) {
-					if (mListOfFriends[(_loc5_ : Int)].isDRFriend) {
-						_loc3_.push(_loc5_);
-					} else {
-						_loc4_.push(_loc5_);
-					}
-				}
-			}
-		if (_loc4_.length > 0) {
-			sendKongregateGift(offerName, offerId, _loc4_);
-		}
-		if (_loc3_.length > 0) {
-			sendDRComGift(offerName, offerId, _loc3_);
-		}
-	}
-
-	function sendFacebookGift(offerName:String, offerId:UInt, fbFriends:Array<ASAny>) {
-		var _loc4_:Array<ASAny> = [];
-		var _loc5_:UInt;
-		if (checkNullIteratee(fbFriends))
-			for (_tmp_ in fbFriends) {
-				_loc5_ = (ASCompat.toInt(_tmp_) : UInt);
-				_loc4_.push(mListOfFriends[(_loc5_ : Int)].facebookId);
-			}
-		mDBFacade.facebookController.sendGiftRequests(offerName, offerId, _loc4_.toString());
-		mDBFacade.dbAccountInfo.giftExcludeIds = mDBFacade.dbAccountInfo.giftExcludeIds.concat(_loc4_);
-		mFriendPopulater.refreshGiftedOnCurrentPage();
 	}
 
 	function sendDRComGift(offerName:String, offerId:UInt, drFriends:Array<ASAny>) {
@@ -315,27 +220,6 @@ class UIFriends extends UIFMState {
 				_loc7_.push(_loc5_);
 				_loc8_.push(_loc4_);
 				mDBFacade.metrics.log("DRGiftRequest", {"friendId": _loc4_});
-			}
-		mDBFacade.dbAccountInfo.giftExcludeIds = mDBFacade.dbAccountInfo.giftExcludeIds.concat(_loc8_);
-		mDBFacade.dbAccountInfo.sendGiftData(offerId, _loc7_, _loc8_);
-		mFriendPopulater.refreshGiftedOnCurrentPage();
-	}
-
-	function sendKongregateGift(offerName:String, offerId:UInt, kongFriends:Array<ASAny>) {
-		var _loc4_:String = null;
-		var _loc5_:String = null;
-		var _loc8_:Array<ASAny> = [];
-		var _loc7_:Array<ASAny> = [];
-		var _loc6_ = Std.string(Date.now().getTime());
-		var _loc9_:UInt;
-		if (checkNullIteratee(kongFriends))
-			for (_tmp_ in kongFriends) {
-				_loc9_ = (ASCompat.toInt(_tmp_) : UInt);
-				_loc4_ = mListOfFriends[(_loc9_ : Int)].kongregateId.toString();
-				_loc5_ = "0_" + _loc6_ + "_" + _loc4_;
-				_loc7_.push(_loc5_);
-				_loc8_.push(_loc4_);
-				mDBFacade.metrics.log("KGGiftRequest", {"friendId": _loc4_});
 			}
 		mDBFacade.dbAccountInfo.giftExcludeIds = mDBFacade.dbAccountInfo.giftExcludeIds.concat(_loc8_);
 		mDBFacade.dbAccountInfo.sendGiftData(offerId, _loc7_, _loc8_);

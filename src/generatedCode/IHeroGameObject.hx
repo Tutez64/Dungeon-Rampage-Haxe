@@ -56,6 +56,8 @@ interface IHeroGameObject {
 
 	@:isVar var setAFK(never, set):UInt;
 
+	@:isVar var ascensionLevel(never, set):UInt;
+
 	function PartyBomb(bomberId:UInt):Void;
 
 	function setStateAndAttackChoreography(targetState:String, attackChoreography:AttackChoreography):Void;

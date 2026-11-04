@@ -3,6 +3,7 @@ package combat.attack;
 import actor.ActorGameObject;
 import actor.ActorView;
 import brain.assetRepository.AssetLoadingComponent;
+import dBGlobals.DBGlobal;
 import facade.DBFacade;
 import gameMasterDictionary.GMAttack;
 import sound.DBSoundComponent;
@@ -30,7 +31,7 @@ class SoundAttackTimelineAction extends AttackTimelineAction {
 		super.execute(timeline);
 		gmAttack = ASCompat.coerce(mDBFacade.gameMaster.attackById.itemFor(mAttackType), gameMasterDictionary.GMAttack);
 		if (gmAttack != null && ASCompat.stringAsBool(gmAttack.AttackSound)) {
-			mAssetLoadingComponent.getSoundAsset(DBFacade.buildFullDownloadPath("Resources/Audio/soundEffects.swf"), gmAttack.AttackSound,
+			mAssetLoadingComponent.getSoundAsset(DBFacade.buildFullDownloadPath(DBGlobal.SFX_PATH), gmAttack.AttackSound,
 				function(param1:brain.sound.SoundAsset) {
 					mSoundComponent.playSfxOneShot(param1, mActorView.worldCenter, 0, gmAttack.AttackVolume);
 				});

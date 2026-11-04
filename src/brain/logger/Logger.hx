@@ -2,6 +2,7 @@ package brain.logger;
 
 import brain.clock.GameClock;
 import com.junkbyte.console.Cc;
+import com.junkbyte.console.Console;
 import com.junkbyte.console.KeyBind;
 import flash.display.Stage;
 import flash.system.Capabilities;
@@ -23,7 +24,7 @@ class Logger {
 
 	public static var customLoggerString:String;
 
-	static var mListSlashCommands:Array<ASAny> = [];
+	static var mListSlashCommands:Array<ASAny>;
 
 	public function new() {}
 
@@ -200,7 +201,7 @@ class Logger {
 		}
 		if (mWantThrowErrors && Capabilities.isDebugger) {
 			displayConsole();
-			Cc.minimumPriority = (8 : UInt);
+			Cc.minimumPriority = Console.WARN;
 			_loc5_.name = "LOGGED " + Std.string(_loc5_.name);
 			throw _loc5_;
 		}
@@ -222,7 +223,7 @@ class Logger {
 		trace(_loc3_);
 		if (mWantConsole) {
 			displayConsole();
-			Cc.minimumPriority = (8 : UInt);
+			Cc.minimumPriority = Console.WARN;
 			Cc.height = 250;
 			Cc.warn(_loc3_);
 			Cc.fatal(logString);
@@ -235,8 +236,6 @@ class Logger {
 		}
 	}
 
-	public static function reloadPage() {}
-
 	public static function custom(myLoggerString:String, logString:String) {
 		if (customLoggerString != myLoggerString) {
 			return;
@@ -246,5 +245,9 @@ class Logger {
 		if (mWantConsole) {
 			Cc.warn(logString);
 		}
+	}
+
+	static function __init__() {
+		mListSlashCommands = [];
 	}
 }

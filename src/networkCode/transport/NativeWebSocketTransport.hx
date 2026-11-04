@@ -156,11 +156,11 @@ class NativeWebSocketTransport extends EventDispatcher implements IGameTransport
 	function onNativeData(event:Event) {
 		var _loc3_:ByteArray = null;
 		var _loc2_:ASObject = null;
-		var _loc4_ = 0;
+		var _loc4_ = (0 : UInt);
 		var _loc5_:String = null;
 		try {
 			_loc2_ = event;
-			_loc4_ = ASCompat.toInt(_loc2_.format);
+			_loc4_ = (ASCompat.toInt(_loc2_.format) : UInt);
 			if (_loc4_ == 1) {
 				_loc5_ = readStringData(_loc2_);
 				if (_loc5_ == null) {

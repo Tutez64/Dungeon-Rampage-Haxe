@@ -38,7 +38,7 @@ class TavernTownSubState extends TownSubState {
 		super.resetHeaderLinks();
 		super.setupHeaderLinks();
 		mDBFacade.menuNavigationController.pushNewLayer("TAVERN_MENU", mTownStateMachine.townHeader.determineCallback,
-			mTavernUI.getDefaultMenuNavigationObject());
+			mTavernUI.getDefaultMenuNavigationObject(), null, mTavernUI.selectPreviousHero, mTavernUI.selectNextHero);
 		mTavernUI.refresh();
 		mTownStateMachine.townHeader.showCloseButton(true);
 		mTavernUI.animateEntry();

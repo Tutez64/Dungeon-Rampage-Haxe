@@ -14,6 +14,7 @@ import brain.sceneGraph.SceneGraphManager;
 import brain.uI.UIButton;
 import brain.uI.UIObject;
 import brain.utils.MemoryTracker;
+import brain.utils.TextUtil;
 import dBGlobals.DBGlobal;
 import distributedObjects.DistributedDungeonSummary;
 import facade.DBFacade;
@@ -29,7 +30,6 @@ import flash.display.DisplayObject;
 import flash.display.MovieClip;
 import flash.geom.Point;
 import flash.text.TextField;
-import flash.text.TextFormat;
 
 class ItemInfoCard extends UIObject {
 	static inline final ITEM_CARD_LEVEL_REQUIREMENT = "ITEM_CARD_LEVEL_REQUIREMENT";
@@ -74,9 +74,9 @@ class ItemInfoCard extends UIObject {
 
 	var mSellPriceLabel:TextField;
 
-	var mSellButton:UIButton;
+	@:allow(uI.inventory) var mSellButton:UIButton;
 
-	var mEquipButton:UIButton;
+	@:allow(uI.inventory) var mEquipButton:UIButton;
 
 	var mCloseButton:UIButton;
 
@@ -127,7 +127,7 @@ class ItemInfoCard extends UIObject {
 		mAssetLoadingComponent = new AssetLoadingComponent(mDBFacade);
 		mEventComponent = new EventComponent(mDBFacade);
 		ASCompat.setProperty((mRoot : ASAny).pet_stats, "visible", false);
-		ASCompat.setProperty((mRoot : ASAny).ability.label_charge, "text", Locale.getString("HOLD"));
+		Locale.setText(ASCompat.coerce((mRoot : ASAny).ability.label_charge, flash.text.TextField), "HOLD");
 		mHoldIcon = new UIObject(mDBFacade, ASCompat.coerce((mRoot : ASAny).ability.icon, flash.display.MovieClip));
 		mHoldManaIcon = ASCompat.coerce((mRoot : ASAny).ability.mana_icon_hold, flash.display.MovieClip);
 		mHoldManaIcon.visible = false;
@@ -137,7 +137,7 @@ class ItemInfoCard extends UIObject {
 		mHoldIcon.tooltip = mHoldTooltip;
 		mHoldIcon.tooltipPos = new Point(0, mHoldIcon.root.height * 0.5);
 		mHoldTooltip.visible = false;
-		ASCompat.setProperty((mRoot : ASAny).ability.label_tap, "text", Locale.getString("TAP"));
+		Locale.setText(ASCompat.coerce((mRoot : ASAny).ability.label_tap, flash.text.TextField), "TAP");
 		mTapIcon = new UIObject(mDBFacade, ASCompat.coerce((mRoot : ASAny).ability.tap_icon, flash.display.MovieClip));
 		mTapTooltip = new UITapHoldTooltip(mDBFacade, chargeTooltipClass);
 		mTapIcon.tooltip = mTapTooltip;
@@ -154,19 +154,19 @@ class ItemInfoCard extends UIObject {
 		mTitleY = mLabel.y;
 		mPowerIcon = ASCompat.coerce((mRoot : ASAny).power, flash.display.MovieClip);
 		mPowerLabel = ASCompat.coerce((mRoot : ASAny).power.label, flash.text.TextField);
-		ASCompat.setProperty((mRoot : ASAny).power.attack_label, "text", Locale.getString("POWER"));
+		Locale.setText(ASCompat.coerce((mRoot : ASAny).power.attack_label, flash.text.TextField), "POWER");
 		mLevelRequirement = ASCompat.coerce((mRoot : ASAny).level_requirement, flash.text.TextField);
 		mLevelRequirementNotMet = ASCompat.coerce((mRoot : ASAny).level_requirement_not_met, flash.text.TextField);
 		mModifierTitle = ASCompat.coerce((mRoot : ASAny).ability.label_modifier, flash.text.TextField);
 		mModifiersList = new Vector<UIModifier>();
 		mSellButton = new UIButton(mDBFacade, ASCompat.coerce((mRoot : ASAny).sell, flash.display.MovieClip));
 		mSellButton.rolloverFilter = DBGlobal.UI_ROLLOVER_FILTER;
-		mSellButton.label.text = Locale.getString("ITEM_CARD_SELL");
+		Locale.setText(mSellButton.label, "ITEM_CARD_SELL");
 		mSellPriceLabel = ASCompat.dynamicAs((mRoot : ASAny).sell.sell_text, TextField);
 		mSellPriceLabel.text = "";
 		mSellButton.enabled = false;
 		mSellItemCallback = sellItemCallback;
-		mSellButton.pressCallback = function() {
+		mSellButton.releaseCallback = function() {
 			mSellItemCallback(mInfo);
 		};
 		ASCompat.setProperty((mRoot : ASAny).pet_stats, "visible", false);
@@ -196,7 +196,7 @@ class ItemInfoCard extends UIObject {
 
 	override public function destroy() {
 		var _loc1_:UIModifier;
-		var __ax4_iter_13:Vector<UIModifier>;
+		var __ax4_iter_348:Vector<UIModifier>;
 		mTapTooltip.destroy();
 		mTapIcon.destroy();
 		mHoldTooltip.destroy();
@@ -207,9 +207,9 @@ class ItemInfoCard extends UIObject {
 		mHoldIcon = null;
 		mWeaponDescTooltip.destroy();
 		if (mModifiersList.length > 0) {
-			__ax4_iter_13 = mModifiersList;
-			if (checkNullIteratee(__ax4_iter_13))
-				for (_tmp_ in __ax4_iter_13) {
+			__ax4_iter_348 = mModifiersList;
+			if (checkNullIteratee(__ax4_iter_348))
+				for (_tmp_ in __ax4_iter_348) {
 					_loc1_ = _tmp_;
 					_loc1_.destroy();
 				}
@@ -269,18 +269,18 @@ class ItemInfoCard extends UIObject {
 		var _loc2_ = (mInfo.sellCoins : UInt);
 		mSellButton.enabled = true;
 		mSellButton.visible = true;
-		mSellPriceLabel.text = Std.string(_loc2_);
+		TextUtil.setText(mSellPriceLabel, Std.string(_loc2_));
 		mSellPriceLabel.visible = true;
 		ASCompat.setProperty((mRoot : ASAny).pet_stats, "visible", false);
 		if (type == "weapon") {
-			mLabel.text = GameMasterLocale.getGameMasterSubString("WEAPON_AESTHETIC_NAME", mInfo.weaponAestheticConstant).toUpperCase();
-			mDescription.text = GameMasterLocale.getGameMasterSubString("WEAPON_AESTHETIC_NAME", mInfo.weaponAestheticConstant);
+			TextUtil.setText(mLabel, GameMasterLocale.getGameMasterSubString("WEAPON_AESTHETIC_NAME", mInfo.weaponAestheticConstant).toUpperCase());
+			TextUtil.setText(mDescription, GameMasterLocale.getGameMasterSubString("WEAPON_AESTHETIC_NAME", mInfo.weaponAestheticConstant));
 		} else if (type == "stackable") {
-			mLabel.text = GameMasterLocale.getGameMasterSubString("STACKABLE_NAME", mInfo.gmInventoryBase.Constant).toUpperCase();
-			mDescription.text = GameMasterLocale.getGameMasterSubString("STACKABLE_DESCRIPTION", mInfo.gmInventoryBase.Constant);
+			TextUtil.setText(mLabel, GameMasterLocale.getGameMasterSubString("STACKABLE_NAME", mInfo.gmInventoryBase.Constant).toUpperCase());
+			TextUtil.setText(mDescription, GameMasterLocale.getGameMasterSubString("STACKABLE_DESCRIPTION", mInfo.gmInventoryBase.Constant));
 		} else {
-			mLabel.text = mInfo.Name.toUpperCase();
-			mDescription.text = mInfo.Description;
+			TextUtil.setText(mLabel, mInfo.Name.toUpperCase());
+			TextUtil.setText(mDescription, mInfo.Description);
 		}
 		mModifierTitle.visible = false;
 		clearModifiers();
@@ -318,7 +318,7 @@ class ItemInfoCard extends UIObject {
 		if (mEquipButton.visible) {
 			mEquipLimitTF.visible = true;
 			mEquipLimitTF.y = 115;
-			mEquipLimitTF.text = Locale.getString("EQUIP_LIMIT") + Std.string(_loc2_.gmStackable.EquipLimit);
+			TextUtil.setText(mEquipLimitTF, Locale.getString("EQUIP_LIMIT") + Std.string(_loc2_.gmStackable.EquipLimit));
 		} else {
 			mEquipLimitTF.visible = false;
 		}
@@ -341,9 +341,9 @@ class ItemInfoCard extends UIObject {
 		if (petInfo == null) {
 			return;
 		}
-		ASCompat.setProperty((mRoot : ASAny).pet_stats.pet_stats_power.label, "text", Locale.getString("TAVERN_ATTACK_LABEL"));
-		ASCompat.setProperty((mRoot : ASAny).pet_stats.pet_stats_speed.label, "text", Locale.getString("TAVERN_SPEED_LABEL"));
-		ASCompat.setProperty((mRoot : ASAny).pet_stats.pet_stats_defense.label, "text", Locale.getString("TAVERN_DEFENSE_LABEL"));
+		Locale.setText(ASCompat.coerce((mRoot : ASAny).pet_stats.pet_stats_power.label, flash.text.TextField), "TAVERN_ATTACK_LABEL");
+		Locale.setText(ASCompat.coerce((mRoot : ASAny).pet_stats.pet_stats_speed.label, flash.text.TextField), "TAVERN_SPEED_LABEL");
+		Locale.setText(ASCompat.coerce((mRoot : ASAny).pet_stats.pet_stats_defense.label, flash.text.TextField), "TAVERN_DEFENSE_LABEL");
 		ASCompat.setProperty((mRoot : ASAny).pet_stats.petname_label, "visible", false);
 		ASCompat.setProperty((mRoot : ASAny).pet_stats, "visible", true);
 		ASCompat.setProperty((mRoot : ASAny).pet_stats.pet_stats_power.star1, "visible", true);
@@ -409,22 +409,24 @@ class ItemInfoCard extends UIObject {
 		mSellButton.visible = true;
 		mSellButton.enabled = true;
 		sellBackPrice = (petInfo.gmNpc.SellCoins : UInt);
-		mSellPriceLabel.text = Std.string(sellBackPrice);
-		mLabel.text = GameMasterLocale.getGameMasterSubString("PET_NAME", petInfo.gmNpc.Constant).toUpperCase();
-		mDescription.text = GameMasterLocale.getGameMasterSubString("PET_DESCRIPTION", petInfo.gmNpc.Constant);
+		TextUtil.setText(mSellPriceLabel, Std.string(sellBackPrice));
+		TextUtil.setText(mLabel, GameMasterLocale.getGameMasterSubString("PET_NAME", petInfo.gmNpc.Constant).toUpperCase());
+		TextUtil.setText(mDescription, GameMasterLocale.getGameMasterSubString("PET_DESCRIPTION", petInfo.gmNpc.Constant));
 		loadIcon();
 		if (petInfo.EquippedHero == 0) {
 			mEquipButton.visible = true;
 			mEquipButton.enabled = true;
-			mEquipButton.label.text = Locale.getString("ITEM_CARD_EQUIP");
+			Locale.setText(mEquipButton.label, "ITEM_CARD_EQUIP");
 			mEquipButton.releaseCallback = function() {
+				moveFocusOffInfoCardBeforeEquip();
 				mPetEquipPicker.handleItemDrop(null, petInfo, (1 : UInt));
 			};
 		} else {
 			mEquipButton.visible = true;
 			mEquipButton.enabled = true;
-			mEquipButton.label.text = Locale.getString("ITEM_CARD_UNEQUIP");
+			Locale.setText(mEquipButton.label, "ITEM_CARD_UNEQUIP");
 			mEquipButton.releaseCallback = function() {
+				moveFocusOffInfoCardBeforeEquip();
 				mPetEquipPicker.unequipPet(petInfo);
 			};
 		}
@@ -458,8 +460,6 @@ class ItemInfoCard extends UIObject {
 		var preNameModifiers:String;
 		var modifierList:Vector<GMModifier>;
 		var i:Int;
-		var format:TextFormat;
-		var sizeMult:Float;
 		this.setupInventoryBaseUI("weapon");
 		ASCompat.setProperty((mRoot : ASAny).ability, "visible", true);
 		mDescription.visible = false;
@@ -530,16 +530,16 @@ class ItemInfoCard extends UIObject {
 		loadItemType(gmWeaponItem);
 		mPowerIcon.visible = true;
 		mPowerLabel.visible = true;
-		mPowerLabel.text = Std.string(power);
-		mLevelRequirement.text = Locale.getString("ITEM_CARD_LEVEL_REQUIREMENT") + itemInfo.requiredLevel;
-		mLevelRequirementNotMet.text = Locale.getString("ITEM_CARD_LEVEL_REQUIREMENT") + itemInfo.requiredLevel;
+		TextUtil.setText(mPowerLabel, Std.string(power));
+		TextUtil.setText(mLevelRequirement, Locale.getString("ITEM_CARD_LEVEL_REQUIREMENT") + itemInfo.requiredLevel);
+		TextUtil.setText(mLevelRequirementNotMet, Locale.getString("ITEM_CARD_LEVEL_REQUIREMENT") + itemInfo.requiredLevel);
 		if (mHeroEquipPicker == null || mHeroEquipPicker.currentlySelectedHero == null) {
 			currentlySelectedAvatarInfo = mDBFacade.dbAccountInfo.activeAvatarInfo;
 		} else {
 			currentlySelectedAvatarInfo = mDBFacade.dbAccountInfo.inventoryInfo.getAvatarInfoForHeroType(mHeroEquipPicker.currentlySelectedHero.Id);
 		}
 		canEquip = (1 : UInt);
-		if (currentlySelectedAvatarInfo != null && currentlySelectedAvatarInfo.level >= itemInfo.requiredLevel) {
+		if (currentlySelectedAvatarInfo != null && currentlySelectedAvatarInfo.levelForWeaponComparison >= itemInfo.requiredLevel) {
 			mLevelRequirement.visible = true;
 			mLevelRequirementNotMet.visible = false;
 		} else {
@@ -560,21 +560,21 @@ class ItemInfoCard extends UIObject {
 		switch (canEquip - 1) {
 			case 0:
 				ASCompat.setProperty((mRoot : ASAny).unequippable, "visible", false);
-				this.mDescription.text = mInfo.Description;
+				TextUtil.setText(this.mDescription, mInfo.Description);
 				this.greyOffer(false);
 
 			case 1:
 				ASCompat.setProperty((mRoot : ASAny).unequippable, "visible", true);
-				this.mDescription.text = Locale.getString("ITEM_CARD_UNUSABLE_LEVEL");
+				Locale.setText(this.mDescription, "ITEM_CARD_UNUSABLE_LEVEL");
 				this.greyOffer(true);
 
 			case 2:
 				ASCompat.setProperty((mRoot : ASAny).unequippable, "visible", true);
-				this.mDescription.text = Locale.getString("ITEM_CARD_UNUSABLE_MASTERCLASS");
+				Locale.setText(this.mDescription, "ITEM_CARD_UNUSABLE_MASTERCLASS");
 				this.greyOffer(true);
 		}
 		mModifierTitle.visible = true;
-		mModifierTitle.text = Locale.getString("MODIFIERS");
+		Locale.setText(mModifierTitle, "MODIFIERS");
 		preNameModifiers = "";
 		modifierList = itemInfo.modifiers;
 		i = 0;
@@ -593,33 +593,22 @@ class ItemInfoCard extends UIObject {
 				(0 : UInt), true, itemInfo.legendaryModifier));
 			weaponName = GameMasterLocale.getGameMasterSubString("WEAPON_AESTHETIC_NAME", gmWeaponItem.getWeaponAesthetic((0 : UInt), true).Constant);
 		}
-		format = new TextFormat();
-		sizeMult = 0.1;
-		if (weaponName.length <= 34) {
-			format.size = 13;
-			sizeMult = weaponName.length < 17 ? 0.2 : 0.1;
-			mLabel.y = mTitleY + mLabel.height * sizeMult;
-		} else {
-			format.size = 12;
-			mLabel.y = mTitleY;
-		}
 		if (weaponName.indexOf("VINTAGE") >= 0) {
 			mSellButton.visible = false;
 			mEquipButton.root.x = mOriginalPosForEquipButton.x - 60;
 			mEquipButton.root.y = mOriginalPosForEquipButton.y - 10;
 		}
-		mLabel.defaultTextFormat = format;
-		mLabel.text = weaponName;
-		mLabel.text = mLabel.text.toUpperCase();
+		TextUtil.setText(mLabel, weaponName.toUpperCase());
+		mLabel.y = mLabel.numLines == 1 ? mTitleY + mLabel.height * 0.2 : mTitleY;
 	}
 
 	function clearModifiers() {
 		var _loc1_:UIModifier;
-		var __ax4_iter_14:Vector<UIModifier>;
+		var __ax4_iter_349:Vector<UIModifier>;
 		if (mModifiersList.length > 0) {
-			__ax4_iter_14 = mModifiersList;
-			if (checkNullIteratee(__ax4_iter_14))
-				for (_tmp_ in __ax4_iter_14) {
+			__ax4_iter_349 = mModifiersList;
+			if (checkNullIteratee(__ax4_iter_349))
+				for (_tmp_ in __ax4_iter_349) {
 					_loc1_ = _tmp_;
 					_loc1_.destroy();
 				}
@@ -664,22 +653,23 @@ class ItemInfoCard extends UIObject {
 		if (itemInfo.avatarId == 0) {
 			mEquipButton.visible = true;
 			mEquipButton.releaseCallback = loadEquipOnAvatarPopup;
-			mEquipButton.label.text = Locale.getString("ITEM_CARD_EQUIP");
+			Locale.setText(mEquipButton.label, "ITEM_CARD_EQUIP");
 		} else if (mDBFacade.dbAccountInfo.inventoryInfo.isThereEmptySpaceInWeaponStorage()) {
 			mEquipButton.visible = true;
 			mEquipButton.enabled = true;
 			mEquipButton.releaseCallback = function() {
+				moveFocusOffInfoCardBeforeEquip();
 				if (Std.isOfType(mInfo, ItemInfo)) {
 					mDBFacade.dbAccountInfo.inventoryInfo.unequipItemOffAvatar(ASCompat.reinterpretAs(mInfo, ItemInfo), mRefreshInventoryCallback);
 				} else {
 					if (!Std.isOfType(mInfo, PetInfo)) {
-						Logger.error("Item id: " + mInfo.databaseId + " being unequipped is not an ItemInfo.");
+						Logger.error("Item being unequipped is not an ItemInfo.");
 						return;
 					}
 					mDBFacade.dbAccountInfo.inventoryInfo.unequipPet(ASCompat.reinterpretAs(mInfo, PetInfo), mRefreshInventoryCallback);
 				}
 			};
-			mEquipButton.label.text = Locale.getString("ITEM_CARD_UNEQUIP");
+			Locale.setText(mEquipButton.label, "ITEM_CARD_UNEQUIP");
 		}
 	}
 
@@ -695,30 +685,31 @@ class ItemInfoCard extends UIObject {
 	function setupStackableItemInfoUI(itemInfo:StackableInfo) {
 		mEquipButton.enabled = false;
 		mEquipButton.visible = false;
-		if (itemInfo.gmId == 60001 || itemInfo.gmId == 60018) {
+		if (itemInfo.gmId == DBGlobal.RESSURECTION_POTION_STACK_ID || itemInfo.gmId == DBGlobal.PARTYBOMB_POTION_STACK_ID) {
 			return;
 		}
 		if (itemInfo.gmStackable.AccountBooster) {
 			mEquipButton.visible = true;
 			mEquipButton.releaseCallback = tryActivateAccountBooster;
-			mEquipButton.label.text = Locale.getString("ITEM_CARD_USE");
+			Locale.setText(mEquipButton.label, "ITEM_CARD_USE");
 		} else if (ASCompat.toNumberField(itemInfo, "isEquipped") == 0) {
 			mEquipButton.visible = true;
 			mEquipButton.releaseCallback = function() {
 				loadEquipOnAvatarPopup(true);
 			};
-			mEquipButton.label.text = Locale.getString("ITEM_CARD_EQUIP");
+			Locale.setText(mEquipButton.label, "ITEM_CARD_EQUIP");
 		} else {
 			mEquipButton.visible = true;
 			mEquipButton.enabled = true;
 			mEquipButton.releaseCallback = function() {
+				moveFocusOffInfoCardBeforeEquip();
 				if (Std.isOfType(mInfo, StackableInfo)) {
 					unEquipConsumable(ASCompat.reinterpretAs(mInfo, StackableInfo), mRefreshInventoryCallback);
 					return;
 				}
-				Logger.error("Item id: " + mInfo.databaseId + " being unequipped is not an ItemInfo.");
+				Logger.error("Item being unequipped is not a StackableInfo.");
 			};
-			mEquipButton.label.text = Locale.getString("ITEM_CARD_UNEQUIP");
+			Locale.setText(mEquipButton.label, "ITEM_CARD_UNEQUIP");
 		}
 	}
 
@@ -762,8 +753,9 @@ class ItemInfoCard extends UIObject {
 			if (_loc2_ != null) {
 				mWeaponTypeLabel.visible = true;
 				mWeaponTypeUnequippableLabel.visible = true;
-				mWeaponTypeLabel.text = GameMasterLocale.getGameMasterSubString("WEAPON_ITEM_NAME", gmWeaponItem.Constant).toUpperCase();
-				mWeaponTypeUnequippableLabel.text = GameMasterLocale.getGameMasterSubString("WEAPON_ITEM_NAME", gmWeaponItem.Constant).toUpperCase();
+				TextUtil.setText(mWeaponTypeLabel, GameMasterLocale.getGameMasterSubString("WEAPON_ITEM_NAME", gmWeaponItem.Constant).toUpperCase());
+				TextUtil.setText(mWeaponTypeUnequippableLabel,
+					GameMasterLocale.getGameMasterSubString("WEAPON_ITEM_NAME", gmWeaponItem.Constant).toUpperCase());
 			} else {
 				mWeaponTypeLabel.visible = false;
 				mWeaponTypeUnequippableLabel.visible = false;
@@ -791,6 +783,7 @@ class ItemInfoCard extends UIObject {
 			Logger.error("Current item info on ItemInfoCard is not an ItemInfo.  info databaseId: " + mInfo.databaseId);
 			return;
 		}
+		moveFocusOffInfoCardBeforeEquip();
 		mEquipPopup = new EquipItemToSlotPopup(mDBFacade, (_loc4_.id : Int), closeEquipCallback,
 			ASCompat.coerce(isConsumable ? _loc3_ : _loc2_, account.InventoryBaseInfo), null, isConsumable);
 		MemoryTracker.track(mEquipPopup, "EquipItemToSlotPopup - created in ItemInfoCard.loadEquipOnAvatarPopup()");
@@ -810,8 +803,19 @@ class ItemInfoCard extends UIObject {
 			Logger.error("Current item info on ItemInfoCard is not an StackableInfo.  info databaseId: " + mInfo.databaseId);
 			return;
 		}
+		moveFocusOffInfoCardBeforeEquip();
 		mEquipPopup = new EquipItemToSlotPopup(mDBFacade, -1, closeEquipCallback, _loc1_, clear);
 		MemoryTracker.track(mEquipPopup, "EquipItemToSlotPopup - created in ItemInfoCard.loadEquipOnAccountPopup()");
+	}
+
+	function moveFocusOffInfoCardBeforeEquip() {
+		var _loc1_ = mEquipButton.rightNavigation;
+		if (_loc1_ == null || !_loc1_.canBeFocused()) {
+			_loc1_ = mEquipButton.downNavigation;
+		}
+		if (_loc1_ != null && _loc1_.canBeFocused()) {
+			mDBFacade.menuNavigationController.setFocusedUiObject(_loc1_);
+		}
 	}
 
 	function closeEquipCallback() {
@@ -819,5 +823,11 @@ class ItemInfoCard extends UIObject {
 			mEquipPopup.destroy();
 			mEquipPopup = null;
 		}
+	}
+
+	@:allow(uI.inventory) function setupMenuNavigation() {
+		mSellButton.clearNavigationAndInteractions();
+		mEquipButton.clearNavigationAndInteractions();
+		mSellButton.isToTheLeftOf(mEquipButton);
 	}
 }

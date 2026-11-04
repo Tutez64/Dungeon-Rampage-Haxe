@@ -7,6 +7,8 @@ import brain.utils.MemoryTracker;
 import brain.workLoop.WorkComponent;
 
 class ActorSpriteSheetRenderer extends SpriteSheetRenderer implements IRenderer {
+	static inline final DEBUG_HEADING = false;
+
 	public static var SPRITE_SHEET_RENDERER_TYPE:String = "SpriteSheetRenderer";
 
 	var mFrameRate:Float = 24;
@@ -36,9 +38,9 @@ class ActorSpriteSheetRenderer extends SpriteSheetRenderer implements IRenderer 
 		}
 		mDuration = 0;
 		var _loc4_:Int;
-		final __ax4_iter_152 = mFrameTimes;
-		if (checkNullIteratee(__ax4_iter_152))
-			for (_tmp_ in __ax4_iter_152) {
+		final __ax4_iter_139 = mFrameTimes;
+		if (checkNullIteratee(__ax4_iter_139))
+			for (_tmp_ in __ax4_iter_139) {
 				_loc4_ = ASCompat.floatToInt(_tmp_);
 				mDuration += _loc4_ / 1000;
 			}
@@ -91,9 +93,9 @@ class ActorSpriteSheetRenderer extends SpriteSheetRenderer implements IRenderer 
 		var _loc3_ = (0 : UInt);
 		var _loc4_:Float = 0;
 		var _loc2_:Float;
-		final __ax4_iter_153 = mFrameTimes;
-		if (checkNullIteratee(__ax4_iter_153))
-			for (_tmp_ in __ax4_iter_153) {
+		final __ax4_iter_140 = mFrameTimes;
+		if (checkNullIteratee(__ax4_iter_140))
+			for (_tmp_ in __ax4_iter_140) {
 				_loc2_ = _tmp_;
 				_loc4_ += _loc2_ / 1000 / mPlayRate;
 				if (_loc4_ > time) {
@@ -158,30 +160,58 @@ class ActorSpriteSheetRenderer extends SpriteSheetRenderer implements IRenderer 
 	}
 
 	override function onFrame(gameClock:GameClock) {
-		var _loc3_ = 0;
-		var _loc5_ = 0;
-		var _loc4_ = 0;
-		var _loc2_ = 0;
+		var _loc3_ = (0 : UInt);
+		var _loc5_ = (0 : UInt);
+		var _loc4_ = (0 : UInt);
+		var _loc2_ = (0 : UInt);
 		if (mIsPlaying && mBitmap.stage != null) {
-			_loc3_ = (getAnimationIndexFromClock(gameClock) : Int);
-			_loc5_ = (getDirectionIndexFromHeading(mHeading) : Int);
-			_loc4_ = (mXIndex : Int);
-			_loc2_ = (mYIndex : Int);
-			setFrameIndexes((_loc3_ : UInt), (_loc5_ : UInt));
-			if (mXIndex != (_loc4_ : UInt) || mYIndex != (_loc2_ : UInt)) {
+			_loc3_ = getAnimationIndexFromClock(gameClock);
+			_loc5_ = getDirectionIndexFromHeading(mHeading);
+			_loc4_ = mXIndex;
+			_loc2_ = mYIndex;
+			setFrameIndexes(_loc3_, _loc5_);
+			if (mXIndex != _loc4_ || mYIndex != _loc2_) {
+				if (false && mBitmap != null && mYIndex != _loc2_) {
+					Logger.debugch("heading",
+						"ActorSpriteSheetRenderer onFrame directionChange name="
+						+ mBitmap.name
+						+ " heading="
+						+ mHeading
+						+ " directionIndex="
+						+ mYIndex
+						+ " frameIndex="
+						+ mXIndex);
+				}
 				super.onFrame(gameClock);
 			}
 		}
 	}
 
 	override public function set_heading(value:Float):Float {
+		var _loc2_ = 0;
 		while (value < -180) {
 			value += 360;
 		}
 		while (value > 180) {
 			value -= 360;
 		}
-		return mHeading = value;
+		mHeading = value;
+		if (false && mBitmap != null) {
+			_loc2_ = -1;
+			try {
+				_loc2_ = getDirectionIndexFromHeading(mHeading);
+			} catch (e:Dynamic) {}
+			Logger.debugch("heading",
+				"ActorSpriteSheetRenderer set heading name="
+				+ mBitmap.name
+				+ " heading="
+				+ mHeading
+				+ " directionIndex="
+				+ _loc2_
+				+ " numFramesY="
+				+ mSpriteSheet.numFramesY);
+		}
+		return value;
 	}
 
 	public override function get_heading():Float {

@@ -1,10 +1,10 @@
 package uI.popup;
 
-import brain.assetRepository.AssetLoadingComponent;
+import brain.assetRepository.SwfAsset;
 import brain.logger.Logger;
-import brain.sceneGraph.SceneGraphComponent;
 import brain.uI.UIButton;
 import brain.uI.UIObject;
+import brain.utils.TextUtil;
 import facade.DBFacade;
 import facade.Locale;
 import gameMasterDictionary.GMOffer;
@@ -12,16 +12,14 @@ import gameMasterDictionary.GMSkin;
 import flash.display.MovieClip;
 import flash.text.TextField;
 
-class DBUIConfirmChestPurchasePopup extends UIObject {
-	var mAssetLoadingComponent:AssetLoadingComponent;
+class DBUIConfirmChestPurchasePopup extends DBUIPopup {
+	static inline final TOWN_PATH = "Resources/Art2D/UI/db_UI_town.swf";
 
-	var mSceneGraphComponent:SceneGraphComponent;
+	static inline final POPUP_CLASS_NAME = "chest_shop_popup";
 
 	var mChestOffer:GMOffer;
 
 	var mSelectedHeroSkin:GMSkin;
-
-	var mCloseButton:UIButton;
 
 	var mCancelButton:UIButton;
 
@@ -39,66 +37,81 @@ class DBUIConfirmChestPurchasePopup extends UIObject {
 
 	var mBuyCallback:ASFunction;
 
-	var mCloseCallback:ASFunction;
-
-	public function new(dbFacade:DBFacade, root:MovieClip, buyCallback:ASFunction, cancelCallback:ASFunction, chestOffer:GMOffer, forHeroSkin:UInt,
-			allowClose:Bool = true, closeCallback:ASFunction = null) {
-		super(dbFacade, root);
-		mAssetLoadingComponent = new AssetLoadingComponent(mFacade);
-		mSceneGraphComponent = new SceneGraphComponent(mFacade, "DBUIConfirmChestPurchasePopup");
+	public function new(dbFacade:DBFacade, buyCallback:ASFunction, cancelCallback:ASFunction, chestOffer:GMOffer, forHeroSkin:UInt, allowClose:Bool = true,
+			closeCallback:ASFunction = null) {
 		mChestOffer = chestOffer;
-		mCloseCallback = cancelCallback;
 		mBuyCallback = buyCallback;
 		mSelectedHeroSkin = ASCompat.dynamicAs(dbFacade.gameMaster.skinsById.itemFor(forHeroSkin), GMSkin);
 		if (mSelectedHeroSkin == null) {
 			Logger.error("Unable to find GMSkin for skin id: " + forHeroSkin);
 		}
-		setupGui();
+		super(dbFacade, "CONFIRM_CHEST_PURCHASE_POPUP", "", null, allowClose, true, cancelCallback, false, false);
 	}
 
-	function setupGui() {
-		mCloseButton = new UIButton(mFacade, ASCompat.coerce((mRoot : ASAny).close, flash.display.MovieClip));
-		mCloseButton.releaseCallback = mCloseCallback;
-		mCancelButton = new UIButton(mFacade, ASCompat.coerce((mRoot : ASAny).button_cancel, flash.display.MovieClip));
-		mCancelButton.releaseCallback = mCloseCallback;
-		mCancelButton.label.text = Locale.getString("CANCEL");
-		mBuyButton = new UIButton(mFacade, ASCompat.coerce((mRoot : ASAny).buy_button_gems, flash.display.MovieClip));
+	override function getSwfPath():String {
+		return "Resources/Art2D/UI/db_UI_town.swf";
+	}
+
+	override function getClassName():String {
+		return "chest_shop_popup";
+	}
+
+	override function setupUI(swfAsset:SwfAsset, titleText:String, content:ASAny, allowClose:Bool, closeCallback:ASFunction) {
+		mSwfAsset = swfAsset;
+		var popupClass = swfAsset.getClass("chest_shop_popup");
+		mPopup = ASCompat.dynamicAs(ASCompat.createInstance(popupClass, []), MovieClip);
+		mRoot.addChild(mPopup);
+		mCloseButton = new UIButton(mFacade, ASCompat.coerce((mPopup : ASAny).close, flash.display.MovieClip));
+		mCloseButton.releaseCallback = handleInputCalledClosed;
+		mCancelButton = new UIButton(mFacade, ASCompat.coerce((mPopup : ASAny).button_cancel, flash.display.MovieClip));
+		mCancelButton.releaseCallback = handleInputCalledClosed;
+		Locale.setText(mCancelButton.label, "CANCEL");
+		mBuyButton = new UIButton(mFacade, ASCompat.coerce((mPopup : ASAny).buy_button_gems, flash.display.MovieClip));
 		mBuyButton.releaseCallback = mBuyCallback;
-		mBuyButton.label.text = Std.string(mChestOffer.Price);
+		TextUtil.setText(mBuyButton.label, Std.string(mChestOffer.Price));
 		ASCompat.setProperty((mBuyButton.root : ASAny).original_price, "visible", false);
 		ASCompat.setProperty((mBuyButton.root : ASAny).icons_bundle.coin, "visible", false);
 		ASCompat.setProperty((mBuyButton.root : ASAny).icons_bundle.gift_icon, "visible", false);
 		ASCompat.setProperty((mBuyButton.root : ASAny).strike, "visible", false);
-		mTitleLabel = ASCompat.coerce((mRoot : ASAny).label, flash.text.TextField);
-		mTitleLabel.text = Locale.getString("CONFIRM_SHOP_CHEST_PURCHASE");
-		mItemIcon = ASCompat.coerce((mRoot : ASAny).icon_slot, flash.display.MovieClip);
-		mAssetLoadingComponent.getSwfAsset(DBFacade.buildFullDownloadPath(mChestOffer.BundleSwfFilepath), function(param1:brain.assetRepository.SwfAsset) {
+		mTitleLabel = ASCompat.coerce((mPopup : ASAny).label, flash.text.TextField);
+		Locale.setText(mTitleLabel, "CONFIRM_SHOP_CHEST_PURCHASE");
+		mItemIcon = ASCompat.coerce((mPopup : ASAny).icon_slot, flash.display.MovieClip);
+		mAssetLoadingComponent.getSwfAsset(DBFacade.buildFullDownloadPath(mChestOffer.BundleSwfFilepath), function(param1:SwfAsset) {
 			var _loc3_ = param1.getClass(mChestOffer.BundleIcon);
 			var _loc2_ = ASCompat.coerce(ASCompat.createInstance(_loc3_, []), flash.display.MovieClip);
 			mItemIcon.addChild(_loc2_);
 		});
-		mHeroLabel = ASCompat.coerce((mRoot : ASAny).hero_label, flash.text.TextField);
-		mHeroLabel.text = Locale.getString("OPENING_WITH");
-		mTextContentLabel = ASCompat.coerce((mRoot : ASAny).text, flash.text.TextField);
-		mTextContentLabel.text = Locale.getString("PURCHASE_AND_OPEN_CHEST_TEXT_CONTENT");
-		mAvatarIcon = ASCompat.coerce((mRoot : ASAny).avatar, flash.display.MovieClip);
-		mAssetLoadingComponent.getSwfAsset(DBFacade.buildFullDownloadPath(mSelectedHeroSkin.IconSwfFilepath), function(param1:brain.assetRepository.SwfAsset) {
+		mHeroLabel = ASCompat.coerce((mPopup : ASAny).hero_label, flash.text.TextField);
+		Locale.setText(mHeroLabel, "OPENING_WITH");
+		mTextContentLabel = ASCompat.coerce((mPopup : ASAny).text, flash.text.TextField);
+		Locale.setText(mTextContentLabel, "PURCHASE_AND_OPEN_CHEST_TEXT_CONTENT");
+		mAvatarIcon = ASCompat.coerce((mPopup : ASAny).avatar, flash.display.MovieClip);
+		mAssetLoadingComponent.getSwfAsset(DBFacade.buildFullDownloadPath(mSelectedHeroSkin.IconSwfFilepath), function(param1:SwfAsset) {
 			var _loc2_ = param1.getClass(mSelectedHeroSkin.IconName);
 			var _loc3_ = ASCompat.coerce(ASCompat.createInstance(_loc2_, []), flash.display.MovieClip);
 			mAvatarIcon.addChild(_loc3_);
 		});
-		mSceneGraphComponent.addChild(mRoot, (105 : UInt));
-		mSceneGraphComponent.showPopupCurtain();
-		mRoot.x = mFacade.viewWidth * 0.5;
-		mRoot.y = mFacade.viewHeight * 0.5 - 50;
+		mPopup.x = mFacade.viewWidth * 0.5;
+		mPopup.y = mFacade.viewHeight * 0.5 - 50;
 	}
 
-	function close() {
-		this.destroy();
+	override function setupMenuNavigation() {
+		mBuyButton.isToTheLeftOf(mCancelButton);
+		mCloseButton.isAbove(mBuyButton);
+	}
+
+	override function getDefaultNavigationObject():UIObject {
+		return mCloseButton;
+	}
+
+	override function getInitialFocusedNavigationObject():UIObject {
+		return mBuyButton;
 	}
 
 	override public function destroy() {
-		super.destroy();
+		if (mDBFacade == null) {
+			return;
+		}
 		if (mCloseButton != null) {
 			mCloseButton.destroy();
 			mCloseButton = null;
@@ -111,15 +124,6 @@ class DBUIConfirmChestPurchasePopup extends UIObject {
 			mBuyButton.destroy();
 			mBuyButton = null;
 		}
-		if (mAssetLoadingComponent != null) {
-			mAssetLoadingComponent.destroy();
-			mAssetLoadingComponent = null;
-		}
-		if (mSceneGraphComponent != null) {
-			mSceneGraphComponent.removePopupCurtain();
-			mSceneGraphComponent.removeChild(mRoot);
-			mSceneGraphComponent.destroy();
-			mSceneGraphComponent = null;
-		}
+		super.destroy();
 	}
 }

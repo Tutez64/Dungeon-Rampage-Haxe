@@ -11,6 +11,7 @@ import dr_floor.FloorObject;
 import gameMasterDictionary.GMDoober;
 import generatedCode.DistributedDooberGameObjectNetworkComponent;
 import generatedCode.IDistributedDooberGameObject;
+import steamInput.RumbleEffect;
 import flash.geom.Vector3D;
 
 class DooberGameObject extends FloorObject implements IDistributedDooberGameObject {
@@ -90,6 +91,9 @@ class DooberGameObject extends FloorObject implements IDistributedDooberGameObje
 		var _loc3_ = 0;
 		hasOwnership = true;
 		mDooberView.collectedEffect(isHeroOwner, heroId, animationComplete);
+		if (isHeroOwner) {
+			mDBFacade.steamInputManager.playRumble(RumbleEffect.PICKING_UP_ITEM);
+		}
 		if (this.distributedDungeonFloor != null && mDooberData != null) {
 			if (mDooberData.Exp > 0) {
 				this.distributedDungeonFloor.addCollectedExp(mDooberData.Exp);

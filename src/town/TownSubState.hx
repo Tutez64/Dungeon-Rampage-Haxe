@@ -60,8 +60,6 @@ class TownSubState extends State {
 
 	override public function enterState() {
 		super.enterState();
-		mDBFacade.mouseCursorManager.disable = false;
-		mDBFacade.mouseCursorManager.pushMouseCursor("auto");
 		mTimeEnter = mDBFacade.gameClock.realTime;
 		mDBFacade.metrics.log("AreaEnter", {"areaType": this.name});
 		mSceneGraphComponent = new SceneGraphComponent(mDBFacade, "TownSubState");
@@ -72,7 +70,6 @@ class TownSubState extends State {
 	}
 
 	override public function exitState() {
-		mDBFacade.mouseCursorManager.popMouseCursor();
 		var _loc1_ = (ASCompat.floatToInt((mDBFacade.gameClock.realTime - mTimeEnter) / 1000) : UInt);
 		mDBFacade.metrics.log("AreaExit", {
 			"areaType": this.name,

@@ -1,9 +1,10 @@
 package brain.jsonRPC;
 
+import brain.event.EventListeners;
 import brain.utils.MemoryTracker;
+import collections.IMapIterator;
+import collections.Map;
 import flash.events.EventDispatcher;
-import org.as3commons.collections.Map;
-import org.as3commons.collections.framework.IMapIterator;
 
 class JSONRPCPendingInvokation extends EventDispatcher {
 	var mRegisteredListeners:Map = new Map();
@@ -24,7 +25,7 @@ class JSONRPCPendingInvokation extends EventDispatcher {
 		}
 		mDestroyCallback = null;
 		this.dispatchEvent(new FaultEvent(e));
-		destory();
+		destroy();
 	}
 
 	public function handleResult(r:ASAny) {
@@ -33,7 +34,7 @@ class JSONRPCPendingInvokation extends EventDispatcher {
 		}
 		mDestroyCallback = null;
 		this.dispatchEvent(new ResultEvent(r));
-		destory();
+		destroy();
 	}
 
 	public function addDestroyCallback(f:ASFunction) {
@@ -42,21 +43,11 @@ class JSONRPCPendingInvokation extends EventDispatcher {
 
 	public function addListener(eventName:String, callback:ASFunction) {
 		mRegisteredListeners.add(eventName, callback);
-		addEventListener(eventName, callback);
+		EventListeners.add(this, eventName, callback);
 	}
 
-	public function removeListener(eventName:String) {
-		if (!mRegisteredListeners.has(eventName)) {
-			return;
-		}
-		var _loc2_ = ASCompat.coerceFunction(mRegisteredListeners.itemFor(eventName));
-		removeEventListener(eventName, _loc2_);
-		mRegisteredListeners.remove(eventName);
-	}
-
-	public function destory() {
+	public function destroy() {
 		removeAllListeners();
-		mRegisteredListeners.clear();
 		mRegisteredListeners = null;
 		mURLStream.close();
 		mURLStream = null;
@@ -67,12 +58,12 @@ class JSONRPCPendingInvokation extends EventDispatcher {
 	}
 
 	public function removeAllListeners() {
-		var _loc2_:String = null;
+		var _loc2_:ASFunction = null;
 		var _loc1_ = ASCompat.reinterpretAs(mRegisteredListeners.iterator(), IMapIterator);
 		while (_loc1_.hasNext()) {
-			_loc1_.next();
-			_loc2_ = ASCompat.asString(_loc1_.current);
-			removeListener(_loc2_);
+			_loc2_ = ASCompat.coerceFunction(_loc1_.next());
+			EventListeners.remove(this, _loc1_.key, _loc2_);
 		}
+		mRegisteredListeners.clear();
 	}
 }

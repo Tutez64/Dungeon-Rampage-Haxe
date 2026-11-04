@@ -3,6 +3,7 @@ package uI.training;
 import brain.assetRepository.SwfAsset;
 import brain.render.MovieClipRenderController;
 import brain.uI.UIObject;
+import brain.utils.TextUtil;
 import facade.DBFacade;
 import facade.GameMasterLocale;
 import flash.display.MovieClip;
@@ -73,7 +74,7 @@ class UIStatHelper {
 		mStatIconTooltipBar.tooltipPos = new Point(-75, ASCompat.toNumberField((mUIRoot : ASAny).hit, "height") * -0.5 + 25);
 		mStatNameText = ASCompat.coerce((mUIRoot : ASAny).training_meter_text, flash.text.TextField);
 		mTooltipBar = new UIObject(mDBFacade, ASCompat.coerce((mUIRoot : ASAny).barTooltip_hit, flash.display.MovieClip));
-		ASCompat.setProperty((mUIRoot : ASAny).barTooltip, "text", "0/75");
+		TextUtil.setText(ASCompat.coerce((mUIRoot : ASAny).barTooltip, flash.text.TextField), "0/75");
 	}
 
 	public function destroy() {
@@ -109,22 +110,26 @@ class UIStatHelper {
 		return mStatAmount;
 	}
 
-	@:isVar public var statName(never, set):String;
+	@:isVar public var statName(get, set):String;
 
 	public function set_statName(val:String):String {
 		return mStatName = val;
 	}
 
+	function get_statName():String {
+		return mStatName;
+	}
+
 	public function refresh(swfAsset:SwfAsset) {
 		var _loc2_:Dynamic = null;
-		if (ASCompat.mapItemForNeNull(mDBFacade.gameMaster.statByConstant, mStatName)) {
-			mStatNameText.text = GameMasterLocale.getGameMasterSubString("STATS_NAME", mDBFacade.gameMaster.statByConstant.itemFor(mStatName).Constant)
-				.toUpperCase();
+		if (mDBFacade.gameMaster.statByConstant.itemFor(mStatName) != null) {
+			TextUtil.setText(mStatNameText,
+				GameMasterLocale.getGameMasterSubString("STATS_NAME", mDBFacade.gameMaster.statByConstant.itemFor(mStatName).Constant).toUpperCase());
 			mStatIconName = mDBFacade.gameMaster.statByConstant.itemFor(mStatName).IconName;
 			mStatIconTooltip.statItem = ASCompat.coerce(mDBFacade.gameMaster.statByConstant.itemFor(mStatName), gameMasterDictionary.GMStat);
 		} else {
-			mStatNameText.text = GameMasterLocale.getGameMasterSubString("STATS_NAME", mDBFacade.gameMaster.superStatByConstant.itemFor(mStatName).Constant)
-				.toUpperCase();
+			TextUtil.setText(mStatNameText,
+				GameMasterLocale.getGameMasterSubString("STATS_NAME", mDBFacade.gameMaster.superStatByConstant.itemFor(mStatName).Constant).toUpperCase());
 			mStatIconName = mDBFacade.gameMaster.superStatByConstant.itemFor(mStatName).IconName;
 			mStatIconTooltip.superStatItem = ASCompat.coerce(mDBFacade.gameMaster.superStatByConstant.itemFor(mStatName), gameMasterDictionary.GMSuperStat);
 		}
@@ -142,11 +147,11 @@ class UIStatHelper {
 	}
 
 	public function updateUI() {
+		var _loc6_ = 0;
 		var _loc5_ = 0;
 		var _loc4_ = (25 : UInt);
 		var _loc3_ = (50 : UInt);
 		var _loc2_ = (75 : UInt);
-		var _loc6_ = 0;
 		if (mStatAmount == _loc2_) {
 			_loc6_ = 3;
 		} else if (mStatAmount >= _loc3_) {
@@ -172,6 +177,6 @@ class UIStatHelper {
 			}
 			_loc5_++;
 		}
-		ASCompat.setProperty((mUIRoot : ASAny).barTooltip, "text", Std.string(mStatAmount) + " / " + Std.string((25 * 3)));
+		TextUtil.setText(ASCompat.coerce((mUIRoot : ASAny).barTooltip, flash.text.TextField), Std.string(mStatAmount) + " / " + Std.string((25 * 3)));
 	}
 }

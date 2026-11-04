@@ -37,9 +37,9 @@ class ChargeWeaponController extends ScalingWeaponController {
 		if (mHoldingAttackTimeline != null && mHoldingAttackTimeline.isPlaying) {
 			mHoldingAttackTimeline.stopAndFinish();
 		}
-		if (!mPlayerExittedState) {
+		if (!mPlayerExitedState) {
 			if (mTotalTime > 0 && mNotEnoughManaTask == null) {
-				_loc2_ = mFramesFinished / 24 * 1 / mTotalTime;
+				_loc2_ = mFramesFinished / 24 / mTotalTime;
 				if (_loc2_ > 1) {
 					_loc2_ = 1;
 				}

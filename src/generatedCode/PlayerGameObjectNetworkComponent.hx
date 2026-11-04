@@ -8,21 +8,23 @@ import networkCode.DcNetworkPacket;
 class PlayerGameObjectNetworkComponent extends DcNetworkClass implements DcNetworkInterface {
 	var the_instance__GeneratedCode_PlayerGameObjectNetworkComponent /*redefined private*/:PlayerGameObject;
 
-	public static inline final FLID_screenName = (180 : UInt);
+	public static inline final FLID_screenName = (187 : UInt);
 
-	public static inline final FLID_basicCurrency = (181 : UInt);
+	public static inline final FLID_heroPreloadLook = (188 : UInt);
 
-	public static inline final FLID_Chat = (182 : UInt);
+	public static inline final FLID_basicCurrency = (189 : UInt);
 
-	public static inline final FLID_ShowPlayerIsTyping = (183 : UInt);
+	public static inline final FLID_Chat = (190 : UInt);
 
-	public static inline final FLID_requesthero = (184 : UInt);
+	public static inline final FLID_ShowPlayerIsTyping = (191 : UInt);
 
-	public static inline final FLID_requestentry = (185 : UInt);
+	public static inline final FLID_requesthero = (192 : UInt);
 
-	public static inline final FLID_requestpartymemberinvite = (186 : UInt);
+	public static inline final FLID_requestentry = (193 : UInt);
 
-	public static inline final FLID_requestexit = (187 : UInt);
+	public static inline final FLID_requestpartymemberinvite = (194 : UInt);
+
+	public static inline final FLID_requestexit = (195 : UInt);
 
 	public function new(Inst:PlayerGameObject, gs:GeneratedDcSocket, id:UInt) {
 		super(Inst, gs, id);
@@ -39,14 +41,17 @@ class PlayerGameObjectNetworkComponent extends DcNetworkClass implements DcNetwo
 	}
 
 	override public function recvById(packet:DcNetworkPacket, fieldid:UInt) {
-		switch (fieldid - 180) {
+		switch (fieldid - 187) {
 			case 0:
 				recv_screenName(packet);
 
-			case 2:
-				recv_Chat(packet);
+			case 1:
+				recv_heroPreloadLook(packet);
 
 			case 3:
+				recv_Chat(packet);
+
+			case 4:
 				recv_ShowPlayerIsTyping(packet);
 
 			default:
@@ -56,6 +61,7 @@ class PlayerGameObjectNetworkComponent extends DcNetworkClass implements DcNetwo
 
 	override public function generate(packet:DcNetworkPacket) {
 		recv_screenName(packet);
+		recv_heroPreloadLook(packet);
 		recvByIdLoop(packet);
 	}
 
@@ -66,6 +72,11 @@ class PlayerGameObjectNetworkComponent extends DcNetworkClass implements DcNetwo
 	public function recv_screenName(packet:DcNetworkPacket) {
 		var _loc2_ = packet.readUTF();
 		the_instance__GeneratedCode_PlayerGameObjectNetworkComponent.screenName = _loc2_;
+	}
+
+	public function recv_heroPreloadLook(packet:DcNetworkPacket) {
+		var _loc2_ = HeroPreloadLook.readFromPacket(packet);
+		the_instance__GeneratedCode_PlayerGameObjectNetworkComponent.heroPreloadLook = _loc2_;
 	}
 
 	public function recv_Chat(packet:DcNetworkPacket) {

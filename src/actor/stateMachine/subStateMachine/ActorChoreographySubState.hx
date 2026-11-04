@@ -51,6 +51,9 @@ class ActorChoreographySubState extends ActorState {
 			}
 			mCurrentScript = mQueuedScript;
 			mQueuedScript = null;
+			if (mActorGameObject.persistentHidePending) {
+				mActorGameObject.healAbandonedPersistentHide();
+			}
 			mCurrentScript.play(mQueuedPlaySpeed, mQueuedTargetActor, mQueuedFinishedCallback, mQueuedStopCallback, mQueuedLoop);
 		} else {
 			Logger.error("No script in choreography!");

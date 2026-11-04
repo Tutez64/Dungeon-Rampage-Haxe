@@ -40,8 +40,8 @@ class RectangleColliderTimelineAction extends ColliderTimelineAction {
 		var _loc13_ = Math.NaN;
 		var _loc12_ = Math.NaN;
 		var _loc15_:Vector3D = null;
-		var _loc18_ = 0;
-		var _loc19_ = 0;
+		var _loc18_ = (0 : UInt);
+		var _loc19_ = (0 : UInt);
 		if (actorGameObject.isOwner) {
 			_loc17_ = weapon != null ? weapon.collisionScale() : 1;
 			_loc10_ = ASCompat.toNumberField(actionObj, "halfHeight") * _loc17_;
@@ -65,16 +65,16 @@ class RectangleColliderTimelineAction extends ColliderTimelineAction {
 				_loc12_ = ASCompat.toNumberField(actionObj, "yGlobalOffset") * _loc17_;
 			}
 			_loc15_ = new Vector3D(_loc13_, _loc12_);
-			_loc18_ = 1;
+			_loc18_ = (1 : UInt);
 			if (actionObj.lifeTime != null) {
-				_loc18_ = ASCompat.toInt(actionObj.timeToLive);
+				_loc18_ = (ASCompat.toInt(actionObj.timeToLive) : UInt);
 			}
-			_loc19_ = 0;
+			_loc19_ = (0 : UInt);
 			if (actionObj.hitDelayPerObject != null) {
-				_loc19_ = ASCompat.toInt(actionObj.hitDelayPerObject);
+				_loc19_ = (ASCompat.toInt(actionObj.hitDelayPerObject) : UInt);
 			}
 			return new RectangleColliderTimelineAction(weapon, actorGameObject, actorView, dbFacade, distributedDungeonFloor, combatResultCallback, _loc14_,
-				_loc15_, _loc16_, _loc10_, _loc11_, (_loc18_ : UInt), (_loc19_ : UInt));
+				_loc15_, _loc16_, _loc10_, _loc11_, _loc18_, _loc19_);
 		}
 		return null;
 	}

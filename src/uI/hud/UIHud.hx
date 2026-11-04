@@ -1,6 +1,5 @@
 package uI.hud;
 
-import account.StoreServicesController;
 import actor.buffs.BuffGameObject;
 import actor.buffs.BuffHandler;
 import actor.FloatingMessage;
@@ -11,18 +10,23 @@ import brain.assetRepository.AssetLoadingComponent;
 import brain.assetRepository.SwfAsset;
 import brain.clock.GameClock;
 import brain.event.EventComponent;
+import brain.event.EventListeners;
 import brain.logger.Logger;
 import brain.render.MovieClipRenderController;
 import brain.render.MovieClipRenderer;
+import brain.render.tweens.TweenHandle;
 import brain.sceneGraph.SceneGraphComponent;
 import brain.uI.UIButton;
 import brain.uI.UIObject;
 import brain.uI.UIProgressBar;
 import brain.utils.MemoryTracker;
+import brain.utils.TextUtil;
+import brain.utils.Timers;
 import brain.workLoop.LogicalWorkComponent;
 import brain.workLoop.Task;
 import combat.weapon.ConsumableWeaponGameObject;
 import combat.weapon.WeaponGameObject;
+import dBGlobals.DBGlobal;
 import distributedObjects.HeroGameObjectOwner;
 import distributedObjects.NPCGameObject;
 import events.BusterPointsEvent;
@@ -36,12 +40,16 @@ import gameMasterDictionary.GMAttack;
 import gameMasterDictionary.GMSkin;
 import gameMasterDictionary.GMWeaponAesthetic;
 import gameMasterDictionary.GMWeaponItem;
+import input.keyBindings.KeyBindings;
+import settings.model.SettingsModel;
+import settings.SettingsPopup;
+import steamInput.OnSteamInputButtonReleasedEvent;
 import uI.*;
+import uI.hud.starlingConverted.IGameHud;
 import uI.infiniteIsland.II_UIExitDungeonPopUp;
 import uI.inventory.UIWeaponTooltip;
-import uI.options.OptionsPanel;
 import uI.popup.UILootLossPopup;
-import com.greensock.TweenMax;
+import flash.display.Bitmap;
 import flash.display.DisplayObject;
 import flash.display.MovieClip;
 import flash.display.Sprite;
@@ -53,7 +61,7 @@ import flash.geom.Vector3D;
 import flash.text.TextField;
 import flash.utils.Timer;
 
-class UIHud {
+class UIHud implements IGameHud {
 	static inline final CONDENSEDHUD_BUFF_ICON_X_STARTPOS = 455;
 
 	static inline final CONDENSEDHUD_BUFF_ICON_Y_STARTPOS = 865;
@@ -98,6 +106,8 @@ class UIHud {
 
 	public static inline final ROYAL_ITEM_BOX_ID = (60006 : UInt);
 
+	static inline final BUSTER_PRESS_TEXT_CONTROLLER_OFFSET_X:Float = -5;
+
 	static final TEAM_DEFAULT:Vector3D = new Vector3D(45, 150);
 
 	static final PROFILE_DEFAULT:Vector3D = new Vector3D(112, 95);
@@ -122,6 +132,24 @@ class UIHud {
 
 	static final CROWD_CONDENSED:Vector3D = new Vector3D(1555, 920);
 
+	static final CONTROLLER_ICON_POSITION_FOR_WEAPON_BUTTONS:Vector3D = new Vector3D(13, -50);
+
+	static final CONTROLLER_GLYPH_SCALE_WEAPON_BUTTONS:Point = new Point(25, 25);
+
+	static final CONTROLLER_ICON_POSITION_FOR_CLOSE_BUTTON:Vector3D = new Vector3D(-5, -27);
+
+	static final CONTROLLER_GLYPH_SCALE_CLOSE_BUTTON:Point = new Point(25, 25);
+
+	static final CONTROLLER_ICON_POSITION_FOR_CHAT_SEND_BUTTON:Vector3D = new Vector3D(32, -10);
+
+	static final CONTROLLER_ICON_POSITION_FOR_CHAT_LOG_BUTTON:Vector3D = new Vector3D(25, -10);
+
+	static final CONTROLLER_GLYPH_SCALE_CHAT_BUTTONS:Point = new Point(20, 20);
+
+	static final CONTROLLER_ICON_POSITION_FOR_DUNGEON_BUSTER:Vector3D = new Vector3D(8, -8);
+
+	static final CONTROLLER_GLYPH_SCALE_DUNGEON_BUSTER:Point = new Point(25, 25);
+
 	var mDBFacade:DBFacade;
 
 	var mHeroOwner:HeroGameObjectOwner;
@@ -138,15 +166,13 @@ class UIHud {
 
 	var mUIRoot:MovieClip;
 
-	var mAddCoinButton:UIButton;
-
-	var mAddCashButton:UIButton;
-
 	var mProfileBox:MovieClip;
 
 	var mProfileBulgeTask:Task;
 
 	var mProfileRestScale:Float = Math.NaN;
+
+	var mBuffDisplayTask:Task;
 
 	var mFloaterTextClass:Dynamic;
 
@@ -200,7 +226,7 @@ class UIHud {
 
 	var mTeamLootMC:MovieClipRenderController;
 
-	var mLootTween:TweenMax;
+	var mLootTween:TweenHandle;
 
 	var mLootTask:Task;
 
@@ -234,13 +260,15 @@ class UIHud {
 
 	var mBusterGlowMc:MovieClipRenderController;
 
+	var mBusterPulseMc:MovieClipRenderController;
+
 	var mXPBonusText:TextField;
 
 	var mCoinBonusText:TextField;
 
-	var mOptionsButton:UIButton;
+	var mSettingsPopup:SettingsPopup;
 
-	var mOptionsPanel:OptionsPanel;
+	var mSettingsModel:SettingsModel;
 
 	var mStacksHud:UIStacksHud;
 
@@ -258,8 +286,6 @@ class UIHud {
 
 	var mUIChatLog:UIChatLog;
 
-	var mSaleLabel:TextField;
-
 	var mHealthFullRevealer:Revealer;
 
 	var mManaFullRevealer:Revealer;
@@ -273,6 +299,8 @@ class UIHud {
 	var mPetPortraitNoneRoot:MovieClip;
 
 	var mPetPortrait:PetPortraitUI;
+
+	var mPetCarriedAcrossRebuild:NPCGameObject;
 
 	var mFloorLabel:TextField;
 
@@ -308,26 +336,82 @@ class UIHud {
 
 	var mBuffCooldowns:Vector<MovieClipRenderer>;
 
+	var mHudControllerIcons:Vector<ControllerIconData>;
+
+	var mExternalControllerIcons:Vector<ControllerIconData>;
+
+	var mBusterPressTextOriginals:ASDictionary<ASAny, ASAny>;
+
+	var mInitControllerIconsLater:Task;
+
+	var mControllerIconLoadDelay:Int = 1;
+
+	var mLootLossPopup:UILootLossPopup;
+
+	var mInfiniteExitPopup:II_UIExitDungeonPopUp;
+
+	var mSuppressNextExitMenuToggle:Bool = false;
+
 	public function new(facade:DBFacade) {
+		var settingsModel:SettingsModel;
+		mHudControllerIcons = new Vector<ControllerIconData>();
+		mExternalControllerIcons = new Vector<ControllerIconData>();
+		mBusterPressTextOriginals = new ASDictionary<ASAny, ASAny>(true);
+
 		mDBFacade = facade;
 		mRoot = new Sprite();
 		mSceneGraphComponent = new SceneGraphComponent(mDBFacade, "UIHud");
 		mAssetLoadingComponent = new AssetLoadingComponent(mDBFacade);
 		mLogicalWorkComponent = new LogicalWorkComponent(mDBFacade, "UIHud");
 		mMaxBusterPoints = (ASCompat.floatToInt(4294967295) : UInt);
-		mOptionsPanel = new OptionsPanel(mDBFacade);
-		MemoryTracker.track(mOptionsPanel, "OptionsPanel - created in UIHud.UIHud()");
+		settingsModel = mDBFacade.settingsModel;
 		mStacksHud = new UIStacksHud(mDBFacade);
 		mEventComponent = new EventComponent(mDBFacade);
+		mDBFacade.keyBindings.addChangeListener(onKeyBindingsChanged);
+		mSettingsModel = settingsModel;
+		mSettingsModel.addChangeListener(onSettingChanged);
 		mAssetLoadingComponent.getSwfAsset(DBFacade.buildFullDownloadPath("Resources/Art2D/UI/db_UI_HUD.swf"), function(param1:SwfAsset) {
-			setupUI(param1, (ASCompat.parseInt(mDBFacade.dbAccountInfo.getAttribute("optionsHudStyle")) : UInt));
+			setupUI(param1, (ASCompat.toInt(settingsModel.getValue("hudStyle")) : UInt));
 		});
-		mAssetLoadingComponent.getSwfAsset(DBFacade.buildFullDownloadPath("Resources/Art2D/UI/db_UI_town.swf"), setupOptions);
 		mXpBulgeTask = null;
 		mProfileBulgeTask = null;
 		mBuffs = new Vector<BuffGameObject>();
 		mBuffIconButtons = new Vector<UIButton>();
 		mBuffCooldowns = new Vector<MovieClipRenderer>();
+	}
+
+	static function setButtonLabel(button:UIButton, text:String) {
+		if (button == null || button.label == null) {
+			return;
+		}
+		button.label.text = text;
+	}
+
+	static function hideControllerIcon(iconData:ControllerIconData) {
+		iconData.mIsHidden = true;
+		if (iconData.mOwner != null && iconData.mControllerGlyph != null && iconData.mOwner.contains(iconData.mControllerGlyph)) {
+			iconData.mOwner.removeChild(iconData.mControllerGlyph);
+		}
+	}
+
+	static function hideControllerIcons(icons:Vector<ControllerIconData>) {
+		var _loc2_:ControllerIconData;
+		if (checkNullIteratee(icons))
+			for (_tmp_ in icons) {
+				_loc2_ = _tmp_;
+				hideControllerIcon(_loc2_);
+			}
+	}
+
+	static function unloadControllerIcons(icons:Vector<ControllerIconData>) {
+		var _loc2_:ControllerIconData;
+		if (checkNullIteratee(icons))
+			for (_tmp_ in icons) {
+				_loc2_ = _tmp_;
+				hideControllerIcon(_loc2_);
+				_loc2_.destroy();
+			}
+		icons.length = 0;
 	}
 
 	public static function isThisAConsumbleChestId(chestId:Int):Bool {
@@ -337,12 +421,21 @@ class UIHud {
 	function switchHudEvent(event:UIHudChangeEvent) {
 		this.setupUI(mSwfAsset, event.hudType);
 		resetBuffButtonPositions();
+		if (mAssetsLoaded && mHeroOwner != null) {
+			setupStatsForResourceBars();
+		}
 	}
 
 	@:isVar public var chatLogContainer(get, never):MovieClip;
 
 	public function get_chatLogContainer():MovieClip {
 		return ASCompat.coerce((mUIRoot : ASAny).chatLogContainer, flash.display.MovieClip);
+	}
+
+	public function offScreenPicChange(playerId:Int, picType:String) {
+		if (mOffScreenPlayerManager != null) {
+			mOffScreenPlayerManager.handlePicChange(playerId, picType);
+		}
 	}
 
 	@:isVar public var ownedHero(get, never):HeroGameObjectOwner;
@@ -355,22 +448,6 @@ class UIHud {
 
 	public function get_swfAsset():SwfAsset {
 		return mSwfAsset;
-	}
-
-	function setupOptions(swfAsset:SwfAsset) {
-		var _loc2_ = swfAsset.getClass("options_panel_button");
-		var _loc7_ = ASCompat.dynamicAs(ASCompat.createInstance(_loc2_, []), MovieClip);
-		mOptionsButton = new UIButton(mDBFacade, _loc7_);
-		mOptionsButton.releaseCallback = mOptionsPanel.toggleVisible;
-		var _loc4_ = mDBFacade.dbConfigManager.getConfigNumber("in_game_options_button_x", 1895);
-		var _loc3_ = mDBFacade.dbConfigManager.getConfigNumber("in_game_options_button_y", 65);
-		var _loc5_ = mDBFacade.dbConfigManager.getConfigNumber("in_game_options_button_scale_x", 1);
-		var _loc6_ = mDBFacade.dbConfigManager.getConfigNumber("in_game_options_button_scale_y", 1);
-		_loc7_.x = _loc4_;
-		_loc7_.y = _loc3_;
-		_loc7_.scaleX = _loc5_;
-		_loc7_.scaleY = _loc6_;
-		setOptionsBasedOnHud();
 	}
 
 	function setDooberLocations(hudType:UInt) {
@@ -402,6 +479,7 @@ class UIHud {
 	}
 
 	function setupUI(swfAsset:SwfAsset, hudType:UInt = (0 : UInt)) {
+		var cooldownIndex:Int;
 		var hudClassName:String;
 		var hudClass:Dynamic;
 		var i:UInt;
@@ -410,6 +488,110 @@ class UIHud {
 		if (mUIRoot != null && mRoot.contains(mUIRoot)) {
 			mRoot.removeChild(mUIRoot);
 		}
+		mPetCarriedAcrossRebuild = ASCompat.coerce(mPetPortrait != null ? mPetPortrait.petNPCGameObject : null, distributedObjects.NPCGameObject);
+		if (mHpBar != null) {
+			mHpBar.destroy();
+		}
+		mHpBar = null;
+		if (mFlashingHpBar != null) {
+			mFlashingHpBar.destroy();
+		}
+		mFlashingHpBar = null;
+		if (mManaBar != null) {
+			mManaBar.destroy();
+		}
+		mManaBar = null;
+		if (mBusterBar != null) {
+			mBusterBar.destroy();
+		}
+		mBusterBar = null;
+		if (mXpBar != null) {
+			mXpBar.destroy();
+		}
+		mXpBar = null;
+		if (mPetPortrait != null) {
+			mPetPortrait.destroy();
+		}
+		mPetPortrait = null;
+		if (mBasicCurrencyUI != null) {
+			mBasicCurrencyUI.destroy();
+		}
+		mBasicCurrencyUI = null;
+		if (mPremiumCurrencyUI != null) {
+			mPremiumCurrencyUI.destroy();
+		}
+		mPremiumCurrencyUI = null;
+		if (mXpObject != null) {
+			mXpObject.destroy();
+		}
+		mXpObject = null;
+		if (mCloseButton != null) {
+			mCloseButton.destroy();
+		}
+		mCloseButton = null;
+		if (mWeaponZButton != null) {
+			mWeaponZButton.destroy();
+		}
+		mWeaponZButton = null;
+		if (mWeaponXButton != null) {
+			mWeaponXButton.destroy();
+		}
+		mWeaponXButton = null;
+		if (mWeaponCButton != null) {
+			mWeaponCButton.destroy();
+		}
+		mWeaponCButton = null;
+		mWeaponButtons = null;
+		if (mConsumable1Button != null) {
+			mConsumable1Button.destroy();
+		}
+		mConsumable1Button = null;
+		if (mConsumable2Button != null) {
+			mConsumable2Button.destroy();
+		}
+		mConsumable2Button = null;
+		mConsumableWeaponButtons = null;
+		if (mDungeonModifer1 != null) {
+			mDungeonModifer1.destroy();
+		}
+		mDungeonModifer1 = null;
+		if (mDungeonModifer2 != null) {
+			mDungeonModifer2.destroy();
+		}
+		mDungeonModifer2 = null;
+		if (mDungeonModifer3 != null) {
+			mDungeonModifer3.destroy();
+		}
+		mDungeonModifer3 = null;
+		if (mDungeonModifer4 != null) {
+			mDungeonModifer4.destroy();
+		}
+		mDungeonModifer4 = null;
+		if (mCooldowns != null) {
+			cooldownIndex = 0;
+			while (cooldownIndex < mCooldowns.length) {
+				if (mCooldowns[cooldownIndex] != null) {
+					mCooldowns[cooldownIndex].destroy();
+				}
+				cooldownIndex = cooldownIndex + 1;
+			}
+			mCooldowns = null;
+		}
+		if (mConsumableCooldowns != null) {
+			cooldownIndex = 0;
+			while (cooldownIndex < mConsumableCooldowns.length) {
+				if (mConsumableCooldowns[cooldownIndex] != null) {
+					mConsumableCooldowns[cooldownIndex].destroy();
+				}
+				cooldownIndex = cooldownIndex + 1;
+			}
+			mConsumableCooldowns = null;
+		}
+		if (mInitControllerIconsLater != null) {
+			mInitControllerIconsLater.destroy();
+		}
+		mInitControllerIconsLater = null;
+		destroyTeamLoot();
 		mSwfAsset = swfAsset;
 		switch (hudType) {
 			case 0:
@@ -428,7 +610,6 @@ class UIHud {
 				mVerticalYClipping = 0;
 				Logger.warn("Unable to determine hud with type: " + hudType);
 		}
-		setOptionsBasedOnHud();
 		setDooberLocations(mHudType);
 		mDBFacade.camera.yCilppingFromBottom = mVerticalYClipping;
 		mDBFacade.camera.forceRedraw();
@@ -443,27 +624,12 @@ class UIHud {
 		mUIChatLog = new UIChatLog(mDBFacade, ASCompat.coerce((mUIRoot : ASAny).chatLogContainer, flash.display.MovieClip),
 			ASCompat.coerce((mUIRoot : ASAny).UI_chat, flash.display.MovieClip), ASCompat.coerce((mUIRoot : ASAny).UI_chat.log_btn, flash.display.MovieClip),
 			ASCompat.coerce((mUIRoot : ASAny).UI_chat.chat_btn, flash.display.MovieClip));
+		if (mHudType != 1) {
+			mUIChatLog.textSizeModifier = 1.18;
+		}
 		mCloseButton = new UIButton(mDBFacade, ASCompat.coerce((mUIRoot : ASAny).close, flash.display.MovieClip));
 		mCloseButton.releaseCallback = function() {
-			var exitPopup:II_UIExitDungeonPopUp;
-			var xpLoss:UInt;
-			var lootLossPopup:UILootLossPopup;
-			var closeCallback:ASFunction = function() {
-				var _loc1_:ASObject = {};
-				ASCompat.setProperty(_loc1_, "buttonDesc", "UIHud Exit Button Clicked");
-				ASCompat.setProperty(_loc1_, "areaType", "Dungeon");
-				mDBFacade.metrics.log("ButtonClick", _loc1_);
-				mUIChatLog.hideChatLog();
-				mDBFacade.mDistributedObjectManager.mMatchMaker.RequestExit();
-				mDBFacade.dbAccountInfo.dbAccountParams.flushParams();
-			};
-			if (mHeroOwner.distributedDungeonFloor.isInfiniteDungeon) {
-				exitPopup = new II_UIExitDungeonPopUp(mDBFacade, closeCallback, null);
-			} else {
-				xpLoss = mHeroOwner.distributedDungeonFloor.completionXp;
-				lootLossPopup = new UILootLossPopup(mDBFacade, xpLoss, mHeroOwner.distributedDungeonFloor.treasureCollected, closeCallback, null);
-				MemoryTracker.track(lootLossPopup, "UILootLossPopup - created in UIHud.setupUI()");
-			}
+			closeButtonReleaseCallback();
 		};
 		if (mDBFacade.dbConfigManager.getConfigBoolean("want_pets", true)) {
 			mWantPets = true;
@@ -492,31 +658,12 @@ class UIHud {
 		hideBustSign();
 		mBasicCurrencyUI = new UIObject(mDBFacade, ASCompat.coerce((mUIRoot : ASAny).UI_currency_coin, flash.display.MovieClip));
 		mBasicCurrencyUI.setRootMovieClipAsBitMap();
-		mBasicCurrencyUI.tooltipDelay = 0.4;
-		ASCompat.setProperty((mBasicCurrencyUI.tooltip : ASAny).title_label, "text", Locale.getString("COIN_TOOLTIP_TITLE"));
-		ASCompat.setProperty((mBasicCurrencyUI.tooltip : ASAny).description_label, "text", Locale.getString("COIN_TOOLTIP_DESCRIPTION"));
 		mPremiumCurrencyUI = new UIObject(mDBFacade, ASCompat.coerce((mUIRoot : ASAny).UI_currency_cash, flash.display.MovieClip));
 		mPremiumCurrencyUI.setRootMovieClipAsBitMap();
-		mPremiumCurrencyUI.tooltipDelay = 0.4;
-		ASCompat.setProperty((mPremiumCurrencyUI.tooltip : ASAny).title_label, "text", Locale.getString("CASH_TOOLTIP_TITLE"));
-		ASCompat.setProperty((mPremiumCurrencyUI.tooltip : ASAny).description_label, "text", Locale.getString("CASH_TOOLTIP_DESCRIPTION"));
-		mSaleLabel = ASCompat.coerce((mPremiumCurrencyUI.root : ASAny).label_sale, flash.text.TextField);
-		mSaleLabel.visible = false;
 		mBasicCurrencyText = ASCompat.coerce((mUIRoot : ASAny).UI_currency_coin.game_currency_text, flash.text.TextField);
 		mBasicCurrencyText.mouseEnabled = false;
 		mPremiumCurrencyText = ASCompat.coerce((mUIRoot : ASAny).UI_currency_cash.cash_text, flash.text.TextField);
 		mPremiumCurrencyText.mouseEnabled = false;
-		mAddCoinButton = new UIButton(mDBFacade, ASCompat.coerce((mUIRoot : ASAny).UI_currency_coin.coin.add_coin_button, flash.display.MovieClip));
-		mAddCoinButton.releaseCallback = function() {
-			StoreServicesController.showCoinPage(mDBFacade);
-		};
-		mAddCoinButton.visible = false;
-		mAddCashButton = new UIButton(mDBFacade, ASCompat.coerce((mUIRoot : ASAny).UI_currency_cash.cash.add_cash_button, flash.display.MovieClip));
-		mAddCashButton.releaseCallback = function() {
-			mDBFacade.metrics.log("UIHudAddCash");
-			StoreServicesController.showCashPage(mDBFacade, "inDungeonUIHudAddCash");
-		};
-		mAddCashButton.visible = false;
 		if (mDBFacade.dbAccountInfo != null) {
 			setCurrency((mDBFacade.dbAccountInfo.basicCurrency : Int), (mDBFacade.dbAccountInfo.premiumCurrency : Int));
 		}
@@ -558,6 +705,7 @@ class UIHud {
 		mConsumableWeaponButtons = Vector.ofArray([mConsumable1Button, mConsumable2Button]);
 		mConsumable1Button.setRootMovieClipAsBitMap();
 		mConsumable2Button.setRootMovieClipAsBitMap();
+		refreshKeyboardLabels();
 		mConsumableCooldowns = new Vector<MovieClipRenderer>();
 		mConsumableCooldowns.push(new MovieClipRenderer(mDBFacade, ASCompat.coerce((mUIRoot : ASAny).consumables_01.cooldown, flash.display.MovieClip)));
 		ASCompat.setProperty((mUIRoot : ASAny).consumables_01.cooldown, "visible", false);
@@ -584,35 +732,307 @@ class UIHud {
 		mDungeonModifer4 = new UIButton(mDBFacade, ASCompat.coerce((mUIRoot : ASAny).floor_modifier04, flash.display.MovieClip));
 		mDungeonModifer4.tooltip = ASCompat.coerce((mUIRoot : ASAny).tooltip_modifier04, flash.display.MovieClip);
 		mDungeonModifer4.tooltipPos = tooltipOffsset;
+		if (mDBFacade.steamInputManager.wantsControllerPrompts) {
+			setAllKeyboardIconsVisibility(false);
+		}
+		if (mDBFacade.steamInputManager.isSteamInputReady) {
+			mInitControllerIconsLater = mLogicalWorkComponent.doLater(mControllerIconLoadDelay, initAllControllerIconsTask);
+		}
 		if (mHeroOwner != null) {
 			this.initializeHud(mHeroOwner);
 		}
 	}
 
-	function setOptionsBasedOnHud() {
-		if (mOptionsPanel == null || mOptionsButton == null) {
+	function closeButtonReleaseCallback() {
+		var xpLoss:UInt;
+		var closeCallback:ASFunction = function() {
+			var _loc1_:ASObject = {};
+			ASCompat.setProperty(_loc1_, "buttonDesc", "UIHud Exit Button Clicked");
+			ASCompat.setProperty(_loc1_, "areaType", "Dungeon");
+			mDBFacade.metrics.log("ButtonClick", _loc1_);
+			mUIChatLog.hideChatLog();
+			mInfiniteExitPopup = null;
+			mLootLossPopup = null;
+			mDBFacade.mDistributedObjectManager.mMatchMaker.RequestExit();
+			mDBFacade.dbAccountInfo.dbAccountParams.flushParams();
+		};
+		if (mHeroOwner.distributedDungeonFloor.isInfiniteDungeon) {
+			if (mInfiniteExitPopup == null) {
+				mInfiniteExitPopup = new II_UIExitDungeonPopUp(mDBFacade, closeCallback, null, openSettingsPopup);
+				MemoryTracker.track(mInfiniteExitPopup, "II_UIExitDungeonPopup - created in UIHud.setupUI()");
+			} else {
+				mInfiniteExitPopup.destroy();
+				mInfiniteExitPopup = null;
+			}
+		} else if (mLootLossPopup == null) {
+			xpLoss = mHeroOwner.distributedDungeonFloor.completionXp;
+			mLootLossPopup = new UILootLossPopup(mDBFacade, xpLoss, mHeroOwner.distributedDungeonFloor.treasureCollected, closeCallback, null,
+				openSettingsPopup);
+			MemoryTracker.track(mLootLossPopup, "UILootLossPopup - created in UIHud.setupUI()");
+		} else {
+			mLootLossPopup.destroy();
+			mLootLossPopup = null;
+		}
+	}
+
+	function initAllControllerIconsTask(inClock:GameClock) {
+		mInitControllerIconsLater = null;
+		initAllControllerIcons();
+	}
+
+	function initAllControllerIcons() {
+		if (!mDBFacade.steamInputManager.isSteamInputReady) {
+			Logger.warn("Attempted to display Controller Icons but no controllers are connected. Aborting.");
 			return;
 		}
-		var _loc2_ = new Point(0, 0);
-		var _loc1_ = new Point(1, 1);
-		switch (mHudType) {
-			case 0:
-				_loc2_ = new Point(1875, 100);
-				_loc1_ = new Point(0.9, 0.9);
-
-			case 1:
-				_loc2_ = new Point(1875, 100);
-				_loc1_ = new Point(0.9, 0.9);
-
-			default:
-				_loc2_ = new Point(1875, 100);
-				_loc1_ = new Point(0.9, 0.9);
-				Logger.warn("Unable to determine hud with type: " + mHudType);
+		unloadControllerIcons(mHudControllerIcons);
+		initControllerIconOn("attack_weapon_1", mWeaponZButton, CONTROLLER_ICON_POSITION_FOR_WEAPON_BUTTONS, CONTROLLER_GLYPH_SCALE_WEAPON_BUTTONS);
+		initControllerIconOn("attack_weapon_2", mWeaponXButton, CONTROLLER_ICON_POSITION_FOR_WEAPON_BUTTONS, CONTROLLER_GLYPH_SCALE_WEAPON_BUTTONS);
+		initControllerIconOn("attack_weapon_3", mWeaponCButton, CONTROLLER_ICON_POSITION_FOR_WEAPON_BUTTONS, CONTROLLER_GLYPH_SCALE_WEAPON_BUTTONS);
+		initControllerIconOn("use_consumable_one", mConsumable1Button, CONTROLLER_ICON_POSITION_FOR_WEAPON_BUTTONS, CONTROLLER_GLYPH_SCALE_WEAPON_BUTTONS);
+		initControllerIconOn("use_consumable_two", mConsumable2Button, CONTROLLER_ICON_POSITION_FOR_WEAPON_BUTTONS, CONTROLLER_GLYPH_SCALE_WEAPON_BUTTONS);
+		initControllerIconOn("use_dungeon_buster", mDungeonBusterButton, CONTROLLER_ICON_POSITION_FOR_DUNGEON_BUSTER, CONTROLLER_GLYPH_SCALE_DUNGEON_BUSTER);
+		initControllerIconOn("toggle_menu", mCloseButton, CONTROLLER_ICON_POSITION_FOR_CLOSE_BUTTON, CONTROLLER_GLYPH_SCALE_CLOSE_BUTTON);
+		initControllerIconOn("toggle_chat_log", ASCompat.coerce(mUIChatLog != null ? mUIChatLog.chatLogButton : null, brain.uI.UIButton),
+			CONTROLLER_ICON_POSITION_FOR_CHAT_LOG_BUTTON, CONTROLLER_GLYPH_SCALE_CHAT_BUTTONS);
+		if (mDBFacade.steamInputManager.usesSteamOnScreenKeyboard) {
+			initControllerIconOn("open_chat_keyboard", ASCompat.coerce(mUIChatLog != null ? mUIChatLog.chatSendButton : null, brain.uI.UIButton),
+				CONTROLLER_ICON_POSITION_FOR_CHAT_SEND_BUTTON, CONTROLLER_GLYPH_SCALE_CHAT_BUTTONS);
 		}
-		mOptionsButton.root.x = _loc2_.x;
-		mOptionsButton.root.y = _loc2_.y;
-		mOptionsButton.root.scaleX = _loc1_.x;
-		mOptionsButton.root.scaleY = _loc1_.y;
+	}
+
+	function onSettingChanged(id:String) {
+		if (id != "numbersOnBars") {
+			return;
+		}
+		if (mAssetsLoaded && mHeroOwner != null) {
+			setupStatsForResourceBars();
+		}
+	}
+
+	function onKeyBindingsChanged(action:String) {
+		refreshKeyboardLabels();
+	}
+
+	function refreshKeyboardLabels() {
+		var _loc2_ = ASCompat.coerce(mDBFacade != null ? mDBFacade.keyBindings : null, input.keyBindings.KeyBindings);
+		if (_loc2_ == null || mUIRoot == null) {
+			return;
+		}
+		setButtonLabel(mWeaponZButton, _loc2_.displayNameFor("attackWeapon1"));
+		setButtonLabel(mWeaponXButton, _loc2_.displayNameFor("attackWeapon2"));
+		setButtonLabel(mWeaponCButton, _loc2_.displayNameFor("attackWeapon3"));
+		setButtonLabel(mConsumable1Button, _loc2_.displayNameFor("useConsumable1"));
+		setButtonLabel(mConsumable2Button, _loc2_.displayNameFor("useConsumable2"));
+		if (mDungeonBusterButton == null || mDBFacade.steamInputManager.hasGlyphForAction("use_dungeon_buster")) {
+			return;
+		}
+		var _loc1_ = Locale.getString("PRESS_BUSTER_BUTTON_KEYBOARD") + _loc2_.displayNameFor("useDungeonBuster");
+		TextUtil.setText(ASCompat.coerce((mUIRoot : ASAny).UI_buster_active.buster_activated.up.db_pressbutton_text, flash.text.TextField), _loc1_);
+		TextUtil.setText(ASCompat.coerce((mUIRoot : ASAny).UI_buster_active.buster_activated.over.mc.db_pressbutton_text, flash.text.TextField), _loc1_);
+	}
+
+	function initControllerIconOn(inActionName:String, inButton:UIButton, iconPosition:Vector3D, iconScale:Point) {
+		if (inButton == null || inButton.root == null) {
+			return;
+		}
+		addControllerIcon(mHudControllerIcons, inActionName, inButton.root, iconPosition, iconScale);
+	}
+
+	function setAllKeyboardIconsVisibility(isVisible:Bool) {
+		mWeaponZButton.label.visible = keepsKeyboardLabel(isVisible, "attack_weapon_1");
+		mWeaponXButton.label.visible = keepsKeyboardLabel(isVisible, "attack_weapon_2");
+		mWeaponCButton.label.visible = keepsKeyboardLabel(isVisible, "attack_weapon_3");
+		mConsumable1Button.label.visible = keepsKeyboardLabel(isVisible, "use_consumable_one");
+		mConsumable2Button.label.visible = keepsKeyboardLabel(isVisible, "use_consumable_two");
+		if (mUIChatLog != null) {
+			mUIChatLog.setChatPromptVisible(isVisible);
+		}
+		setBusterPressText(keepsKeyboardLabel(isVisible, "use_dungeon_buster"));
+	}
+
+	function keepsKeyboardLabel(isVisible:Bool, actionName:String):Bool {
+		return isVisible || !mDBFacade.steamInputManager.hasGlyphForAction(actionName);
+	}
+
+	function setBusterPressText(isKeyboard:Bool) {
+		var _loc2_:ASObject = null;
+		if (mUIRoot == null || (mUIRoot : ASAny).UI_buster_active == null) {
+			return;
+		}
+		var _loc4_ = ASCompat.coerce((mUIRoot : ASAny).UI_buster_active.buster_activated, flash.display.MovieClip);
+		if (_loc4_ == null) {
+			return;
+		}
+		var _loc3_:TextField;
+		final __ax4_iter_417:Array<ASAny> = [
+			(_loc4_ : ASAny)
+			.up.db_pressbutton_text,
+			(_loc4_ : ASAny)
+			.over.mc.db_pressbutton_text
+		];
+		if (checkNullIteratee(__ax4_iter_417))
+			for (_tmp_ in __ax4_iter_417) {
+				_loc3_ = ASCompat.coerce(_tmp_, flash.text.TextField);
+				if (_loc3_ != null) {
+					_loc2_ = mBusterPressTextOriginals[_loc3_];
+					if (_loc2_ == null) {
+						_loc2_ = {
+							"text": _loc3_.text,
+							"x": _loc3_.x
+						};
+						mBusterPressTextOriginals[_loc3_] = _loc2_;
+					}
+					if (isKeyboard) {
+						_loc3_.x = ASCompat.toNumberField(_loc2_, "x");
+						TextUtil.setText(_loc3_, _loc2_.text);
+					} else {
+						_loc3_.x = ASCompat.toNumber(_loc2_.x + -5);
+						Locale.setText(_loc3_, "PRESS_BUSTER_BUTTON_CONTROLLER");
+					}
+				}
+			}
+		if (isKeyboard) {
+			refreshKeyboardLabels();
+		}
+	}
+
+	public function initControllerIcon(inActionName:String, inOwner:MovieClip, iconPosition:Vector3D, iconScale:Point) {
+		addControllerIcon(mExternalControllerIcons, inActionName, inOwner, iconPosition, iconScale);
+	}
+
+	public function removeControllerIcons(inOwner:MovieClip) {
+		var _loc2_ = 0;
+		var _loc3_:ControllerIconData = null;
+		_loc2_ = mExternalControllerIcons.length - 1;
+		while (_loc2_ >= 0) {
+			_loc3_ = mExternalControllerIcons[_loc2_];
+			if (_loc3_.mOwner == inOwner) {
+				hideControllerIcon(_loc3_);
+				_loc3_.destroy();
+				mExternalControllerIcons.removeAt(_loc2_);
+			}
+			_loc2_--;
+		}
+	}
+
+	function addControllerIcon(icons:Vector<ControllerIconData>, inActionName:String, inOwner:MovieClip, iconPosition:Vector3D, iconScale:Point) {
+		if (inOwner == null) {
+			return;
+		}
+		var _loc7_:ControllerIconData = null;
+		var _loc6_:ControllerIconData;
+		if (checkNullIteratee(icons))
+			for (_tmp_ in icons) {
+				_loc6_ = _tmp_;
+				if (_loc6_.mActionName == inActionName && _loc6_.mOwner == inOwner) {
+					_loc7_ = _loc6_;
+					break;
+				}
+			}
+		if (_loc7_ == null) {
+			_loc7_ = new ControllerIconData(null, inOwner, false);
+			_loc7_.mActionName = inActionName;
+			icons.push(_loc7_);
+		}
+		_loc7_.mPosition = iconPosition;
+		_loc7_.mScale = iconScale;
+		if (!mDBFacade.steamInputManager.isSteamInputReady) {
+			_loc7_.mIsHidden = true;
+			return;
+		}
+		showControllerIcon(_loc7_);
+	}
+
+	function showControllerIcon(iconData:ControllerIconData) {
+		var glyphFilePath:String;
+		iconData.mIsHidden = false;
+		glyphFilePath = mDBFacade.steamInputManager.getGlyphFilePathForAction(iconData.mActionName);
+		if (glyphFilePath == "error1" || glyphFilePath == "") {
+			glyphFilePath = null;
+		}
+		if (glyphFilePath == iconData.mGlyphFilePath) {
+			if (iconData.mControllerGlyph != null && !iconData.mOwner.contains(iconData.mControllerGlyph)) {
+				iconData.mOwner.addChild(iconData.mControllerGlyph);
+			}
+			return;
+		}
+		if (iconData.mControllerGlyph != null && iconData.mOwner.contains(iconData.mControllerGlyph)) {
+			iconData.mOwner.removeChild(iconData.mControllerGlyph);
+		}
+		iconData.mControllerGlyph = null;
+		iconData.mGlyphFilePath = glyphFilePath;
+		if (glyphFilePath == null) {
+			Logger.warnch("Input", "UIHud: no controller glyph for action \'" + iconData.mActionName + "\'");
+			return;
+		}
+		mAssetLoadingComponent.getImageAsset(glyphFilePath, function(param1:brain.assetRepository.ImageAsset) {
+			if (iconData.mOwner == null || iconData.mGlyphFilePath != glyphFilePath || iconData.mControllerGlyph != null) {
+				return;
+			}
+			var _loc2_ = new Bitmap(param1.image.bitmapData, param1.image.pixelSnapping, param1.image.smoothing);
+			_loc2_.x = iconData.mPosition.x;
+			_loc2_.y = iconData.mPosition.y;
+			_loc2_.width = iconData.mScale.x;
+			_loc2_.height = iconData.mScale.y;
+			iconData.mControllerGlyph = _loc2_;
+			if (!iconData.mIsHidden) {
+				iconData.mOwner.addChild(_loc2_);
+			}
+		});
+	}
+
+	function refreshControllerIcons(icons:Vector<ControllerIconData>) {
+		var _loc2_:ControllerIconData;
+		if (checkNullIteratee(icons))
+			for (_tmp_ in icons) {
+				_loc2_ = _tmp_;
+				showControllerIcon(_loc2_);
+			}
+	}
+
+	function hideAndUnloadControllerIcons() {
+		unloadControllerIcons(mHudControllerIcons);
+		unloadControllerIcons(mExternalControllerIcons);
+	}
+
+	function syncControllerPrompts() {
+		if (mDBFacade.steamInputManager.isSteamInputReady) {
+			initAllControllerIcons();
+			refreshControllerIcons(mExternalControllerIcons);
+		} else {
+			hideControllerIcons(mHudControllerIcons);
+			hideControllerIcons(mExternalControllerIcons);
+		}
+		setAllKeyboardIconsVisibility(!mDBFacade.steamInputManager.wantsControllerPrompts);
+	}
+
+	function openSettingsPopup() {
+		if (mSettingsPopup != null || mDBFacade == null) {
+			return;
+		}
+		mSettingsPopup = new SettingsPopup(mDBFacade, onSettingsPopupClosed);
+		MemoryTracker.track(mSettingsPopup, "SettingsPopup - created in UIHud.openSettingsPopup()");
+	}
+
+	function toggleSettingsPopup() {
+		if (mSettingsPopup == null) {
+			openSettingsPopup();
+		} else if (SettingsPopup.isTopMenu(mDBFacade)) {
+			mSettingsPopup.destroy();
+			mSettingsPopup = null;
+		}
+	}
+
+	function onSteamInputButtonReleased(event:OnSteamInputButtonReleasedEvent) {
+		if (event.actionName == "menu_options" && mSettingsPopup != null) {
+			toggleSettingsPopup();
+		}
+	}
+
+	function onSettingsPopupClosed() {
+		mSettingsPopup = null;
+		mSuppressNextExitMenuToggle = mDBFacade.inputManager.check(27);
 	}
 
 	function mouseOverXpListener(e:Event) {
@@ -674,8 +1094,8 @@ class UIHud {
 		showBonusCoinEffects(null);
 		var _loc2_ = mDBFacade.dbAccountInfo.inventoryInfo.timeTillNextBoosterExpire();
 		if (_loc2_ >= 0) {
-			mBoosterTimer = new Timer(_loc2_, 0);
-			mBoosterTimer.addEventListener("timer", handleBoosterTimeUp);
+			mBoosterTimer = Timers.create(_loc2_, 0, "UIHud.mBoosterTimer");
+			EventListeners.add(mBoosterTimer, "timer", handleBoosterTimeUp);
 			mBoosterTimer.start();
 		}
 	}
@@ -689,10 +1109,10 @@ class UIHud {
 		var _loc2_ = mDBFacade.dbAccountInfo.inventoryInfo.findHighestBoosterXP();
 		if (mDBFacade.accountBonus.isXPBonusActive) {
 			mXPBonusText.visible = true;
-			mXPBonusText.text = mDBFacade.accountBonus.xpBonusText;
+			TextUtil.setText(mXPBonusText, mDBFacade.accountBonus.xpBonusText);
 		} else if (_loc2_ != null && _loc2_.BuffInfo.Exp > 1) {
 			mXPBonusText.visible = true;
-			mXPBonusText.text = _loc2_.BuffInfo.Exp + Locale.getString("BOOSTER_XP");
+			TextUtil.setText(mXPBonusText, _loc2_.BuffInfo.Exp + Locale.getString("BOOSTER_XP"));
 		} else {
 			mXPBonusText.visible = false;
 		}
@@ -702,10 +1122,10 @@ class UIHud {
 		var _loc2_ = mDBFacade.dbAccountInfo.inventoryInfo.findHighestBoosterGold();
 		if (mDBFacade.accountBonus.isCoinBonusActive) {
 			mCoinBonusText.visible = true;
-			mCoinBonusText.text = mDBFacade.accountBonus.coinBonusText;
+			TextUtil.setText(mCoinBonusText, mDBFacade.accountBonus.coinBonusText);
 		} else if (_loc2_ != null && _loc2_.BuffInfo.Gold > 1) {
 			mCoinBonusText.visible = true;
-			mCoinBonusText.text = _loc2_.BuffInfo.Gold + Locale.getString("BOOSTER_GOLD");
+			TextUtil.setText(mCoinBonusText, _loc2_.BuffInfo.Gold + Locale.getString("BOOSTER_GOLD"));
 		} else {
 			mCoinBonusText.visible = false;
 		}
@@ -734,6 +1154,9 @@ class UIHud {
 
 	function createWeaponTooltip(button:UIButton, num:UInt) {
 		mAssetLoadingComponent.getSwfAsset(DBFacade.buildFullDownloadPath("Resources/Art2D/UI/db_UI_town.swf"), function(param1:SwfAsset) {
+			if (button.root == null) {
+				return;
+			}
 			var _loc2_ = num == 0 ? param1.getClass("DR_weapon_tooltip_z") : param1.getClass("DR_weapon_tooltip");
 			var _loc4_ = new UIWeaponTooltip(mDBFacade, _loc2_);
 			button.tooltip = _loc4_;
@@ -744,7 +1167,27 @@ class UIHud {
 		});
 	}
 
+	function destroyTeamLoot() {
+		if (mLootTween != null) {
+			mDBFacade.mTween.killTween(mLootTween);
+			mLootTween = null;
+		}
+		if (mLootTask != null) {
+			mLootTask.destroy();
+			mLootTask = null;
+		}
+		if (mTeamLootMC != null) {
+			mTeamLootMC.clip.visible = false;
+			if (mTeamLootMC.clip.parent != null) {
+				mTeamLootMC.clip.parent.removeChild(mTeamLootMC.clip);
+			}
+			mTeamLootMC.destroy();
+			mTeamLootMC = null;
+		}
+	}
+
 	public function openTeamLoot(chestId:UInt) {
+		destroyTeamLoot();
 		var _loc4_ = "";
 		switch (chestId - 60001) {
 			case 0:
@@ -769,14 +1212,14 @@ class UIHud {
 		var _loc2_ = ASCompat.dynamicAs(ASCompat.createInstance(_loc3_, []), MovieClip);
 		mTeamLootMC = new MovieClipRenderController(mDBFacade, _loc2_);
 		mUIRoot.addChild(mTeamLootMC.clip);
-		mTeamLootMC.clip.scaleX = mTeamLootMC.clip.scaleY = 1.8;
+		mTeamLootMC.clip.scaleX = mTeamLootMC.clip.scaleY = DBGlobal.UI_16_TO_9_PORT_OBJECT_SCALE;
 		mTeamLootMC.clip.x = -550;
 		mTeamLootMC.clip.y = -150;
 		if (mLootTween != null) {
-			mLootTween.kill();
+			mDBFacade.mTween.killTween(mLootTween);
 		}
 		mTeamLootMC.play((0 : UInt), true);
-		mLootTween = TweenMax.to(mTeamLootMC.clip, 0.5, {"x": -550});
+		mLootTween = mDBFacade.mTween.tweenMaxTo(mTeamLootMC.clip, 0.5, {"x": -550});
 		if (mLootTask != null) {
 			mLootTask.destroy();
 		}
@@ -784,31 +1227,102 @@ class UIHud {
 	}
 
 	public function closeTeamLoot(gameClock:GameClock = null) {
-		var cleanupFunc:ASFunction = function() {
+		var cleanupFunc:ASFunction;
+		if (mTeamLootMC == null) {
+			return;
+		}
+		cleanupFunc = function() {
+			if (mTeamLootMC == null) {
+				return;
+			}
 			mTeamLootMC.stop();
 			mTeamLootMC.clip.visible = false;
 		};
 		if (mLootTask != null) {
 			mLootTask.destroy();
 		}
+		mLootTask = null;
 		if (mLootTween != null) {
-			mLootTween.kill();
+			mDBFacade.mTween.killTween(mLootTween);
 		}
-		mLootTween = TweenMax.to(mTeamLootMC.clip, 0.5, {
+		mLootTween = mDBFacade.mTween.tweenMaxTo(mTeamLootMC.clip, 0.5, {
 			"x": -250,
 			"onComplete": cleanupFunc
 		});
 	}
 
 	public function detachHero() {
+		var _loc1_ = 0;
 		hide();
 		hideBustSign();
-		mOffScreenPlayerManager.destroy();
+		if (mOffScreenPlayerManager != null) {
+			mOffScreenPlayerManager.destroy();
+		}
 		mOffScreenPlayerManager = null;
 		mHeroOwner = null;
+		if (mUIChatLog != null) {
+			mUIChatLog.heroOwner = null;
+		}
 		mEventComponent.removeAllListeners();
-		(mUIRoot : ASAny).UI_XP.removeEventListener("mouseOver", mouseOverXpListener);
-		(mUIRoot : ASAny).UI_XP.removeEventListener("mouseOut", mouseOutXpListener);
+		EventListeners.remove(ASCompat.coerce((mUIRoot : ASAny).UI_XP, flash.events.IEventDispatcher), "mouseOver", mouseOverXpListener);
+		EventListeners.remove(ASCompat.coerce((mUIRoot : ASAny).UI_XP, flash.events.IEventDispatcher), "mouseOut", mouseOutXpListener);
+		if (mProfileBox != null) {
+			EventListeners.remove(mProfileBox, "mouseOver", mouseOverProfileBox);
+			EventListeners.remove(mProfileBox, "mouseOut", mouseOutProfileBox);
+		}
+		if (mBuffDisplayTask != null) {
+			mBuffDisplayTask.destroy();
+		}
+		mBuffDisplayTask = null;
+		if (mBuffs != null) {
+			mBuffs.splice(0, (mBuffs.length : UInt));
+		}
+		if (mBuffIconButtons != null) {
+			_loc1_ = 0;
+			while (_loc1_ < mBuffIconButtons.length) {
+				if (mBuffIconButtons[_loc1_] != null) {
+					mBuffIconButtons[_loc1_].destroy();
+				}
+				_loc1_++;
+			}
+			mBuffIconButtons.splice(0, (mBuffIconButtons.length : UInt));
+		}
+		if (mBuffCooldowns != null) {
+			_loc1_ = 0;
+			while (_loc1_ < mBuffCooldowns.length) {
+				if (mBuffCooldowns[_loc1_] != null) {
+					mBuffCooldowns[_loc1_].destroy();
+				}
+				_loc1_++;
+			}
+			mBuffCooldowns.splice(0, (mBuffCooldowns.length : UInt));
+		}
+		if (mBoosterTimer != null) {
+			mBoosterTimer.stop();
+			EventListeners.remove(mBoosterTimer, "timer", handleBoosterTimeUp);
+			mBoosterTimer = null;
+		}
+		if (mDungeonBusterButton != null) {
+			mDungeonBusterButton.destroy();
+		}
+		mDungeonBusterButton = null;
+		if (mBusterGlowMc != null) {
+			mBusterGlowMc.destroy();
+		}
+		mBusterGlowMc = null;
+		if (mBusterPulseMc != null) {
+			mBusterPulseMc.destroy();
+		}
+		mBusterPulseMc = null;
+		if (mLootLossPopup != null) {
+			mLootLossPopup.destroy();
+		}
+		mLootLossPopup = null;
+		if (mInfiniteExitPopup != null) {
+			mInfiniteExitPopup.destroy();
+		}
+		mInfiniteExitPopup = null;
+		destroyTeamLoot();
 	}
 
 	public function initializeHud(heroOwner:HeroGameObjectOwner) {
@@ -832,13 +1346,21 @@ class UIHud {
 			setXp(mHeroOwner.experiencePoints);
 			bulgeXpBar();
 			bulgeProfileBox();
-			setBusterPoints(mHeroOwner.dungeonBusterPoints);
 			this.addListeners();
+			if (mBoosterTimer != null) {
+				mBoosterTimer.stop();
+				mBoosterTimer.removeEventListener("timer", handleBoosterTimeUp);
+				mBoosterTimer = null;
+			}
 			boosterTime = mDBFacade.dbAccountInfo.inventoryInfo.timeTillNextBoosterExpire();
 			if (boosterTime >= 0) {
-				mBoosterTimer = new Timer(boosterTime, 0);
-				mBoosterTimer.addEventListener("timer", handleBoosterTimeUp);
+				mBoosterTimer = Timers.create(boosterTime, 0, "UIHud.mBoosterTimer");
+				EventListeners.add(mBoosterTimer, "timer", handleBoosterTimeUp);
 				mBoosterTimer.start();
+			}
+			if (mOffScreenPlayerManager != null) {
+				mOffScreenPlayerManager.destroy();
+				mOffScreenPlayerManager = null;
 			}
 			mOffScreenPlayerManager = new UIOffScreenPlayerManager(mDBFacade, mUIRoot, mHeroOwner);
 			equippedWeapons = new Vector<WeaponGameObject>();
@@ -873,6 +1395,9 @@ class UIHud {
 				});
 			}
 			mStacksHud.setupStacksUI();
+			if (mDungeonBusterButton != null) {
+				mDungeonBusterButton.destroy();
+			}
 			mDungeonBusterButton = new UIButton(mDBFacade, ASCompat.coerce((mUIRoot : ASAny).UI_buster_active.buster_activated, flash.display.MovieClip));
 			mDungeonBusterButton.releaseCallback = handleBusterBarClickEvent;
 			mBusterLabel = ASCompat.coerce((mUIRoot : ASAny).UI_buster_active.buster_activated.up.name_mc.name_label, flash.text.TextField);
@@ -880,9 +1405,23 @@ class UIHud {
 			busterConstant = mHeroOwner.gMHero.DBuster1;
 			busterAttack = ASCompat.coerce(mDBFacade.gameMaster.attackByConstant.itemFor(busterConstant), gameMasterDictionary.GMAttack);
 			busterName = busterAttack != null ? GameMasterLocale.getGameMasterSubString("ATTACK_BUSTER_NAME", busterAttack.Constant) : "BUSTER!";
-			mBusterLabel.text = mBusterLabelOver.text = busterName.toUpperCase();
+			TextUtil.setText(mBusterLabel, busterName.toUpperCase());
+			TextUtil.setText(mBusterLabelOver, busterName.toUpperCase());
+			if (mBusterGlowMc != null) {
+				mBusterGlowMc.destroy();
+			}
 			mBusterGlowMc = new MovieClipRenderController(mDBFacade, ASCompat.coerce((mUIRoot : ASAny).UI_buster_glow, flash.display.MovieClip));
-			ASCompat.setProperty((mUIRoot : ASAny).UI_buster_glow.buster_text.buster_text_label.name_label, "text", busterName.toUpperCase());
+			if (mBusterPulseMc != null) {
+				mBusterPulseMc.destroy();
+			}
+			mBusterPulseMc = new MovieClipRenderController(mDBFacade,
+				ASCompat.coerce((mUIRoot : ASAny).UI_buster.buster_activated_glow, flash.display.MovieClip));
+			if (ASCompat.toBool((mUIRoot : ASAny).UI_buster.buster_activated_glow.visible)) {
+				mBusterPulseMc.play((0 : UInt), true);
+			}
+			TextUtil.setText(ASCompat.coerce((mUIRoot : ASAny).UI_buster_glow.buster_text.buster_text_label.name_label, flash.text.TextField),
+				busterName.toUpperCase());
+			refreshKeyboardLabels();
 			if (mDBFacade.dbAccountInfo != null) {
 				setCurrency((mDBFacade.dbAccountInfo.basicCurrency : Int), (mDBFacade.dbAccountInfo.premiumCurrency : Int));
 			}
@@ -892,24 +1431,27 @@ class UIHud {
 			setCurrentFloorLabel();
 			setDungeonModifiers();
 			mUIChatLog.heroOwner = mHeroOwner;
-			mLogicalWorkComponent.doEveryFrame(updateBuffDisplay);
+			if (mBuffDisplayTask != null) {
+				mBuffDisplayTask.destroy();
+			}
+			mBuffDisplayTask = mLogicalWorkComponent.doEveryFrame(updateBuffDisplay);
 			setupStatsForResourceBars();
 		}
 	}
 
 	function setCurrentFloorLabel() {
-		mFloorLabel.text = Locale.getString("UI_HUD_FLOOR_LABEL") + Std.string(mHeroOwner.distributedDungeonFloor.getCurrentFloorNum());
+		TextUtil.setText(mFloorLabel, Locale.getString("UI_HUD_FLOOR_LABEL") + Std.string(mHeroOwner.distributedDungeonFloor.getCurrentFloorNum()));
 	}
 
 	function setDungeonModifiers() {
 		var _loc1_:UIButton = null;
-		var _loc2_ = 0;
+		var _loc2_ = (0 : UInt);
 		mDungeonModifer1.visible = false;
 		mDungeonModifer2.visible = false;
 		mDungeonModifer3.visible = false;
 		mDungeonModifer4.visible = false;
-		_loc2_ = 0;
-		while (_loc2_ < mHeroOwner.distributedDungeonFloor.activeGMDungeonModifiers.length) {
+		_loc2_ = (0 : UInt);
+		while (_loc2_ < (mHeroOwner.distributedDungeonFloor.activeGMDungeonModifiers.length:UInt)) {
 			switch (_loc2_) {
 				case 0:
 					_loc1_ = mDungeonModifer1;
@@ -923,17 +1465,20 @@ class UIHud {
 				case 3:
 					_loc1_ = mDungeonModifer4;
 			}
-			setupModifiers(_loc1_, mHeroOwner.distributedDungeonFloor.activeGMDungeonModifiers[_loc2_]);
+			setupModifiers(_loc1_, mHeroOwner.distributedDungeonFloor.activeGMDungeonModifiers[(_loc2_ : Int)]);
 			_loc2_++;
 		}
 	}
 
 	function setupModifiers(dungeonModButton:UIButton, gmDungeonModifier:DungeonModifierHelper) {
-		ASCompat.setProperty((dungeonModButton.tooltip : ASAny).title_label, "text",
+		TextUtil.setText(ASCompat.coerce((dungeonModButton.tooltip : ASAny).title_label, flash.text.TextField),
 			GameMasterLocale.getGameMasterSubString("DUNGEON_MODIFIER_NAME", gmDungeonModifier.GMDungeonMod.Constant));
-		ASCompat.setProperty((dungeonModButton.tooltip : ASAny).description_label, "text",
+		TextUtil.setText(ASCompat.coerce((dungeonModButton.tooltip : ASAny).description_label, flash.text.TextField),
 			GameMasterLocale.getGameMasterSubString("DUNGEON_MODIFIER_DESCRIPTION", gmDungeonModifier.GMDungeonMod.Constant));
 		mAssetLoadingComponent.getSwfAsset(DBFacade.buildFullDownloadPath(gmDungeonModifier.GMDungeonMod.IconFilepath), function(param1:SwfAsset) {
+			if (dungeonModButton.root == null) {
+				return;
+			}
 			var _loc2_ = param1.getClass(gmDungeonModifier.GMDungeonMod.IconName);
 			if (_loc2_ == null) {
 				return;
@@ -952,13 +1497,15 @@ class UIHud {
 		var _loc1_:NPCGameObject = null;
 		if (mPetPortrait != null) {
 			_loc1_ = mPetPortrait.petNPCGameObject;
+		} else {
+			_loc1_ = mPetCarriedAcrossRebuild;
 		}
+		mPetCarriedAcrossRebuild = null;
 		registerPet(_loc1_);
 	}
 
 	public function show() {
 		mSceneGraphComponent.addChild(mRoot, (50 : UInt));
-		mSceneGraphComponent.addChild(mOptionsButton.root, (50 : UInt));
 		mStacksHud.show();
 		mDBFacade.camera.yCilppingFromBottom = mVerticalYClipping;
 		initializePetPortraits();
@@ -966,10 +1513,12 @@ class UIHud {
 
 	public function hide() {
 		mSceneGraphComponent.removeChild(mRoot);
-		mSceneGraphComponent.removeChild(mOptionsButton.root);
 		mDBFacade.camera.yCilppingFromBottom = 0;
 		mDBFacade.camera.forceRedraw();
-		mOptionsPanel.hide();
+		if (mSettingsPopup != null) {
+			mSettingsPopup.destroy();
+			mSettingsPopup = null;
+		}
 		mStacksHud.hide();
 		if (mUIChatLog != null) {
 			mUIChatLog.disable();
@@ -977,8 +1526,9 @@ class UIHud {
 		}
 		if (mPetPortrait != null) {
 			mPetPortrait.destroy();
-			mPetPortrait = null;
 		}
+		mPetPortrait = null;
+		mPetCarriedAcrossRebuild = null;
 	}
 
 	public function showStacks() {
@@ -1055,17 +1605,21 @@ class UIHud {
 					var weaponAesthetic = param2;
 					var rarity = param3;
 					return function(param1:SwfAsset) {
+						var weaponClass:Dynamic;
 						var bgColoredExists:Bool;
 						var bgSwfPath:String;
 						var bgIconName:String;
 						var swfAsset = param1;
-						var weaponClass = swfAsset.getClass(weaponAesthetic.IconName);
+						if (weaponButton.root == null) {
+							return;
+						}
+						weaponClass = swfAsset.getClass(weaponAesthetic.IconName);
 						if (weaponClass == null) {
 							return;
 						}
 						weapon = ASCompat.coerce(ASCompat.createInstance(weaponClass, []), flash.display.MovieClip);
 						weapon.name = "weaponIcon";
-						weapon.scaleX = weapon.scaleY = 60 / 100;
+						weapon.scaleX = weapon.scaleY = 60 / DBGlobal.WEAPON_ICON_NATIVE_SIZE;
 						(weaponButton.root : ASAny).graphic.addChildAt(weapon, 0);
 						bgColoredExists = rarity.HasColoredBackground;
 						bgSwfPath = rarity.BackgroundSwf;
@@ -1073,6 +1627,9 @@ class UIHud {
 						if (bgColoredExists && mDBFacade.featureFlags.getFlagValue("want-dynamic-rarity-backgrounds")) {
 							mAssetLoadingComponent.getSwfAsset(DBFacade.buildFullDownloadPath(bgSwfPath), function(param1:SwfAsset) {
 								var _loc3_:MovieClip = null;
+								if (weaponButton.root == null) {
+									return;
+								}
 								var _loc2_ = param1.getClass(bgIconName);
 								if (_loc2_ != null) {
 									_loc3_ = ASCompat.dynamicAs(ASCompat.createInstance(_loc2_, []), MovieClip);
@@ -1116,7 +1673,8 @@ class UIHud {
 				ASCompat.setProperty(button.root, "weaponIndex", i);
 				ASCompat.setProperty((button.root : ASAny).quantity, "visible", true);
 				ASCompat.setProperty((button.root : ASAny).textx, "visible", true);
-				ASCompat.setProperty((button.root : ASAny).quantity, "text", Std.string(consumableWeaponGameObject.getConsumableCount()));
+				TextUtil.setText(ASCompat.coerce((button.root : ASAny).quantity, flash.text.TextField),
+					Std.string(consumableWeaponGameObject.getConsumableCount()));
 				switch (i) {
 					case 0:
 						tooltip = ASCompat.coerce((mUIRoot : ASAny).consumable_tooltip01, flash.display.MovieClip);
@@ -1125,7 +1683,7 @@ class UIHud {
 						tooltip = ASCompat.coerce((mUIRoot : ASAny).consumable_tooltip02, flash.display.MovieClip);
 				}
 				button.tooltip = tooltip;
-				ASCompat.setProperty((button.tooltip : ASAny).description_label, "text",
+				TextUtil.setText(ASCompat.coerce((button.tooltip : ASAny).description_label, flash.text.TextField),
 					GameMasterLocale.getGameMasterSubString("STACKABLE_DESCRIPTION", consumableWeaponGameObject.getGMStackable().Constant));
 				tooltip.visible = true;
 				button.setTooltipToBeParentedToStage();
@@ -1137,13 +1695,16 @@ class UIHud {
 					var weaponButton = param1;
 					var gmStackable = param2;
 					return function(param1:SwfAsset) {
+						if (weaponButton.root == null) {
+							return;
+						}
 						var _loc2_ = param1.getClass(gmStackable.IconName);
 						if (_loc2_ == null) {
 							return;
 						}
 						weapon = ASCompat.coerce(ASCompat.createInstance(_loc2_, []), flash.display.MovieClip);
 						weapon.name = "weaponIcon";
-						weapon.scaleX = weapon.scaleY = 60 / 100;
+						weapon.scaleX = weapon.scaleY = 60 / DBGlobal.WEAPON_ICON_NATIVE_SIZE;
 						(weaponButton.root : ASAny).graphic.addChildAt(weapon, 0);
 					};
 				};
@@ -1184,10 +1745,21 @@ class UIHud {
 			}
 		});
 		mEventComponent.addListener("UI_HUD_CHANGE_EVENT", switchHudEvent);
-		mProfileBox.addEventListener("mouseOver", mouseOverProfileBox);
-		mProfileBox.addEventListener("mouseOut", mouseOutProfileBox);
-		(mUIRoot : ASAny).UI_XP.addEventListener("mouseOver", mouseOverXpListener);
-		(mUIRoot : ASAny).UI_XP.addEventListener("mouseOut", mouseOutXpListener);
+		mEventComponent.addListener("OnSteamInputGlyphsChanged", onSteamInputGlyphsChanged);
+		mEventComponent.addListener("ControllerConnectionChangedEvent", onControllerConnectionChanged);
+		mEventComponent.addListener("OnSteamInputButtonReleasedEvent", onSteamInputButtonReleased);
+		EventListeners.add(mProfileBox, "mouseOver", mouseOverProfileBox);
+		EventListeners.add(mProfileBox, "mouseOut", mouseOutProfileBox);
+		EventListeners.add(ASCompat.coerce((mUIRoot : ASAny).UI_XP, flash.events.IEventDispatcher), "mouseOver", mouseOverXpListener);
+		EventListeners.add(ASCompat.coerce((mUIRoot : ASAny).UI_XP, flash.events.IEventDispatcher), "mouseOut", mouseOutXpListener);
+		setAllKeyboardIconsVisibility(!mDBFacade.steamInputManager.wantsControllerPrompts);
+		if (mDBFacade.steamInputManager.isSteamInputReady && mInitControllerIconsLater == null) {
+			mInitControllerIconsLater = mLogicalWorkComponent.doLater(mControllerIconLoadDelay, initAllControllerIconsTask);
+		}
+	}
+
+	function onControllerConnectionChanged(inEvent:Event) {
+		syncControllerPrompts();
 	}
 
 	function mouseOutProfileBox(e:Event) {
@@ -1263,7 +1835,7 @@ class UIHud {
 		var _loc3_ = current / max;
 		mHpBar.value = _loc3_;
 		mFlashingHpBar.value = _loc3_;
-		mHpText.text = Std.string(current) + " / " + Std.string(max);
+		TextUtil.setText(mHpText, Std.string(current) + " / " + Std.string(max));
 	}
 
 	public function setMana(current:UInt, max:UInt) {
@@ -1271,7 +1843,7 @@ class UIHud {
 			return;
 		}
 		mManaBar.value = current / max;
-		mManaText.text = Std.string(current) + " / " + Std.string(max);
+		TextUtil.setText(mManaText, Std.string(current) + " / " + Std.string(max));
 	}
 
 	function spawnBusterFloater(delta:Int, offset:Float) {}
@@ -1297,8 +1869,8 @@ class UIHud {
 		if (!mAssetsLoaded) {
 			return;
 		}
-		mBasicCurrencyText.text = Std.string(basicCurrency);
-		mPremiumCurrencyText.text = Std.string(premiumCurrency);
+		TextUtil.setText(mBasicCurrencyText, Std.string(basicCurrency));
+		TextUtil.setText(mPremiumCurrencyText, Std.string(premiumCurrency));
 	}
 
 	function spawnCoinFloater(delta:Int) {}
@@ -1311,7 +1883,7 @@ class UIHud {
 		if (_loc2_ > 0) {
 			spawnCoinFloater(_loc2_);
 		}
-		mBasicCurrencyText.text = Std.string(basicCurrency);
+		TextUtil.setText(mBasicCurrencyText, Std.string(basicCurrency));
 		mBasicCurrency = (basicCurrency : UInt);
 	}
 
@@ -1325,7 +1897,7 @@ class UIHud {
 		if (_loc2_ > 0) {
 			spawnCashFloater(_loc2_);
 		}
-		mPremiumCurrencyText.text = Std.string(premiumCurrency);
+		TextUtil.setText(mPremiumCurrencyText, Std.string(premiumCurrency));
 		mPremiumCurrency = (premiumCurrency : UInt);
 	}
 
@@ -1337,13 +1909,13 @@ class UIHud {
 		}
 		var _loc5_ = mHeroOwner.level;
 		var _loc4_ = xp;
-		var _loc2_ = (mHeroOwner.gMHero.getLevelIndex(xp) : UInt);
+		var _loc2_ = (mHeroOwner.gMHero.getLevelIndex(xp, (mHeroOwner.ascensionLevel : Int)) : UInt);
 		var _loc7_ = (ASCompat.toInt(_loc2_ > 0 ? mHeroOwner.gMHero.getExpFromIndex(_loc2_ - 1) : 0) : UInt);
 		var _loc6_ = mHeroOwner.gMHero.getExpFromIndex(_loc2_);
-		mLevelText.text = Std.string(_loc5_);
-		var _loc3_ = (_loc4_ - _loc7_) / (_loc6_ - _loc7_);
+		TextUtil.setText(mLevelText, Std.string(_loc5_));
+		var _loc3_ = ((_loc4_ : Float) - (_loc7_ : Float)) / ((_loc6_ : Float) - (_loc7_ : Float));
 		mXpBar.value = _loc3_;
-		mXpText.text = Std.string(_loc4_) + " / " + Std.string(_loc6_);
+		TextUtil.setText(mXpText, Std.string(_loc4_) + " / " + Std.string(_loc6_));
 		spawnXpFloater((xp - mXpValue : Int), _loc3_ * 100);
 		mXpValue = xp;
 		if (!mXpGotInitialUpdate) {
@@ -1355,7 +1927,7 @@ class UIHud {
 	function updateXpBulge(clock:GameClock) {
 		var _loc3_ = mXpObject.root;
 		var _loc2_ = _loc3_.scaleX - mXpRestScale;
-		_loc2_ *= Math.pow(0.75, clock.tickLength / GameClock.ANIMATION_FRAME_DURATION);
+		_loc2_ *= 0.75;
 		_loc3_.scaleX = mXpRestScale + _loc2_;
 		_loc3_.scaleY = mXpRestScale + _loc2_;
 		if (Math.abs(_loc2_) <= 0.01) {
@@ -1379,7 +1951,7 @@ class UIHud {
 
 	function updateProfileBulge(clock:GameClock) {
 		var _loc2_ = mProfileBox.scaleX - mProfileRestScale;
-		_loc2_ *= Math.pow(0.75, clock.tickLength / GameClock.ANIMATION_FRAME_DURATION);
+		_loc2_ *= 0.75;
 		mProfileBox.scaleX = mProfileRestScale + _loc2_;
 		mProfileBox.scaleY = mProfileRestScale + _loc2_;
 		if (Math.abs(_loc2_) <= 0.01) {
@@ -1404,35 +1976,50 @@ class UIHud {
 	public function destroy() {
 		var _loc2_ = 0;
 		var _loc1_:UIButton = null;
+		if (mDBFacade != null && mDBFacade.keyBindings != null) {
+			mDBFacade.keyBindings.removeChangeListener(onKeyBindingsChanged);
+		}
+		if (mSettingsModel != null) {
+			mSettingsModel.removeChangeListener(onSettingChanged);
+			mSettingsModel = null;
+		}
 		if (mProfileBox != null) {
-			mProfileBox.removeEventListener("mouseOver", mouseOverProfileBox);
-			mProfileBox.removeEventListener("mouseOut", mouseOutProfileBox);
+			EventListeners.remove(mProfileBox, "mouseOver", mouseOverProfileBox);
+			EventListeners.remove(mProfileBox, "mouseOut", mouseOutProfileBox);
 		}
-		mBuffs.splice(0, (mBuffs.length : UInt));
-		mBuffs = null;
-		_loc2_ = 0;
-		while (_loc2_ < mBuffIconButtons.length) {
-			if (mBuffIconButtons[_loc2_] != null) {
-				mBuffIconButtons[_loc2_].destroy();
+		if (mBuffs != null) {
+			mBuffs.splice(0, (mBuffs.length : UInt));
+			mBuffs = null;
+		}
+		if (mBuffIconButtons != null) {
+			_loc2_ = 0;
+			while (_loc2_ < mBuffIconButtons.length) {
+				if (mBuffIconButtons[_loc2_] != null) {
+					mBuffIconButtons[_loc2_].destroy();
+				}
+				_loc2_++;
 			}
-			_loc2_++;
+			mBuffIconButtons = null;
 		}
-		mBuffIconButtons = null;
-		_loc2_ = 0;
-		while (_loc2_ < mBuffCooldowns.length) {
-			if (mBuffCooldowns[_loc2_] != null) {
-				mBuffCooldowns[_loc2_].destroy();
+		if (mBuffCooldowns != null) {
+			_loc2_ = 0;
+			while (_loc2_ < mBuffCooldowns.length) {
+				if (mBuffCooldowns[_loc2_] != null) {
+					mBuffCooldowns[_loc2_].destroy();
+				}
+				_loc2_++;
 			}
-			_loc2_++;
+			mBuffCooldowns = null;
 		}
-		mBuffCooldowns = null;
 		if (mBoosterTimer != null) {
 			mBoosterTimer.stop();
 			mBoosterTimer = null;
 		}
 		mDBFacade = null;
-		mOptionsPanel.destroy();
-		mOptionsPanel = null;
+		if (mSettingsPopup != null) {
+			mSettingsPopup.destroy();
+			mSettingsPopup = null;
+		}
 		mStacksHud.destroy();
 		mStacksHud = null;
 		if (mOffScreenPlayerManager != null) {
@@ -1450,18 +2037,18 @@ class UIHud {
 		mHeroOwner = null;
 		mRoot = null;
 		mUIRoot = null;
-		if (mAddCoinButton != null) {
-			mAddCoinButton.destroy();
+		if (mInitControllerIconsLater != null) {
+			mInitControllerIconsLater.destroy();
 		}
-		mAddCoinButton = null;
-		if (mAddCashButton != null) {
-			mAddCashButton.destroy();
-		}
-		mAddCashButton = null;
+		mInitControllerIconsLater = null;
 		if (mProfileBulgeTask != null) {
 			mProfileBulgeTask.destroy();
 		}
 		mProfileBulgeTask = null;
+		if (mBuffDisplayTask != null) {
+			mBuffDisplayTask.destroy();
+		}
+		mBuffDisplayTask = null;
 		if (mHpBar != null) {
 			mHpBar.destroy();
 		}
@@ -1522,14 +2109,14 @@ class UIHud {
 			mBusterGlowMc.destroy();
 		}
 		mBusterGlowMc = null;
-		if (mOptionsButton != null) {
-			mOptionsButton.destroy();
+		if (mBusterPulseMc != null) {
+			mBusterPulseMc.destroy();
 		}
-		mOptionsButton = null;
-		if (mOptionsPanel != null) {
-			mOptionsPanel.destroy();
+		mBusterPulseMc = null;
+		if (mSettingsPopup != null) {
+			mSettingsPopup.destroy();
 		}
-		mOptionsPanel = null;
+		mSettingsPopup = null;
 		if (mStacksHud != null) {
 			mStacksHud.destroy();
 		}
@@ -1545,25 +2132,26 @@ class UIHud {
 		if (mPetPortrait != null) {
 			mPetPortrait.destroy();
 		}
-		final __ax4_iter_85 = mWeaponButtons;
-		if (checkNullIteratee(__ax4_iter_85))
-			for (_tmp_ in __ax4_iter_85) {
+		mPetPortrait = null;
+		final __ax4_iter_418 = mWeaponButtons;
+		if (checkNullIteratee(__ax4_iter_418))
+			for (_tmp_ in __ax4_iter_418) {
 				_loc1_ = _tmp_;
 				if (_loc1_ != null) {
 					_loc1_.destroy();
 				}
 				_loc1_ = null;
 			}
-		final __ax4_iter_86 = mConsumableWeaponButtons;
-		if (checkNullIteratee(__ax4_iter_86))
-			for (_tmp_ in __ax4_iter_86) {
+		final __ax4_iter_419 = mConsumableWeaponButtons;
+		if (checkNullIteratee(__ax4_iter_419))
+			for (_tmp_ in __ax4_iter_419) {
 				_loc1_ = _tmp_;
 				if (_loc1_ != null) {
 					_loc1_.destroy();
 				}
 				_loc1_ = null;
 			}
-		mSaleLabel = null;
+		hideAndUnloadControllerIcons();
 		mProfileBox = null;
 		mFloaterTextClass = null;
 		mHpText = null;
@@ -1581,6 +2169,14 @@ class UIHud {
 		mBusterLabel = null;
 		mBusterLabelOver = null;
 		mSwfAsset = null;
+		if (mLootLossPopup != null) {
+			mLootLossPopup.destroy();
+		}
+		mLootLossPopup = null;
+		if (mInfiniteExitPopup != null) {
+			mInfiniteExitPopup.destroy();
+		}
+		mInfiniteExitPopup = null;
 	}
 
 	@:isVar public var offScreenPlayerManager(get, never):UIOffScreenPlayerManager;
@@ -1595,6 +2191,9 @@ class UIHud {
 			ASCompat.setProperty((mUIRoot : ASAny).UI_buster_glow, "visible", false);
 			ASCompat.setProperty((mUIRoot : ASAny).UI_buster_active, "visible", true);
 			ASCompat.setProperty((mUIRoot : ASAny).UI_buster.buster_activated_glow, "visible", true);
+			if (mBusterPulseMc != null && !mBusterPulseMc.isPlaying) {
+				mBusterPulseMc.play((0 : UInt), true);
+			}
 		});
 	}
 
@@ -1602,6 +2201,9 @@ class UIHud {
 		ASCompat.setProperty((mUIRoot : ASAny).UI_buster_glow, "visible", false);
 		ASCompat.setProperty((mUIRoot : ASAny).UI_buster_active, "visible", false);
 		ASCompat.setProperty((mUIRoot : ASAny).UI_buster.buster_activated_glow, "visible", false);
+		if (mBusterPulseMc != null) {
+			mBusterPulseMc.stop();
+		}
 	}
 
 	public function handleBusterBarClickEvent() {
@@ -1612,9 +2214,9 @@ class UIHud {
 
 	public function setWeaponHighlight(currentWeaponIndex:Int) {
 		var _loc2_:UIButton;
-		final __ax4_iter_87 = mWeaponButtons;
-		if (checkNullIteratee(__ax4_iter_87))
-			for (_tmp_ in __ax4_iter_87) {
+		final __ax4_iter_420 = mWeaponButtons;
+		if (checkNullIteratee(__ax4_iter_420))
+			for (_tmp_ in __ax4_iter_420) {
 				_loc2_ = _tmp_;
 				ASCompat.setProperty((_loc2_.root : ASAny).selectionFrame, "visible", false);
 			}
@@ -1627,7 +2229,7 @@ class UIHud {
 
 	public function showNotEnoughMana() {
 		ASCompat.setProperty((mUIRoot : ASAny).UI_center_message, "visible", true);
-		ASCompat.setProperty((mUIRoot : ASAny).UI_center_message, "text", Locale.getString("NOT_ENOUGH_MANA"));
+		Locale.setText(ASCompat.coerce((mUIRoot : ASAny).UI_center_message, flash.text.TextField), "NOT_ENOUGH_MANA");
 	}
 
 	@:isVar public var chatLog(get, never):UIChatLog;
@@ -1651,12 +2253,12 @@ class UIHud {
 		mCooldowns[currentWeaponIndex].stop();
 		mCooldowns[currentWeaponIndex].clip.visible = false;
 		ASCompat.setProperty((mWeaponButtons[currentWeaponIndex].root : ASAny).graphic, "alpha", 1);
-		TweenMax.to((mWeaponButtons[currentWeaponIndex].root : ASAny).graphic, 0.25, {
+		mDBFacade.mTween.tweenMaxTo((mWeaponButtons[currentWeaponIndex].root : ASAny).graphic, 0.25, {
 			"scaleX": 1.25,
 			"scaleY": 1.25,
 			"tint": 16777215,
 			"onComplete": function() {
-				TweenMax.to((mWeaponButtons[currentWeaponIndex].root : ASAny).graphic, 0.25, {
+				mDBFacade.mTween.tweenMaxTo((mWeaponButtons[currentWeaponIndex].root : ASAny).graphic, 0.25, {
 					"scaleX": 1,
 					"scaleY": 1,
 					"removeTint": true
@@ -1676,12 +2278,12 @@ class UIHud {
 		mConsumableCooldowns[currentWeaponIndex].stop();
 		mConsumableCooldowns[currentWeaponIndex].clip.visible = false;
 		ASCompat.setProperty((mConsumableWeaponButtons[currentWeaponIndex].root : ASAny).graphic, "alpha", 1);
-		TweenMax.to((mConsumableWeaponButtons[currentWeaponIndex].root : ASAny).graphic, 0.25, {
+		mDBFacade.mTween.tweenMaxTo((mConsumableWeaponButtons[currentWeaponIndex].root : ASAny).graphic, 0.25, {
 			"scaleX": 1.25,
 			"scaleY": 1.25,
 			"tint": 16777215,
 			"onComplete": function() {
-				TweenMax.to((mConsumableWeaponButtons[currentWeaponIndex].root : ASAny).graphic, 0.25, {
+				mDBFacade.mTween.tweenMaxTo((mConsumableWeaponButtons[currentWeaponIndex].root : ASAny).graphic, 0.25, {
 					"scaleX": 1,
 					"scaleY": 1,
 					"removeTint": true
@@ -1691,8 +2293,8 @@ class UIHud {
 	}
 
 	public function decrementConsumableCount(slot:UInt) {
-		ASCompat.setProperty((mConsumableWeaponButtons[(slot : Int)].root : ASAny).quantity, "text",
-			Std.string((ASCompat.toInt((mConsumableWeaponButtons[(slot : Int)].root : ASAny).quantity.text) - 1)));
+		TextUtil.setText(ASCompat.coerce((mConsumableWeaponButtons[(slot : Int)].root : ASAny).quantity, flash.text.TextField),
+			Std.string(ASCompat.toInt((mConsumableWeaponButtons[(slot : Int)].root : ASAny).quantity.text) - 1));
 	}
 
 	public function totalConsumableCountReached(slot:UInt) {
@@ -1707,12 +2309,12 @@ class UIHud {
 	public function showText(localeTextName:String) {
 		if ((mUIRoot : ASAny).UI_center_message.visible == false) {
 			ASCompat.setProperty((mUIRoot : ASAny).UI_center_message, "visible", true);
-			ASCompat.setProperty((mUIRoot : ASAny).UI_center_message, "text", Locale.getString(localeTextName));
+			Locale.setText(ASCompat.coerce((mUIRoot : ASAny).UI_center_message, flash.text.TextField), localeTextName);
 			mLogicalWorkComponent.doLater(0.35, function() {
 				ASCompat.setProperty((mUIRoot : ASAny).UI_center_message, "visible", false);
 			});
 		} else {
-			ASCompat.setProperty((mUIRoot : ASAny).UI_center_message, "text", Locale.getString(localeTextName));
+			Locale.setText(ASCompat.coerce((mUIRoot : ASAny).UI_center_message, flash.text.TextField), localeTextName);
 		}
 	}
 
@@ -1754,6 +2356,9 @@ class UIHud {
 
 	public function showBuffDisplay(buffGO:BuffGameObject) {
 		mAssetLoadingComponent.getSwfAsset(DBFacade.buildFullDownloadPath(buffGO.buffData.IconSwf), function(param1:SwfAsset) {
+			if (buffGO.isDestroyed) {
+				return;
+			}
 			var _loc6_ = param1.getClass(buffGO.buffData.IconName);
 			var _loc5_ = ASCompat.dynamicAs(ASCompat.createInstance(_loc6_, []), MovieClip);
 			var _loc2_ = mSwfAsset.getClass("buff_cooldown_icon");
@@ -1765,14 +2370,15 @@ class UIHud {
 			mRoot.addChild(_loc4_);
 			var _loc3_ = new UIButton(mDBFacade, _loc4_);
 			_loc3_.tooltip = ASCompat.coerce((_loc4_ : ASAny).tooltip, flash.display.MovieClip);
-			ASCompat.setProperty((_loc4_ : ASAny).tooltip.title_label, "text", GameMasterLocale.getGameMasterSubString("BUFF_NAME", buffGO.buffData.Constant));
-			ASCompat.setProperty((_loc4_ : ASAny).tooltip.description_label, "text",
+			TextUtil.setText(ASCompat.coerce((_loc4_ : ASAny).tooltip.title_label, flash.text.TextField),
+				GameMasterLocale.getGameMasterSubString("BUFF_NAME", buffGO.buffData.Constant));
+			TextUtil.setText(ASCompat.coerce((_loc4_ : ASAny).tooltip.description_label, flash.text.TextField),
 				GameMasterLocale.getGameMasterSubString("BUFF_DESCRIPTION",
 					buffGO.buffData.Constant) + buffGO.buffData.getStacksDescription((buffGO.instanceCount : Int)));
 			mBuffIconButtons.push(_loc3_);
 			mBuffs.push(buffGO);
 			mBuffCooldowns.push(_loc7_);
-			ASCompat.setProperty((_loc4_ : ASAny).quantity, "text", buffGO.instanceCount);
+			TextUtil.setText(ASCompat.coerce((_loc4_ : ASAny).quantity, flash.text.TextField), Std.string(buffGO.instanceCount));
 			resetBuffButtonPositions();
 			startBuffCooldown(mBuffIconButtons.length - 1, buffGO.buffData.Duration);
 		});
@@ -1808,8 +2414,8 @@ class UIHud {
 		while (_loc3_ < mBuffs.length) {
 			_loc2_ = mBuffs[_loc3_];
 			if (_loc2_ == updatedBuffGO) {
-				ASCompat.setProperty((mBuffIconButtons[_loc3_].root : ASAny).quantity, "text", _loc2_.instanceCount);
-				ASCompat.setProperty((mBuffIconButtons[_loc3_].root : ASAny).tooltip.description_label, "text",
+				TextUtil.setText(ASCompat.coerce((mBuffIconButtons[_loc3_].root : ASAny).quantity, flash.text.TextField), Std.string(_loc2_.instanceCount));
+				TextUtil.setText(ASCompat.coerce((mBuffIconButtons[_loc3_].root : ASAny).tooltip.description_label, flash.text.TextField),
 					GameMasterLocale.getGameMasterSubString("BUFF_DESCRIPTION",
 						_loc2_.buffData.Constant) + _loc2_.buffData.getStacksDescription((_loc2_.instanceCount : Int)));
 				startBuffCooldown(_loc3_, _loc2_.buffData.Duration);
@@ -1836,5 +2442,41 @@ class UIHud {
 
 	public function refreshHUD() {
 		this.setupUI(mSwfAsset, mHudType);
+	}
+
+	function onSteamInputGlyphsChanged(event:Event) {
+		if (mDBFacade.steamInputManager.isSteamInputReady) {
+			syncControllerPrompts();
+		}
+	}
+
+	public function handleMenuButtonPressed(index:UInt) {
+		if (index == 0) {
+			if (mSuppressNextExitMenuToggle) {
+				mSuppressNextExitMenuToggle = false;
+				return;
+			}
+			if (mSettingsPopup != null) {
+				return;
+			}
+			closeButtonReleaseCallback();
+		} else if (index == 1) {
+			toggleSettingsPopup();
+		} else if (index == 2) {
+			mUIChatLog.tryToggleChatLog();
+		} else if (index == 3) {
+			if (mDBFacade.steamInputManager.usesSteamOnScreenKeyboard) {
+				mUIChatLog.focusChatInput();
+			}
+		}
+	}
+
+	public function clearExitMenu() {
+		mLootLossPopup = null;
+		mInfiniteExitPopup = null;
+	}
+
+	public function suppressNextExitMenuToggle() {
+		mSuppressNextExitMenuToggle = mDBFacade.inputManager.check(27) || mDBFacade.steamInputManager.pressedAction("menu_cancel");
 	}
 }

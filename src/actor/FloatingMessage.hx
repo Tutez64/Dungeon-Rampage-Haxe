@@ -1,9 +1,8 @@
 package actor;
 
+import brain.render.tweens.Quint;
+import brain.render.tweens.TweenHandle;
 import facade.DBFacade;
-import com.greensock.TimelineMax;
-import com.greensock.TweenMax;
-import com.greensock.easing.Quint;
 import flash.display.DisplayObject;
 import flash.display.DisplayObjectContainer;
 import flash.geom.Vector3D;
@@ -31,7 +30,7 @@ class FloatingMessage {
 
 	var mHoldDuration:UInt = 0;
 
-	var mTimelineMax:TimelineMax;
+	var mTimelineMax:TweenHandle;
 
 	var mStartPosition:Vector3D;
 
@@ -63,15 +62,15 @@ class FloatingMessage {
 	}
 
 	function damageFloaterTween() {
-		var dt = brain.clock.GameClock.ANIMATION_FRAME_DURATION;
+		var dt = mDBFacade.gameClock.tickLength;
 		var distance = mFloatSpeed * mTotalDuration * dt;
 		var toX = mRoot.x + mFloatDirection.x * distance;
 		var toY = mRoot.y + mFloatDirection.y * distance;
 		var toScaleX = mRoot.scaleX * mScaleDampening;
 		var toScaleY = mRoot.scaleY * mScaleDampening;
-		mTimelineMax = new TimelineMax({
+		mTimelineMax = mDBFacade.mTween.createTimeline({
 			"tweens": [
-				TweenMax.to(mRoot, mTotalDuration * 0.8 * dt, {
+				mDBFacade.mTween.tweenMaxTo(mRoot, mTotalDuration * 0.8 * dt, {
 					"delay": mHoldDuration * dt,
 					"x": toX,
 					"y": toY,
@@ -79,7 +78,7 @@ class FloatingMessage {
 					"scaleY": toScaleY,
 					"ease": Quint.easeOut
 				}),
-				TweenMax.to(mRoot, mTotalDuration * 0.2 * dt, {"alpha": 0})
+				mDBFacade.mTween.tweenMaxTo(mRoot, mTotalDuration * 0.2 * dt, {"alpha": 0})
 			],
 			"align": "sequence",
 			"onComplete": function() {
@@ -93,7 +92,7 @@ class FloatingMessage {
 	}
 
 	function buffFloaterTween() {
-		var dt = brain.clock.GameClock.ANIMATION_FRAME_DURATION;
+		var dt = mDBFacade.gameClock.tickLength;
 		var distance = mFloatSpeed * mTotalDuration * dt * 2;
 		var toX = mRoot.x + mFloatDirection.x * distance;
 		var maxY = mRoot.y + mFloatDirection.y * distance * 0.5;
@@ -102,22 +101,22 @@ class FloatingMessage {
 		var toScaleY = mRoot.scaleY * mScaleDampening;
 		var maxYTime = mTotalDuration * dt * 0.1;
 		var minYTime = mTotalDuration * dt * 0.7;
-		mTimelineMax = new TimelineMax({
+		mTimelineMax = mDBFacade.mTween.createTimeline({
 			"tweens": [
-				TweenMax.to(mRoot, mTotalDuration * dt, {
+				mDBFacade.mTween.tweenMaxTo(mRoot, mTotalDuration * dt, {
 					"x": toX,
 					"scaleX": toScaleX,
 					"scaleY": toScaleY
 				}),
-				TweenMax.to(mRoot, mTotalDuration * 0.3 * dt, {
+				mDBFacade.mTween.tweenMaxTo(mRoot, mTotalDuration * 0.3 * dt, {
 					"delay": mTotalDuration * 0.7 * dt,
 					"alpha": 0
 				}),
-				TweenMax.to(mRoot, maxYTime, {
+				mDBFacade.mTween.tweenMaxTo(mRoot, maxYTime, {
 					"y": maxY,
 					"ease": Quint.easeOut
 				}),
-				TweenMax.to(mRoot, minYTime, {
+				mDBFacade.mTween.tweenMaxTo(mRoot, minYTime, {
 					"delay": maxYTime,
 					"y": minY,
 					"ease": Quint.easeIn
@@ -144,10 +143,10 @@ class FloatingMessage {
 			mFinishedCallback = null;
 		}
 		mRoot = null;
-		mDBFacade = null;
 		if (mTimelineMax != null) {
-			mTimelineMax.kill();
+			mDBFacade.mTween.killTween(mTimelineMax);
 			mTimelineMax = null;
 		}
+		mDBFacade = null;
 	}
 }

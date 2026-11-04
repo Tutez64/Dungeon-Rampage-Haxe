@@ -3,16 +3,26 @@ package actor.player.input;
 import brain.logger.Logger;
 import distributedObjects.HeroGameObjectOwner;
 import facade.DBFacade;
+import input.keyBindings.InputAction;
+import input.keyBindings.KeyBindings;
 import flash.geom.Vector3D;
 
 class KeyboardController {
-	static final KEYS_TO_ATTACK_INDEX:Array<ASAny> = [0, 1, 2, 3, 0, 1, 2, 0];
+	static inline final MENU_INDEX_EXIT = 0;
 
-	static final KEYS_TO_CONSUMABLE_INDEX:Array<ASAny> = [0, 1];
+	static inline final MENU_INDEX_OPEN_OPTIONS_MENU = 1;
+
+	static inline final MENU_INDEX_TOGGLE_CHAT_LOG = 2;
+
+	static inline final MENU_INDEX_CHAT_INPUT = 3;
+
+	static inline final MENU_INDEX_COUNT = 4;
 
 	var mDBFacade:DBFacade;
 
 	var mHeroOwner:HeroGameObjectOwner;
+
+	var mKeyBindings:KeyBindings;
 
 	var mInputVector:Vector3D;
 
@@ -20,30 +30,27 @@ class KeyboardController {
 
 	var mInputHeading:Vector3D;
 
-	var mCombatKeys:Vector<Int>;
-
 	var mPressedCombatKeysThisFrame:Vector<Int>;
 
 	var mReleasedCombatKeysThisFrame:Vector<Int>;
 
-	var mConsumableKeys:Vector<Int>;
-
 	var mReleasedConsumableKeysThisFrame:Vector<Int>;
+
+	var mReleasedMenuKeysThisFrame:Vector<Int>;
 
 	var mCombatDisabled:Bool = false;
 
 	public function new(dbFacade:DBFacade, heroOwner:HeroGameObjectOwner) {
 		mDBFacade = dbFacade;
 		mHeroOwner = heroOwner;
+		mKeyBindings = dbFacade.keyBindings;
 		mMovementVelocity = new Vector3D();
 		mInputHeading = new Vector3D();
-		mCombatKeys = new Vector<Int>();
 		mPressedCombatKeysThisFrame = new Vector<Int>();
-		mConsumableKeys = new Vector<Int>();
+		mReleasedCombatKeysThisFrame = new Vector<Int>();
 		mReleasedConsumableKeysThisFrame = new Vector<Int>();
-		ASCompat.ASArray.pushMultiple(mCombatKeys, 90, 88, 67, 66, 74, 75, 76, 89);
+		mReleasedMenuKeysThisFrame = new Vector<Int>();
 		mCombatDisabled = false;
-		ASCompat.ASArray.pushMultiple(mConsumableKeys, 49, 50);
 	}
 
 	public function perFrameUpCall() {
@@ -61,16 +68,16 @@ class KeyboardController {
 
 	function getInputDirectionVector() {
 		mInputVector = new Vector3D();
-		if (mDBFacade.inputManager.check(38) || mDBFacade.inputManager.check(87)) {
+		if (mKeyBindings.isDown("moveUp")) {
 			mInputVector.y -= 1;
 		}
-		if (mDBFacade.inputManager.check(40) || mDBFacade.inputManager.check(83)) {
+		if (mKeyBindings.isDown("moveDown")) {
 			mInputVector.y += 1;
 		}
-		if (mDBFacade.inputManager.check(39) || mDBFacade.inputManager.check(68)) {
+		if (mKeyBindings.isDown("moveRight")) {
 			mInputVector.x += 1;
 		}
-		if (mDBFacade.inputManager.check(37) || mDBFacade.inputManager.check(65)) {
+		if (mKeyBindings.isDown("moveLeft")) {
 			mInputVector.x -= 1;
 		}
 		mInputVector.normalize();
@@ -82,31 +89,33 @@ class KeyboardController {
 		return mCombatDisabled = disableCombat;
 	}
 
-	public function KeyIndexToAttack(keyIndex:Int):Int {
-		return ASCompat.toInt(KEYS_TO_ATTACK_INDEX[keyIndex]);
-	}
-
-	public function KeyIndexToConsumable(keyIndex:Int):Int {
-		return ASCompat.toInt(KEYS_TO_CONSUMABLE_INDEX[keyIndex]);
-	}
-
 	function checkCombatButtons() {
+		var _loc1_:String;
+		var __ax4_iter_426:Vector<String>;
 		if (!mCombatDisabled) {
 			mReleasedCombatKeysThisFrame = new Vector<Int>();
 			mPressedCombatKeysThisFrame = new Vector<Int>();
-			ASCompat.ASVector.forEach(mCombatKeys, checkCombatButton, this);
+			__ax4_iter_426 = InputAction.ATTACK_SLOTS;
+			if (checkNullIteratee(__ax4_iter_426))
+				for (_tmp_ in __ax4_iter_426) {
+					_loc1_ = _tmp_;
+					mPressedCombatKeysThisFrame.push(ASCompat.toInt(mKeyBindings.isDown(_loc1_)));
+					mReleasedCombatKeysThisFrame.push(ASCompat.toInt(mKeyBindings.wasReleased(_loc1_)));
+				}
 		}
 		mReleasedConsumableKeysThisFrame = new Vector<Int>();
-		ASCompat.ASVector.forEach(mConsumableKeys, checkConsumableButton, this);
-	}
-
-	function checkCombatButton(key:Int, weaponIndex:UInt, combatKeys:Vector<Int>) {
-		mPressedCombatKeysThisFrame.push(ASCompat.toInt(mDBFacade.inputManager.check(key)));
-		mReleasedCombatKeysThisFrame.push(ASCompat.toInt(mDBFacade.inputManager.released(key)));
-	}
-
-	function checkConsumableButton(key:Int, consumableIndex:UInt, combatKeys:Vector<Int>) {
-		mReleasedConsumableKeysThisFrame.push(ASCompat.toInt(mDBFacade.inputManager.released(key)));
+		var _loc2_:String;
+		final __ax4_iter_427 = InputAction.CONSUMABLE_SLOTS;
+		if (checkNullIteratee(__ax4_iter_427))
+			for (_tmp_ in __ax4_iter_427) {
+				_loc2_ = _tmp_;
+				mReleasedConsumableKeysThisFrame.push(ASCompat.toInt(mKeyBindings.wasReleased(_loc2_)));
+			}
+		mReleasedMenuKeysThisFrame = new Vector<Int>((4 : UInt));
+		mReleasedMenuKeysThisFrame[0] = ASCompat.toInt(mDBFacade.inputManager.released(27));
+		mReleasedMenuKeysThisFrame[1] = ASCompat.toInt(mKeyBindings.wasReleased("openOptionsMenu"));
+		mReleasedMenuKeysThisFrame[2] = ASCompat.toInt(mKeyBindings.wasReleased("toggleChatLog"));
+		mReleasedMenuKeysThisFrame[3] = ASCompat.toInt(mDBFacade.inputManager.released(13));
 	}
 
 	public function determineMotion() {
@@ -146,5 +155,13 @@ class KeyboardController {
 		return mReleasedConsumableKeysThisFrame;
 	}
 
-	public function destroy() {}
+	@:isVar public var releasedMenuKeysThisFrame(get, never):Vector<Int>;
+
+	public function get_releasedMenuKeysThisFrame():Vector<Int> {
+		return mReleasedMenuKeysThisFrame;
+	}
+
+	public function destroy() {
+		mKeyBindings = null;
+	}
 }

@@ -43,7 +43,7 @@ class FloorMessageView {
 		if (mMessageString != "") {
 			ASCompat.setProperty((mMessageClip : ASAny).message_text_01, "text", mMessageString);
 		} else {
-			ASCompat.setProperty((mMessageClip : ASAny).message_text_01, "text", Locale.getString(mMessageKey));
+			Locale.setText(ASCompat.coerce((mMessageClip : ASAny).message_text_01, flash.text.TextField), mMessageKey);
 		}
 		if (ASCompat.toNumberField((mMessageClip : ASAny).message_text_01, "textWidth") > 700) {
 			ASCompat.setProperty((mMessageClip : ASAny).message_text_01, "autoSize", "center");

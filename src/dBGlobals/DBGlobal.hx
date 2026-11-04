@@ -1,167 +1,165 @@
 package dBGlobals;
 
 import brain.logger.Logger;
+import flash.display.DisplayObject;
 import flash.display.MovieClip;
 import flash.filters.GlowFilter;
+import haxe.Log;
 
 class DBGlobal {
 	public static var TUTORIAL_MAP_NODE_ID:UInt = (50002 : UInt);
 
-	public static var MUSIC_VOLUME:Float = 0.7;
+	public static var MUSIC_VOLUME:Float = 0.5;
 
-	public static var SFX_VOLUME:Float = 0.7;
+	public static var SFX_VOLUME:Float = 0.5;
 
-	public static inline final RESSURECTION_POTION_STACK_ID = (60001 : UInt);
+	public static var RESSURECTION_POTION_STACK_ID:UInt = (60001 : UInt);
 
-	public static inline final RESSURECTION_POTION_OFFER_ID = (51304 : UInt);
+	public static var RESSURECTION_POTION_OFFER_ID:UInt = (51304 : UInt);
 
-	public static inline final PARTYBOMB_POTION_STACK_ID = (60018 : UInt);
+	public static var PARTYBOMB_POTION_STACK_ID:UInt = (60018 : UInt);
 
-	public static inline final PARTYBOMB_POTION_OFFER_ID = (51369 : UInt);
+	public static var PARTYBOMB_POTION_OFFER_ID:UInt = (51369 : UInt);
 
-	public static inline final SFX_PATH = "Resources/Audio/soundEffects.swf";
+	public static var CONSUMABLE_WEAPON_ID:UInt = (40000 : UInt);
 
-	public static inline final DEFAULT_ICON_NATIVE_SIZE:Float = 100;
+	public static var SFX_PATH:String = "Resources/Audio/soundEffects.swf";
 
-	public static inline final WEAPON_ICON_NATIVE_SIZE:Float = 100;
+	public static var DEFAULT_ICON_NATIVE_SIZE:Float = 100;
 
-	public static inline final CHEST_ICON_NATIVE_SIZE:Float = 120;
+	public static var WEAPON_ICON_NATIVE_SIZE:Float = 100;
 
-	public static inline final CHARGE_ICON_NATIVE_SIZE:Float = 60;
+	public static var CHEST_ICON_NATIVE_SIZE:Float = 120;
 
-	public static inline final HERO_ICON_NATIVE_SIZE:Float = 72;
+	public static var CHARGE_ICON_NATIVE_SIZE:Float = 60;
 
-	public static inline final PET_ICON_NATIVE_SIZE:Float = 68;
+	public static var HERO_ICON_NATIVE_SIZE:Float = 72;
 
-	public static inline final BERSERKER_TYPE_ID = (101 : UInt);
+	public static var PET_ICON_NATIVE_SIZE:Float = 68;
 
-	public static inline final RANGER_TYPE_ID = (102 : UInt);
+	public static var BERSERKER_TYPE_ID:UInt = (101 : UInt);
 
-	public static inline final SORCERER_TYPE_ID = (103 : UInt);
+	public static var RANGER_TYPE_ID:UInt = (102 : UInt);
 
-	public static inline final BATTLE_CHEF_TYPE_ID = (104 : UInt);
+	public static var SORCERER_TYPE_ID:UInt = (103 : UInt);
 
-	public static inline final VAMPIRE_HUNTER_TYPE_ID = (105 : UInt);
+	public static var BATTLE_CHEF_TYPE_ID:UInt = (104 : UInt);
 
-	public static inline final GHOST_SAMURAI_TYPE_ID = (106 : UInt);
+	public static var VAMPIRE_HUNTER_TYPE_ID:UInt = (105 : UInt);
 
-	public static inline final MELEE_ITEM_CATEGORY = "MELEE";
+	public static var GHOST_SAMURAI_TYPE_ID:UInt = (106 : UInt);
 
-	public static inline final SHOOTING_ITEM_CATEGORY = "SHOOTING";
+	public static var MELEE_ITEM_CATEGORY:String = "MELEE";
 
-	public static inline final MAGIC_ITEM_CATEGORY = "MAGIC";
+	public static var SHOOTING_ITEM_CATEGORY:String = "SHOOTING";
 
-	public static inline final HP_BOOST:Float = 0;
+	public static var MAGIC_ITEM_CATEGORY:String = "MAGIC";
 
-	public static inline final MP_BOOST:Float = 1;
+	public static var HP_BOOST:Int = 0;
 
-	public static inline final MELEE_ATK:Float = 2;
+	public static var MP_BOOST:Int = 1;
 
-	public static inline final SHOOT_ATK:Float = 3;
+	public static var MELEE_ATK:Int = 2;
 
-	public static inline final MAGIC_ATK:Float = 4;
+	public static var SHOOT_ATK:Int = 3;
 
-	public static inline final MELEE_DEF:Float = 5;
+	public static var MAGIC_ATK:Int = 4;
 
-	public static inline final SHOOT_DEF:Float = 6;
+	public static var MELEE_DEF:Int = 5;
 
-	public static inline final MAGIC_DEF:Float = 7;
+	public static var SHOOT_DEF:Int = 6;
 
-	public static inline final MELEE_SPD:Float = 8;
+	public static var MAGIC_DEF:Int = 7;
 
-	public static inline final SHOOT_SPD:Float = 9;
+	public static var MELEE_SPD:Int = 8;
 
-	public static inline final MAGIC_SPD:Float = 10;
+	public static var SHOOT_SPD:Int = 9;
 
-	public static inline final HP_REGEN:Float = 11;
+	public static var MAGIC_SPD:Int = 10;
 
-	public static inline final MP_REGEN:Float = 12;
+	public static var HP_REGEN:Int = 11;
 
-	public static inline final MOVEMENT:Float = 13;
+	public static var MP_REGEN:Int = 12;
 
-	public static inline final LUCK:Float = 14;
+	public static var MOVEMENT:Int = 13;
 
-	public static inline final LV_HP_BOOST:Float = 0;
+	public static var LV_HP_BOOST:Int = 0;
 
-	public static inline final LV_MP_BOOST:Float = 1;
+	public static var LV_MP_BOOST:Int = 1;
 
-	public static inline final LV_MELEE_ATK:Float = 2;
+	public static var LV_MELEE_ATK:Int = 2;
 
-	public static inline final LV_SHOOT_ATK:Float = 3;
+	public static var LV_SHOOT_ATK:Int = 3;
 
-	public static inline final LV_MAGIC_ATK:Float = 4;
+	public static var LV_MAGIC_ATK:Int = 4;
 
-	public static inline final LV_MELEE_DEF:Float = 5;
+	public static var LV_MELEE_DEF:Int = 5;
 
-	public static inline final LV_SHOOT_DEF:Float = 6;
+	public static var LV_SHOOT_DEF:Int = 6;
 
-	public static inline final LV_MAGIC_DEF:Float = 7;
+	public static var LV_MAGIC_DEF:Int = 7;
 
-	public static inline final LV_MELEE_SPD:Float = 8;
+	public static var LV_MELEE_SPD:Int = 8;
 
-	public static inline final LV_SHOOT_SPD:Float = 9;
+	public static var LV_SHOOT_SPD:Int = 9;
 
-	public static inline final LV_MAGIC_SPD:Float = 10;
+	public static var LV_MAGIC_SPD:Int = 10;
 
-	public static inline final LV_HP_REGEN:Float = 11;
+	public static var LV_HP_REGEN:Int = 11;
 
-	public static inline final LV_MP_REGEN:Float = 12;
+	public static var LV_MP_REGEN:Int = 12;
 
-	public static inline final LV_MOVEMENT:Float = 13;
+	public static var LV_MOVEMENT:Int = 13;
 
-	public static inline final LV_LUCK:Float = 14;
+	public static var ATTTACK_TYPE_MELEE:Int = 0;
 
-	public static inline final ATTTACK_TYPE_MELEE:Float = 0;
+	public static var ATTTACK_TYPE_RANGE:Int = 1;
 
-	public static inline final ATTTACK_TYPE_RANGE:Float = 1;
+	public static var ATTTACK_TYPE_MAGIC:Int = 2;
 
-	public static inline final ATTTACK_TYPE_MAGIC:Float = 2;
+	public static var B2D_ENVIRONMENT_MASK:UInt = (1 : UInt);
 
-	public static inline final B2D_ENVIRONMENT_MASK = (1 : UInt);
+	public static var B2D_COMBAT_MASK:UInt = (2 : UInt);
 
-	public static inline final B2D_COMBAT_MASK = (2 : UInt);
+	public static var TEAM_ENVIRONMENT:UInt = (1 : UInt);
 
-	public static inline final TEAM_ENVIRONMENT = (1 : UInt);
+	public static var TEAM_1:UInt = (5 : UInt);
 
-	public static inline final TEAM_1 = (5 : UInt);
+	public static var TEAM_2:UInt = (6 : UInt);
 
-	public static inline final TEAM_2 = (6 : UInt);
+	public static var TEAM_3:UInt = (7 : UInt);
 
-	public static inline final TEAM_3 = (7 : UInt);
+	public static var ABILITY_SUFFER_IMMUNITY:UInt = (1 : UInt);
 
-	public static inline final ABILITY_SUFFER_IMMUNITY = (1 : UInt);
+	public static var ABILITY_INVULNERABLE_MELEE:UInt = (2 : UInt);
 
-	public static inline final ABILITY_INVULNERABLE_MELEE = (2 : UInt);
+	public static var ABILITY_INVULNERABLE_MAGIC:UInt = (4 : UInt);
 
-	public static inline final ABILITY_INVULNERABLE_MAGIC = (4 : UInt);
+	public static var ABILITY_INVULNERABLE_SHOOT:UInt = (8 : UInt);
 
-	public static inline final ABILITY_INVULNERABLE_SHOOT = (8 : UInt);
+	public static var ABILITY_BERSERK_MODE:UInt = (16 : UInt);
 
-	public static inline final ABILITY_INVULNERABLE_ALL = (14 : UInt);
+	public static var ABILITY_PARALYZED:UInt = (32 : UInt);
 
-	public static inline final ABILITY_BERSERK_MODE = (16 : UInt);
+	public static var ABILITY_BREAK_FREE:UInt = (64 : UInt);
 
-	public static inline final ABILITY_PARALYZED = (32 : UInt);
+	public static var ABILITY_PANIC:UInt = (128 : UInt);
 
-	public static inline final ABILITY_BREAK_FREE = (64 : UInt);
+	public static var ABILITY_PARALYZE_IMMUNITY:UInt = (256 : UInt);
 
-	public static inline final ABILITY_PANIC = (128 : UInt);
+	public static var ABILITY_DISABLE_CONTROLS:UInt = (512 : UInt);
 
-	public static inline final ABILITY_PARALYZE_IMMUNITY = (256 : UInt);
+	public static var ABILITY_PIERCE_IMMUNE:UInt = (16777216 : UInt);
 
-	public static inline final ABILITY_DISABLE_CONTROLS = (512 : UInt);
+	public static var BERSERKER_RAMPAGE:String = "RAMPAGE";
 
-	public static inline final ABILITY_PIERCE_IMMUNE = (16777216 : UInt);
+	public static var UI_16_TO_9_PORT_OBJECT_SCALE:Float = 1.8;
 
-	public static inline final BERSERKER_RAMPAGE = "RAMPAGE";
+	public static var FILTER_QUALITY_LOW:UInt = (0 : UInt);
 
-	public static inline final UI_16_TO_9_PORT_OBJECT_SCALE:Float = 1.8;
+	public static var FILTER_QUALITY_MEDIUM:UInt = (1 : UInt);
 
-	public static inline final FILTER_QUALITY_LOW = (0 : UInt);
-
-	public static inline final FILTER_QUALITY_MEDIUM = (1 : UInt);
-
-	public static inline final FILTER_QUALITY_HIGH = (2 : UInt);
+	public static var FILTER_QUALITY_HIGH:UInt = (2 : UInt);
 
 	public static var StatNames:Vector<String> = Vector.ofArray([
 		"HP_BOOST",
@@ -169,127 +167,152 @@ class DBGlobal {
 		"MELEE_ATK",
 		"SHOOT_ATK",
 		"MAGIC_ATK",
-		"SHOOT_DEF",
 		"MELEE_DEF",
+		"SHOOT_DEF",
 		"MAGIC_DEF",
 		"MELEE_SPD",
 		"SHOOT_SPD",
 		"MAGIC_SPD",
 		"HP_REGEN",
 		"MP_REGEN",
-		"MOVEMENT",
-		"LUCK"
+		"MOVEMENT"
 	]);
 
-	public static final UI_ROLLOVER_FILTER:GlowFilter = new GlowFilter((16633879 : UInt), 1, 8, 8, 5);
+	public static var ABILITY_INVULNERABLE_ALL:UInt = ((DBGlobal.ABILITY_INVULNERABLE_MELEE : Int) | (DBGlobal.ABILITY_INVULNERABLE_MAGIC : Int) | (DBGlobal.ABILITY_INVULNERABLE_SHOOT : Int) : UInt);
 
-	public static final UI_SELECTED_FILTER:GlowFilter = new GlowFilter((16777215 : UInt), 1, 6, 6, 12);
+	public static var UI_ROLLOVER_FILTER:GlowFilter = new GlowFilter((16633879 : UInt), 1, 8, 8, 5);
 
-	public static final UI_DISABLED_FILTER:GlowFilter = new GlowFilter((16711680 : UInt), 0.1, 5, 5, 2.6);
+	public static var UI_SELECTED_FILTER:GlowFilter = new GlowFilter((16777215 : UInt), 1, 6, 6, 12);
+
+	public static var UI_DISABLED_FILTER:GlowFilter = new GlowFilter((16711680 : UInt), 0.1, 5, 5, 2.6);
 
 	public function new() {}
 
 	public static function NameToSlotOffset(name:String):Int {
+		var _loc4_ = 0;
 		var _loc2_ = 0;
-		_loc2_ = 0;
-		while (_loc2_ < StatNames.length) {
-			if (StatNames[_loc2_] == name) {
-				return _loc2_;
+		var _loc3_ = DBGlobal.StatNames.length;
+		while (_loc2_ < _loc3_) {
+			_loc4_ = _loc2_++;
+			if (DBGlobal.StatNames[_loc4_] == name) {
+				return _loc4_;
 			}
-			_loc2_++;
 		}
 		return -1;
 	}
 
 	public static function b2dMaskForAllTeamsBut(team:UInt):UInt {
-		if (team == 5) {
-			return (193 : UInt);
+		if (team == DBGlobal.TEAM_1) {
+			return ((DBGlobal.B2D_ENVIRONMENT_MASK : Int) | 1 << (DBGlobal.TEAM_2 : Int) | 1 << (DBGlobal.TEAM_3 : Int) : UInt);
 		}
-		if (team == 6) {
-			return (161 : UInt);
+		if (team == DBGlobal.TEAM_2) {
+			return ((DBGlobal.B2D_ENVIRONMENT_MASK : Int) | 1 << (DBGlobal.TEAM_1 : Int) | 1 << (DBGlobal.TEAM_3 : Int) : UInt);
 		}
-		if (team == 7) {
-			return (97 : UInt);
+		if (team == DBGlobal.TEAM_3) {
+			return ((DBGlobal.B2D_ENVIRONMENT_MASK : Int) | 1 << (DBGlobal.TEAM_1 : Int) | 1 << (DBGlobal.TEAM_2 : Int) : UInt);
 		}
-		if (team == 1) {
-			return (96 : UInt);
+		if (team == DBGlobal.TEAM_ENVIRONMENT) {
+			return (1 << (DBGlobal.TEAM_1 : Int) | 1 << (DBGlobal.TEAM_2 : Int) : UInt);
 		}
-		Logger.error("Unable to determine box2D team mask for team: " + team + " in function: b2dMaskForAllTeamsBut");
+		Logger.error("Unable to determine box2D team mask for team: " + ("" + team) + " in function: b2dMaskForAllTeamsBut");
 		return (0 : UInt);
 	}
 
 	public static function b2dMaskForTeam(team:UInt):UInt {
-		if (team == 5) {
-			return (1 << 5 : UInt);
+		if (team == DBGlobal.TEAM_1) {
+			return (1 << (DBGlobal.TEAM_1 : Int) : UInt);
 		}
-		if (team == 6) {
-			return (1 << 6 : UInt);
+		if (team == DBGlobal.TEAM_2) {
+			return (1 << (DBGlobal.TEAM_2 : Int) : UInt);
 		}
-		if (team == 7) {
-			return (1 << 7 : UInt);
+		if (team == DBGlobal.TEAM_3) {
+			return (1 << (DBGlobal.TEAM_3 : Int) : UInt);
 		}
-		if (team == 1) {
-			return (1 : UInt);
+		if (team == DBGlobal.TEAM_ENVIRONMENT) {
+			return DBGlobal.B2D_ENVIRONMENT_MASK;
 		}
-		Logger.error("Unable to determine box2D team mask for team: " + team + " in function: b2dMaskForTeam");
+		Logger.error("Unable to determine box2D team mask for team: " + ("" + team) + " in function: b2dMaskForTeam");
 		return (0 : UInt);
 	}
 
 	public static function mapAbilityMask(ability:String):UInt {
 		if (ability == "SUFFER_IMMUNE") {
-			return (1 : UInt);
+			return DBGlobal.ABILITY_SUFFER_IMMUNITY;
 		}
 		if (ability == "INVULNERABLE_MELEE") {
-			return (2 : UInt);
+			return DBGlobal.ABILITY_INVULNERABLE_MELEE;
 		}
 		if (ability == "INVULNERABLE_MAGIC") {
-			return (4 : UInt);
+			return DBGlobal.ABILITY_INVULNERABLE_MAGIC;
 		}
 		if (ability == "INVULNERABLE_SHOOT") {
-			return (8 : UInt);
+			return DBGlobal.ABILITY_INVULNERABLE_SHOOT;
 		}
 		if (ability == "INVULNERABLE_ALL") {
-			return (14 : UInt);
+			return DBGlobal.ABILITY_INVULNERABLE_ALL;
 		}
 		if (ability == "BERSERK_MODE") {
-			return (16 : UInt);
+			return DBGlobal.ABILITY_BERSERK_MODE;
 		}
 		if (ability == "PARALYZED") {
-			return (32 : UInt);
+			return DBGlobal.ABILITY_PARALYZED;
 		}
 		if (ability == "DISABLE_CONTROLS") {
-			return (512 : UInt);
+			return DBGlobal.ABILITY_DISABLE_CONTROLS;
 		}
 		if (ability == "BREAK_FREE") {
-			return (64 : UInt);
+			return DBGlobal.ABILITY_BREAK_FREE;
 		}
 		if (ability == "PANIC") {
-			return (128 : UInt);
+			return DBGlobal.ABILITY_PANIC;
 		}
 		if (ability == "PARALYZE_IMMUNITY") {
-			return (256 : UInt);
+			return DBGlobal.ABILITY_PARALYZE_IMMUNITY;
 		}
 		if (ability == "PIERCE_IMMUNE") {
-			return (16777216 : UInt);
+			return DBGlobal.ABILITY_PIERCE_IMMUNE;
 		}
 		return (0 : UInt);
 	}
 
 	public static function traceClipChildren(clipToTrace:MovieClip) {
+		var _loc4_ = 0;
+		var _loc5_ = ASCompat.dynamicAs(null, DisplayObject);
+		Log.trace("+ number of DisplayObject: " + clipToTrace.numChildren + "  --------------------------------", {
+			"fileName": "../DungeonBusters/Client/GameMasterProjectHaxe/src/dbglobals/DBGlobal.hx",
+			"lineNumber": 202,
+			"className": "dbglobals.DBGlobal",
+			"methodName": "traceClipChildren"
+		});
 		var _loc2_ = 0;
-		_loc2_ = 0;
-		while (_loc2_ < clipToTrace.numChildren) {
-			_loc2_++;
+		var _loc3_ = clipToTrace.numChildren;
+		while (_loc2_ < _loc3_) {
+			_loc4_ = _loc2_++;
+			_loc5_ = clipToTrace.getChildAt(_loc4_);
+			Log.trace("\t|\t " + _loc4_ + ".\t name:" + Std.string(_loc5_.name) + "\t type:" + Type.getClassName(Type.getClass(_loc5_)) + "\t"
+				+ Std.string(_loc5_),
+				{
+					"fileName": "../DungeonBusters/Client/GameMasterProjectHaxe/src/dbglobals/DBGlobal.hx",
+					"lineNumber": 205,
+					"className": "dbglobals.DBGlobal",
+					"methodName": "traceClipChildren"
+				});
 		}
+		Log.trace("\t+ --------------------------------------------------------------------------------------", {
+			"fileName": "../DungeonBusters/Client/GameMasterProjectHaxe/src/dbglobals/DBGlobal.hx",
+			"lineNumber": 207,
+			"className": "dbglobals.DBGlobal",
+			"methodName": "traceClipChildren"
+		});
 	}
 
 	public static function highlightButton(button:ASAny, quality:UInt = (1 : UInt)) {
-		var _loc3_ = UI_ROLLOVER_FILTER;
-		if (quality == 0) {
+		var _loc3_ = DBGlobal.UI_ROLLOVER_FILTER;
+		if (quality == DBGlobal.FILTER_QUALITY_LOW) {
 			_loc3_.quality = 1;
-		} else if (quality == 1) {
+		} else if (quality == DBGlobal.FILTER_QUALITY_MEDIUM) {
 			_loc3_.quality = 2;
-		} else if (quality == 2) {
+		} else if (quality == DBGlobal.FILTER_QUALITY_HIGH) {
 			_loc3_.quality = 3;
 		} else {
 			Logger.warn("No such quality exists..");

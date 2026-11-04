@@ -15,6 +15,7 @@ import combat.attack.ScriptTimeline;
 import combat.weapon.WeaponGameObject;
 import dBGlobals.DBGlobal;
 import distributedObjects.DistributedDungeonFloor;
+import distributedObjects.HeroGameObjectOwner;
 import dungeon.Tile;
 import events.HpEvent;
 import facade.DBFacade;
@@ -26,6 +27,7 @@ import gameMasterDictionary.StatVector;
 import generatedCode.AttackChoreography;
 import generatedCode.CombatResult;
 import generatedCode.WeaponDetails;
+import steamInput.RumbleEffect;
 import flash.display.DisplayObject;
 import flash.geom.Point;
 import flash.geom.Vector3D;
@@ -41,13 +43,19 @@ class ActorGameObject extends FloorObject {
 
 	static inline final TELEPORT = "TELEPORT";
 
-	public static inline final ATTEMPT_REVIVE_INSTANT_TIMELINE_NAME = "TM_ATTEMPT_REVIVE_INSTANT";
-
 	public static inline final ATTEMPT_REVIVE_LONG_TIMELINE_NAME = "TM_ATTEMPT_REVIVE_LONG";
 
 	static inline final ATTEMPT_REVIVE_LONG_ATTACK_ID = (910900 : UInt);
 
-	static inline final ATTEMPT_REVIVE_INSTANT_ATTACK_ID = (910901 : UInt);
+	static inline final RUMBLE_MIN_DAMAGE_SCALE:Float = 0.2;
+
+	static inline final RUMBLE_MAX_DAMAGE_SCALE:Float = 2;
+
+	static inline final RUMBLE_FULL_DAMAGE_FRACTION:Float = 0.8;
+
+	static inline final PERSISTENT_HIDE_OFFSTAGE_GRACE_MS = 2000;
+
+	static inline final RUN_HOLD_MS = 200;
 
 	var mScreenName:String = "";
 
@@ -107,6 +115,10 @@ class ActorGameObject extends FloorObject {
 
 	var mAFK:Bool = false;
 
+	var mPersistentHideAt:Int = -1;
+
+	var mForceFlash:Bool = false;
+
 	var mIsBlocking:Bool = false;
 
 	var mMaximumDotForBlock:Float = -1.1;
@@ -116,6 +128,10 @@ class ActorGameObject extends FloorObject {
 	var mAttemptReviveScript:AttackTimeline;
 
 	var mCanBeKnockedBack:Bool = true;
+
+	var mLastMovingTime:Float = Math.NEGATIVE_INFINITY;
+
+	var mOneShotHoldUntil:Int = 0;
 
 	public function new(dbFacade:DBFacade, remoteId:UInt = (0 : UInt)) {
 		super(dbFacade, remoteId);
@@ -136,6 +152,12 @@ class ActorGameObject extends FloorObject {
 	@:isVar public var isOwner(get, never):Bool;
 
 	public function get_isOwner():Bool {
+		return false;
+	}
+
+	@:isVar public var belongsToRemotePlayer(get, never):Bool;
+
+	public function get_belongsToRemotePlayer():Bool {
 		return false;
 	}
 
@@ -189,26 +211,23 @@ class ActorGameObject extends FloorObject {
 	}
 
 	override public function init() {
-		var _loc2_:String = null;
 		super.init();
 		this.createNavCollisions(this.actorData.constant);
 		mMouseEventHandler.Init();
 		setupWeapons();
 		initializeToFirstValidWeapon();
+		if (mTile != null && mTile.isOnStage) {
+			mActorView.addToStage();
+		}
 		determineState();
-		var _loc3_ = this.actorData.gMActor.TeleportInTimeline;
+		var _loc2_ = this.actorData.gMActor.TeleportInTimeline;
 		var _loc1_ = this.actorData.gMActor.TeleportOutTimeline;
-		if (ASCompat.stringAsBool(_loc3_) && ASCompat.stringAsBool(_loc1_)) {
-			mTeleportInTimeline = mDBFacade.timelineFactory.createScriptTimeline(_loc3_, this, mDistributedDungeonFloor);
+		if (ASCompat.stringAsBool(_loc2_) && ASCompat.stringAsBool(_loc1_)) {
+			mTeleportInTimeline = mDBFacade.timelineFactory.createScriptTimeline(_loc2_, this, mDistributedDungeonFloor);
 			mTeleportOutTimeline = mDBFacade.timelineFactory.createScriptTimeline(_loc1_, this, mDistributedDungeonFloor);
 		}
 		if (mAttemptReviveScript == null) {
-			if (mDBFacade.dbConfigManager.getConfigBoolean("use_long_revive", true)) {
-				_loc2_ = "TM_ATTEMPT_REVIVE_LONG";
-			} else {
-				_loc2_ = "TM_ATTEMPT_REVIVE_INSTANT";
-			}
-			mAttemptReviveScript = mDBFacade.timelineFactory.createAttackTimeline(_loc2_, null, this, mDistributedDungeonFloor);
+			mAttemptReviveScript = mDBFacade.timelineFactory.createAttackTimeline("TM_ATTEMPT_REVIVE_LONG", null, this, mDistributedDungeonFloor);
 		}
 	}
 
@@ -341,7 +360,7 @@ class ActorGameObject extends FloorObject {
 	}
 
 	function move() {
-		mMovementController.move(this.position, this.heading);
+		mMovementController.move(mPosition, this.heading);
 	}
 
 	public function getHeadingAsVector(degreesOffset:Float = 0):Vector3D {
@@ -407,6 +426,10 @@ class ActorGameObject extends FloorObject {
 			mTeleportOutTimeline.destroy();
 			mTeleportOutTimeline = null;
 		}
+		if (mAttemptReviveScript != null) {
+			mAttemptReviveScript.destroy();
+			mAttemptReviveScript = null;
+		}
 		mPosition = null;
 		mMovementController.destroy();
 		mMovementController = null;
@@ -431,9 +454,9 @@ class ActorGameObject extends FloorObject {
 		mCurrentWeapon = null;
 		mWeaponDetails = null;
 		var _loc1_:WeaponGameObject;
-		final __ax4_iter_20 = mWeapons;
-		if (checkNullIteratee(__ax4_iter_20))
-			for (_tmp_ in __ax4_iter_20) {
+		final __ax4_iter_12 = mWeapons;
+		if (checkNullIteratee(__ax4_iter_12))
+			for (_tmp_ in __ax4_iter_12) {
 				_loc1_ = _tmp_;
 				if (_loc1_ != null) {
 					_loc1_.destroy();
@@ -474,6 +497,9 @@ class ActorGameObject extends FloorObject {
 		mHitPoints = val;
 		mActorView.setHp(mHitPoints, (ASCompat.floatToInt(this.maxHitPoints) : UInt));
 		mFacade.eventManager.dispatchEvent(new HpEvent("HpEvent_HP_UPDATE", id, mHitPoints, (ASCompat.floatToInt(this.maxHitPoints) : UInt)));
+		if (mHitPoints == 0 && this.actorData != null && this.isProp) {
+			removeNavColliders();
+		}
 		return val;
 	}
 
@@ -525,14 +551,38 @@ class ActorGameObject extends FloorObject {
 			} else if (combatResult.blocked == 0) {
 				this.actorView.receiveDamage(combatResult, _loc2_);
 				receiveDamage(combatResult);
+				playCombatRumble(combatResult);
 			}
 		}
+	}
+
+	function playCombatRumble(combatResult:CombatResult) {
+		var _loc2_:RumbleEffect = null;
+		var _loc3_ = HeroGameObjectOwner.currentHeroOwnerId;
+		if (this.id == _loc3_) {
+			_loc2_ = RumbleEffect.PLAYER_TAKING_DAMAGE.scaled(takingDamageRumbleScale(combatResult.damage));
+			mDBFacade.steamInputManager.playRumble(_loc2_);
+		} else if (combatResult.attacker == _loc3_) {
+			mDBFacade.steamInputManager.playRumble(RumbleEffect.PLAYER_DEALING_DAMAGE);
+		}
+	}
+
+	function takingDamageRumbleScale(damage:Int):Float {
+		var _loc2_ = this.maxHitPoints;
+		if (_loc2_ <= 0 || damage <= 0) {
+			return 0.2;
+		}
+		var _loc3_ = damage / _loc2_ / 0.8;
+		if (_loc3_ > 1) {
+			_loc3_ = 1;
+		}
+		return 0.2 + (2 - 0.2) * _loc3_;
 	}
 
 	@:isVar public var canSuffer(get, set):Bool;
 
 	public function get_canSuffer():Bool {
-		return !this.hasAbility((1 : UInt));
+		return !this.hasAbility(DBGlobal.ABILITY_SUFFER_IMMUNITY);
 	}
 
 	@:isVar public var canBeKnockedBack(get, set):Bool;
@@ -550,7 +600,7 @@ class ActorGameObject extends FloorObject {
 			mMouseEventHandler.sendGotHitEvent();
 		}
 		var _loc2_:Float = 1;
-		if (combatResult.knockback == 1 && canBeKnockedBack) {
+		if (combatResult.knockback == 1 && canBeKnockedBack && (!isProp || canSuffer)) {
 			if (mSufferKnockBackTimeline == null) {
 				mSufferKnockBackTimeline = mDBFacade.timelineFactory.createScriptTimeline("GENERIC_SUFFER_KNOCKBACK", this, mDistributedDungeonFloor);
 			}
@@ -577,9 +627,9 @@ class ActorGameObject extends FloorObject {
 
 	function getWeaponForId(weaponType:UInt):WeaponGameObject {
 		var _loc2_:WeaponGameObject;
-		final __ax4_iter_21 = mWeapons;
-		if (checkNullIteratee(__ax4_iter_21))
-			for (_tmp_ in __ax4_iter_21) {
+		final __ax4_iter_13 = mWeapons;
+		if (checkNullIteratee(__ax4_iter_13))
+			for (_tmp_ in __ax4_iter_13) {
 				_loc2_ = _tmp_;
 				if (_loc2_ != null && _loc2_.weaponType == weaponType) {
 					return _loc2_;
@@ -660,9 +710,9 @@ class ActorGameObject extends FloorObject {
 
 	function setupWeapons() {
 		var _loc1_:WeaponGameObject;
-		final __ax4_iter_22 = mWeapons;
-		if (checkNullIteratee(__ax4_iter_22))
-			for (_tmp_ in __ax4_iter_22) {
+		final __ax4_iter_14 = mWeapons;
+		if (checkNullIteratee(__ax4_iter_14))
+			for (_tmp_ in __ax4_iter_14) {
 				_loc1_ = _tmp_;
 				if (_loc1_ != null) {
 					_loc1_.destroy();
@@ -671,9 +721,9 @@ class ActorGameObject extends FloorObject {
 		var _loc2_:Float = 0;
 		mWeapons = new Vector<WeaponGameObject>();
 		var _loc3_:WeaponDetails;
-		final __ax4_iter_23 = mWeaponDetails;
-		if (checkNullIteratee(__ax4_iter_23))
-			for (_tmp_ in __ax4_iter_23) {
+		final __ax4_iter_15 = mWeaponDetails;
+		if (checkNullIteratee(__ax4_iter_15))
+			for (_tmp_ in __ax4_iter_15) {
 				_loc3_ = _tmp_;
 				if (_loc3_.type != 0) {
 					_loc1_ = new WeaponGameObject(_loc3_, this, mActorView, mDBFacade, mDistributedDungeonFloor, _loc2_);
@@ -691,11 +741,11 @@ class ActorGameObject extends FloorObject {
 
 	function initializeToFirstValidWeapon() {
 		var _loc1_:WeaponGameObject = null;
-		var _loc2_ = 0;
+		var _loc2_ = (0 : UInt);
 		if (mWeapons.length > 0) {
-			_loc2_ = 0;
-			while (_loc2_ < mWeapons.length) {
-				_loc1_ = mWeapons[_loc2_];
+			_loc2_ = (0 : UInt);
+			while (_loc2_ < (mWeapons.length:UInt)) {
+				_loc1_ = mWeapons[(_loc2_ : Int)];
 				if (_loc1_ != null) {
 					this.currentWeapon = _loc1_;
 					break;
@@ -720,7 +770,7 @@ class ActorGameObject extends FloorObject {
 	}
 
 	public function localToGlobal(point:Point):Point {
-		return this.view.root.localToGlobal(point);
+		return mDBFacade.designLocalToGlobal(this.view.root, point);
 	}
 
 	public function globalToLocal(point:Point):Point {
@@ -801,31 +851,31 @@ class ActorGameObject extends FloorObject {
 	}
 
 	function refreshStatVector() {
-		var _loc1_ = 0;
-		_loc1_ = 5;
+		var _loc1_ = (0 : UInt);
+		_loc1_ = (5 : UInt);
 		var _loc4_ = mTeam == 5 ? mLevel : Math.pow(mLevel, 1.5);
 		var _loc3_ = StatVector.add(mActorData.baseValues, StatVector.multiplyScalar(mActorData.levelValues, _loc4_));
 		var _loc2_ = StatVector.add(StatVector.multiply(_loc3_, mDBFacade.gameMaster.stat_BonusMultiplier), mDBFacade.gameMaster.stat_bias);
-		_loc2_.values[0] = mActorData.hp + _loc2_.values[0];
-		_loc2_.values[1] = mActorData.mp + _loc2_.values[1];
-		_loc2_.values[13] = mActorData.gMActor.BaseMove + _loc2_.values[13];
+		_loc2_.values[DBGlobal.HP_BOOST] = mActorData.hp + _loc2_.values[DBGlobal.HP_BOOST];
+		_loc2_.values[DBGlobal.MP_BOOST] = mActorData.mp + _loc2_.values[DBGlobal.MP_BOOST];
+		_loc2_.values[DBGlobal.MOVEMENT] = mActorData.gMActor.BaseMove + _loc2_.values[DBGlobal.MOVEMENT];
 		stats = _loc2_;
 	}
 
 	override function buildFilter():B2FilterData {
 		var _loc1_ = new B2FilterData();
-		_loc1_.maskBits = (0 : UInt);
-		_loc1_.categoryBits = (0 : UInt);
-		_loc1_.categoryBits = ((_loc1_.categoryBits | DBGlobal.b2dMaskForTeam((team : UInt)):UInt) : UInt);
+		_loc1_.maskBits = 0;
+		_loc1_.categoryBits = 0;
+		_loc1_.categoryBits = _loc1_.categoryBits | (DBGlobal.b2dMaskForTeam((team : UInt)) : Int);
 		if (!this.isNavigable) {
-			_loc1_.maskBits = ((_loc1_.maskBits | (1 : UInt):UInt) : UInt);
-			_loc1_.maskBits = ((_loc1_.maskBits | DBGlobal.b2dMaskForAllTeamsBut((team : UInt)):UInt) : UInt);
+			_loc1_.maskBits = _loc1_.maskBits | (DBGlobal.B2D_ENVIRONMENT_MASK : Int);
+			_loc1_.maskBits = _loc1_.maskBits | (DBGlobal.b2dMaskForAllTeamsBut((team : UInt)) : Int);
 			if (this.actorData.gMActor.CollideWithTeam || this.isOwner) {
-				_loc1_.maskBits = ((_loc1_.maskBits | DBGlobal.b2dMaskForTeam((team : UInt)):UInt) : UInt);
+				_loc1_.maskBits = _loc1_.maskBits | (DBGlobal.b2dMaskForTeam((team : UInt)) : Int);
 			}
 		}
 		if (actorData.gMActor.Species != "TRAP") {
-			_loc1_.maskBits = ((_loc1_.maskBits | (2 : UInt):UInt) : UInt);
+			_loc1_.maskBits = _loc1_.maskBits | (DBGlobal.B2D_COMBAT_MASK : Int);
 		}
 		return _loc1_;
 	}
@@ -851,16 +901,97 @@ class ActorGameObject extends FloorObject {
 	}
 
 	public function stopRunIdleMonitoring() {
+		if (mDBFacade.featureFlags.getFlagValue("smooth-run-and-direction-states")
+			&& !isOwner
+			&& flash.Lib.getTimer() - mLastMovingTime < 200
+			&& mActorView != null
+			&& mActorView.velocity.lengthSquared == 0
+			&& mActorView.hasAnim("idle")) {
+			mActorView.playAnim("idle");
+		}
+		mLastMovingTime = Math.NEGATIVE_INFINITY;
+		mOneShotHoldUntil = 0;
 		if (mRunIdleMonitorTask != null) {
 			mRunIdleMonitorTask.destroy();
 			mRunIdleMonitorTask = null;
 		}
 	}
 
+	public function holdOneShotUntilMoving(seconds:Float) {
+		mOneShotHoldUntil = seconds > 0 ? flash.Lib.getTimer() + ASCompat.floatToInt(seconds * 1000) : 0;
+	}
+
 	function runIdleMonitor(gameClock:GameClock) {
-		if (mActorView.velocity.lengthSquared == 0) {
+		if (hasAbandonedPersistentHide) {
+			healAbandonedPersistentHide();
+		}
+		var _loc2_ = mActorView.bodyAnimRenderer;
+		if (_loc2_ != null && _loc2_.isCulled) {
+			if (mActorView.velocity.lengthSquared != 0) {
+				mLastMovingTime = flash.Lib.getTimer();
+			}
+			return;
+		}
+		updateRunIdleAnim();
+	}
+
+	public function refreshRunIdleAnim() {
+		if (mRunIdleMonitorTask != null) {
+			updateRunIdleAnim();
+		}
+	}
+
+	public function notePersistentHide() {
+		mPersistentHideAt = flash.Lib.getTimer();
+	}
+
+	public function cancelPersistentHideWatch() {
+		mPersistentHideAt = -1;
+	}
+
+	@:isVar public var persistentHidePending(get, never):Bool;
+
+	public function get_persistentHidePending():Bool {
+		return mPersistentHideAt >= 0;
+	}
+
+	@:isVar public var hasAbandonedPersistentHide(get, never):Bool;
+
+	public function get_hasAbandonedPersistentHide():Bool {
+		return mPersistentHideAt >= 0 && flash.Lib.getTimer() - mPersistentHideAt >= 2000;
+	}
+
+	public function healAbandonedPersistentHide() {
+		mPersistentHideAt = -1;
+		if (mHitPoints != 0 && mActorView != null && mActorView.root != null) {
+			mActorView.root.visible = true;
+		}
+	}
+
+	function updateRunIdleAnim() {
+		if (this.actorData == null || this.actorData.gMActor == null) {
+			return;
+		}
+		if (this.actorData.gMActor.CharType == "PROP") {
+			return;
+		}
+		if (mOneShotHoldUntil != 0) {
+			if (flash.Lib.getTimer() < mOneShotHoldUntil && mActorView.velocity.lengthSquared == 0) {
+				return;
+			}
+			mOneShotHoldUntil = 0;
+		}
+		if (mActorView.velocity.lengthSquared == 0 || !mActorView.hasAnim("run")) {
+			if (mDBFacade.featureFlags.getFlagValue("smooth-run-and-direction-states")
+				&& !isOwner
+				&& flash.Lib.getTimer() - mLastMovingTime < 200
+				&& mActorView.hasAnim("run")) {
+				mActorView.playAnim("run");
+				return;
+			}
 			mActorView.playAnim("idle");
 		} else {
+			mLastMovingTime = flash.Lib.getTimer();
 			mActorView.playAnim("run");
 		}
 	}
@@ -871,6 +1002,16 @@ class ActorGameObject extends FloorObject {
 		this.mAFK = flag != 0;
 		mActorView.AFK = this.mAFK;
 		return flag;
+	}
+
+	@:isVar public var forceFlash(get, set):Bool;
+
+	public function get_forceFlash():Bool {
+		return mForceFlash;
+	}
+
+	function set_forceFlash(value:Bool):Bool {
+		return mForceFlash = value;
 	}
 
 	@:isVar public var isBlocking(get, set):Bool;

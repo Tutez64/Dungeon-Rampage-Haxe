@@ -1,10 +1,10 @@
 package brain.render;
 
 import brain.utils.MemoryTracker;
+import collections.ArrayUtils;
 import flash.display.DisplayObject;
 import flash.display.Sprite;
-import org.as3commons.collections.utils.ArrayUtils;
-import org.as3commons.collections.framework.IComparator;
+import collections.IComparator;
 
 class Layer extends Sprite {
 	var mComparator:ChildComparator;
@@ -32,14 +32,14 @@ class Layer extends Sprite {
 	}
 
 	public function sortLayer() {
-		var _loc2_ = 0;
+		var _loc2_ = (0 : UInt);
 		if (this.numChildren == 0) {
 			return;
 		}
 		var _loc1_ = ASCompat.allocArray(this.numChildren);
-		_loc2_ = 0;
-		while (_loc2_ < this.numChildren) {
-			_loc1_[_loc2_] = getChildAt(_loc2_);
+		_loc2_ = (0 : UInt);
+		while (_loc2_ < (this.numChildren:UInt)) {
+			_loc1_[(_loc2_ : Int)] = getChildAt((_loc2_ : Int));
 			_loc2_++;
 		}
 		ArrayUtils.insertionSort(_loc1_, mComparator);

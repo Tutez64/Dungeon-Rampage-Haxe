@@ -10,8 +10,8 @@ class XPBonusEvent extends Event {
 
 	var mIsActive:Bool = false;
 
-	public function new(type:String, isActive:Bool, xpMultiplier:Float = 1, bubbles:Bool = false, cancelable:Bool = false) {
-		super(type, bubbles, cancelable);
+	public function new(inType:String, isActive:Bool, xpMultiplier:Float = 1, bubbles:Bool = false, cancelable:Bool = false) {
+		super(inType, bubbles, cancelable);
 		mIsActive = isActive;
 		mXPMultiplier = xpMultiplier;
 	}

@@ -1,10 +1,12 @@
 package uI.popup;
 
 import brain.assetRepository.SwfAsset;
+import brain.logger.Logger;
 import brain.uI.UIButton;
+import brain.uI.UIObject;
+import brain.utils.TextUtil;
 import dBGlobals.DBGlobal;
 import facade.DBFacade;
-import uI.*;
 
 class DBUITwoButtonPopup extends DBUIPopup {
 	var mLeftButton:UIButton;
@@ -19,14 +21,13 @@ class DBUITwoButtonPopup extends DBUIPopup {
 
 	var mRightText:String;
 
-	public function new(dbFacade:DBFacade, titleText:String, content:ASAny, leftText:String, leftCallback:ASFunction, rightText:String,
-			rightCallback:ASFunction, allowClose:Bool = true, closeCallback:ASFunction = null, useOriginalPopup:Bool = true, scalePopup:Bool = true,
-			UILayerName:String = "") {
+	public function new(dbFacade:DBFacade, uiLayerName:String, titleText:String, content:ASAny, leftText:String, leftCallback:ASFunction, rightText:String,
+			rightCallback:ASFunction, allowClose:Bool = true, closeCallback:ASFunction = null, useOriginalPopup:Bool = true, scalePopup:Bool = true) {
 		mLeftText = leftText;
 		mLeftCallback = leftCallback;
 		mRightText = rightText;
 		mRightCallback = rightCallback;
-		super(dbFacade, titleText, content, allowClose, useCurtain(), closeCallback, useOriginalPopup, scalePopup, UILayerName);
+		super(dbFacade, uiLayerName, titleText, content, allowClose, useCurtain(), closeCallback, useOriginalPopup, scalePopup);
 	}
 
 	override public function destroy() {
@@ -49,7 +50,7 @@ class DBUITwoButtonPopup extends DBUIPopup {
 			ASCompat.setProperty((mPopup : ASAny).left_button, "visible", true);
 			mLeftButton = new UIButton(mDBFacade, ASCompat.coerce((mPopup : ASAny).left_button, flash.display.MovieClip));
 			mLeftButton.rolloverFilter = DBGlobal.UI_ROLLOVER_FILTER;
-			mLeftButton.label.text = mLeftText;
+			TextUtil.setText(mLeftButton.label, mLeftText);
 			mLeftButton.releaseCallback = function() {
 				close(mLeftCallback);
 			};
@@ -60,14 +61,13 @@ class DBUITwoButtonPopup extends DBUIPopup {
 			ASCompat.setProperty((mPopup : ASAny).right_button, "visible", true);
 			mRightButton = new UIButton(mDBFacade, ASCompat.coerce((mPopup : ASAny).right_button, flash.display.MovieClip));
 			mRightButton.rolloverFilter = DBGlobal.UI_ROLLOVER_FILTER;
-			mRightButton.label.text = mRightText;
+			TextUtil.setText(mRightButton.label, mRightText);
 			mRightButton.releaseCallback = function() {
 				close(mRightCallback);
 			};
 		} else {
 			ASCompat.setProperty((mPopup : ASAny).right_button, "visible", false);
 		}
-		setupMenuNavigation();
 	}
 
 	override function getClassName():String {
@@ -75,20 +75,36 @@ class DBUITwoButtonPopup extends DBUIPopup {
 	}
 
 	override function setupMenuNavigation() {
-		if (ASCompat.stringAsBool(mLeftText) && ASCompat.stringAsBool(mRightText)) {
+		var _loc1_ = ASCompat.stringAsBool(mLeftText) && mLeftButton != null;
+		var _loc2_ = ASCompat.stringAsBool(mRightText) && mRightButton != null;
+		if (_loc1_ && _loc2_) {
 			mRightButton.isToTheLeftOf(mLeftButton);
-			if (mCloseButton != null) {
-				mCloseButton.isAbove(mLeftButton);
+		}
+		if (mCloseButton != null) {
+			if (_loc2_) {
+				mCloseButton.isAbove(mRightButton);
+			}
+			if (_loc1_) {
+				mLeftButton.upNavigation = mCloseButton;
 			}
 		}
-		if (ASCompat.stringAsBool(mUILayerName)) {
-			if (mCloseButton != null) {
-				mDBFacade.menuNavigationController.pushNewLayer(mUILayerName, mCloseCallback, mCloseButton);
-			} else {
-				mDBFacade.menuNavigationController.pushNewLayer(mUILayerName, mCloseCallback, mLeftButton);
-			}
+		if (chooseFocusTarget(_loc1_, _loc2_) == null) {
+			Logger.debugch("UI", "DBUITwoButtonPopup: setupMenuNavigation: No buttons found to set focused on");
 		}
 	}
 
-	override function initializeMenuNavigationLayer() {}
+	function chooseFocusTarget(hasLeft:Bool, hasRight:Bool):UIButton {
+		if (hasRight) {
+			return mRightButton;
+		}
+		if (hasLeft) {
+			return mLeftButton;
+		}
+		Logger.debugch("UI", "DBUITwoButtonPopup: setupMenuNavigation: No left or right buttons found to setup navigation for");
+		return mCloseButton;
+	}
+
+	override function getDefaultNavigationObject():UIObject {
+		return chooseFocusTarget(ASCompat.stringAsBool(mLeftText) && mLeftButton != null, ASCompat.stringAsBool(mRightText) && mRightButton != null);
+	}
 }

@@ -8,21 +8,21 @@ import networkCode.DcNetworkPacket;
 class DistributedDungionAreaNetworkComponent extends DcNetworkClass implements DcNetworkInterface {
 	var the_instance:DistributedDungionArea;
 
-	public static inline final FLID_tileLibrary = (211 : UInt);
+	public static inline final FLID_tileLibrary = (219 : UInt);
 
-	public static inline final FLID_cacheNpc = (212 : UInt);
+	public static inline final FLID_cacheNpc = (220 : UInt);
 
-	public static inline final FLID_cacheSWC = (213 : UInt);
+	public static inline final FLID_cacheSWC = (221 : UInt);
 
-	public static inline final FLID_floorReward = (214 : UInt);
+	public static inline final FLID_floorReward = (222 : UInt);
 
-	public static inline final FLID_floorEnding = (215 : UInt);
+	public static inline final FLID_floorEnding = (223 : UInt);
 
-	public static inline final FLID_dungeonEnding = (216 : UInt);
+	public static inline final FLID_dungeonEnding = (224 : UInt);
 
-	public static inline final FLID_floorfailing = (217 : UInt);
+	public static inline final FLID_floorfailing = (225 : UInt);
 
-	public static inline final FLID_tellClientInfiniteRewardData = (218 : UInt);
+	public static inline final FLID_tellClientInfiniteRewardData = (226 : UInt);
 
 	public function new(Inst:DistributedDungionArea, gs:GeneratedDcSocket, id:UInt) {
 		super(Inst, gs, id);
@@ -39,7 +39,7 @@ class DistributedDungionAreaNetworkComponent extends DcNetworkClass implements D
 	}
 
 	override public function recvById(packet:DcNetworkPacket, fieldid:UInt) {
-		switch (fieldid - 211) {
+		switch (fieldid - 219) {
 			case 0:
 				recv_tileLibrary(packet);
 
@@ -97,13 +97,13 @@ class DistributedDungionAreaNetworkComponent extends DcNetworkClass implements D
 
 	public function recv_cacheNpc(packet:DcNetworkPacket) {
 		var v_cacheNpc = (function(param1:DcNetworkPacket):Vector<UInt> {
-			var _loc5_ = 0;
+			var _loc5_ = (0 : UInt);
 			var _loc3_ = new Vector<UInt>();
 			var _loc2_ = param1.readUnsignedShort();
 			var _loc4_ = _loc2_ + param1.position;
 			while (param1.position < _loc4_) {
-				_loc5_ = (param1.readUnsignedInt() : Int);
-				_loc3_.push((_loc5_ : UInt));
+				_loc5_ = param1.readUnsignedInt();
+				_loc3_.push(_loc5_);
 			}
 			return _loc3_;
 		})(packet);

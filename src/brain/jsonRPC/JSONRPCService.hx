@@ -4,7 +4,7 @@ import brain.logger.Logger;
 import brain.utils.HttpStatusEventUtils;
 import brain.jsonRPC.JSONRPCPendingInvokation;
 import brain.jsonRPC.JSONRPCService;
-import com.maccherone.json.JSON;
+import json.JsonCodec;
 import flash.net.URLRequest;
 import flash.net.URLRequestHeader;
 
@@ -42,7 +42,7 @@ function getMethod(name:String, url:String):ASFunction {
 		var req:URLRequest;
 		var resp:flash.net.URLLoader;
 		var inv:JSONRPCPendingInvokation;
-		var traceInfo:String;
+		var traceInfo:String = null;
 		var responseStatusCode:Int;
 		var args = rest;
 		var cbResult:ASFunction = null;
@@ -87,7 +87,7 @@ function getMethod(name:String, url:String):ASFunction {
 			});
 		}
 		try {
-			req.data = com.maccherone.json.JSON.encode({
+			req.data = JsonCodec.encode({
 				"jsonrpc": "2.0",
 				"method": name,
 				"params": args,
@@ -132,7 +132,7 @@ function getMethod(name:String, url:String):ASFunction {
 					inv.handleError(new Error("Unexpected HTTP response: " + responseStatusCode, -1));
 					return;
 				}
-				_loc3_ = com.maccherone.json.JSON.decode(_loc2_);
+				_loc3_ = JsonCodec.decode(_loc2_);
 			} catch (e:Dynamic) {
 				Logger.warn(Std.string(counter) + " JSONRPCService error parsing JSON: " + sanitizeForLog(_loc2_, name));
 				inv.handleError(e);

@@ -7,7 +7,7 @@ class MessageOfTheDay {
 
 	public static inline final MOVIE = (2 : UInt);
 
-	public var type:UInt = 0;
+	public var imageType:UInt = 0;
 
 	public var title:String;
 
@@ -26,11 +26,11 @@ class MessageOfTheDay {
 	public function new(LayoutType:String, TitleText:String, MessageText:String, ImageURL:String, MainText:String, MainCallback:ASFunction, WebText:String,
 			WebURL:String) {
 		if (LayoutType == "IMAGE_PORTRAIT") {
-			type = (0 : UInt);
+			imageType = (0 : UInt);
 		} else if (LayoutType == "IMAGE_LANDSCAPE") {
-			type = (1 : UInt);
+			imageType = (1 : UInt);
 		} else if (LayoutType == "MOVIE") {
-			type = (2 : UInt);
+			imageType = (2 : UInt);
 		}
 		title = TitleText;
 		message = MessageText;

@@ -9,73 +9,75 @@ import flash.geom.Vector3D;
 class HeroGameObjectNetworkComponent extends DcNetworkClass implements DcNetworkInterface {
 	var the_instance__GeneratedCode_HeroGameObjectNetworkComponent /*redefined private*/:HeroGameObject;
 
-	public static inline final FLID_type = (146 : UInt);
+	public static inline final FLID_type = (147 : UInt);
 
-	public static inline final FLID_position = (147 : UInt);
+	public static inline final FLID_position = (148 : UInt);
 
-	public static inline final FLID_heading = (148 : UInt);
+	public static inline final FLID_heading = (149 : UInt);
 
-	public static inline final FLID_scale = (149 : UInt);
+	public static inline final FLID_scale = (150 : UInt);
 
-	public static inline final FLID_flip = (150 : UInt);
+	public static inline final FLID_flip = (151 : UInt);
 
-	public static inline final FLID_hitPoints = (151 : UInt);
+	public static inline final FLID_hitPoints = (152 : UInt);
 
-	public static inline final FLID_weaponDetails = (152 : UInt);
+	public static inline final FLID_weaponDetails = (153 : UInt);
 
-	public static inline final FLID_consumableDetails = (153 : UInt);
+	public static inline final FLID_consumableDetails = (154 : UInt);
 
-	public static inline final FLID_healthBombsUsed = (154 : UInt);
+	public static inline final FLID_healthBombsUsed = (155 : UInt);
 
-	public static inline final FLID_partyBombsUsed = (155 : UInt);
+	public static inline final FLID_partyBombsUsed = (156 : UInt);
 
-	public static inline final FLID_playerID = (156 : UInt);
+	public static inline final FLID_playerID = (157 : UInt);
 
-	public static inline final FLID_state = (157 : UInt);
+	public static inline final FLID_state = (158 : UInt);
 
-	public static inline final FLID_team = (158 : UInt);
+	public static inline final FLID_team = (159 : UInt);
 
-	public static inline final FLID_ReceiveAttackChoreography = (159 : UInt);
+	public static inline final FLID_ReceiveAttackChoreography = (160 : UInt);
 
-	public static inline final FLID_ReceiveCombatResult = (160 : UInt);
+	public static inline final FLID_ReceiveCombatResult = (161 : UInt);
 
-	public static inline final FLID_skinType = (161 : UInt);
+	public static inline final FLID_skinType = (162 : UInt);
 
-	public static inline final FLID_screenName = (162 : UInt);
+	public static inline final FLID_screenName = (163 : UInt);
 
-	public static inline final FLID_manaPoints = (163 : UInt);
+	public static inline final FLID_manaPoints = (164 : UInt);
 
-	public static inline final FLID_experiencePoints = (164 : UInt);
+	public static inline final FLID_experiencePoints = (165 : UInt);
 
-	public static inline final FLID_slotPoints = (165 : UInt);
+	public static inline final FLID_slotPoints = (166 : UInt);
 
-	public static inline final FLID_dungeonBusterPoints = (166 : UInt);
+	public static inline final FLID_dungeonBusterPoints = (167 : UInt);
 
-	public static inline final FLID_setAFK = (167 : UInt);
+	public static inline final FLID_setAFK = (168 : UInt);
 
-	public static inline final FLID_ReportBuffEffect = (168 : UInt);
+	public static inline final FLID_ascensionLevel = (169 : UInt);
 
-	public static inline final FLID_ReceivedBuffEffect = (169 : UInt);
+	public static inline final FLID_ReportBuffEffect = (170 : UInt);
 
-	public static inline final FLID_TooFullForDoober = (170 : UInt);
+	public static inline final FLID_ReceivedBuffEffect = (171 : UInt);
 
-	public static inline final FLID_ProposeCombatResults = (171 : UInt);
+	public static inline final FLID_TooFullForDoober = (172 : UInt);
 
-	public static inline final FLID_ProposeAttackChoreography = (172 : UInt);
+	public static inline final FLID_ProposeCombatResults = (173 : UInt);
 
-	public static inline final FLID_ProposeRevive = (173 : UInt);
+	public static inline final FLID_ProposeAttackChoreography = (174 : UInt);
 
-	public static inline final FLID_ProposeSelfRevive = (174 : UInt);
+	public static inline final FLID_ProposeRevive = (175 : UInt);
 
-	public static inline final FLID_ProposeSelfRevive_Resp = (175 : UInt);
+	public static inline final FLID_ProposeSelfRevive = (176 : UInt);
 
-	public static inline final FLID_PartyBomb = (176 : UInt);
+	public static inline final FLID_ProposeSelfRevive_Resp = (177 : UInt);
 
-	public static inline final FLID_ProposeCreateNPC = (177 : UInt);
+	public static inline final FLID_PartyBomb = (178 : UInt);
 
-	public static inline final FLID_setStateAndAttackChoreography = (178 : UInt);
+	public static inline final FLID_ProposeCreateNPC = (179 : UInt);
 
-	public static inline final FLID_StopChoreography = (179 : UInt);
+	public static inline final FLID_setStateAndAttackChoreography = (180 : UInt);
+
+	public static inline final FLID_StopChoreography = (181 : UInt);
 
 	public function new(Inst:HeroGameObject, gs:GeneratedDcSocket, id:UInt) {
 		super(Inst, gs, id);
@@ -93,79 +95,82 @@ class HeroGameObjectNetworkComponent extends DcNetworkClass implements DcNetwork
 
 	override public function recvById(packet:DcNetworkPacket, fieldid:UInt) {
 		switch (fieldid) {
-			case 146:
+			case 147:
 				recv_type(packet);
 
-			case 147:
+			case 148:
 				recv_position(packet);
 
-			case 148:
+			case 149:
 				recv_heading(packet);
 
-			case 149:
+			case 150:
 				recv_scale(packet);
 
-			case 150:
+			case 151:
 				recv_flip(packet);
 
-			case 151:
+			case 152:
 				recv_hitPoints(packet);
 
-			case 152:
+			case 153:
 				recv_weaponDetails(packet);
 
-			case 153:
+			case 154:
 				recv_consumableDetails(packet);
 
-			case 154:
+			case 155:
 				recv_healthBombsUsed(packet);
 
-			case 155:
+			case 156:
 				recv_partyBombsUsed(packet);
 
-			case 156:
+			case 157:
 				recv_playerID(packet);
 
-			case 157:
+			case 158:
 				recv_state(packet);
 
-			case 158:
+			case 159:
 				recv_team(packet);
 
-			case 159:
+			case 160:
 				recv_ReceiveAttackChoreography(packet);
 
-			case 160:
+			case 161:
 				recv_ReceiveCombatResult(packet);
 
-			case 161:
+			case 162:
 				recv_skinType(packet);
 
-			case 162:
+			case 163:
 				recv_screenName(packet);
 
-			case 163:
+			case 164:
 				recv_manaPoints(packet);
 
-			case 164:
+			case 165:
 				recv_experiencePoints(packet);
 
-			case 165:
+			case 166:
 				recv_slotPoints(packet);
 
-			case 166:
+			case 167:
 				recv_dungeonBusterPoints(packet);
 
-			case 167:
+			case 168:
 				recv_setAFK(packet);
 
-			case 176:
-				recv_PartyBomb(packet);
+			case 169:
+				recv_ascensionLevel(packet);
 
 			case 178:
+				recv_PartyBomb(packet);
+
+			case 180:
 				recv_setStateAndAttackChoreography(packet);
 
-			case 179:
+			case 181:
 				recv_StopChoreography(packet);
 
 			default:
@@ -194,6 +199,7 @@ class HeroGameObjectNetworkComponent extends DcNetworkClass implements DcNetwork
 		recv_slotPoints(packet);
 		recv_dungeonBusterPoints(packet);
 		recv_setAFK(packet);
+		recv_ascensionLevel(packet);
 		recvByIdLoop(packet);
 	}
 
@@ -238,12 +244,12 @@ class HeroGameObjectNetworkComponent extends DcNetworkClass implements DcNetwork
 
 	public function recv_weaponDetails(packet:DcNetworkPacket) {
 		var v_weaponDetails = (function(param1:DcNetworkPacket):Vector<WeaponDetails> {
-			var _loc3_ = 0;
+			var _loc3_ = (0 : UInt);
 			var _loc5_:WeaponDetails = null;
 			var _loc4_ = new Vector<WeaponDetails>();
 			var _loc2_ = (4 : UInt);
-			_loc3_ = 0;
-			while ((_loc3_ : UInt) < _loc2_) {
+			_loc3_ = (0 : UInt);
+			while (_loc3_ < _loc2_) {
 				_loc5_ = WeaponDetails.readFromPacket(param1);
 				_loc4_.push(_loc5_);
 				_loc3_++;
@@ -255,12 +261,12 @@ class HeroGameObjectNetworkComponent extends DcNetworkClass implements DcNetwork
 
 	public function recv_consumableDetails(packet:DcNetworkPacket) {
 		var v_consumableDetails = (function(param1:DcNetworkPacket):Vector<ConsumableDetails> {
-			var _loc3_ = 0;
+			var _loc3_ = (0 : UInt);
 			var _loc5_:ConsumableDetails = null;
 			var _loc4_ = new Vector<ConsumableDetails>();
 			var _loc2_ = (2 : UInt);
-			_loc3_ = 0;
-			while ((_loc3_ : UInt) < _loc2_) {
+			_loc3_ = (0 : UInt);
+			while (_loc3_ < _loc2_) {
 				_loc5_ = ConsumableDetails.readFromPacket(param1);
 				_loc4_.push(_loc5_);
 				_loc3_++;
@@ -327,14 +333,14 @@ class HeroGameObjectNetworkComponent extends DcNetworkClass implements DcNetwork
 
 	public function recv_slotPoints(packet:DcNetworkPacket) {
 		var v_slotPoints = (function(param1:DcNetworkPacket):Vector<UInt> {
-			var _loc3_ = 0;
-			var _loc5_ = 0;
+			var _loc3_ = (0 : UInt);
+			var _loc5_ = (0 : UInt);
 			var _loc4_ = new Vector<UInt>();
 			var _loc2_ = (4 : UInt);
-			_loc3_ = 0;
-			while ((_loc3_ : UInt) < _loc2_) {
-				_loc5_ = (param1.readUnsignedShort() : Int);
-				_loc4_.push((_loc5_ : UInt));
+			_loc3_ = (0 : UInt);
+			while (_loc3_ < _loc2_) {
+				_loc5_ = param1.readUnsignedShort();
+				_loc4_.push(_loc5_);
 				_loc3_++;
 			}
 			return _loc4_;
@@ -350,6 +356,11 @@ class HeroGameObjectNetworkComponent extends DcNetworkClass implements DcNetwork
 	public function recv_setAFK(packet:DcNetworkPacket) {
 		var _loc2_ = packet.readUnsignedByte();
 		the_instance__GeneratedCode_HeroGameObjectNetworkComponent.setAFK = _loc2_;
+	}
+
+	public function recv_ascensionLevel(packet:DcNetworkPacket) {
+		var _loc2_ = packet.readUnsignedInt();
+		the_instance__GeneratedCode_HeroGameObjectNetworkComponent.ascensionLevel = _loc2_;
 	}
 
 	public function recv_PartyBomb(packet:DcNetworkPacket) {

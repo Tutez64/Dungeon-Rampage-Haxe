@@ -11,6 +11,7 @@ import brain.sceneGraph.SceneGraphComponent;
 import brain.sceneGraph.SceneGraphManager;
 import brain.uI.UIButton;
 import brain.utils.MemoryTracker;
+import brain.utils.TextUtil;
 import brain.workLoop.LogicalWorkComponent;
 import dBGlobals.DBGlobal;
 import events.DBAccountResponseEvent;
@@ -26,6 +27,8 @@ import uI.popup.UIRetrainPopup;
 import uI.UITownTweens;
 import flash.display.DisplayObject;
 import flash.display.MovieClip;
+import flash.geom.Point;
+import flash.geom.Rectangle;
 import flash.text.TextField;
 
 class UIHeroTraining {
@@ -59,9 +62,17 @@ class UIHeroTraining {
 
 	var mHeroPortraitText:TextField;
 
+	var mHeroLevelText:TextField;
+
+	var mHeroPortraitBounds:Rectangle;
+
 	var mStatHelpers:Vector<UIStatHelper>;
 
-	var mStatLevelPlusButtons:Vector<UIButton>;
+	var mStatLevelPlusButtons:Vector<UIStatUpgradeButton>;
+
+	var mStatLevelPlusTooltips:Vector<UIStatUpgradeTooltip>;
+
+	var mStatUpgradeDifferenceHelpers:Vector<UIStatUpgradeDifferenceHelper>;
 
 	var mHeroLevel:UInt = 0;
 
@@ -83,38 +94,48 @@ class UIHeroTraining {
 
 	var mEventComponent:EventComponent;
 
-	public function new(dbFacade:DBFacade, swfAsset:SwfAsset, rootClip:MovieClip, townHeader:TownHeader) {
+	public function new(dbFacade:DBFacade, swfAsset:SwfAsset, rootClip:MovieClip, townHeader:TownHeader, isActiveCallback:ASFunction = null) {
 		mDBFacade = dbFacade;
 		mSceneGraphComponent = new SceneGraphComponent(mDBFacade, "UIHeroTraining");
 		mAssetLoadingComponent = new AssetLoadingComponent(mDBFacade);
 		mLogicalWorkComponent = new LogicalWorkComponent(mDBFacade, "UIHeroTraining");
 		mEventComponent = new EventComponent(mDBFacade);
 		mTownHeader = townHeader;
-		var _loc6_ = swfAsset.getClass("DR_weapon_tooltip");
-		var _loc7_ = swfAsset.getClass("avatar_tooltip");
-		mHeroWithEquipPicker = new HeroWithEquipPicker(mDBFacade, ASCompat.coerce((rootClip : ASAny).hero_picker, flash.display.MovieClip), _loc6_, _loc7_,
-			heroSelected);
-		var _loc5_:ASObject = {"avatar_id": 103};
-		mFakeHeroInfo = new AvatarInfo(mDBFacade, _loc5_, null);
+		var _loc7_ = swfAsset.getClass("DR_weapon_tooltip");
+		var _loc8_ = swfAsset.getClass("avatar_tooltip");
+		mHeroWithEquipPicker = new HeroWithEquipPicker(mDBFacade, ASCompat.coerce((rootClip : ASAny).hero_picker, flash.display.MovieClip), _loc7_, _loc8_,
+			heroSelected, null, null, null, null, false, true, isActiveCallback);
+		var _loc6_:ASObject = {"avatar_id": 103};
+		mFakeHeroInfo = new AvatarInfo(mDBFacade, _loc6_, null);
 		this.setupUI(rootClip, swfAsset.getClass("stat_tooltip"));
 		mAssetLoadingComponent.getSwfAsset(DBFacade.buildFullDownloadPath("Resources/Art2D/Icons/Stats/db_icon_stats.swf"), setupIcons);
 		mGMOffer = ASCompat.coerce(mDBFacade.gameMaster.offerById.itemFor(RESPEC_OFFER_ID), gameMasterDictionary.GMOffer);
 	}
 
 	function setupUI(rootClip:MovieClip, tooltipClass:Dynamic) {
-		var i = 0;
+		var createFunc:ASFunction;
+		var listOfStatUpgrades:Array<ASAny>;
+		var listOfStatPlusButtons:Array<ASAny>;
+		var i:Int;
+		var buttonBounds:Rectangle;
 		mUIRoot = ASCompat.coerce((rootClip : ASAny).training_main, flash.display.MovieClip);
 		mHeroPortrait = ASCompat.coerce((rootClip : ASAny).training_avatar, flash.display.MovieClip);
-		mHeroPortraitText = ASCompat.coerce((mUIRoot : ASAny).hero_text, flash.text.TextField);
+		mHeroPortraitText = ASCompat.coerce((rootClip : ASAny).hero_text, flash.text.TextField);
+		mHeroLevelText = ASCompat.coerce((rootClip : ASAny).xp_label.level_label, flash.text.TextField);
+		mHeroPortraitBounds = ASCompat.coerce((rootClip : ASAny).skin_frame.getBounds(mHeroPortrait), flash.geom.Rectangle);
+		mHeroPortraitBounds.inflate(0, -6);
+		mHeroPortraitBounds.bottom -= 1;
 		mStatHelpers = new Vector<UIStatHelper>();
-		mStatLevelPlusButtons = new Vector<UIButton>();
-		var createFunc:ASFunction = function(param1:Int):ASFunction {
+		mStatLevelPlusButtons = new Vector<UIStatUpgradeButton>();
+		mStatLevelPlusTooltips = new Vector<UIStatUpgradeTooltip>();
+		mStatUpgradeDifferenceHelpers = new Vector<UIStatUpgradeDifferenceHelper>();
+		createFunc = function(param1:Int):ASFunction {
 			var i = param1;
 			return function() {
 				statPlusReleased(i);
 			};
 		};
-		var listOfStatUpgrades:Array<ASAny> = [
+		listOfStatUpgrades = [
 			(mUIRoot : ASAny)
 			.UI_statupgrade1,
 			(mUIRoot : ASAny)
@@ -124,7 +145,7 @@ class UIHeroTraining {
 			(mUIRoot : ASAny)
 			.UI_statupgrade4
 		];
-		var listOfStatPlusButtons:Array<ASAny> = [
+		listOfStatPlusButtons = [
 			(mUIRoot : ASAny)
 			.statupgrade1_plus_button,
 			(mUIRoot : ASAny)
@@ -137,15 +158,20 @@ class UIHeroTraining {
 		i = 0;
 		while (i < 4) {
 			mStatHelpers.push(new UIStatHelper(mDBFacade, tooltipClass, ASCompat.coerce(listOfStatUpgrades[i], flash.display.MovieClip)));
-			mStatLevelPlusButtons.push(new UIButton(mDBFacade, ASCompat.coerce(listOfStatPlusButtons[i], flash.display.MovieClip)));
+			mStatLevelPlusButtons.push(new UIStatUpgradeButton(mDBFacade, ASCompat.coerce(listOfStatPlusButtons[i], flash.display.MovieClip)));
+			mStatLevelPlusTooltips.push(new UIStatUpgradeTooltip(tooltipClass));
+			mStatUpgradeDifferenceHelpers.push(new UIStatUpgradeDifferenceHelper(mDBFacade));
+			mStatLevelPlusButtons[i].tooltip = mStatLevelPlusTooltips[i];
+			buttonBounds = ASCompat.coerce(listOfStatPlusButtons[i].getBounds(listOfStatPlusButtons[i]), flash.geom.Rectangle);
+			mStatLevelPlusButtons[i].tooltipPos = new Point((buttonBounds.left + buttonBounds.right) * 0.5, buttonBounds.top);
 			mStatLevelPlusButtons[i].releaseCallback = ASCompat.coerceFunction(createFunc(i));
 			i = i + 1;
 		}
 		mSpendButton = new UIButton(mDBFacade, ASCompat.coerce((mUIRoot : ASAny).spend_button, flash.display.MovieClip));
 		mSpendButton.enabled = false;
-		ASCompat.setProperty((mSpendButton.root : ASAny).button_text, "text", Locale.getString("TRAINING_POINTS"));
+		Locale.setText(ASCompat.coerce((mSpendButton.root : ASAny).button_text, flash.text.TextField), "TRAINING_POINTS");
 		mResetButton = new UIButton(mDBFacade, ASCompat.coerce((mUIRoot : ASAny).reset_button, flash.display.MovieClip));
-		mResetButton.label.text = Locale.getString("RETRAIN");
+		Locale.setText(mResetButton.label, "RETRAIN");
 		mResetButton.releaseCallback = function() {
 			resetReleased();
 		};
@@ -154,7 +180,7 @@ class UIHeroTraining {
 
 	public function animateEntry() {
 		if (mDBFacade.featureFlags.getFlagValue("want-town-animations")) {
-			UITownTweens.avatarFadeInTweenSequence(mHeroPortrait);
+			UITownTweens.avatarFadeInTweenSequence(mHeroPortrait, mDBFacade);
 			mTownHeader.rootMovieClip.visible = false;
 			mLogicalWorkComponent.doLater(0.20833333333333334, function(param1:brain.clock.GameClock) {
 				mTownHeader.animateHeader();
@@ -185,6 +211,8 @@ class UIHeroTraining {
 		while (_loc1_ < 4) {
 			mStatHelpers[_loc1_].destroy();
 			mStatLevelPlusButtons[_loc1_].destroy();
+			mStatLevelPlusTooltips[_loc1_].destroy();
+			mStatUpgradeDifferenceHelpers[_loc1_].destroy();
 			_loc1_++;
 		}
 		mSpendButton.destroy();
@@ -194,6 +222,7 @@ class UIHeroTraining {
 		mSceneGraphComponent.destroy();
 		mAssetLoadingComponent.destroy();
 		mEventComponent.destroy();
+		mTownHeader = null;
 	}
 
 	public function enableHud() {
@@ -204,10 +233,17 @@ class UIHeroTraining {
 		mHeroWithEquipPicker.refresh(true);
 		mHeroInfo = mDBFacade.dbAccountInfo.activeAvatarInfo;
 		mSelectedHero = ASCompat.coerce(mDBFacade.gameMaster.heroById.itemFor(mHeroInfo.avatarType), gameMasterDictionary.GMHero);
-		var _loc1_ = mDBFacade.dbAccountInfo.inventoryInfo.ownsItem(mSelectedHero.Id);
-		this.heroSelected(mSelectedHero, _loc1_);
+		var _loc2_ = mDBFacade.dbAccountInfo.inventoryInfo.ownsItem(mSelectedHero.Id);
+		this.heroSelected(mSelectedHero, _loc2_);
 		mUIRoot.visible = true;
 		mHeroPortrait.visible = true;
+		var _loc1_:UIStatHelper;
+		final __ax4_iter_0 = mStatHelpers;
+		if (checkNullIteratee(__ax4_iter_0))
+			for (_tmp_ in __ax4_iter_0) {
+				_loc1_ = _tmp_;
+				mDBFacade.steamAchievementsHelper.unlockUpgradeStat(_loc1_.amount);
+			}
 	}
 
 	public function disableHud() {
@@ -258,24 +294,30 @@ class UIHeroTraining {
 		} else {
 			gmSkin = mDBFacade.gameMaster.getSkinByType(mHeroInfo.skinId);
 		}
-		mHeroLevel = mSelectedHero.getLevelFromExp(mHeroInfo.experience);
+		mHeroLevel = mSelectedHero.getLevelFromExp(mHeroInfo.experience, mHeroInfo.mAscensionLevel);
 		if (gmSkin == null) {
 			Logger.error("Unable to find gmSkin for ID: " + mHeroInfo.skinId);
 		} else {
 			mAssetLoadingComponent.getSwfAsset(DBFacade.buildFullDownloadPath(gmSkin.PortraitName), function(param1:SwfAsset) {
-				var _loc3_ = param1.getClass(gmSkin.CardName);
-				if (_loc3_ == null) {
+				var _loc7_ = param1.getClass(gmSkin.BackgroundClassName);
+				var _loc5_ = param1.getClass(gmSkin.PortraitClassName);
+				if (_loc7_ == null || _loc5_ == null) {
 					return;
 				}
-				var _loc4_ = ASCompat.coerce(ASCompat.createInstance(_loc3_, []), flash.display.MovieClip);
-				_loc4_.scaleX = _loc4_.scaleY = 0.7;
-				_loc4_.x = 15;
-				var _loc2_ = new MovieClipRenderController(mDBFacade, _loc4_);
+				var _loc6_ = new MovieClip();
+				_loc6_.addChild(ASCompat.coerce(ASCompat.createInstance(_loc7_, []), flash.display.DisplayObject));
+				_loc6_.addChild(ASCompat.coerce(ASCompat.createInstance(_loc5_, []), flash.display.DisplayObject));
+				var _loc3_ = _loc6_.getBounds(_loc6_);
+				var _loc4_ = Math.min(mHeroPortraitBounds.width / _loc3_.width, mHeroPortraitBounds.height / _loc3_.height);
+				_loc6_.scaleX = _loc6_.scaleY = _loc4_;
+				_loc6_.x = mHeroPortraitBounds.x + (mHeroPortraitBounds.width - _loc3_.width * _loc4_) * 0.5 - _loc3_.x * _loc4_;
+				_loc6_.y = mHeroPortraitBounds.y + (mHeroPortraitBounds.height - _loc3_.height * _loc4_) * 0.5 - _loc3_.y * _loc4_;
+				var _loc2_ = new MovieClipRenderController(mDBFacade, _loc6_);
 				_loc2_.play();
 				if (mHeroPortrait.numChildren > 0) {
 					mHeroPortrait.removeChildAt(0);
 				}
-				mHeroPortrait.addChildAt(_loc4_, 0);
+				mHeroPortrait.addChildAt(_loc6_, 0);
 			});
 		}
 		readSelectedHeroInfo();
@@ -304,42 +346,49 @@ class UIHeroTraining {
 		if (mHeroInfo == mFakeHeroInfo) {
 			return 0;
 		}
-		return ASCompat.floatToInt(Math.max(mHeroInfo.skillPointsEarned
-			- (mStatHelpers[0].amount + mStatHelpers[1].amount + mStatHelpers[2].amount + mStatHelpers[3].amount), 0));
+		return ASCompat.floatToInt(Math.max((mHeroInfo.skillPointsEarned : Float)
+			- ((mStatHelpers[0].amount + mStatHelpers[1].amount + mStatHelpers[2].amount + mStatHelpers[3].amount) : Float),
+			0));
 	}
 
 	function updateResetButton() {
-		var _loc1_ = mSelectedHero.getTotalStatFromExp(mHeroInfo.experience);
-		var _loc2_ = (spendAmountClient : UInt);
+		var _loc1_ = mStatHelpers[0].amount + mStatHelpers[1].amount + mStatHelpers[2].amount + mStatHelpers[3].amount;
 		mResetButton.enabled = false;
-		if (mHeroInfo != mFakeHeroInfo && _loc2_ != _loc1_) {
+		if (mHeroInfo != mFakeHeroInfo && _loc1_ > 0) {
 			mResetButton.enabled = true;
 		}
 	}
 
 	public function readSelectedHeroInfo() {
 		var _loc2_ = 0;
-		mHeroPortraitText.text = GameMasterLocale.getGameMasterSubString("SKIN_NAME", mSelectedHero.Constant).toUpperCase();
+		TextUtil.setText(mHeroPortraitText, GameMasterLocale.getGameMasterSubString("SKIN_NAME", mSelectedHero.Constant).toUpperCase());
 		var _loc1_:Array<ASAny> = [
 			mSelectedHero.StatUpgrade1,
 			mSelectedHero.StatUpgrade2,
 			mSelectedHero.StatUpgrade3,
 			mSelectedHero.StatUpgrade4
 		];
+		var _loc3_:Array<ASAny> = [
+			mSelectedHero.AmtStat1,
+			mSelectedHero.AmtStat2,
+			mSelectedHero.AmtStat3,
+			mSelectedHero.AmtStat4
+		];
 		_loc2_ = 0;
 		while (_loc2_ < 4) {
 			mStatHelpers[_loc2_].statName = _loc1_[_loc2_];
+			mStatUpgradeDifferenceHelpers[_loc2_].configure(_loc1_[_loc2_], ASCompat.toNumber(_loc3_[_loc2_]));
 			mStatHelpers[_loc2_].refresh(mIconSwfAsset);
 			_loc2_++;
 		}
-		ASCompat.setProperty((mUIRoot : ASAny).training_db_label, "text", Locale.getString("DUNGEON_BUSTER"));
-		ASCompat.setProperty((mUIRoot : ASAny).training_db_name, "text",
+		Locale.setText(ASCompat.coerce((mUIRoot : ASAny).training_db_label, flash.text.TextField), "DUNGEON_BUSTER");
+		TextUtil.setText(ASCompat.coerce((mUIRoot : ASAny).training_db_name, flash.text.TextField),
 			GameMasterLocale.getGameMasterSubString("ATTACK_BUSTER_NAME", mDBFacade.gameMaster.attackByConstant.itemFor(mSelectedHero.DBuster1).Constant)
 				.toUpperCase());
-		ASCompat.setProperty((mUIRoot : ASAny).training_db_description, "text",
+		TextUtil.setText(ASCompat.coerce((mUIRoot : ASAny).training_db_description, flash.text.TextField),
 			GameMasterLocale.getGameMasterSubString("ATTACK_BUSTER_DESCRIPTION",
 				mDBFacade.gameMaster.attackByConstant.itemFor(mSelectedHero.DBuster1).Constant));
-		ASCompat.setProperty((mUIRoot : ASAny).xp_label.level_label, "text", mHeroLevel);
+		TextUtil.setText(mHeroLevelText, Std.string(mHeroLevel));
 	}
 
 	function updateUIClient() {
@@ -352,10 +401,11 @@ class UIHeroTraining {
 		_loc4_ = 0;
 		while (_loc4_ < 4) {
 			mStatHelpers[_loc4_].updateUI();
-			mStatLevelPlusButtons[_loc4_].enabled = false;
+			updateStatUpgradeTooltip(_loc4_);
+			mStatLevelPlusButtons[_loc4_].upgradeEnabled = false;
 			_loc4_++;
 		}
-		ASCompat.setProperty((mSpendButton.root : ASAny).spend_amount_text, "text", mSpendAmount);
+		TextUtil.setText(ASCompat.coerce((mSpendButton.root : ASAny).spend_amount_text, flash.text.TextField), Std.string(mSpendAmount));
 		if (mSpendAmount <= 0) {
 			mSpendAmount = 0;
 			mHeroWithEquipPicker.disableAvatarAlertOnSelectedHero();
@@ -363,7 +413,7 @@ class UIHeroTraining {
 			_loc4_ = 0;
 			while (_loc4_ < 4) {
 				if (mStatHelpers[_loc4_].statAmount < _loc1_) {
-					mStatLevelPlusButtons[_loc4_].enabled = true;
+					mStatLevelPlusButtons[_loc4_].upgradeEnabled = true;
 				}
 				_loc4_++;
 			}
@@ -387,22 +437,23 @@ class UIHeroTraining {
 			mStatHelpers[_loc4_].statAmount = (ASCompat.toInt(_loc5_[_loc4_]) : UInt);
 			_loc4_++;
 		}
-		mHeroLevel = mSelectedHero.getLevelFromExp(mHeroInfo.experience);
+		mHeroLevel = mSelectedHero.getLevelFromExp(mHeroInfo.experience, mHeroInfo.mAscensionLevel);
 		mSpendAmount = spendAmount;
 		_loc4_ = 0;
 		while (_loc4_ < 4) {
 			mStatHelpers[_loc4_].updateUI();
-			mStatLevelPlusButtons[_loc4_].enabled = false;
+			updateStatUpgradeTooltip(_loc4_);
+			mStatLevelPlusButtons[_loc4_].upgradeEnabled = false;
 			_loc4_++;
 		}
-		ASCompat.setProperty((mSpendButton.root : ASAny).spend_amount_text, "text", mSpendAmount);
+		TextUtil.setText(ASCompat.coerce((mSpendButton.root : ASAny).spend_amount_text, flash.text.TextField), Std.string(mSpendAmount));
 		if (mSpendAmount <= 0) {
 			mSpendAmount = 0;
 		} else {
 			_loc4_ = 0;
 			while (_loc4_ < 4) {
 				if (mStatHelpers[_loc4_].statAmount < _loc1_) {
-					mStatLevelPlusButtons[_loc4_].enabled = true;
+					mStatLevelPlusButtons[_loc4_].upgradeEnabled = true;
 				}
 				_loc4_++;
 			}
@@ -410,31 +461,37 @@ class UIHeroTraining {
 		updateResetButton();
 	}
 
+	function updateStatUpgradeTooltip(index:Int) {
+		mStatUpgradeDifferenceHelpers[index].statAmount = mStatHelpers[index].statAmount;
+		mStatLevelPlusTooltips[index].update(mStatUpgradeDifferenceHelpers[index].statName, mStatUpgradeDifferenceHelpers[index].description);
+	}
+
 	public function setCurrency(basicCurrency:Int, premiumCurrency:Int) {
 		if (!mAssetsLoaded) {
 			return;
 		}
-		mBasicCurrencyText.text = Std.string(basicCurrency);
-		mPremiumCurrencyText.text = Std.string(premiumCurrency);
+		TextUtil.setText(mBasicCurrencyText, Std.string(basicCurrency));
+		TextUtil.setText(mPremiumCurrencyText, Std.string(premiumCurrency));
 	}
 
 	public function setBasicCurrency(basicCurrency:Int) {
 		if (!mAssetsLoaded) {
 			return;
 		}
-		mBasicCurrencyText.text = Std.string(basicCurrency);
+		TextUtil.setText(mBasicCurrencyText, Std.string(basicCurrency));
 	}
 
 	public function setPremiumCurrency(premiumCurrency:Int) {
 		if (!mAssetsLoaded) {
 			return;
 		}
-		mPremiumCurrencyText.text = Std.string(premiumCurrency);
+		TextUtil.setText(mPremiumCurrencyText, Std.string(premiumCurrency));
 	}
 
 	function statPlusReleased(num:Int) {
 		mStatHelpers[num].statAmount = mStatHelpers[num].amount + 1;
 		updateUIClient();
+		mDBFacade.steamAchievementsHelper.unlockUpgradeStat(mStatHelpers[num].amount);
 	}
 
 	function resetReleased() {
@@ -448,10 +505,8 @@ class UIHeroTraining {
 						mStatHelpers[_loc2_].statAmount = (0 : UInt);
 						_loc2_++;
 					}
-					if (mDBFacade.steamAchievementsManager != null) {
-						mDBFacade.steamAchievementsManager.addToStatInt("RETRAIN_STAT", 1);
-						mDBFacade.steamAchievementsManager.setAchievement("RETRAIN_CHARACTER");
-					}
+					mDBFacade.steamAchievementsHelper.addValueToStatInt(1, "HEROES_RETRAINED");
+					mDBFacade.steamAchievementsHelper.unlockAchievement("RETRAIN_CHARACTER");
 					updateUIClient();
 				});
 			}, (ASCompat.floatToInt(mGMOffer.Price) : UInt));
@@ -470,6 +525,14 @@ class UIHeroTraining {
 		if (mDBFacade.dbAccountInfo.activeAvatarInfo.gmHero.Id != _loc1_) {
 			mDBFacade.dbAccountInfo.changeActiveAvatarRPC(_loc1_);
 		}
+	}
+
+	public function selectPreviousHero() {
+		mHeroWithEquipPicker.selectPreviousHero();
+	}
+
+	public function selectNextHero() {
+		mHeroWithEquipPicker.selectNextHero();
 	}
 
 	function setupMenuNavigation() {
@@ -497,16 +560,24 @@ class UIHeroTraining {
 
 	function setButtonNavigationFilters() {
 		mStatLevelPlusButtons[0].navigationSelectedInteraction = function() {
-			DBGlobal.highlightButton(mStatLevelPlusButtons[0]);
+			if (mStatLevelPlusButtons[0].upgradeEnabled) {
+				DBGlobal.highlightButton(mStatLevelPlusButtons[0]);
+			}
 		};
 		mStatLevelPlusButtons[1].navigationSelectedInteraction = function() {
-			DBGlobal.highlightButton(mStatLevelPlusButtons[1]);
+			if (mStatLevelPlusButtons[1].upgradeEnabled) {
+				DBGlobal.highlightButton(mStatLevelPlusButtons[1]);
+			}
 		};
 		mStatLevelPlusButtons[2].navigationSelectedInteraction = function() {
-			DBGlobal.highlightButton(mStatLevelPlusButtons[2]);
+			if (mStatLevelPlusButtons[2].upgradeEnabled) {
+				DBGlobal.highlightButton(mStatLevelPlusButtons[2]);
+			}
 		};
 		mStatLevelPlusButtons[3].navigationSelectedInteraction = function() {
-			DBGlobal.highlightButton(mStatLevelPlusButtons[3]);
+			if (mStatLevelPlusButtons[3].upgradeEnabled) {
+				DBGlobal.highlightButton(mStatLevelPlusButtons[3]);
+			}
 		};
 		mStatLevelPlusButtons[0].navigationSetToUnselectedInteraction = function() {
 			DBGlobal.unHighlightButton(mStatLevelPlusButtons[0]);

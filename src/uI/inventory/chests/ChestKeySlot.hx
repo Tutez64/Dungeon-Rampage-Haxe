@@ -3,6 +3,7 @@ package uI.inventory.chests;
 import account.KeyInfo;
 import brain.assetRepository.AssetLoadingComponent;
 import brain.render.MovieClipRenderer;
+import brain.utils.TextUtil;
 import facade.DBFacade;
 import flash.display.MovieClip;
 import flash.text.TextField;
@@ -54,7 +55,7 @@ class ChestKeySlot {
 		mUnusableMC = ASCompat.coerce((mSlotMC : ASAny).unusable, flash.display.MovieClip);
 		mIconExistsMC = ASCompat.coerce((mSlotMC : ASAny).icon_exists, flash.display.MovieClip);
 		mNumberLabel = ASCompat.coerce((mSlotMC : ASAny).number_label, flash.text.TextField);
-		mNumberLabel.text = Std.string(mKeyInfo.count);
+		TextUtil.setText(mNumberLabel, Std.string(mKeyInfo.count));
 		mAssetLoadingComponent.getSwfAsset(DBFacade.buildFullDownloadPath(mKeyInfo.gmKeyOffer.BundleSwfFilepath),
 			function(param1:brain.assetRepository.SwfAsset) {
 				var _loc2_ = param1.getClass(mKeyInfo.gmKeyOffer.BundleIcon);
@@ -75,7 +76,7 @@ class ChestKeySlot {
 
 	public function refresh(newKeyInfo:KeyInfo) {
 		mKeyInfo = newKeyInfo;
-		mNumberLabel.text = Std.string(newKeyInfo.count);
+		TextUtil.setText(mNumberLabel, Std.string(newKeyInfo.count));
 	}
 
 	public function setSelected(value:Bool) {

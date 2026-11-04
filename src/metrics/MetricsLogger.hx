@@ -1,8 +1,9 @@
 package metrics;
 
+import brain.event.EventListeners;
 import brain.logger.Logger;
 import facade.DBFacade;
-import com.maccherone.json.JSON;
+import json.JsonCodec;
 import flash.events.Event;
 import flash.net.URLLoader;
 import flash.net.URLRequest;
@@ -30,25 +31,25 @@ class MetricsLogger {
 			eventData = {};
 		}
 		var _loc6_:String;
-		final __ax4_iter_135:ASObject = mDBFacade.demographics;
-		if (checkNullIteratee(__ax4_iter_135))
-			for (_tmp_ in __ax4_iter_135.___keys()) {
+		final __ax4_iter_130:ASObject = mDBFacade.demographics;
+		if (checkNullIteratee(__ax4_iter_130))
+			for (_tmp_ in __ax4_iter_130.___keys()) {
 				_loc6_ = _tmp_;
 				if (eventData.hasOwnProperty(_loc6_)) {
 					Logger.warn("Duplicate metric property: " + _loc6_ + " in event: " + eventName);
 				}
 				eventData[_loc6_] = mDBFacade.demographics[_loc6_];
 			}
-		var _loc4_ = com.maccherone.json.JSON.encode(eventData);
+		var _loc4_ = JsonCodec.encode(eventData);
 		var _loc7_ = new URLVariables();
 		ASCompat.setProperty(_loc7_, "e", eventName);
 		ASCompat.setProperty(_loc7_, "parameters", _loc4_);
 		_loc3_.data = _loc7_;
 		_loc3_.method = "POST";
 		var _loc5_ = new URLLoader(_loc3_);
-		_loc5_.addEventListener("complete", completeHandler);
-		_loc5_.addEventListener("securityError", securityErrorHandler);
-		_loc5_.addEventListener("ioError", ioErrorHandler);
+		EventListeners.add(_loc5_, "complete", completeHandler);
+		EventListeners.add(_loc5_, "securityError", securityErrorHandler);
+		EventListeners.add(_loc5_, "ioError", ioErrorHandler);
 		_loc5_.load(_loc3_);
 	}
 

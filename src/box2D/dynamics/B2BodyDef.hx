@@ -3,48 +3,51 @@ package box2D.dynamics;
 import box2D.common.math.B2Vec2;
 
 class B2BodyDef {
-	public var type:UInt = 0;
+	public var userData:ASAny;
 
-	public var position:B2Vec2 = new B2Vec2();
+	public var type:Int = 0;
 
-	public var angle:Float = Math.NaN;
+	public var position:B2Vec2;
 
-	public var linearVelocity:B2Vec2 = new B2Vec2();
-
-	public var angularVelocity:Float = Math.NaN;
+	public var linearVelocity:B2Vec2;
 
 	public var linearDamping:Float = Math.NaN;
 
-	public var angularDamping:Float = Math.NaN;
+	public var inertiaScale:Float = Math.NaN;
 
-	public var allowSleep:Bool = false;
-
-	public var awake:Bool = false;
+	public var gravityScale:Float = Math.NaN;
 
 	public var fixedRotation:Bool = false;
 
 	public var bullet:Bool = false;
 
+	public var awake:Bool = false;
+
+	public var angularVelocity:Float = Math.NaN;
+
+	public var angularDamping:Float = Math.NaN;
+
+	public var angle:Float = Math.NaN;
+
+	public var allowSleep:Bool = false;
+
 	public var active:Bool = false;
 
-	public var userData:ASAny;
-
-	public var inertiaScale:Float = Math.NaN;
-
 	public function new() {
-		this.userData = null;
-		this.position.Set(0, 0);
-		this.angle = 0;
-		this.linearVelocity.Set(0, 0);
-		this.angularVelocity = 0;
-		this.linearDamping = 0;
-		this.angularDamping = 0;
-		this.allowSleep = true;
-		this.awake = true;
-		this.fixedRotation = false;
-		this.bullet = false;
-		this.type = B2Body.b2_staticBody;
-		this.active = true;
-		this.inertiaScale = 1;
+		position = new B2Vec2();
+		linearVelocity = new B2Vec2();
+		userData = null;
+		angle = 0;
+		angularVelocity = 0;
+		linearDamping = 0;
+		angularDamping = 0;
+		allowSleep = true;
+		awake = true;
+		fixedRotation = false;
+		bullet = false;
+		type = 0;
+		active = true;
+		inertiaScale = 1;
+		gravityScale = 1;
 	}
 }

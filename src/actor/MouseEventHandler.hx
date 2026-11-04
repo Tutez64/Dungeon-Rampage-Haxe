@@ -6,6 +6,7 @@ import actor.player.input.dBMouseEvents.MouseOutOnActorEvent;
 import actor.player.input.dBMouseEvents.MouseOverOnActorEvent;
 import actor.player.input.dBMouseEvents.MouseUpOnActorEvent;
 import brain.event.EventComponent;
+import brain.event.EventListeners;
 import facade.DBFacade;
 import dr_floor.FloorView;
 import flash.events.Event;
@@ -17,6 +18,8 @@ class MouseEventHandler {
 	var mActorGameObject:ActorGameObject;
 
 	var mEventComponent:EventComponent;
+
+	var mWantsClicks:Bool = false;
 
 	public function new(actorGameObject:ActorGameObject, dbFacade:DBFacade) {
 		mDBFacade = dbFacade;
@@ -55,6 +58,7 @@ class MouseEventHandler {
 	}
 
 	function addListeners() {
+		ActorMousePicker.unregister(this);
 		mEventComponent.removeAllListeners();
 		mActorGameObject.view.root.mouseEnabled = false;
 		if (!mActorGameObject.isAttackable || mActorGameObject.isPet) {
@@ -69,21 +73,37 @@ class MouseEventHandler {
 		if (heroOwnerView != null && !heroOwnerView.wantMouseEnabled) {
 			return;
 		}
-		mActorGameObject.view.root.mouseEnabled = true;
-		actorView.root.addEventListener("rollOver", onMouseOver);
-		actorView.root.addEventListener("rollOut", onMouseOut);
-		if (!mActorGameObject.isHeroType) {
-			actorView.root.addEventListener("mouseDown", onMouseDown);
-			actorView.root.addEventListener("mouseUp", onMouseUp);
+		mActorGameObject.view.root.mouseChildren = false;
+		actorView.mousePickedCentrally = true;
+		mWantsClicks = !mActorGameObject.isHeroType;
+		ActorMousePicker.register(this, mDBFacade);
+		EventListeners.add(actorView.root, "rollOver", onMouseOver);
+		EventListeners.add(actorView.root, "rollOut", onMouseOut);
+		if (mWantsClicks) {
+			EventListeners.add(actorView.root, "mouseDown", onMouseDown);
+			EventListeners.add(actorView.root, "mouseUp", onMouseUp);
 		}
 	}
 
+	@:isVar public var wantsClicks(get, never):Bool;
+
+	public function get_wantsClicks():Bool {
+		return mWantsClicks;
+	}
+
+	@:isVar public var actorId(get, never):UInt;
+
+	public function get_actorId():UInt {
+		return mActorGameObject != null ? mActorGameObject.id : (0 : UInt);
+	}
+
 	function removeListeners() {
+		ActorMousePicker.unregister(this);
 		mEventComponent.removeAllListeners();
-		actorView.root.removeEventListener("rollOver", onMouseOver);
-		actorView.root.removeEventListener("rollOut", onMouseOut);
-		actorView.root.removeEventListener("mouseDown", onMouseDown);
-		actorView.root.removeEventListener("mouseUp", onMouseUp);
+		EventListeners.remove(actorView.root, "rollOver", onMouseOver);
+		EventListeners.remove(actorView.root, "rollOut", onMouseOut);
+		EventListeners.remove(actorView.root, "mouseDown", onMouseDown);
+		EventListeners.remove(actorView.root, "mouseUp", onMouseUp);
 	}
 
 	public function onMouseOver(event:MouseEvent) {

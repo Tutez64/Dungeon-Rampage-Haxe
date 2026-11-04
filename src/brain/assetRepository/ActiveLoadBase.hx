@@ -1,7 +1,7 @@
 package brain.assetRepository;
 
-import org.as3commons.collections.Set;
-import org.as3commons.collections.framework.core.SetIterator;
+import collections.Set;
+import collections.SetIterator;
 
 class ActiveLoadBase {
 	public var mPendingSuccessCallback:Set;
@@ -40,7 +40,7 @@ class ActiveLoadBase {
 	}
 
 	public function hasNoCallbacks():Bool {
-		return mPendingSuccessCallback.size != 0 || mPendingErrorCallbacks.size != 0;
+		return mPendingSuccessCallback.size == 0 && mPendingErrorCallbacks.size == 0;
 	}
 
 	public function executeErrorCallbacks(assetLoaderInfo:AssetLoaderInfo) {

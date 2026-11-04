@@ -1,25 +1,27 @@
 package actor;
 
 import account.PlayerSpecialStatus;
+import actor.starlingConvertedOverlay.StarlingNametag;
+import actor.starlingConvertedOverlay.StarlingOverlays;
 import brain.assetRepository.AssetLoadingComponent;
 import brain.assetRepository.SwfAsset;
 import brain.clock.GameClock;
 import brain.event.EventComponent;
-import brain.facade.Facade;
+import brain.event.EventListeners;
 import brain.gameObject.GameObject;
 import brain.uI.UIProgressBar;
+import brain.utils.TextUtil;
 import brain.workLoop.LogicalWorkComponent;
 import brain.workLoop.Task;
 import distributedObjects.PlayerGameObject;
 import events.GameObjectEvent;
 import facade.DBFacade;
 import facade.Locale;
-import com.greensock.TimelineMax;
-import com.greensock.TweenMax;
 import flash.display.DisplayObject;
 import flash.display.Loader;
 import flash.display.MovieClip;
 import flash.display.Sprite;
+import flash.events.Event;
 import flash.net.URLRequest;
 import flash.system.LoaderContext;
 import flash.text.TextField;
@@ -27,11 +29,19 @@ import flash.text.TextField;
 class ActorNametag extends Sprite {
 	public static inline final NAMETAG_SWF_ROOT = "Resources/Art2D/UI/db_UI_nametag.swf";
 
-	static inline final FACEBOOK_PIC_VISIBLE_TIME:Float = 5;
+	static inline final STEAM_AVATAR_VISIBLE_TIME:Float = 5;
 
-	static inline final FACEBOOK_PIC_ANIMATE_UP_FRAMES:Float = 0.25;
+	static inline final STEAM_AVATAR_ANIMATE_UP_FRAMES:Float = 0.25;
 
-	static inline final FACEBOOK_PIC_ANIMATE_DOWN_FRAMES:Float = 0.25;
+	static inline final STEAM_AVATAR_ANIMATE_DOWN_FRAMES:Float = 0.25;
+
+	static inline final AFK_TEXT_GAP:Float = 2;
+
+	static inline final AFK_TEXT_SIZE_MODIFIER:Float = 1.45;
+
+	static inline final TYPING_TEXT_SIZE:Float = 16;
+
+	static inline final TYPING_FLOOR_SCALE:Float = 0.7;
 
 	var mLogicalWorkComponent:LogicalWorkComponent;
 
@@ -47,13 +57,17 @@ class ActorNametag extends Sprite {
 
 	var mTextField:TextField;
 
+	var mTextFieldBottom:Float = Math.NaN;
+
 	var mAFKText:TextField;
+
+	var mAFKTextBottom:Float = Math.NaN;
 
 	var mScreenName:String = Locale.getString("DEFAULT_NAMETAG");
 
 	var mHealth:Float = 1;
 
-	var mFacade:Facade;
+	var mDBFacade:DBFacade;
 
 	var mNametagTop:Sprite;
 
@@ -63,21 +77,27 @@ class ActorNametag extends Sprite {
 
 	var mPlayerIsTypingNotification:MovieClip;
 
+	var mTypingTopY:Float = 0;
+
 	var mChatDuration:Float = 5;
 
 	var mAFK:Bool = false;
 
 	var mNametagFBPicSlot:MovieClip;
 
-	var mFacebokPic:DisplayObject;
+	var mSteamAvatar:DisplayObject;
 
 	var mHpBarHolder:MovieClip;
 
-	public function new(facade:Facade, assetLoader:AssetLoadingComponent, workComponent:LogicalWorkComponent, nametagY:Float) {
+	var mStarlingNametag:StarlingNametag;
+
+	var mWantVisible:Bool = true;
+
+	public function new(dbfacade:DBFacade, assetLoader:AssetLoadingComponent, workComponent:LogicalWorkComponent, nametagY:Float) {
 		super();
-		mFacade = facade;
+		mDBFacade = dbfacade;
 		mLogicalWorkComponent = workComponent;
-		mEventComponent = new EventComponent(mFacade);
+		mEventComponent = new EventComponent(mDBFacade);
 		this.name = "ActorNametag";
 		this.mouseChildren = false;
 		this.mouseEnabled = false;
@@ -90,7 +110,31 @@ class ActorNametag extends Sprite {
 		mChatBalloon = new ChatBalloon();
 		mChatBalloon.visible = false;
 		this.addChild(mChatBalloon);
+		ChatBalloonOverlay.register(mChatBalloon);
+		mEventComponent.addListener("UI_HIDE_TOGGLE_CHANGED", applyVisible);
+		applyVisible();
 		assetLoader.getSwfAsset(DBFacade.buildFullDownloadPath("Resources/Art2D/UI/db_UI_nametag.swf"), setupNametagFromSwf);
+	}
+
+	override public function set_visible(value:Bool) {
+		mWantVisible = value;
+		applyVisible();
+		return value;
+	}
+
+	override public function get_visible():Bool {
+		return mWantVisible;
+	}
+
+	@:isVar public var shownOnScreen(get, never):Bool;
+
+	public function get_shownOnScreen():Bool {
+		return super.visible;
+	}
+
+	function applyVisible(event:Event = null) {
+		var _loc2_ = mDBFacade != null && mDBFacade.uiHideToggle != null && mDBFacade.uiHideToggle.hidden;
+		super.visible = mWantVisible && !_loc2_;
 	}
 
 	function setupNametagFromSwf(swfAsset:SwfAsset) {
@@ -99,27 +143,41 @@ class ActorNametag extends Sprite {
 		mNametagFBPicSlot = ASCompat.coerce((_loc5_ : ASAny).avatar, flash.display.MovieClip);
 		mNametagFBPicSlot.visible = false;
 		mHpBarHolder = ASCompat.coerce((_loc5_ : ASAny).hp, flash.display.MovieClip);
-		mHpProgressBar = new UIProgressBar(mFacade, ASCompat.coerce((_loc5_ : ASAny).hp.hpBar, flash.display.MovieClip));
+		mHpProgressBar = new UIProgressBar(mDBFacade, ASCompat.coerce((_loc5_ : ASAny).hp.hpBar, flash.display.MovieClip));
 		mHpProgressBar.value = mHealth;
 		mHpProgressBar.visible = mHpProgressBarVisible;
 		mTextField = ASCompat.coerce((_loc5_ : ASAny).nameText, flash.text.TextField);
+		mTextFieldBottom = mTextField.y + mTextField.height;
+		if (TextUtil.enabled) {
+			mTextField.autoSize = "center";
+		}
 		updateNameTagText();
 		mAFKText = ASCompat.coerce((_loc5_ : ASAny).AFKText, flash.text.TextField);
+		mAFKTextBottom = mAFKText.y + mAFKText.height;
+		if (TextUtil.enabled) {
+			mAFKText.autoSize = "center";
+		}
 		mAFKText.text = "";
 		mHpBarBg = ASCompat.coerce((_loc5_ : ASAny).hp.hpBarBg, flash.display.Sprite);
 		mNametagTop.addChild(_loc5_);
 		mNametagTopStartingYPosition = mNametagTop.y;
 		var _loc4_ = swfAsset.getClass("UI_speechbubble");
 		var _loc2_ = ASCompat.coerce(ASCompat.createInstance(_loc4_, []), flash.display.MovieClip);
-		mChatBalloon.initializeChatBalloon(swfAsset);
+		mChatBalloon.initializeChatBalloon(swfAsset, null, chatSizeModifier);
 		var _loc6_ = swfAsset.getClass("UI_speechbubble_typing");
 		mPlayerIsTypingNotification = ASCompat.coerce(ASCompat.createInstance(_loc6_, []), flash.display.MovieClip);
 		this.addChild(mPlayerIsTypingNotification);
-		showPlayerIsTypingNotification(false);
+		mPlayerIsTypingNotification.visible = false;
+		mPlayerIsTypingNotification.stop();
+		mTypingTopY = mPlayerIsTypingNotification.getBounds(mPlayerIsTypingNotification).top;
+		if (StarlingOverlays.wanted(mDBFacade)) {
+			mStarlingNametag = StarlingOverlays.get(mDBFacade).addTag(this, mNametagTop, _loc5_, mTextField, mAFKText, mHpBarHolder, mHpProgressBar.bar);
+		}
 	}
 
 	public function setChat(message:String) {
 		if (mChatBalloon != null) {
+			mChatBalloon.sizeModifier = chatSizeModifier;
 			mChatBalloon.text = message;
 		}
 		showChat();
@@ -133,6 +191,12 @@ class ActorNametag extends Sprite {
 
 	public function get_chatBalloon():ChatBalloon {
 		return mChatBalloon;
+	}
+
+	@:isVar var chatSizeModifier(get, never):Float;
+
+	function get_chatSizeModifier():Float {
+		return Math.max(1.82, Locale.nametagSizeModifier);
 	}
 
 	public function setHp(hp:UInt, maxHp:UInt) {
@@ -175,9 +239,26 @@ class ActorNametag extends Sprite {
 
 	function updateNameTagText() {
 		if (mTextField != null) {
-			mTextField.text = mScreenName;
+			TextUtil.setText(mTextField, mScreenName, Locale.nametagSizeModifier);
+			TextUtil.addOverhangSlack(mTextField);
+			mTextField.y = mTextFieldBottom - mTextField.height;
 			mTextField.textColor = PlayerSpecialStatus.getSpecialTextColor(mScreenName, mTextField.textColor);
+			layoutAFKText();
 		}
+		if (mStarlingNametag != null) {
+			mStarlingNametag.contentChanged();
+		}
+	}
+
+	function layoutAFKText() {
+		if (mAFKText == null) {
+			return;
+		}
+		var _loc1_ = mAFKTextBottom;
+		if (mTextField != null && mTextField.text != "") {
+			_loc1_ = Math.min(_loc1_, mTextField.y - 2);
+		}
+		mAFKText.y = _loc1_ - mAFKText.height;
 	}
 
 	function showChat(gameClock:GameClock = null) {
@@ -197,10 +278,26 @@ class ActorNametag extends Sprite {
 	public function showPlayerIsTypingNotification(value:Bool) {
 		if (mPlayerIsTypingNotification != null && !mChatBalloon.visible) {
 			mPlayerIsTypingNotification.visible = value;
+			if (value) {
+				scaleTypingToFloor();
+				mPlayerIsTypingNotification.play();
+			} else {
+				mPlayerIsTypingNotification.stop();
+			}
 		}
 	}
 
+	function scaleTypingToFloor() {
+		var _loc1_ = TextUtil.scaleToFloor(16, Locale.nametagSizeModifier * 0.7);
+		mPlayerIsTypingNotification.scaleX = mPlayerIsTypingNotification.scaleY = _loc1_;
+		mPlayerIsTypingNotification.y = mTypingTopY * (1 - _loc1_);
+	}
+
 	public function destroy() {
+		if (mStarlingNametag != null) {
+			mStarlingNametag.destroy();
+		}
+		mStarlingNametag = null;
 		if (mShowNametagTask != null) {
 			mShowNametagTask.destroy();
 		}
@@ -212,52 +309,59 @@ class ActorNametag extends Sprite {
 		}
 		mEventComponent = null;
 		mHpBarHolder = null;
+		if (mChatBalloon != null) {
+			ChatBalloonOverlay.unregister(mChatBalloon);
+		}
 		mChatBalloon = null;
-		mFacebokPic = null;
+		mSteamAvatar = null;
 		mNametagFBPicSlot = null;
+		if (mPlayerIsTypingNotification != null) {
+			mPlayerIsTypingNotification.stop();
+		}
 		mPlayerIsTypingNotification = null;
 		mLogicalWorkComponent = null;
 		if (this.parent != null) {
 			this.parent.removeChild(this);
 		}
-		mFacade = null;
+		mDBFacade = null;
 	}
 
-	public function showFacebookPicture(playerId:UInt) {
+	public function showSteamAvatar(playerId:UInt) {
 		var go:GameObject;
 		var player:PlayerGameObject;
-		if (mFacebokPic == null) {
-			go = mFacade.gameObjectManager.getReferenceFromId(playerId);
+		if (mSteamAvatar == null) {
+			go = mDBFacade.gameObjectManager.getReferenceFromId(playerId);
 			player = ASCompat.reinterpretAs(go, PlayerGameObject);
 			if (player != null) {
-				if (ASCompat.stringAsBool(player.facebookId) && player.facebookId != "") {
-					saveFacebookPic(player.facebookId);
+				if (ASCompat.stringAsBool(player.steamAvatarUrl) && player.steamAvatarUrl != "") {
+					saveSteamAvatar(player.steamAvatarUrl);
 				} else {
-					mEventComponent.addListener(GameObjectEvent.uniqueEvent("FACEBOOK_ID_RECEIVED_EVENT", player.id),
-						function(param1:events.FacebookIdReceivedEvent) {
-							saveFacebookPic(param1.facebookId);
+					mEventComponent.addListener(GameObjectEvent.uniqueEvent("STEAM_AVATAR_URL_RECEIVED_EVENT", player.id),
+						function(param1:events.SteamAvatarUrlReceivedEvent) {
+							saveSteamAvatar(param1.steamAvatarUrl);
 						});
 				}
 			}
 		} else if (mNametagFBPicSlot != null && !mNametagFBPicSlot.visible) {
-			startFacebookPicLerp();
+			startSteamAvatarPicLerp();
 		}
 	}
 
-	function saveFacebookPic(fbId:String) {
+	function saveSteamAvatar(steamAvatarUrl:String) {
 		var lc:LoaderContext;
 		var loader = new Loader();
-		var picUrl = "https://graph.facebook.com/" + fbId + "/picture";
+		var picUrl = steamAvatarUrl;
 		var url = new URLRequest(picUrl);
-		loader.contentLoaderInfo.addEventListener("ioError", (cast function() {}));
-		loader.contentLoaderInfo.addEventListener("securityError", (cast function() {}));
-		loader.contentLoaderInfo.addEventListener("complete", function(param1:flash.events.Event) {
-			mFacebokPic = loader;
-			mFacebokPic.x -= 25;
-			mFacebokPic.y -= 25;
+		EventListeners.add(loader.contentLoaderInfo, "ioError", function() {});
+		EventListeners.add(loader.contentLoaderInfo, "securityError", function() {});
+		EventListeners.add(loader.contentLoaderInfo, "complete", function(param1:Event) {
+			mSteamAvatar = loader;
+			mSteamAvatar.x -= 25;
+			mSteamAvatar.y -= 25;
+			mSteamAvatar.width = mSteamAvatar.height = 50;
 			if (mNametagFBPicSlot != null) {
-				mNametagFBPicSlot.addChild(mFacebokPic);
-				startFacebookPicLerp();
+				mNametagFBPicSlot.addChild(mSteamAvatar);
+				startSteamAvatarPicLerp();
 			}
 		});
 		lc = new LoaderContext(true);
@@ -265,22 +369,22 @@ class ActorNametag extends Sprite {
 		loader.load(url, lc);
 	}
 
-	function startFacebookPicLerp() {
-		var _loc1_ = new TimelineMax({
+	function startSteamAvatarPicLerp() {
+		var _loc1_ = mDBFacade.mTween.createTimeline({
 			"tweens": [
-				TweenMax.to(mNametagTop, 0.25, {"y": mNametagTopStartingYPosition - mNametagFBPicSlot.height}),
-				TweenMax.to(mNametagFBPicSlot, 0.041666666666666664, {"visible": true})
+				mDBFacade.mTween.tweenMaxTo(mNametagTop, 0.25, {"y": mNametagTopStartingYPosition - mNametagFBPicSlot.height}),
+				mDBFacade.mTween.tweenMaxTo(mNametagFBPicSlot, 0.041666666666666664, {"visible": true})
 			],
 			"align": "sequence"
 		});
-		mLogicalWorkComponent.doLater(5, finishFacebookLerp);
+		mLogicalWorkComponent.doLater(5, finishSteamAvatarLerp);
 	}
 
-	function finishFacebookLerp(gameClock:GameClock) {
-		var _loc2_ = new TimelineMax({
+	function finishSteamAvatarLerp(gameClock:GameClock) {
+		var _loc2_ = mDBFacade.mTween.createTimeline({
 			"tweens": [
-				TweenMax.to(mNametagFBPicSlot, 0.041666666666666664, {"visible": false}),
-				TweenMax.to(mNametagTop, 0.25, {"y": mNametagTopStartingYPosition})
+				mDBFacade.mTween.tweenMaxTo(mNametagFBPicSlot, 0.041666666666666664, {"visible": false}),
+				mDBFacade.mTween.tweenMaxTo(mNametagTop, 0.25, {"y": mNametagTopStartingYPosition})
 			],
 			"align": "sequence"
 		});
@@ -291,11 +395,11 @@ class ActorNametag extends Sprite {
 	public function set_AFK(value:Bool):Bool {
 		mAFK = value;
 		if (mAFKText != null) {
-			if (mAFK) {
-				mAFKText.text = Locale.getString("AFK");
-			} else {
-				mAFKText.text = "";
-			}
+			Locale.setText(mAFKText, mAFK ? "AFK" : null, null, 1.82 * 1.45);
+			layoutAFKText();
+		}
+		if (mStarlingNametag != null) {
+			mStarlingNametag.contentChanged();
 		}
 		return value;
 	}

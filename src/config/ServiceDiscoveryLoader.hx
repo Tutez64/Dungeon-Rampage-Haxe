@@ -1,5 +1,6 @@
 package config;
 
+import brain.event.EventListeners;
 import brain.logger.Logger;
 import flash.events.*;
 import flash.net.*;
@@ -17,11 +18,11 @@ class ServiceDiscoveryLoader {
 		mOnComplete = onComplete;
 		mUrl = serviceDiscoveryUrl + "/game-status/service-discovery";
 		mLoader = new URLLoader();
-		mLoader.addEventListener("httpResponseStatus", onResponseStatus);
-		mLoader.addEventListener("complete", onCompleted);
-		mLoader.addEventListener("ioError", onError);
-		mLoader.addEventListener("securityError", onError);
-		mLoader.addEventListener("certificateError", onError);
+		EventListeners.add(mLoader, "httpResponseStatus", onResponseStatus);
+		EventListeners.add(mLoader, "complete", onCompleted);
+		EventListeners.add(mLoader, "ioError", onError);
+		EventListeners.add(mLoader, "securityError", onError);
+		EventListeners.add(mLoader, "certificateError", onError);
 		mLoader.load(new URLRequest(mUrl));
 	}
 
@@ -83,11 +84,11 @@ class ServiceDiscoveryLoader {
 		if (mLoader == null) {
 			return;
 		}
-		mLoader.removeEventListener("httpResponseStatus", onResponseStatus);
-		mLoader.removeEventListener("complete", onCompleted);
-		mLoader.removeEventListener("ioError", onError);
-		mLoader.removeEventListener("securityError", onError);
-		mLoader.removeEventListener("certificateError", onError);
+		EventListeners.remove(mLoader, "httpResponseStatus", onResponseStatus);
+		EventListeners.remove(mLoader, "complete", onCompleted);
+		EventListeners.remove(mLoader, "ioError", onError);
+		EventListeners.remove(mLoader, "securityError", onError);
+		EventListeners.remove(mLoader, "certificateError", onError);
 		mLoader = null;
 	}
 }

@@ -32,7 +32,7 @@ class BackgroundFader {
 
 	var mFadeTask:Task;
 
-	var mFramesElapsed:Float = 0;
+	var mFramesElapsed:UInt = 0;
 
 	var mStartTop:Float = Math.NaN;
 
@@ -41,7 +41,7 @@ class BackgroundFader {
 	static inline final mPadding:Float = 1300;
 
 	public function new(facade:Facade) {
-		mFramesElapsed = 0;
+		mFramesElapsed = (0 : UInt);
 		mFacade = facade;
 		mWorkComponent = new LogicalWorkComponent(facade, "BackgroundFader");
 		MemoryTracker.track(mWorkComponent, "LogicalWorkComponent - created in BackgroundFader()", "brain");
@@ -58,10 +58,10 @@ class BackgroundFader {
 			mExcludes = excludes;
 			execute();
 		} else {
-			_loc6_ = Std.int(mDuration - mFramesElapsed);
+			_loc6_ = (mDuration - mFramesElapsed : Int);
 			mDuration = (_loc6_ : UInt) > duration ? (_loc6_ : UInt) : duration;
 			mTransitionDuration = transitionDur;
-			mFramesElapsed = 0;
+			mFramesElapsed = (0 : UInt);
 			mAlpha = mAlpha > alpha ? mAlpha : alpha;
 			mOffset = mAlpha / mTransitionDuration;
 		}
@@ -71,7 +71,7 @@ class BackgroundFader {
 		if (mFramesElapsed != 0) {
 			ResetFade();
 		}
-		mFramesElapsed = 0;
+		mFramesElapsed = (0 : UInt);
 		mRectSprite = new Sprite();
 		MemoryTracker.track(mRectSprite, "Sprite - fade rect created in BackgroundFader.execute()", "brain");
 		mRectSprite.graphics.beginFill((ASCompat.floatToInt(mColor.x) << 16 | ASCompat.floatToInt(mColor.y) << 8 | ASCompat.floatToInt(mColor.z):UInt), 1);
@@ -83,9 +83,9 @@ class BackgroundFader {
 		mRectSprite.alpha = 0;
 		mFacade.sceneGraphManager.addChild(mRectSprite, 42);
 		var _loc1_:Sprite;
-		final __ax4_iter_207 = mExcludes;
-		if (checkNullIteratee(__ax4_iter_207))
-			for (_tmp_ in __ax4_iter_207) {
+		final __ax4_iter_297 = mExcludes;
+		if (checkNullIteratee(__ax4_iter_297))
+			for (_tmp_ in __ax4_iter_297) {
 				_loc1_ = ASCompat.coerce(_tmp_, flash.display.Sprite);
 				mFacade.sceneGraphManager.addChild(_loc1_, 46);
 			}
@@ -99,13 +99,12 @@ class BackgroundFader {
 		}
 		mRectSprite.x = mFacade.camera.visibleRectangle.left - mStartLeft - 1300 * 0.5;
 		mRectSprite.y = mFacade.camera.visibleRectangle.top - mStartTop - 1300 * 0.5;
-		var _loc2_ = clock.tickLength / GameClock.ANIMATION_FRAME_DURATION;
-		mFramesElapsed += _loc2_;
+		mFramesElapsed = mFramesElapsed + 1;
 		if (mFramesElapsed <= mTransitionDuration) {
-			mRectSprite.alpha += mOffset * _loc2_;
+			mRectSprite.alpha += mOffset;
 			mRectSprite.alpha = Math.min(mRectSprite.alpha, mAlpha);
 		} else if (mFramesElapsed >= mDuration - mTransitionDuration) {
-			mRectSprite.alpha -= mOffset * _loc2_;
+			mRectSprite.alpha -= mOffset;
 			mRectSprite.alpha = Math.max(mRectSprite.alpha, 0);
 		}
 		if (mFramesElapsed > mDuration) {
@@ -115,12 +114,12 @@ class BackgroundFader {
 	}
 
 	function ResetFade() {
-		mFramesElapsed = 0;
+		mFramesElapsed = (0 : UInt);
 		mFacade.sceneGraphManager.removeChild(mRectSprite);
 		var _loc1_:Sprite;
-		final __ax4_iter_208 = mExcludes;
-		if (checkNullIteratee(__ax4_iter_208))
-			for (_tmp_ in __ax4_iter_208) {
+		final __ax4_iter_298 = mExcludes;
+		if (checkNullIteratee(__ax4_iter_298))
+			for (_tmp_ in __ax4_iter_298) {
 				_loc1_ = ASCompat.coerce(_tmp_, flash.display.Sprite);
 				mFacade.sceneGraphManager.addChild(_loc1_, 20);
 			}
@@ -128,6 +127,19 @@ class BackgroundFader {
 		mRectSprite = null;
 		mFadeTask.destroy();
 		mFadeTask = null;
+	}
+
+	@:isVar public var color(get, never):UInt;
+
+	public function get_color():UInt {
+		return
+			(mColor != null ? (ASCompat.floatToInt(mColor.x) << 16 | ASCompat.floatToInt(mColor.y) << 8 | ASCompat.floatToInt(mColor.z):UInt) : (0 : UInt) : UInt);
+	}
+
+	@:isVar public var alpha(get, never):Float;
+
+	public function get_alpha():Float {
+		return mRectSprite != null ? mRectSprite.alpha : 0;
 	}
 
 	public function forceStop() {

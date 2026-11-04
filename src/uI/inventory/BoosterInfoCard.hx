@@ -11,6 +11,7 @@ import brain.render.MovieClipRenderController;
 import brain.sceneGraph.SceneGraphComponent;
 import brain.uI.UIButton;
 import brain.uI.UIObject;
+import brain.utils.TextUtil;
 import events.BoostersParsedEvent;
 import facade.DBFacade;
 import facade.GameMasterLocale;
@@ -39,6 +40,12 @@ class BoosterInfoCard extends UIObject {
 
 	var mActivateAnotherButton:UIButton;
 
+	var mActivatedCallback:ASFunction;
+
+	var mActivationPending:Bool = false;
+
+	var mUpdatingInfo:Bool = false;
+
 	var mSparkleController:MovieClipRenderController;
 
 	var mEventComponent:EventComponent;
@@ -49,9 +56,10 @@ class BoosterInfoCard extends UIObject {
 
 	var mAssetLoadingComponent:AssetLoadingComponent;
 
-	public function new(dbFacade:DBFacade, sceneGraphComponent:SceneGraphComponent, root:MovieClip) {
+	public function new(dbFacade:DBFacade, sceneGraphComponent:SceneGraphComponent, root:MovieClip, activatedCallback:ASFunction = null) {
 		super(dbFacade, root);
 		mDBFacade = dbFacade;
+		mActivatedCallback = activatedCallback;
 		setupBoosterCardUI();
 		hide();
 	}
@@ -69,6 +77,7 @@ class BoosterInfoCard extends UIObject {
 			mAssetLoadingComponent.destroy();
 			mAssetLoadingComponent = null;
 		}
+		mActivatedCallback = null;
 		super.destroy();
 	}
 
@@ -81,6 +90,7 @@ class BoosterInfoCard extends UIObject {
 
 	public function set_info(info:StackableInfo):StackableInfo {
 		var invInfo:DBInventoryInfo;
+		mUpdatingInfo = true;
 		mInfo = info;
 		if (mInfo == null) {
 			mRoot.visible = false;
@@ -99,12 +109,13 @@ class BoosterInfoCard extends UIObject {
 				mAssetLoadingComponent = new AssetLoadingComponent(mDBFacade);
 			}
 			setupBoosterInfoUI(mInfo);
-			ASCompat.setProperty((mRoot : ASAny).label, "text", GameMasterLocale.getGameMasterSubString("STACKABLE_NAME", mInfo.gmStackable.Constant));
-			ASCompat.setProperty((mRoot : ASAny).description, "text",
+			TextUtil.setText(ASCompat.coerce((mRoot : ASAny).label, flash.text.TextField),
+				GameMasterLocale.getGameMasterSubString("STACKABLE_NAME", mInfo.gmStackable.Constant));
+			TextUtil.setText(ASCompat.coerce((mRoot : ASAny).description, flash.text.TextField),
 				GameMasterLocale.getGameMasterSubString("STACKABLE_DESCRIPTION", mInfo.gmStackable.Constant));
-			ASCompat.setProperty((mRoot : ASAny).button_activate.label, "text", Locale.getString("BOOSTER_CARD_ACTIVATE"));
+			Locale.setText(ASCompat.coerce((mRoot : ASAny).button_activate.label, flash.text.TextField), "BOOSTER_CARD_ACTIVATE");
 			ASCompat.setProperty((mRoot : ASAny).booster_activated, "visible", false);
-			ASCompat.setProperty((mRoot : ASAny).booster_activated.label_time, "text", "00:00:00");
+			TextUtil.setText(ASCompat.coerce((mRoot : ASAny).booster_activated.label_time, flash.text.TextField), "00:00:00");
 			mActivateButton = new UIButton(mDBFacade, ASCompat.coerce((mRoot : ASAny).button_activate, flash.display.MovieClip));
 			mActivateButton.releaseCallback = function() {
 				activateBooster();
@@ -117,6 +128,8 @@ class BoosterInfoCard extends UIObject {
 			mAssetLoadingComponent.getSwfAsset(DBFacade.buildFullDownloadPath("Resources/Art2D/UI/db_UI_town.swf"), boostersLoaded);
 			setupTimer();
 		}
+		mUpdatingInfo = false;
+		completePendingActivationIfReady();
 		return info;
 	}
 
@@ -162,6 +175,7 @@ class BoosterInfoCard extends UIObject {
 		if (mInfo == null && mRoot != null) {
 			hide();
 		}
+		completePendingActivationIfReady();
 	}
 
 	function iconsLoaded(swfAsset:SwfAsset) {
@@ -175,6 +189,7 @@ class BoosterInfoCard extends UIObject {
 		if (mFlagIcon && mFlagBooster) {
 			mRoot.visible = true;
 			show();
+			completePendingActivationIfReady();
 		}
 	}
 
@@ -204,11 +219,12 @@ class BoosterInfoCard extends UIObject {
 		ASCompat.setProperty((mRoot : ASAny).booster_activated.booster_icon, "visible", false);
 		(mRoot : ASAny).booster_activated.removeChild(_loc6_);
 		(mRoot : ASAny).booster_activated.addChild(_loc6_);
-		ASCompat.setProperty((mRoot : ASAny).booster_activated.booster_icon_text, "text", _loc2_);
+		TextUtil.setText(ASCompat.coerce((mRoot : ASAny).booster_activated.booster_icon_text, flash.text.TextField), _loc2_);
 		mFlagBooster = true;
 		if (mFlagIcon && mFlagBooster) {
 			mRoot.visible = true;
 			show();
+			completePendingActivationIfReady();
 		}
 	}
 
@@ -226,7 +242,18 @@ class BoosterInfoCard extends UIObject {
 
 	function activateBooster() {
 		var _loc1_ = mInfo;
+		mActivationPending = true;
 		StoreServicesController.useAccountBooster(mDBFacade, _loc1_);
+	}
+
+	function completePendingActivationIfReady() {
+		if (!mActivationPending || mUpdatingInfo || mInfo != null && !isShowing()) {
+			return;
+		}
+		mActivationPending = false;
+		if (mActivatedCallback != null) {
+			mActivatedCallback();
+		}
 	}
 
 	function setupBoosterInfoUI(info:StackableInfo) {}
@@ -241,5 +268,17 @@ class BoosterInfoCard extends UIObject {
 
 	public function isShowing():Bool {
 		return this.visible;
+	}
+
+	@:isVar public var visibleActivationButton(get, never):UIButton;
+
+	public function get_visibleActivationButton():UIButton {
+		if (ASCompat.toBool((mRoot : ASAny).button_activate.visible)) {
+			return mActivateButton;
+		}
+		if (ASCompat.toBool((mRoot : ASAny).booster_activated.visible)) {
+			return mActivateAnotherButton;
+		}
+		return null;
 	}
 }

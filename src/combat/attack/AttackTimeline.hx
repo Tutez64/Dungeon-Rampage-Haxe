@@ -3,17 +3,13 @@ package combat.attack;
 import actor.ActorGameObject;
 import actor.ActorView;
 import brain.clock.GameClock;
-import brain.logger.Logger;
+import collections.LinkedList;
+import collections.Map;
 import combat.weapon.WeaponGameObject;
 import distributedObjects.DistributedDungeonFloor;
-import effects.ChargeEffectGameObject;
-import effects.EffectGameObject;
 import facade.DBFacade;
 import generatedCode.AttackChoreography;
 import generatedCode.CombatResult;
-import org.as3commons.collections.LinkedList;
-import org.as3commons.collections.Map;
-import org.as3commons.collections.framework.IMapIterator;
 
 class AttackTimeline extends ScriptTimeline {
 	var mCombatResultActions:Map;
@@ -23,10 +19,6 @@ class AttackTimeline extends ScriptTimeline {
 	var mWeapon:WeaponGameObject;
 
 	var mChoreographed:Bool = false;
-
-	var mRegisteredEffects:Map;
-
-	var mChargeEffect:ChargeEffectGameObject;
 
 	var mPowerMultiplier:Float = 1;
 
@@ -45,15 +37,11 @@ class AttackTimeline extends ScriptTimeline {
 		mWeapon = weapon;
 		super(actorGameObject, actorView, attackJson, dbFacade, distributedDungeonFloor);
 		mCombatResultActions = new Map();
-		mRegisteredEffects = new Map();
 		mAttackName = attackJson.attackName;
 		mChoreographed = ASCompat.toBool(attackJson.choreographed);
 	}
 
 	override public function destroy() {
-		this.cleanUpRegisteredEffects();
-		mRegisteredEffects.clear();
-		mRegisteredEffects = null;
 		mCombatResultActions.clear();
 		mCombatResultActions = null;
 		mWeapon = null;
@@ -79,36 +67,32 @@ class AttackTimeline extends ScriptTimeline {
 	public function isAttackWithinComboWindow():Bool {
 		var _loc1_ = (ASCompat.floatToInt(currentGMAttack.ComboWindow * mTotalFrames) : UInt);
 		var _loc2_ = (mLastExecutedFrame : UInt);
-		if (_loc2_ >= _loc1_) {
-			return true;
-		}
-		return false;
+		return _loc2_ >= _loc1_;
 	}
 
 	override function parseAction(actionObj:ASObject):AttackTimelineAction {
-		var _loc3_ = ASCompat.asString(actionObj.type);
-		var _loc2_:AttackTimelineAction = null;
-		switch (_loc3_) {
+		var _loc2_ = ASCompat.asString(actionObj.type);
+		var _loc3_:AttackTimelineAction = null;
+		switch (_loc2_) {
 			case "attackEffect":
-				_loc2_ = PlayEffectAttackTimelineAction.buildFromJson(mActorGameObject, mActorView, mDBFacade, mDistributedDungeonFloor, actionObj, mWeapon,
-					registerEffect);
+				_loc3_ = PlayEffectAttackTimelineAction.buildFromJson(mActorGameObject, mActorView, mDBFacade, mDistributedDungeonFloor, actionObj, mWeapon);
 
 			case "projectile":
-				_loc2_ = ProjectileAttackTimelineAction.buildFromJson(mActorGameObject, mActorView, mDBFacade, mDistributedDungeonFloor, actionObj, mWeapon);
+				_loc3_ = ProjectileAttackTimelineAction.buildFromJson(mActorGameObject, mActorView, mDBFacade, mDistributedDungeonFloor, actionObj, mWeapon);
 
 			case "automove":
-				_loc2_ = AutoMoveTimelineAction.buildFromJson(mActorGameObject, mActorView, mDBFacade);
+				_loc3_ = AutoMoveTimelineAction.buildFromJson(mActorGameObject, mActorView, mDBFacade);
 
 			case "attackautomove":
-				_loc2_ = AttackAutoMoveTimelineAction.buildFromJson(mActorGameObject, mActorView, mDBFacade);
+				_loc3_ = AttackAutoMoveTimelineAction.buildFromJson(mActorGameObject, mActorView, mDBFacade);
 
 			case "block":
-				_loc2_ = BlockAttackTimelineAction.buildFromJson(mActorGameObject, mActorView, mDBFacade, actionObj);
+				_loc3_ = BlockAttackTimelineAction.buildFromJson(mActorGameObject, mActorView, mDBFacade, actionObj);
 
 			default:
 				return super.parseAction(actionObj);
 		}
-		return _loc2_;
+		return _loc3_;
 	}
 
 	override function processTimelineActions(frame:Int, gameClock:GameClock) {
@@ -118,36 +102,21 @@ class AttackTimeline extends ScriptTimeline {
 
 	override public function stop() {
 		super.stop();
-		cleanUpRegisteredEffects();
-	}
-
-	function cleanUpRegisteredEffects() {
-		var _loc2_:EffectGameObject = null;
-		var _loc1_ = ASCompat.reinterpretAs(mRegisteredEffects.iterator(), IMapIterator);
-		while (ASCompat.toBool(_loc1_.next())) {
-			_loc2_ = ASCompat.dynamicAs(_loc1_.current, EffectGameObject);
-			_loc2_.destroy();
-		}
-		mRegisteredEffects.clear();
-		if (mChargeEffect != null) {
-			mChargeEffect.destroy();
-			mChargeEffect = null;
-		}
 	}
 
 	public function appendChoreography(attackChoreography:AttackChoreography) {
 		var _loc2_:CombatResultAttackTimelineAction = null;
 		var _loc4_:LinkedList = null;
-		var _loc5_ = 0;
+		var _loc5_ = (0 : UInt);
 		var _loc3_:CombatResult;
-		final __ax4_iter_41 = attackChoreography.combatResults;
-		if (checkNullIteratee(__ax4_iter_41))
-			for (_tmp_ in __ax4_iter_41) {
+		final __ax4_iter_25 = attackChoreography.combatResults;
+		if (checkNullIteratee(__ax4_iter_25))
+			for (_tmp_ in __ax4_iter_25) {
 				_loc3_ = _tmp_;
-				_loc5_ = (_loc3_.when : Int);
+				_loc5_ = _loc3_.when;
 				_loc2_ = new CombatResultAttackTimelineAction(mActorGameObject, mActorView, mDBFacade, _loc3_, mDistributedDungeonFloor);
 				if (mCombatResultActions.hasKey(_loc5_)) {
-					_loc4_ = ASCompat.coerce(mCombatResultActions.itemFor(_loc5_), org.as3commons.collections.LinkedList);
+					_loc4_ = ASCompat.coerce(mCombatResultActions.itemFor(_loc5_), collections.LinkedList);
 					_loc4_.add(_loc2_);
 				} else {
 					_loc4_ = new LinkedList();
@@ -155,26 +124,6 @@ class AttackTimeline extends ScriptTimeline {
 					mCombatResultActions.add(_loc5_, _loc4_);
 				}
 			}
-	}
-
-	public function registerEffect(effectGameObject:EffectGameObject) {
-		if (Std.isOfType(effectGameObject, ChargeEffectGameObject)) {
-			if (mChargeEffect != null) {
-				Logger.error("Trying to register more than one charge effect on timeline.");
-				mRegisteredEffects.removeKey(mChargeEffect.id);
-				mChargeEffect.destroy();
-				mChargeEffect = null;
-				return;
-			}
-			mChargeEffect = ASCompat.reinterpretAs(effectGameObject, ChargeEffectGameObject);
-		}
-		mRegisteredEffects.add(effectGameObject.id, effectGameObject);
-	}
-
-	@:isVar public var chargeEffect(get, never):ChargeEffectGameObject;
-
-	public function get_chargeEffect():ChargeEffectGameObject {
-		return mChargeEffect;
 	}
 
 	@:isVar public var powerMultiplier(get, set):Float;

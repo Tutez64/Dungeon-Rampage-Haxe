@@ -1,10 +1,12 @@
 package brain.uI;
 
 import brain.clock.GameClock;
+import brain.event.EventListeners;
 import brain.facade.Facade;
 import brain.logger.Logger;
 import brain.workLoop.DoLater;
 import flash.display.DisplayObject;
+import flash.display.DisplayObjectContainer;
 import flash.display.MovieClip;
 import flash.events.MouseEvent;
 import flash.geom.Point;
@@ -26,6 +28,8 @@ class UIObject {
 	static inline final NAVIGATION_SELECTED = "SELECTED";
 
 	static inline final NAVIGATION_SET_TO_UNSELECTED = "SET_TO_UNSELECTED";
+
+	public static var mouseFocusRequestHandler:ASFunction;
 
 	var mEnabled:Bool = true;
 
@@ -49,11 +53,17 @@ class UIObject {
 
 	var mIsParentedToStage:Bool = false;
 
+	var mTooltipParent:DisplayObjectContainer;
+
 	var mNavigationDictionary:ASDictionary<ASAny, ASAny> = new ASDictionary(true);
 
 	var mNavigationAdditionalInteraction:ASDictionary<ASAny, ASAny> = new ASDictionary(true);
 
 	var mIsFocused:Bool = false;
+
+	var mIsHovered:Bool = false;
+
+	var mHighlightApplied:Bool = false;
 
 	public function new(facade:Facade, root:MovieClip, tooltipDrawLayer:Int = 0, dontKillChildren:Bool = false) {
 		mFacade = facade;
@@ -89,7 +99,11 @@ class UIObject {
 	@:isVar public var visible(get, set):Bool;
 
 	public function set_visible(value:Bool):Bool {
-		return mRoot.visible = value;
+		mRoot.visible = value;
+		if (!value && mIsHovered) {
+			onMouseRollOut(null);
+		}
+		return value;
 	}
 
 	function get_visible():Bool {
@@ -105,26 +119,78 @@ class UIObject {
 	function set_enabled(value:Bool):Bool {
 		mEnabled = value;
 		hideTooltip();
+		if (!mEnabled && mIsHovered) {
+			onMouseRollOut(null);
+		}
 		removeListeners();
 		if (mEnabled) {
 			addListeners();
 		}
+		updateHighlight();
 		return value;
 	}
 
 	function addListeners() {
-		mRoot.addEventListener("rollOver", onRollOver);
-		mRoot.addEventListener("rollOut", onRollOut);
+		EventListeners.add(mRoot, "rollOver", onMouseRollOver);
+		EventListeners.add(mRoot, "rollOut", onMouseRollOut);
+	}
+
+	@:isVar var isHighlighted(get, never):Bool;
+
+	function get_isHighlighted():Bool {
+		return mEnabled && (mIsFocused || mIsHovered);
+	}
+
+	function updateHighlight(event:MouseEvent = null) {
+		if (mRoot == null) {
+			return;
+		}
+		if (isHighlighted == mHighlightApplied) {
+			return;
+		}
+		mHighlightApplied = isHighlighted;
+		if (mHighlightApplied) {
+			onRollOver(event);
+		} else {
+			onRollOut(event);
+		}
+	}
+
+	function onMouseRollOver(event:MouseEvent) {
+		if (mIsHovered) {
+			return;
+		}
+		mIsHovered = true;
+		updateHighlight(event);
+		if (mouseFocusRequestHandler != null && canBeFocused()) {
+			mouseFocusRequestHandler(this);
+		}
+	}
+
+	function onMouseRollOut(event:MouseEvent) {
+		if (!mIsHovered) {
+			return;
+		}
+		mIsHovered = false;
+		updateHighlight(event);
 	}
 
 	public function setFocused(focused:Bool) {
-		if (mIsFocused != focused) {
-			mIsFocused = focused;
-			if (mIsFocused) {
-				onFocused();
-			} else {
-				onUnfocused();
-			}
+		if (mRoot == null) {
+			return;
+		}
+		if (mIsFocused == focused) {
+			return;
+		}
+		mIsFocused = focused;
+		if (isHighlighted == mHighlightApplied) {
+			return;
+		}
+		mHighlightApplied = isHighlighted;
+		if (mHighlightApplied) {
+			onFocused();
+		} else {
+			onUnfocused();
 		}
 	}
 
@@ -136,11 +202,11 @@ class UIObject {
 		onRollOut(null);
 	}
 
-	public function onSelected() {}
+	public function onSelected(fromController:Bool = false) {}
 
 	function removeListeners() {
-		mRoot.removeEventListener("rollOver", onRollOver);
-		mRoot.removeEventListener("rollOut", onRollOut);
+		EventListeners.remove(mRoot, "rollOver", onMouseRollOver);
+		EventListeners.remove(mRoot, "rollOut", onMouseRollOut);
 	}
 
 	function onRollOver(event:MouseEvent) {
@@ -186,6 +252,11 @@ class UIObject {
 
 	public function setTooltipToBeParentedToStage() {
 		mIsParentedToStage = true;
+	}
+
+	public function lockTooltipToParent(parent:DisplayObjectContainer) {
+		hideTooltip();
+		mTooltipParent = parent;
 	}
 
 	@:isVar public var tooltip(get, set):MovieClip;
@@ -262,11 +333,19 @@ class UIObject {
 
 	function showTooltip(gameClock:GameClock = null) {
 		var _loc2_:Point = null;
+		var _loc3_:Point = null;
 		if (mTooltip != null) {
-			if (!mIsParentedToStage) {
-				_loc2_ = root.localToGlobal(mTooltipPos);
+			if (mTooltipParent != null) {
+				_loc2_ = mTooltipParent.globalToLocal(mRoot.localToGlobal(mTooltipPos));
 				mTooltip.x = _loc2_.x;
 				mTooltip.y = _loc2_.y;
+				mTooltipParent.addChild(mTooltip);
+				return;
+			}
+			if (!mIsParentedToStage) {
+				_loc3_ = mFacade.designLocalToGlobal(root, mTooltipPos);
+				mTooltip.x = _loc3_.x;
+				mTooltip.y = _loc3_.y;
 			} else {
 				mTooltip.x = mTooltipPos.x;
 				mTooltip.y = mTooltipPos.y;
@@ -287,6 +366,8 @@ class UIObject {
 				ASCompat.setProperty(mRoot, "UIObject", null);
 			}
 			hideTooltip();
+			mIsHovered = false;
+			mHighlightApplied = false;
 			removeListeners();
 			if (!mDontKillMyChildren) {
 				while (mRoot.numChildren > 0) {
@@ -294,13 +375,14 @@ class UIObject {
 				}
 			}
 			mNavigationDictionary = null;
+			mNavigationAdditionalInteraction = null;
 			mRoot = null;
 			mFacade = null;
 		}
 	}
 
 	public function canBeFocused():Bool {
-		return enabled && visible;
+		return mRoot != null && enabled && visible;
 	}
 
 	public function isFocused():Bool {
@@ -324,25 +406,25 @@ class UIObject {
 	@:isVar public var leftNavigation(get, set):UIObject;
 
 	public function get_leftNavigation():UIObject {
-		return ASCompat.coerce(mNavigationDictionary["LEFT"], UIObject);
+		return ASCompat.coerce(mNavigationDictionary != null ? ASCompat.coerce(mNavigationDictionary["LEFT"], UIObject) : null, UIObject);
 	}
 
 	@:isVar public var rightNavigation(get, set):UIObject;
 
 	public function get_rightNavigation():UIObject {
-		return ASCompat.coerce(mNavigationDictionary["RIGHT"], UIObject);
+		return ASCompat.coerce(mNavigationDictionary != null ? ASCompat.coerce(mNavigationDictionary["RIGHT"], UIObject) : null, UIObject);
 	}
 
 	@:isVar public var upNavigation(get, set):UIObject;
 
 	public function get_upNavigation():UIObject {
-		return ASCompat.coerce(mNavigationDictionary["UP"], UIObject);
+		return ASCompat.coerce(mNavigationDictionary != null ? ASCompat.coerce(mNavigationDictionary["UP"], UIObject) : null, UIObject);
 	}
 
 	@:isVar public var downNavigation(get, set):UIObject;
 
 	public function get_downNavigation():UIObject {
-		return ASCompat.coerce(mNavigationDictionary["DOWN"], UIObject);
+		return ASCompat.coerce(mNavigationDictionary != null ? ASCompat.coerce(mNavigationDictionary["DOWN"], UIObject) : null, UIObject);
 	}
 
 	function set_leftNavigation(leftUiObject:UIObject):UIObject {
@@ -401,18 +483,22 @@ class UIObject {
 
 	public function clearLeftNavigation() {
 		mNavigationDictionary["LEFT"] = null;
+		mNavigationAdditionalInteraction["LEFT"] = null;
 	}
 
 	public function clearRightNavigation() {
 		mNavigationDictionary["RIGHT"] = null;
+		mNavigationAdditionalInteraction["RIGHT"] = null;
 	}
 
 	public function clearUpNavigation() {
 		mNavigationDictionary["UP"] = null;
+		mNavigationAdditionalInteraction["UP"] = null;
 	}
 
 	public function clearDownNavigation() {
 		mNavigationDictionary["DOWN"] = null;
+		mNavigationAdditionalInteraction["DOWN"] = null;
 	}
 
 	public function clearNavigationAndInteractions() {
@@ -431,37 +517,38 @@ class UIObject {
 	@:isVar public var leftNavigationAdditionalInteraction(get, set):ASFunction;
 
 	public function get_leftNavigationAdditionalInteraction():ASFunction {
-		return ASCompat.coerceFunction(mNavigationAdditionalInteraction["LEFT"]);
+		return ASCompat.coerceFunction(mNavigationAdditionalInteraction != null ? ASCompat.coerceFunction(mNavigationAdditionalInteraction["LEFT"]) : null);
 	}
 
 	@:isVar public var rightNavigationAdditionalInteraction(get, set):ASFunction;
 
 	public function get_rightNavigationAdditionalInteraction():ASFunction {
-		return ASCompat.coerceFunction(mNavigationAdditionalInteraction["RIGHT"]);
+		return ASCompat.coerceFunction(mNavigationAdditionalInteraction != null ? ASCompat.coerceFunction(mNavigationAdditionalInteraction["RIGHT"]) : null);
 	}
 
 	@:isVar public var upNavigationAdditionalInteraction(get, set):ASFunction;
 
 	public function get_upNavigationAdditionalInteraction():ASFunction {
-		return ASCompat.coerceFunction(mNavigationAdditionalInteraction["UP"]);
+		return ASCompat.coerceFunction(mNavigationAdditionalInteraction != null ? ASCompat.coerceFunction(mNavigationAdditionalInteraction["UP"]) : null);
 	}
 
 	@:isVar public var downNavigationAdditionalInteraction(get, set):ASFunction;
 
 	public function get_downNavigationAdditionalInteraction():ASFunction {
-		return ASCompat.coerceFunction(mNavigationAdditionalInteraction["DOWN"]);
+		return ASCompat.coerceFunction(mNavigationAdditionalInteraction != null ? ASCompat.coerceFunction(mNavigationAdditionalInteraction["DOWN"]) : null);
 	}
 
 	@:isVar public var navigationSelectedInteraction(get, set):ASFunction;
 
 	public function get_navigationSelectedInteraction():ASFunction {
-		return ASCompat.coerceFunction(mNavigationAdditionalInteraction["SELECTED"]);
+		return ASCompat.coerceFunction(mNavigationAdditionalInteraction != null ? ASCompat.coerceFunction(mNavigationAdditionalInteraction["SELECTED"]) : null);
 	}
 
 	@:isVar public var navigationSetToUnselectedInteraction(get, set):ASFunction;
 
 	public function get_navigationSetToUnselectedInteraction():ASFunction {
-		return ASCompat.coerceFunction(mNavigationAdditionalInteraction["SET_TO_UNSELECTED"]);
+		return
+			ASCompat.coerceFunction(mNavigationAdditionalInteraction != null ? ASCompat.coerceFunction(mNavigationAdditionalInteraction["SET_TO_UNSELECTED"]) : null);
 	}
 
 	function set_leftNavigationAdditionalInteraction(leftUiObjectInteraction:ASFunction):ASFunction {

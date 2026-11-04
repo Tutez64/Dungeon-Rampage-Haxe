@@ -35,12 +35,27 @@ class NPCGameObject extends ActorGameObject implements IDistributedNPCGameObject
 
 	override public function init() {
 		mGmNpc = ASCompat.coerce(this.mDBFacade.gameMaster.npcById.itemFor(this.type), gameMasterDictionary.GMNpc);
+		determineForceFlash();
 		super.init();
 		this.createOffNavCollisions(this.actorData.constant);
 		this.triggerState = this.triggerState;
 		tryRegisterPet();
 		mArchwayAlpha = mGmNpc.ArchwayAlpha;
 		initializeToFirstValidWeapon();
+	}
+
+	function determineForceFlash() {
+		if (this.distributedDungeonFloor == null || this.tile == null) {
+			return;
+		}
+		var _loc1_ = this.distributedDungeonFloor.dungeonFloorFactory.tileFactory;
+		if (_loc1_ == null) {
+			return;
+		}
+		var _loc2_ = this.tile;
+		var _loc4_ = this.position.x - _loc2_.position.x;
+		var _loc3_ = this.position.y - _loc2_.position.y;
+		this.forceFlash = _loc1_.getForceFlashForNpc(this.actorData.constant, _loc2_.position, _loc4_, _loc3_);
 	}
 
 	override public function get_maxHitPoints():Float {
@@ -110,9 +125,9 @@ class NPCGameObject extends ActorGameObject implements IDistributedNPCGameObject
 		mActorStateMachine.destroy();
 		mActorStateMachine = null;
 		var _loc1_:NavCollider;
-		final __ax4_iter_219 = mOffNavCollisions;
-		if (checkNullIteratee(__ax4_iter_219))
-			for (_tmp_ in __ax4_iter_219) {
+		final __ax4_iter_304 = mOffNavCollisions;
+		if (checkNullIteratee(__ax4_iter_304))
+			for (_tmp_ in __ax4_iter_304) {
 				_loc1_ = _tmp_;
 				_loc1_.destroy();
 			}
@@ -152,9 +167,9 @@ class NPCGameObject extends ActorGameObject implements IDistributedNPCGameObject
 
 	public function removeOffNavColliders() {
 		var _loc1_:NavCollider;
-		final __ax4_iter_220 = mOffNavCollisions;
-		if (checkNullIteratee(__ax4_iter_220))
-			for (_tmp_ in __ax4_iter_220) {
+		final __ax4_iter_305 = mOffNavCollisions;
+		if (checkNullIteratee(__ax4_iter_305))
+			for (_tmp_ in __ax4_iter_305) {
 				_loc1_ = _tmp_;
 				_loc1_.destroy();
 			}
@@ -171,9 +186,9 @@ class NPCGameObject extends ActorGameObject implements IDistributedNPCGameObject
 
 	public function set_offNavCollidersActive(value:Bool):Bool {
 		var _loc2_:NavCollider;
-		final __ax4_iter_221 = mOffNavCollisions;
-		if (checkNullIteratee(__ax4_iter_221))
-			for (_tmp_ in __ax4_iter_221) {
+		final __ax4_iter_306 = mOffNavCollisions;
+		if (checkNullIteratee(__ax4_iter_306))
+			for (_tmp_ in __ax4_iter_306) {
 				_loc2_ = _tmp_;
 				_loc2_.active = value;
 			}
@@ -240,5 +255,10 @@ class NPCGameObject extends ActorGameObject implements IDistributedNPCGameObject
 
 	function get_masterId():UInt {
 		return mMasterId;
+	}
+
+	override public function get_belongsToRemotePlayer():Bool {
+		var _loc1_ = ASCompat.reinterpretAs(mDBFacade.gameObjectManager.getReferenceFromId(mMasterId), HeroGameObject);
+		return _loc1_ != null && !_loc1_.isOwner;
 	}
 }

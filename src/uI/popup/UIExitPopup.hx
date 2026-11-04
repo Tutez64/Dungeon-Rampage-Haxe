@@ -37,7 +37,7 @@ class UIExitPopup extends DBUITwoButtonPopup {
 			_loc8_ = Locale.getString("EXIT_KEEP_PLAYING");
 			_loc3_ = closePopupAction;
 		}
-		super(dbFacade, _loc4_, _loc6_, _loc2_, _loc5_, _loc8_, _loc3_, true, closePopupAction, true, true, "EXIT_POPUP");
+		super(dbFacade, "EXIT_POPUP", _loc4_, _loc6_, _loc2_, _loc5_, _loc8_, _loc3_, true, closePopupAction);
 	}
 
 	function wishlistAction() {
@@ -59,7 +59,6 @@ class UIExitPopup extends DBUITwoButtonPopup {
 			var _loc1_ = new URLRequest("https://discord.com/invite/dungeonrampage");
 			flash.Lib.getURL(_loc1_, "_blank");
 		};
-		setupMenuNavigationLinks();
 	}
 
 	override function getSwfPath():String {
@@ -70,7 +69,7 @@ class UIExitPopup extends DBUITwoButtonPopup {
 		return "popup_exit";
 	}
 
-	public function setupMenuNavigationLinks() {
+	override function setupMenuNavigation() {
 		mCloseButton.clearNavigationAndInteractions();
 		mLeftButton.clearNavigationAndInteractions();
 		mRightButton.clearNavigationAndInteractions();

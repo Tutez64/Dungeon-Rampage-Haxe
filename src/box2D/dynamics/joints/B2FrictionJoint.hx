@@ -3,191 +3,227 @@ package box2D.dynamics.joints;
 import box2D.common.math.B2Mat22;
 import box2D.common.math.B2Math;
 import box2D.common.math.B2Vec2;
-import box2D.dynamics.B2Body;
 import box2D.dynamics.B2TimeStep;
 
-/*use*/ /*namespace*/ /*b2internal*/ class B2FrictionJoint extends B2Joint {
-	var m_localAnchorA:B2Vec2 = new B2Vec2();
+class B2FrictionJoint extends B2Joint {
+	public var m_maxTorque:Float = Math.NaN;
 
-	var m_localAnchorB:B2Vec2 = new B2Vec2();
+	public var m_maxForce:Float = Math.NaN;
 
-	public var m_linearMass:B2Mat22 = new B2Mat22();
+	public var m_localAnchorB:B2Vec2;
+
+	public var m_localAnchorA:B2Vec2;
+
+	public var m_linearMass:B2Mat22;
+
+	public var m_linearImpulse:B2Vec2;
 
 	public var m_angularMass:Float = Math.NaN;
 
-	var m_linearImpulse:B2Vec2 = new B2Vec2();
+	public var m_angularImpulse:Float = Math.NaN;
 
-	var m_angularImpulse:Float = Math.NaN;
-
-	var m_maxForce:Float = Math.NaN;
-
-	var m_maxTorque:Float = Math.NaN;
-
-	public function new(def:B2FrictionJointDef) {
+	public function new(def:B2FrictionJointDef = /*undefined*/ null) {
 		super(def);
-		this.m_localAnchorA.SetV(def.localAnchorA);
-		this.m_localAnchorB.SetV(def.localAnchorB);
-		this.m_linearMass.SetZero();
-		this.m_angularMass = 0;
-		this.m_linearImpulse.SetZero();
-		this.m_angularImpulse = 0;
-		this.m_maxForce = def.maxForce;
-		this.m_maxTorque = def.maxTorque;
+		m_localAnchorA = new B2Vec2();
+		m_localAnchorB = new B2Vec2();
+		m_linearMass = new B2Mat22();
+		m_linearImpulse = new B2Vec2();
+		m_localAnchorA.setV(def.localAnchorA);
+		m_localAnchorB.setV(def.localAnchorB);
+		m_linearMass.setZero();
+		m_angularMass = 0;
+		m_linearImpulse.setZero();
+		m_angularImpulse = 0;
+		m_maxForce = def.maxForce;
+		m_maxTorque = def.maxTorque;
 	}
 
-	override public function GetAnchorA():B2Vec2 {
-		return m_bodyA.GetWorldPoint(this.m_localAnchorA);
+	override public function solveVelocityConstraints(step:B2TimeStep) {
+		SolveVelocityConstraints(step);
 	}
 
-	override public function GetAnchorB():B2Vec2 {
-		return m_bodyB.GetWorldPoint(this.m_localAnchorB);
+	override public function solvePositionConstraints(baumgarte:Float):Bool {
+		return SolvePositionConstraints(baumgarte);
 	}
 
-	override public function GetReactionForce(inv_dt:Float):B2Vec2 {
-		return new B2Vec2(inv_dt * this.m_linearImpulse.x, inv_dt * this.m_linearImpulse.y);
+	public function setMaxTorque(torque:Float) {
+		SetMaxTorque(torque);
 	}
 
-	override public function GetReactionTorque(inv_dt:Float):Float {
-		return inv_dt * this.m_angularImpulse;
+	public function setMaxForce(force:Float) {
+		SetMaxForce(force);
 	}
 
-	public function SetMaxForce(force:Float) {
-		this.m_maxForce = force;
+	override public function initVelocityConstraints(step:B2TimeStep) {
+		InitVelocityConstraints(step);
 	}
 
-	public function GetMaxForce():Float {
-		return this.m_maxForce;
+	override public function getReactionTorque(inv_dt:Float):Float {
+		return GetReactionTorque(inv_dt);
 	}
 
-	public function SetMaxTorque(torque:Float) {
-		this.m_maxTorque = torque;
+	override public function getReactionForce(inv_dt:Float):B2Vec2 {
+		return GetReactionForce(inv_dt);
 	}
 
-	public function GetMaxTorque():Float {
-		return this.m_maxTorque;
+	public function getMaxTorque():Float {
+		return GetMaxTorque();
 	}
 
-	override public function InitVelocityConstraints(step:B2TimeStep) {
-		var _loc2_:B2Mat22 = null;
-		var _loc3_ = Math.NaN;
-		var _loc4_:B2Body = null;
-		var _loc5_:B2Body = null;
-		var _loc6_ = Math.NaN;
-		var _loc8_ = Math.NaN;
-		var _loc10_ = Math.NaN;
-		var _loc12_ = Math.NaN;
-		var _loc13_ = Math.NaN;
-		var _loc14_:B2Mat22 = null;
-		var _loc15_:B2Vec2 = null;
-		_loc4_ = m_bodyA;
-		_loc5_ = m_bodyB;
-		_loc2_ = _loc4_.m_xf.R;
-		_loc6_ = this.m_localAnchorA.x - _loc4_.m_sweep.localCenter.x;
-		var _loc7_ = this.m_localAnchorA.y - _loc4_.m_sweep.localCenter.y;
-		_loc3_ = _loc2_.col1.x * _loc6_ + _loc2_.col2.x * _loc7_;
-		_loc7_ = _loc2_.col1.y * _loc6_ + _loc2_.col2.y * _loc7_;
-		_loc6_ = _loc3_;
-		_loc2_ = _loc5_.m_xf.R;
-		_loc8_ = this.m_localAnchorB.x - _loc5_.m_sweep.localCenter.x;
-		var _loc9_ = this.m_localAnchorB.y - _loc5_.m_sweep.localCenter.y;
-		_loc3_ = _loc2_.col1.x * _loc8_ + _loc2_.col2.x * _loc9_;
-		_loc9_ = _loc2_.col1.y * _loc8_ + _loc2_.col2.y * _loc9_;
-		_loc8_ = _loc3_;
-		_loc10_ = _loc4_.m_invMass;
-		var _loc11_ = _loc5_.m_invMass;
-		_loc12_ = _loc4_.m_invI;
-		_loc13_ = _loc5_.m_invI;
-		_loc14_ = new B2Mat22();
-		_loc14_.col1.x = _loc10_ + _loc11_;
-		_loc14_.col2.x = 0;
-		_loc14_.col1.y = 0;
-		_loc14_.col2.y = _loc10_ + _loc11_;
-		_loc14_.col1.x += _loc12_ * _loc7_ * _loc7_;
-		_loc14_.col2.x += -_loc12_ * _loc6_ * _loc7_;
-		_loc14_.col1.y += -_loc12_ * _loc6_ * _loc7_;
-		_loc14_.col2.y += _loc12_ * _loc6_ * _loc6_;
-		_loc14_.col1.x += _loc13_ * _loc9_ * _loc9_;
-		_loc14_.col2.x += -_loc13_ * _loc8_ * _loc9_;
-		_loc14_.col1.y += -_loc13_ * _loc8_ * _loc9_;
-		_loc14_.col2.y += _loc13_ * _loc8_ * _loc8_;
-		_loc14_.GetInverse(this.m_linearMass);
-		this.m_angularMass = _loc12_ + _loc13_;
-		if (this.m_angularMass > 0) {
-			this.m_angularMass = 1 / this.m_angularMass;
-		}
-		if (step.warmStarting) {
-			this.m_linearImpulse.x *= step.dtRatio;
-			this.m_linearImpulse.y *= step.dtRatio;
-			this.m_angularImpulse *= step.dtRatio;
-			_loc15_ = this.m_linearImpulse;
-			_loc4_.m_linearVelocity.x -= _loc10_ * _loc15_.x;
-			_loc4_.m_linearVelocity.y -= _loc10_ * _loc15_.y;
-			_loc4_.m_angularVelocity -= _loc12_ * (_loc6_ * _loc15_.y - _loc7_ * _loc15_.x + this.m_angularImpulse);
-			_loc5_.m_linearVelocity.x += _loc11_ * _loc15_.x;
-			_loc5_.m_linearVelocity.y += _loc11_ * _loc15_.y;
-			_loc5_.m_angularVelocity += _loc13_ * (_loc8_ * _loc15_.y - _loc9_ * _loc15_.x + this.m_angularImpulse);
-		} else {
-			this.m_linearImpulse.SetZero();
-			this.m_angularImpulse = 0;
-		}
+	public function getMaxForce():Float {
+		return GetMaxForce();
+	}
+
+	override public function getAnchorB():B2Vec2 {
+		return GetAnchorB();
+	}
+
+	override public function getAnchorA():B2Vec2 {
+		return GetAnchorA();
 	}
 
 	override public function SolveVelocityConstraints(step:B2TimeStep) {
-		var _loc2_:B2Mat22 = null;
-		var _loc3_ = Math.NaN;
-		var _loc18_ = Math.NaN;
-		var _loc4_ = m_bodyA;
-		var _loc5_ = m_bodyB;
-		var _loc6_ = _loc4_.m_linearVelocity;
-		var _loc7_ = _loc4_.m_angularVelocity;
-		var _loc8_ = _loc5_.m_linearVelocity;
-		var _loc9_ = _loc5_.m_angularVelocity;
-		var _loc10_ = _loc4_.m_invMass;
-		var _loc11_ = _loc5_.m_invMass;
-		var _loc12_ = _loc4_.m_invI;
-		var _loc13_ = _loc5_.m_invI;
-		_loc2_ = _loc4_.m_xf.R;
-		var _loc14_ = this.m_localAnchorA.x - _loc4_.m_sweep.localCenter.x;
-		var _loc15_ = this.m_localAnchorA.y - _loc4_.m_sweep.localCenter.y;
-		_loc3_ = _loc2_.col1.x * _loc14_ + _loc2_.col2.x * _loc15_;
-		_loc15_ = _loc2_.col1.y * _loc14_ + _loc2_.col2.y * _loc15_;
-		_loc14_ = _loc3_;
-		_loc2_ = _loc5_.m_xf.R;
-		var _loc16_ = this.m_localAnchorB.x - _loc5_.m_sweep.localCenter.x;
-		var _loc17_ = this.m_localAnchorB.y - _loc5_.m_sweep.localCenter.y;
-		_loc3_ = _loc2_.col1.x * _loc16_ + _loc2_.col2.x * _loc17_;
-		_loc17_ = _loc2_.col1.y * _loc16_ + _loc2_.col2.y * _loc17_;
-		_loc16_ = _loc3_;
-		var _loc19_ = _loc9_ - _loc7_;
-		var _loc20_ = -this.m_angularMass * _loc19_;
-		var _loc21_ = this.m_angularImpulse;
-		_loc18_ = step.dt * this.m_maxTorque;
-		this.m_angularImpulse = B2Math.Clamp(this.m_angularImpulse + _loc20_, -_loc18_, _loc18_);
-		_loc20_ = this.m_angularImpulse - _loc21_;
-		_loc7_ -= _loc12_ * _loc20_;
-		_loc9_ += _loc13_ * _loc20_;
-		var _loc22_ = _loc8_.x - _loc9_ * _loc17_ - _loc6_.x + _loc7_ * _loc15_;
-		var _loc23_ = _loc8_.y + _loc9_ * _loc16_ - _loc6_.y - _loc7_ * _loc14_;
-		var _loc24_ = B2Math.MulMV(this.m_linearMass, new B2Vec2(-_loc22_, -_loc23_));
-		var _loc25_ = this.m_linearImpulse.Copy();
-		this.m_linearImpulse.Add(_loc24_);
-		_loc18_ = step.dt * this.m_maxForce;
-		if (this.m_linearImpulse.LengthSquared() > _loc18_ * _loc18_) {
-			this.m_linearImpulse.Normalize();
-			this.m_linearImpulse.Multiply(_loc18_);
+		var _loc2_ = m_bodyA;
+		var _loc3_ = m_bodyB;
+		var _loc4_ = _loc2_.m_linearVelocity;
+		var _loc5_ = _loc2_.m_angularVelocity;
+		var _loc6_ = _loc3_.m_linearVelocity;
+		var _loc7_ = _loc3_.m_angularVelocity;
+		var _loc8_ = _loc2_.m_invMass;
+		var _loc9_ = _loc3_.m_invMass;
+		var _loc10_ = _loc2_.m_invI;
+		var _loc11_ = _loc3_.m_invI;
+		var _loc12_ = _loc2_.m_xf.R;
+		var _loc13_ = m_localAnchorA.x - _loc2_.m_sweep.localCenter.x;
+		var _loc14_ = m_localAnchorA.y - _loc2_.m_sweep.localCenter.y;
+		var _loc15_ = _loc12_.col1.x * _loc13_ + _loc12_.col2.x * _loc14_;
+		_loc14_ = _loc12_.col1.y * _loc13_ + _loc12_.col2.y * _loc14_;
+		_loc13_ = _loc15_;
+		_loc12_ = _loc3_.m_xf.R;
+		var _loc16_ = m_localAnchorB.x - _loc3_.m_sweep.localCenter.x;
+		var _loc17_ = m_localAnchorB.y - _loc3_.m_sweep.localCenter.y;
+		_loc15_ = _loc12_.col1.x * _loc16_ + _loc12_.col2.x * _loc17_;
+		_loc17_ = _loc12_.col1.y * _loc16_ + _loc12_.col2.y * _loc17_;
+		_loc16_ = _loc15_;
+		var _loc19_ = _loc7_ - _loc5_;
+		var _loc20_ = -m_angularMass * _loc19_;
+		var _loc21_ = m_angularImpulse;
+		var _loc18_ = step.dt * m_maxTorque;
+		m_angularImpulse = B2Math.clamp(m_angularImpulse + _loc20_, -_loc18_, _loc18_);
+		_loc20_ = m_angularImpulse - _loc21_;
+		_loc5_ -= _loc10_ * _loc20_;
+		_loc7_ += _loc11_ * _loc20_;
+		_loc19_ = _loc6_.x - _loc7_ * _loc17_ - _loc4_.x + _loc5_ * _loc14_;
+		_loc20_ = _loc6_.y + _loc7_ * _loc16_ - _loc4_.y - _loc5_ * _loc13_;
+		var _loc22_ = B2Math.mulMV(m_linearMass, new B2Vec2(-_loc19_, -_loc20_));
+		var _loc23_ = m_linearImpulse.copy();
+		m_linearImpulse.add(_loc22_);
+		_loc18_ = step.dt * m_maxForce;
+		if (m_linearImpulse.lengthSquared() > _loc18_ * _loc18_) {
+			m_linearImpulse.normalize();
+			m_linearImpulse.multiply(_loc18_);
 		}
-		_loc24_ = B2Math.SubtractVV(this.m_linearImpulse, _loc25_);
-		_loc6_.x -= _loc10_ * _loc24_.x;
-		_loc6_.y -= _loc10_ * _loc24_.y;
-		_loc7_ -= _loc12_ * (_loc14_ * _loc24_.y - _loc15_ * _loc24_.x);
-		_loc8_.x += _loc11_ * _loc24_.x;
-		_loc8_.y += _loc11_ * _loc24_.y;
-		_loc9_ += _loc13_ * (_loc16_ * _loc24_.y - _loc17_ * _loc24_.x);
-		_loc4_.m_angularVelocity = _loc7_;
-		_loc5_.m_angularVelocity = _loc9_;
+		_loc22_ = B2Math.subtractVV(m_linearImpulse, _loc23_);
+		_loc4_.x -= _loc8_ * _loc22_.x;
+		_loc4_.y -= _loc8_ * _loc22_.y;
+		_loc5_ -= _loc10_ * (_loc13_ * _loc22_.y - _loc14_ * _loc22_.x);
+		_loc6_.x += _loc9_ * _loc22_.x;
+		_loc6_.y += _loc9_ * _loc22_.y;
+		_loc7_ += _loc11_ * (_loc16_ * _loc22_.y - _loc17_ * _loc22_.x);
+		_loc2_.m_angularVelocity = _loc5_;
+		_loc3_.m_angularVelocity = _loc7_;
 	}
 
 	override public function SolvePositionConstraints(baumgarte:Float):Bool {
 		return true;
+	}
+
+	public function SetMaxTorque(torque:Float) {
+		m_maxTorque = torque;
+	}
+
+	public function SetMaxForce(force:Float) {
+		m_maxForce = force;
+	}
+
+	override public function InitVelocityConstraints(step:B2TimeStep) {
+		var _loc15_ = ASCompat.dynamicAs(null, B2Vec2);
+		var _loc2_ = m_bodyA;
+		var _loc3_ = m_bodyB;
+		var _loc4_ = _loc2_.m_xf.R;
+		var _loc5_ = m_localAnchorA.x - _loc2_.m_sweep.localCenter.x;
+		var _loc6_ = m_localAnchorA.y - _loc2_.m_sweep.localCenter.y;
+		var _loc7_ = _loc4_.col1.x * _loc5_ + _loc4_.col2.x * _loc6_;
+		_loc6_ = _loc4_.col1.y * _loc5_ + _loc4_.col2.y * _loc6_;
+		_loc5_ = _loc7_;
+		_loc4_ = _loc3_.m_xf.R;
+		var _loc8_ = m_localAnchorB.x - _loc3_.m_sweep.localCenter.x;
+		var _loc9_ = m_localAnchorB.y - _loc3_.m_sweep.localCenter.y;
+		_loc7_ = _loc4_.col1.x * _loc8_ + _loc4_.col2.x * _loc9_;
+		_loc9_ = _loc4_.col1.y * _loc8_ + _loc4_.col2.y * _loc9_;
+		_loc8_ = _loc7_;
+		var _loc10_ = _loc2_.m_invMass;
+		var _loc11_ = _loc3_.m_invMass;
+		var _loc12_ = _loc2_.m_invI;
+		var _loc13_ = _loc3_.m_invI;
+		var _loc14_ = new B2Mat22();
+		_loc14_.col1.x = _loc10_ + _loc11_;
+		_loc14_.col2.x = 0;
+		_loc14_.col1.y = 0;
+		_loc14_.col2.y = _loc10_ + _loc11_;
+		_loc14_.col1.x += _loc12_ * _loc6_ * _loc6_;
+		_loc14_.col2.x += -_loc12_ * _loc5_ * _loc6_;
+		_loc14_.col1.y += -_loc12_ * _loc5_ * _loc6_;
+		_loc14_.col2.y += _loc12_ * _loc5_ * _loc5_;
+		_loc14_.col1.x += _loc13_ * _loc9_ * _loc9_;
+		_loc14_.col2.x += -_loc13_ * _loc8_ * _loc9_;
+		_loc14_.col1.y += -_loc13_ * _loc8_ * _loc9_;
+		_loc14_.col2.y += _loc13_ * _loc8_ * _loc8_;
+		_loc14_.getInverse(m_linearMass);
+		m_angularMass = _loc12_ + _loc13_;
+		if (m_angularMass > 0) {
+			m_angularMass = 1 / m_angularMass;
+		}
+		if (step.warmStarting) {
+			m_linearImpulse.x *= step.dtRatio;
+			m_linearImpulse.y *= step.dtRatio;
+			m_angularImpulse *= step.dtRatio;
+			_loc15_ = m_linearImpulse;
+			_loc2_.m_linearVelocity.x -= _loc10_ * ASCompat.toNumberField(_loc15_, "x");
+			_loc2_.m_linearVelocity.y -= _loc10_ * ASCompat.toNumberField(_loc15_, "y");
+			_loc2_.m_angularVelocity -= _loc12_ * (_loc5_ * ASCompat.toNumberField(_loc15_, "y") - _loc6_ * ASCompat.toNumberField(_loc15_, "x")
+				+ m_angularImpulse);
+			_loc3_.m_linearVelocity.x += _loc11_ * ASCompat.toNumberField(_loc15_, "x");
+			_loc3_.m_linearVelocity.y += _loc11_ * ASCompat.toNumberField(_loc15_, "y");
+			_loc3_.m_angularVelocity += _loc13_ * (_loc8_ * ASCompat.toNumberField(_loc15_, "y") - _loc9_ * ASCompat.toNumberField(_loc15_, "x")
+				+ m_angularImpulse);
+		} else {
+			m_linearImpulse.setZero();
+			m_angularImpulse = 0;
+		}
+	}
+
+	override public function GetReactionTorque(inv_dt:Float):Float {
+		return inv_dt * m_angularImpulse;
+	}
+
+	override public function GetReactionForce(inv_dt:Float):B2Vec2 {
+		return new B2Vec2(inv_dt * m_linearImpulse.x, inv_dt * m_linearImpulse.y);
+	}
+
+	public function GetMaxTorque():Float {
+		return m_maxTorque;
+	}
+
+	public function GetMaxForce():Float {
+		return m_maxForce;
+	}
+
+	override public function GetAnchorB():B2Vec2 {
+		return m_bodyB.getWorldPoint(m_localAnchorB);
+	}
+
+	override public function GetAnchorA():B2Vec2 {
+		return m_bodyA.getWorldPoint(m_localAnchorA);
 	}
 }

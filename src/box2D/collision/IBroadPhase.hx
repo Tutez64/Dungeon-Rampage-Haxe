@@ -3,27 +3,51 @@ package box2D.collision;
 import box2D.common.math.B2Vec2;
 
 interface IBroadPhase {
-	function CreateProxy(aabb:B2AABB, userData:ASAny):ASAny;
+	function validate():Void;
 
-	function DestroyProxy(proxy:ASAny):Void;
+	function updatePairs(callbackMethod:ASAny):Void;
 
-	function MoveProxy(proxy:ASAny, aabb:B2AABB, displacement:B2Vec2):Void;
+	function testOverlap(proxyA:ASAny, proxyB:ASAny):Bool;
 
-	function TestOverlap(proxyA:ASAny, proxyB:ASAny):Bool;
+	function rebalance(iterations:Int):Void;
 
-	function GetUserData(proxy:ASAny):ASAny;
+	function rayCast(callbackMethod:ASFunction, input:B2RayCastInput):Void;
 
-	function GetFatAABB(proxy:ASAny):B2AABB;
+	function query(callbackMethod:ASFunction, aabb:B2AABB):Void;
 
-	function GetProxyCount():Int;
+	function moveProxy(proxy:ASAny, aabb:B2AABB, displacement:B2Vec2):Void;
 
-	function UpdatePairs(callback:ASFunction):Void;
+	function getUserData(proxy:ASAny):ASAny;
 
-	function Query(callback:ASFunction, aabb:B2AABB):Void;
+	function getProxyCount():Int;
 
-	function RayCast(callback:ASFunction, input:B2RayCastInput):Void;
+	function getFatAABB(proxy:ASAny):B2AABB;
+
+	function destroyProxy(proxy:ASAny):Void;
+
+	function createProxy(aabb:B2AABB, userData:ASAny):ASAny;
 
 	function Validate():Void;
 
+	function UpdatePairs(callbackMethod:ASAny):Void;
+
+	function TestOverlap(proxyA:ASAny, proxyB:ASAny):Bool;
+
 	function Rebalance(iterations:Int):Void;
+
+	function RayCast(callbackMethod:ASFunction, input:B2RayCastInput):Void;
+
+	function Query(callbackMethod:ASFunction, aabb:B2AABB):Void;
+
+	function MoveProxy(proxy:ASAny, aabb:B2AABB, displacement:B2Vec2):Void;
+
+	function GetUserData(proxy:ASAny):ASAny;
+
+	function GetProxyCount():Int;
+
+	function GetFatAABB(proxy:ASAny):B2AABB;
+
+	function DestroyProxy(proxy:ASAny):Void;
+
+	function CreateProxy(aabb:B2AABB, userData:ASAny):ASAny;
 }

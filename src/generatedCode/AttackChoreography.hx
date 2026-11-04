@@ -42,13 +42,13 @@ class AttackChoreography {
 		outpacket.writeFloat(playSpeed);
 		outpacket.writeFloat(scalingMaxProjectiles);
 		combatResultsfunc = function() {
-			var _loc2_ = 0;
+			var _loc2_ = (0 : UInt);
 			var _loc1_ = (combatResults.length : UInt);
 			var _loc3_ = outpacket;
 			outpacket = new DcNetworkPacket();
-			_loc2_ = 0;
-			while ((_loc2_ : UInt) < _loc1_) {
-				combatResults[_loc2_].writeToPacket(outpacket);
+			_loc2_ = (0 : UInt);
+			while (_loc2_ < _loc1_) {
+				combatResults[(_loc2_ : Int)].writeToPacket(outpacket);
 				_loc2_++;
 			}
 			_loc3_.writeShort((outpacket.length : Int));

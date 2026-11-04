@@ -4,6 +4,7 @@ import account.ChestInfo;
 import brain.assetRepository.AssetLoadingComponent;
 import brain.render.MovieClipRenderer;
 import brain.uI.UIButton;
+import dBGlobals.DBGlobal;
 import facade.DBFacade;
 import flash.display.MovieClip;
 
@@ -25,12 +26,15 @@ class DungeonRewardElement extends UIButton {
 		var bgSwfPath:String;
 		var bgIconName:String;
 		super(dbFacade, root);
+		dontKillMyChildren = true;
 		mDBFacade = dbFacade;
 		mChestInfo = chestInfo;
 		mSelectedCallback = selectedCallback;
 		mAssetLoadingComponent = new AssetLoadingComponent(mDBFacade);
 		releaseCallback = callSelectedCallback;
-		ChestInfo.loadItemIconFromId(mChestInfo.gmId, mRoot, mDBFacade, (60 : UInt), (100 : UInt), mAssetLoadingComponent);
+		rolloverFilter = DBGlobal.UI_ROLLOVER_FILTER;
+		ChestInfo.loadItemIconFromId(mChestInfo.gmId, mRoot, mDBFacade, (60 : UInt), (ASCompat.floatToInt(DBGlobal.WEAPON_ICON_NATIVE_SIZE) : UInt),
+			mAssetLoadingComponent);
 		mChestRenderer = new MovieClipRenderer(mDBFacade, mRoot);
 		mChestRenderer.play((0 : UInt), true);
 		bgColoredExists = mChestInfo.hasColoredBackground;

@@ -31,7 +31,7 @@ class StuffWithEquipPicker extends UIObject {
 	var mCurrentStartIndex:UInt = (0 : UInt);
 
 	public function new(dbFacade:DBFacade, root:MovieClip, heroTooltipClass:Dynamic, getSelectedHeroIndexCallback:ASFunction = null,
-			setSelectedHeroIndexCallback:ASFunction = null) {
+			setSelectedHeroIndexCallback:ASFunction = null, isActiveCallback:ASFunction = null) {
 		super(dbFacade, root);
 		mDBFacade = dbFacade;
 		mEventComponent = new EventComponent(mDBFacade);
@@ -50,27 +50,29 @@ class StuffWithEquipPicker extends UIObject {
 		mShiftLeft.releaseCallback = shiftLeft;
 		mShiftRight = new UIButton(mDBFacade, ASCompat.coerce((mRoot : ASAny).shift_right, flash.display.MovieClip));
 		mShiftRight.releaseCallback = shiftRight;
-		mShiftLeft.visible = false;
-		mShiftRight.visible = false;
 		mTotalGMHeroes = (mDBFacade.gameMaster.Heroes.length : UInt);
-		ASCompat.setProperty((mRoot : ASAny).label, "text", Locale.getString("INVENTORY_STUFF_DESCRIPTION"));
+		mShiftLeft.visible = mTotalGMHeroes > (mHeroSlots.length : UInt);
+		mShiftRight.visible = mShiftLeft.visible;
+		Locale.setText(ASCompat.coerce((mRoot : ASAny).label, flash.text.TextField), "INVENTORY_STUFF_DESCRIPTION");
 		mEventComponent.addListener("DB_ACCOUNT_INFO_RESPONSE", function(param1:events.DBAccountResponseEvent) {
-			refresh();
+			if (isActiveCallback == null || ASCompat.toBool(isActiveCallback())) {
+				refresh();
+			}
 		});
 	}
 
 	function populateHeroSlots() {
-		var _loc2_ = 0;
+		var _loc2_ = (0 : UInt);
 		var _loc3_ = mDBFacade.gameMaster.Heroes;
 		var _loc1_ = mCurrentStartIndex;
-		_loc2_ = 0;
-		while (_loc2_ < mHeroSlots.length) {
-			mHeroSlots[_loc2_].clear();
+		_loc2_ = (0 : UInt);
+		while (_loc2_ < (mHeroSlots.length:UInt)) {
+			mHeroSlots[(_loc2_ : Int)].clear();
 			if (_loc1_ < (_loc3_.length:UInt)
 				&& (!_loc3_[(_loc1_ : Int)].Hidden || mDBFacade.dbConfigManager.getConfigBoolean("want_hidden_heroes", false))) {
-				mHeroSlots[_loc2_].gmHero = _loc3_[(_loc1_ : Int)];
+				mHeroSlots[(_loc2_ : Int)].gmHero = _loc3_[(_loc1_ : Int)];
 			} else {
-				mHeroSlots[_loc2_].enabled = false;
+				mHeroSlots[(_loc2_ : Int)].enabled = false;
 			}
 			_loc1_++;
 			_loc2_++;
@@ -102,6 +104,18 @@ class StuffWithEquipPicker extends UIObject {
 		populateHeroSlots();
 	}
 
+	function rotateRosterLeft() {
+		if (mCurrentStartIndex > 0) {
+			shiftLeft();
+		}
+	}
+
+	function rotateRosterRight() {
+		if (mCurrentStartIndex + mHeroSlots.length < mTotalGMHeroes) {
+			shiftRight();
+		}
+	}
+
 	override public function destroy() {
 		mEventComponent.destroy();
 		mDBFacade = null;
@@ -120,7 +134,38 @@ class StuffWithEquipPicker extends UIObject {
 		if (selectedHeroIndex == -1 || resync) {
 			setActiveAvatarAsCurrentSelection();
 		}
+		if ((selectedHeroIndex : UInt) < mCurrentStartIndex || (selectedHeroIndex : UInt) >= mCurrentStartIndex + mHeroSlots.length) {
+			setCurrentIndexToShowSelectedHero();
+		}
 		populateHeroSlots();
+	}
+
+	public function getFirstUIObject():UIObject {
+		return mHeroSlots[0];
+	}
+
+	public function setupMenuNavigation(returnObject:UIObject) {
+		var _loc2_ = (0 : UInt);
+		_loc2_ = (0 : UInt);
+		while (_loc2_ < (mHeroSlots.length:UInt)) {
+			mHeroSlots[(_loc2_ : Int)].upNavigation = returnObject;
+			if (_loc2_ > 0) {
+				mHeroSlots[(_loc2_ - 1 : Int)].isToTheLeftOf(mHeroSlots[(_loc2_ : Int)]);
+			}
+			_loc2_++;
+		}
+		mHeroSlots[0].leftNavigationAdditionalInteraction = rotateRosterLeft;
+		mHeroSlots[mHeroSlots.length - 1].rightNavigationAdditionalInteraction = rotateRosterRight;
+	}
+
+	public function resetMenuNavigation() {
+		var _loc1_:UIObject;
+		final __ax4_iter_481 = mHeroSlots;
+		if (checkNullIteratee(__ax4_iter_481))
+			for (_tmp_ in __ax4_iter_481) {
+				_loc1_ = _tmp_;
+				_loc1_.clearNavigationAndInteractions();
+			}
 	}
 
 	function setActiveAvatarAsCurrentSelection() {
@@ -170,13 +215,13 @@ class StuffWithEquipPicker extends UIObject {
 	}
 
 	function determineSelectedElement() {
-		var _loc1_ = 0;
-		_loc1_ = 0;
-		while (_loc1_ < mHeroSlots.length) {
+		var _loc1_ = (0 : UInt);
+		_loc1_ = (0 : UInt);
+		while (_loc1_ < (mHeroSlots.length:UInt)) {
 			if (_loc1_ + mCurrentStartIndex == (selectedHeroIndex : UInt)) {
-				mHeroSlots[_loc1_].select();
+				mHeroSlots[(_loc1_ : Int)].select();
 			} else {
-				mHeroSlots[_loc1_].deselect();
+				mHeroSlots[(_loc1_ : Int)].deselect();
 			}
 			_loc1_++;
 		}
@@ -191,12 +236,12 @@ class StuffWithEquipPicker extends UIObject {
 	}
 
 	function findHeroIndex(avatarId:UInt):UInt {
-		var _loc2_ = 0;
+		var _loc2_ = (0 : UInt);
 		var _loc3_ = mDBFacade.gameMaster.Heroes;
-		_loc2_ = 0;
-		while (_loc2_ < _loc3_.length) {
-			if (avatarId == _loc3_[_loc2_].Id) {
-				return (_loc2_ : UInt);
+		_loc2_ = (0 : UInt);
+		while (_loc2_ < (_loc3_.length:UInt)) {
+			if (avatarId == _loc3_[(_loc2_ : Int)].Id) {
+				return _loc2_;
 			}
 			_loc2_++;
 		}

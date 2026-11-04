@@ -9,8 +9,8 @@ class PlayerIsTypingEvent extends GameObjectEvent {
 
 	public var subtype:String;
 
-	public function new(type:String, id:UInt, subType:String, bubbles:Bool = false, cancelable:Bool = false) {
+	public function new(inType:String, id:UInt, subType:String, bubbles:Bool = false, cancelable:Bool = false) {
 		subtype = subType;
-		super(type, id, bubbles, cancelable);
+		super(inType, id, bubbles, cancelable);
 	}
 }

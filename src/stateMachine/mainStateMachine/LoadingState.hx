@@ -17,8 +17,11 @@ import events.ManagersLoadedEvent;
 import events.MatchMakerLoadedEvent;
 import facade.DBFacade;
 import facade.TrickleCacheLoader;
+import steamAchievements.SteamAchievementsHelper;
 import steamAchievements.SteamAchievementsManager;
+import uI.hud.starlingConverted.HudArt;
 import uI.map.PlayerActivityCount;
+import util.GameLogOutput;
 
 class LoadingState extends State {
 	public static inline final NAME = "LoadingState";
@@ -82,7 +85,7 @@ class LoadingState extends State {
 		mEventComponent.destroy();
 		mEventComponent = null;
 		super.exitState();
-		var _loc1_ = (mDBFacade.gameClock.realTime - mLoadingStartTime) / 1000;
+		var _loc1_ = (mDBFacade.gameClock.realTime - (mLoadingStartTime : Float)) / 1000;
 		mDBFacade.metrics.log("GameLoaded", {"timeSpentSeconds": _loc1_});
 		Logger.debug("MAIN STATE MACHINE TRANSITION -- EXIT LOADING STATE");
 	}
@@ -102,8 +105,14 @@ class LoadingState extends State {
 		mDBFacade.applyServiceDiscoveryResult(event.serviceDiscoveryResult);
 		mConfigLoaded = true;
 		mDBFacade.featureFlags.loadFeatureFlagValuesFromConfigs(mDBFacade.dbConfigManager);
+		if (mDBFacade.featureFlags.getFlagValue("file-logging-by-default")) {
+			GameLogOutput.configure(["--log"]);
+		}
+		mDBFacade.initStarlingRendering();
 		SteamAccountInfo.getOrCreateAccount(mDBFacade, steamInfoLoaded);
+		mDBFacade.steamAchievementsHelper = new SteamAchievementsHelper(mDBFacade);
 		mDBFacade.steamAchievementsManager = new SteamAchievementsManager(mDBFacade);
+		Logger.infoch("SteamAchievements", "creating SteamAchievementsHelper");
 		Logger.infoch("SteamAchievements", "creating SteamAchievementsManager");
 		TownState.preLoadAssets(mDBFacade);
 		TrickleCacheLoader.swfAsset(DBFacade.buildFullDownloadPath("Resources/Art2D/UI/db_UI_loading_screen.swf"), mDBFacade);
@@ -161,6 +170,9 @@ class LoadingState extends State {
 		mDBFacade.loadingBarTick();
 		mAccountLoaded = true;
 		mDBAccountInfo = dbAccountLoadedEvent.dbAccountInfo;
+		if (mDBFacade.featureFlags.getFlagValue("starling-hud")) {
+			HudArt.begin(mDBFacade);
+		}
 		checkIfLoadingFinished();
 	}
 

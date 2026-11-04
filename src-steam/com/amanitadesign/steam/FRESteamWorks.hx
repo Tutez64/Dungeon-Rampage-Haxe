@@ -137,6 +137,31 @@ class FRESteamWorks extends EventDispatcher {
 		return isReady;
 	}
 
+	function correctFilePath(path:String):String {
+		if (ASCompat.stringAsBool(path) && path.indexOf("/") != -1) {
+			path = path.split("\\").join("/");
+		}
+		return path;
+	}
+
+	public function getGlyphSVGForActionOrigin(eOrigin:String, flags:Int):String {
+		#if air
+		return correctFilePath(ASCompat.asString(_ExtensionContext.call("AIRSteam_GetGlyphSVGForActionOrigin", [eOrigin, flags])));
+		#else
+		return "";
+		#end
+	}
+
+	public function getGlyphPNGForActionOrigin(eOrigin:String, eSize:Int, flags:Int):String {
+		#if air
+		return correctFilePath(ASCompat.asString(_ExtensionContext.call("AIRSteam_GetGlyphPNGForActionOrigin", [eOrigin, eSize, flags])));
+		#elseif (cpp && !air)
+		return Steam.controllers != null ? Steam.controllers.getGlyphForActionOrigin(cast parseHandle(eOrigin)) : "";
+		#else
+		return "";
+		#end
+	}
+
 	public function runCallbacks():Bool {
 		#if air
 		return ASCompat.asBool(_ExtensionContext.call("AIRSteam_RunCallbacks"));
@@ -247,20 +272,6 @@ class FRESteamWorks extends EventDispatcher {
 		return ASCompat.asUint(_ExtensionContext.call("AIRSteam_GetEarliestPurchaseUnixTime", appID));
 		#else
 		return (0 : UInt);
-		#end
-	}
-
-	public function requestStats():Bool {
-		#if air
-		return ASCompat.asBool(_ExtensionContext.call("AIRSteam_RequestStats"));
-		#elseif (cpp && !air)
-		var result = Steam.active;
-		if (result) {
-			dispatchEvent(new SteamEvent(SteamEvent.STEAM_RESPONSE, 0, 1));
-		}
-		return result;
-		#else
-		return false;
 		#end
 	}
 
@@ -1240,6 +1251,14 @@ class FRESteamWorks extends EventDispatcher {
 		#end
 	}
 
+	public function setInputActionManifestFilePath(inputActionManifestAbsolutePath:String):Bool {
+		#if air
+		return ASCompat.asBool(_ExtensionContext.call("AIRSteam_SetInputActionManifestFilePath", inputActionManifestAbsolutePath));
+		#else
+		return false;
+		#end
+	}
+
 	public function getControllerForGamepadIndex(index:Int):String {
 		#if air
 		return ASCompat.asString(_ExtensionContext.call("AIRSteam_GetControllerForGamepadIndex", index));
@@ -1286,19 +1305,31 @@ class FRESteamWorks extends EventDispatcher {
 		#end
 	}
 
-	public function getDigitalActionData(inputHandle:String, actionHandle:String):InputDigitalActionData {
+	public function getDigitalActionButtonState(inputHandle:String, actionHandle:String):Bool {
 		#if air
-		return ASCompat.dynamicAs(_ExtensionContext.call("AIRSteam_GetDigitalActionData", [inputHandle, actionHandle]), InputDigitalActionData);
+		return ASCompat.asBool(_ExtensionContext.call("AIRSteam_GetDigitalActionButtonState", [inputHandle, actionHandle]));
 		#elseif (cpp && !air)
-		var result = new InputDigitalActionData();
-		if (Steam.controllers != null) {
-			var data:ControllerDigitalActionData = Steam.controllers.getDigitalActionData(parseHandle(inputHandle), parseHandle(actionHandle));
-			result.bState = data.bState;
-			result.bActive = data.bActive;
+		if (Steam.controllers == null) {
+			return false;
 		}
-		return result;
+		var data:ControllerDigitalActionData = Steam.controllers.getDigitalActionData(parseHandle(inputHandle), parseHandle(actionHandle));
+		return data.bState;
 		#else
-		return new InputDigitalActionData();
+		return false;
+		#end
+	}
+
+	public function getDigitalActionButtonActive(inputHandle:String, actionHandle:String):Bool {
+		#if air
+		return ASCompat.asBool(_ExtensionContext.call("AIRSteam_GetDigitalActionButtonActive", [inputHandle, actionHandle]));
+		#elseif (cpp && !air)
+		if (Steam.controllers == null) {
+			return false;
+		}
+		var data:ControllerDigitalActionData = Steam.controllers.getDigitalActionData(parseHandle(inputHandle), parseHandle(actionHandle));
+		return data.bActive;
+		#else
+		return false;
 		#end
 	}
 
@@ -1393,31 +1424,6 @@ class FRESteamWorks extends EventDispatcher {
 		#end
 	}
 
-	public function getGlyphSVGForActionOrigin(eOrigin:String, flags:Int):String {
-		#if air
-		return correctFilePath(ASCompat.asString(_ExtensionContext.call("AIRSteam_GetGlyphSVGForActionOrigin", [eOrigin, flags])));
-		#else
-		return "";
-		#end
-	}
-
-	public function getGlyphPNGForActionOrigin(eOrigin:String, eSize:Int, flags:Int):String {
-		#if air
-		return correctFilePath(ASCompat.asString(_ExtensionContext.call("AIRSteam_GetGlyphPNGForActionOrigin", [eOrigin, eSize, flags])));
-		#elseif (cpp && !air)
-		return Steam.controllers != null ? Steam.controllers.getGlyphForActionOrigin(cast parseHandle(eOrigin)) : "";
-		#else
-		return "";
-		#end
-	}
-
-	function correctFilePath(path:String):String {
-		if (ASCompat.stringAsBool(path) && path.indexOf("/") != -1) {
-			path = path.split("\\").join("/");
-		}
-		return path;
-	}
-
 	public function getStringForActionOrigin(eOrigin:String):String {
 		#if air
 		return ASCompat.asString(_ExtensionContext.call("AIRSteam_GetStringForActionOrigin", eOrigin));
@@ -1450,9 +1456,55 @@ class FRESteamWorks extends EventDispatcher {
 		#end
 	}
 
+	public function setLEDColor(inputHandle:String, colorR:Int, colorG:Int, colorB:Int, flags:UInt):Bool {
+		#if air
+		return ASCompat.asBool(_ExtensionContext.call("AIRSteam_SetLEDColor", [inputHandle, colorR, colorG, colorB, flags]));
+		#elseif (cpp && !air)
+		if (Steam.controllers == null) {
+			return false;
+		}
+		Steam.controllers.setLEDColor(parseHandle(inputHandle), ((colorR & 0xFF) << 16) | ((colorG & 0xFF) << 8) | (colorB & 0xFF), flags);
+		return true;
+		#else
+		return false;
+		#end
+	}
+
+	public function triggerVibration(inputHandle:String, leftSpeed:UInt, rightSpeed:UInt):Bool {
+		#if air
+		return ASCompat.asBool(_ExtensionContext.call("AIRSteam_TriggerVibration", [inputHandle, leftSpeed, rightSpeed]));
+		#elseif (cpp && !air)
+		if (Steam.controllers == null) {
+			return false;
+		}
+		Steam.controllers.triggerVibration(parseHandle(inputHandle), leftSpeed, rightSpeed);
+		return true;
+		#else
+		return false;
+		#end
+	}
+
+	public function getInputTypeForHandle(inputHandle:String):Int {
+		#if air
+		return ASCompat.asInt(_ExtensionContext.call("AIRSteam_GetInputTypeForHandle", inputHandle));
+		#elseif (cpp && !air)
+		return Steam.controllers != null ? Std.int(Steam.controllers.getInputTypeForHandle(parseHandle(inputHandle))) : 0;
+		#else
+		return 0;
+		#end
+	}
+
+	public function translateActionOrigin(destinationInputType:Int, sourceOrigin:String):String {
+		#if air
+		return ASCompat.asString(_ExtensionContext.call("AIRSteam_TranslateActionOrigin", [destinationInputType, sourceOrigin]));
+		#else
+		return sourceOrigin;
+		#end
+	}
+
 	public function steamInputShutdown():Bool {
 		#if air
-		return ASCompat.asBool(_ExtensionContext.call("AIRSteam_SteamInputShutDown"));
+		return ASCompat.asBool(_ExtensionContext.call("AIRSteam_SteamInputShutdown"));
 		#elseif (cpp && !air)
 		if (Steam.controllers != null && Steam.controllers.active) {
 			Steam.controllers.shutdown();
@@ -1486,6 +1538,15 @@ class FRESteamWorks extends EventDispatcher {
 		return false;
 		#end
 	}
+
+	public function getLaunchQueryParam(key:String):String {
+		#if air
+		return ASCompat.asString(_ExtensionContext.call("AIRSteam_GetLaunchQueryParam", key));
+		#else
+		return "";
+		#end
+	}
+
 	static function parseHandle(value:String):Int {
 		var parsed = Std.parseInt(value);
 		return parsed == null ? 0 : parsed;

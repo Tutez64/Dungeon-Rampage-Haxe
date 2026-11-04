@@ -6,221 +6,310 @@ import box2D.collision.shapes.B2Shape;
 import box2D.collision.B2AABB;
 import box2D.collision.B2RayCastInput;
 import box2D.collision.B2RayCastOutput;
-import box2D.common.math.B2Math;
 import box2D.common.math.B2Transform;
 import box2D.common.math.B2Vec2;
 import box2D.dynamics.contacts.B2Contact;
+import box2dcompat.Scratch;
 
-/*use*/ /*namespace*/ /*b2internal*/ class B2Fixture {
-	var m_massData:B2MassData;
-
-	/*b2internal*/
-	public var m_aabb:B2AABB;
-
-	/*b2internal*/
-	public var m_density:Float = Math.NaN;
-
-	/*b2internal*/
-	public var m_next:B2Fixture;
-
-	/*b2internal*/
-	public var m_body:B2Body;
-
-	/*b2internal*/
-	public var m_shape:B2Shape;
-
-	/*b2internal*/
-	public var m_friction:Float = Math.NaN;
-
-	/*b2internal*/
-	public var m_restitution:Float = Math.NaN;
-
-	/*b2internal*/
-	public var m_proxy:ASAny;
-
-	/*b2internal*/
-	public var m_filter:B2FilterData = new B2FilterData();
-
-	/*b2internal*/
-	public var m_isSensor:Bool = false;
-
-	/*b2internal*/
+class B2Fixture {
 	public var m_userData:ASAny;
 
+	public var m_shape:B2Shape;
+
+	public var m_restitution:Float = Math.NaN;
+
+	public var m_proxy:ASAny;
+
+	public var m_next:B2Fixture;
+
+	public var m_massData:B2MassData;
+
+	public var m_isSensor:Bool = false;
+
+	public var m_friction:Float = Math.NaN;
+
+	public var m_filter:B2FilterData;
+
+	public var m_density:Float = Math.NaN;
+
+	public var m_body:B2Body;
+
+	public var m_aabb:B2AABB;
+
 	public function new() {
-		this.m_aabb = new B2AABB();
-		this.m_userData = null;
-		this.m_body = null;
-		this.m_next = null;
-		this.m_shape = null;
-		this.m_density = 0;
-		this.m_friction = 0;
-		this.m_restitution = 0;
+		m_filter = new B2FilterData();
+		m_aabb = new B2AABB();
+		m_userData = null;
+		m_body = null;
+		m_next = null;
+		m_shape = null;
+		m_density = 0;
+		m_friction = 0;
+		m_restitution = 0;
 	}
 
-	public function GetType():Int {
-		return this.m_shape.GetType();
+	public function testPoint(p:B2Vec2):Bool {
+		return TestPoint(p);
 	}
 
-	public function GetShape():B2Shape {
-		return this.m_shape;
+	public function synchronize(broadPhase:IBroadPhase, transform1:B2Transform, transform2:B2Transform) {
+		Synchronize(broadPhase, transform1, transform2);
 	}
 
-	public function SetSensor(sensor:Bool) {
-		var _loc3_:B2Contact = null;
-		var _loc4_:B2Fixture = null;
-		var _loc5_:B2Fixture = null;
-		if (this.m_isSensor == sensor) {
-			return;
-		}
-		this.m_isSensor = sensor;
-		if (this.m_body == null) {
-			return;
-		}
-		var _loc2_ = this.m_body.GetContactList();
-		while (_loc2_ != null) {
-			_loc3_ = _loc2_.contact;
-			_loc4_ = _loc3_.GetFixtureA();
-			_loc5_ = _loc3_.GetFixtureB();
-			if (_loc4_ == this || _loc5_ == this) {
-				_loc3_.SetSensor(_loc4_.IsSensor() || _loc5_.IsSensor());
-			}
-			_loc2_ = _loc2_.next;
-		}
+	public function setUserData(data:ASAny) {
+		SetUserData(data);
 	}
 
-	public function IsSensor():Bool {
-		return this.m_isSensor;
+	public function setSensor(sensor:Bool) {
+		SetSensor(sensor);
 	}
 
-	public function SetFilterData(filter:B2FilterData) {
-		var _loc3_:B2Contact = null;
-		var _loc4_:B2Fixture = null;
-		var _loc5_:B2Fixture = null;
-		this.m_filter = filter.Copy();
-		if (this.m_body != null) {
-			return;
-		}
-		var _loc2_ = this.m_body.GetContactList();
-		while (_loc2_ != null) {
-			_loc3_ = _loc2_.contact;
-			_loc4_ = _loc3_.GetFixtureA();
-			_loc5_ = _loc3_.GetFixtureB();
-			if (_loc4_ == this || _loc5_ == this) {
-				_loc3_.FlagForFiltering();
-			}
-			_loc2_ = _loc2_.next;
-		}
+	public function setRestitution(restitution:Float) {
+		SetRestitution(restitution);
 	}
 
-	public function GetFilterData():B2FilterData {
-		return this.m_filter.Copy();
+	public function setFriction(friction:Float) {
+		SetFriction(friction);
 	}
 
-	public function GetBody():B2Body {
-		return this.m_body;
+	public function setFilterData(filter:B2FilterData) {
+		SetFilterData(filter);
 	}
 
-	public function GetNext():B2Fixture {
-		return this.m_next;
+	public function setDensity(density:Float) {
+		SetDensity(density);
 	}
 
-	public function GetUserData():ASAny {
-		return this.m_userData;
+	public function rayCast(output:B2RayCastOutput, input:B2RayCastInput):Bool {
+		return RayCast(output, input);
 	}
 
-	public function SetUserData(data:ASAny) {
-		this.m_userData = data;
+	public function isSensor():Bool {
+		return IsSensor();
+	}
+
+	public function getUserData():ASAny {
+		return GetUserData();
+	}
+
+	public function getType():Int {
+		return GetType();
+	}
+
+	public function getShape():B2Shape {
+		return GetShape();
+	}
+
+	public function getRestitution():Float {
+		return GetRestitution();
+	}
+
+	public function getNext():B2Fixture {
+		return GetNext();
+	}
+
+	public function getMassData(massData:B2MassData = /*undefined*/ null):B2MassData {
+		return GetMassData(massData);
+	}
+
+	public function getFriction():Float {
+		return GetFriction();
+	}
+
+	public function getFilterData():B2FilterData {
+		return GetFilterData();
+	}
+
+	public function getDensity():Float {
+		return GetDensity();
+	}
+
+	public function getBody():B2Body {
+		return GetBody();
+	}
+
+	public function getAABB():B2AABB {
+		return GetAABB();
+	}
+
+	public function destroyProxy(broadPhase:IBroadPhase) {
+		DestroyProxy(broadPhase);
+	}
+
+	public function destroy() {
+		Destroy();
+	}
+
+	public function createProxy(broadPhase:IBroadPhase, xf:B2Transform) {
+		CreateProxy(broadPhase, xf);
+	}
+
+	public function create(body:B2Body, xf:B2Transform, def:B2FixtureDef) {
+		Create(body, xf, def);
 	}
 
 	public function TestPoint(p:B2Vec2):Bool {
-		return this.m_shape.TestPoint(this.m_body.GetTransform(), p);
+		return m_shape.testPoint(m_body.getTransform(), p);
 	}
 
-	public function RayCast(output:B2RayCastOutput, input:B2RayCastInput):Bool {
-		return this.m_shape.RayCast(output, input, this.m_body.GetTransform());
-	}
-
-	public function GetMassData(massData:B2MassData = null):B2MassData {
-		if (massData == null) {
-			massData = new B2MassData();
+	public function Synchronize(broadPhase:IBroadPhase, transform1:B2Transform, transform2:B2Transform) {
+		if (m_proxy == null) {
+			return;
 		}
-		this.m_shape.ComputeMass(massData, this.m_density);
-		return massData;
+		var _loc4_ = ASCompat.coerce(Scratch.aabbs[0], box2D.collision.B2AABB);
+		var _loc5_ = ASCompat.coerce(Scratch.aabbs[1], box2D.collision.B2AABB);
+		m_shape.computeAABB(_loc4_, transform1);
+		m_shape.computeAABB(_loc5_, transform2);
+		m_aabb.combine(_loc4_, _loc5_);
+		var _loc6_ = transform2.position;
+		var _loc7_ = transform1.position;
+		Scratch.difference.x = _loc6_.x - _loc7_.x;
+		Scratch.difference.y = _loc6_.y - _loc7_.y;
+		var _loc8_ = Scratch.difference;
+		broadPhase.moveProxy(m_proxy, m_aabb, _loc8_);
 	}
 
-	public function SetDensity(density:Float) {
-		this.m_density = density;
+	public function SetUserData(data:ASAny) {
+		m_userData = data;
 	}
 
-	public function GetDensity():Float {
-		return this.m_density;
-	}
-
-	public function GetFriction():Float {
-		return this.m_friction;
-	}
-
-	public function SetFriction(friction:Float) {
-		this.m_friction = friction;
-	}
-
-	public function GetRestitution():Float {
-		return this.m_restitution;
+	public function SetSensor(sensor:Bool) {
+		var _loc3_ = ASCompat.dynamicAs(null, B2Contact);
+		var _loc4_:ASAny = ASCompat.dynamicAs(null, B2Fixture);
+		var _loc5_:ASAny = ASCompat.dynamicAs(null, B2Fixture);
+		if (m_isSensor == sensor) {
+			return;
+		}
+		m_isSensor = sensor;
+		if (m_body == null) {
+			return;
+		}
+		var _loc2_ = m_body.getContactList();
+		while (_loc2_ != null) {
+			_loc3_ = _loc2_.contact;
+			_loc4_ = _loc3_.getFixtureA();
+			_loc5_ = _loc3_.getFixtureB();
+			if (_loc4_ == this || _loc5_ == this) {
+				_loc3_.setSensor(ASCompat.thisOrDefault(_loc4_.isSensor(), _loc5_.isSensor()));
+			}
+			_loc2_ = _loc2_.next;
+		}
 	}
 
 	public function SetRestitution(restitution:Float) {
-		this.m_restitution = restitution;
+		m_restitution = restitution;
+	}
+
+	public function SetFriction(friction:Float) {
+		m_friction = friction;
+	}
+
+	public function SetFilterData(filter:B2FilterData) {
+		var _loc3_ = ASCompat.dynamicAs(null, B2Contact);
+		var _loc4_:ASAny = ASCompat.dynamicAs(null, B2Fixture);
+		var _loc5_:ASAny = ASCompat.dynamicAs(null, B2Fixture);
+		m_filter = filter.copy();
+		if (m_body == null) {
+			return;
+		}
+		var _loc2_ = m_body.getContactList();
+		while (_loc2_ != null) {
+			_loc3_ = _loc2_.contact;
+			_loc4_ = _loc3_.getFixtureA();
+			_loc5_ = _loc3_.getFixtureB();
+			if (_loc4_ == this || _loc5_ == this) {
+				_loc3_.flagForFiltering();
+			}
+			_loc2_ = _loc2_.next;
+		}
+	}
+
+	public function SetDensity(density:Float) {
+		m_density = density;
+	}
+
+	public function RayCast(output:B2RayCastOutput, input:B2RayCastInput):Bool {
+		return m_shape.rayCast(output, input, m_body.getTransform());
+	}
+
+	public function IsSensor():Bool {
+		return m_isSensor;
+	}
+
+	public function GetUserData():ASAny {
+		return m_userData;
+	}
+
+	public function GetType():Int {
+		return m_shape.getType();
+	}
+
+	public function GetShape():B2Shape {
+		return m_shape;
+	}
+
+	public function GetRestitution():Float {
+		return m_restitution;
+	}
+
+	public function GetNext():B2Fixture {
+		return m_next;
+	}
+
+	public function GetMassData(massData:B2MassData = /*undefined*/ null):B2MassData {
+		if (massData == null) {
+			massData = new B2MassData();
+		}
+		m_shape.computeMass(massData, m_density);
+		return massData;
+	}
+
+	public function GetFriction():Float {
+		return m_friction;
+	}
+
+	public function GetFilterData():B2FilterData {
+		return m_filter.copy();
+	}
+
+	public function GetDensity():Float {
+		return m_density;
+	}
+
+	public function GetBody():B2Body {
+		return m_body;
 	}
 
 	public function GetAABB():B2AABB {
-		return this.m_aabb;
+		return m_aabb;
 	}
 
-	/*b2internal*/
-	public function Create(body:B2Body, xf:B2Transform, def:B2FixtureDef) {
-		this.m_userData = def.userData;
-		this.m_friction = def.friction;
-		this.m_restitution = def.restitution;
-		this.m_body = body;
-		this.m_next = null;
-		this.m_filter = def.filter.Copy();
-		this.m_isSensor = def.isSensor;
-		this.m_shape = def.shape.Copy();
-		this.m_density = def.density;
-	}
-
-	/*b2internal*/
-	public function Destroy() {
-		this.m_shape = null;
-	}
-
-	/*b2internal*/
-	public function CreateProxy(broadPhase:IBroadPhase, xf:B2Transform) {
-		this.m_shape.ComputeAABB(this.m_aabb, xf);
-		this.m_proxy = broadPhase.CreateProxy(this.m_aabb, this);
-	}
-
-	/*b2internal*/
 	public function DestroyProxy(broadPhase:IBroadPhase) {
-		if (this.m_proxy == null) {
+		if (m_proxy == null) {
 			return;
 		}
-		broadPhase.DestroyProxy(this.m_proxy);
-		this.m_proxy = null;
+		broadPhase.destroyProxy(m_proxy);
+		m_proxy = null;
 	}
 
-	/*b2internal*/
-	public function Synchronize(broadPhase:IBroadPhase, transform1:B2Transform, transform2:B2Transform) {
-		if (!ASCompat.toBool(this.m_proxy)) {
-			return;
-		}
-		var _loc4_ = new B2AABB();
-		var _loc5_ = new B2AABB();
-		this.m_shape.ComputeAABB(_loc4_, transform1);
-		this.m_shape.ComputeAABB(_loc5_, transform2);
-		this.m_aabb._Combine(_loc4_, _loc5_);
-		var _loc6_ = B2Math.SubtractVV(transform2.position, transform1.position);
-		broadPhase.MoveProxy(this.m_proxy, this.m_aabb, _loc6_);
+	public function Destroy() {
+		m_shape = null;
+	}
+
+	public function CreateProxy(broadPhase:IBroadPhase, xf:B2Transform) {
+		m_shape.computeAABB(m_aabb, xf);
+		m_proxy = broadPhase.createProxy(m_aabb, this);
+	}
+
+	public function Create(body:B2Body, xf:B2Transform, def:B2FixtureDef) {
+		m_userData = def.userData;
+		m_friction = def.friction;
+		m_restitution = def.restitution;
+		m_body = body;
+		m_next = null;
+		m_filter = def.filter.copy();
+		m_isSensor = def.isSensor;
+		m_shape = def.shape.copy();
+		m_density = def.density;
 	}
 }

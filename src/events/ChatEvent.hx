@@ -7,8 +7,8 @@ class ChatEvent extends GameObjectEvent {
 
 	public var message:String;
 
-	public function new(type:String, id:UInt, message:String, bubbles:Bool = false, cancelable:Bool = false) {
+	public function new(chatEventType:String, id:UInt, message:String, bubbles:Bool = false, cancelable:Bool = false) {
 		this.message = message;
-		super(type, id, bubbles, cancelable);
+		super(chatEventType, id, bubbles, cancelable);
 	}
 }

@@ -1,13 +1,14 @@
 package dungeon;
 
+import brain.render.RendererFactorySelector;
 import brain.utils.MemoryTracker;
+import collections.IIterator;
+import collections.Set;
 import distributedObjects.DistributedDungeonFloor;
 import facade.DBFacade;
 import dr_floor.FloorObject;
 import generatedCode.DungeonTileUsage;
 import flash.geom.Vector3D;
-import org.as3commons.collections.Set;
-import org.as3commons.collections.framework.IIterator;
 
 class DungeonFloorFactory {
 	var mTileNetworkComponents:Vector<DungeonTileUsage>;
@@ -51,9 +52,19 @@ class DungeonFloorFactory {
 		return mTileFactory;
 	}
 
-	public function buildDungeonFloor(tileNetworkComponents:Vector<DungeonTileUsage>, tilesBuiltCallback:ASFunction) {
+	public function buildDungeonFloor(tileNetworkComponents:Vector<DungeonTileUsage>, tilesBuiltCallback:ASFunction, clearGroundLayer:Bool = true) {
+		var _loc4_:RendererFactorySelector = null;
+		if (clearGroundLayer) {
+			_loc4_ = mDBFacade.rendererFactorySelector;
+			if (_loc4_ != null) {
+				_loc4_.clearLayer(5);
+			} else if (mDBFacade.starlingLayerManager != null) {
+				mDBFacade.starlingLayerManager.cleanLayers();
+			}
+		}
 		mTileNetworkComponents = tileNetworkComponents;
 		mTilesBuiltCallback = tilesBuiltCallback;
+		mNumTilesCreated = (0 : UInt);
 		buildGrid(tileNetworkComponents);
 		AddFillerTiles();
 	}
@@ -67,7 +78,7 @@ class DungeonFloorFactory {
 			_loc4_.tileId = mTileFactory.mFillerTiles[0].id;
 			_loc4_.x = ASCompat.floatToInt(pos.x);
 			_loc4_.y = ASCompat.floatToInt(pos.y);
-			mTileFactory.buildTile(_loc4_, addToGrid, tileInitialized, mDistributedDungeonFloor);
+			mTileFactory.buildTile(_loc4_, addToGrid, tileInitialized, mDistributedDungeonFloor, true);
 		}
 	}
 
@@ -92,10 +103,10 @@ class DungeonFloorFactory {
 	}
 
 	function buildGrid(tileNetworkComponents:Vector<DungeonTileUsage>) {
-		var _loc2_ = 0;
-		_loc2_ = 0;
-		while (_loc2_ < tileNetworkComponents.length) {
-			mTileFactory.buildTile(tileNetworkComponents[_loc2_], addToGrid, tileInitialized, mDistributedDungeonFloor);
+		var _loc2_ = (0 : UInt);
+		_loc2_ = (0 : UInt);
+		while (_loc2_ < (tileNetworkComponents.length:UInt)) {
+			mTileFactory.buildTile(tileNetworkComponents[(_loc2_ : Int)], addToGrid, tileInitialized, mDistributedDungeonFloor);
 			_loc2_++;
 		}
 	}
@@ -121,8 +132,6 @@ class DungeonFloorFactory {
 
 	function tileInitialized(tile:Tile) {
 		mTileGrid.setTileAtPosition(tile.position, tile);
-		mDistributedDungeonFloor.astarGrids.InitTileAstarGrids((ASCompat.floatToInt(tile.position.x / 900 + 1) : UInt),
-			(ASCompat.floatToInt(tile.position.y / 900 + 1) : UInt));
 		mNumTilesCreated = mNumTilesCreated + 1;
 		if (mNumTilesCreated == (mTileNetworkComponents.length : UInt)) {
 			mTilesBuiltCallback(mTileGrid);

@@ -2,6 +2,7 @@ package combat.weapon;
 
 import actor.ActorGameObject;
 import actor.ActorView;
+import dBGlobals.DBGlobal;
 import distributedObjects.DistributedDungeonFloor;
 import distributedObjects.HeroGameObjectOwner;
 import facade.DBFacade;
@@ -34,7 +35,7 @@ class ConsumableWeaponGameObject extends WeaponGameObject {
 	public function new(consumableDetails:ConsumableDetails, actorGameObject:ActorGameObject, actorView:ActorView, dbFacade:DBFacade,
 			distributedDungeonFloor:DistributedDungeonFloor, slot:Float) {
 		mConsumableDetails = consumableDetails;
-		mDefaultWeaponDetails.type = (40000 : UInt);
+		mDefaultWeaponDetails.type = DBGlobal.CONSUMABLE_WEAPON_ID;
 		mDefaultWeaponDetails.rarity = (0 : UInt);
 		mDefaultWeaponDetails.requiredlevel = (1 : UInt);
 		mDefaultWeaponDetails.power = (1 : UInt);
@@ -44,6 +45,9 @@ class ConsumableWeaponGameObject extends WeaponGameObject {
 		super(mDefaultWeaponDetails, actorGameObject, actorView, dbFacade, distributedDungeonFloor, slot);
 		mGMStackable = ASCompat.coerce(mDBFacade.gameMaster.stackableById.itemFor(mConsumableDetails.type), gameMasterDictionary.GMStackable);
 		mConsumableAttack = ASCompat.coerce(mDBFacade.gameMaster.attackByConstant.itemFor(mGMStackable.UsageAttack), gameMasterDictionary.GMAttack);
+		if (mConsumableAttack != null) {
+			preloadProjectileAssetsForAttack(mConsumableAttack);
+		}
 	}
 
 	override public function destroy() {
@@ -65,9 +69,7 @@ class ConsumableWeaponGameObject extends WeaponGameObject {
 	public function consume() {
 		mConsumableDetails.count--;
 		mDBFacade.hud.decrementConsumableCount((slot : UInt));
-		if (mDBFacade.steamAchievementsManager != null) {
-			mDBFacade.steamAchievementsManager.setAchievement("USE_CONSUMABLE_FIRST_TIME");
-		}
+		mDBFacade.steamAchievementsHelper.unlockAchievement("USE_CONSUMABLE_FIRST_TIME");
 		if (mConsumableDetails.count == 0) {
 			mDBFacade.hud.totalConsumableCountReached((slot : UInt));
 		}

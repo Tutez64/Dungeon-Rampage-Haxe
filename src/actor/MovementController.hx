@@ -11,6 +11,8 @@ import flash.geom.Vector3D;
 class MovementController {
 	public static inline final IDLE_VELOCITY_THRESHOLD:Float = 1;
 
+	public static inline final MIN_HEADING_SPEED:Float = 2;
+
 	static inline final DEFAULT_SMOOTH_FACTOR:Float = 0.8;
 
 	public static inline final LOCKED_HERO_MOVEMENT_TYPE = "locked_hero";
@@ -25,6 +27,10 @@ class MovementController {
 
 	public static final ZERO_VECTOR:Vector3D = new Vector3D();
 
+	static final sNewPos:Vector3D = new Vector3D();
+
+	static final sActorPos:Vector3D = new Vector3D();
+
 	var mTargetPosition:Point = new Point(0, 0);
 
 	var mActorGameObject:ActorGameObject;
@@ -32,6 +38,8 @@ class MovementController {
 	var mView:ActorView;
 
 	var mPositionLerpTask:Task;
+
+	var mLerpResting:Bool = false;
 
 	var mMovementType:String = "normal";
 
@@ -100,6 +108,7 @@ class MovementController {
 			if (mPositionLerpTask == null) {
 				mPositionLerpTask = mPreRenderWorkComponent.doEveryFrame(positionLerp);
 			}
+			mLerpResting = false;
 		} else {
 			mView.position = targetPosition;
 			mView.heading = targetHeading;
@@ -112,33 +121,31 @@ class MovementController {
 	}
 
 	function positionLerp(gameClock:GameClock) {
-		var _loc5_:Vector3D = null;
-		var _loc2_ = Math.NaN;
-		var _loc3_ = Math.NaN;
-		var _loc6_ = Math.NaN;
-		var _loc7_ = Math.NaN;
-		var _loc4_ = 1 - Math.pow(mSmoothFactor, gameClock.tickLength / GameClock.ANIMATION_FRAME_DURATION);
-		if (mWantSmoothTelemetry) {
-			_loc2_ = mView.position.x * (1 - _loc4_) + mActorGameObject.position.x * _loc4_;
-			_loc3_ = mView.position.y * (1 - _loc4_) + mActorGameObject.position.y * _loc4_;
-			_loc5_ = new Vector3D(_loc2_, _loc3_);
-		} else {
-			_loc5_ = mActorGameObject.position;
+		if (mLerpResting) {
+			return;
 		}
-		mView.velocity = _loc5_.subtract(mView.position);
-		_loc6_ = Math.max(0.0001, 1 - mSmoothFactor);
-		_loc7_ = mSmoothFactor / _loc6_;
-		if (_loc5_.nearEquals(mActorGameObject.position, _loc7_)) {
-			if (mPositionLerpTask != null) {
-				mPositionLerpTask.destroy();
-				mPositionLerpTask = null;
-			}
+		var _loc3_ = mView.positionX;
+		var _loc4_ = mView.positionY;
+		var _loc2_ = sActorPos;
+		_loc2_.x = mActorGameObject.positionX;
+		_loc2_.y = mActorGameObject.positionY;
+		_loc2_.z = mActorGameObject.positionZ;
+		var _loc6_ = _loc2_;
+		var _loc5_ = (1 - mSmoothFactor) * gameClock.timeScale;
+		if (mWantSmoothTelemetry) {
+			_loc6_ = sNewPos;
+			_loc6_.x = _loc3_ * (1 - _loc5_) + _loc2_.x * _loc5_;
+			_loc6_.y = _loc4_ * (1 - _loc5_) + _loc2_.y * _loc5_;
+		}
+		mView.velocity = new Vector3D(_loc6_.x - _loc3_, _loc6_.y - _loc4_, _loc6_.z);
+		if (mView.velocity.nearEquals(ZERO_VECTOR, 1)) {
+			mLerpResting = true;
 			mView.heading = mActorGameObject.heading;
-			mView.position = mActorGameObject.position;
+			mView.position = _loc2_;
 			mView.velocity.scaleBy(0);
 		} else {
-			mView.position = _loc5_;
-			if (canMoveR) {
+			mView.position = _loc6_;
+			if (canMoveR && (mView.velocity.length >= 2 || !mDBFacade.featureFlags.getFlagValue("smooth-run-and-direction-states"))) {
 				mView.heading = Math.atan2(mView.velocity.y, mView.velocity.x) * 180 / 3.141592653589793;
 			}
 		}

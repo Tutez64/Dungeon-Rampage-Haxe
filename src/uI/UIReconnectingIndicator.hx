@@ -33,7 +33,7 @@ class UIReconnectingIndicator {
 		_loc2_.color = 16767370;
 		_loc2_.size = 22;
 		_loc1_.defaultTextFormat = _loc2_;
-		_loc1_.text = Locale.getString("RECONNECTING");
+		Locale.setText(_loc1_, "RECONNECTING");
 		_loc1_.background = true;
 		_loc1_.backgroundColor = (0 : UInt);
 		_loc1_.cacheAsBitmap = true;
@@ -48,9 +48,11 @@ class UIReconnectingIndicator {
 		if (mField == null) {
 			return;
 		}
-		mField.text = StringTools.replace(StringTools.replace(StringTools.replace(Locale.getString("RECONNECTING_DETAIL"), "#ATTEMPT", Std.string(attempt)),
-			"#ELAPSED", Std.string(ASCompat.floatToInt(elapsedMilliseconds / 1000))),
-			"#GRACE", Std.string(ASCompat.floatToInt(graceMilliseconds / 1000)));
+		Locale.setText(mField, "RECONNECTING_DETAIL", {
+			"ATTEMPT": attempt,
+			"ELAPSED": ASCompat.floatToInt(elapsedMilliseconds / 1000),
+			"GRACE": ASCompat.floatToInt(graceMilliseconds / 1000)
+		});
 		centre();
 	}
 

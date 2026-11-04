@@ -3,7 +3,9 @@ package uI.friendManager.states;
 import account.FriendInfo;
 import brain.event.EventComponent;
 import brain.uI.UIButton;
+import brain.uI.UIObject;
 import brain.jsonRPC.JSONRPCService;
+import dBGlobals.DBGlobal;
 import distributedObjects.PresenceManager;
 import events.FriendshipEvent;
 import facade.DBFacade;
@@ -65,22 +67,22 @@ class UIPending extends UIFMState {
 		mUIFriendManager.clearUI();
 	}
 
-	public function destroy() {
-		mDBFacade = null;
+	override public function destroy() {
 		mEventComponent.removeListener(UIFriendManager.FRIENDSHIP_MADE);
 		mEventComponent.destroy();
+		super.destroy();
 	}
 
 	function refresh(list:Array<ASAny>) {
-		var _loc3_ = 0;
+		var _loc3_ = (0 : UInt);
 		var _loc2_:UInt;
 		if (checkNullIteratee(list))
 			for (_tmp_ in list) {
 				_loc2_ = (ASCompat.toInt(_tmp_) : UInt);
-				_loc3_ = 0;
-				while (_loc3_ < mPendingFriendRequests.length) {
-					if (ASCompat.toNumberField(mPendingFriendRequests[_loc3_], "id") == _loc2_) {
-						mPendingFriendRequests.splice(_loc3_, (1 : UInt));
+				_loc3_ = (0 : UInt);
+				while (_loc3_ < (mPendingFriendRequests.length:UInt)) {
+					if (ASCompat.toNumberField(mPendingFriendRequests[(_loc3_ : Int)], "id") == _loc2_) {
+						mPendingFriendRequests.splice((_loc3_ : Int), (1 : UInt));
 						break;
 					}
 					_loc3_++;
@@ -107,9 +109,9 @@ class UIPending extends UIFMState {
 		var _loc2_:FriendInfo = null;
 		pendingFriendRequests = mPendingFriendRequests;
 		var _loc1_:ASObject;
-		final __ax4_iter_203 = mPendingFriendRequests;
-		if (checkNullIteratee(__ax4_iter_203))
-			for (_tmp_ in __ax4_iter_203) {
+		final __ax4_iter_293 = mPendingFriendRequests;
+		if (checkNullIteratee(__ax4_iter_293))
+			for (_tmp_ in __ax4_iter_293) {
 				_loc1_ = _tmp_;
 				_loc2_ = new FriendInfo(mDBFacade, _loc1_);
 				mListOfFriendRequests.push(_loc2_);
@@ -117,6 +119,18 @@ class UIPending extends UIFMState {
 		mFriendRequestPopulater = new FriendPopulater(mDBFacade, mTownStateMachine, mListOfFriendRequests, mUIFriendManager);
 		mDeclineButton = createButton("friend_management_button_grey", Locale.getString("DECLINE"), 800, 1000, declineButtonCallback);
 		mAcceptButton = createButton("friend_management_button", Locale.getString("ACCEPT"), 1075, 1000, acceptButtonCallback);
+		setupMenuNavigation();
+	}
+
+	function setupMenuNavigation() {
+		mDeclineButton.rolloverFilter = DBGlobal.UI_ROLLOVER_FILTER;
+		mAcceptButton.rolloverFilter = DBGlobal.UI_ROLLOVER_FILTER;
+		mDeclineButton.isToTheLeftOf(mAcceptButton);
+		mFriendRequestPopulater.setupMenuNavigation(mUIFriendManager.currentTabButton, mDeclineButton, mAcceptButton);
+	}
+
+	override public function getFirstNavigationUIObject():UIObject {
+		return mFriendRequestPopulater.getFirstNavigationUIObject();
 	}
 
 	function declineButtonCallback() {
@@ -124,9 +138,9 @@ class UIPending extends UIFMState {
 		var idx:UInt;
 		mSelectedFriendToIds.splice(0, (mSelectedFriendToIds.length : UInt));
 		mSelectedFriendRequestIds.splice(0, (mSelectedFriendRequestIds.length : UInt));
-		final __ax4_iter_204 = mFriendRequestPopulater.getSelectedToggles();
-		if (checkNullIteratee(__ax4_iter_204))
-			for (_tmp_ in __ax4_iter_204) {
+		final __ax4_iter_294 = mFriendRequestPopulater.getSelectedToggles();
+		if (checkNullIteratee(__ax4_iter_294))
+			for (_tmp_ in __ax4_iter_294) {
 				idx = (ASCompat.toInt(_tmp_) : UInt);
 				mSelectedFriendToIds.push(mPendingFriendRequests[(idx : Int)].account_id);
 				mSelectedFriendRequestIds.push(mPendingFriendRequests[(idx : Int)].id);
@@ -134,11 +148,11 @@ class UIPending extends UIFMState {
 		if (mSelectedFriendToIds.length > 0) {
 			rpcFunc = JSONRPCService.getFunction("DRFriendRequestUpdate", mDBFacade.rpcRoot + "friendrequests");
 			rpcFunc(mDBFacade.accountId, mSelectedFriendRequestIds, mSelectedFriendToIds, 2, mDBFacade.validationToken, function(param1:ASAny) {
-				var _loc2_ = 0;
+				var _loc2_ = (0 : UInt);
 				refresh(mSelectedFriendRequestIds);
-				_loc2_ = 0;
-				while (_loc2_ < mSelectedFriendToIds.length) {
-					mDBFacade.metrics.log("DRFriendDecline", {"friendId": Std.string(mSelectedFriendToIds[_loc2_])});
+				_loc2_ = (0 : UInt);
+				while (_loc2_ < (mSelectedFriendToIds.length:UInt)) {
+					mDBFacade.metrics.log("DRFriendDecline", {"friendId": Std.string(mSelectedFriendToIds[(_loc2_ : Int)])});
 					_loc2_++;
 				}
 			});
@@ -152,9 +166,9 @@ class UIPending extends UIFMState {
 		mSelectedFriendToIds.splice(0, (mSelectedFriendToIds.length : UInt));
 		mSelectedFriendRequestIds.splice(0, (mSelectedFriendRequestIds.length : UInt));
 		fullAcceptList = "[";
-		final __ax4_iter_205 = mFriendRequestPopulater.getSelectedToggles();
-		if (checkNullIteratee(__ax4_iter_205))
-			for (_tmp_ in __ax4_iter_205) {
+		final __ax4_iter_295 = mFriendRequestPopulater.getSelectedToggles();
+		if (checkNullIteratee(__ax4_iter_295))
+			for (_tmp_ in __ax4_iter_295) {
 				idx = (ASCompat.toInt(_tmp_) : UInt);
 				mSelectedFriendToIds.push(mPendingFriendRequests[(idx : Int)].account_id);
 				mSelectedFriendRequestIds.push(mPendingFriendRequests[(idx : Int)].id);
@@ -162,28 +176,31 @@ class UIPending extends UIFMState {
 		if (mSelectedFriendToIds.length > 0) {
 			rpcFunc = JSONRPCService.getFunction("DRFriendRequestUpdate", mDBFacade.rpcRoot + "friendrequests");
 			rpcFunc(mDBFacade.accountId, mSelectedFriendRequestIds, mSelectedFriendToIds, 1, mDBFacade.validationToken, function(param1:ASAny) {
-				var _loc2_ = 0;
+				var _loc2_ = (0 : UInt);
 				refresh(mSelectedFriendRequestIds);
 				var _loc3_ = Vector.ofArray((ASCompat.coerce((cast mSelectedFriendToIds), Array) : Array<UInt>));
 				PresenceManager.instance().addFriends(_loc3_);
 				mDBFacade.dbAccountInfo.addFriendCallback(param1);
 				mTownStateMachine.leaderboard.refreshLeaderboard();
-				_loc2_ = 0;
-				while (_loc2_ < mSelectedFriendToIds.length) {
-					mDBFacade.metrics.log("DRFriendAccept", {"friendId": Std.string(mSelectedFriendToIds[_loc2_])});
+				_loc2_ = (0 : UInt);
+				while (_loc2_ < (mSelectedFriendToIds.length:UInt)) {
+					mDBFacade.metrics.log("DRFriendAccept", {"friendId": Std.string(mSelectedFriendToIds[(_loc2_ : Int)])});
 					_loc2_++;
+				}
+				if (param1 != null && ASCompat.toNumberField(param1, "length") > 0) {
+					mDBFacade.steamAchievementsHelper.unlockAchievement("ADD_FRIEND");
 				}
 			}, UIFriendManager.createFriendRPCErrorCallback(mDBFacade, "acceptButton"));
 		}
 	}
 
 	function friendshipMadeHandler(event:FriendshipEvent) {
-		var _loc3_ = 0;
+		var _loc3_ = (0 : UInt);
 		var _loc2_ = event.id;
-		_loc3_ = 0;
-		while (_loc3_ < mPendingFriendRequests.length) {
-			if (ASCompat.toNumberField(mPendingFriendRequests[_loc3_], "id") == event.id) {
-				mPendingFriendRequests.splice(_loc3_, (1 : UInt));
+		_loc3_ = (0 : UInt);
+		while (_loc3_ < (mPendingFriendRequests.length:UInt)) {
+			if (ASCompat.toNumberField(mPendingFriendRequests[(_loc3_ : Int)], "id") == event.id) {
+				mPendingFriendRequests.splice((_loc3_ : Int), (1 : UInt));
 				break;
 			}
 			_loc3_++;

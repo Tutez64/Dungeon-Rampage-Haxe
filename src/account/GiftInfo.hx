@@ -1,8 +1,6 @@
 package account;
 
 import facade.DBFacade;
-import flash.display.DisplayObject;
-import flash.events.Event;
 
 class GiftInfo {
 	var mFromAccountId:UInt = 0;
@@ -10,8 +8,6 @@ class GiftInfo {
 	var mOfferId:UInt = 0;
 
 	var mRequestId:String;
-
-	var mProfilePic:DisplayObject;
 
 	var mDBFacade:DBFacade;
 
@@ -33,18 +29,6 @@ class GiftInfo {
 		if (mResponseCallback != null) {
 			mResponseCallback();
 		}
-	}
-
-	function ignoreIOError(event:Event) {}
-
-	@:isVar public var pic(get, set):DisplayObject;
-
-	public function get_pic():DisplayObject {
-		return mProfilePic;
-	}
-
-	function set_pic(profilePic:DisplayObject):DisplayObject {
-		return mProfilePic = profilePic;
 	}
 
 	@:isVar public var fromAccountId(get, never):UInt;

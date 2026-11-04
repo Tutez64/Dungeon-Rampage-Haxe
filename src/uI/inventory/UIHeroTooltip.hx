@@ -1,6 +1,7 @@
 package uI.inventory;
 
 import account.AvatarInfo;
+import brain.utils.TextUtil;
 import facade.DBFacade;
 import facade.GameMasterLocale;
 import facade.Locale;
@@ -41,8 +42,8 @@ class UIHeroTooltip extends MovieClip {
 	@:isVar public var ownedHero(never, set):AvatarInfo;
 
 	public function set_ownedHero(avatarInfo:AvatarInfo):AvatarInfo {
-		mLabel.text = GameMasterLocale.getGameMasterSubString("SKIN_NAME", avatarInfo.gmHero.Constant).toUpperCase();
-		mLevelLabel.text = Std.string(avatarInfo.level);
+		TextUtil.setText(mLabel, GameMasterLocale.getGameMasterSubString("SKIN_NAME", avatarInfo.gmHero.Constant).toUpperCase());
+		TextUtil.setText(mLevelLabel, Std.string(avatarInfo.cloutLevel));
 		mLevelLabel.visible = true;
 		mStar.visible = true;
 		mDescriptionLabel.visible = false;
@@ -52,10 +53,11 @@ class UIHeroTooltip extends MovieClip {
 	@:isVar public var unownedHero(never, set):GMHero;
 
 	public function set_unownedHero(gmHero:GMHero):GMHero {
-		mLabel.text = GameMasterLocale.getGameMasterSubString("SKIN_NAME", gmHero.Constant).toUpperCase();
+		TextUtil.setText(mLabel, GameMasterLocale.getGameMasterSubString("SKIN_NAME", gmHero.Constant).toUpperCase());
 		mLevelLabel.visible = false;
 		mStar.visible = false;
-		mDescriptionLabel.text = Locale.getString("HERO_NOT_UNLOCKED_TOOLTIP");
+		Locale.setText(mDescriptionLabel, "HERO_NOT_UNLOCKED_TOOLTIP", null, 1.55);
+		TextUtil.fitToField(mDescriptionLabel);
 		mDescriptionLabel.visible = true;
 		return gmHero;
 	}

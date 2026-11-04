@@ -4,6 +4,8 @@ import account.InventoryBaseInfo;
 import account.ItemInfo;
 import brain.assetRepository.SwfAsset;
 import brain.logger.Logger;
+import brain.uI.UIObject;
+import brain.utils.TextUtil;
 import facade.DBFacade;
 import facade.Locale;
 import uI.popup.DBUITwoButtonPopup;
@@ -17,7 +19,7 @@ class UISellItemPopup extends DBUITwoButtonPopup {
 	public function new(dbFacade:DBFacade, titleText:String, info:InventoryBaseInfo, leftText:String, leftCallback:ASFunction, rightText:String,
 			rightCallback:ASFunction, allowClose:Bool = true, closeCallback:ASFunction = null) {
 		mInfo = info;
-		super(dbFacade, titleText, null, leftText, leftCallback, rightText, rightCallback, allowClose, closeCallback);
+		super(dbFacade, "SELL_ITEM_POPUP", titleText, null, leftText, leftCallback, rightText, rightCallback, allowClose, closeCallback);
 	}
 
 	override public function destroy() {
@@ -28,6 +30,21 @@ class UISellItemPopup extends DBUITwoButtonPopup {
 		return "item_popup";
 	}
 
+	override function setupMenuNavigation() {
+		if (mRightButton == null || mLeftButton == null) {
+			super.setupMenuNavigation();
+			return;
+		}
+		if (mCloseButton != null) {
+			mCloseButton.isAbove(mRightButton);
+		}
+		mRightButton.isAbove(mLeftButton);
+	}
+
+	override function getInitialFocusedNavigationObject():UIObject {
+		return mRightButton;
+	}
+
 	override function setupUI(swfAsset:SwfAsset, titleText:String, content:ASAny, allowClose:Bool, closeCallback:ASFunction) {
 		var itemInfo:ItemInfo;
 		var swfPath:String;
@@ -36,8 +53,8 @@ class UISellItemPopup extends DBUITwoButtonPopup {
 		itemInfo = ASCompat.reinterpretAs(mInfo, ItemInfo);
 		ASCompat.setProperty((mPopup : ASAny).power, "visible", itemInfo != null);
 		if (itemInfo != null) {
-			ASCompat.setProperty((mPopup : ASAny).power.attack_label, "text", Locale.getString("POWER"));
-			ASCompat.setProperty((mPopup : ASAny).power.label, "text", Std.string(itemInfo.power));
+			Locale.setText(ASCompat.coerce((mPopup : ASAny).power.attack_label, flash.text.TextField), "POWER");
+			TextUtil.setText(ASCompat.coerce((mPopup : ASAny).power.label, flash.text.TextField), Std.string(itemInfo.power));
 		}
 		swfPath = mInfo.uiSwfFilepath;
 		iconName = mInfo.iconName;
@@ -54,7 +71,7 @@ class UISellItemPopup extends DBUITwoButtonPopup {
 		ASCompat.setProperty((mPopup : ASAny).coin, "visible", true);
 		ASCompat.setProperty((mPopup : ASAny).coin, "mouseEnabled", false);
 		ASCompat.setProperty((mPopup : ASAny).coin, "mouseChildren", false);
-		ASCompat.setProperty((mPopup : ASAny).price, "text", Std.string(mInfo.sellCoins));
+		TextUtil.setText(ASCompat.coerce((mPopup : ASAny).price, flash.text.TextField), Std.string(mInfo.sellCoins));
 		ASCompat.setProperty((mPopup : ASAny).price, "mouseEnabled", false);
 	}
 }

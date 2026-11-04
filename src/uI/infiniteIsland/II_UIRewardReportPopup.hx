@@ -1,7 +1,10 @@
 package uI.infiniteIsland;
 
 import brain.assetRepository.SwfAsset;
+import brain.event.EventListeners;
 import brain.render.MovieClipRenderController;
+import brain.utils.TextUtil;
+import brain.utils.Timers;
 import facade.DBFacade;
 import facade.Locale;
 import gameMasterDictionary.GMChest;
@@ -69,9 +72,9 @@ class II_UIRewardReportPopup extends DBUIPopup {
 		}
 		mRewardData = rewardData;
 		var _loc14_:InfiniteRewardData;
-		final __ax4_iter_32 = mRewardData;
-		if (checkNullIteratee(__ax4_iter_32))
-			for (_tmp_ in __ax4_iter_32) {
+		final __ax4_iter_358 = mRewardData;
+		if (checkNullIteratee(__ax4_iter_358))
+			for (_tmp_ in __ax4_iter_358) {
 				_loc14_ = _tmp_;
 				if (_loc14_.status == 3) {
 					mNewDooberId = (_loc14_.dooberId : Int);
@@ -81,7 +84,11 @@ class II_UIRewardReportPopup extends DBUIPopup {
 					break;
 				}
 			}
-		super(dbFacade, titleText, content, allowClose, wantCurtain, closeCallback, useOriginalPopUp);
+		super(dbFacade, "INFINITE_REWARD_REPORT_POPUP", titleText, content, allowClose, wantCurtain, closeCallback, useOriginalPopUp);
+	}
+
+	override function setupUI(swfAsset:SwfAsset, titleText:String, content:ASAny, allowClose:Bool, closeCallback:ASFunction) {
+		super.setupUI(swfAsset, titleText, content, allowClose, closeCallback);
 		mRewardSlots = new Vector<MovieClip>();
 		mRewardSlots.push(ASCompat.coerce((mPopup : ASAny).loot_01, flash.display.MovieClip));
 		mRewardSlots.push(ASCompat.coerce((mPopup : ASAny).loot_02, flash.display.MovieClip));
@@ -101,7 +108,7 @@ class II_UIRewardReportPopup extends DBUIPopup {
 	}
 
 	function init() {
-		var __ax4_iter_34:Vector<InfiniteRewardData>;
+		var __ax4_iter_360:Vector<InfiniteRewardData>;
 		var _loc5_:InfiniteRewardData = null;
 		var _loc1_ = false;
 		var _loc11_:GMDoober = null;
@@ -118,16 +125,16 @@ class II_UIRewardReportPopup extends DBUIPopup {
 		var _loc14_ = 0;
 		_loc14_ = mTotalGold;
 		var _loc4_ = 0;
-		final __ax4_iter_33 = mRewardData;
-		if (checkNullIteratee(__ax4_iter_33))
-			for (_tmp_ in __ax4_iter_33) {
+		final __ax4_iter_359 = mRewardData;
+		if (checkNullIteratee(__ax4_iter_359))
+			for (_tmp_ in __ax4_iter_359) {
 				_loc5_ = _tmp_;
 				if (_loc4_ < mRewardSlots.length) {
 					_loc1_ = false;
-					if (ASCompat.toNumberField(_loc5_, "status") == 0) {
+					if (_loc5_.status == 0) {
 						continue;
 					}
-					if (ASCompat.toNumberField(_loc5_, "status") == 1) {
+					if (_loc5_.status == 1) {
 						_loc1_ = true;
 					}
 					_loc11_ = ASCompat.coerce(mDBFacade.gameMaster.dooberById.itemFor(_loc5_.dooberId), gameMasterDictionary.GMDoober);
@@ -174,15 +181,16 @@ class II_UIRewardReportPopup extends DBUIPopup {
 			} else {
 				ASCompat.setProperty((mPopup : ASAny).coin, "visible", false);
 				ASCompat.setProperty((mPopup : ASAny).label_coin_count, "visible", false);
-				ASCompat.setProperty((mPopup : ASAny).label_next_bonus_chest, "text", Locale.getString("INFINITE_TILL_REWARD") + Std.string(mNextChestFloor));
+				TextUtil.setText(ASCompat.coerce((mPopup : ASAny).label_next_bonus_chest, flash.text.TextField),
+					Locale.getString("INFINITE_TILL_REWARD") + Std.string(mNextChestFloor));
 			}
 			ASCompat.setProperty((mPopup : ASAny).loot_00_center, "visible", false);
 			ASCompat.setProperty((mPopup : ASAny).loot_00.loot, "visible", false);
-			ASCompat.setProperty((mPopup : ASAny).label_coin_count_total, "text", "x" + Std.string(mTotalGold));
-			ASCompat.setProperty((mPopup : ASAny).label_coin_count, "text", "x" + Std.string(mFloorGold));
-			ASCompat.setProperty((mPopup : ASAny).label_coin_count_center, "text", "x" + Std.string(mFloorGold));
+			TextUtil.setText(ASCompat.coerce((mPopup : ASAny).label_coin_count_total, flash.text.TextField), "x" + Std.string(mTotalGold));
+			TextUtil.setText(ASCompat.coerce((mPopup : ASAny).label_coin_count, flash.text.TextField), "x" + Std.string(mFloorGold));
+			TextUtil.setText(ASCompat.coerce((mPopup : ASAny).label_coin_count_center, flash.text.TextField), "x" + Std.string(mFloorGold));
 		} else {
-			ASCompat.setProperty((mPopup : ASAny).label, "text", Locale.getString("INFINITE_BEAT"));
+			Locale.setText(ASCompat.coerce((mPopup : ASAny).label, flash.text.TextField), "INFINITE_BEAT");
 			ASCompat.setProperty((mPopup : ASAny).label_loot_01, "text", "");
 			ASCompat.setProperty((mPopup : ASAny).label_loot_02, "text", "");
 			ASCompat.setProperty((mPopup : ASAny).label_loot_03, "text", "");
@@ -193,25 +201,28 @@ class II_UIRewardReportPopup extends DBUIPopup {
 			mRewardSlotLabels.push(ASCompat.coerce((mPopup : ASAny).label_loot_03, flash.text.TextField));
 			mRewardSlotLabels.push(ASCompat.coerce((mPopup : ASAny).label_loot_04, flash.text.TextField));
 			_loc4_ = 0;
-			__ax4_iter_34 = mRewardData;
-			if (checkNullIteratee(__ax4_iter_34))
-				for (_tmp_ in __ax4_iter_34) {
+			__ax4_iter_360 = mRewardData;
+			if (checkNullIteratee(__ax4_iter_360))
+				for (_tmp_ in __ax4_iter_360) {
 					_loc5_ = _tmp_;
-					if (ASCompat.toNumberField(_loc5_, "status") == 1
-						&& ASCompat.toNumberField(_loc5_, "floorNumber") == mCurrentFloorNum) {
-						mRewardSlotLabels[_loc4_].text = Locale.getString("INFINITE_ALREADY_REWARD");
+					if (_loc5_.status == 1 && _loc5_.floorNumber == (mCurrentFloorNum : UInt)) {
+						Locale.setText(mRewardSlotLabels[_loc4_], "INFINITE_ALREADY_REWARD");
 					}
 					_loc4_++;
 				}
 			ASCompat.setProperty((mPopup : ASAny).label_next_bonus_coins, "text", "");
 			if (mNextChestFloor != 0) {
-				ASCompat.setProperty((mPopup : ASAny).label_next_bonus_chest, "text", Locale.getString("INFINITE_TILL_REWARD") + Std.string(mNextChestFloor));
+				TextUtil.setText(ASCompat.coerce((mPopup : ASAny).label_next_bonus_chest, flash.text.TextField),
+					Locale.getString("INFINITE_TILL_REWARD") + Std.string(mNextChestFloor));
 			}
 			_loc12_ = mAvStartScore + 1;
-			ASCompat.setProperty((mPopup : ASAny).label_next_bonus_coins, "text", Locale.getString("INFINITE_TILL_GOLD") + Std.string(_loc12_));
-			ASCompat.setProperty((mPopup : ASAny).label_coin_count, "text", "x" + Std.string(mFloorGold));
+			TextUtil.setText(ASCompat.coerce((mPopup : ASAny).label_next_bonus_coins, flash.text.TextField),
+				Locale.getString("INFINITE_TILL_GOLD") + Std.string(_loc12_));
+			TextUtil.setText(ASCompat.coerce((mPopup : ASAny).label_coin_count, flash.text.TextField), "x" + Std.string(mFloorGold));
 		}
-		startCountdown();
+		if (mTimeRemaining > 0) {
+			startCountdown();
+		}
 	}
 
 	function startCountdown() {
@@ -219,21 +230,23 @@ class II_UIRewardReportPopup extends DBUIPopup {
 			endCountdown();
 		}
 		mTimeRemaining -= 1;
-		ASCompat.setProperty((mPopup : ASAny).countdown_bounce.countdown.countdown_text, "text", "" + ASCompat.floatToInt(mTimeRemaining));
-		mCountDownTimer = new Timer(1000);
-		mCountDownTimer.addEventListener("timer", tickCountdown);
+		TextUtil.setText(ASCompat.coerce((mPopup : ASAny).countdown_bounce.countdown.countdown_text, flash.text.TextField),
+			"" + ASCompat.floatToInt(mTimeRemaining));
+		mCountDownTimer = Timers.create(1000, 0, "II_UIRewardReportPopup.mCountDownTimer");
+		EventListeners.add(mCountDownTimer, "timer", tickCountdown);
 		mCountDownTimer.start();
 	}
 
 	function endCountdown() {
 		if (mCountDownTimer != null) {
-			mCountDownTimer.removeEventListener("timer", tickCountdown);
+			EventListeners.remove(mCountDownTimer, "timer", tickCountdown);
 			mCountDownTimer.stop();
 		}
 	}
 
 	function tickCountdown(event:TimerEvent) {
-		ASCompat.setProperty((mPopup : ASAny).countdown_bounce.countdown.countdown_text, "text", "" + ASCompat.floatToInt(mTimeRemaining));
+		TextUtil.setText(ASCompat.coerce((mPopup : ASAny).countdown_bounce.countdown.countdown_text, flash.text.TextField),
+			"" + ASCompat.floatToInt(mTimeRemaining));
 		if (mTimeRemaining <= 0) {
 			endCountdown();
 			destroy();
@@ -275,6 +288,10 @@ class II_UIRewardReportPopup extends DBUIPopup {
 
 	override function getSwfPath():String {
 		return "Resources/Art2D/UI/db_UI_screens.swf";
+	}
+
+	override function waitsOnPlayer():Bool {
+		return false;
 	}
 
 	override function getClassName():String {

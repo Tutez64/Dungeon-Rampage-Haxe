@@ -1,148 +1,197 @@
 package brain.mouseCursor;
 
+import brain.event.EventListeners;
 import brain.facade.Facade;
 import brain.logger.Logger;
-import flash.display.MovieClip;
+import flash.display.BitmapData;
+import flash.display.DisplayObject;
+import flash.events.Event;
 import flash.events.MouseEvent;
+import flash.geom.Matrix;
+import flash.geom.Point;
+import flash.text.TextField;
 import flash.ui.Mouse;
-import org.as3commons.collections.Map;
-import flash.display.MovieClip;
+import flash.ui.MouseCursorData;
 
 class MouseCursorManager {
-	var mCursorTypes:Map;
+	public static inline final MAX_CURSOR_SIZE = 32;
 
-	var mCurrentCursor:String;
+	static inline final NATIVE_NAME_PREFIX = "custom_";
 
-	var mIsTransient:Bool = false;
-
-	var mCursorClip:MovieClip;
-
-	var mCursorStack:Array<ASAny>;
+	static var BUILT_IN_CURSORS:Array<ASAny>;
 
 	var mFacade:Facade;
 
+	var mCursors:ASDictionary<ASAny, ASAny>;
+
+	var mStack:Vector<CursorEntry>;
+
+	var mDefaultCursor:String;
+
 	var mNextKey:UInt = 0;
 
-	var mDisabled:Bool = false;
+	var mHoveredTextInput:TextField;
+
+	var mTextInputCursorKey:UInt = 0;
+
+	var mCursorHidden:Bool = false;
 
 	public function new(facade:Facade) {
 		mFacade = facade;
-		mCursorTypes = new Map();
-		mNextKey = (1 : UInt);
-		mIsTransient = false;
-		mDisabled = false;
-		mCursorStack = [];
-		registerBuiltInTypes();
-		setMouseCursor("auto");
-	}
-
-	@:isVar public var disable(never, set):Bool;
-
-	public function set_disable(disabled:Bool):Bool {
-		mDisabled = disabled;
-		if (mDisabled) {
-			if (mCursorClip != null) {
-				mFacade.stageRef.removeEventListener("mouseOver", onMouseOver);
-				mFacade.stageRef.removeEventListener("mouseMove", onMouseMove);
-				mFacade.stageRef.removeEventListener("mouseOut", onMouseOut);
-				mFacade.sceneGraphManager.removeChild(mCursorClip);
+		mCursors = new ASDictionary<ASAny, ASAny>();
+		var _loc2_:String;
+		final __ax4_iter_519 = BUILT_IN_CURSORS;
+		if (checkNullIteratee(__ax4_iter_519))
+			for (_tmp_ in __ax4_iter_519) {
+				_loc2_ = _tmp_;
+				mCursors[_loc2_] = _loc2_;
 			}
-			setBuiltInCursor("auto");
-		}
-		return disabled;
+		mStack = new Vector<CursorEntry>();
+		mDefaultCursor = "auto";
+		mNextKey = (1 : UInt);
+		EventListeners.add(mFacade.stageRef, "mouseOver", onStageMouseOver, true);
+		EventListeners.add(mFacade.stageRef, "mouseMove", onMouseKeyboardInput, true);
+		EventListeners.add(mFacade.stageRef, "mouseDown", onMouseKeyboardInput, true);
+		EventListeners.add(mFacade.stageRef, "mouseWheel", onMouseKeyboardInput, true);
+		EventListeners.add(mFacade.stageRef, "keyDown", onMouseKeyboardInput, true);
+		refresh();
 	}
 
-	function registerBuiltInTypes() {
-		var _loc1_ = new CursorType(null, true);
-		mCursorTypes.add("arrow", _loc1_);
-		mCursorTypes.add("auto", _loc1_);
-		mCursorTypes.add("button", _loc1_);
-		mCursorTypes.add("hand", _loc1_);
-		mCursorTypes.add("ibeam", _loc1_);
+	static function rasterize(art:DisplayObject):MouseCursorData {
+		var _loc4_ = art.getBounds(art);
+		var _loc5_ = Math.min(1, 32 / Math.max(_loc4_.width, _loc4_.height));
+		var _loc3_ = new BitmapData(32, 32, true, (0 : UInt));
+		var _loc6_ = new Matrix(_loc5_, 0, 0, _loc5_, -_loc4_.x * _loc5_, -_loc4_.y * _loc5_);
+		_loc3_.drawWithQuality(art, _loc6_, null, null, null, true, "best");
+		var _loc2_ = new MouseCursorData();
+		_loc2_.data = Vector.ofArray([_loc3_]);
+		_loc2_.hotSpot = new Point(clampToCursor(-_loc4_.x * _loc5_), clampToCursor(-_loc4_.y * _loc5_));
+		return _loc2_;
 	}
 
-	public function registerMouseCursor(root:MovieClip, name:String, override_ /*haxe keyword*/:Bool = false) {
-		var _loc4_:CursorType = null;
-		if (root == null) {
-			Logger.error("Trying to register a mouse cursor with a null MovieClip.");
+	static function clampToCursor(value:Float):Int {
+		return ASCompat.floatToInt(Math.max(0, Math.min(32 - 1, Math.fround(value))));
+	}
+
+	public function hideMouseCursor() {
+		if (mCursorHidden) {
 			return;
 		}
-		root.mouseChildren = false;
-		root.mouseEnabled = false;
-		if (mCursorTypes.hasKey(name)) {
-			if (!override_) {
-				return;
-			}
-			_loc4_ = ASCompat.coerce(mCursorTypes.itemFor(name), CursorType);
-			_loc4_.isBuiltIn = false;
-			_loc4_.root = root;
-			if (name == mCurrentCursor) {
-				setMouseCursor(name);
-			}
-		} else {
-			_loc4_ = new CursorType(root, false);
-			mCursorTypes.add(name, _loc4_);
-		}
-	}
-
-	function onMouseMove(event:MouseEvent) {
-		mCursorClip.x = event.stageX;
-		mCursorClip.y = event.stageY;
-		event.updateAfterEvent();
-	}
-
-	function onMouseOver(event:MouseEvent) {
-		if (mCursorClip != null) {
-			mCursorClip.visible = true;
-			mFacade.stageRef.removeEventListener("mouseOver", onMouseOver);
-		}
-	}
-
-	function onMouseOut(event:MouseEvent) {
-		if (mCursorClip != null && mCursorClip.visible) {
-			mCursorClip.visible = false;
-			mFacade.stageRef.addEventListener("mouseOver", onMouseOver);
-			mFacade.stageRef.removeEventListener("mouseOut", onMouseOut);
-		}
-	}
-
-	function setBuiltInCursor(name:String) {
-		Mouse.show();
-		Mouse.cursor = name;
-		mCursorClip = null;
-	}
-
-	function setCustomCursor(type:CursorType) {
+		mCursorHidden = true;
 		Mouse.hide();
-		mCursorClip = type.root;
-		mCursorClip.visible = true;
-		mCursorClip.mouseChildren = false;
-		mCursorClip.mouseEnabled = false;
-		mFacade.sceneGraphManager.addChild(mCursorClip, 200);
-		type.root.x = type.root.stage.mouseX;
-		type.root.y = type.root.stage.mouseY;
-		mFacade.stageRef.addEventListener("mouseMove", onMouseMove);
-		mFacade.stageRef.addEventListener("mouseOut", onMouseOut);
+		mFacade.stageRef.mouseChildren = false;
+	}
+
+	function onMouseKeyboardInput(event:Event) {
+		if (!mCursorHidden) {
+			return;
+		}
+		mCursorHidden = false;
+		mFacade.stageRef.mouseChildren = true;
+		Mouse.show();
+		refresh();
+	}
+
+	public function registerMouseCursor(name:String, art:DisplayObject) {
+		if (art == null) {
+			Logger.error("Trying to register mouse cursor " + name + " without art.");
+			return;
+		}
+		if (BUILT_IN_CURSORS.indexOf(name) != -1) {
+			Logger.error("Trying to replace built-in mouse cursor " + name + ".");
+			return;
+		}
+		if (!Mouse.supportsNativeCursor) {
+			Logger.warn("Native mouse cursors are not supported, " + name + " will show the system cursor.");
+			return;
+		}
+		var _loc3_ = "custom_" + name;
+		Mouse.registerCursor(_loc3_, rasterize(art));
+		mCursors[name] = _loc3_;
+		refresh();
+	}
+
+	@:isVar public var defaultMouseCursor(never, set):String;
+
+	public function set_defaultMouseCursor(name:String):String {
+		mDefaultCursor = name;
+		refresh();
+		return name;
 	}
 
 	public function pushMouseCursor(name:String, transient:Bool = false):UInt {
-		return (0 : UInt);
+		if (mStack.length > 0 && mStack[mStack.length - 1].transient) {
+			mStack.pop();
+		}
+		var _loc3_ = mNextKey++;
+		mStack.push(new CursorEntry(_loc3_, name, transient));
+		refresh();
+		return _loc3_;
 	}
 
-	public function popMouseCursor(key:UInt = (0 : UInt)) {}
+	public function popMouseCursor(key:UInt) {
+		var _loc2_ = 0;
+		_loc2_ = mStack.length - 1;
+		while (_loc2_ >= 0) {
+			if (mStack[_loc2_].key == key) {
+				mStack.splice(_loc2_, (1 : UInt));
+				refresh();
+				return;
+			}
+			_loc2_--;
+		}
+	}
 
-	public function setMouseCursor(name:String) {
-		var _loc2_:ASAny = null;
+	function refresh() {
+		var _loc2_ = mStack.length > 0 ? mStack[mStack.length - 1].name : mDefaultCursor;
+		var _loc1_:String = mCursors[_loc2_];
+		Mouse.cursor = ASCompat.stringAsBool(_loc1_) ? _loc1_ : "auto";
+	}
+
+	function onStageMouseOver(event:MouseEvent) {
+		var _loc2_ = ASCompat.dynamicAs(event.target, TextField);
+		if (_loc2_ == mHoveredTextInput) {
+			return;
+		}
+		releaseTextInputCursor();
+		if (_loc2_ != null && _loc2_.type == "input") {
+			mHoveredTextInput = _loc2_;
+			EventListeners.add(mHoveredTextInput, "mouseOut", onTextInputLeft);
+			EventListeners.add(mHoveredTextInput, "removedFromStage", onTextInputLeft);
+			mTextInputCursorKey = pushMouseCursor("ibeam");
+		}
+	}
+
+	function onTextInputLeft(event:Event) {
+		releaseTextInputCursor();
+	}
+
+	function releaseTextInputCursor() {
+		if (mHoveredTextInput == null) {
+			return;
+		}
+		EventListeners.remove(mHoveredTextInput, "mouseOut", onTextInputLeft);
+		EventListeners.remove(mHoveredTextInput, "removedFromStage", onTextInputLeft);
+		mHoveredTextInput = null;
+		popMouseCursor(mTextInputCursorKey);
+		mTextInputCursorKey = (0 : UInt);
+	}
+
+	static function __init__() {
+		BUILT_IN_CURSORS = ["arrow", "auto", "button", "hand", "ibeam"];
 	}
 }
 
-private class CursorType {
-	public var isBuiltIn:Bool = false;
+private class CursorEntry {
+	public var key:UInt = 0;
 
-	public var root:MovieClip;
+	public var name:String;
 
-	public function new(clip:MovieClip, builtIn:Bool) {
-		root = clip;
-		isBuiltIn = builtIn;
+	public var transient:Bool = false;
+
+	public function new(key:UInt, name:String, transient:Bool) {
+		this.key = key;
+		this.name = name;
+		this.transient = transient;
 	}
 }

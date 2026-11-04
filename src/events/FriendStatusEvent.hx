@@ -11,8 +11,8 @@ class FriendStatusEvent extends Event {
 
 	var mStatus:Bool = false;
 
-	public function new(type:String, friendId:UInt, status:Bool, bubbles:Bool = false, cancelable:Bool = false) {
-		super(type, bubbles, cancelable);
+	public function new(friendStatusEventType:String, friendId:UInt, status:Bool, bubbles:Bool = false, cancelable:Bool = false) {
+		super(friendStatusEventType, bubbles, cancelable);
 		mFriendId = friendId;
 		mStatus = status;
 	}

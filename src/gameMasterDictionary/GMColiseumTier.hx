@@ -1,22 +1,22 @@
 package gameMasterDictionary;
 
 class GMColiseumTier extends GMItem {
+	public var TotalFloors:Int = 0;
+
 	public var MusicFilepath:String;
+
+	public var MinLevel:Int = 0;
 
 	public var BonusGold:Float = Math.NaN;
 
 	public var BonusExp:Float = Math.NaN;
 
-	public var MinLevel:UInt = 0;
-
-	public var TotalFloors:UInt = 0;
-
-	public function new(jsonAsset:ASObject) {
+	public function new(jsonAsset:ASObject = /*undefined*/ null) {
 		super(jsonAsset);
 		MusicFilepath = jsonAsset.MusicFilepath;
-		BonusGold = ASCompat.toNumberField(jsonAsset, "Gold");
-		BonusExp = ASCompat.toNumberField(jsonAsset, "Exp");
-		MinLevel = (ASCompat.toInt(jsonAsset.MinLevel) : UInt);
-		TotalFloors = (ASCompat.toInt(jsonAsset.MinFloors) : UInt);
+		BonusGold = ASCompat.toNumber(jsonAsset.Gold);
+		BonusExp = ASCompat.toNumber(jsonAsset.Exp);
+		MinLevel = ASCompat.toInt(jsonAsset.MinLevel);
+		TotalFloors = ASCompat.toInt(jsonAsset.MinFloors);
 	}
 }

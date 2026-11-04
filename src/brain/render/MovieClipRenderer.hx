@@ -1,6 +1,7 @@
 package brain.render;
 
 import brain.clock.GameClock;
+import brain.event.EventListeners;
 import brain.facade.Facade;
 import brain.logger.Logger;
 import brain.workLoop.LogicalWorkComponent;
@@ -15,8 +16,6 @@ class MovieClipRenderer {
 	static inline final LOOP_LABEL = "loop";
 
 	static inline final NO_LOOP_LABEL = "noloop";
-
-	static inline final RENDERER_OWNER_PROPERTY = "MCR_renderer";
 
 	var mFrameRate:Float = 24;
 
@@ -44,12 +43,12 @@ class MovieClipRenderer {
 		this.clip = clip;
 		mFinishedCallback = finishedCallback;
 		if (mMaxFrames > 1) {
-			mLogicalWorkComponent = new LogicalWorkComponent(facade, "MovieClipRenderer");
+			mLogicalWorkComponent = new LogicalWorkComponent(facade, "MovieClipRenderer", "pool");
 			if (mClip.stage != null) {
 				onAdd();
 			}
-			mClip.addEventListener("addedToStage", onAdd);
-			mClip.addEventListener("removedFromStage", onRemove);
+			EventListeners.add(mClip, "addedToStage", onAdd);
+			EventListeners.add(mClip, "removedFromStage", onRemove);
 		}
 	}
 
@@ -94,11 +93,8 @@ class MovieClipRenderer {
 
 	public function destroy() {
 		if (mClip != null) {
-			mClip.removeEventListener("addedToStage", onAdd);
-			mClip.removeEventListener("removedFromStage", onRemove);
-			if (ASCompat.getProperty(mClip, RENDERER_OWNER_PROPERTY) == this) {
-				ASCompat.deleteProperty(mClip, RENDERER_OWNER_PROPERTY);
-			}
+			EventListeners.remove(mClip, "addedToStage", onAdd);
+			EventListeners.remove(mClip, "removedFromStage", onRemove);
 		}
 		if (mOnFrameTask != null) {
 			mOnFrameTask.destroy();
@@ -124,6 +120,12 @@ class MovieClipRenderer {
 			mOnFrameTask.destroy();
 			mOnFrameTask = null;
 		}
+	}
+
+	@:isVar public var backendType(get, never):String;
+
+	public function get_backendType():String {
+		return "flash";
 	}
 
 	@:isVar public var playRate(get, set):Float;
@@ -173,11 +175,10 @@ class MovieClipRenderer {
 		if (!mIsPlaying) {
 			return;
 		}
-		var previousFrame = Math.fround(mPlayHead);
 		mPlayHead += mFrameRate * gameClock.tickLength * mPlayRate;
-		if (mPlayHead > mMaxFrames - 1 && !mLoop) {
+		if (mPlayHead > (mMaxFrames : Float) - 1 && !mLoop) {
 			mIsPlaying = false;
-			mPlayHead = mMaxFrames - 1;
+			mPlayHead = (mMaxFrames : Float) - 1;
 			this.updateClip(mClip);
 			if (mOnFrameTask != null) {
 				mOnFrameTask.destroy();
@@ -189,9 +190,7 @@ class MovieClipRenderer {
 			}
 			return;
 		}
-		if (previousFrame != Math.fround(mPlayHead)) {
-			this.updateClip(mClip);
-		}
+		this.updateClip(mClip);
 	}
 
 	@:isVar public var clip(get, set):MovieClip;
@@ -200,11 +199,7 @@ class MovieClipRenderer {
 		if (value == mClip) {
 			return value;
 		}
-		if (mClip != null && ASCompat.getProperty(mClip, RENDERER_OWNER_PROPERTY) == this) {
-			ASCompat.deleteProperty(mClip, RENDERER_OWNER_PROPERTY);
-		}
 		mClip = value;
-		ASCompat.setProperty(mClip, RENDERER_OWNER_PROPERTY, this);
 		mPlayHead = mStartFrame;
 		mMaxFrames = initialize(mClip);
 		this.updateClip(mClip);
@@ -225,32 +220,28 @@ class MovieClipRenderer {
 	}
 
 	function updateClip(parent:DisplayObjectContainer) {
-		var rendererOwner = ASCompat.getProperty(parent, RENDERER_OWNER_PROPERTY);
-		if (parent != mClip && rendererOwner != null && rendererOwner != this) {
-			return;
-		}
 		var _loc5_:MovieClip = null;
 		var _loc4_:DisplayObject = null;
 		var _loc7_:DisplayObjectContainer = null;
 		var _loc2_:MovieClip = null;
-		var _loc3_ = 0;
-		var _loc6_ = 0;
+		var _loc3_ = (0 : UInt);
+		var _loc6_ = (0 : UInt);
 		var _loc8_ = 0;
 		_loc5_ = ASCompat.reinterpretAs(parent, MovieClip);
 		if (_loc5_ != null && _loc5_.totalFrames > 1) {
 			if (ASCompat.toNumberField((_loc5_ : ASAny), "MCR_firstLoopFrame") > 0) {
 				if (ASCompat.toBool((_loc5_ : ASAny).MCR_playedIntro)) {
-					_loc3_ = ASCompat.floatToInt(_loc5_.totalFrames - ASCompat.toNumberField((_loc5_ : ASAny), "MCR_firstLoopFrame") + 1);
-					_loc6_ = ASCompat.toInt(Math.fround((mPlayHead - ASCompat.toNumberField((_loc5_ : ASAny), "MCR_firstLoopFrame") - 1) % _loc3_)
-						+ (_loc5_ : ASAny).MCR_firstLoopFrame);
+					_loc3_ = (ASCompat.floatToInt(_loc5_.totalFrames - ASCompat.toNumberField((_loc5_ : ASAny), "MCR_firstLoopFrame") + 1) : UInt);
+					_loc6_ = (ASCompat.toInt(Math.fround((mPlayHead - ASCompat.toNumberField((_loc5_ : ASAny), "MCR_firstLoopFrame") - 1) % _loc3_)
+						+ (_loc5_ : ASAny).MCR_firstLoopFrame) : UInt);
 				} else {
-					_loc6_ = ASCompat.floatToInt(Math.fround(mPlayHead % _loc5_.totalFrames) + 1);
+					_loc6_ = (ASCompat.floatToInt(Math.fround(mPlayHead % _loc5_.totalFrames) + 1) : UInt);
 					if (mPlayHead >= _loc5_.totalFrames) {
 						ASCompat.setProperty(_loc5_, "MCR_playedIntro", true);
 					}
 				}
 			} else {
-				_loc6_ = ASCompat.floatToInt(Math.fround(mPlayHead % _loc5_.totalFrames) + 1);
+				_loc6_ = (ASCompat.floatToInt(Math.fround(mPlayHead % _loc5_.totalFrames) + 1) : UInt);
 			}
 			_loc5_.gotoAndStop(_loc6_);
 		}
@@ -288,10 +279,6 @@ class MovieClipRenderer {
 	}
 
 	function initialize(parent:DisplayObjectContainer, currentMax:UInt = (0 : UInt), indent:String = ""):UInt {
-		var rendererOwner = ASCompat.getProperty(parent, RENDERER_OWNER_PROPERTY);
-		if (parent != mClip && rendererOwner != null && rendererOwner != this) {
-			return currentMax;
-		}
 		var _loc7_:DisplayObject = null;
 		var _loc4_:MovieClip = null;
 		var _loc5_:DisplayObjectContainer = null;
@@ -320,9 +307,9 @@ class MovieClipRenderer {
 	function determineFrames(mc:MovieClip) {
 		var _loc2_ = -1;
 		var _loc3_:FrameLabel;
-		final __ax4_iter_151 = mc.currentLabels;
-		if (checkNullIteratee(__ax4_iter_151))
-			for (_tmp_ in __ax4_iter_151) {
+		final __ax4_iter_138 = mc.currentLabels;
+		if (checkNullIteratee(__ax4_iter_138))
+			for (_tmp_ in __ax4_iter_138) {
 				_loc3_ = _tmp_;
 				if (_loc3_.name == "loop") {
 					_loc2_ = _loc3_.frame;

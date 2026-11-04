@@ -8,6 +8,7 @@ import box2D.collision.B2DistanceProxy;
 import box2D.collision.B2SimplexCache;
 import brain.logger.Logger;
 import brain.utils.Tuple;
+import dBGlobals.DBGlobal;
 import distributedObjects.HeroGameObjectOwner;
 import facade.DBFacade;
 import flash.events.MouseEvent;
@@ -42,7 +43,7 @@ class GBS_ModernMouseController extends MouseController {
 		mDistanceInputCache.proxyB = new B2DistanceProxy();
 		mDistanceOutputCache = new B2DistanceOutput();
 		mDistanceSimplexCache = new B2SimplexCache();
-		mDistanceSimplexCache.count = (0 : UInt);
+		mDistanceSimplexCache.count = 0;
 		mHeroLocationPreviousFrame = mHeroGameObjectOwner.view.position;
 	}
 
@@ -75,10 +76,10 @@ class GBS_ModernMouseController extends MouseController {
 	}
 
 	function checkStationaryKey() {
-		if (!mIsStationaryAttack && mDBFacade.inputManager.check(16)) {
+		if (!mIsStationaryAttack && mDBFacade.keyBindings.isDown("holdInPlace")) {
 			cancelMovementAction();
 			mIsStationaryAttack = true;
-		} else if (mIsStationaryAttack && !mDBFacade.inputManager.check(16)) {
+		} else if (mIsStationaryAttack && !mDBFacade.keyBindings.isDown("holdInPlace")) {
 			mHeroGameObjectOwner.PlayerAttack.stopAttacking();
 			mIsStationaryAttack = false;
 		}
@@ -101,6 +102,10 @@ class GBS_ModernMouseController extends MouseController {
 	function handleCurrentTargetDied() {
 		if (mCurrentTarget.actorView != null) {
 			mCurrentTarget.actorView.mouseOverUnhighlight();
+		}
+		if (mActorMousedOver == mCurrentTarget) {
+			mActorMousedOver = null;
+			popAttackCursor();
 		}
 		setCurrentTargetSelection(false);
 		mCurrentTarget = null;
@@ -180,8 +185,8 @@ class GBS_ModernMouseController extends MouseController {
 		if (_loc1_ == null) {
 			return false;
 		}
-		return mHeroGameObjectOwner.weapons[0].weaponData.ClassType == "SHOOTING"
-			|| mHeroGameObjectOwner.weapons[0].weaponData.ClassType == "MAGIC";
+		return mHeroGameObjectOwner.weapons[0].weaponData.ClassType == DBGlobal.SHOOTING_ITEM_CATEGORY
+			|| mHeroGameObjectOwner.weapons[0].weaponData.ClassType == DBGlobal.MAGIC_ITEM_CATEGORY;
 	}
 
 	function isValidTarget(actor:ActorGameObject):Bool {
@@ -245,7 +250,7 @@ class GBS_ModernMouseController extends MouseController {
 		mDistanceInputCache.transformA = _loc3_.getBody().GetTransform();
 		mDistanceInputCache.transformB = _loc2_.getBody().GetTransform();
 		mDistanceInputCache.useRadii = true;
-		mDistanceSimplexCache.count = (0 : UInt);
+		mDistanceSimplexCache.count = 0;
 		B2Distance.Distance(mDistanceOutputCache, mDistanceSimplexCache, mDistanceInputCache);
 		return mDistanceOutputCache.distance;
 	}

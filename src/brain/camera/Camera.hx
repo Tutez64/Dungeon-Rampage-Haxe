@@ -2,9 +2,7 @@ package brain.camera;
 
 import brain.clock.GameClock;
 import brain.facade.Facade;
-import com.greensock.TimelineMax;
-import com.greensock.TweenLite;
-import com.greensock.TweenMax;
+import brain.render.tweens.TweenHandle;
 import flash.display.DisplayObject;
 import flash.geom.Matrix;
 import flash.geom.Point;
@@ -12,6 +10,8 @@ import flash.geom.Rectangle;
 import flash.geom.Vector3D;
 
 class Camera {
+	static final sInverse:Matrix = new Matrix();
+
 	var mTargetObject:DisplayObject;
 
 	var mBounds:Rectangle;
@@ -28,7 +28,11 @@ class Camera {
 
 	var mRootPosition:Vector3D = new Vector3D();
 
+	var mPrevRootPosition:Vector3D = new Vector3D();
+
 	var mRootTransform:Matrix = new Matrix();
+
+	var mApplied:Matrix = new Matrix(0, 0, 0, 0);
 
 	var mShakePosition:Vector3D = new Vector3D();
 
@@ -40,11 +44,15 @@ class Camera {
 
 	var mVisibleRect:Rectangle;
 
+	var mCullRect:Rectangle = new Rectangle();
+
+	var mHasCullRect:Bool = false;
+
 	var mDefaultZoom:Float = Math.NaN;
 
-	var mTweenZoom:TweenLite;
+	var mTweenZoom:TweenHandle;
 
-	var mTweenRotation:TweenLite;
+	var mTweenRotation:TweenHandle;
 
 	var mOffset:Point;
 
@@ -61,12 +69,47 @@ class Camera {
 		mLetterboxEffect = letterboxEffect;
 	}
 
+	public static function viewBoundsInWorld(cameraMatrix:Matrix, parentX:Float, parentY:Float, viewWidth:Float, viewHeight:Float, out:Rectangle) {
+		var _loc14_ = 0;
+		var _loc9_ = Math.NaN;
+		var _loc11_ = Math.NaN;
+		var _loc7_ = Math.NaN;
+		var _loc8_ = Math.NaN;
+		sInverse.copyFrom(cameraMatrix);
+		sInverse.invert();
+		var _loc15_ = Math.POSITIVE_INFINITY;
+		var _loc13_ = Math.POSITIVE_INFINITY;
+		var _loc12_ = Math.NEGATIVE_INFINITY;
+		var _loc10_ = Math.NEGATIVE_INFINITY;
+		_loc14_ = 0;
+		while (_loc14_ < 4) {
+			_loc9_ = ((_loc14_ & 1) != 0 ? viewWidth : 0) - parentX;
+			_loc11_ = ((_loc14_ & 2) != 0 ? viewHeight : 0) - parentY;
+			_loc7_ = sInverse.a * _loc9_ + sInverse.c * _loc11_ + sInverse.tx;
+			_loc8_ = sInverse.b * _loc9_ + sInverse.d * _loc11_ + sInverse.ty;
+			if (_loc7_ < _loc15_) {
+				_loc15_ = _loc7_;
+			}
+			if (_loc7_ > _loc12_) {
+				_loc12_ = _loc7_;
+			}
+			if (_loc8_ < _loc13_) {
+				_loc13_ = _loc8_;
+			}
+			if (_loc8_ > _loc10_) {
+				_loc10_ = _loc8_;
+			}
+			_loc14_++;
+		}
+		out.setTo(_loc15_, _loc13_, _loc12_ - _loc15_, _loc10_ - _loc13_);
+	}
+
 	public function destroy() {
 		if (mTweenZoom != null) {
-			mTweenZoom.kill();
+			mFacade.mTween.killTween(mTweenZoom);
 		}
 		if (mTweenRotation != null) {
-			mTweenRotation.kill();
+			mFacade.mTween.killTween(mTweenRotation);
 		}
 		if (mBackgroundFader != null) {
 			mBackgroundFader.forceStop();
@@ -108,6 +151,8 @@ class Camera {
 		var _loc2_ = getDeltaToPoint(focusPoint.x, focusPoint.y);
 		if (!_loc2_.equals(mRootPosition)) {
 			mRootPosition = _loc2_;
+			mPrevRootPosition.x = mRootPosition.x;
+			mPrevRootPosition.y = mRootPosition.y;
 			mTransformDirty = true;
 		}
 	}
@@ -137,11 +182,85 @@ class Camera {
 				mTargetObject.transform.matrix = mRootTransform;
 			}
 			mTransformDirty = false;
+			mApplied.setTo(0, 0, 0, 0, 0, 0);
 		}
+	}
+
+	public function beginTick() {
+		mPrevRootPosition.x = mRootPosition.x;
+		mPrevRootPosition.y = mRootPosition.y;
+	}
+
+	public function renderInterpolated(alpha:Float) {
+		var _loc7_ = Math.NaN;
+		var _loc4_ = Math.NaN;
+		var _loc9_ = Math.NaN;
+		var _loc6_ = Math.NaN;
+		var _loc8_ = Math.NaN;
+		var _loc5_ = Math.NaN;
+		if (mTargetObject == null) {
+			return;
+		}
+		var _loc2_ = mPrevRootPosition.x + (mRootPosition.x - mPrevRootPosition.x) * alpha;
+		var _loc3_ = mPrevRootPosition.y + (mRootPosition.y - mPrevRootPosition.y) * alpha;
+		mRootTransform.identity();
+		if (mWantScrollRectCulling) {
+			mRootTransform.scale(mZoom, mZoom);
+			mRootTransform.rotate((mRotation + _shakeRotation) * 3.141592653589793 / 180);
+			mTargetObject.transform.matrix = mRootTransform;
+			mTargetObject.x = -mFacade.viewWidth * 0.5;
+			mTargetObject.y = -mFacade.viewHeight * 0.5;
+			_loc7_ = Math.fround(-_loc2_ - mFacade.viewWidth / mZoom * 0.5);
+			_loc4_ = Math.fround(-_loc3_ - mFacade.viewHeight / mZoom * 0.5 + mOffset.y / mZoom);
+			_loc9_ = Math.fround(mFacade.viewWidth / mZoom);
+			_loc6_ = Math.fround(mFacade.viewHeight / mZoom - mYClippingFromBottom / mZoom);
+			mTargetObject.scrollRect = new Rectangle(_loc7_, _loc4_, _loc9_, _loc6_);
+			mApplied.setTo(0, 0, 0, 0, 0, 0);
+		} else {
+			mRootTransform.translate(_loc2_ + mOffset.x + mShakePosition.x, _loc3_ + mOffset.y + mShakePosition.y);
+			mRootTransform.scale(mZoom, mZoom);
+			mRootTransform.rotate((mRotation + _shakeRotation) * 3.141592653589793 / 180);
+			if (!sameAsApplied()) {
+				mTargetObject.transform.matrix = mRootTransform;
+				mApplied.copyFrom(mRootTransform);
+			}
+		}
+		mTransformDirty = false;
+		mHasCullRect = mWantScrollRectCulling || mTargetObject.parent != null;
+		if (!mHasCullRect) {
+			return;
+		}
+		if (mWantScrollRectCulling) {
+			mCullRect.copyFrom(visibleRectangle);
+			_loc8_ = Math.abs(Math.sin((mRotation + mShakeRotation) * 3.141592653589793 / 180));
+			if (_loc8_ > 0) {
+				_loc5_ = 0.5 * (mCullRect.width + mCullRect.height) * _loc8_;
+				mCullRect.inflate(_loc5_, _loc5_);
+			}
+		} else {
+			viewBoundsInWorld(mRootTransform, mTargetObject.parent.x, mTargetObject.parent.y, mFacade.viewWidth, mFacade.viewHeight, mCullRect);
+		}
+	}
+
+	public function isInCullView(x:Float, y:Float, margin:Float):Bool {
+		if (!mHasCullRect) {
+			return true;
+		}
+		return x >= mCullRect.x - margin
+			&& x <= mCullRect.x + mCullRect.width + margin
+			&& y >= mCullRect.y - margin
+			&& y <= mCullRect.y + mCullRect.height + margin;
+	}
+
+	function sameAsApplied():Bool {
+		return mApplied.a == mRootTransform.a && mApplied.b == mRootTransform.b && mApplied.c == mRootTransform.c && mApplied.d == mRootTransform.d
+			&& mApplied.tx == mRootTransform.tx && mApplied.ty == mRootTransform.ty;
 	}
 
 	public function translateTo(point:Vector3D) {
 		mRootPosition = point;
+		mPrevRootPosition.x = mRootPosition.x;
+		mPrevRootPosition.y = mRootPosition.y;
 		mTransformDirty = true;
 	}
 
@@ -154,7 +273,10 @@ class Camera {
 	@:isVar public var targetObject(get, set):DisplayObject;
 
 	public function set_targetObject(target:DisplayObject):DisplayObject {
-		return mTargetObject = target;
+		mTargetObject = target;
+		mHasCullRect = false;
+		mApplied.setTo(0, 0, 0, 0, 0, 0);
+		return target;
 	}
 
 	function get_targetObject():DisplayObject {
@@ -211,10 +333,10 @@ class Camera {
 
 	public function tweenRotation(duration:Float, value:Float) {
 		if (mTweenRotation != null) {
-			mTweenRotation.kill();
+			mFacade.mTween.killTween(mTweenRotation);
 		}
 		if (mFacade.featureFlags.getFlagValue("want-zoom")) {
-			mTweenRotation = TweenLite.to(this, duration, {"rotation": value});
+			mTweenRotation = mFacade.mTween.tweenLiteTo(this, duration, {"rotation": value});
 		}
 	}
 
@@ -238,31 +360,31 @@ class Camera {
 
 	public function killTweenZooms() {
 		if (mTweenZoom != null) {
-			mTweenZoom.kill();
+			mFacade.mTween.killTween(mTweenZoom);
 			mTweenZoom = null;
 		}
 	}
 
-	function shakeFunction(createTween:ASFunction, duration:Float, strength:Float, numShakes:UInt):TimelineMax {
+	function shakeFunction(createTween:ASFunction, duration:Float, strength:Float, numShakes:UInt):TweenHandle {
 		var _loc6_ = Math.NaN;
-		var _loc8_ = 0;
-		var _loc7_ = new TimelineMax();
+		var _loc8_ = (0 : UInt);
+		var _loc7_ = mFacade.mTween.createTimeline();
 		var _loc5_ = duration / numShakes;
-		_loc8_ = 0;
-		while ((_loc8_ : UInt) < numShakes) {
+		_loc8_ = (0 : UInt);
+		while (_loc8_ < numShakes) {
 			strength = -strength;
 			_loc6_ = _loc8_ == 0 ? _loc5_ * 0.5 : _loc5_;
-			_loc7_.append(ASCompat.coerce(createTween(_loc6_, strength), com.greensock.core.TweenCore));
+			mFacade.mTween.appendTween(_loc7_, ASCompat.coerce(createTween(_loc6_, strength), brain.render.tweens.TweenHandle));
 			_loc8_++;
 		}
-		_loc7_.append(ASCompat.coerce(createTween(_loc5_ * 0.5, 0), com.greensock.core.TweenCore));
+		mFacade.mTween.appendTween(_loc7_, ASCompat.coerce(createTween(_loc5_ * 0.5, 0), brain.render.tweens.TweenHandle));
 		return _loc7_;
 	}
 
-	public function shakeRotation(duration:Float, strength:Float, numShakes:UInt):TimelineMax {
+	public function shakeRotation(duration:Float, strength:Float, numShakes:UInt):TweenHandle {
 		var self = this;
-		var createTween:ASFunction = function(param1:Float, param2:Float):TweenMax {
-			return new TweenMax(self, param1, {
+		var createTween:ASFunction = function(param1:Float, param2:Float):TweenHandle {
+			return mFacade.mTween.tweenMaxTo(self, param1, {
 				"_shakeRotation": param2,
 				"onUpdate": update
 			});
@@ -270,10 +392,10 @@ class Camera {
 		return this.shakeFunction(createTween, duration, strength, numShakes);
 	}
 
-	public function shakeX(duration:Float, strength:Float, numShakes:UInt):TimelineMax {
+	public function shakeX(duration:Float, strength:Float, numShakes:UInt):TweenHandle {
 		var self = this;
-		var createTween:ASFunction = function(param1:Float, param2:Float):TweenMax {
-			return new TweenMax(self, param1, {
+		var createTween:ASFunction = function(param1:Float, param2:Float):TweenHandle {
+			return mFacade.mTween.tweenMaxTo(self, param1, {
 				"_shakeX": param2,
 				"onUpdate": update
 			});
@@ -281,10 +403,10 @@ class Camera {
 		return this.shakeFunction(createTween, duration, strength, numShakes);
 	}
 
-	public function shakeY(duration:Float, strength:Float, numShakes:UInt):TimelineMax {
+	public function shakeY(duration:Float, strength:Float, numShakes:UInt):TweenHandle {
 		var self = this;
-		var createTween:ASFunction = function(param1:Float, param2:Float):TweenMax {
-			return new TweenMax(self, param1, {
+		var createTween:ASFunction = function(param1:Float, param2:Float):TweenHandle {
+			return mFacade.mTween.tweenMaxTo(self, param1, {
 				"_shakeY": param2,
 				"onUpdate": update
 			});
@@ -302,16 +424,16 @@ class Camera {
 		return mDefaultZoom;
 	}
 
-	public function tweenToDefaultZoom(duration:Float):TweenLite {
+	public function tweenToDefaultZoom(duration:Float):TweenHandle {
 		return tweenZoom(duration, defaultZoom);
 	}
 
-	public function tweenZoom(duration:Float, value:Float, setAsDefault:Bool = false):TweenLite {
+	public function tweenZoom(duration:Float, value:Float, setAsDefault:Bool = false):TweenHandle {
 		if (setAsDefault) {
 			mDefaultZoom = value;
 		}
 		killTweenZooms();
-		mTweenZoom = TweenMax.to(this, duration, {
+		mTweenZoom = mFacade.mTween.tweenMaxTo(this, duration, {
 			"zoom": value,
 			"onUpdate": update
 		});
@@ -324,6 +446,18 @@ class Camera {
 
 	public function doLetterboxEffect(duration:UInt, transitionDur:Float, color:Vector3D, alpha:Float) {
 		mLetterboxEffect.doFade(duration, transitionDur, color, alpha);
+	}
+
+	@:isVar public var backgroundFadeAlpha(get, never):Float;
+
+	public function get_backgroundFadeAlpha():Float {
+		return mBackgroundFader != null ? mBackgroundFader.alpha : 0;
+	}
+
+	@:isVar public var backgroundFadeColor(get, never):UInt;
+
+	public function get_backgroundFadeColor():UInt {
+		return mBackgroundFader != null ? mBackgroundFader.color : (0 : UInt);
 	}
 
 	public function killBackgroundFader() {
@@ -392,6 +526,8 @@ class Camera {
 	}
 
 	public function forceRedraw() {
+		mPrevRootPosition.x = mRootPosition.x;
+		mPrevRootPosition.y = mRootPosition.y;
 		mTransformDirty = true;
 		update(null);
 	}

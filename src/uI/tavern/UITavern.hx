@@ -10,12 +10,14 @@ import brain.uI.UIButton;
 import brain.uI.UIObject;
 import brain.uI.UIProgressBar;
 import brain.utils.ColorMatrix;
+import brain.utils.TextUtil;
 import brain.workLoop.LogicalWorkComponent;
+import collections.IMapIterator;
+import collections.Map;
 import dBGlobals.DBGlobal;
 import facade.DBFacade;
 import facade.GameMasterLocale;
 import facade.Locale;
-import facebookAPI.DBFacebookBragFeedPost;
 import gameMasterDictionary.GMHero;
 import gameMasterDictionary.GMOffer;
 import gameMasterDictionary.GMSkin;
@@ -25,8 +27,6 @@ import uI.*;
 import flash.display.MovieClip;
 import flash.geom.Point;
 import flash.text.TextField;
-import org.as3commons.collections.Map;
-import org.as3commons.collections.framework.IMapIterator;
 
 class UITavern {
 	static inline final ONE_DAY_MS:Float = 86400000;
@@ -185,28 +185,34 @@ class UITavern {
 		mStoryInfoClip.visible = true;
 		mAttackStars = new Vector<MovieClip>();
 		ASCompat.ASArray.pushMultiple(mAttackStars, ASCompat.coerce((mStoryInfoClip : ASAny).attack_star_0, flash.display.MovieClip),
-			(mStoryInfoClip : ASAny).attack_star_1, (mStoryInfoClip : ASAny).attack_star_2, (mStoryInfoClip : ASAny).attack_star_3,
-			(mStoryInfoClip : ASAny).attack_star_4);
+			ASCompat.coerce((mStoryInfoClip : ASAny).attack_star_1, flash.display.MovieClip),
+			ASCompat.coerce((mStoryInfoClip : ASAny).attack_star_2, flash.display.MovieClip),
+			ASCompat.coerce((mStoryInfoClip : ASAny).attack_star_3, flash.display.MovieClip),
+			ASCompat.coerce((mStoryInfoClip : ASAny).attack_star_4, flash.display.MovieClip));
 		mDefenseStars = new Vector<MovieClip>();
 		ASCompat.ASArray.pushMultiple(mDefenseStars, ASCompat.coerce((mStoryInfoClip : ASAny).defense_star_0, flash.display.MovieClip),
-			(mStoryInfoClip : ASAny).defense_star_1, (mStoryInfoClip : ASAny).defense_star_2, (mStoryInfoClip : ASAny).defense_star_3,
-			(mStoryInfoClip : ASAny).defense_star_4);
+			ASCompat.coerce((mStoryInfoClip : ASAny).defense_star_1, flash.display.MovieClip),
+			ASCompat.coerce((mStoryInfoClip : ASAny).defense_star_2, flash.display.MovieClip),
+			ASCompat.coerce((mStoryInfoClip : ASAny).defense_star_3, flash.display.MovieClip),
+			ASCompat.coerce((mStoryInfoClip : ASAny).defense_star_4, flash.display.MovieClip));
 		mSpeedStars = new Vector<MovieClip>();
 		ASCompat.ASArray.pushMultiple(mSpeedStars, ASCompat.coerce((mStoryInfoClip : ASAny).speed_star_0, flash.display.MovieClip),
-			(mStoryInfoClip : ASAny).speed_star_1, (mStoryInfoClip : ASAny).speed_star_2, (mStoryInfoClip : ASAny).speed_star_3,
-			(mStoryInfoClip : ASAny).speed_star_4);
-		ASCompat.setProperty((mStoryInfoClip : ASAny).likes_text, "text", Locale.getString("TAVERN_LIKES_LABEL"));
-		ASCompat.setProperty((mStoryInfoClip : ASAny).dislikes_text, "text", Locale.getString("TAVERN_DISLIKES_LABEL"));
-		ASCompat.setProperty((mStoryInfoClip : ASAny).attack_label, "text", Locale.getString("TAVERN_ATTACK_LABEL"));
-		ASCompat.setProperty((mStoryInfoClip : ASAny).defense_label, "text", Locale.getString("TAVERN_DEFENSE_LABEL"));
-		ASCompat.setProperty((mStoryInfoClip : ASAny).speed_label, "text", Locale.getString("TAVERN_SPEED_LABEL"));
+			ASCompat.coerce((mStoryInfoClip : ASAny).speed_star_1, flash.display.MovieClip),
+			ASCompat.coerce((mStoryInfoClip : ASAny).speed_star_2, flash.display.MovieClip),
+			ASCompat.coerce((mStoryInfoClip : ASAny).speed_star_3, flash.display.MovieClip),
+			ASCompat.coerce((mStoryInfoClip : ASAny).speed_star_4, flash.display.MovieClip));
+		Locale.setText(ASCompat.coerce((mStoryInfoClip : ASAny).likes_text, flash.text.TextField), "TAVERN_LIKES_LABEL");
+		Locale.setText(ASCompat.coerce((mStoryInfoClip : ASAny).dislikes_text, flash.text.TextField), "TAVERN_DISLIKES_LABEL");
+		Locale.setText(ASCompat.coerce((mStoryInfoClip : ASAny).attack_label, flash.text.TextField), "TAVERN_ATTACK_LABEL");
+		Locale.setText(ASCompat.coerce((mStoryInfoClip : ASAny).defense_label, flash.text.TextField), "TAVERN_DEFENSE_LABEL");
+		Locale.setText(ASCompat.coerce((mStoryInfoClip : ASAny).speed_label, flash.text.TextField), "TAVERN_SPEED_LABEL");
 		mCharacterInfoClip = ASCompat.coerce((mTavernInfoClip : ASAny).character_info, flash.display.MovieClip);
 		mCharacterInfoClip.visible = true;
-		ASCompat.setProperty((mCharacterInfoClip : ASAny).weapon_types_text, "text", Locale.getString("TAVERN_USABLE_WEAPON_TYPES_LABEL"));
+		Locale.setText(ASCompat.coerce((mCharacterInfoClip : ASAny).weapon_types_text, flash.text.TextField), "TAVERN_USABLE_WEAPON_TYPES_LABEL");
 		mSkinInfoClip = ASCompat.coerce((mRootMovieClip : ASAny).UI_town_tavern_body.UI_town_tavern_skin, flash.display.MovieClip);
 		mSkinNameLabel = ASCompat.coerce((mSkinInfoClip : ASAny).skin_name_text, flash.text.TextField);
 		mSkinNotAvailableLabel = ASCompat.coerce((mSkinInfoClip : ASAny).label_not_available, flash.text.TextField);
-		mSkinNotAvailableLabel.text = Locale.getString("TAVERN_SKIN_NOT_AVAILABLE");
+		Locale.setText(mSkinNotAvailableLabel, "TAVERN_SKIN_NOT_AVAILABLE");
 		mSkinNotAvailableLabel.mouseEnabled = false;
 		mSkinNotAvailableLabel.visible = false;
 		mSkinVector = new Vector<UITavernSkinButton>();
@@ -242,16 +248,18 @@ class UITavern {
 		mRecruitButton.rolloverFilter = DBGlobal.UI_ROLLOVER_FILTER;
 		mRecruitButton.visible = false;
 		mHeroRequiredForSkinPurchase = ASCompat.coerce((mSkinInfoClip : ASAny).hero_required_label, flash.display.MovieClip);
-		ASCompat.setProperty((mHeroRequiredForSkinPurchase : ASAny).hero_label, "text", Locale.getString("PURCHASE_HERO_BEFORE_BUYING_SYTLE_TAVERN_LABEL"));
+		Locale.setText(ASCompat.coerce((mHeroRequiredForSkinPurchase : ASAny).hero_label, flash.text.TextField),
+			"PURCHASE_HERO_BEFORE_BUYING_SYTLE_TAVERN_LABEL");
 		mSaleLabel = ASCompat.coerce((mTavernInfoClip : ASAny).sale_label, flash.text.TextField);
 		mSaleLabel.visible = false;
 		mXPParentObject = new UIObject(mDBFacade, ASCompat.coerce((mTavernInfoClip : ASAny).character_info.UI_XP, flash.display.MovieClip));
 		mXPBar = new UIProgressBar(mDBFacade, ASCompat.coerce((mTavernInfoClip : ASAny).character_info.UI_XP.xp_bar, flash.display.MovieClip));
+		if (ASCompat.toBool((mTavernInfoClip : ASAny).character_info.UI_XP.xp_bar_delta)) {
+			ASCompat.setProperty((mTavernInfoClip : ASAny).character_info.UI_XP.xp_bar_delta, "visible", false);
+		}
 		mXPText = ASCompat.coerce((mTavernInfoClip : ASAny).character_info.UI_XP.xp_points, flash.text.TextField);
-		mXPText.scaleY = mXPText.scaleX = 1.8;
-		mXPText.x = 80;
-		mXPText.y = 25;
 		mXPParentObject.setTooltip(mXPText);
+		mXPParentObject.lockTooltipToParent(ASCompat.coerce((mTavernInfoClip : ASAny).character_info.UI_XP, flash.display.DisplayObjectContainer));
 		mXPParentObject.tooltipDelay = 0;
 		mXPBar.value = 0;
 		mXPLevelText = ASCompat.coerce((mTavernInfoClip : ASAny).character_info.UI_XP.xp_level, flash.text.TextField);
@@ -260,16 +268,16 @@ class UITavern {
 				var _loc2_ = param1.getClass("weapon_tavern_tooltip");
 				var _loc3_ = param1.getClass("tavern_gloat");
 				var _loc4_:UIObject;
-				final __ax4_iter_209 = mWeaponIcons3;
-				if (checkNullIteratee(__ax4_iter_209))
-					for (_tmp_ in __ax4_iter_209) {
+				final __ax4_iter_520 = mWeaponIcons3;
+				if (checkNullIteratee(__ax4_iter_520))
+					for (_tmp_ in __ax4_iter_520) {
 						_loc4_ = _tmp_;
 						_loc4_.tooltip = ASCompat.coerce(ASCompat.createInstance(_loc2_, []), flash.display.MovieClip);
 						_loc4_.tooltipPos = new Point(0, 0);
 					}
-				final __ax4_iter_210 = mWeaponIcons4;
-				if (checkNullIteratee(__ax4_iter_210))
-					for (_tmp_ in __ax4_iter_210) {
+				final __ax4_iter_521 = mWeaponIcons4;
+				if (checkNullIteratee(__ax4_iter_521))
+					for (_tmp_ in __ax4_iter_521) {
 						_loc4_ = _tmp_;
 						_loc4_.tooltip = ASCompat.coerce(ASCompat.createInstance(_loc2_, []), flash.display.MovieClip);
 						_loc4_.tooltipPos = new Point(0, 0);
@@ -316,35 +324,28 @@ class UITavern {
 			mActiveAvatar = ASCompat.coerce(mDBFacade.dbAccountInfo.inventoryInfo.avatars.itemFor(keys[0]), account.AvatarInfo);
 		}
 		avatarStartIndex = getActiveAvatarIndex();
-		if (mHeroIds.length <= mHeroSlots.length) {
-			mSelectorRightScroll.visible = false;
-		}
-		if (mAvatarSelectorStartIndex == 0) {
-			mSelectorLeftScroll.visible = false;
-		}
+		updateSelectorScrollButtons();
 		mCurrentChosenIndex = (avatarStartIndex : Int);
 		populateAvatarSelector();
 		populateAvatarInfo((avatarStartIndex : Int));
 	}
 
 	function getActiveAvatarIndex():UInt {
-		var _loc2_ = 0;
-		var _loc1_ = (0 : UInt);
+		var _loc1_ = 0;
 		if (mActiveAvatar != null) {
-			_loc2_ = 0;
-			while (_loc2_ < mHeroIds.length) {
-				if (mHeroIds[_loc2_] == mActiveAvatar.avatarType) {
-					_loc1_ = (_loc2_ : UInt);
-					if (_loc2_ >= mHeroSlots.length) {
-						mAvatarSelectorStartIndex = _loc2_ - mHeroSlots.length + 1;
-						_loc1_ = (mHeroSlots.length - 1:UInt);
+			_loc1_ = 0;
+			while (_loc1_ < mHeroIds.length) {
+				if (mHeroIds[_loc1_] == mActiveAvatar.avatarType) {
+					if (_loc1_ < mAvatarSelectorStartIndex || _loc1_ >= mAvatarSelectorStartIndex + mHeroSlots.length) {
+						mAvatarSelectorStartIndex = _loc1_ < mHeroSlots.length ? 0 : _loc1_ - mHeroSlots.length + 1;
 					}
-					break;
+					return (_loc1_ - mAvatarSelectorStartIndex : UInt);
 				}
-				_loc2_++;
+				_loc1_++;
 			}
 		}
-		return _loc1_;
+		mAvatarSelectorStartIndex = 0;
+		return (0 : UInt);
 	}
 
 	function loadHeroOffers() {
@@ -352,9 +353,9 @@ class UITavern {
 		var _loc3_ = 0;
 		var _loc1_ = mDBFacade.gameMaster.Offers;
 		var _loc4_:GMHero;
-		final __ax4_iter_211 = mDBFacade.gameMaster.Heroes;
-		if (checkNullIteratee(__ax4_iter_211))
-			for (_tmp_ in __ax4_iter_211) {
+		final __ax4_iter_522 = mDBFacade.gameMaster.Heroes;
+		if (checkNullIteratee(__ax4_iter_522))
+			for (_tmp_ in __ax4_iter_522) {
 				_loc4_ = _tmp_;
 				if (!(_loc4_.Hidden && !mDBFacade.dbConfigManager.getConfigBoolean("want_hidden_heroes", false))) {
 					mHeroIds.push(_loc4_.Id);
@@ -376,7 +377,7 @@ class UITavern {
 
 	function loadSkinOffers() {
 		var _loc3_:GMSkin;
-		var __ax4_iter_212:Vector<GMSkin>;
+		var __ax4_iter_523:Vector<GMSkin>;
 		var _loc2_:GMOffer = null;
 		var _loc4_ = 0;
 		var _loc1_ = mDBFacade.gameMaster.Offers;
@@ -384,9 +385,9 @@ class UITavern {
 		while (_loc4_ < _loc1_.length) {
 			_loc2_ = _loc1_[_loc4_];
 			if (_loc2_.Tab == "SKIN" && _loc2_.Location == "STORE" && !_loc2_.IsBundle && !_loc2_.IsCoinAltOffer && _loc2_.isVisible()) {
-				__ax4_iter_212 = mDBFacade.gameMaster.Skins;
-				if (checkNullIteratee(__ax4_iter_212))
-					for (_tmp_ in __ax4_iter_212) {
+				__ax4_iter_523 = mDBFacade.gameMaster.Skins;
+				if (checkNullIteratee(__ax4_iter_523))
+					for (_tmp_ in __ax4_iter_523) {
 						_loc3_ = _tmp_;
 						if (_loc2_.Details[0].SkinId == _loc3_.Id) {
 							mSkinOffers.add(_loc3_.Id, _loc2_);
@@ -411,7 +412,7 @@ class UITavern {
 
 	public function animateEntry() {
 		if (mDBFacade.featureFlags.getFlagValue("want-town-animations")) {
-			UITownTweens.avatarFadeInTweenSequence(mHeroPic);
+			UITownTweens.avatarFadeInTweenSequence(mHeroPic, mDBFacade);
 			mTownHeader.rootMovieClip.visible = false;
 			mLogicalWorkComponent.doLater(0.20833333333333334, function(param1:GameClock) {
 				mTownHeader.animateHeader();
@@ -442,6 +443,7 @@ class UITavern {
 		}
 		mActiveAvatar = mDBFacade.dbAccountInfo.activeAvatarInfo;
 		var _loc1_ = getActiveAvatarIndex();
+		updateSelectorScrollButtons();
 		mCurrentChosenIndex = (_loc1_ : Int);
 		if (ASCompat.toBool((mHeroSlots[mCurrentChosenIndex].root : ASAny).chosen)) {
 			ASCompat.setProperty((mHeroSlots[mCurrentChosenIndex].root : ASAny).chosen, "visible", true);
@@ -462,6 +464,7 @@ class UITavern {
 			}
 			_loc1_++;
 		}
+		updateChosenMarkers();
 	}
 
 	function loadAvatarHolderAtPosition(heroIndex:Int, vectorIndex:Int) {
@@ -472,23 +475,27 @@ class UITavern {
 		var avatarID = gmHero.Id;
 		var avatarInfo = mDBFacade.dbAccountInfo.inventoryInfo.getAvatarInfoForHeroType(gmHero.Id);
 		if (avatarInfo == null) {
-			ASCompat.setProperty((mHeroSlots[heroIndex].root : ASAny).xp_star, "visible", false);
+			ASCompat.setProperty((mHeroSlots[vectorIndex].root : ASAny).xp_star, "visible", false);
 			gmSkin = mDBFacade.gameMaster.getSkinByConstant(gmHero.DefaultSkin);
 		} else {
-			ASCompat.setProperty((mHeroSlots[heroIndex].root : ASAny).xp_star, "visible", true);
-			ASCompat.setProperty((mHeroSlots[heroIndex].root : ASAny).xp_star.xp_text, "text", avatarInfo.level);
+			ASCompat.setProperty((mHeroSlots[vectorIndex].root : ASAny).xp_star, "visible", true);
+			TextUtil.setText(ASCompat.coerce((mHeroSlots[vectorIndex].root : ASAny).xp_star.xp_text, flash.text.TextField), Std.string(avatarInfo.cloutLevel));
 			gmSkin = mDBFacade.gameMaster.getSkinByType(avatarInfo.skinId);
 		}
 		iconName = gmSkin.IconName;
 		swfFilePath = gmSkin.UISwfFilepath;
 		ASCompat.setProperty((mHeroSlots[vectorIndex].root : ASAny).coming_soon, "visible", false);
 		mAssetLoadingComponent.getSwfAsset(DBFacade.buildFullDownloadPath(swfFilePath), function(param1:brain.assetRepository.SwfAsset) {
-			var _loc3_:ColorMatrix = null;
-			var _loc4_ = param1.getClass(iconName);
-			if (_loc4_ == null) {
+			var _loc4_:ColorMatrix = null;
+			var _loc3_ = vectorIndex + mAvatarSelectorStartIndex;
+			if (_loc3_ >= mHeroIds.length || mHeroIds[_loc3_] != avatarID) {
 				return;
 			}
-			var _loc2_ = ASCompat.coerce(ASCompat.createInstance(_loc4_, []), flash.display.MovieClip);
+			var _loc5_ = param1.getClass(iconName);
+			if (_loc5_ == null) {
+				return;
+			}
+			var _loc2_ = ASCompat.coerce(ASCompat.createInstance(_loc5_, []), flash.display.MovieClip);
 			_loc2_.scaleX *= 0.86;
 			_loc2_.scaleY *= 0.86;
 			if (ASCompat.toNumberField((mHeroSlots[vectorIndex].root : ASAny).avatar_icon, "numChildren") > 0) {
@@ -499,11 +506,11 @@ class UITavern {
 			if (mDBFacade.dbAccountInfo.inventoryInfo.ownsItem(avatarID)) {
 				ASCompat.setProperty((mHeroSlots[vectorIndex].root : ASAny).avatar_icon, "filters", []);
 			} else {
-				_loc3_ = new ColorMatrix();
-				_loc3_.adjustSaturation(0.1);
-				_loc3_.adjustBrightness(-64);
-				_loc3_.adjustContrast(-0.5);
-				ASCompat.setProperty((mHeroSlots[vectorIndex].root : ASAny).avatar_icon, "filters", [_loc3_.filter]);
+				_loc4_ = new ColorMatrix();
+				_loc4_.adjustSaturation(0.1);
+				_loc4_.adjustBrightness(-64);
+				_loc4_.adjustContrast(-0.5);
+				ASCompat.setProperty((mHeroSlots[vectorIndex].root : ASAny).avatar_icon, "filters", [_loc4_.filter]);
 			}
 		});
 	}
@@ -520,8 +527,34 @@ class UITavern {
 		handleScaledSlotIndex(-1);
 	}
 
+	public function selectPreviousHero() {
+		selectAdjacentHero(-1);
+	}
+
+	public function selectNextHero() {
+		selectAdjacentHero(1);
+	}
+
+	function selectAdjacentHero(direction:Int) {
+		if (mHeroIds.length == 0) {
+			return;
+		}
+		var _loc2_ = mAvatarSelectorStartIndex + mCurrentChosenIndex;
+		_loc2_ = (_loc2_ + direction + mHeroIds.length) % mHeroIds.length;
+		if (_loc2_ < mAvatarSelectorStartIndex) {
+			avatarSelectorStartIndex = _loc2_;
+		} else if (_loc2_ >= mAvatarSelectorStartIndex + mHeroSlots.length) {
+			avatarSelectorStartIndex = _loc2_ - mHeroSlots.length + 1;
+		}
+		populateAvatarInfo(_loc2_ - mAvatarSelectorStartIndex);
+		if (mSkinVector.length > 0 && mSkinVector[0].canBeFocused()) {
+			mDBFacade.menuNavigationController.setFocusedUiObject(mSkinVector[0]);
+		}
+	}
+
 	function scrollSkins(scrollAmount:Int) {
-		var _loc3_ = ASCompat.coerce(mDBFacade.gameMaster.heroById.itemFor(mHeroIds[mCurrentChosenIndex]), gameMasterDictionary.GMHero);
+		var _loc3_ = ASCompat.coerce(mDBFacade.gameMaster.heroById.itemFor(mHeroIds[mCurrentChosenIndex + mAvatarSelectorStartIndex]),
+			gameMasterDictionary.GMHero);
 		var _loc2_ = this.getSkinsToDisplay(_loc3_);
 		var _loc4_ = mSkinStartIndex + scrollAmount;
 		if (_loc4_ >= 0 && _loc4_ + mSkinVector.length <= (_loc2_.length : UInt)) {
@@ -551,12 +584,12 @@ class UITavern {
 		}
 		var _loc3_ = ASCompat.coerce(mDBFacade.gameMaster.heroById.itemFor(mHeroIds[index]), gameMasterDictionary.GMHero);
 		chooseThisHero(_loc3_.Id, index - mAvatarSelectorStartIndex);
-		ASCompat.setProperty((mTavernInfoClip : ASAny).avatar_name_text, "text",
+		TextUtil.setText(ASCompat.coerce((mTavernInfoClip : ASAny).avatar_name_text, flash.text.TextField),
 			GameMasterLocale.getGameMasterSubString("SKIN_NAME", _loc3_.Constant).toUpperCase());
 		var _loc2_ = mDBFacade.dbAccountInfo.inventoryInfo.getAvatarInfoForHeroType(_loc3_.Id);
 		if (_loc2_ != null) {
-			setXP(_loc2_.experience, _loc3_);
-			mDBFacade.steamAchievementsManager.setHeroLevelStat(_loc2_.level, _loc2_.gmHero);
+			setXP(_loc2_.experience, _loc2_.mAscensionLevel, _loc3_);
+			mDBFacade.steamAchievementsHelper.updateHeroLevelStat(_loc2_.gmHero.Constant, _loc2_.cloutLevel, _loc2_.mAscensionLevel);
 		}
 		mXPParentObject.visible = _loc2_ != null;
 		populateWeaponIcons(index);
@@ -567,12 +600,12 @@ class UITavern {
 	}
 
 	function populateHeroStars(gmHero:GMHero) {
-		var _loc2_ = 0;
-		_loc2_ = 0;
-		while (_loc2_ < mAttackStars.length) {
-			mAttackStars[_loc2_].visible = gmHero.AttackRating - 1 >= _loc2_;
-			mDefenseStars[_loc2_].visible = gmHero.DefenseRating - 1 >= _loc2_;
-			mSpeedStars[_loc2_].visible = gmHero.SpeedRating - 1 >= _loc2_;
+		var _loc2_ = (0 : UInt);
+		_loc2_ = (0 : UInt);
+		while (_loc2_ < (mAttackStars.length:UInt)) {
+			mAttackStars[(_loc2_ : Int)].visible = gmHero.AttackRating - 1 >= _loc2_;
+			mDefenseStars[(_loc2_ : Int)].visible = gmHero.DefenseRating - 1 >= _loc2_;
+			mSpeedStars[(_loc2_ : Int)].visible = gmHero.SpeedRating - 1 >= _loc2_;
 			_loc2_++;
 		}
 	}
@@ -584,8 +617,14 @@ class UITavern {
 		var gmHero:GMHero;
 		mSkinNotAvailableLabel.visible = false;
 		mAssetLoadingComponent.getSwfAsset(DBFacade.buildFullDownloadPath(gmSkin.PortraitName), function(param1:brain.assetRepository.SwfAsset) {
-			var _loc3_ = param1.getClass(gmSkin.CardName);
-			var _loc4_ = ASCompat.coerce(ASCompat.createInstance(_loc3_, []), flash.display.MovieClip);
+			var _loc5_ = param1.getClass(gmSkin.BackgroundClassName);
+			var _loc3_ = param1.getClass(gmSkin.PortraitClassName);
+			if (_loc5_ == null || _loc3_ == null) {
+				return;
+			}
+			var _loc4_ = new MovieClip();
+			_loc4_.addChild(ASCompat.coerce(ASCompat.createInstance(_loc5_, []), flash.display.DisplayObject));
+			_loc4_.addChild(ASCompat.coerce(ASCompat.createInstance(_loc3_, []), flash.display.DisplayObject));
 			var _loc2_ = new MovieClipRenderController(mDBFacade, _loc4_);
 			_loc2_.play();
 			if (mHeroPic.numChildren > 0) {
@@ -606,7 +645,7 @@ class UITavern {
 				setupBuyButtonWithSkin(gmSkin, false);
 			}
 		}
-		mSkinNameLabel.text = GameMasterLocale.getGameMasterSubString("SKIN_NAME", gmSkin.Constant).toUpperCase();
+		TextUtil.setText(mSkinNameLabel, GameMasterLocale.getGameMasterSubString("SKIN_NAME", gmSkin.Constant).toUpperCase());
 		setUpSkinSelector();
 	}
 
@@ -649,14 +688,14 @@ class UITavern {
 						comingSoonText += Std.string(Math.ffloor(hoursRemaining)) + Locale.getString("SKIN_MINS_LEFT");
 					}
 				}
-				mSkinNotAvailableLabel.text = comingSoonText;
+				setSkinStatusText(comingSoonText);
 				return;
 			}
 			if (offer.EndDate != null && offer.EndDate.getTime() <= nowTime) {
 				mBuyButton.visible = false;
 				mHeroRequiredForSkinPurchase.visible = false;
 				mSkinNotAvailableLabel.visible = true;
-				mSkinNotAvailableLabel.text = Locale.getString("TAVERN_SKIN_SOLD_OUT");
+				setSkinStatusText(Locale.getString("TAVERN_SKIN_SOLD_OUT"));
 				return;
 			}
 		}
@@ -664,32 +703,32 @@ class UITavern {
 			mBuyButton.visible = false;
 			mHeroRequiredForSkinPurchase.visible = false;
 			mSkinNotAvailableLabel.visible = true;
-			mSkinNotAvailableLabel.text = Locale.getString("TAVERN_SKIN_NOT_AVAILABLE");
+			setSkinStatusText(Locale.getString("TAVERN_SKIN_NOT_AVAILABLE"));
 			return;
 		}
 		mBuyButton.visible = true;
 		mBuyButton.enabled = true;
-		mBuyButton.label.text = Locale.getString("SKIN_BUY_BUTTON_BUY_TEXT");
+		Locale.setText(mBuyButton.label, "SKIN_BUY_BUTTON_BUY_TEXT");
 		saleOffer = offer.isOnSaleNow;
 		currentOffer = saleOffer != null ? saleOffer : offer;
 		ASCompat.setProperty((mBuyButton.root : ASAny).cost_text, "visible", true);
-		ASCompat.setProperty((mBuyButton.root : ASAny).cost_text, "text", currentOffer.Price);
-		ASCompat.setProperty((mBuyButton.root : ASAny).cash_icon, "visible", currentOffer.CurrencyType == "PREMIUM");
-		ASCompat.setProperty((mBuyButton.root : ASAny).coin_icon, "visible", currentOffer.CurrencyType == "BASIC");
-		ASCompat.setProperty((mBuyButton.root : ASAny).dlc_cash_icon, "visible", currentOffer.CurrencyType == "DLC");
+		TextUtil.setText(ASCompat.coerce((mBuyButton.root : ASAny).cost_text, flash.text.TextField), Std.string(currentOffer.Price));
+		ASCompat.setProperty((mBuyButton.root : ASAny).cash_icon, "visible", currentOffer.CurrencyType == GMOffer.PREMIUM_CURRENCY);
+		ASCompat.setProperty((mBuyButton.root : ASAny).coin_icon, "visible", currentOffer.CurrencyType == GMOffer.BASIC_CURRENCY);
+		ASCompat.setProperty((mBuyButton.root : ASAny).dlc_cash_icon, "visible", currentOffer.CurrencyType == GMOffer.DLC_CURRENCY);
 		mBuyButton.releaseCallback = function() {
 			buySkin(gmSkin.Id);
 		};
-		if (currentOffer.CurrencyType == "DLC") {
+		if (currentOffer.CurrencyType == GMOffer.DLC_CURRENCY) {
 			mBuyButton.visible = true;
 			mBuyButtonCoin.visible = false;
 			mBuyButtonCash.visible = false;
 			ASCompat.setProperty((mSkinInfoClip : ASAny).label_or, "visible", false);
 			mRecruitButton.visible = false;
 			ASCompat.setProperty((mBuyButton.root : ASAny).cost_text, "visible", false);
-			ASCompat.setProperty((mBuyButton.root : ASAny).cash_icon, "visible", currentOffer.CurrencyType == "PREMIUM");
-			ASCompat.setProperty((mBuyButton.root : ASAny).coin_icon, "visible", currentOffer.CurrencyType == "BASIC");
-			ASCompat.setProperty((mBuyButton.root : ASAny).dlc_cash_icon, "visible", currentOffer.CurrencyType == "DLC");
+			ASCompat.setProperty((mBuyButton.root : ASAny).cash_icon, "visible", currentOffer.CurrencyType == GMOffer.PREMIUM_CURRENCY);
+			ASCompat.setProperty((mBuyButton.root : ASAny).coin_icon, "visible", currentOffer.CurrencyType == GMOffer.BASIC_CURRENCY);
+			ASCompat.setProperty((mBuyButton.root : ASAny).dlc_cash_icon, "visible", currentOffer.CurrencyType == GMOffer.DLC_CURRENCY);
 			mBuyButton.releaseCallback = function() {
 				mDBFacade.overlaySteamBasedOnAppId(offer.SteamAppId);
 			};
@@ -706,8 +745,13 @@ class UITavern {
 			&& offer.SaleEndDate != null
 			&& offer.SaleStartDate.getTime() <= nowTime
 			&& offer.SaleEndDate.getTime() > nowTime) {
-			mBuyButton.label.text = Locale.getString("TAVERN_SKIN_ON_SALE");
+			Locale.setText(mBuyButton.label, "TAVERN_SKIN_ON_SALE");
 		}
+	}
+
+	function setSkinStatusText(text:String) {
+		TextUtil.setText(mSkinNotAvailableLabel, text, 1.55);
+		TextUtil.fitToField(mSkinNotAvailableLabel);
 	}
 
 	function setupBuyButtonForHero(gmHero:GMHero) {
@@ -720,7 +764,7 @@ class UITavern {
 		mSkinNotAvailableLabel.visible = false;
 		mBuyButton.visible = true;
 		mBuyButton.enabled = true;
-		mBuyButton.label.text = Locale.getString("TAVERN_BUY_HERO_BUTTON_TEXT");
+		Locale.setText(mBuyButton.label, "TAVERN_BUY_HERO_BUTTON_TEXT");
 		offer = ASCompat.coerce(mHeroOffers.itemFor(gmHero.Id), gameMasterDictionary.GMOffer);
 		saleOffer = offer.isOnSaleNow;
 		coinOffer = offer.CoinOffer;
@@ -742,8 +786,8 @@ class UITavern {
 			mBuyButtonCash.visible = true;
 			ASCompat.setProperty((mSkinInfoClip : ASAny).label_or, "visible", true);
 			mRecruitButton.visible = false;
-			mBuyButtonCash.label.text = Std.string(currentOffer.Price);
-			mBuyButtonCoin.label.text = Std.string(currentCoinOffer.Price);
+			TextUtil.setText(mBuyButtonCash.label, Std.string(currentOffer.Price));
+			TextUtil.setText(mBuyButtonCoin.label, Std.string(currentCoinOffer.Price));
 			mBuyButtonCash.releaseCallback = function() {
 				buyThisHero(currentOffer, (mCurrentChosenIndex : UInt));
 			};
@@ -757,10 +801,10 @@ class UITavern {
 			ASCompat.setProperty((mSkinInfoClip : ASAny).label_or, "visible", false);
 			mRecruitButton.visible = false;
 			ASCompat.setProperty((mBuyButton.root : ASAny).cost_text, "visible", true);
-			ASCompat.setProperty((mBuyButton.root : ASAny).cost_text, "text", Std.string(currentOffer.Price));
-			ASCompat.setProperty((mBuyButton.root : ASAny).cash_icon, "visible", currentOffer.CurrencyType == "PREMIUM");
-			ASCompat.setProperty((mBuyButton.root : ASAny).coin_icon, "visible", currentOffer.CurrencyType == "BASIC");
-			ASCompat.setProperty((mBuyButton.root : ASAny).dlc_cash_icon, "visible", currentOffer.CurrencyType == "DLC");
+			TextUtil.setText(ASCompat.coerce((mBuyButton.root : ASAny).cost_text, flash.text.TextField), Std.string(currentOffer.Price));
+			ASCompat.setProperty((mBuyButton.root : ASAny).cash_icon, "visible", currentOffer.CurrencyType == GMOffer.PREMIUM_CURRENCY);
+			ASCompat.setProperty((mBuyButton.root : ASAny).coin_icon, "visible", currentOffer.CurrencyType == GMOffer.BASIC_CURRENCY);
+			ASCompat.setProperty((mBuyButton.root : ASAny).dlc_cash_icon, "visible", currentOffer.CurrencyType == GMOffer.DLC_CURRENCY);
 			mBuyButton.releaseCallback = function() {
 				buyThisHero(currentOffer, (mCurrentChosenIndex : UInt));
 			};
@@ -787,16 +831,17 @@ class UITavern {
 	}
 
 	function determineSkinSelectorStartIndex(gmSkin:GMSkin) {
-		var _loc4_ = 0;
-		var _loc3_ = ASCompat.coerce(mDBFacade.gameMaster.heroById.itemFor(mHeroIds[mCurrentChosenIndex]), gameMasterDictionary.GMHero);
+		var _loc4_ = (0 : UInt);
+		var _loc3_ = ASCompat.coerce(mDBFacade.gameMaster.heroById.itemFor(mHeroIds[mCurrentChosenIndex + mAvatarSelectorStartIndex]),
+			gameMasterDictionary.GMHero);
 		var _loc2_ = this.getSkinsToDisplay(_loc3_);
-		_loc4_ = 0;
-		while (_loc4_ < _loc2_.length) {
-			if (_loc2_[_loc4_].Id == gmSkin.Id) {
-				if (_loc4_ < mSkinVector.length) {
+		_loc4_ = (0 : UInt);
+		while (_loc4_ < (_loc2_.length:UInt)) {
+			if (_loc2_[(_loc4_ : Int)].Id == gmSkin.Id) {
+				if (_loc4_ < (mSkinVector.length:UInt)) {
 					mSkinStartIndex = (0 : UInt);
 				} else {
-					mSkinStartIndex = (_loc4_ - mSkinVector.length + 1 : UInt);
+					mSkinStartIndex = (ASCompat.floatToInt((_loc4_ : Float) - mSkinVector.length + 1) : UInt);
 				}
 				return;
 			}
@@ -808,13 +853,13 @@ class UITavern {
 	function skinSelected(gmSkin:GMSkin) {
 		mSelectedSkin = gmSkin;
 		if (gmSkin != null) {
-			ASCompat.setProperty((mStoryInfoClip : ASAny).avatar_description_text, "text",
-				GameMasterLocale.getGameMasterSubString("SKIN_DESCRIPTION", gmSkin.Constant));
-			ASCompat.setProperty((mStoryInfoClip : ASAny).avatar_likes_text, "text",
+			TextUtil.setText(ASCompat.coerce((mStoryInfoClip : ASAny).avatar_description_text, flash.text.TextField),
+				GameMasterLocale.getGameMasterSubString("SKIN_DESCRIPTION", gmSkin.Constant), 1.55);
+			TextUtil.setText(ASCompat.coerce((mStoryInfoClip : ASAny).avatar_likes_text, flash.text.TextField),
 				GameMasterLocale.getGameMasterSubString("SKIN_LIKES", gmSkin.Constant).toUpperCase());
-			ASCompat.setProperty((mStoryInfoClip : ASAny).avatar_dislikes_text, "text",
+			TextUtil.setText(ASCompat.coerce((mStoryInfoClip : ASAny).avatar_dislikes_text, flash.text.TextField),
 				GameMasterLocale.getGameMasterSubString("SKIN_DISLIKES", gmSkin.Constant).toUpperCase());
-			ASCompat.setProperty((mStoryInfoClip : ASAny).avatar_nickname_text, "text",
+			TextUtil.setText(ASCompat.coerce((mStoryInfoClip : ASAny).avatar_nickname_text, flash.text.TextField),
 				GameMasterLocale.getGameMasterSubString("SKIN_NICKNAME", gmSkin.Constant).toUpperCase());
 		}
 		var _loc4_ = mDBFacade.dbAccountInfo.inventoryInfo.doesPlayerOwnSkin(gmSkin.Id);
@@ -836,8 +881,8 @@ class UITavern {
 	}
 
 	function setHeroAndSkin() {
-		var _loc4_ = 0;
-		var _loc3_ = 0;
+		var _loc4_ = (0 : UInt);
+		var _loc3_ = (0 : UInt);
 		var _loc2_ = mDBFacade.dbAccountInfo.inventoryInfo.getAvatarInfoForHeroType(mAvatarIdToMakeActiveAvatar);
 		if (_loc2_ == null) {
 			Logger.error("Trying to set active avatar to an avatar the user does no own.");
@@ -848,9 +893,9 @@ class UITavern {
 		}
 		var _loc1_ = ASCompat.reinterpretAs(mHeroSelectionsToFlush.iterator(), IMapIterator);
 		while (ASCompat.toBool(_loc1_.next())) {
-			_loc3_ = ASCompat.toInt(_loc1_.key);
-			_loc4_ = (ASCompat.asUint(_loc1_.current) : Int);
-			setSkinOnAvatar((_loc3_ : UInt), (_loc4_ : UInt));
+			_loc3_ = (ASCompat.toInt(_loc1_.key) : UInt);
+			_loc4_ = ASCompat.asUint(_loc1_.current);
+			setSkinOnAvatar(_loc3_, _loc4_);
 		}
 		mHeroSelectionsToFlush.clear();
 	}
@@ -879,24 +924,25 @@ class UITavern {
 	}
 
 	function setUpSkinSelector() {
-		var _loc3_ = 0;
-		var _loc2_ = ASCompat.coerce(mDBFacade.gameMaster.heroById.itemFor(mHeroIds[mCurrentChosenIndex]), gameMasterDictionary.GMHero);
+		var _loc3_ = (0 : UInt);
+		var _loc2_ = ASCompat.coerce(mDBFacade.gameMaster.heroById.itemFor(mHeroIds[mCurrentChosenIndex + mAvatarSelectorStartIndex]),
+			gameMasterDictionary.GMHero);
 		var _loc1_ = this.getSkinsToDisplay(_loc2_);
-		_loc3_ = 0;
-		while (_loc3_ < mSkinVector.length) {
+		_loc3_ = (0 : UInt);
+		while (_loc3_ < (mSkinVector.length:UInt)) {
 			if ((_loc1_.length : UInt) > _loc3_ + mSkinStartIndex) {
-				mSkinVector[_loc3_].selected = false;
+				mSkinVector[(_loc3_ : Int)].selected = false;
 				if (mSelectedSkin != null && mSelectedSkin.Id == _loc1_[(_loc3_ + mSkinStartIndex : Int)].Id) {
-					mSkinVector[_loc3_].selected = true;
+					mSkinVector[(_loc3_ : Int)].selected = true;
 				}
-				mSkinVector[_loc3_].chosen = false;
+				mSkinVector[(_loc3_ : Int)].chosen = false;
 				if (mChosenSkin != null && mChosenSkin.Id == _loc1_[(_loc3_ + mSkinStartIndex : Int)].Id) {
-					mSkinVector[_loc3_].chosen = true;
+					mSkinVector[(_loc3_ : Int)].chosen = true;
 				}
-				mSkinVector[_loc3_].gmSkin = _loc1_[(_loc3_ + mSkinStartIndex : Int)];
-				mSkinVector[_loc3_].visible = true;
+				mSkinVector[(_loc3_ : Int)].gmSkin = _loc1_[(_loc3_ + mSkinStartIndex : Int)];
+				mSkinVector[(_loc3_ : Int)].visible = true;
 			} else {
-				mSkinVector[_loc3_].visible = false;
+				mSkinVector[(_loc3_ : Int)].visible = false;
 			}
 			_loc3_++;
 		}
@@ -913,14 +959,14 @@ class UITavern {
 	}
 
 	function resizeHeroSlots(selectedIndex:UInt) {
-		var _loc2_ = 0;
+		var _loc2_ = (0 : UInt);
 		mScaledSlotIndex = (selectedIndex : Int);
-		_loc2_ = 0;
-		while (_loc2_ < mHeroSlots.length) {
-			if ((_loc2_ : UInt) == selectedIndex) {
-				select(mHeroSlots[_loc2_].root);
+		_loc2_ = (0 : UInt);
+		while (_loc2_ < (mHeroSlots.length:UInt)) {
+			if (_loc2_ == selectedIndex) {
+				select(mHeroSlots[(_loc2_ : Int)].root);
 			} else {
-				deselect(mHeroSlots[_loc2_].root);
+				deselect(mHeroSlots[(_loc2_ : Int)].root);
 			}
 			_loc2_++;
 		}
@@ -936,16 +982,16 @@ class UITavern {
 		root.scaleY = 1;
 	}
 
-	function setXP(xp:UInt, gmHero:GMHero) {
+	function setXP(xp:UInt, ascensionLevel:UInt, gmHero:GMHero) {
 		mXPBar.value = xp;
-		var _loc5_ = gmHero.getLevelFromExp(xp);
-		var _loc4_ = xp;
-		var _loc3_ = (gmHero.getLevelIndex(xp) : UInt);
-		var _loc7_ = (ASCompat.toInt(_loc3_ > 0 ? gmHero.getExpFromIndex(_loc3_ - 1) : 0) : UInt);
-		var _loc6_ = gmHero.getExpFromIndex(_loc3_);
-		mXPLevelText.text = Std.string(_loc5_);
-		mXPBar.value = (_loc4_ - _loc7_) / (_loc6_ - _loc7_);
-		mXPText.text = Std.string(_loc4_) + " / " + Std.string(_loc6_);
+		var _loc6_ = gmHero.getLevelFromExp(xp, ascensionLevel);
+		var _loc5_ = xp;
+		var _loc4_ = (gmHero.getLevelIndex(xp, (ascensionLevel : Int)) : UInt);
+		var _loc8_ = (ASCompat.toInt(_loc4_ > 0 ? gmHero.getExpFromIndex(_loc4_ - 1) : 0) : UInt);
+		var _loc7_ = gmHero.getExpFromIndex(_loc4_);
+		TextUtil.setText(mXPLevelText, Std.string(_loc6_));
+		mXPBar.value = ((_loc5_ : Float) - (_loc8_ : Float)) / ((_loc7_ : Float) - (_loc8_ : Float));
+		TextUtil.setText(mXPText, Std.string(_loc5_) + " / " + Std.string(_loc7_));
 	}
 
 	public function populateWeaponIcons(index:Int) {
@@ -973,7 +1019,7 @@ class UITavern {
 				mWeaponIconsVector[index].visible = true;
 				(mWeaponIconsVector[index].root : ASAny).bg_slot.addChild(_loc4_);
 				_loc4_.name = "weaponIcon";
-				ASCompat.setProperty((mWeaponIconsVector[index].tooltip : ASAny).title_label, "text",
+				TextUtil.setText(ASCompat.coerce((mWeaponIconsVector[index].tooltip : ASAny).title_label, flash.text.TextField),
 					GameMasterLocale.getGameMasterSubString("WEAPON_MASTERTYPE", subType.Constant).toUpperCase());
 			};
 		};
@@ -1027,35 +1073,34 @@ class UITavern {
 	}
 
 	function chooseThisHero(avatarID:UInt, index:Int) {
-		var _loc4_ = 0;
 		var _loc3_ = mDBFacade.dbAccountInfo.inventoryInfo.getAvatarInfoForHeroType(avatarID);
 		if (_loc3_ != null) {
-			if (_loc3_ != null && mCurrentChosenIndex < mHeroSlots.length && mCurrentChosenIndex >= 0) {
-				if (ASCompat.toBool((mHeroSlots[mCurrentChosenIndex].root : ASAny).chosen)) {
-					ASCompat.setProperty((mHeroSlots[mCurrentChosenIndex].root : ASAny).chosen, "visible", false);
-				}
-			}
-			_loc4_ = 0;
-			while (_loc4_ < mHeroSlots.length) {
-				if (ASCompat.toBool((mHeroSlots[_loc4_].root : ASAny).chosen)) {
-					ASCompat.setProperty((mHeroSlots[_loc4_].root : ASAny).chosen, "visible", false);
-				}
-				_loc4_++;
-			}
 			mAvatarIdToMakeActiveAvatar = _loc3_.gmHero.Id;
-			if (ASCompat.toBool((mHeroSlots[index].root : ASAny).chosen)) {
-				ASCompat.setProperty((mHeroSlots[index].root : ASAny).chosen, "visible", true);
-			}
+			updateChosenMarkers();
 		}
 		mCurrentChosenIndex = index;
 		mChosenAvatarID = avatarID;
 	}
 
+	function updateChosenMarkers() {
+		var _loc2_ = 0;
+		var _loc1_ = 0;
+		_loc2_ = 0;
+		while (_loc2_ < mHeroSlots.length) {
+			_loc1_ = _loc2_ + mAvatarSelectorStartIndex;
+			if (ASCompat.toBool((mHeroSlots[_loc2_].root : ASAny).chosen)) {
+				ASCompat.setProperty((mHeroSlots[_loc2_].root : ASAny).chosen,
+					"visible", _loc1_ < mHeroIds.length && mHeroIds[_loc1_] == mAvatarIdToMakeActiveAvatar);
+			}
+			_loc2_++;
+		}
+	}
+
 	function buyThisHero(offer:GMOffer, index:UInt) {
 		StoreServicesController.tryBuyOffer(mDBFacade, offer, function(param1:ASAny) {
 			var _loc2_ = offer.Details[0].HeroId;
-			DBFacebookBragFeedPost.buyHeroSuccess(mTownHeader, ASCompat.coerce(mDBFacade.gameMaster.heroById.itemFor(_loc2_), gameMasterDictionary.GMHero),
-				mDBFacade, mAssetLoadingComponent);
+			UIBragFeedPost.buyHeroSuccess(mTownHeader, ASCompat.coerce(mDBFacade.gameMaster.heroById.itemFor(_loc2_), gameMasterDictionary.GMHero), mDBFacade,
+				mAssetLoadingComponent);
 			populateAvatarInfo((index : Int));
 			populateAvatarSelector();
 		});
@@ -1067,7 +1112,7 @@ class UITavern {
 		var currentOffer = saleOffer != null ? saleOffer : offer;
 		StoreServicesController.tryBuyOffer(mDBFacade, currentOffer, function(param1:ASAny) {
 			var _loc3_ = mDBFacade.gameMaster.getSkinByType(skinId);
-			DBFacebookBragFeedPost.buySkinSuccess(_loc3_, mDBFacade, mAssetLoadingComponent);
+			UIBragFeedPost.buySkinSuccess(_loc3_, mDBFacade, mAssetLoadingComponent);
 			var _loc2_ = ASCompat.coerce(mDBFacade.gameMaster.heroByConstant.itemFor(_loc3_.ForHero), gameMasterDictionary.GMHero);
 			if (_loc2_ == null) {
 				Logger.error("Unable to find gmHero by constant: " + _loc3_.ForHero);
@@ -1088,17 +1133,37 @@ class UITavern {
 		}
 		mAvatarSelectorStartIndex = value;
 		populateAvatarSelector();
-		if (mSelectorRightScroll.visible && mAvatarSelectorStartIndex + mHeroSlots.length >= mHeroIds.length) {
-			mSelectorRightScroll.visible = false;
-		} else if (!mSelectorRightScroll.visible && mAvatarSelectorStartIndex + mHeroSlots.length < mHeroIds.length) {
-			mSelectorRightScroll.visible = true;
-		}
-		if (mSelectorLeftScroll.visible && mAvatarSelectorStartIndex == 0) {
-			mSelectorLeftScroll.visible = false;
-		} else if (!mSelectorLeftScroll.visible && mAvatarSelectorStartIndex > 0) {
-			mSelectorLeftScroll.visible = true;
-		}
+		updateSelectorScrollButtons();
 		return value;
+	}
+
+	@:isVar var canScrollSelectorLeft(get, never):Bool;
+
+	function get_canScrollSelectorLeft():Bool {
+		return mAvatarSelectorStartIndex > 0;
+	}
+
+	@:isVar var canScrollSelectorRight(get, never):Bool;
+
+	function get_canScrollSelectorRight():Bool {
+		return mAvatarSelectorStartIndex + mHeroSlots.length < mHeroIds.length;
+	}
+
+	function updateSelectorScrollButtons() {
+		mSelectorLeftScroll.visible = canScrollSelectorLeft;
+		mSelectorRightScroll.visible = canScrollSelectorRight;
+	}
+
+	function rotateSelectorLeft() {
+		if (canScrollSelectorLeft) {
+			scrollLeft();
+		}
+	}
+
+	function rotateSelectorRight() {
+		if (canScrollSelectorRight) {
+			scrollRight();
+		}
 	}
 
 	@:isVar public var currentChosenIndex(never, set):Int;
@@ -1155,7 +1220,42 @@ class UITavern {
 		if (mXPParentObject != null) {
 			mXPParentObject.destroy();
 		}
+		if (mSkinVector != null) {
+			_loc1_ = 0;
+			while (_loc1_ < mSkinVector.length) {
+				if (mSkinVector[_loc1_] != null) {
+					mSkinVector[_loc1_].destroy();
+				}
+				_loc1_++;
+			}
+			mSkinVector = null;
+		}
+		if (mScrollSkinsLeftButton != null) {
+			mScrollSkinsLeftButton.destroy();
+		}
+		mScrollSkinsLeftButton = null;
+		if (mScrollSkinsRightButton != null) {
+			mScrollSkinsRightButton.destroy();
+		}
+		mScrollSkinsRightButton = null;
+		if (mBuyButton != null) {
+			mBuyButton.destroy();
+		}
+		mBuyButton = null;
+		if (mBuyButtonCoin != null) {
+			mBuyButtonCoin.destroy();
+		}
+		mBuyButtonCoin = null;
+		if (mBuyButtonCash != null) {
+			mBuyButtonCash.destroy();
+		}
+		mBuyButtonCash = null;
+		if (mRecruitButton != null) {
+			mRecruitButton.destroy();
+		}
+		mRecruitButton = null;
 		mTavernInfoClip = null;
+		mTownHeader = null;
 	}
 
 	public function setupHeaderLinks() {
@@ -1185,6 +1285,12 @@ class UITavern {
 		mHeroSlots[4].isToTheLeftOf(mHeroSlots[5]);
 		mHeroSlots[5].isToTheLeftOf(mHeroSlots[6]);
 		mHeroSlots[6].isToTheLeftOf(mHeroSlots[7]);
+		if (mHeroSlots[0].leftNavigationAdditionalInteraction == null) {
+			mHeroSlots[0].leftNavigationAdditionalInteraction = rotateSelectorLeft;
+		}
+		if (mHeroSlots[7].rightNavigationAdditionalInteraction == null) {
+			mHeroSlots[7].rightNavigationAdditionalInteraction = rotateSelectorRight;
+		}
 		mHeroSlots[1].upNavigation = mBuyButton;
 		mHeroSlots[2].upNavigation = mBuyButton;
 		mHeroSlots[3].upNavigation = mBuyButton;

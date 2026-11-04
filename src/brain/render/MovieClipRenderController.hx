@@ -2,6 +2,7 @@ package brain.render;
 
 import brain.facade.Facade;
 import brain.utils.IPoolable;
+import flash.display.DisplayObject;
 import flash.display.FrameLabel;
 import flash.display.MovieClip;
 
@@ -48,9 +49,9 @@ class MovieClipRenderController implements IPoolable {
 
 	function determineRenderer(finishedCallback:ASFunction, assetLabel:String = null) {
 		var _loc3_:FrameLabel;
-		final __ax4_iter_154 = mClip.currentLabels;
-		if (checkNullIteratee(__ax4_iter_154))
-			for (_tmp_ in __ax4_iter_154) {
+		final __ax4_iter_141 = mClip.currentLabels;
+		if (checkNullIteratee(__ax4_iter_141))
+			for (_tmp_ in __ax4_iter_141) {
 				_loc3_ = _tmp_;
 				if (_loc3_.name.indexOf("random") >= 0) {
 					mRenderer = new MovieClipRandomRenderer(mFacade, mClip, finishedCallback, assetLabel);
@@ -151,5 +152,29 @@ class MovieClipRenderController implements IPoolable {
 
 	function set_playRate(value:Float):Float {
 		return mRenderer.playRate = value;
+	}
+
+	@:isVar public var displayObject(get, never):DisplayObject;
+
+	public function get_displayObject():DisplayObject {
+		return mRenderer.clip;
+	}
+
+	@:isVar public var rendererType(get, never):String;
+
+	public function get_rendererType():String {
+		return "MovieClipRenderer";
+	}
+
+	@:isVar public var heading(never, set):Float;
+
+	public function set_heading(value:Float):Float {
+		return value;
+	}
+
+	@:isVar public var backendType(get, never):String;
+
+	public function get_backendType():String {
+		return "flash";
 	}
 }

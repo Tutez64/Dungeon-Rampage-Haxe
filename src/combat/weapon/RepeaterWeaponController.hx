@@ -103,14 +103,14 @@ class RepeaterWeaponController extends ScalingWeaponController {
 	}
 
 	override public function onWeaponUp(autoAim:Bool = true) {
-		var _loc2_ = 0;
+		var _loc2_ = (0 : UInt);
 		if (!mDBFacade.dbAccountInfo.dbAccountParams.hasRepeaterTutorialParam() && !mTutorialMessageSent) {
 			mDBFacade.eventManager.dispatchEvent(new FirstRepeaterEvent());
 			mTutorialMessageSent = true;
 		}
 		if (!mInRepeaterMode) {
-			_loc2_ = (getNextAttackId() : Int);
-			attack((_loc2_ : UInt), mAutoAim);
+			_loc2_ = getNextAttackId();
+			attack(_loc2_, mAutoAim);
 		}
 		clear();
 	}

@@ -4,6 +4,7 @@ import account.FriendInfo;
 import brain.assetRepository.AssetLoadingComponent;
 import brain.clock.GameClock;
 import brain.sceneGraph.SceneGraphComponent;
+import brain.utils.TextUtil;
 import brain.workLoop.LogicalWorkComponent;
 import events.ChatLogEvent;
 import events.FriendStatusEvent;
@@ -11,8 +12,8 @@ import events.FriendSummaryNewsFeedEvent;
 import events.GenericNewsFeedEvent;
 import facade.DBFacade;
 import facade.Locale;
+import uI.portrait.PlayerPortraits;
 import uI.UIChatLog;
-import com.greensock.TweenMax;
 import flash.display.MovieClip;
 import flash.events.Event;
 import flash.text.TextField;
@@ -35,6 +36,8 @@ class UINewsFeed {
 
 	public static inline final FEED_HANGING_OFF_THE_EDGE_OFFSET:Float = 13;
 
+	var mPortraits:PlayerPortraits = new PlayerPortraits();
+
 	var mDBFacade:DBFacade;
 
 	var mAssetLoadingComponent:AssetLoadingComponent;
@@ -50,6 +53,8 @@ class UINewsFeed {
 	var mLabelY:Float = Math.NaN;
 
 	var mIcon:MovieClip;
+
+	var mTopShift:Float = 0;
 
 	var mFriendEvent:FriendStatusEvent;
 
@@ -100,16 +105,26 @@ class UINewsFeed {
 		mLabel = ASCompat.coerce((mRoot : ASAny).label, flash.text.TextField);
 		mLabelY = mLabel.y;
 		mIcon = ASCompat.coerce((mRoot : ASAny).icon, flash.display.MovieClip);
+		var _loc2_ = TextUtil.scaleToFloor(ASCompat.toNumber(mLabel.defaultTextFormat.size), 1.82);
+		var _loc1_ = mRoot.getBounds(mRoot);
+		mTopShift = (_loc1_.height - _loc1_.top) * (_loc2_ - 1);
+		mRoot.scaleX = mRoot.scaleY = _loc2_;
+	}
+
+	@:isVar public var topShift(get, never):Float;
+
+	public function get_topShift():Float {
+		return mTopShift;
 	}
 
 	public function lerpIntoScreen() {
 		mRoot.visible = true;
-		TweenMax.to(mRoot, 0.25, {"x": mRoot.x - mRoot.width / 2 + 13});
+		mDBFacade.mTween.tweenMaxTo(mRoot, 0.25, {"x": mRoot.x - mRoot.width / 2 + 13});
 		mLogicalWorkComponent.doLater(5, lerpOutOfScreen);
 	}
 
 	public function lerpOutOfScreen(gameClock:GameClock) {
-		TweenMax.to(mRoot, 0.25, {"x": mRoot.x + mRoot.width});
+		mDBFacade.mTween.tweenMaxTo(mRoot, 0.25, {"x": mRoot.x + mRoot.width});
 		mLogicalWorkComponent.doLater(0.25, mFinishedCallback);
 	}
 
@@ -130,9 +145,8 @@ class UINewsFeed {
 			return;
 		}
 		var _loc1_ = _loc2_.name;
-		mLabel.text = _loc1_;
-		var _loc3_ = _loc2_.clonePic();
-		mIcon.addChild(_loc3_);
+		TextUtil.setText(mLabel, _loc1_);
+		var _loc3_ = mPortraits.showFriend(mIcon, mDBFacade, _loc2_);
 		_loc3_.x -= 25;
 		_loc3_.y -= 25;
 	}
@@ -155,7 +169,7 @@ class UINewsFeed {
 			_loc2_ += Locale.getString("NEWS_FEED_FRIEND_OFFLINE");
 			_loc1_ = UIChatLog.FRIEND_STATUS_OFFLINE_TYPE;
 		}
-		mLabel.text = mLabel.text + _loc2_;
+		TextUtil.setText(mLabel, mLabel.text + _loc2_);
 		mDBFacade.eventManager.dispatchEvent(new ChatLogEvent("CHAT_LOG_EVENT", mLabel.text.toUpperCase(), _loc1_));
 		adjustLabelHeight();
 	}
@@ -170,7 +184,7 @@ class UINewsFeed {
 			_loc2_ += Locale.getString("NEWS_FEED_PLAYER_LEFT_DUNGEON");
 			_loc1_ = UIChatLog.LEFT_DUNGEON_TYPE;
 		}
-		mLabel.text = mLabel.text + _loc2_;
+		TextUtil.setText(mLabel, mLabel.text + _loc2_);
 		mDBFacade.eventManager.dispatchEvent(new ChatLogEvent("CHAT_LOG_EVENT", mLabel.text.toUpperCase(), _loc1_));
 		adjustLabelHeight();
 	}
@@ -180,6 +194,7 @@ class UINewsFeed {
 	}
 
 	function prepareFriendSummaryMessageFeed() {
+		var _loc2_:MovieClip = null;
 		if (mFriendSummaryFeedMessageEvent == null) {
 			mIsValid = false;
 			return;
@@ -187,17 +202,25 @@ class UINewsFeed {
 		var _loc1_ = new TextFormat();
 		_loc1_.color = FriendSummaryNewsFeedEvent.FRIEND_NAME_HIGHLIGHT_COLOR;
 		if (mFriendSummaryFeedMessageEvent.isFriendNameInFront) {
-			mLabel.text = mFriendSummaryFeedMessageEvent.friendName + mFriendSummaryFeedMessageEvent.message;
+			TextUtil.setText(mLabel, mFriendSummaryFeedMessageEvent.friendName + mFriendSummaryFeedMessageEvent.message);
 			colorizeMessage(_loc1_, 0, mFriendSummaryFeedMessageEvent.friendName.length);
 		} else {
-			mLabel.text = mFriendSummaryFeedMessageEvent.message + mFriendSummaryFeedMessageEvent.friendName;
+			TextUtil.setText(mLabel, mFriendSummaryFeedMessageEvent.message + mFriendSummaryFeedMessageEvent.friendName);
 			colorizeMessage(_loc1_, mFriendSummaryFeedMessageEvent.message.length,
 				mFriendSummaryFeedMessageEvent.message.length + mFriendSummaryFeedMessageEvent.friendName.length);
 		}
 		adjustLabelHeight();
-		var _loc2_ = mFriendSummaryFeedMessageEvent.pic;
-		_loc2_.scaleX = _loc2_.scaleY = 0.75;
-		mIcon.addChild(_loc2_);
+		if (mFriendSummaryFeedMessageEvent.hasPortrait) {
+			_loc2_ = mPortraits.show(mIcon, mDBFacade, mFriendSummaryFeedMessageEvent.skinId, 65, mFriendSummaryFeedMessageEvent.steamAvatarUrl);
+		} else {
+			_loc2_ = mFriendSummaryFeedMessageEvent.pic;
+			if (_loc2_ != null) {
+				mIcon.addChild(_loc2_);
+			}
+		}
+		if (_loc2_ != null) {
+			_loc2_.scaleX = _loc2_.scaleY = 0.75;
+		}
 	}
 
 	function prepareGenericMessageFeed() {
@@ -207,7 +230,7 @@ class UINewsFeed {
 			mIsValid = false;
 			return;
 		}
-		mLabel.text = mGenericFeedMessageEvent.message;
+		TextUtil.setText(mLabel, mGenericFeedMessageEvent.message);
 		adjustLabelHeight();
 		picLocation = mGenericFeedMessageEvent.picLocation;
 		picClassName = mGenericFeedMessageEvent.picClassName;
@@ -232,6 +255,7 @@ class UINewsFeed {
 	}
 
 	public function destroy() {
+		mPortraits.destroy();
 		if (mSceneGraphComponent.contains(mRoot, (50 : UInt))) {
 			mSceneGraphComponent.removeChild(mRoot);
 		}

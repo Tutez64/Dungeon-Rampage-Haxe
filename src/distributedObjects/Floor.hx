@@ -27,6 +27,8 @@ import flash.geom.Vector3D;
 class Floor extends GameObject {
 	public static inline final FLOOR_INTEREST_CLOSURE = "FLOOR_INTEREST_CLOSURE";
 
+	public static inline final FLOOR_REVEALED = "FLOOR_REVEALED";
+
 	public static inline final BOX2D_SCALE:Float = 50;
 
 	static inline final POSITION_ITERATIONS = (3 : UInt);
@@ -52,6 +54,8 @@ class Floor extends GameObject {
 	public var pastInitialLoad:Bool = false;
 
 	var mFloorEndingGui:FloorEndingGui;
+
+	var mRevealed:Bool = false;
 
 	var mSceneGraphComponent:SceneGraphComponent;
 
@@ -95,9 +99,26 @@ class Floor extends GameObject {
 		mSceneGraphComponent = new SceneGraphComponent(mDBFacade, "Floor");
 		mEventComponent = new EventComponent(mDBFacade);
 		mEventComponent.addListener(HeroGameObjectOwner.HERO_OWNER_READY, function(param1:Event) {
+			heroOwnerReady();
+		});
+		mEventComponent.addListener("FLOOR_REVEALED", function(param1:Event) {
+			if (mFloorEndingGui == null) {
+				return;
+			}
+			mEventComponent.removeListener("FLOOR_REVEALED");
+			mRevealed = true;
 			floorStart();
 		});
-		mSceneGraphComponent.fadeIn(1);
+	}
+
+	function heroOwnerReady() {
+		if (!mRevealed && mDBFacade.mainStateMachine.currentStateName != "LoadingScreenState") {
+			revealFloor();
+		}
+	}
+
+	function revealFloor() {
+		mEventComponent.dispatchEvent(new Event("FLOOR_REVEALED"));
 	}
 
 	function buildFloorEndingGui() {
@@ -113,10 +134,10 @@ class Floor extends GameObject {
 	@:isVar public var activeDungeonModifiers(never, set):Vector<DungeonModifier>;
 
 	public function set_activeDungeonModifiers(val:Vector<DungeonModifier>):Vector<DungeonModifier> {
-		var _loc2_ = 0;
-		_loc2_ = 0;
-		while (_loc2_ < val.length) {
-			mActiveDungeonModifiers.push(new DungeonModifierHelper(val[_loc2_].id, val[_loc2_].new_this_floor == 1, mDBFacade));
+		var _loc2_ = (0 : UInt);
+		_loc2_ = (0 : UInt);
+		while (_loc2_ < (val.length:UInt)) {
+			mActiveDungeonModifiers.push(new DungeonModifierHelper(val[(_loc2_ : Int)].id, val[(_loc2_ : Int)].new_this_floor == 1, mDBFacade));
 			_loc2_++;
 		}
 		return val;

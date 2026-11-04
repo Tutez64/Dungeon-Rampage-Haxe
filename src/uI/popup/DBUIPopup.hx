@@ -2,14 +2,15 @@ package uI.popup;
 
 import brain.assetRepository.AssetLoadingComponent;
 import brain.assetRepository.SwfAsset;
+import brain.event.EventListeners;
 import brain.logger.Logger;
 import brain.uI.UIButton;
 import brain.uI.UIObject;
+import brain.utils.TextUtil;
 import dBGlobals.DBGlobal;
 import facade.DBFacade;
 import facade.Locale;
 import gameMasterDictionary.GMOffer;
-import com.greensock.TweenMax;
 import flash.display.MovieClip;
 import flash.display.Sprite;
 import flash.events.KeyboardEvent;
@@ -53,23 +54,27 @@ class DBUIPopup extends UIObject {
 
 	var mUILayerName:String;
 
-	public function new(dbFacade:DBFacade, titleText:String = "", content:ASAny = null, allowClose:Bool = true, wantCurtain:Bool = true,
-			closeCallback:ASFunction = null, useOriginalPopUp:Bool = false, scalePopup:Bool = true, UILayerName:String = "") {
+	public function new(dbFacade:DBFacade, uiLayerName:String, titleText:String = "", content:ASAny = null, allowClose:Bool = true, wantCurtain:Bool = true,
+			closeCallback:ASFunction = null, useOriginalPopUp:Bool = false, scalePopup:Bool = true) {
 		mDBFacade = dbFacade;
 		super(dbFacade, new MovieClip());
 		mUseOriginalPopUp = useOriginalPopUp;
 		mScalePopup = scalePopup;
 		mWantCurtain = wantCurtain;
 		makeCurtain();
+		if (waitsOnPlayer() && mDBFacade.uiHideToggle != null) {
+			mDBFacade.uiHideToggle.reveal();
+		}
 		if (allowClose) {
 			mCloseCallback = closeCallback;
-			mDBFacade.stageRef.addEventListener("keyDown", handleKeyDown);
+			EventListeners.add(mDBFacade.stageRef, "keyDown", handleKeyDown);
 		}
-		mUILayerName = UILayerName;
+		mUILayerName = uiLayerName;
 		mDBFacade.sceneGraphManager.addChild(mRoot, 105);
 		mAssetLoadingComponent = new AssetLoadingComponent(dbFacade);
 		mAssetLoadingComponent.getSwfAsset(DBFacade.buildFullDownloadPath(getSwfPath()), function(param1:SwfAsset) {
 			setupUI(param1, titleText, content, allowClose, closeCallback);
+			completeMenuNavigationSetup();
 		});
 	}
 
@@ -79,6 +84,10 @@ class DBUIPopup extends UIObject {
 	}
 
 	function useCurtain():Bool {
+		return true;
+	}
+
+	function waitsOnPlayer():Bool {
 		return true;
 	}
 
@@ -105,11 +114,12 @@ class DBUIPopup extends UIObject {
 			return;
 		}
 		if (ASCompat.stringAsBool(mUILayerName)) {
-			popMenuNavigationLayer();
+			removeMenuNavigationLayer();
 		}
-		TweenMax.killTweensOf(mRoot);
+		mDBFacade.mTween.killTweensOf(mRoot);
+		mDBFacade.sceneGraphManager.removeChild(mRoot);
 		removeCurtain();
-		mDBFacade.stageRef.removeEventListener("keyDown", handleKeyDown);
+		EventListeners.remove(mDBFacade.stageRef, "keyDown", handleKeyDown);
 		mDBFacade = null;
 		mCloseCallback = null;
 		if (mCloseButton != null) {
@@ -151,7 +161,7 @@ class DBUIPopup extends UIObject {
 		}
 		if (ASCompat.toBool((mPopup : ASAny).title_label)) {
 			mTitle = ASCompat.coerce((mPopup : ASAny).title_label, flash.text.TextField);
-			mTitle.text = titleText;
+			TextUtil.setText(mTitle, titleText);
 		}
 		if (ASCompat.toBool((mPopup : ASAny).message_label)) {
 			mMessage = ASCompat.coerce((mPopup : ASAny).message_label, flash.text.TextField);
@@ -161,7 +171,7 @@ class DBUIPopup extends UIObject {
 			mContent = ASCompat.coerce((mPopup : ASAny).content, flash.display.Sprite);
 			mContent.addChild(ASCompat.coerce(content, flash.display.DisplayObject));
 		} else if (Std.isOfType(content, String)) {
-			mMessage.text = content;
+			setMessageText(content);
 		}
 		if (ASCompat.toBool((mPopup : ASAny).close)) {
 			if (allowClose) {
@@ -181,8 +191,12 @@ class DBUIPopup extends UIObject {
 		if (mWantCurtain) {
 			animatedEntrance();
 		}
-		if (ASCompat.stringAsBool(mUILayerName)) {
-			initializeMenuNavigationLayer();
+	}
+
+	function setMessageText(text:String) {
+		TextUtil.setText(mMessage, text, 1.55);
+		if (mMessage.bottomScrollV < mMessage.numLines) {
+			TextUtil.setText(mMessage, text);
 		}
 	}
 
@@ -193,14 +207,6 @@ class DBUIPopup extends UIObject {
 	}
 
 	function close(callback:ASFunction, offer:GMOffer = null) {
-		// Pop this popup's nav layer before the callback. Otherwise callbacks that
-		// pop a parent layer (e.g. DISTRIBUTED_DUNGEON_SUMMARY after the abandon-loot
-		// confirm) fail because this popup layer is still on top, leaking a stale
-		// UIObject reference that later Null Object Reference crashes town teardown.
-		if (ASCompat.stringAsBool(mUILayerName)) {
-			popMenuNavigationLayer();
-			mUILayerName = null;
-		}
 		if (callback != null) {
 			if (offer == null) {
 				callback();
@@ -212,21 +218,41 @@ class DBUIPopup extends UIObject {
 	}
 
 	function scalePopup() {
-		mPopup.scaleX = mPopup.scaleY = 1.8;
+		mPopup.scaleX = mPopup.scaleY = DBGlobal.UI_16_TO_9_PORT_OBJECT_SCALE;
 	}
 
 	function centerPopup() {
-		var _loc1_ = mPopup.getBounds(mDBFacade.stageRef);
-		mPopup.x = mDBFacade.stageRef.stageWidth / 2 - _loc1_.width / 2 - _loc1_.x;
-		mPopup.y = mDBFacade.stageRef.stageHeight / 2 - _loc1_.height / 2 - _loc1_.y;
+		var _loc1_ = mPopup.getBounds(mDBFacade.scalingRoot);
+		mPopup.x = mDBFacade.viewWidth / 2 - _loc1_.width / 2 - _loc1_.x;
+		mPopup.y = mDBFacade.viewHeight / 2 - _loc1_.height / 2 - _loc1_.y;
 	}
 
 	function initializeMenuNavigationLayer() {
-		mDBFacade.menuNavigationController.pushNewLayer(mUILayerName, mCloseCallback, mCloseButton);
+		mDBFacade.menuNavigationController.pushNewLayer(mUILayerName, getNavigationExitCallback(), getDefaultNavigationObject(),
+			getInitialFocusedNavigationObject());
 	}
 
-	function popMenuNavigationLayer() {
-		mDBFacade.menuNavigationController.popLayer(mUILayerName);
+	function getNavigationExitCallback():ASFunction {
+		return handleInputCalledClosed;
+	}
+
+	function getDefaultNavigationObject():UIObject {
+		return mCloseButton;
+	}
+
+	function getInitialFocusedNavigationObject():UIObject {
+		return null;
+	}
+
+	function completeMenuNavigationSetup() {
+		setupMenuNavigation();
+		if (ASCompat.stringAsBool(mUILayerName)) {
+			initializeMenuNavigationLayer();
+		}
+	}
+
+	function removeMenuNavigationLayer() {
+		mDBFacade.menuNavigationController.removeLayer(mUILayerName);
 	}
 
 	function setupMenuNavigation() {}

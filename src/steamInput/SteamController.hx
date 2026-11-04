@@ -2,7 +2,6 @@ package steamInput;
 
 import com.amanitadesign.steam.FRESteamWorks;
 import com.amanitadesign.steam.InputAnalogActionData;
-import com.amanitadesign.steam.InputDigitalActionData;
 import flash.geom.Vector3D;
 
 class SteamController {
@@ -100,19 +99,19 @@ class SteamController {
 	}
 
 	function readDigitalActions(mSteamworks:FRESteamWorks) {
-		var _loc5_:InputDigitalActionData = null;
+		var _loc5_ = false;
 		var _loc3_ = new Vector<SteamInputAction>();
 		var _loc6_:SteamInputAction;
-		final __ax4_iter_94 = mInGameControlsActionSet.digitalActionHandles;
-		if (checkNullIteratee(__ax4_iter_94))
-			for (_tmp_ in __ax4_iter_94) {
+		final __ax4_iter_103 = mInGameControlsActionSet.digitalActionHandles;
+		if (checkNullIteratee(__ax4_iter_103))
+			for (_tmp_ in __ax4_iter_103) {
 				_loc6_ = _tmp_;
 				_loc3_.push(_loc6_);
 			}
 		var _loc2_:SteamInputAction;
-		final __ax4_iter_95 = mMenuControlsActionSet.digitalActionHandles;
-		if (checkNullIteratee(__ax4_iter_95))
-			for (_tmp_ in __ax4_iter_95) {
+		final __ax4_iter_104 = mMenuControlsActionSet.digitalActionHandles;
+		if (checkNullIteratee(__ax4_iter_104))
+			for (_tmp_ in __ax4_iter_104) {
 				_loc2_ = _tmp_;
 				_loc3_.push(_loc2_);
 			}
@@ -120,8 +119,8 @@ class SteamController {
 		if (checkNullIteratee(_loc3_))
 			for (_tmp_ in _loc3_) {
 				_loc4_ = _tmp_;
-				_loc5_ = mSteamworks.getDigitalActionData(controllerHandle, _loc4_.actionHandle);
-				writeDigitalActionState(_loc4_.actionName, _loc5_.bState);
+				_loc5_ = mSteamworks.getDigitalActionButtonState(controllerHandle, _loc4_.actionHandle);
+				writeDigitalActionState(_loc4_.actionName, _loc5_);
 			}
 	}
 

@@ -40,9 +40,9 @@ class FlightComponent {
 	}
 
 	public function update() {
-		if (mProjectile.gmProjectile.Lifetime > 0 && mDBFacade.gameClock.gameTime - mStartTime > mProjectile.gmProjectile.Lifetime) {
+		if (mProjectile.gmProjectile.Lifetime > 0
+			&& mDBFacade.gameClock.gameTime - (mStartTime : Float) > mProjectile.gmProjectile.Lifetime) {
 			mProjectile.destroy();
-			return;
 		}
 	}
 

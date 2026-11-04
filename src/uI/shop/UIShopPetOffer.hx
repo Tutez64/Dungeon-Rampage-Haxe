@@ -1,5 +1,6 @@
 package uI.shop;
 
+import dBGlobals.DBGlobal;
 import facade.DBFacade;
 import facade.GameMasterLocale;
 import gameMasterDictionary.GMHero;
@@ -24,7 +25,7 @@ class UIShopPetOffer extends UIShopOffer {
 	}
 
 	override function get_nativeIconSize():Float {
-		return 68;
+		return DBGlobal.PET_ICON_NATIVE_SIZE;
 	}
 
 	override function get_offerDescription():String {

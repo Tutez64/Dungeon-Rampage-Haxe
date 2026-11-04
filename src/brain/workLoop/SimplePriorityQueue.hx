@@ -48,7 +48,9 @@ class SimplePriorityQueue {
 			_loc1_ = _heap[1];
 			_posLookup.remove(_loc1_);
 			_heap[1] = _heap[_count];
-			walkDown(1);
+			if (_count > 1) {
+				walkDown(1);
+			}
 			_heap[_count] = null;
 			_count = _count - 1;
 			return ASCompat.coerce(_loc1_, brain.workLoop.IPrioritizable);
@@ -68,20 +70,27 @@ class SimplePriorityQueue {
 	}
 
 	public function remove(obj:IPrioritizable):Bool {
-		var _loc2_ = 0;
-		var _loc3_:ASAny = /*undefined*/ null;
-		if (_count >= 1) {
-			_loc2_ = ASCompat.toInt(_posLookup[obj]);
-			_loc3_ = _heap[_loc2_];
-			_posLookup.remove(_loc3_);
-			_heap[_loc2_] = _heap[_count];
-			walkDown(_loc2_);
+		var _loc2_ = ASCompat.toInt(_posLookup[obj]);
+		if (_loc2_ <= 0 || _loc2_ > _count || _heap[_loc2_] != obj) {
+			_posLookup.remove(obj);
+			return false;
+		}
+		_posLookup.remove(obj);
+		if (_loc2_ == _count) {
 			_heap[_count] = null;
-			_posLookup.remove(_count);
 			_count = _count - 1;
 			return true;
 		}
-		return false;
+		_heap[_loc2_] = _heap[_count];
+		_posLookup[_heap[_loc2_]] = _loc2_;
+		if (_loc2_ > 1 && ASCompat.toNumberField(_heap[_loc2_], "priority") - ASCompat.toNumberField(_heap[_loc2_ >> 1], "priority") > 0) {
+			walkUp(_loc2_);
+		} else {
+			walkDown(_loc2_);
+		}
+		_heap[_count] = null;
+		_count = _count - 1;
+		return true;
 	}
 
 	public function contains(obj:ASAny):Bool {

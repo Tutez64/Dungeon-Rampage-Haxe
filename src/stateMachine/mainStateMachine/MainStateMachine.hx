@@ -28,8 +28,6 @@ class MainStateMachine extends StateMachine {
 
 	var mShowedInvitePopup:Bool = false;
 
-	var mShowedHeroUpsellPopup:Bool = false;
-
 	var mShowedRewardPopup:Bool = false;
 
 	public function new(dbFacade:DBFacade) {
@@ -54,7 +52,7 @@ class MainStateMachine extends StateMachine {
 	}
 
 	public function enterLoadingScreenState(mapNodeID:UInt = (0 : UInt), nodeType:String = "", friendID:UInt = (0 : UInt), mapID:UInt = (0 : UInt),
-			jumpToMap:Bool = false, makeprivate:Bool = false) {
+			jumpToMap:Bool = false, makePrivate:Bool = false) {
 		if (mapNodeID != 0) {
 			mLoadingScreenState.mapNodeID = mapNodeID;
 		} else if (friendID != 0) {
@@ -62,7 +60,7 @@ class MainStateMachine extends StateMachine {
 		} else if (mapID != 0) {
 			mLoadingScreenState.mapID = mapID;
 		}
-		mLoadingScreenState.friendsOnly = makeprivate;
+		mLoadingScreenState.friendsOnly = makePrivate;
 		mLoadingScreenState.nodeType = nodeType;
 		mLoadingScreenState.jumpToMapState = jumpToMap;
 		this.transitionToState(mLoadingScreenState);
@@ -82,9 +80,9 @@ class MainStateMachine extends StateMachine {
 		}
 	}
 
-	public function enterTownInventoryState(type:UInt = (0 : UInt), offerId:UInt = (0 : UInt), showEquipOption:Bool = false) {
+	public function enterTownInventoryState(itemTypeId:UInt = (0 : UInt), offerId:UInt = (0 : UInt), showEquipOption:Bool = false) {
 		if (this.currentStateName == mTownState.name) {
-			mTownState.townStateMachine.enterInventoryState(false, "", type, offerId, showEquipOption);
+			mTownState.townStateMachine.enterInventoryState(false, "", itemTypeId, offerId, showEquipOption);
 		} else {
 			Logger.error("Trying to enter inventory state while not in the town state.");
 		}
@@ -102,6 +100,14 @@ class MainStateMachine extends StateMachine {
 			mTownState.jumpToMapState = mJumpToMapState;
 		}
 		this.transitionToState(mReloadTownState);
+	}
+
+	public function setOneShotReloadTownCallback(callback:ASFunction) {
+		var stateMachine = this;
+		mReloadTownState.finishedCallback = function() {
+			mReloadTownState.finishedCallback = stateMachine.enterTownState;
+			callback();
+		};
 	}
 
 	public function enterRunState() {
@@ -125,22 +131,12 @@ class MainStateMachine extends StateMachine {
 		if (mLastHeroId != 0
 			&& mLastHeroId == mDBFacade.dbAccountInfo.activeAvatarInfo.avatarType
 			&& mLastHeroLevel != 0
-			&& mLastHeroLevel < mDBFacade.dbAccountInfo.activeAvatarInfo.level) {
+			&& mLastHeroLevel < mDBFacade.dbAccountInfo.activeAvatarInfo.cloutLevel) {
 			_loc1_ = true;
 		}
 		mLastHeroId = mDBFacade.dbAccountInfo.activeAvatarInfo.avatarType;
-		mLastHeroLevel = mDBFacade.dbAccountInfo.activeAvatarInfo.level;
+		mLastHeroLevel = mDBFacade.dbAccountInfo.activeAvatarInfo.cloutLevel;
 		return _loc1_;
-	}
-
-	@:isVar public var showedHeroUpsellPopup(get, set):Bool;
-
-	public function set_showedHeroUpsellPopup(value:Bool):Bool {
-		return mShowedHeroUpsellPopup = value;
-	}
-
-	function get_showedHeroUpsellPopup():Bool {
-		return mShowedHeroUpsellPopup;
 	}
 
 	@:isVar public var showedInvitePopup(get, set):Bool;

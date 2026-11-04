@@ -7,10 +7,10 @@ import brain.event.EventComponent;
 import brain.logger.Logger;
 import brain.uI.UIButton;
 import brain.uI.UIObject;
-import brain.uI.UIPopup;
 import facade.DBFacade;
 import facade.Locale;
 import uI.inventory.UIInventoryItem;
+import uI.popup.DBUIPopup;
 import flash.display.MovieClip;
 
 class PetsWithEquipPicker extends UIObject {
@@ -32,6 +32,8 @@ class PetsWithEquipPicker extends UIObject {
 
 	var mCurrentStartIndex:UInt = (0 : UInt);
 
+	var mFirstSlotLeftNavigation:UIObject;
+
 	var mEquipResponseCallback:ASFunction;
 
 	var mTotalGMHeroes:UInt = 0;
@@ -44,7 +46,7 @@ class PetsWithEquipPicker extends UIObject {
 
 	public function new(dbFacade:DBFacade, root:MovieClip, weaponTooltipClass:Dynamic, heroTooltipClass:Dynamic, clickedEquippedPetCallback:ASFunction = null,
 			getSelectedHeroIndexCallback:ASFunction = null, setSelectedHeroIndexCallback:ASFunction = null, equipResponseFinishedCallback:ASFunction = null,
-			allowEquipmentSwapping:Bool = false) {
+			allowEquipmentSwapping:Bool = false, isActiveCallback:ASFunction = null) {
 		super(dbFacade, root);
 		mDBFacade = dbFacade;
 		mEventComponent = new EventComponent(mDBFacade);
@@ -52,7 +54,7 @@ class PetsWithEquipPicker extends UIObject {
 		mEquipResponseCallback = equipResponseFinishedCallback;
 		mSetSelectedHeroCallback = setSelectedHeroIndexCallback;
 		mGetSelectedHeroCallback = getSelectedHeroIndexCallback;
-		ASCompat.setProperty((mRoot : ASAny).label, "text", Locale.getString("PET_PICKER_LABEL"));
+		Locale.setText(ASCompat.coerce((mRoot : ASAny).label, flash.text.TextField), "PET_PICKER_LABEL");
 		mEquipElements = new Vector<AvatarEquipElement>();
 		mEquipElements.push(new AvatarEquipElement(mDBFacade, "", ASCompat.coerce((mRoot : ASAny).UI_pet.equip_slot_1, flash.display.MovieClip),
 			weaponTooltipClass, unequipPet, handleItemDrop, (0 : UInt), equippedPetClicked, equipResponseFinishedCallback, allowEquipmentSwapping));
@@ -77,31 +79,34 @@ class PetsWithEquipPicker extends UIObject {
 		mShiftLeft.releaseCallback = shiftLeft;
 		mShiftRight = new UIButton(mDBFacade, ASCompat.coerce((mRoot : ASAny).shift_right, flash.display.MovieClip));
 		mShiftRight.releaseCallback = shiftRight;
-		mShiftLeft.visible = false;
-		mShiftRight.visible = false;
 		mTotalGMHeroes = (mDBFacade.gameMaster.Heroes.length : UInt);
+		mShiftLeft.visible = mTotalGMHeroes > (mHeroSlots.length : UInt);
+		mShiftRight.visible = mShiftLeft.visible;
 		mEventComponent.addListener("DB_ACCOUNT_INFO_RESPONSE", function(param1:events.DBAccountResponseEvent) {
-			refresh();
+			if (isActiveCallback == null || ASCompat.toBool(isActiveCallback())) {
+				refresh();
+			}
 		});
 	}
 
 	function populateHeroSlots() {
-		var _loc2_ = 0;
+		var _loc2_ = (0 : UInt);
 		var _loc3_ = mDBFacade.gameMaster.Heroes;
 		var _loc1_ = mCurrentStartIndex;
-		_loc2_ = 0;
-		while (_loc2_ < mHeroSlots.length) {
-			mHeroSlots[_loc2_].clear();
+		_loc2_ = (0 : UInt);
+		while (_loc2_ < (mHeroSlots.length:UInt)) {
+			mHeroSlots[(_loc2_ : Int)].clear();
 			if (_loc1_ < (_loc3_.length:UInt)
 				&& (!_loc3_[(_loc1_ : Int)].Hidden || mDBFacade.dbConfigManager.getConfigBoolean("want_hidden_heroes", false))) {
-				mHeroSlots[_loc2_].gmHero = _loc3_[(_loc1_ : Int)];
+				mHeroSlots[(_loc2_ : Int)].gmHero = _loc3_[(_loc1_ : Int)];
 			} else {
-				mHeroSlots[_loc2_].enabled = false;
+				mHeroSlots[(_loc2_ : Int)].enabled = false;
 			}
 			_loc1_++;
 			_loc2_++;
 		}
 		updateShiftButtons();
+		updateFirstSlotLeftNavigation();
 		determineSelectedElement();
 	}
 
@@ -133,13 +138,13 @@ class PetsWithEquipPicker extends UIObject {
 	}
 
 	function determineSelectedElement() {
-		var _loc1_ = 0;
-		_loc1_ = 0;
-		while (_loc1_ < mHeroSlots.length) {
+		var _loc1_ = (0 : UInt);
+		_loc1_ = (0 : UInt);
+		while (_loc1_ < (mHeroSlots.length:UInt)) {
 			if (_loc1_ + mCurrentStartIndex == (selectedHeroIndex : UInt)) {
-				mHeroSlots[_loc1_].select();
+				mHeroSlots[(_loc1_ : Int)].select();
 			} else {
-				mHeroSlots[_loc1_].deselect();
+				mHeroSlots[(_loc1_ : Int)].deselect();
 			}
 			_loc1_++;
 		}
@@ -163,7 +168,7 @@ class PetsWithEquipPicker extends UIObject {
 		deselectEquipment();
 		if (mClickedEquippedPetCallback != null && equipElement.itemInfo != null) {
 			equipElement.select();
-			mClickedEquippedPetCallback(equipElement.itemInfo);
+			mClickedEquippedPetCallback(equipElement.itemInfo, equipElement);
 		}
 	}
 
@@ -184,6 +189,9 @@ class PetsWithEquipPicker extends UIObject {
 	public function refresh(resync:Bool = false) {
 		if (selectedHeroIndex == -1 || resync) {
 			setActiveAvatarAsCurrentSelection();
+		}
+		if ((selectedHeroIndex : UInt) < mCurrentStartIndex || (selectedHeroIndex : UInt) >= mCurrentStartIndex + mHeroSlots.length) {
+			setCurrentIndexToShowSelectedHero();
 		}
 		setEquipSlots();
 		populateHeroSlots();
@@ -208,6 +216,16 @@ class PetsWithEquipPicker extends UIObject {
 		selectedHeroIndex = (findHeroIndex(_loc1_.avatarType) : Int);
 	}
 
+	@:isVar var selectedAvatarInfo(get, never):AvatarInfo;
+
+	function get_selectedAvatarInfo():AvatarInfo {
+		var _loc2_ = mDBFacade.gameMaster.Heroes;
+		var _loc1_ = selectedHeroIndex;
+		return ASCompat.coerce(_loc1_ >= 0
+			&& _loc1_ < _loc2_.length ? mDBFacade.dbAccountInfo.inventoryInfo.getAvatarInfoForHeroType(_loc2_[_loc1_].Id) : null,
+			account.AvatarInfo);
+	}
+
 	function setCurrentIndexToShowSelectedHero() {
 		if (selectedHeroIndex < mHeroSlots.length) {
 			mCurrentStartIndex = (0 : UInt);
@@ -217,12 +235,12 @@ class PetsWithEquipPicker extends UIObject {
 	}
 
 	function findHeroIndex(avatarId:UInt):UInt {
-		var _loc2_ = 0;
+		var _loc2_ = (0 : UInt);
 		var _loc3_ = mDBFacade.gameMaster.Heroes;
-		_loc2_ = 0;
-		while (_loc2_ < _loc3_.length) {
-			if (avatarId == _loc3_[_loc2_].Id) {
-				return (_loc2_ : UInt);
+		_loc2_ = (0 : UInt);
+		while (_loc2_ < (_loc3_.length:UInt)) {
+			if (avatarId == _loc3_[(_loc2_ : Int)].Id) {
+				return _loc2_;
 			}
 			_loc2_++;
 		}
@@ -231,10 +249,10 @@ class PetsWithEquipPicker extends UIObject {
 	}
 
 	function setEquipSlots() {
-		var _loc3_ = 0;
-		_loc3_ = 0;
-		while (_loc3_ < mEquipElements.length) {
-			mEquipElements[_loc3_].clear();
+		var _loc3_ = (0 : UInt);
+		_loc3_ = (0 : UInt);
+		while (_loc3_ < (mEquipElements.length:UInt)) {
+			mEquipElements[(_loc3_ : Int)].clear();
 			_loc3_++;
 		}
 		var _loc1_ = mDBFacade.dbAccountInfo.inventoryInfo.getAvatarInfoForHeroType(mDBFacade.gameMaster.Heroes[selectedHeroIndex].Id);
@@ -245,17 +263,17 @@ class PetsWithEquipPicker extends UIObject {
 		if (_loc2_.length > 3) {
 			Logger.warn("Avatar has more than three equipped pets.  Equipping first three.");
 		}
-		_loc3_ = 0;
-		while (_loc3_ < mEquipElements.length) {
-			if (_loc3_ >= _loc2_.length) {
+		_loc3_ = (0 : UInt);
+		while (_loc3_ < (mEquipElements.length:UInt)) {
+			if (_loc3_ >= (_loc2_.length : UInt)) {
 				break;
 			}
-			if (_loc2_.length > _loc3_) {
-				if (mEquipElements[_loc3_].itemInfo != null) {
+			if ((_loc2_.length : UInt) > _loc3_) {
+				if (mEquipElements[(_loc3_ : Int)].itemInfo != null) {
 					Logger.warn("Equipped items contains multiple items assigned to the same slot. First itemId: "
-						+ mEquipElements[_loc3_].itemInfo.gmId + ". Second itemId: " + _loc2_[_loc3_].gmId);
+						+ mEquipElements[(_loc3_ : Int)].itemInfo.gmId + ". Second itemId: " + _loc2_[(_loc3_ : Int)].gmId);
 				} else {
-					mEquipElements[_loc3_].itemInfo = _loc2_[_loc3_];
+					mEquipElements[(_loc3_ : Int)].itemInfo = _loc2_[(_loc3_ : Int)];
 				}
 			}
 			_loc3_++;
@@ -265,22 +283,23 @@ class PetsWithEquipPicker extends UIObject {
 	public function equipPetOnCurrentAvatar(info:InventoryBaseInfo, responseFinishedCallback:ASFunction = null, errorCallback:ASFunction = null) {
 		var doEquip:ASFunction;
 		var equippedItems:Vector<PetInfo>;
-		var avatarInfo = mDBFacade.dbAccountInfo.inventoryInfo.getAvatarInfoForHeroType(mHeroSlots[selectedHeroIndex].gmHero.Id);
+		var avatarInfo = selectedAvatarInfo;
 		if (avatarInfo != null) {
 			doEquip = function() {
-				var equippingModal:UIPopup = null;
+				var equippingModal:DBUIPopup = null;
 				var equipServiceResponse:ASFunction = function() {
 					equippingModal.destroy();
+					if (mDBFacade != null) {
+						mDBFacade.steamAchievementsHelper.unlockAchievement("EQUIP_PET");
+					}
 					if (responseFinishedCallback != null) {
 						responseFinishedCallback();
 					}
 				};
-				equippingModal = UIPopup.show(mDBFacade, Locale.getString("EQUIPPING_MODAL"));
+				equippingModal = createEquippingModal();
 				var avatarId = avatarInfo.id;
-				mDBFacade.dbAccountInfo.inventoryInfo.equipPetOnAvatar(avatarId, info.databaseId, equipServiceResponse, errorCallback);
-				if (mDBFacade.steamAchievementsManager != null) {
-					mDBFacade.steamAchievementsManager.setAchievement("EQUIP_PET");
-				}
+				mDBFacade.dbAccountInfo.inventoryInfo.equipPetOnAvatar(avatarId, info.databaseId, equipServiceResponse,
+					closeEquippingModalOnError(equippingModal, errorCallback));
 			};
 			equippedItems = mDBFacade.dbAccountInfo.inventoryInfo.getEquipedPetsOnAvatar(avatarInfo.id);
 			if (equippedItems.length > 0) {
@@ -292,25 +311,88 @@ class PetsWithEquipPicker extends UIObject {
 	}
 
 	public function unequipPet(info:PetInfo, responseFinishedCallback:ASFunction = null, errorCallback:ASFunction = null) {
-		var equippingModal = UIPopup.show(mDBFacade, Locale.getString("EQUIPPING_MODAL"));
+		var equippingModal = createEquippingModal();
 		var equipServiceResponse:ASFunction = function() {
 			equippingModal.destroy();
 			if (responseFinishedCallback != null) {
 				responseFinishedCallback();
 			}
 		};
-		mDBFacade.dbAccountInfo.inventoryInfo.unequipPet(info, equipServiceResponse, errorCallback);
+		mDBFacade.dbAccountInfo.inventoryInfo.unequipPet(info, equipServiceResponse, closeEquippingModalOnError(equippingModal, errorCallback));
+	}
+
+	function createEquippingModal():DBUIPopup {
+		return new DBUIPopup(mDBFacade, "", Locale.getString("EQUIPPING_MODAL"), null, false);
+	}
+
+	function closeEquippingModalOnError(modal:DBUIPopup, callback:ASFunction):ASFunction {
+		return Reflect.makeVarArgs(function(_rest:Array<ASAny>) {
+			var rest = ASCompat.restToArray(_rest);
+			modal.destroy();
+			if (callback != null) {
+				ASCompatMacro.applyClosure(callback, rest);
+			}
+		});
 	}
 
 	public function highlightItem(info:InventoryBaseInfo) {}
 
 	public function deselectEquipment() {
-		var _loc1_ = 0;
-		_loc1_ = 0;
-		while (_loc1_ < mEquipElements.length) {
-			mEquipElements[_loc1_].deselect();
+		var _loc1_ = (0 : UInt);
+		_loc1_ = (0 : UInt);
+		while (_loc1_ < (mEquipElements.length:UInt)) {
+			mEquipElements[(_loc1_ : Int)].deselect();
 			_loc1_++;
 		}
+	}
+
+	public function getFirstUIObject():UIObject {
+		return mHeroSlots[0];
+	}
+
+	public function setupMenuNavigation(returnObject:UIObject) {
+		var _loc2_ = (0 : UInt);
+		_loc2_ = (0 : UInt);
+		while (_loc2_ < (mEquipElements.length:UInt)) {
+			mEquipElements[(_loc2_ : Int)].upNavigation = returnObject;
+			if (_loc2_ > 0) {
+				mEquipElements[(_loc2_ - 1 : Int)].isToTheLeftOf(mEquipElements[(_loc2_ : Int)]);
+			}
+			_loc2_++;
+		}
+		if (mEquipElements.length > 0) {
+			mEquipElements[mEquipElements.length - 1].isToTheLeftOf(mHeroSlots[0]);
+		}
+		_loc2_ = (0 : UInt);
+		while (_loc2_ < (mHeroSlots.length:UInt)) {
+			mHeroSlots[(_loc2_ : Int)].upNavigation = returnObject;
+			if (_loc2_ > 0) {
+				mHeroSlots[(_loc2_ - 1 : Int)].isToTheLeftOf(mHeroSlots[(_loc2_ : Int)]);
+			}
+			_loc2_++;
+		}
+		mHeroSlots[0].leftNavigationAdditionalInteraction = rotateRosterLeft;
+		mHeroSlots[mHeroSlots.length - 1].rightNavigationAdditionalInteraction = rotateRosterRight;
+		mFirstSlotLeftNavigation = ASCompat.coerce(mEquipElements.length > 0 ? mEquipElements[mEquipElements.length - 1] : null, brain.uI.UIObject);
+		updateFirstSlotLeftNavigation();
+	}
+
+	public function resetMenuNavigation() {
+		mFirstSlotLeftNavigation = null;
+		var _loc2_:UIObject;
+		final __ax4_iter_474 = mEquipElements;
+		if (checkNullIteratee(__ax4_iter_474))
+			for (_tmp_ in __ax4_iter_474) {
+				_loc2_ = _tmp_;
+				_loc2_.clearNavigationAndInteractions();
+			}
+		var _loc1_:UIObject;
+		final __ax4_iter_475 = mHeroSlots;
+		if (checkNullIteratee(__ax4_iter_475))
+			for (_tmp_ in __ax4_iter_475) {
+				_loc1_ = _tmp_;
+				_loc1_.clearNavigationAndInteractions();
+			}
 	}
 
 	function shiftLeft() {
@@ -321,6 +403,29 @@ class PetsWithEquipPicker extends UIObject {
 	function shiftRight() {
 		mCurrentStartIndex = mCurrentStartIndex + 1;
 		populateHeroSlots();
+	}
+
+	function rotateRosterLeft() {
+		if (mCurrentStartIndex > 0) {
+			shiftLeft();
+		}
+	}
+
+	function rotateRosterRight() {
+		if (mCurrentStartIndex + mHeroSlots.length < mTotalGMHeroes) {
+			shiftRight();
+		}
+	}
+
+	function updateFirstSlotLeftNavigation() {
+		var _loc1_ = mHeroSlots[0].leftNavigationAdditionalInteraction;
+		mHeroSlots[0].clearLeftNavigation();
+		if (_loc1_ != null) {
+			mHeroSlots[0].leftNavigationAdditionalInteraction = _loc1_;
+		}
+		if (mCurrentStartIndex == 0 && mFirstSlotLeftNavigation != null) {
+			mHeroSlots[0].leftNavigation = mFirstSlotLeftNavigation;
+		}
 	}
 
 	public function handleItemDrop(dropObject:UIObject, petInfo:InventoryBaseInfo, equipSlot:UInt):Bool {

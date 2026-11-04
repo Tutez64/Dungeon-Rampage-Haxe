@@ -7,9 +7,9 @@ class HpEvent extends GameObjectEvent {
 
 	public var maxHp:UInt = 0;
 
-	public function new(type:String, id:UInt, hp:UInt, maxHp:UInt, bubbles:Bool = false, cancelable:Bool = false) {
+	public function new(inType:String, id:UInt, hp:UInt, maxHp:UInt, bubbles:Bool = false, cancelable:Bool = false) {
 		this.hp = hp;
 		this.maxHp = maxHp;
-		super(type, id, bubbles, cancelable);
+		super(inType, id, bubbles, cancelable);
 	}
 }

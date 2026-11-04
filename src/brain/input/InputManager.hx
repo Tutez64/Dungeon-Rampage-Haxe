@@ -1,14 +1,16 @@
 package brain.input;
 
+import brain.event.EventListeners;
 import brain.facade.Facade;
 import brain.logger.Logger;
-import brain.mouseScrollPlugin.CustomMouseWheelEvent;
 import brain.utils.MemoryTracker;
 import flash.events.Event;
 import flash.events.KeyboardEvent;
 import flash.events.MouseEvent;
 
 class InputManager {
+	public static inline final KEY_CODE_COUNT = 256;
+
 	var mEnabled:Bool = false;
 
 	var mKeysDown:Vector<Bool> = new Vector((256 : UInt));
@@ -76,25 +78,25 @@ class InputManager {
 	@:isVar public var mouseX(get, never):Int;
 
 	public function get_mouseX():Int {
-		return ASCompat.floatToInt(mFacade.stageRef.mouseX);
+		return ASCompat.floatToInt(mFacade.scalingRoot.mouseX);
 	}
 
 	@:isVar public var mouseY(get, never):Int;
 
 	public function get_mouseY():Int {
-		return ASCompat.floatToInt(mFacade.stageRef.mouseY);
+		return ASCompat.floatToInt(mFacade.scalingRoot.mouseY);
 	}
 
 	@:isVar public var mouseFlashX(get, never):Int;
 
 	public function get_mouseFlashX():Int {
-		return ASCompat.floatToInt(mFacade.stageRef.mouseX);
+		return ASCompat.floatToInt(mFacade.scalingRoot.mouseX);
 	}
 
 	@:isVar public var mouseFlashY(get, never):Int;
 
 	public function get_mouseFlashY():Int {
-		return ASCompat.floatToInt(mFacade.stageRef.mouseY);
+		return ASCompat.floatToInt(mFacade.scalingRoot.mouseY);
 	}
 
 	public function check(input:ASAny):Bool {
@@ -110,13 +112,13 @@ class InputManager {
 	}
 
 	function enable() {
-		mFacade.stageRef.addEventListener("keyDown", onKeyDown);
-		mFacade.stageRef.addEventListener("keyUp", onKeyUp);
-		mFacade.stageRef.addEventListener("mouseDown", onMouseDown);
-		mFacade.stageRef.addEventListener("mouseUp", onMouseUp);
-		mFacade.stageRef.addEventListener("onMove", onMouseWheel);
-		mFacade.stageRef.addEventListener("mouseLeave", onMouseLeave);
-		mFacade.stageRef.addEventListener("deactivate", onDeactivate);
+		EventListeners.add(mFacade.stageRef, "keyDown", onKeyDown);
+		EventListeners.add(mFacade.stageRef, "keyUp", onKeyUp);
+		EventListeners.add(mFacade.stageRef, "mouseDown", onMouseDown);
+		EventListeners.add(mFacade.stageRef, "mouseUp", onMouseUp);
+		EventListeners.add(mFacade.stageRef, "mouseWheel", onMouseWheel);
+		EventListeners.add(mFacade.stageRef, "mouseLeave", onMouseLeave);
+		EventListeners.add(mFacade.stageRef, "deactivate", onDeactivate);
 	}
 
 	public function flush() {
@@ -157,14 +159,19 @@ class InputManager {
 	}
 
 	function onKeyUp(e:KeyboardEvent) {
-		var _loc2_ = 0;
 		if (!disableInputs) {
-			_loc2_ = e.keyCode;
-			if (mKeysDown[_loc2_]) {
-				mKeysDown[_loc2_] = false;
-				mNumberOfKeysDown = mNumberOfKeysDown - 1;
-				mKeysReleased[mNumberOfKeysReleased++] = _loc2_;
-			}
+			releaseKey((e.keyCode : Int));
+		}
+	}
+
+	public function releaseKey(code:Int) {
+		if (code < 0 || code >= mKeysDown.length) {
+			return;
+		}
+		if (mKeysDown[code]) {
+			mKeysDown[code] = false;
+			mNumberOfKeysDown = mNumberOfKeysDown - 1;
+			mKeysReleased[mNumberOfKeysReleased++] = code;
 		}
 	}
 
@@ -192,7 +199,7 @@ class InputManager {
 		}
 	}
 
-	function onMouseWheel(e:CustomMouseWheelEvent) {
+	function onMouseWheel(e:MouseEvent) {
 		if (!disableInputs) {
 			mouseWheel = true;
 			mMouseWheelDelta = e.delta;

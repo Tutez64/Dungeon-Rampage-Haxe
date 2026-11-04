@@ -3,7 +3,9 @@ package uI.friendManager.states;
 import account.FriendInfo;
 import brain.logger.Logger;
 import brain.uI.UIButton;
+import brain.uI.UIObject;
 import brain.jsonRPC.JSONRPCService;
+import dBGlobals.DBGlobal;
 import facade.DBFacade;
 import facade.Locale;
 import town.TownStateMachine;
@@ -28,7 +30,7 @@ class UIBlocked extends UIFMState {
 	}
 
 	override public function enter() {
-		Logger.debug("Enterred Blocked State");
+		Logger.debug("Entered Blocked State");
 		mUIFriendManager.updateHeading(Locale.getString("FRIEND_MANAGEMENT_HEADING_BLOCKED"));
 		mUIFriendManager.updateDescription(Locale.getString("FRIEND_MANAGEMENT_DESCRIPTION_BLOCKED"));
 		setupUI();
@@ -46,15 +48,15 @@ class UIBlocked extends UIFMState {
 	}
 
 	function refresh(list:Array<ASAny>) {
-		var _loc3_ = 0;
+		var _loc3_ = (0 : UInt);
 		var _loc2_:UInt;
 		if (checkNullIteratee(list))
 			for (_tmp_ in list) {
 				_loc2_ = (ASCompat.toInt(_tmp_) : UInt);
-				_loc3_ = 0;
-				while (_loc3_ < mListOfBlockedFriends.length) {
-					if (mListOfBlockedFriends[_loc3_].id == _loc2_) {
-						mListOfBlockedFriends.splice(_loc3_, (1 : UInt));
+				_loc3_ = (0 : UInt);
+				while (_loc3_ < (mListOfBlockedFriends.length:UInt)) {
+					if (mListOfBlockedFriends[(_loc3_ : Int)].id == _loc2_) {
+						mListOfBlockedFriends.splice((_loc3_ : Int), (1 : UInt));
 						break;
 					}
 					_loc3_++;
@@ -68,6 +70,16 @@ class UIBlocked extends UIFMState {
 		mListOfBlockedFriends = mDBFacade.dbAccountInfo.ignoredFriends;
 		mFriendPopulater = new FriendPopulater(mDBFacade, mTownStateMachine, mListOfBlockedFriends, mUIFriendManager);
 		mUnblockButton = createButton("friend_management_button", Locale.getString("UNBLOCK"), 960, 1000, unblockButtonCallback);
+		setupMenuNavigation();
+	}
+
+	function setupMenuNavigation() {
+		mUnblockButton.rolloverFilter = DBGlobal.UI_ROLLOVER_FILTER;
+		mFriendPopulater.setupMenuNavigation(mUIFriendManager.currentTabButton, mUnblockButton);
+	}
+
+	override public function getFirstNavigationUIObject():UIObject {
+		return mFriendPopulater.getFirstNavigationUIObject();
 	}
 
 	function unblockButtonCallback() {
@@ -75,9 +87,9 @@ class UIBlocked extends UIFMState {
 		var idx:UInt;
 		Logger.debug("unblock button clicked");
 		mSelectedFriends.splice(0, (mSelectedFriends.length : UInt));
-		final __ax4_iter_206 = mFriendPopulater.getSelectedToggles();
-		if (checkNullIteratee(__ax4_iter_206))
-			for (_tmp_ in __ax4_iter_206) {
+		final __ax4_iter_296 = mFriendPopulater.getSelectedToggles();
+		if (checkNullIteratee(__ax4_iter_296))
+			for (_tmp_ in __ax4_iter_296) {
 				idx = (ASCompat.toInt(_tmp_) : UInt);
 				mSelectedFriends.push(mListOfBlockedFriends[(idx : Int)].id);
 			}

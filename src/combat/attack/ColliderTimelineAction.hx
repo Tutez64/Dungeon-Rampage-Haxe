@@ -49,7 +49,7 @@ class ColliderTimelineAction extends AttackTimelineAction {
 	}
 
 	function buildCombatGameObject(lifetime:UInt, hitDelayPerObj:UInt):CombatGameObject {
-		Logger.error("Build Combat Game Object should be overriden.  Implement it in the sub class.");
+		Logger.error("Build Combat Game Object should be overridden.  Implement it in the sub class.");
 		return null;
 	}
 

@@ -1,12 +1,13 @@
 package actor.stateMachine;
 
 import actor.ActorGameObject;
+import actor.ActorRenderer;
 import actor.ActorView;
 import brain.workLoop.LogicalWorkComponent;
 import brain.workLoop.Task;
 import distributedObjects.NPCGameObject;
 import facade.DBFacade;
-import com.greensock.TweenMax;
+import gameMasterDictionary.GMActor;
 
 class ActorDeadState extends ActorState {
 	static inline final ROT_ON_FLOOR_TIME:Float = 8;
@@ -19,18 +20,21 @@ class ActorDeadState extends ActorState {
 
 	var mFinishedDeathCallback:Task;
 
+	var mPendingDeathCallback:ASFunction;
+
 	public function new(dbFacade:DBFacade, actorGameObject:ActorGameObject, actorView:ActorView) {
 		super(dbFacade, actorGameObject, actorView, "ActorDeadState");
 		mWorkComponent = new LogicalWorkComponent(mDBFacade, "ActorDeadState");
 	}
 
 	override public function destroy() {
-		TweenMax.killTweensOf(mActorGameObject.view);
-		TweenMax.killTweensOf(mActorGameObject.view.root);
+		mDBFacade.mTween.killTweensOf(mActorGameObject.view);
+		mDBFacade.mTween.killTweensOf(mActorGameObject.view.root);
 		if (mFinishedDeathCallback != null) {
 			mFinishedDeathCallback.destroy();
 			mFinishedDeathCallback = null;
 		}
+		clearPendingDeathCallback();
 		mWorkComponent.destroy();
 		mWorkComponent = null;
 		super.destroy();
@@ -38,80 +42,137 @@ class ActorDeadState extends ActorState {
 
 	override public function enterState() {
 		super.enterState();
-		if (this.mActorGameObject.actorData.gMActor.CharType == "PROP") {
+		if (this.mActorGameObject.actorData.gMActor.CharType == GMActor.CHAR_TYPE_PROP) {
 			propDeath();
 		} else {
 			enemyDeath();
 		}
 	}
 
-	function enemyDeath() {
-		var deathAnimDuration:Float;
-		var angle:Float;
-		var actorView = ASCompat.reinterpretAs(mActorGameObject.view, ActorView);
-		if (actorView.hasAnim("death")) {
-			deathAnimDuration = actorView.getAnimDurationInSeconds("death") + 8;
-			mFinishedDeathCallback = mWorkComponent.doLater(deathAnimDuration, mFinishedCallback);
-			actorView.playAnim("death", 0, false, false);
-		} else {
-			switch (mActorGameObject.actorData.gMActor.DefaultDestruct) {
-				case "TIPOVER":
-					angle = Math.random() < 0.5 ? -90 : 90;
-					TweenMax.to(actorView, 0.3, {"rotation": angle});
-
-				default:
-					actorView.root.visible = false;
-			}
-			mFinishedDeathCallback = mWorkComponent.doLater(8, mFinishedCallback);
-		}
+	function setupDeadActorCommon() {
+		mActorView.removeFromStage();
+		mActorView.layer = 10;
+		mActorView.root.alpha = 0.7;
+		mActorView.addToStage();
 		mActorView.actionsForDeadState();
-		if (actorView.currentWeapon != null && actorView.currentWeapon.weaponRenderer != null) {
-			actorView.currentWeapon.weaponRenderer.stop();
+		if (mActorView.currentWeapon != null && mActorView.currentWeapon.weaponRenderer != null) {
+			mActorView.currentWeapon.weaponRenderer.stop();
 		}
-		actorView.removeFromStage();
-		actorView.layer = 10;
-		actorView.root.alpha = 0.7;
-		actorView.addToStage();
-		mWorkComponent.doLater(8 * 0.8, function(param1:brain.clock.GameClock) {
-			TweenMax.to(actorView.root, 8 * 0.2, {"alpha": 0});
-		});
 		mActorGameObject.removeNavColliders();
 		if (mActorGameObject.isPet && mActorGameObject.usePetUI) {
 			mDBFacade.hud.unregisterPet(ASCompat.reinterpretAs(mActorGameObject, NPCGameObject));
 		}
 	}
 
-	function propDeath() {
-		var _loc2_ = Math.NaN;
-		var _loc3_ = Math.NaN;
-		var _loc1_ = ASCompat.reinterpretAs(mActorGameObject.view, ActorView);
-		_loc1_.removeFromStage();
-		_loc1_.layer = 10;
-		_loc1_.root.alpha = 0.7;
-		_loc1_.addToStage();
-		if (_loc1_.hasAnim("death")) {
-			_loc2_ = Math.random() < 0.5 ? -20 : 20;
-			_loc2_ *= Math.random();
-			TweenMax.to(_loc1_, 0.3, {"rotation": _loc2_});
-			_loc1_.playAnim("death", 0, false, false);
-		} else {
-			switch (mActorGameObject.actorData.gMActor.DefaultDestruct) {
-				case "TIPOVER":
-					_loc3_ = Math.random() < 0.5 ? -90 : 90;
-					TweenMax.to(_loc1_, 0.3, {"rotation": _loc3_});
+	function clearPendingDeathCallback() {
+		if (mPendingDeathCallback == null) {
+			return;
+		}
+		var _loc1_ = mActorView.bodyAnimRenderer;
+		if (_loc1_ != null) {
+			_loc1_.removeLoadCompleteCallback(mPendingDeathCallback);
+		}
+		mPendingDeathCallback = null;
+	}
 
-				default:
-					_loc1_.root.visible = false;
+	function enemyDeath() {
+		mActorView.root.visible = true;
+		setupDeadActorCommon();
+		mWorkComponent.doLater(8 * 0.8, function(param1:brain.clock.GameClock) {
+			mDBFacade.mTween.tweenMaxTo(mActorView.root, 8 * 0.2, {"alpha": 0});
+		});
+		tryScheduleEnemyDeathOrFallback();
+	}
+
+	function tryScheduleEnemyDeathOrFallback() {
+		var deathAnimDuration:Float;
+		var bodyRenderer:ActorRenderer;
+		var angle:Float;
+		var actorView = ASCompat.reinterpretAs(mActorGameObject.view, ActorView);
+		if (actorView.hasAnim("death")) {
+			deathAnimDuration = actorView.getAnimDurationInSeconds("death") + 8;
+			mFinishedDeathCallback = mWorkComponent.doLater(deathAnimDuration, mFinishedCallback);
+			actorView.playAnim("death", 0, false, false);
+			return;
+		}
+		bodyRenderer = actorView.bodyAnimRenderer;
+		if (bodyRenderer != null && bodyRenderer.isStarlingLoading) {
+			clearPendingDeathCallback();
+			mPendingDeathCallback = function() {
+				mPendingDeathCallback = null;
+				tryScheduleEnemyDeathOrFallback();
+			};
+			bodyRenderer.addLoadCompleteCallback(mPendingDeathCallback);
+			return;
+		}
+		switch (mActorGameObject.actorData.gMActor.DefaultDestruct) {
+			case(_ == GMActor.DESTRUCTION_TIPOVER => true):
+				angle = Math.random() < 0.5 ? -90 : 90;
+				mDBFacade.mTween.tweenMaxTo(actorView, 0.3, {"rotation": angle});
+
+			default:
+				actorView.root.visible = false;
+				if (actorView.bodyAnimRenderer != null) {
+					actorView.bodyAnimRenderer.visible = false;
+				}
+		}
+		mFinishedDeathCallback = mWorkComponent.doLater(8, mFinishedCallback);
+	}
+
+	function propDeath() {
+		setupDeadActorCommon();
+		trySchedulePropDeathOrFallback();
+	}
+
+	function trySchedulePropDeathOrFallback() {
+		var corpseAngle:Float;
+		var propDeathDuration:Float;
+		var fadeStart:Float;
+		var bodyRenderer:ActorRenderer;
+		var angle:Float;
+		var actorView = ASCompat.reinterpretAs(mActorGameObject.view, ActorView);
+		if (actorView.hasAnim("death")) {
+			corpseAngle = Math.random() < 0.5 ? -20 : 20;
+			corpseAngle *= Math.random();
+			mDBFacade.mTween.tweenMaxTo(actorView, 0.3, {"rotation": corpseAngle});
+			propDeathDuration = actorView.getAnimDurationInSeconds("death") + 8;
+			mFinishedDeathCallback = mWorkComponent.doLater(propDeathDuration, mFinishedCallback);
+			actorView.playAnim("death", 0, false, false);
+			fadeStart = propDeathDuration - 8 * 0.2;
+			if (fadeStart < 0) {
+				fadeStart = 0;
 			}
-			mFinishedDeathCallback = mWorkComponent.doLater(8, mFinishedCallback);
+			mWorkComponent.doLater(fadeStart, function(param1:brain.clock.GameClock) {
+				mDBFacade.mTween.tweenMaxTo(actorView.root, 8 * 0.2, {"alpha": 0});
+			});
+			return;
 		}
-		mActorView.actionsForDeadState();
-		if (_loc1_.currentWeapon != null && _loc1_.currentWeapon.weaponRenderer != null) {
-			_loc1_.currentWeapon.weaponRenderer.stop();
+		bodyRenderer = actorView.bodyAnimRenderer;
+		if (bodyRenderer != null && bodyRenderer.isStarlingLoading) {
+			clearPendingDeathCallback();
+			mPendingDeathCallback = function() {
+				mPendingDeathCallback = null;
+				trySchedulePropDeathOrFallback();
+			};
+			bodyRenderer.addLoadCompleteCallback(mPendingDeathCallback);
+			return;
 		}
-		mActorGameObject.removeNavColliders();
-		if (mActorGameObject.isPet && mActorGameObject.usePetUI) {
-			mDBFacade.hud.unregisterPet(ASCompat.reinterpretAs(mActorGameObject, NPCGameObject));
+		switch (mActorGameObject.actorData.gMActor.DefaultDestruct) {
+			case(_ == GMActor.DESTRUCTION_TIPOVER => true):
+				angle = Math.random() < 0.5 ? -90 : 90;
+				mDBFacade.mTween.tweenMaxTo(actorView, 0.3, {"rotation": angle});
+
+			default:
+				actorView.root.visible = false;
+				if (actorView.bodyAnimRenderer != null) {
+					actorView.bodyAnimRenderer.visible = false;
+				}
+		}
+		mFinishedDeathCallback = mWorkComponent.doLater(8, mFinishedCallback);
+		if (actorView.root.visible) {
+			mWorkComponent.doLater(8 * 0.8, function(param1:brain.clock.GameClock) {
+				mDBFacade.mTween.tweenMaxTo(actorView.root, 8 * 0.2, {"alpha": 0});
+			});
 		}
 	}
 
@@ -121,5 +182,6 @@ class ActorDeadState extends ActorState {
 			mFinishedDeathCallback.destroy();
 			mFinishedDeathCallback = null;
 		}
+		clearPendingDeathCallback();
 	}
 }

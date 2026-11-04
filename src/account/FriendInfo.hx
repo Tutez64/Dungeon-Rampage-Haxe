@@ -1,53 +1,35 @@
 package account;
 
-import account.iI.II_AvatarMapnodeScore;
+import account.iI.II_AvatarMapNodeScore;
 import account.iI.II_AvatarsScoresInfo;
 import account.iI.II_FriendChampionsboardInfo;
-import brain.assetRepository.AssetLoadingComponent;
 import brain.event.EventComponent;
-import brain.logger.Logger;
-import brain.uI.UIObject;
 import facade.DBFacade;
-import gameMasterDictionary.GMSkin;
-import flash.display.Bitmap;
-import flash.display.DisplayObject;
-import flash.display.Loader;
-import flash.display.MovieClip;
+import facade.GameMasterLocale;
+import gameMasterDictionary.GMMapNode;
 import flash.events.Event;
-import flash.net.URLRequest;
-import flash.system.ApplicationDomain;
-import flash.system.LoaderContext;
+import flash.events.EventDispatcher;
 
-class FriendInfo {
+class FriendInfo extends EventDispatcher {
+	public static inline final PORTRAIT_CHANGED = "FriendPortraitChanged";
+
 	public static var FRIEND_SCORES_PARSED:String = "FRIEND_SCORES_PARSED";
 
-	var mAssetLoadingComponent:AssetLoadingComponent;
+	var mSkinId:UInt = (151 : UInt);
 
-	var mRoot:MovieClip;
+	var mPortraitUrl:String;
 
 	var mAccountId:UInt = 0;
 
-	var mIsDRFriend:Bool = false;
-
-	var mFacebookId:String;
-
-	var mKongregateId:String;
+	var mSteamAvatarUrl:String;
 
 	var mFriendName:String;
 
 	var mTrophies:UInt = 0;
 
-	var mGMSkin:GMSkin;
-
-	var mIcon:MovieClip;
-
 	var mDBFacade:DBFacade;
 
 	var mResponseCallback:ASFunction;
-
-	var mProfilePic:DisplayObject;
-
-	var mProfilePicBitmap:Bitmap;
 
 	var mIILeaderboardInfo:II_FriendChampionsboardInfo;
 
@@ -56,100 +38,35 @@ class FriendInfo {
 	var mEventComponent:EventComponent;
 
 	public function new(dbFacade:DBFacade, friendJson:ASObject, responseCallback:ASFunction = null) {
+		super();
 		mResponseCallback = responseCallback;
 		mDBFacade = dbFacade;
-		mAssetLoadingComponent = new AssetLoadingComponent(mDBFacade);
 		mEventComponent = new EventComponent(mDBFacade);
 		parseFriendJson(friendJson);
 	}
 
-	function loadHeroIcon():DisplayObject {
-		var swfPath = mGMSkin.UISwfFilepath;
-		var iconName = mGMSkin.IconName;
-		if (mIcon != null && mRoot != null && mRoot.contains(mIcon)) {
-			mRoot.removeChild(mIcon);
-		}
-		mIcon = new MovieClip();
-		mAssetLoadingComponent.getSwfAsset(DBFacade.buildFullDownloadPath(swfPath), function(param1:brain.assetRepository.SwfAsset) {
-			var _loc4_ = param1.getClass(iconName);
-			var _loc3_ = ASCompat.coerce(ASCompat.createInstance(_loc4_, []), flash.display.MovieClip);
-			var _loc2_ = (50 : UInt);
-			UIObject.scaleToFit(_loc3_, _loc2_);
-			_loc3_.x = 25;
-			_loc3_.y = 25;
-			mIcon.addChild(_loc3_);
-		});
-		return mIcon;
-	}
-
 	public function parseFriendJson(friendJson:ASObject) {
-		var identifier:Array<ASAny>;
-		var network:String = null;
-		var key:String;
-		var loader:Loader;
-		var picUrl:String;
-		var url:URLRequest;
-		var skinId:UInt;
-		var avatarInfo:AvatarInfo;
-		var context:LoaderContext;
+		var _loc4_:AvatarInfo = null;
 		if (friendJson == null) {
 			return;
 		}
 		mAccountId = ASCompat.asUint(friendJson.account_id);
 		mFriendName = ASCompat.asString(friendJson.name);
 		mTrophies = ASCompat.asUint(friendJson.trophies);
-		mFacebookId = ASCompat.asString(friendJson.facebook_id);
-		mKongregateId = ASCompat.asString(friendJson.kongregate_id);
-		if (ASCompat.toBool(friendJson.is_ingame_friend)) {
-			mIsDRFriend = ASCompat.asBool(friendJson.is_ingame_friend);
+		mSteamAvatarUrl = ASCompat.asString(friendJson.steam_avatar_url);
+		var _loc3_ = mSkinId;
+		var _loc2_ = mPortraitUrl;
+		if (friendJson.hasOwnProperty("active_skin")) {
+			mSkinId = (ASCompat.toInt(friendJson.active_skin) : UInt);
+		} else if (mAccountId == mDBFacade.accountId) {
+			_loc4_ = mDBFacade.dbAccountInfo.activeAvatarInfo;
+			mSkinId = _loc4_ != null ? _loc4_.skinId : (151 : UInt);
+		} else {
+			mSkinId = (151 : UInt);
 		}
-		if (ASCompat.toBool(friendJson.identifier)) {
-			identifier = ASCompat.coerce(Std.string(friendJson.identifier).split("_"), Array);
-			if (identifier.length > 1) {
-				network = identifier[0];
-				key = identifier[1];
-			} else {
-				key = identifier[0];
-			}
-			if (network == "1") {
-				mFacebookId = key;
-			} else if (network == "2") {
-				mKongregateId = key;
-			}
-		}
-		if (mProfilePic == null) {
-			loader = new Loader();
-			picUrl = "";
-			if (!ASCompat.stringAsBool(this.facebookId) || this.facebookId == "" || mDBFacade.isDRPlayer) {
-				avatarInfo = mDBFacade.dbAccountInfo.inventoryInfo.getAvatarInfoForHeroType(mDBFacade.dbAccountInfo.activeAvatarInfo.avatarType);
-				if (avatarInfo == null) {
-					mGMSkin = mDBFacade.gameMaster.getSkinByType((164 : UInt));
-				} else {
-					if (friendJson.hasOwnProperty("active_skin")) {
-						skinId = (ASCompat.toInt(friendJson.active_skin) : UInt);
-					} else {
-						skinId = avatarInfo.skinId;
-					}
-					mGMSkin = mDBFacade.gameMaster.getSkinByType(skinId);
-				}
-				mProfilePic = loadHeroIcon();
-			} else if (mFacebookId != null || mFacebookId != "") {
-				context = new LoaderContext();
-				context.checkPolicyFile = true;
-				context.applicationDomain = ApplicationDomain.currentDomain;
-				picUrl = "https://graph.facebook.com/" + mFacebookId + "/picture";
-				url = new URLRequest(picUrl);
-				loader.contentLoaderInfo.addEventListener("ioError", ignoreError);
-				loader.contentLoaderInfo.addEventListener("securityError", function(param1:flash.events.SecurityErrorEvent) {
-					Logger.error("parseFriendJson :" + param1.toString() + " Data:" + Std.string(url.data) + " URL:" + picUrl);
-				});
-				loader.contentLoaderInfo.addEventListener("complete", function(param1:Event) {
-					loader.cacheAsBitmap = true;
-					mProfilePicBitmap = ASCompat.reinterpretAs(loader.content, Bitmap);
-				});
-				loader.load(url, context);
-				mProfilePic = loader;
-			}
+		mPortraitUrl = mSteamAvatarUrl;
+		if (_loc3_ != mSkinId || _loc2_ != mPortraitUrl) {
+			dispatchEvent(new Event("FriendPortraitChanged"));
 		}
 		if (mResponseCallback != null) {
 			mResponseCallback();
@@ -165,38 +82,23 @@ class FriendInfo {
 		mEventComponent.dispatchEvent(new Event(FRIEND_SCORES_PARSED));
 	}
 
-	function ignoreError(event:Event) {}
-
-	@:isVar public var pic(get, never):DisplayObject;
-
-	public function get_pic():DisplayObject {
-		return mProfilePic;
+	public function refreshOwnPortrait() {
+		if (mAccountId != mDBFacade.accountId) {
+			return;
+		}
+		var _loc2_ = mDBFacade.dbAccountInfo.activeAvatarInfo;
+		var _loc1_ = _loc2_ != null ? _loc2_.skinId : (151 : UInt);
+		if (_loc1_ == mSkinId) {
+			return;
+		}
+		mSkinId = _loc1_;
+		dispatchEvent(new Event("FriendPortraitChanged"));
 	}
 
-	public function clonePic():DisplayObject {
-		var loader:Loader;
-		var picUrl:String;
-		var url:URLRequest;
-		var lc:LoaderContext;
-		var clone:DisplayObject;
-		if (this.facebookId == null || this.facebookId == "") {
-			return loadHeroIcon();
-		}
-		if (mProfilePicBitmap == null) {
-			loader = new Loader();
-			picUrl = "https://graph.facebook.com/" + mFacebookId + "/picture";
-			url = new URLRequest(picUrl);
-			loader.contentLoaderInfo.addEventListener("ioError", ignoreError);
-			loader.contentLoaderInfo.addEventListener("securityError", function(param1:flash.events.SecurityErrorEvent) {
-				Logger.error("clonePic: " + param1.toString() + " Data:" + Std.string(url.data) + " URL:" + picUrl);
-			});
-			lc = new LoaderContext(true);
-			lc.checkPolicyFile = true;
-			loader.load(url, lc);
-			return loader;
-		}
-		clone = new Bitmap(mProfilePicBitmap.bitmapData);
-		return clone;
+	@:isVar public var skinId(get, never):UInt;
+
+	public function get_skinId():UInt {
+		return mSkinId;
 	}
 
 	@:isVar public var id(get, never):UInt;
@@ -205,22 +107,10 @@ class FriendInfo {
 		return mAccountId;
 	}
 
-	@:isVar public var isDRFriend(get, never):Bool;
+	@:isVar public var steamAvatarUrl(get, never):String;
 
-	public function get_isDRFriend():Bool {
-		return mIsDRFriend;
-	}
-
-	@:isVar public var facebookId(get, never):String;
-
-	public function get_facebookId():String {
-		return mFacebookId;
-	}
-
-	@:isVar public var kongregateId(get, never):String;
-
-	public function get_kongregateId():String {
-		return mKongregateId;
+	public function get_steamAvatarUrl():String {
+		return mSteamAvatarUrl;
 	}
 
 	@:isVar public var trophies(get, set):UInt;
@@ -240,6 +130,16 @@ class FriendInfo {
 			return mDBFacade.mDistributedObjectManager.mPresenceManager.InDungeonId(mAccountId);
 		}
 		return (0 : UInt);
+	}
+
+	@:isVar public var dungeonName(get, never):String;
+
+	public function get_dungeonName():String {
+		var _loc1_ = ASCompat.coerce(mDBFacade.gameMaster != null ? mDBFacade.gameMaster.getMapNode(lastMapNode) : null, gameMasterDictionary.GMMapNode);
+		if (_loc1_ == null) {
+			return null;
+		}
+		return GameMasterLocale.getGameMasterSubString("DUNGEON_NAME", _loc1_.Constant);
 	}
 
 	public function isOnline():Bool {
@@ -268,16 +168,7 @@ class FriendInfo {
 	@:isVar public var excludeId(get, never):String;
 
 	public function get_excludeId():String {
-		if (mDBFacade.isDRPlayer || this.isDRFriend) {
-			return Std.string(this.id);
-		}
-		if (mDBFacade.isFacebookPlayer && ASCompat.stringAsBool(this.facebookId)) {
-			return this.facebookId.toString();
-		}
-		if (mDBFacade.isKongregatePlayer && ASCompat.stringAsBool(this.kongregateId)) {
-			return this.kongregateId.toString();
-		}
-		return "not found";
+		return Std.string(this.id);
 	}
 
 	public function getWeaponsUsedForNode(nodeId:UInt):Array<Dynamic> {
@@ -306,7 +197,7 @@ class FriendInfo {
 		if (mIIAvatarScoresInfo == null) {
 			return 0;
 		}
-		var _loc4_ = ASCompat.coerce(mIIAvatarScoresInfo.avatarIdToAvatarScore.itemFor(avatarId), account.iI.II_AvatarMapnodeScore);
+		var _loc4_ = ASCompat.coerce(mIIAvatarScoresInfo.avatarIdToAvatarScore.itemFor(avatarId), account.iI.II_AvatarMapNodeScore);
 		if (_loc4_ != null) {
 			_loc3_ = ASCompat.toInt(_loc4_.nodeIdToScore.itemFor(nodeId));
 			if (_loc3_ != 0) {

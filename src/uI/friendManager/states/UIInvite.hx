@@ -8,17 +8,20 @@ import brain.uI.UIButton;
 import brain.uI.UIInputText;
 import brain.uI.UIObject;
 import brain.utils.MemoryTracker;
+import brain.utils.TextUtil;
 import brain.workLoop.LogicalWorkComponent;
 import brain.jsonRPC.JSONRPCService;
+import dBGlobals.DBGlobal;
 import distributedObjects.PresenceManager;
 import events.FriendSummaryNewsFeedEvent;
 import events.FriendshipEvent;
 import facade.DBFacade;
 import facade.Locale;
-import gameMasterDictionary.GMSkin;
 import town.TownStateMachine;
 import uI.friendManager.UIFriendManager;
 import uI.popup.DBUIOneButtonPopup;
+import com.amanitadesign.steam.SteamEvent;
+import flash.desktop.Clipboard;
 import flash.display.MovieClip;
 import flash.external.ExternalInterface;
 
@@ -39,7 +42,7 @@ class UIInvite extends UIFMState {
 
 	var mInviteViaEmailButton:UIButton;
 
-	var mInviteViaFBConnectButton:UIButton;
+	var mCopyFriendCodeButton:UIButton;
 
 	var mLogicalWorkComponent:LogicalWorkComponent;
 
@@ -66,8 +69,8 @@ class UIInvite extends UIFMState {
 		mInviteUIMC.x = 300;
 		mInviteUIMC.y = 150;
 		steamHex = SteamIdConverter.convertSteamID64ToSteamHex(mDBFacade.mSteamUserId);
-		ASCompat.setProperty((mInviteUIMC : ASAny).search_label2, "text", Locale.getString("FRIEND_MANAGEMENT_DESCRIPTION_INVITE_2") + steamHex);
-		ASCompat.setProperty((mInviteUIMC : ASAny).search_label2, "selectable", true);
+		Locale.setText(ASCompat.coerce((mInviteUIMC : ASAny).search_label2, flash.text.TextField), "FRIEND_MANAGEMENT_DESCRIPTION_INVITE_2", null, 2.73);
+		TextUtil.fitToField(ASCompat.coerce((mInviteUIMC : ASAny).search_label2, flash.text.TextField));
 		ASCompat.setProperty((mInviteUIMC : ASAny).search_label1, "visible", false);
 		ASCompat.setProperty((mInviteUIMC : ASAny).search_label, "textColor", 16711680);
 		ASCompat.setProperty((mInviteUIMC : ASAny).search_label, "visible", false);
@@ -75,9 +78,27 @@ class UIInvite extends UIFMState {
 		mInviteInputText = new UIInputText(mDBFacade, ASCompat.coerce((mInviteUIMC : ASAny).friend_enterEmailId, flash.display.MovieClip));
 		mInviteInputText.defaultText = Locale.getString("DRINVITE_PROMPT");
 		mInviteInputText.enterCallback = inviteViaEmail;
+		mInviteInputText.focusInCallback = function() {
+			if (mDBFacade.steamInputManager.usesSteamOnScreenKeyboard) {
+				mDBFacade.steamInputManager.showFloatingGamepadTextInputForField(mInviteInputText.textField);
+			}
+		};
+		mInviteInputText.cancelCallback = function() {
+			mInviteInputText.releaseKeyboardFocus();
+		};
+		mInviteInputText.focusOutCallback = function() {
+			if (mInviteInputText.text == "") {
+				mInviteInputText.defaultText = Locale.getString("DRINVITE_PROMPT");
+			}
+		};
 		mInviteInputText.textField.maxChars = 200;
+		mInviteInputText.textField.multiline = false;
+		mInviteInputText.textField.wordWrap = false;
+		mInviteInputText.rolloverFilter = DBGlobal.UI_ROLLOVER_FILTER;
+		mInviteInputText.menuNavigationKeysEnabled = true;
+		mDBFacade.mSteamworks.addEventListener(SteamEvent.STEAM_RESPONSE, onSteamResponse);
 		mInviteViaEmailButton = new UIButton(mDBFacade, ASCompat.coerce((mInviteUIMC : ASAny).send_button, flash.display.MovieClip));
-		mInviteViaEmailButton.label.text = Locale.getString("DRINVITE_FRIEND_EMAIL_BUTTON");
+		Locale.setText(mInviteViaEmailButton.label, "DRINVITE_FRIEND_EMAIL_BUTTON");
 		mInviteViaEmailButton.releaseCallback = function() {
 			var _loc1_ = new compat.RegExp("[\\s\\r\\n]*", "gim");
 			ASCompat.setProperty((mInviteUIMC : ASAny).friend_enterEmailId.textField, "text",
@@ -85,12 +106,23 @@ class UIInvite extends UIFMState {
 			inviteViaEmail((mInviteUIMC : ASAny).friend_enterEmailId.textField.text, inviteViaEmailSuccessCallback);
 			ASCompat.setProperty((mInviteUIMC : ASAny).friend_enterEmailId.textField, "text", "");
 		};
-		ASCompat.setProperty((mInviteUIMC : ASAny).connect_button_kongregate, "visible", false);
-		mInviteViaFBConnectButton = new UIButton(mDBFacade, ASCompat.coerce((mInviteUIMC : ASAny).connect_button_facebook, flash.display.MovieClip));
-		mInviteViaFBConnectButton.releaseCallback = inviteViaFBConnect;
-		if (!mDBFacade.isFacebookPlayer) {
-			mInviteViaFBConnectButton.visible = false;
-		}
+		mCopyFriendCodeButton = new UIButton(mDBFacade, ASCompat.coerce((mInviteUIMC : ASAny).copy_button, flash.display.MovieClip));
+		Locale.setText(mCopyFriendCodeButton.label, "DRINVITE_COPY_FRIEND_CODE_BUTTON");
+		mCopyFriendCodeButton.releaseCallback = function() {
+			Clipboard.generalClipboard.clear();
+			Clipboard.generalClipboard.setData("air:text", steamHex);
+		};
+		setupMenuNavigation();
+	}
+
+	function setupMenuNavigation() {
+		mInviteInputText.navigationSetToUnselectedInteraction = function() {
+			mInviteInputText.releaseKeyboardFocus();
+		};
+		mInviteInputText.isAbove(mInviteViaEmailButton);
+		mInviteViaEmailButton.isAbove(mCopyFriendCodeButton);
+		mInviteViaEmailButton.rolloverFilter = DBGlobal.UI_ROLLOVER_FILTER;
+		mCopyFriendCodeButton.rolloverFilter = DBGlobal.UI_ROLLOVER_FILTER;
 	}
 
 	function inviteViaEmail(value:String, successCallback:ASFunction = null) {
@@ -98,6 +130,7 @@ class UIInvite extends UIFMState {
 		var accountIdRegex:compat.RegExp;
 		var steamID64:String;
 		var rpcSuccessCallback:ASFunction;
+		var deadFacebookIdParameter:String;
 		var rpcFunc = JSONRPCService.getFunction("DRFriendRequest", mDBFacade.rpcRoot + "friendrequests");
 		var rex = new compat.RegExp("[\\s\\r\\n]*", "gim");
 		mInviteInputText.text = rex.replace(mInviteInputText.text, "");
@@ -108,7 +141,7 @@ class UIInvite extends UIFMState {
 		} else {
 			if (!SteamIdConverter.isValidSteamId(mInviteInputText.text)) {
 				mInviteInputText.text = "";
-				ASCompat.setProperty((mInviteUIMC : ASAny).search_label, "text", Locale.getString("DRINVITE_PROMPT_INVALID_EMAIL"));
+				Locale.setText(ASCompat.coerce((mInviteUIMC : ASAny).search_label, flash.text.TextField), "DRINVITE_PROMPT_INVALID_EMAIL");
 				ASCompat.setProperty((mInviteUIMC : ASAny).search_label, "visible", true);
 				mLogicalWorkComponent.doLater(2, function(param1:brain.clock.GameClock) {
 					ASCompat.setProperty((mInviteUIMC : ASAny).search_label, "visible", false);
@@ -118,7 +151,7 @@ class UIInvite extends UIFMState {
 			steamID64 = SteamIdConverter.normalizeSteamIdToSteamID64(mInviteInputText.text);
 			if (steamID64 == "") {
 				mInviteInputText.text = "";
-				ASCompat.setProperty((mInviteUIMC : ASAny).search_label, "text", Locale.getString("DRINVITE_PROMPT_INVALID_EMAIL"));
+				Locale.setText(ASCompat.coerce((mInviteUIMC : ASAny).search_label, flash.text.TextField), "DRINVITE_PROMPT_INVALID_EMAIL");
 				ASCompat.setProperty((mInviteUIMC : ASAny).search_label, "visible", true);
 				mLogicalWorkComponent.doLater(2, function(param1:brain.clock.GameClock) {
 					ASCompat.setProperty((mInviteUIMC : ASAny).search_label, "visible", false);
@@ -129,7 +162,7 @@ class UIInvite extends UIFMState {
 			rex = new compat.RegExp("([0-9a-zA-Z]+[-._+&])*[0-9a-zA-Z]+@([-0-9a-zA-Z]+[.])+[a-zA-Z]{2,6}");
 			if (rex.test(finalValue) == false) {
 				mInviteInputText.text = "";
-				ASCompat.setProperty((mInviteUIMC : ASAny).search_label, "text", Locale.getString("DRINVITE_PROMPT_INVALID_EMAIL"));
+				Locale.setText(ASCompat.coerce((mInviteUIMC : ASAny).search_label, flash.text.TextField), "DRINVITE_PROMPT_INVALID_EMAIL");
 				ASCompat.setProperty((mInviteUIMC : ASAny).search_label, "visible", true);
 				mLogicalWorkComponent.doLater(2, function(param1:brain.clock.GameClock) {
 					ASCompat.setProperty((mInviteUIMC : ASAny).search_label, "visible", false);
@@ -140,11 +173,13 @@ class UIInvite extends UIFMState {
 		rpcSuccessCallback = function(param1:ASAny) {
 			var popup:DBUIOneButtonPopup;
 			var requestJson:ASObject;
-			var iconContainer:MovieClip;
-			var skin:GMSkin;
 			var details:ASAny = param1;
+			if (mInviteUIMC == null) {
+				Logger.debug("Dropping DRFriendRequest result: the Invite state was exited before it returned");
+				return;
+			}
 			if (details == null) {
-				ASCompat.setProperty((mInviteUIMC : ASAny).search_label, "text", Locale.getString("DRINVITE_PROMPT_ALREADY_FRIEND"));
+				Locale.setText(ASCompat.coerce((mInviteUIMC : ASAny).search_label, flash.text.TextField), "DRINVITE_PROMPT_ALREADY_FRIEND");
 				ASCompat.setProperty((mInviteUIMC : ASAny).search_label, "visible", true);
 				mLogicalWorkComponent.doLater(2, function(param1:brain.clock.GameClock) {
 					ASCompat.setProperty((mInviteUIMC : ASAny).search_label, "visible", false);
@@ -153,13 +188,13 @@ class UIInvite extends UIFMState {
 			}
 			if (ASCompat.getQualifiedClassName(details) == "Array" && ASCompat.toNumberField(details, "length") <= 0) {
 				mEmailText = value;
-				popup = new DBUIOneButtonPopup(mDBFacade, Locale.getString("DRINVITE_FAILED_POPUP_TITLE"), Locale.getString("DRINVITE_FAILED_POPUP_DESC"),
-					Locale.getString("OK"), invokeMailClient);
+				popup = new DBUIOneButtonPopup(mDBFacade, "INVITE_FAILED_POPUP", Locale.getString("DRINVITE_FAILED_POPUP_TITLE"),
+					Locale.getString("DRINVITE_FAILED_POPUP_DESC"), Locale.getString("OK"), invokeMailClient);
 				MemoryTracker.track(popup, "DBUIOneButtonPopup - created in UIInvite.UIInvite()");
 				return;
 			}
 			if (details == false) {
-				ASCompat.setProperty((mInviteUIMC : ASAny).search_label, "text", Locale.getString("DRINVITE_PROMPT_INVITE_SENT"));
+				Locale.setText(ASCompat.coerce((mInviteUIMC : ASAny).search_label, flash.text.TextField), "DRINVITE_PROMPT_INVITE_SENT");
 				ASCompat.setProperty((mInviteUIMC : ASAny).search_label, "visible", true);
 				mLogicalWorkComponent.doLater(2, function(param1:brain.clock.GameClock) {
 					ASCompat.setProperty((mInviteUIMC : ASAny).search_label, "visible", false);
@@ -167,35 +202,19 @@ class UIInvite extends UIFMState {
 				return;
 			}
 			requestJson = parseJson(details);
-			iconContainer = new MovieClip();
-			skin = mDBFacade.gameMaster.getSkinByType((ASCompat.toInt(requestJson.active_skin) : UInt));
-			mAssetLoadingComponent.getSwfAsset(DBFacade.buildFullDownloadPath(skin.UISwfFilepath), function(param1:brain.assetRepository.SwfAsset) {
-				var _loc3_ = param1.getClass(skin.IconName);
-				var _loc2_ = ASCompat.coerce(ASCompat.createInstance(_loc3_, []), flash.display.MovieClip);
-				UIObject.scaleToFit(_loc2_, 65);
-				iconContainer.addChild(_loc2_);
-				mEventComponent.dispatchEvent(new FriendSummaryNewsFeedEvent("FRIEND_SUMMARY_NEWS_FEED_MESSAGE_EVENT",
-					Locale.getString("Friend_Request_Sent_to_"), iconContainer, value));
-				mDBFacade.metrics.log("DRFriendRequest", {"friendId": requestJson.to_account_id});
-			});
+			mEventComponent.dispatchEvent(FriendSummaryNewsFeedEvent.forPortrait(Locale.getString("Friend_Request_Sent_to_"),
+				(ASCompat.toInt(requestJson.active_skin) : UInt), value));
+			mDBFacade.metrics.log("DRFriendRequest", {"friendId": requestJson.to_account_id});
+			mDBFacade.steamAchievementsHelper.unlockAchievement("ADD_FRIEND");
 			if (successCallback != null) {
 				successCallback();
 			}
 		};
-		rpcFunc(mDBFacade.dbAccountInfo.name, mDBFacade.dbAccountInfo.trophies, mDBFacade.dbAccountInfo.activeAvatarSkinId,
-			mDBFacade.dbAccountInfo.facebookId, mDBFacade.dbAccountInfo.id, finalValue, mDBFacade.demographics, mDBFacade.validationToken, rpcSuccessCallback,
+		deadFacebookIdParameter = "";
+		rpcFunc(mDBFacade.dbAccountInfo.name, mDBFacade.dbAccountInfo.trophies, mDBFacade.dbAccountInfo.activeAvatarSkinId, deadFacebookIdParameter,
+			mDBFacade.dbAccountInfo.id, finalValue, mDBFacade.demographics, mDBFacade.validationToken, rpcSuccessCallback,
 			UIFriendManager.createFriendRPCErrorCallback(mDBFacade, "InviteViaEmail"));
 		mInviteInputText.text = "";
-	}
-
-	function inviteViaFBConnect() {
-		if (mDBFacade.dbConfigManager.getConfigBoolean("FUFB", false)) {
-			mDBFacade.errorPopup("INVITE CURRENTLY DISABLED", "Sorry for the inconvenience, we are looking into resolving the issue.");
-			return;
-		}
-		if (mDBFacade.facebookController != null) {
-			mDBFacade.facebookController.genericFriendRequests();
-		}
 	}
 
 	function invokeMailClient() {
@@ -203,6 +222,20 @@ class UIInvite extends UIFMState {
 			ExternalInterface.call("sendInviteEmail", mDBFacade.dbAccountInfo.id, mDBFacade.dbConfigManager.networkId, mDBFacade.dbAccountInfo.name,
 				mEmailText);
 		}
+	}
+
+	function onSteamResponse(event:SteamEvent) {
+		if (event.req_type != 35 && event.req_type != 34) {
+			return;
+		}
+		if (mInviteInputText == null || mDBFacade == null) {
+			return;
+		}
+		if (mDBFacade.stageRef.focus != mInviteInputText.textField) {
+			return;
+		}
+		mInviteInputText.releaseKeyboardFocus();
+		mDBFacade.inputManager.clear();
 	}
 
 	public function parseJson(details:ASAny):ASObject {
@@ -213,7 +246,7 @@ class UIInvite extends UIFMState {
 			_loc2_ = ASCompat.coerce(details[0], Array);
 			_loc4_ = details[1];
 			_loc3_ = new Vector<UInt>();
-			_loc3_.push(_loc4_.account_id);
+			_loc3_.push((ASCompat.toInt(_loc4_.account_id) : UInt));
 			PresenceManager.instance().addFriends(_loc3_);
 			mDBFacade.dbAccountInfo.addFriendCallback(_loc2_);
 			mEventComponent.dispatchEvent(new FriendshipEvent(UIFriendManager.FRIENDSHIP_MADE, (ASCompat.toInt(_loc4_.id) : UInt)));
@@ -226,18 +259,44 @@ class UIInvite extends UIFMState {
 	}
 
 	function inviteViaEmailSuccessCallback() {
+		if (mInviteInputText == null) {
+			return;
+		}
 		mInviteInputText.defaultText = Locale.getString("DRINVITE_PROMPT");
 	}
 
 	override public function exit() {
 		Logger.debug("Exiting Invite State");
-		mUIFriendManager.clearUI();
+		mDBFacade.mSteamworks.removeEventListener(SteamEvent.STEAM_RESPONSE, onSteamResponse);
+		mLogicalWorkComponent.clear();
+		if (mInviteInputText != null) {
+			mInviteInputText.clearNavigationAndInteractions();
+			mInviteInputText.destroy();
+			mInviteInputText = null;
+		}
+		if (mInviteViaEmailButton != null) {
+			mInviteViaEmailButton.destroy();
+			mInviteViaEmailButton = null;
+		}
+		if (mCopyFriendCodeButton != null) {
+			mCopyFriendCodeButton.destroy();
+			mCopyFriendCodeButton = null;
+		}
+		mInviteUIMC = null;
+		if (mUIFriendManager != null) {
+			mUIFriendManager.clearUI();
+		}
 	}
 
-	public function destroy() {
-		mDBFacade = null;
+	override public function destroy() {
+		exit();
 		mLogicalWorkComponent.destroy();
 		mAssetLoadingComponent.destroy();
 		mEventComponent.destroy();
+		super.destroy();
+	}
+
+	override public function getFirstNavigationUIObject():UIObject {
+		return mInviteInputText;
 	}
 }

@@ -3,13 +3,13 @@ package brain.sound;
 import brain.event.EventComponent;
 import brain.facade.Facade;
 import brain.logger.Logger;
-import org.as3commons.collections.Map;
-import org.as3commons.collections.Set;
+import collections.Map;
+import collections.Set;
 
 class SoundManager {
 	static inline final GLOBAL_VOLUME_DAMPENER:Float = 0.2040816;
 
-	static inline final DEFAULT_VOLUME:Float = 0.7;
+	static inline final DEFAULT_VOLUME:Float = 0.5;
 
 	var mCategoryVolumeScale:Map;
 
@@ -77,7 +77,7 @@ class SoundManager {
 		if (mCategoryVolumeScale.hasKey(category)) {
 			return ASCompat.toNumber(mCategoryVolumeScale.itemFor(category));
 		}
-		Logger.warn("No volume category found for category: " + category + "  Returning " + 0.7);
-		return 0.7;
+		Logger.warn("No volume category found for category: " + category + "  Returning " + 0.5);
+		return 0.5;
 	}
 }

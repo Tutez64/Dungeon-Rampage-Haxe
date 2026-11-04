@@ -17,9 +17,27 @@ class MemoryTracker {
 
 	static var m_currentFilter:ASObject = null;
 
+	static var m_gcInFlight:Bool = false;
+
+	static var m_gcReport:Bool = false;
+
+	public static var captureCreationStacks:Bool = false;
+
 	static var m_tracking:ASDictionary<ASAny, ASAny> = new ASDictionary(true);
 
+	static var m_gcCallbacks:Array<ASAny>;
+
 	public function new() {}
+
+	public static function registerWorkManagerForHuskCheck(mgr:ASAny) {}
+
+	public static function clearWorkManagersForHuskCheck() {}
+
+	@:isVar public static var gcInFlight(get, never):Bool;
+
+	static public function get_gcInFlight():Bool {
+		return m_gcInFlight;
+	}
 
 	@:isVar public static var stage(never, set):Stage;
 
@@ -28,6 +46,14 @@ class MemoryTracker {
 	}
 
 	public static function track(obj:ASAny, label:String, category:String = "default") {}
+
+	public static function isTracked(obj:ASAny):Bool {
+		return ASCompat.dictionaryLookupNeNull(m_tracking, obj);
+	}
+
+	static function captureCreationStack():String {
+		return null;
+	}
 
 	public static function nextGeneration() {}
 
@@ -100,16 +126,22 @@ class MemoryTracker {
 		return m_generation;
 	}
 
-	public static function memoryReport(filterString:String = null) {}
+	public static function memoryReport(filterString:String = null, onComplete:ASFunction = null) {}
+
+	static function _startGC() {}
+
+	static function _finishGC() {}
+
+	public static function forceGC(onComplete:ASFunction = null) {}
 
 	@:isVar public static var trackedCount(get, never):Int;
 
 	static public function get_trackedCount():Int {
 		var _loc1_ = 0;
 		var _loc2_:ASObject;
-		final __ax4_iter_60 = m_tracking;
-		if (checkNullIteratee(__ax4_iter_60))
-			for (_tmp_ in __ax4_iter_60.keys()) {
+		final __ax4_iter_37 = m_tracking;
+		if (checkNullIteratee(__ax4_iter_37))
+			for (_tmp_ in __ax4_iter_37.keys()) {
 				_loc2_ = _tmp_;
 				_loc1_++;
 			}
@@ -122,9 +154,9 @@ class MemoryTracker {
 		var _loc3_:ASObject = null;
 		var _loc1_ = 0;
 		var _loc2_:ASObject;
-		final __ax4_iter_61 = m_tracking;
-		if (checkNullIteratee(__ax4_iter_61))
-			for (_tmp_ in __ax4_iter_61.keys()) {
+		final __ax4_iter_38 = m_tracking;
+		if (checkNullIteratee(__ax4_iter_38))
+			for (_tmp_ in __ax4_iter_38.keys()) {
 				_loc2_ = _tmp_;
 				_loc3_ = m_tracking[_loc2_];
 				if (ASCompat.toNumberField(_loc3_, "generation") >= m_checkpointGeneration) {
@@ -136,9 +168,9 @@ class MemoryTracker {
 
 	static function _forEachTracked(fn:ASFunction) {
 		var _loc2_:ASObject;
-		final __ax4_iter_62 = m_tracking;
-		if (checkNullIteratee(__ax4_iter_62))
-			for (_tmp_ in __ax4_iter_62.keys()) {
+		final __ax4_iter_39 = m_tracking;
+		if (checkNullIteratee(__ax4_iter_39))
+			for (_tmp_ in __ax4_iter_39.keys()) {
 				_loc2_ = _tmp_;
 				fn(_loc2_, m_tracking[_loc2_]);
 			}
@@ -162,5 +194,11 @@ class MemoryTracker {
 
 	static function _gc(e:Event) {}
 
+	static function _gcTail() {}
+
 	static function _doLastGC() {}
+
+	static function __init__() {
+		m_gcCallbacks = [];
+	}
 }

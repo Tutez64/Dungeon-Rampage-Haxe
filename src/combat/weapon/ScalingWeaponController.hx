@@ -38,9 +38,9 @@ class ScalingWeaponController extends WeaponController {
 
 	var mTotalTime:Float = 0;
 
-	var mFramesFinished:Float = 0;
+	var mFramesFinished:UInt = (0 : UInt);
 
-	var mPlayerExittedState:Bool = false;
+	var mPlayerExitedState:Bool = false;
 
 	var mChargeReleaseGMAttack:GMAttack;
 
@@ -87,9 +87,9 @@ class ScalingWeaponController extends WeaponController {
 		var _loc2_ = mWeapon.weaponData.ChargeAttack;
 		mChargeReleaseGMAttack = ASCompat.coerce(mDBFacade.gameMaster.attackByConstant.itemFor(_loc2_), gameMasterDictionary.GMAttack);
 		var _loc1_:GMModifier;
-		final __ax4_iter_0 = mWeapon.modifierList;
-		if (checkNullIteratee(__ax4_iter_0))
-			for (_tmp_ in __ax4_iter_0) {
+		final __ax4_iter_329 = mWeapon.modifierList;
+		if (checkNullIteratee(__ax4_iter_329))
+			for (_tmp_ in __ax4_iter_329) {
 				_loc1_ = _tmp_;
 				if (_loc1_.MODIFIER_TYPE == "MANA_COST") {
 					mWeaponModifierManaReduction = _loc1_.MP_COST;
@@ -117,7 +117,7 @@ class ScalingWeaponController extends WeaponController {
 	override public function onWeaponDown(autoAim:Bool = true) {
 		if (!mWeaponDownActive) {
 			super.onWeaponDown(autoAim);
-			mFramesFinished = 0;
+			mFramesFinished = (0 : UInt);
 			mWeaponDownActive = true;
 			mScalingLogicalWorkComponent.clear();
 			if (mTotalTime > 0) {
@@ -134,20 +134,20 @@ class ScalingWeaponController extends WeaponController {
 					});
 				}
 			}
-			mPlayerExittedState = false;
+			mPlayerExitedState = false;
 		}
 	}
 
 	override public function onWeaponUp(autoAim:Bool = true) {
 		var _loc12_:GMModifier;
-		var __ax4_iter_1:Vector<GMModifier>;
+		var __ax4_iter_330:Vector<GMModifier>;
 		var _loc6_ = Math.NaN;
-		var _loc3_ = 0;
+		var _loc3_ = (0 : UInt);
 		var _loc10_:AttackTimeline = null;
 		var _loc11_ = Math.NaN;
-		var _loc7_:Float = 0;
+		var _loc7_ = (0 : UInt);
 		var _loc4_ = Math.NaN;
-		var _loc2_:Float = 0;
+		var _loc2_ = (0 : UInt);
 		var _loc9_ = false;
 		var _loc5_ = 0;
 		var _loc8_:AttackTimeline = null;
@@ -158,27 +158,27 @@ class ScalingWeaponController extends WeaponController {
 		if (mHoldingAttackTimeline != null && mHoldingAttackTimeline.isPlaying) {
 			mHoldingAttackTimeline.stopAndFinish();
 		}
-		if (!mPlayerExittedState) {
+		if (!mPlayerExitedState) {
 			if (mTotalTime > 0 && mNotEnoughManaTask == null) {
-				_loc6_ = mFramesFinished / 24 * 1 / mTotalTime;
+				_loc6_ = mFramesFinished / 24 / mTotalTime;
 				if (_loc6_ > 1) {
 					_loc6_ = 1;
 				}
-				_loc3_ = 0;
+				_loc3_ = (0 : UInt);
 				if (mChargeReleaseGMAttack != null && _loc6_ > 0) {
-					_loc3_ = (mChargeReleaseGMAttack.Id : Int);
+					_loc3_ = mChargeReleaseGMAttack.Id;
 				} else {
-					_loc3_ = (getNextAttackId() : Int);
+					_loc3_ = getNextAttackId();
 				}
-				_loc10_ = mWeapon.getAttackTimeline((_loc3_ : UInt));
+				_loc10_ = mWeapon.getAttackTimeline(_loc3_);
 				if (_loc10_ == null) {
 					Logger.error("AttackTimeline for attack: <" + _loc3_ + "> was null. Ignoring onWeaponDown");
 					return;
 				}
 				_loc11_ = mPowerMultiplier > 1 ? 1 + _loc6_ * mPowerMultiplier : 1;
-				_loc7_ = 1;
+				_loc7_ = (1 : UInt);
 				if (_loc6_ > 0 && (mProjectileMinMultiplier > 1 || mProjectileMaxMultiplier > 1)) {
-					_loc7_ = ASCompat.floatToInt(Math.fceil(mProjectileMinMultiplier + _loc6_ * (mProjectileMaxMultiplier - mProjectileMinMultiplier)));
+					_loc7_ = (Math.ceil(mProjectileMinMultiplier + _loc6_ * ((mProjectileMaxMultiplier : Float) - (mProjectileMinMultiplier : Float))) : UInt);
 				}
 				_loc4_ = 0;
 				if (_loc7_ > 1) {
@@ -188,18 +188,18 @@ class ScalingWeaponController extends WeaponController {
 						_loc4_ = mProjectileStartScalingAngle - (mProjectileStartScalingAngle - mProjectileEndScalingAngle) * _loc6_;
 					}
 				}
-				_loc2_ = 0;
+				_loc2_ = (0 : UInt);
 				_loc9_ = false;
-				__ax4_iter_1 = mWeapon.modifierList;
-				if (checkNullIteratee(__ax4_iter_1))
-					for (_tmp_ in __ax4_iter_1) {
+				__ax4_iter_330 = mWeapon.modifierList;
+				if (checkNullIteratee(__ax4_iter_330))
+					for (_tmp_ in __ax4_iter_330) {
 						_loc12_ = _tmp_;
 						if (_loc12_.MAX_PROJECTILES > 0) {
-							_loc7_ += _loc6_ * _loc12_.MAX_PROJECTILES;
+							_loc7_ += (ASCompat.floatToInt(_loc6_ * _loc12_.MAX_PROJECTILES) : UInt);
 							_loc9_ = true;
 						}
 						if (_loc12_.INCREASED_PROJECTILE_ANGLE_PERCENT >= 0) {
-							_loc2_ += _loc12_.INCREASED_PROJECTILE_ANGLE_PERCENT * _loc4_ * _loc12_.MAX_PROJECTILES;
+							_loc2_ += (ASCompat.floatToInt(_loc12_.INCREASED_PROJECTILE_ANGLE_PERCENT * _loc4_ * _loc12_.MAX_PROJECTILES) : UInt);
 						}
 					}
 				if (_loc6_ == 0) {
@@ -208,7 +208,7 @@ class ScalingWeaponController extends WeaponController {
 						_loc7_ = mProjectileMinMultiplier;
 					} else {
 						_loc4_ = 0;
-						_loc7_ = 1;
+						_loc7_ = (1 : UInt);
 					}
 				}
 				if (_loc10_.projectileMultiplier > 1) {
@@ -216,32 +216,32 @@ class ScalingWeaponController extends WeaponController {
 				}
 				_loc10_.powerMultiplier = _loc11_;
 				if (_loc7_ < 1) {
-					_loc7_ = 1;
+					_loc7_ = (1 : UInt);
 				}
-				_loc10_.projectileMultiplier = (ASCompat.floatToInt(_loc7_) : UInt);
+				_loc10_.projectileMultiplier = _loc7_;
 				_loc10_.projectileScalingAngle = (ASCompat.floatToInt((_loc4_ + _loc2_) / _loc7_) : UInt);
 				_loc10_.distanceScalingTime = mDistanceScalingTime;
 				_loc10_.distanceScalingHero = mDistanceScalingForHeroMin + _loc6_ * (mDistanceScalingForHeroMax - mDistanceScalingForHeroMin);
 				_loc10_.distanceScalingProjectile = mDistanceScalingForProjectilesMin
 					+ _loc6_ * (mDistanceScalingForProjectilesMax - mDistanceScalingForProjectilesMin);
 			} else {
-				_loc5_ = _loc3_;
-				_loc3_ = (getNextAttackId() : Int);
-				_loc8_ = mWeapon.getAttackTimeline((_loc3_ : UInt));
+				_loc5_ = (_loc3_ : Int);
+				_loc3_ = getNextAttackId();
+				_loc8_ = mWeapon.getAttackTimeline(_loc3_);
 				_loc8_.projectileMultiplier = (1 : UInt);
 				_loc8_.projectileScalingAngle = (0 : UInt);
 			}
-			attack((_loc3_ : UInt), mAutoAim);
+			attack(_loc3_, mAutoAim);
 		}
 		clear();
 	}
 
 	public function update(gameClock:GameClock) {
-		mFramesFinished += gameClock.tickLength / GameClock.ANIMATION_FRAME_DURATION;
+		mFramesFinished = mFramesFinished + 1;
 	}
 
 	override public function clear() {
-		mFramesFinished = 0;
+		mFramesFinished = (0 : UInt);
 		mScalingLogicalWorkComponent.clear();
 		mWeaponDownActive = false;
 		if (mNotEnoughManaTask != null) {
@@ -255,10 +255,7 @@ class ScalingWeaponController extends WeaponController {
 			if (mCurrentAttackTimeline == mHoldingAttackTimeline) {
 				return true;
 			}
-			if (mCurrentAttackTimeline.isAttackWithinComboWindow()) {
-				return true;
-			}
-			return false;
+			return mCurrentAttackTimeline.isAttackWithinComboWindow();
 		}
 		return true;
 	}

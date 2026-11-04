@@ -2,13 +2,14 @@ package uI.popup;
 
 import brain.assetRepository.SwfAsset;
 import brain.uI.UIButton;
+import brain.uI.UIObject;
+import brain.utils.TextUtil;
+import dBGlobals.DBGlobal;
 import facade.DBFacade;
 import gameMasterDictionary.GMOffer;
-import uI.*;
 import uI.shop.UIShopBundleOffer;
 import uI.shop.UIShopOffer;
 import flash.display.MovieClip;
-import flash.geom.Rectangle;
 
 class UIOfferPopup extends DBUIPopup {
 	static inline final TEMPLATE_CLASSNAME = "shop_offer_template";
@@ -38,12 +39,12 @@ class UIOfferPopup extends DBUIPopup {
 	var mWantNewRollOverScale:Bool = false;
 
 	public function new(dbFacade:DBFacade, titleText:String, offerIds:Vector<UInt>, buyCallback:ASFunction, closeCallback:ASFunction,
-			useIconScaling:Bool = true, wantNewRollOverScale:Bool = true) {
+			useIconScaling:Bool = true, wantNewRollOverScale:Bool = true, navigationLayerName:String = "POPUP_OFFER") {
 		mOfferIds = offerIds;
 		mBuyCallback = buyCallback;
 		mUseIconScaling = useIconScaling;
 		mWantNewRollOverScale = wantNewRollOverScale;
-		super(dbFacade, titleText, null, true, true, closeCallback);
+		super(dbFacade, navigationLayerName, titleText, null, true, true, closeCallback, false);
 	}
 
 	override public function destroy() {
@@ -59,7 +60,6 @@ class UIOfferPopup extends DBUIPopup {
 	}
 
 	override function setupUI(swfAsset:SwfAsset, titleText:String, content:ASAny, allowClose:Bool, closeCallback:ASFunction) {
-		var bounds:Rectangle;
 		var offerId:UInt;
 		var emptyOffer:MovieClip;
 		var gmOffer:GMOffer;
@@ -70,12 +70,10 @@ class UIOfferPopup extends DBUIPopup {
 		var popupClass = swfAsset.getClass(this.getClassName());
 		mPopup = ASCompat.coerce(ASCompat.createInstance(popupClass, []), flash.display.MovieClip);
 		mRoot.addChild(mPopup);
-		mPopup.scaleY = mPopup.scaleX = 1.8;
-		bounds = mPopup.getBounds(mDBFacade.stageRef);
-		mPopup.x = mDBFacade.stageRef.stageWidth / 2 - bounds.width / 2 - bounds.x;
-		mPopup.y = mDBFacade.stageRef.stageHeight / 2 - bounds.height / 2 - bounds.y;
+		mPopup.scaleY = mPopup.scaleX = DBGlobal.UI_16_TO_9_PORT_OBJECT_SCALE;
+		centerPopup();
 		mTitle = ASCompat.coerce((mPopup : ASAny).title_label, flash.text.TextField);
-		mTitle.text = titleText;
+		TextUtil.setText(mTitle, titleText);
 		mEmptyOffers.push(ASCompat.coerce((mPopup : ASAny).coin_shop_empty_slot_1, flash.display.MovieClip));
 		mEmptyOffers.push(ASCompat.coerce((mPopup : ASAny).coin_shop_empty_slot_2, flash.display.MovieClip));
 		mEmptyOffers.push(ASCompat.coerce((mPopup : ASAny).coin_shop_empty_slot_3, flash.display.MovieClip));
@@ -89,7 +87,7 @@ class UIOfferPopup extends DBUIPopup {
 			};
 			offerId = mOfferIds[(i : Int)];
 			gmOffer = ASCompat.coerce(mDBFacade.gameMaster.offerById.itemFor(offerId), gameMasterDictionary.GMOffer);
-			offerClass = gmOffer.CurrencyType == "PREMIUM"
+			offerClass = gmOffer.CurrencyType == GMOffer.PREMIUM_CURRENCY
 				&& ASCompat.floatAsBool(gmOffer.Price) ? mPremiumOfferTemplateClass : mOfferTemplateClass;
 			uiShopOffer = new UIShopBundleOffer(mDBFacade, offerClass, callback, mUseIconScaling, mWantNewRollOverScale);
 			emptyOffer = mEmptyOffers[(i : Int)];
@@ -107,5 +105,47 @@ class UIOfferPopup extends DBUIPopup {
 			close(closeCallback);
 		};
 		animatedEntrance();
+	}
+
+	override function setupMenuNavigation() {
+		var _loc2_ = (0 : UInt);
+		var _loc1_ = getNavigationButtons();
+		var _loc3_:UIButton;
+		if (checkNullIteratee(_loc1_))
+			for (_tmp_ in _loc1_) {
+				_loc3_ = _tmp_;
+				_loc3_.clearNavigationAndInteractions();
+			}
+		mCloseButton.clearNavigationAndInteractions();
+		_loc2_ = (0 : UInt);
+		while (_loc2_ < (_loc1_.length:UInt)) {
+			_loc1_[(_loc2_ : Int)].upNavigation = mCloseButton;
+			if (_loc2_ > 0) {
+				_loc1_[(_loc2_ - 1 : Int)].isToTheLeftOf(_loc1_[(_loc2_ : Int)]);
+			}
+			_loc2_++;
+		}
+		if (_loc1_.length > 0) {
+			mCloseButton.downNavigation = _loc1_[0];
+		}
+	}
+
+	override function getInitialFocusedNavigationObject():UIObject {
+		var _loc1_ = getNavigationButtons();
+		return _loc1_.length > 0 ? _loc1_[0] : mCloseButton;
+	}
+
+	function getNavigationButtons():Vector<UIButton> {
+		var _loc1_ = new Vector<UIButton>();
+		var _loc2_:UIShopOffer;
+		final __ax4_iter_32 = mUIOffers;
+		if (checkNullIteratee(__ax4_iter_32))
+			for (_tmp_ in __ax4_iter_32) {
+				_loc2_ = _tmp_;
+				if (_loc2_.navigationButton != null) {
+					_loc1_.push(_loc2_.navigationButton);
+				}
+			}
+		return _loc1_;
 	}
 }

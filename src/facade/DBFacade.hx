@@ -2,11 +2,11 @@ package facade;
 
 import account.AccountBonus;
 import account.DBAccountInfo;
-import account.FacebookAccountInfo;
-import account.StoreServices;
 import brain.assetRepository.AssetLoadingComponent;
 import brain.assetRepository.JsonAsset;
+import brain.assetRepository.TestResourceLocator;
 import brain.clock.GameClock;
+import brain.event.EventListeners;
 import brain.facade.Facade;
 import brain.logger.Logger;
 import brain.render.MovieClipPool;
@@ -15,6 +15,7 @@ import brain.utils.MemoryTracker;
 import brain.workLoop.LogicalWorkComponent;
 import brain.workLoop.Task;
 import brain.jsonRPC.JSONRPCService;
+import collections.Map;
 import combat.attack.TimelineFactory;
 import config.ConfigFileLoadedEvent;
 import config.DBConfigManager;
@@ -24,32 +25,42 @@ import distributedObjects.DistributedObjectManager;
 import effects.CustomSkinVisualsOverrideHandler;
 import effects.EffectPool;
 import events.ManagersLoadedEvent;
-import facebookAPI.DBFacebookAPIController;
 import gameMasterDictionary.GameMaster;
 import generatedCode.InfiniteMapNodeDetail;
+import input.keyBindings.KeyBindings;
 import input.MenuNavigationController;
+import json.JsonCodec;
 import magicWords.MagicWordManager;
+import metrics.FPSReadout;
 #if cpp
 import modding.Host;
 #end
 import metrics.MetricsLogger;
-import metrics.PixelTracker;
 import networkCode.transport.GameEndpoints;
 import networkCode.transport.TransportSettings;
+import settings.model.DisplayTimingSettings;
+import settings.model.SettingsModel;
+import settings.model.SettingsStore;
 import sound.DBSoundManager;
 import stateMachine.mainStateMachine.LoadingFinishedEvent;
+import stateMachine.mainStateMachine.LoadingScreenState;
+import stateMachine.mainStateMachine.LoadingState;
 import stateMachine.mainStateMachine.MainStateMachine;
+import steamAchievements.SteamAchievementsHelper;
 import steamAchievements.SteamAchievementsManager;
 import steamInput.SteamInputManager;
-import town.AdManager;
+import uI.cursor.UIMouseCursors;
+import uI.hud.starlingConverted.HudArt;
+import uI.hud.starlingConverted.IGameHud;
+import uI.hud.starlingConverted.StarlingHud;
 import uI.hud.UIHud;
 import uI.map.PlayerActivityCount;
 import uI.popup.DBUIOneButtonPopup;
+import uI.UIHideToggle;
+import uI.UILevelUpPostController;
 import uI.UIReconnectingIndicator;
 import com.amanitadesign.steam.FRESteamWorks;
-import com.maccherone.json.JSON;
 import flash.display.DisplayObject;
-import flash.display.Loader;
 import flash.display.MovieClip;
 import flash.display.Shape;
 import flash.display.Stage;
@@ -60,27 +71,17 @@ import flash.events.KeyboardEvent;
 import flash.external.ExternalInterface;
 import flash.net.URLRequest;
 import flash.system.Capabilities;
-import flash.system.LoaderContext;
 import flash.system.Security;
 import flash.text.TextField;
-import org.as3commons.collections.Map;
 
 class DBFacade extends Facade {
 	static inline final CLIENT_ERROR_EVENT = "CLIENT_ERROR_EVENT";
 
 	public static inline final VALIDATION_REFRESH_TIME:Float = 3600;
 
-	static inline final ORDER_COMPLETE_EXTERNAL_INTERFACE = "orderComplete";
-
 	static var mDownloadRoot:String = "";
 
-	public static inline final NETWORK_FACEBOOK = (1 : UInt);
-
-	public static inline final NETWORK_KONGREGATE = (2 : UInt);
-
-	public static inline final NETWORK_DRCOM = (3 : UInt);
-
-	var LoadingClass:Dynamic = Loading_screen_swf;
+	var LoadingClass:Dynamic = Db_UI_game_loading_screen_swf;
 
 	var mInitialLoadingClip:MovieClip;
 
@@ -88,27 +89,31 @@ class DBFacade extends Facade {
 
 	var mLoadingBarIntStatus:Float = 0;
 
+	var mAltEnterDown:Bool = false;
+
+	var mPlainEnterDown:Bool = false;
+
 	var mMainStateMachine:MainStateMachine;
 
 	var mDBAccountInfo:DBAccountInfo;
 
-	var mFacebookAccountInfo:FacebookAccountInfo;
-
 	var mDBConfigManager:DBConfigManager;
 
-	var mHud:UIHud;
+	var mHud:IGameHud;
 
 	var mEffectPool:EffectPool;
 
 	var mMovieClipPool:MovieClipPool;
+
+	var mMetricsLogger:MetricsLogger;
+
+	var mFPSReadout:FPSReadout;
 
 	var mReconnectingIndicator:UIReconnectingIndicator;
 
 	var mReconnectFrozeInput:Bool = false;
 
 	var mMainStateAtDrop:String;
-
-	var mMetricsLogger:MetricsLogger;
 
 	var mTileLibraryMap:Map;
 
@@ -126,7 +131,7 @@ class DBFacade extends Facade {
 
 	var mGameMasterJson:ASObject;
 
-	var mDBFaceBookAPIController:DBFacebookAPIController;
+	var mUILevelUpPostController:UILevelUpPostController;
 
 	var mAccountBonus:AccountBonus;
 
@@ -134,13 +139,17 @@ class DBFacade extends Facade {
 
 	var mCustomSkinVisualsOverrideHandler:CustomSkinVisualsOverrideHandler;
 
+	var mSettingsModel:SettingsModel;
+
+	var mDisplayTimingSettings:DisplayTimingSettings;
+
+	var mKeyBindings:KeyBindings;
+
+	var mUIHideToggle:UIHideToggle;
+
 	public var gameMaster:GameMaster;
 
-	var mAssetLoader:AssetLoadingComponent;
-
 	var mMagicWordManager:MagicWordManager;
-
-	public var steamAchievementsManager:SteamAchievementsManager;
 
 	var mWebServicesUrl:String;
 
@@ -164,14 +173,6 @@ class DBFacade extends Facade {
 
 	var mAccountId:UInt = 0;
 
-	var mFacebookId:String;
-
-	var mFacebookPlayerId:String;
-
-	var mFacebookThirdPartyId:String;
-
-	var mFacebookApplication:String;
-
 	var mValidationToken:String;
 
 	var mDemographics:ASObject;
@@ -192,17 +193,11 @@ class DBFacade extends Facade {
 
 	var mErrorTask:Task;
 
-	var mKongregate:ASAny;
-
-	var mKongregatePlayerId:String;
-
 	var mSecurityGM:Int = 0;
 
 	var mSecurityTL:Int = 0;
 
 	var mSecuritySL:Int = 0;
-
-	var mAdManager:AdManager;
 
 	public var mSteamworks:FRESteamWorks = new FRESteamWorks();
 
@@ -216,6 +211,12 @@ class DBFacade extends Facade {
 
 	public var mSteamAuthTicketHandle:UInt = 0;
 
+	public var mSteamLoginFailure:String;
+
+	var mSteamAchievementsHelper:SteamAchievementsHelper;
+
+	var mSteamAchievementsManager:SteamAchievementsManager;
+
 	public var mUseSteamLogin:Bool = false;
 
 	public var mSeenFlaggedPopup:Bool = false;
@@ -228,6 +229,8 @@ class DBFacade extends Facade {
 
 	public var mSteamIsFlaggedDueToFamilySharingOwnerName:String;
 
+	public var mSteamAvatarUrl:String;
+
 	var mSteamInputManager:SteamInputManager;
 
 	public var mAdditionalConfigFilesToLoad:Array<ASAny> = [];
@@ -235,8 +238,6 @@ class DBFacade extends Facade {
 	var mShowCollisions:Bool = false;
 
 	public var NODE_RULES:UInt = (0 : UInt);
-
-	var tKongregateLoader:Loader;
 
 	var stagetwo_init_call_count:UInt = (0 : UInt);
 
@@ -253,34 +254,6 @@ class DBFacade extends Facade {
 		Security.allowDomain("http://ak.ssl.dungeonbusters.com");
 		Security.allowInsecureDomain("https://ak.ssl.dungeonbusters.com");
 		Security.allowDomain("www.youtube.com");
-		Security.loadPolicyFile("http://profile.ak.fbcdn.net/crossdomain.xml");
-		Security.loadPolicyFile("https://fbstatic-a.akamaihd.net/crossdomain.xml");
-		Security.loadPolicyFile("https://fbcdn-profile-a.akamaihd.net/crossdomain.xml");
-		Security.loadPolicyFile("https://profile-a.xx.fbcdn.net/crossdomain.xml");
-		Security.loadPolicyFile("https://profile-b.xx.fbcdn.net/crossdomain.xml");
-		Security.allowDomain("http://profile.ak.fbcdn.net");
-		Security.allowInsecureDomain("https://profile.ak.fbcdn.net");
-		Security.allowDomain("http://profile-a.xx.fbcdn.net");
-		Security.allowInsecureDomain("https://profile-a.xx.fbcdn.net");
-		Security.allowDomain("http://profile-a.xx.fbcdn.net/hprofile-snc6/");
-		Security.allowInsecureDomain("https://profile-a.xx.fbcdn.net/hprofile-snc6/");
-		Security.allowDomain("http://fbcdn-profile-a.akamaihd.net");
-		Security.allowInsecureDomain("https://fbcdn-profile-a.akamaihd.net");
-		Security.allowDomain("http://fbcdn-profile-a.akamaihd.net/hprofile-ak-snc4/");
-		Security.allowInsecureDomain("https://fbcdn-profile-a.akamaihd.net/hprofile-ak-snc4/");
-		Security.allowDomain("http://fbcdn-profile-a.akamaihd.net/hprofile-ash4/");
-		Security.allowInsecureDomain("https://fbcdn-profile-a.akamaihd.net/hprofile-ash4/");
-		Security.allowDomain("http://fbcdn-profile-a.akamaihd.net/hprofile-ak-ash4/");
-		Security.allowInsecureDomain("https://fbcdn-profile-a.akamaihd.net/hprofile-ak-ash4/");
-		Security.allowDomain("http://fbstatic-a.akamaihd.net");
-		Security.allowInsecureDomain("https://fbstatic-a.akamaihd.net");
-		Security.allowDomain("http://s-static.ak.facebook.com");
-		Security.allowInsecureDomain("https://s-static.ak.facebook.com");
-		Security.loadPolicyFile("https://ads.sele.co/crossdomain.xml");
-		Security.allowDomain("http://ads.sele.co");
-		Security.allowInsecureDomain("https://ads.sele.co");
-		Security.loadPolicyFile("https://dungionbusters.webfetti.com/crossdomain.xml");
-		Security.allowDomain("https://dungionbusters.webfetti.com");
 		killWebSecurity();
 	}
 
@@ -298,7 +271,7 @@ class DBFacade extends Facade {
 			Logger.error("Trying to create a path from an empty string");
 			return "";
 		}
-		return mDownloadRoot + rawAssetPath;
+		return TestResourceLocator.url(mDownloadRoot + rawAssetPath);
 	}
 
 	public function killWebSecurity() {
@@ -317,6 +290,26 @@ class DBFacade extends Facade {
 		return showThem;
 	}
 
+	@:isVar public var steamAchievementsHelper(get, set):SteamAchievementsHelper;
+
+	public function get_steamAchievementsHelper():SteamAchievementsHelper {
+		return mSteamAchievementsHelper;
+	}
+
+	function set_steamAchievementsHelper(inSteamAchievementsHelper:SteamAchievementsHelper):SteamAchievementsHelper {
+		return mSteamAchievementsHelper = inSteamAchievementsHelper;
+	}
+
+	@:isVar public var steamAchievementsManager(get, set):SteamAchievementsManager;
+
+	public function get_steamAchievementsManager():SteamAchievementsManager {
+		return mSteamAchievementsManager;
+	}
+
+	function set_steamAchievementsManager(inSteamAchievementsManager:SteamAchievementsManager):SteamAchievementsManager {
+		return mSteamAchievementsManager = inSteamAchievementsManager;
+	}
+
 	override public function logCheater(howICheat:String) {
 		var requestFunc = JSONRPCService.getFunction("LogCheater", rpcRoot + "store");
 		requestFunc(dbAccountInfo.id, validationToken, howICheat, demographics, function() {}, function(param1:Error) {});
@@ -324,32 +317,39 @@ class DBFacade extends Facade {
 
 	function loadBackground() {
 		var countBackgroundImagesLoaded = 0;
-		mAssetLoader.getImageAsset(DBFacade.buildFullDownloadPath("Resources/Art2D/background/left.jpg"), function(param1:brain.assetRepository.ImageAsset) {
-			var _loc2_:DisplayObject = param1.image;
-			var _loc3_ = viewHeight / _loc2_.height;
-			_loc2_.scaleX = _loc3_;
-			_loc2_.scaleY = _loc3_;
-			_loc2_.x = -_loc2_.width;
-			_loc2_.y = 0;
-			addRootDisplayObject(_loc2_, 1001);
-			countBackgroundImagesLoaded = countBackgroundImagesLoaded + 1;
-			if (countBackgroundImagesLoaded > 1) {
-				mStageRef.displayState = "fullScreenInteractive";
-			}
-		});
-		mAssetLoader.getImageAsset(DBFacade.buildFullDownloadPath("Resources/Art2D/background/right.jpg"), function(param1:brain.assetRepository.ImageAsset) {
-			var _loc2_:DisplayObject = param1.image;
-			var _loc3_ = viewHeight / _loc2_.height;
-			_loc2_.scaleX = _loc3_;
-			_loc2_.scaleY = _loc3_;
-			_loc2_.x = viewWidth;
-			_loc2_.y = 0;
-			addRootDisplayObject(_loc2_, 1001);
-			countBackgroundImagesLoaded = countBackgroundImagesLoaded + 1;
-			if (countBackgroundImagesLoaded > 1) {
-				mStageRef.displayState = "fullScreenInteractive";
-			}
-		});
+		var startWindowed = featureFlags.getFlagValue("start-windowed");
+		mAssetLoadingComponent.getImageAsset(DBFacade.buildFullDownloadPath("Resources/Art2D/background/left.jpg"),
+			function(param1:brain.assetRepository.ImageAsset) {
+				var _loc2_:DisplayObject = param1.image;
+				var _loc3_ = viewHeight / _loc2_.height;
+				_loc2_.scaleX = _loc3_;
+				_loc2_.scaleY = _loc3_;
+				_loc2_.x = -_loc2_.width;
+				_loc2_.y = 0;
+				addRootDisplayObject(_loc2_, 1001);
+				if (!startWindowed) {
+					countBackgroundImagesLoaded = countBackgroundImagesLoaded + 1;
+					if (countBackgroundImagesLoaded > 1) {
+						mStageRef.displayState = "fullScreenInteractive";
+					}
+				}
+			});
+		mAssetLoadingComponent.getImageAsset(DBFacade.buildFullDownloadPath("Resources/Art2D/background/right.jpg"),
+			function(param1:brain.assetRepository.ImageAsset) {
+				var _loc2_:DisplayObject = param1.image;
+				var _loc3_ = viewHeight / _loc2_.height;
+				_loc2_.scaleX = _loc3_;
+				_loc2_.scaleY = _loc3_;
+				_loc2_.x = viewWidth;
+				_loc2_.y = 0;
+				addRootDisplayObject(_loc2_, 1001);
+				if (!startWindowed) {
+					countBackgroundImagesLoaded = countBackgroundImagesLoaded + 1;
+					if (countBackgroundImagesLoaded > 1) {
+						mStageRef.displayState = "fullScreenInteractive";
+					}
+				}
+			});
 	}
 
 	function loadLocale() {
@@ -362,7 +362,8 @@ class DBFacade extends Facade {
 		if (mHud != null) {
 			return;
 		}
-		mHud = new UIHud(this);
+		mHud = ASCompat.coerce(featureFlags.getFlagValue("starling-hud") && HudArt.begun ? new StarlingHud(this) : new UIHud(this),
+			uI.hud.starlingConverted.IGameHud);
 	}
 
 	public function refreshHUD() {
@@ -383,12 +384,16 @@ class DBFacade extends Facade {
 
 	override public function buildEngines() {
 		Logger.info("building engines 0");
+		SettingsStore.applyStartupFlags(featureFlags);
 		loadBackground();
 		Logger.info("building engines 1");
 		loadLocale();
 		Logger.info("building engines 2");
 		computeServerTimeOffset();
 		super.buildEngines();
+		UIMouseCursors.register(this);
+		mKeyBindings = new KeyBindings(inputManager);
+		mUIHideToggle = new UIHideToggle(this);
 		mSteamInputManager = new SteamInputManager(this, mSteamworks, mStageRef, featureFlags.getFlagValue("experimental-use-steam-input"));
 		Logger.info("building engines 3");
 		mSoundManager = new DBSoundManager(this);
@@ -404,12 +409,7 @@ class DBFacade extends Facade {
 		}
 		Logger.info("building engines 5");
 		mDemographics = mDBConfigManager.GetValueOrDefault("Demographics", {});
-		mFacebookId = mDBConfigManager.getConfigString("FacebookAppId", "");
-		mFacebookPlayerId = mDBConfigManager.getConfigString("FacebookPlayerId", "");
-		mKongregatePlayerId = mDBConfigManager.getConfigString("KongregatePlayerId", "");
 		Logger.info("building engines 5.1");
-		mFacebookThirdPartyId = mDBConfigManager.getConfigString("FacebookThirdPartyId", "0");
-		mFacebookApplication = mDBConfigManager.getConfigString("FacebookApplication", "");
 		Logger.info("building engines 6");
 		this.validationToken = mDBConfigManager.getConfigString("API_ValidationToken", "");
 		Logger.info("building engines 7");
@@ -417,63 +417,15 @@ class DBFacade extends Facade {
 			Logger.error("ValidationToken is empty.  Cannot continue without a valid ValidationToken.");
 		}
 		Logger.info("building engines 8");
-		Logger.info("DBFacade: accountId: " + Std.string(mAccountId) + " facebookId: " + mFacebookId.toString() + " Facebook Player Id:"
-			+ mFacebookPlayerId.toString() + " Facebook Application:" + mFacebookApplication.toString());
-		mDBFaceBookAPIController = new DBFacebookAPIController(this);
-		mFacebookAccountInfo = new FacebookAccountInfo(this);
+		Logger.info("DBFacade: accountId: " + Std.string(mAccountId));
+		mUILevelUpPostController = new UILevelUpPostController(this);
 		mAccountBonus = new AccountBonus(this);
 		createTokenRegenTask();
-		if (isKongregatePlayer) {
-			kongregateInit();
-		}
 		logSystemMetrics();
 		NODE_RULES = (ASCompat.toInt(getSplitTestBoolean("NODE_UNLOCK_GLOBAL", false)) : UInt);
 		environmentPrefix = dbConfigManager.getConfigString("EnvironmentPrefix", "u");
 		mMenuNavigationController = new MenuNavigationController(this);
 		mCustomSkinVisualsOverrideHandler = new CustomSkinVisualsOverrideHandler(this);
-	}
-
-	function kongregateInit() {
-		var request:URLRequest;
-		var context:LoaderContext;
-		var paramObj:ASObject = stageRef.root.loaderInfo.parameters;
-		var apiPath:String = if (ASCompat.toBool(paramObj.kongregate_api_path)) paramObj.kongregate_api_path else
-			"http://www.kongregate.com/flash/API_AS3_Local.swf";
-		Security.allowDomain(apiPath);
-		Logger.info("Loading Kongregate swf " + apiPath);
-		request = new URLRequest(apiPath);
-		context = new LoaderContext();
-		context.checkPolicyFile = true;
-		tKongregateLoader = new Loader();
-		tKongregateLoader.contentLoaderInfo.addEventListener("complete", kongregateLoaded);
-		tKongregateLoader.contentLoaderInfo.addEventListener("ioError", function(param1:flash.events.IOErrorEvent) {
-			Logger.error("IOErrorEvent: " + param1.toString() + " Data:" + Std.string(request.data) + " URL:" + apiPath.toString());
-		});
-		tKongregateLoader.contentLoaderInfo.addEventListener("securityError", function(param1:flash.events.SecurityErrorEvent) {
-			Logger.error("SecurityErrorEvent: " + param1.toString() + " Data:" + Std.string(request.data) + " URL:" + apiPath.toString());
-		});
-		tKongregateLoader.load(request, context);
-		addRootDisplayObject(tKongregateLoader);
-	}
-
-	public function kongregateLoaded(event:Event) {
-		Logger.info("Kongregate swf loaded");
-		mKongregate = event.target.content;
-		Logger.info("Connecting to Kongregate");
-		if (mKongregate.services == null) {
-			Logger.info("Kongregate services is null!");
-		} else {
-			mKongregate.services.connect();
-		}
-		removeRootDisplayObject(tKongregateLoader);
-		tKongregateLoader = null;
-		mKongregate.stats.submit("initialized", 1);
-	}
-
-	@:isVar public var kongregateAPI(get, never):ASAny;
-
-	public function get_kongregateAPI():ASAny {
-		return mKongregate;
 	}
 
 	function localeAvailable() {
@@ -489,6 +441,10 @@ class DBFacade extends Facade {
 	override public function mainLoop(event:Event) {
 		mSteamInputManager.runFrame();
 		super.mainLoop(event);
+		if (mFPSReadout != null) {
+			mFPSReadout.update(mTickCounter, mWallClockTimeElapsed, ASCompat.floatToInt(mFrameAccumulator), mRenderTickCounter,
+				ASCompat.floatToInt(mTickAccumulator));
+		}
 	}
 
 	override function flushInputs() {
@@ -535,14 +491,21 @@ class DBFacade extends Facade {
 
 	override public function init(stageRef:Stage) {
 		super.init(stageRef);
+		mDisplayTimingSettings = new DisplayTimingSettings(stageRef);
 		MemoryTracker.stage = stageRef;
-		this.setupExternalInterfaces();
 		this.stageRef.showDefaultContextMenu = false;
-		this.stageRef.addEventListener("keyDown", toggleFullscreen);
+		EventListeners.add(this.stageRef, "keyDown", toggleFullscreen);
+		EventListeners.add(this.stageRef, "keyDown", altEnterFullscreen, true);
+		EventListeners.add(this.stageRef, "keyDown", altEnterFullscreen);
+		EventListeners.add(this.stageRef, "keyUp", releaseAltEnter, true);
+		EventListeners.add(this.stageRef, "keyUp", releaseAltEnter);
+		EventListeners.add(this.stageRef, "deactivate", forgetPlainEnter);
 		createLetterbox();
 		mInitialLoadingClip = ASCompat.coerce(ASCompat.createInstance(LoadingClass, []), flash.display.MovieClip);
+		mInitialLoadingClip.addFrameScript(mInitialLoadingClip.totalFrames - 1, mInitialLoadingClip.stop);
 		mLoadingBar = new UIProgressBar(this, ASCompat.coerce((mInitialLoadingClip : ASAny).loadingBar.loadingBar, flash.display.MovieClip));
 		this.loadingBarTick();
+		mFPSReadout = new FPSReadout(this);
 		addRootDisplayObject(mInitialLoadingClip);
 		mEventComponent.addListener("enterFrame", this.stagetwo_init);
 	}
@@ -554,6 +517,37 @@ class DBFacade extends Facade {
 		if (event.keyCode == 27) {
 			event.preventDefault();
 		}
+	}
+
+	function altEnterFullscreen(event:KeyboardEvent) {
+		if (event.keyCode != 13) {
+			return;
+		}
+		if (!mAltEnterDown) {
+			if (!event.altKey || mPlainEnterDown) {
+				mPlainEnterDown = true;
+				return;
+			}
+			mAltEnterDown = true;
+			stageRef.displayState = this.stageRef.displayState == "normal" ? "fullScreenInteractive" : "normal";
+		}
+		event.stopImmediatePropagation();
+	}
+
+	function releaseAltEnter(event:KeyboardEvent) {
+		if (event.keyCode != 13) {
+			return;
+		}
+		mPlainEnterDown = false;
+		if (!mAltEnterDown) {
+			return;
+		}
+		mAltEnterDown = false;
+		event.stopImmediatePropagation();
+	}
+
+	function forgetPlainEnter(event:Event) {
+		mPlainEnterDown = false;
 	}
 
 	function createLetterbox() {
@@ -574,26 +568,13 @@ class DBFacade extends Facade {
 		if (stagetwo_init_call_count >= 2) {
 			this.loadingBarTick();
 			mEventComponent.removeListener("enterFrame");
-			mAssetLoader = new AssetLoadingComponent(this);
+			if (mAssetLoadingComponent == null) {
+				mAssetLoadingComponent = new AssetLoadingComponent(this);
+			}
 			mEventComponent.addListener("LoadingFinishedEvent", architectureLoaded);
 			mEventComponent.addListener("ConfigFileLoadedEvent", configLoaded);
 			mMainStateMachine = new MainStateMachine(this);
 			mMainStateMachine.enterLoadingState();
-		}
-	}
-
-	function setupExternalInterfaces() {
-		if (ExternalInterface.available) {
-			ExternalInterface.addCallback("orderComplete", function(param1:String, param2:UInt) {
-				StoreServices.orderCompleteCallback(this, param1, param2);
-			});
-			ExternalInterface.addCallback("earnCurrencyCallback", function(param1:ASObject) {
-				if (ASCompat.toBool(param1) && ASCompat.toNumberField(param1, "vc_amount") > 0) {
-					mDBAccountInfo.getUsersFullAccountInfo();
-				}
-				mMetricsLogger.log("FacebookEarnCallback");
-			});
-			Logger.debug("ExternalInterface setup complete");
 		}
 	}
 
@@ -644,15 +625,27 @@ class DBFacade extends Facade {
 		Logger.errorCallback = loggerErrorCall;
 	}
 
+	public function toggleFpsOverlay() {
+		if (mFPSReadout != null) {
+			mFPSReadout.toggleVisibility();
+		}
+	}
+
+	@:isVar public var fpsReadout(get, never):FPSReadout;
+
+	public function get_fpsReadout():FPSReadout {
+		return mFPSReadout;
+	}
+
 	public function preLoadJson() {
 		this.loadingBarTick();
-		var _loc3_ = dbConfigManager.getConfigString("gameMasterPath", "Resources/Levels/DB_GameMaster.json");
+		var _loc3_ = dbConfigManager.getConfigString("gameMasterPath", "Resources/Levels/DB_GameMaster_C.json");
 		var _loc4_ = buildFullDownloadPath(_loc3_);
 		var _loc1_ = buildFullDownloadPath("Resources/Levels/library_server.json");
 		var _loc2_ = buildFullDownloadPath("Resources/Combat/AttackTimeline.json");
-		mAssetLoader.getJsonAsset(_loc4_, gameMasterFinishedLoading, errorLoadingGameMaster);
-		mAssetLoader.getJsonAsset(_loc1_, libraryFinishedLoading, errorLoadingLibrary);
-		mAssetLoader.getJsonAsset(_loc2_, timelineFinishedLoading, errorLoadingAttackTimeline);
+		mAssetLoadingComponent.getJsonAsset(_loc4_, gameMasterFinishedLoading, errorLoadingGameMaster);
+		mAssetLoadingComponent.getJsonAsset(_loc1_, libraryFinishedLoading, errorLoadingLibrary);
+		mAssetLoadingComponent.getJsonAsset(_loc2_, timelineFinishedLoading, errorLoadingAttackTimeline);
 	}
 
 	function errorLoadingGameMaster() {
@@ -671,9 +664,9 @@ class DBFacade extends Facade {
 		var _loc2_:JsonAsset = null;
 		mTileLibraryMap.clear();
 		var _loc1_:ASObject;
-		final __ax4_iter_71 = mJsonAssets;
-		if (checkNullIteratee(__ax4_iter_71))
-			for (_tmp_ in __ax4_iter_71) {
+		final __ax4_iter_81 = mJsonAssets;
+		if (checkNullIteratee(__ax4_iter_81))
+			for (_tmp_ in __ax4_iter_81) {
 				_loc1_ = _tmp_;
 				_loc2_ = ASCompat.dynamicAs(_loc1_, JsonAsset);
 				_loc2_.destroy();
@@ -695,12 +688,6 @@ class DBFacade extends Facade {
 		return mTileLibraryMap.itemFor(path);
 	}
 
-	@:isVar public var facebookAccountInfo(get, never):FacebookAccountInfo;
-
-	public function get_facebookAccountInfo():FacebookAccountInfo {
-		return mFacebookAccountInfo;
-	}
-
 	@:isVar public var libraryJson(get, never):Array<ASAny>;
 
 	public function get_libraryJson():Array<ASAny> {
@@ -709,7 +696,7 @@ class DBFacade extends Facade {
 
 	function libraryFinishedLoading(libraryJson:JsonAsset) {
 		var _loc2_:ASObject;
-		var __ax4_iter_73:Array<ASAny>;
+		var __ax4_iter_83:Array<ASAny>;
 		Logger.info("libraryFinishedLoading");
 		this.loadingBarTick();
 		mLibraryJsonLoaded = true;
@@ -717,14 +704,14 @@ class DBFacade extends Facade {
 		var _loc4_ = 0;
 		mLibraryJson = ASCompat.dynamicAs(libraryJson.json, Array);
 		var _loc3_:ASObject;
-		final __ax4_iter_72:ASObject = libraryJson.json;
-		if (checkNullIteratee(__ax4_iter_72))
-			for (_tmp_ in iterateDynamicValues(__ax4_iter_72)) {
+		final __ax4_iter_82:ASObject = libraryJson.json;
+		if (checkNullIteratee(__ax4_iter_82))
+			for (_tmp_ in iterateDynamicValues(__ax4_iter_82)) {
 				_loc3_ = _tmp_;
 				_loc4_ = 0;
-				__ax4_iter_73 = _loc3_.navCollisions;
-				if (checkNullIteratee(__ax4_iter_73))
-					for (_tmp_ in __ax4_iter_73) {
+				__ax4_iter_83 = _loc3_.navCollisions;
+				if (checkNullIteratee(__ax4_iter_83))
+					for (_tmp_ in __ax4_iter_83) {
 						_loc2_ = _tmp_;
 						_loc4_ += GetSecurityValue(_loc2_);
 					}
@@ -771,9 +758,9 @@ class DBFacade extends Facade {
 		mGameMasterJsonLoaded = true;
 		var _loc3_ = false;
 		var _loc2_:ASObject;
-		final __ax4_iter_74:Array<ASAny> = mGameMasterJson.Hero;
-		if (checkNullIteratee(__ax4_iter_74))
-			for (_tmp_ in __ax4_iter_74) {
+		final __ax4_iter_84:Array<ASAny> = mGameMasterJson.Hero;
+		if (checkNullIteratee(__ax4_iter_84))
+			for (_tmp_ in __ax4_iter_84) {
 				_loc2_ = _tmp_;
 				if (ASCompat.toNumberField(_loc2_, "BaseMove") > 250) {
 					_loc3_ = true;
@@ -812,19 +799,33 @@ class DBFacade extends Facade {
 	}
 
 	public function loadingBarTick() {
-		var _loc2_:TextField = null;
-		var _loc1_:String = null;
 		if (mLoadingBar != null) {
 			mLoadingBar.value += 0.06666666666666667;
 			mLoadingBarIntStatus = mLoadingBarIntStatus + 1;
-			if (ASCompat.reinterpretAs(mLoadingBar.root.parent, MovieClip) != null
-				&& ASCompat.toBool((ASCompat.reinterpretAs(mLoadingBar.root.parent, MovieClip) : ASAny).loading_text)) {
-				_loc2_ = ASCompat.dynamicAs((ASCompat.reinterpretAs(mLoadingBar.root.parent, MovieClip) : ASAny).loading_text, TextField);
-				_loc1_ = "LOADING " + String.fromCharCode(ASCompat.floatToInt(64 + mLoadingBarIntStatus)) + "...";
-				Logger.info("loadingBarTick at: " + _loc1_);
-				_loc2_.text = _loc1_;
-			}
+			setLoadingBarText("LOADING " + String.fromCharCode(ASCompat.floatToInt(64 + mLoadingBarIntStatus)) + "...");
 		}
+	}
+
+	public function setLoadingBarText(message:String) {
+		var _loc2_ = ASCompat.coerce(mInitialLoadingClip != null ? ASCompat.dynamicAs((mInitialLoadingClip : ASAny).loadingBar, MovieClip) : null,
+			flash.display.MovieClip);
+		var _loc4_ = ASCompat.coerce(_loc2_ != null ? ASCompat.dynamicAs((_loc2_ : ASAny).loading_text, TextField) : null, flash.text.TextField);
+		if (_loc4_ == null || _loc4_.text == message) {
+			return;
+		}
+		Logger.info("loadingBarTick at: " + message);
+		_loc4_.text = message;
+		var _loc3_ = _loc4_.textWidth + 4;
+		if (_loc3_ > _loc4_.width) {
+			_loc4_.x -= (_loc3_ - _loc4_.width) / 2;
+			_loc4_.width = _loc3_;
+		}
+	}
+
+	@:isVar public var loadingStateLeft(get, never):Bool;
+
+	public function get_loadingStateLeft():Bool {
+		return mMainStateMachine != null && !Std.isOfType(mMainStateMachine.currentState, LoadingState);
 	}
 
 	public function powerUpDistributedObjectManager() {
@@ -854,7 +855,7 @@ class DBFacade extends Facade {
 		Logger.warn("WorldServer connection lost, resuming: " + reason);
 		mMainStateAtDrop = mMainStateMachine?.currentStateName;
 		showReconnectingIndicator();
-		if (!mReconnectFrozeInput && inputManager != null && !inputManager.disableInputs) {
+		if (!mReconnectFrozeInput && inputManager != null) {
 			inputManager.disableControls();
 			mReconnectFrozeInput = true;
 		}
@@ -908,12 +909,15 @@ class DBFacade extends Facade {
 	}
 
 	public function warningPopup(title:String, message:String) {
-		var _loc3_ = new DBUIOneButtonPopup(this, title, message, Locale.getString("OK"), null);
+		var _loc3_ = new DBUIOneButtonPopup(this, "WARNING_POPUP", title, message, Locale.getString("OK"), null);
 		MemoryTracker.track(_loc3_, "DBUIOneButtonPopup - created in DBFacade.warningPopup()");
 	}
 
-	public function errorPopup(title:String, message:String, UILayerName:String = "") {
-		var _loc4_ = new DBUIOneButtonPopup(this, title, message, Locale.getString("OK"), null, true, null, null, null, ASCompat.stringAsBool(UILayerName));
+	public function errorPopup(title:String, message:String, uiLayerName:String) {
+		if (menuNavigationController != null && menuNavigationController.getAllCurrentLayers().indexOf(uiLayerName) >= 0) {
+			return;
+		}
+		var _loc4_ = new DBUIOneButtonPopup(this, uiLayerName, title, message, Locale.getString("OK"), null);
 		MemoryTracker.track(_loc4_, "DBUIOneButtonPopup - created in DBFacade.errorPopup()");
 	}
 
@@ -969,8 +973,6 @@ class DBFacade extends Facade {
 	function architectureLoaded(event:LoadingFinishedEvent) {
 		this.loadingBarTick();
 		mDBAccountInfo = event.dbAccountInfo;
-		mDBAccountInfo.checkFriendsHash();
-		PixelTracker.returnDAU(this);
 		mEventComponent.removeListener("LoadingFinishedEvent");
 		mGameClock.initTime();
 		#if cpp
@@ -1009,9 +1011,9 @@ class DBFacade extends Facade {
 		return mGameMasterJson;
 	}
 
-	@:isVar public var hud(get, never):UIHud;
+	@:isVar public var hud(get, never):IGameHud;
 
-	public function get_hud():UIHud {
+	public function get_hud():IGameHud {
 		return mHud;
 	}
 
@@ -1041,28 +1043,10 @@ class DBFacade extends Facade {
 		return mMainStateMachine;
 	}
 
-	@:isVar public var facebookController(get, never):DBFacebookAPIController;
+	@:isVar public var heroInputSuspended(get, never):Bool;
 
-	public function get_facebookController():DBFacebookAPIController {
-		return mDBFaceBookAPIController;
-	}
-
-	@:isVar public var isFacebookPlayer(get, never):Bool;
-
-	public function get_isFacebookPlayer():Bool {
-		return dbConfigManager.networkId == 1;
-	}
-
-	@:isVar public var isKongregatePlayer(get, never):Bool;
-
-	public function get_isKongregatePlayer():Bool {
-		return dbConfigManager.networkId == 2;
-	}
-
-	@:isVar public var isDRPlayer(get, never):Bool;
-
-	public function get_isDRPlayer():Bool {
-		return dbConfigManager.networkId == 3;
+	public function get_heroInputSuspended():Bool {
+		return mMainStateMachine != null && Std.isOfType(mMainStateMachine.currentState, LoadingScreenState);
 	}
 
 	@:isVar public var accountBonus(get, never):AccountBonus;
@@ -1140,40 +1124,6 @@ class DBFacade extends Facade {
 		return mValidationToken;
 	}
 
-	@:isVar public var facebookId(get, never):String;
-
-	public function get_facebookId():String {
-		return mFacebookId;
-	}
-
-	@:isVar public var kongregatePlayerId(get, never):String;
-
-	public function get_kongregatePlayerId():String {
-		return mKongregatePlayerId;
-	}
-
-	@:isVar public var facebookPlayerId(get, never):String;
-
-	public function get_facebookPlayerId():String {
-		return mFacebookPlayerId;
-	}
-
-	@:isVar public var facebookThirdPartyId(get, set):String;
-
-	public function get_facebookThirdPartyId():String {
-		return mFacebookThirdPartyId;
-	}
-
-	function set_facebookThirdPartyId(value:String):String {
-		return mFacebookThirdPartyId = value;
-	}
-
-	@:isVar public var facebookApplication(get, never):String;
-
-	public function get_facebookApplication():String {
-		return mFacebookApplication;
-	}
-
 	@:isVar public var demographics(get, never):ASObject;
 
 	public function get_demographics():ASObject {
@@ -1183,7 +1133,7 @@ class DBFacade extends Facade {
 	@:isVar public var demographicsJson(get, never):String;
 
 	public function get_demographicsJson():String {
-		return com.maccherone.json.JSON.encode(mDemographics);
+		return JsonCodec.encode(mDemographics);
 	}
 
 	@:isVar public var steamInputManager(get, never):SteamInputManager;
@@ -1212,12 +1162,19 @@ class DBFacade extends Facade {
 		mHiddenFocusText.mouseEnabled = false;
 		mHiddenFocusText.tabEnabled = false;
 		addRootDisplayObject(mHiddenFocusText);
-		mHiddenFocusText.addEventListener("focusOut", _textFocus);
+		EventListeners.add(mHiddenFocusText, "focusOut", _textFocus);
 		this.regainFocus();
 	}
 
 	public function regainFocus() {
 		mStageRef.focus = ASCompat.coerce(mHiddenFocusText != null ? mHiddenFocusText : mStageRef, flash.display.InteractiveObject);
+	}
+
+	@:isVar public var textInputHasFocus(get, never):Bool;
+
+	public function get_textInputHasFocus():Bool {
+		var _loc1_ = ASCompat.reinterpretAs(mStageRef.focus, TextField);
+		return _loc1_ != null && _loc1_.type == "input" && _loc1_ != mHiddenFocusText;
 	}
 
 	public function loggerErrorCall(logString:String) {
@@ -1260,9 +1217,9 @@ class DBFacade extends Facade {
 
 	public function getSplitTestNumber(key:String, defaultValue:Float):Float {
 		var _loc3_:ASObject;
-		final __ax4_iter_75:ASObject = this.splitTests;
-		if (checkNullIteratee(__ax4_iter_75))
-			for (_tmp_ in iterateDynamicValues(__ax4_iter_75)) {
+		final __ax4_iter_85:ASObject = this.splitTests;
+		if (checkNullIteratee(__ax4_iter_85))
+			for (_tmp_ in iterateDynamicValues(__ax4_iter_85)) {
 				_loc3_ = _tmp_;
 				if (_loc3_.name == key) {
 					return ASCompat.toNumber(_loc3_.value);
@@ -1274,9 +1231,9 @@ class DBFacade extends Facade {
 
 	public function getSplitTestBoolean(key:String, defaultValue:Bool):Bool {
 		var _loc3_:ASObject;
-		final __ax4_iter_76:ASObject = this.splitTests;
-		if (checkNullIteratee(__ax4_iter_76))
-			for (_tmp_ in iterateDynamicValues(__ax4_iter_76)) {
+		final __ax4_iter_86:ASObject = this.splitTests;
+		if (checkNullIteratee(__ax4_iter_86))
+			for (_tmp_ in iterateDynamicValues(__ax4_iter_86)) {
 				_loc3_ = _tmp_;
 				if (_loc3_.name == key) {
 					Logger.debug("splitTestValueFor " + key + ": " + Std.string(_loc3_.value));
@@ -1289,9 +1246,9 @@ class DBFacade extends Facade {
 
 	public function getSplitTestString(key:String, defaultValue:String):String {
 		var _loc3_:ASObject;
-		final __ax4_iter_77:ASObject = this.splitTests;
-		if (checkNullIteratee(__ax4_iter_77))
-			for (_tmp_ in iterateDynamicValues(__ax4_iter_77)) {
+		final __ax4_iter_87:ASObject = this.splitTests;
+		if (checkNullIteratee(__ax4_iter_87))
+			for (_tmp_ in iterateDynamicValues(__ax4_iter_87)) {
 				_loc3_ = _tmp_;
 				if (_loc3_.name == key) {
 					return _loc3_.value;
@@ -1305,16 +1262,6 @@ class DBFacade extends Facade {
 
 	public function getInfiniteDungeonDetailForNodeId(nodeId:UInt):InfiniteMapNodeDetail {
 		return mDistributedObjectManager.mMatchMaker.getInfiniteDungeonDetailForNodeId(nodeId);
-	}
-
-	@:isVar public var adManager(get, set):AdManager;
-
-	public function get_adManager():AdManager {
-		return mAdManager;
-	}
-
-	function set_adManager(manager:AdManager):AdManager {
-		return mAdManager = manager;
 	}
 
 	public function overlaySteamwithURL(urlLink:String) {
@@ -1345,5 +1292,33 @@ class DBFacade extends Facade {
 
 	public function get_customSkinVisualsOverrideHandler():CustomSkinVisualsOverrideHandler {
 		return mCustomSkinVisualsOverrideHandler;
+	}
+
+	@:isVar public var keyBindings(get, never):KeyBindings;
+
+	public function get_keyBindings():KeyBindings {
+		return mKeyBindings;
+	}
+
+	@:isVar public var uiHideToggle(get, never):UIHideToggle;
+
+	public function get_uiHideToggle():UIHideToggle {
+		return mUIHideToggle;
+	}
+
+	@:isVar public var settingsModel(get, never):SettingsModel;
+
+	public function get_settingsModel():SettingsModel {
+		if (mSettingsModel == null) {
+			mSettingsModel = new SettingsModel(this);
+			MemoryTracker.track(mSettingsModel, "SettingsModel - created in DBFacade.settingsModel");
+		}
+		return mSettingsModel;
+	}
+
+	@:isVar public var displayTimingSettings(get, never):DisplayTimingSettings;
+
+	public function get_displayTimingSettings():DisplayTimingSettings {
+		return mDisplayTimingSettings;
 	}
 }

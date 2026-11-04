@@ -111,7 +111,6 @@ class MovieClipCutsceneRenderer extends MovieClipRenderer {
 		if (!mIsPlaying) {
 			return;
 		}
-		var previousFrame = Math.fround(mPlayHead);
 		mPlayHead += mFrameRate * gameClock.tickLength * mPlayRate;
 		if (mPlayHead > mNextPauseFrame) {
 			mIsPlaying = false;
@@ -129,25 +128,23 @@ class MovieClipCutsceneRenderer extends MovieClipRenderer {
 			}
 			return;
 		}
-		if (previousFrame != Math.fround(mPlayHead)) {
-			this.updateClip(mClip);
-		}
+		this.updateClip(mClip);
 	}
 
 	override function determineFrames(clip:MovieClip) {
 		var _loc3_ = Math.NaN;
-		var _loc4_ = 0;
+		var _loc4_ = (0 : UInt);
 		var _loc2_:String = null;
 		if (clip.currentLabels != null) {
 			_loc3_ = clip.soundTransform.volume;
-			_loc4_ = 1;
-			while (_loc4_ <= clip.totalFrames) {
+			_loc4_ = (1 : UInt);
+			while (_loc4_ <= (clip.totalFrames : UInt)) {
 				clip.gotoAndStop(_loc4_);
 				clip.soundTransform.volume = 0;
 				if (clip.currentFrameLabel == "pause") {
-					mPauseFrames.push((_loc4_ : UInt));
+					mPauseFrames.push(_loc4_);
 				} else if (ASCompat.stringAsBool(clip.currentFrameLabel) && clip.currentFrameLabel.indexOf("play ") == 0) {
-					mSoundFrames.push((_loc4_ : UInt));
+					mSoundFrames.push(_loc4_);
 					_loc2_ = clip.currentFrameLabel.substring(5);
 					mSoundClasses.push(_loc2_);
 				}

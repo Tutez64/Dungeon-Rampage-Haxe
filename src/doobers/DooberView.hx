@@ -1,20 +1,27 @@
 package doobers;
 
 import brain.assetRepository.AssetLoadingComponent;
+import brain.assetRepository.StarlingAssetMapper;
 import brain.assetRepository.SwfAsset;
+import brain.clock.GameClock;
+import brain.logger.Logger;
 import brain.render.MovieClipRenderController;
+import brain.render.tweens.Quad;
+import brain.render.tweens.TweenHandle;
 import brain.sound.SoundAsset;
+import brain.workLoop.LayerWorkComponent;
+import collections.Map;
+import dBGlobals.DBGlobal;
 import distributedObjects.HeroGameObject;
 import facade.DBFacade;
 import dr_floor.FloorView;
 import sound.DBSoundComponent;
-import com.greensock.*;
-import com.greensock.easing.*;
+import starling.SwfFallbackDebug;
 import flash.display.MovieClip;
 import flash.display.Sprite;
 import flash.geom.Point;
 import flash.geom.Vector3D;
-import org.as3commons.collections.Map;
+import starling.extensions.animate.Animation;
 
 class DooberView extends FloorView {
 	static inline final LOOP_HEIGHT = 270;
@@ -41,9 +48,9 @@ class DooberView extends FloorView {
 
 	var mDooberGameObject:DooberGameObject;
 
-	var mBounceTimeline:TimelineMax;
+	var mBounceTimeline:TweenHandle;
 
-	var mMoveToUITween:TweenMax;
+	var mMoveToUITween:TweenHandle;
 
 	var mEndPos:Vector3D;
 
@@ -55,10 +62,16 @@ class DooberView extends FloorView {
 
 	var mDooberSwfAsset:SwfAsset;
 
+	var mStarlingRenderer:StarlingDooberRenderer;
+
+	var mStarlingSyncComponent:LayerWorkComponent;
+
+	var mOnStage:Bool = false;
+
 	public function new(facade:DBFacade, dooberGameObject:DooberGameObject) {
 		super(facade, dooberGameObject);
 		mDooberGameObject = dooberGameObject;
-		mAssetLoadingComponent = new AssetLoadingComponent(mFacade);
+		mAssetLoadingComponent = new AssetLoadingComponent(mDBFacade);
 		mSoundComponent = new DBSoundComponent(facade);
 		mRoot.name = "DooberView_" + mDooberGameObject.id;
 		mBody = new Sprite();
@@ -69,15 +82,141 @@ class DooberView extends FloorView {
 	override public function init() {
 		super.init();
 		mBody.scaleX = mBody.scaleY = mDooberGameObject.mDooberData.ScaleVisual;
-		mAssetLoadingComponent.getSwfAsset(mDooberGameObject.swfPath, assetLoaded);
-		mAssetLoadingComponent.getSoundAsset(DBFacade.buildFullDownloadPath("Resources/Audio/soundEffects.swf"), mDooberGameObject.mDooberData.PickupSound,
-			soundLoaded);
+		loadDooberAssets();
+		mAssetLoadingComponent.getSoundAsset(DBFacade.buildFullDownloadPath(DBGlobal.SFX_PATH), mDooberGameObject.mDooberData.PickupSound, soundLoaded);
 		mRoot.mouseEnabled = false;
 		mRoot.mouseChildren = false;
 	}
 
+	override public function isViewObjectTweenDriven():Bool {
+		return true;
+	}
+
 	function soundLoaded(soundAsset:SoundAsset) {
 		mPickupSound = soundAsset;
+	}
+
+	function loadDooberAssets() {
+		var swfPath = mDooberGameObject.swfPath;
+		if (!ASCompat.stringAsBool(mDooberGameObject.className)
+			|| mDBFacade.assetLoadingComponent == null
+			|| mDBFacade.starlingLayerManager == null) {
+			reportSwfFallback(!ASCompat.stringAsBool(mDooberGameObject.className) ? "no AssetClassName for doober" : (mDBFacade.assetLoadingComponent == null ? "no asset loading component" : "no Starling layer manager (Stage3D not up)"));
+			mAssetLoadingComponent.getSwfAsset(swfPath, assetLoaded);
+			return;
+		}
+		mDBFacade.assetLoadingComponent.queueStarlingAssetsForPath(swfPath, function() {
+			if (mDooberGameObject == null) {
+				return;
+			}
+			if (!loadStarlingDoober()) {
+				reportSwfFallback("no bundle animation, per-class animation, or packed label matches the doober class");
+				mAssetLoadingComponent.getSwfAsset(swfPath, assetLoaded);
+			}
+		});
+	}
+
+	function reportSwfFallback(reason:String) {
+		SwfFallbackDebug.report(mDBFacade, "DOOBER", mDooberGameObject != null ? mDooberGameObject.className : "?",
+			mDooberGameObject != null ? mDooberGameObject.swfPath : null, reason);
+	}
+
+	function loadStarlingDoober():Bool {
+		var _loc3_:String = null;
+		var _loc1_:String = null;
+		var _loc4_ = mDooberGameObject.className;
+		var _loc7_:Animation = null;
+		var _loc5_:String = null;
+		var _loc2_ = StarlingAssetMapper.getActorAtlasKeyFromPath(mDooberGameObject.swfPath);
+		var _loc6_ = _loc4_.lastIndexOf("_");
+		if (_loc6_ > 0) {
+			_loc3_ = _loc4_.substring(0, _loc6_);
+			_loc1_ = _loc4_.substring(_loc6_ + 1);
+			_loc7_ = mDBFacade.assetLoadingComponent.createAnimationFromAtlas(_loc2_, _loc3_);
+			if (_loc7_ == null) {
+				_loc7_ = mDBFacade.assetLoadingComponent.createAnimationFromAssetManager(_loc3_);
+			}
+			if (_loc7_ != null) {
+				if (_loc7_.getFrame(_loc1_) >= 0) {
+					_loc5_ = _loc1_;
+				} else {
+					Logger.warnch("Starling", "Doober bundle \'" + _loc3_ + "\' has no label \'" + _loc1_ + "\' for " + _loc4_);
+					_loc7_.dispose();
+					_loc7_ = null;
+				}
+			}
+		}
+		if (_loc7_ == null) {
+			_loc7_ = mDBFacade.assetLoadingComponent.createAnimationFromAtlas(_loc2_, _loc4_);
+			if (_loc7_ == null) {
+				_loc7_ = mDBFacade.assetLoadingComponent.createAnimationFromAssetManager(_loc4_);
+			}
+		}
+		if (_loc7_ == null) {
+			if (_loc2_ != null) {
+				_loc7_ = mDBFacade.assetLoadingComponent.createAnimationFromAssetManager(_loc2_);
+				if (_loc7_ != null) {
+					if (_loc7_.getFrame(_loc4_) >= 0) {
+						_loc5_ = _loc4_;
+					} else {
+						_loc7_.dispose();
+						_loc7_ = null;
+					}
+				}
+			}
+		}
+		if (_loc7_ == null) {
+			Logger.warnch("Starling", "No Starling asset for doober " + _loc4_ + "; falling back to SWF");
+			return false;
+		}
+		mStarlingRenderer = new StarlingDooberRenderer(mDBFacade, _loc4_ + "_" + mDooberGameObject.id, 0, _loc7_, _loc5_);
+		this.layer = mDooberGameObject.layer;
+		if (mOnStage) {
+			mStarlingRenderer.setLayer(this.layer);
+		}
+		mStarlingRenderer.visible = mOnStage && mRoot.visible;
+		syncStarlingTransform();
+		mStarlingRenderer.play();
+		mStarlingSyncComponent = new LayerWorkComponent(mDBFacade, "DooberView");
+		mStarlingSyncComponent.doEveryFrame(onStarlingSyncFrame);
+		return true;
+	}
+
+	function onStarlingSyncFrame(clock:GameClock) {
+		syncStarlingTransform();
+	}
+
+	function syncStarlingTransform() {
+		if (mStarlingRenderer == null || mRoot == null) {
+			return;
+		}
+		var _loc1_ = mRoot.x;
+		var _loc2_ = mRoot.y;
+		if (mDooberGameObject.layer == 20) {
+			_loc1_ = positionX;
+			_loc2_ = positionY;
+		}
+		mStarlingRenderer.setTransform(mRoot.x + mBody.x * mRoot.scaleX, mRoot.y + mBody.y * mRoot.scaleY, mRoot.scaleX * mBody.scaleX,
+			mRoot.scaleY * mBody.scaleY, mRoot.alpha, _loc1_, _loc2_);
+		mStarlingRenderer.visible = mOnStage && mRoot.visible;
+	}
+
+	override public function addToStage() {
+		super.addToStage();
+		mOnStage = true;
+		if (mStarlingRenderer != null) {
+			mStarlingRenderer.setLayer(this.layer);
+			mStarlingRenderer.visible = mRoot.visible;
+		}
+	}
+
+	override public function removeFromStage() {
+		mOnStage = false;
+		if (mStarlingRenderer != null) {
+			mStarlingRenderer.setLayer(0);
+			mStarlingRenderer.visible = false;
+		}
+		super.removeFromStage();
 	}
 
 	function assetLoaded(swfAsset:SwfAsset) {
@@ -86,14 +225,25 @@ class DooberView extends FloorView {
 		if (ASCompat.toBool((mDoober : ASAny).doober_shadow)) {
 			ASCompat.setProperty((mDoober : ASAny).doober_shadow, "visible", true);
 		}
+		SwfFallbackDebug.applyOutline(mDBFacade, mDoober, "DOOBER");
 		mBody.addChild(mDoober);
 		mDooberRenderer.play((0 : UInt), true);
 		this.layer = mDooberGameObject.layer;
 	}
 
 	function checkinDoober() {
-		mDBFacade.movieClipPool.checkin(mDooberRenderer);
-		mDooberRenderer = null;
+		if (mStarlingSyncComponent != null) {
+			mStarlingSyncComponent.destroy();
+			mStarlingSyncComponent = null;
+		}
+		if (mStarlingRenderer != null) {
+			mStarlingRenderer.destroy();
+			mStarlingRenderer = null;
+		}
+		if (mDooberRenderer != null) {
+			mDBFacade.movieClipPool.checkin(mDooberRenderer);
+			mDooberRenderer = null;
+		}
 		mDoober = null;
 	}
 
@@ -107,14 +257,14 @@ class DooberView extends FloorView {
 			animationComplete();
 		};
 		if (mBounceTimeline != null) {
-			mBounceTimeline.kill();
+			mDBFacade.mTween.killTween(mBounceTimeline);
 			mBounceTimeline = null;
 		}
 		if (mPickupSound != null) {
 			mSoundComponent.playSfxOneShot(mPickupSound, worldCenter, 0, mDooberGameObject != null ? mDooberGameObject.mDooberData.PickupVolume : 1);
 		}
 		localPoint = new Point(0, 0);
-		globalPoint = mRoot.localToGlobal(localPoint);
+		globalPoint = mDBFacade.designLocalToGlobal(mRoot, localPoint);
 		this.removeFromStage();
 		mDooberGameObject.layer = 50;
 		this.addToStage();
@@ -124,6 +274,9 @@ class DooberView extends FloorView {
 		if (mDooberRenderer != null) {
 			mDooberRenderer.stop();
 			mDooberRenderer.setFrame((0 : UInt));
+		}
+		if (mStarlingRenderer != null) {
+			mStarlingRenderer.rewindAndStop();
 		}
 		if (mDoober != null && ASCompat.toBool((mDoober : ASAny).doober_shadow)) {
 			ASCompat.setProperty((mDoober : ASAny).doober_shadow, "visible", false);
@@ -142,7 +295,7 @@ class DooberView extends FloorView {
 	}
 
 	public function animateDooberBounce(startPos:Vector3D, endPos:Vector3D) {
-		if (mDoober == null) {
+		if (mDoober == null && mStarlingRenderer == null) {
 			return;
 		}
 		if (mDoober != null && ASCompat.toBool((mDoober : ASAny).doober_shadow)) {
@@ -151,7 +304,7 @@ class DooberView extends FloorView {
 		mEndPos = endPos;
 		this.mRoot.x = startPos.x;
 		this.mRoot.y = startPos.y;
-		mBounceTimeline = new TimelineMax();
+		mBounceTimeline = mDBFacade.mTween.createTimeline();
 		var _loc6_ = 0.9 + Math.random() * 0.3;
 		var _loc3_ = _loc6_ * 60 / (60 + 40);
 		var _loc4_ = _loc6_ * 40 / (60 + 40);
@@ -161,31 +314,31 @@ class DooberView extends FloorView {
 		var _loc10_ = new Vector3D(startPos.x + _loc5_ * Math.cos(_loc11_), startPos.y + _loc5_ * Math.sin(_loc11_));
 		var _loc9_ = new Vector3D((startPos.x + _loc10_.x) / 2, startPos.y - 270 * 75 / (75 + 25));
 		var _loc7_ = new Vector3D((_loc10_.x + endPos.x) / 2, _loc10_.y - 270 * 25 / (75 + 25));
-		mBounceTimeline.addLabel("start", 0);
-		mBounceTimeline.addLabel("loop1", _loc3_ / 2);
-		mBounceTimeline.addLabel("mid", _loc3_);
-		mBounceTimeline.addLabel("loop2", _loc3_ + _loc4_ / 2);
-		mBounceTimeline.addLabel("end", _loc3_ + _loc4_);
+		mDBFacade.mTween.addLabel(mBounceTimeline, "start", 0);
+		mDBFacade.mTween.addLabel(mBounceTimeline, "loop1", _loc3_ / 2);
+		mDBFacade.mTween.addLabel(mBounceTimeline, "mid", _loc3_);
+		mDBFacade.mTween.addLabel(mBounceTimeline, "loop2", _loc3_ + _loc4_ / 2);
+		mDBFacade.mTween.addLabel(mBounceTimeline, "end", _loc3_ + _loc4_);
 		var _loc12_ = _loc3_ + _loc4_;
-		mBounceTimeline.append(new TweenMax(this.mRoot, _loc12_, {"x": endPos.x}));
-		mBounceTimeline.insert(new TweenMax(this.mBody, _loc3_ / 2, {
+		mDBFacade.mTween.appendTween(mBounceTimeline, mDBFacade.mTween.tweenMaxTo(this.mRoot, _loc12_, {"x": endPos.x}));
+		mDBFacade.mTween.insertTween(mBounceTimeline, mDBFacade.mTween.tweenMaxTo(this.mBody, _loc3_ / 2, {
 			"y": _loc9_.y - startPos.y,
 			"ease": Quad.easeOut
 		}), "start");
-		mBounceTimeline.insert(new TweenMax(this.mBody, _loc3_ / 2, {
+		mDBFacade.mTween.insertTween(mBounceTimeline, mDBFacade.mTween.tweenMaxTo(this.mBody, _loc3_ / 2, {
 			"y": _loc10_.y - startPos.y,
 			"ease": Quad.easeIn
 		}), "loop1");
-		mBounceTimeline.insert(new TweenMax(this.mBody, _loc4_ / 2, {
+		mDBFacade.mTween.insertTween(mBounceTimeline, mDBFacade.mTween.tweenMaxTo(this.mBody, _loc4_ / 2, {
 			"y": _loc7_.y - startPos.y,
 			"ease": Quad.easeOut
 		}), "mid");
-		mBounceTimeline.insert(new TweenMax(this.mBody, _loc4_ / 2, {
+		mDBFacade.mTween.insertTween(mBounceTimeline, mDBFacade.mTween.tweenMaxTo(this.mBody, _loc4_ / 2, {
 			"y": endPos.y - startPos.y,
 			"ease": Quad.easeIn,
 			"onComplete": timelineComplete
 		}), "loop2");
-		mBounceTimeline.play();
+		mDBFacade.mTween.playTween(mBounceTimeline);
 	}
 
 	function timelineComplete() {
@@ -195,42 +348,44 @@ class DooberView extends FloorView {
 		if (mDooberRenderer != null) {
 			mDooberRenderer.play((0 : UInt), true);
 		}
+		if (mStarlingRenderer != null) {
+			mStarlingRenderer.play();
+		}
 		if (mDoober != null && ASCompat.toBool((mDoober : ASAny).doober_shadow)) {
 			ASCompat.setProperty((mDoober : ASAny).doober_shadow, "visible", true);
 		}
 	}
 
-	function moveToUI(dooberType:String, animationComplete:ASFunction):TweenMax {
-		var _loc3_:ASAny = null;
-		var _loc4_:Vector3D = null;
+	function moveToUI(dooberType:String, animationComplete:ASFunction):TweenHandle {
+		var _loc3_:Vector3D = null;
 		switch (dooberType) {
 			case "GOLD" | "COIN" | "TREASURE":
-				_loc4_ = mDBFacade.hud.coinsDestination;
+				_loc3_ = mDBFacade.hud.coinsDestination;
 
 			case "EXP":
-				_loc4_ = mDBFacade.hud.expDestination;
+				_loc3_ = mDBFacade.hud.expDestination;
 
-			case "CROWD" | "FAME":
-				_loc4_ = mDBFacade.hud.crowdDestination;
+			case "CROWD":
+				_loc3_ = mDBFacade.hud.crowdDestination;
 
 			default:
-				_loc4_ = mDBFacade.hud.profileDestination;
+				_loc3_ = mDBFacade.hud.profileDestination;
 		}
-		return TweenMax.to(this.mRoot, 0.5, {
-			"x": _loc4_.x,
-			"y": _loc4_.y,
+		return mDBFacade.mTween.tweenMaxTo(this.mRoot, 0.5, {
+			"x": _loc3_.x,
+			"y": _loc3_.y,
 			"onComplete": animationComplete
 		});
 	}
 
-	function moveToTeamUI(animationComplete:ASFunction, chestId:UInt):TweenMax {
+	function moveToTeamUI(animationComplete:ASFunction, chestId:UInt):TweenHandle {
 		var _loc3_ = new Vector3D();
 		if (this.mDBFacade.hud != null) {
 			_loc3_ = mDBFacade.hud.teamLootDestination;
 			this.mDBFacade.hud.openTeamLoot(chestId);
 		}
 		if (chestId == 60001) {
-			return TweenMax.to(this.mRoot, 0.5, {
+			return mDBFacade.mTween.tweenMaxTo(this.mRoot, 0.5, {
 				"x": _loc3_.x,
 				"y": _loc3_.y,
 				"scaleX": 0.8,
@@ -240,7 +395,7 @@ class DooberView extends FloorView {
 			});
 		}
 		if (chestId == 60004) {
-			return TweenMax.to(this.mRoot, 0.5, {
+			return mDBFacade.mTween.tweenMaxTo(this.mRoot, 0.5, {
 				"x": _loc3_.x,
 				"y": _loc3_.y,
 				"scaleX": 0.5,
@@ -249,7 +404,7 @@ class DooberView extends FloorView {
 				"onComplete": animationComplete
 			});
 		}
-		return TweenMax.to(this.mRoot, 0.5, {
+		return mDBFacade.mTween.tweenMaxTo(this.mRoot, 0.5, {
 			"x": _loc3_.x,
 			"y": _loc3_.y,
 			"scaleX": 0.6,
@@ -268,26 +423,30 @@ class DooberView extends FloorView {
 			_loc2_ = mDooberGameObject.distributedDungeonFloor.remoteHeroes;
 			_loc3_ = ASCompat.dynamicAs(_loc2_.itemFor(collectedPlayerId), HeroGameObject);
 			if (_loc3_ != null) {
-				return mFacade.camera.isPointOnScreen(_loc3_.view.position);
+				return mDBFacade.camera.isPointOnScreen(_loc3_.view.position);
 			}
 		}
 		return false;
 	}
 
 	override public function destroy() {
-		if (mDooberRenderer != null) {
+		if (mDooberRenderer != null || mStarlingRenderer != null) {
 			this.checkinDoober();
 		}
+		if (mStarlingSyncComponent != null) {
+			mStarlingSyncComponent.destroy();
+			mStarlingSyncComponent = null;
+		}
 		if (mBounceTimeline != null) {
-			mBounceTimeline.kill();
+			mDBFacade.mTween.killTween(mBounceTimeline);
 			mBounceTimeline = null;
 		}
 		if (mMoveToUITween != null) {
-			mMoveToUITween.kill();
+			mDBFacade.mTween.killTween(mMoveToUITween);
 			mMoveToUITween = null;
 		}
-		TweenMax.killTweensOf(this.mRoot);
-		TweenMax.killTweensOf(this.mBody);
+		mDBFacade.mTween.killTweensOf(this.mRoot);
+		mDBFacade.mTween.killTweensOf(this.mBody);
 		mAssetLoadingComponent.destroy();
 		mAssetLoadingComponent = null;
 		mSoundComponent.destroy();

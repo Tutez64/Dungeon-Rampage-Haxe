@@ -1,6 +1,7 @@
 package actor.player;
 
 import actor.ActorView;
+import dBGlobals.DBGlobal;
 import distributedObjects.HeroGameObject;
 import facade.DBFacade;
 import flash.geom.Vector3D;
@@ -24,9 +25,8 @@ class HeroView extends ActorView {
 			"db_fx_levelup", new Vector3D(), mHeroPlayerObject);
 		mHeroPlayerObject.distributedDungeonFloor.effectManager.playEffect(DBFacade.buildFullDownloadPath("Resources/Art2D/FX/db_fx_library.swf"),
 			"db_fx_levelup_background", new Vector3D(), mHeroPlayerObject, true, 1, 0, 0, 0, 0, false, "background");
-		mAssetLoadingComponent.getSoundAsset(DBFacade.buildFullDownloadPath("Resources/Audio/soundEffects.swf"), "LevelUp2",
-			function(param1:brain.sound.SoundAsset) {
-				mSoundComponent.playSfxOneShot(param1, null);
-			});
+		mAssetLoadingComponent.getSoundAsset(DBFacade.buildFullDownloadPath(DBGlobal.SFX_PATH), "LevelUp2", function(param1:brain.sound.SoundAsset) {
+			mSoundComponent.playSfxOneShot(param1, null);
+		});
 	}
 }

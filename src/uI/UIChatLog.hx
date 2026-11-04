@@ -3,17 +3,21 @@ package uI;
 import account.PlayerSpecialStatus;
 import brain.assetRepository.AssetLoadingComponent;
 import brain.event.EventComponent;
+import brain.event.EventListeners;
 import brain.logger.Logger;
+import brain.render.tweens.TweenHandle;
 import brain.sceneGraph.SceneGraphComponent;
 import brain.uI.UIButton;
 import brain.uI.UIInputText;
 import brain.uI.UISlider;
+import brain.utils.TextUtil;
 import distributedObjects.HeroGameObjectOwner;
 import events.ChatEvent;
 import events.ChatLogEvent;
 import facade.DBFacade;
 import facade.Locale;
-import com.greensock.TweenMax;
+import com.amanitadesign.steam.SteamEvent;
+import flash.display.DisplayObject;
 import flash.display.MovieClip;
 import flash.events.FocusEvent;
 import flash.events.KeyboardEvent;
@@ -53,6 +57,8 @@ class UIChatLog {
 
 	static var mChats:Vector<ChatTextFieldHelper>;
 
+	static var sChatsVersion:Int = 0;
+
 	var mDBFacade:DBFacade;
 
 	var mChatLog:TextField;
@@ -63,7 +69,7 @@ class UIChatLog {
 
 	var mChatLogContainer:MovieClip;
 
-	var mFadeTween:TweenMax;
+	var mFadeTween:TweenHandle;
 
 	var mSceneGraphComponent:SceneGraphComponent;
 
@@ -85,9 +91,19 @@ class UIChatLog {
 
 	var mChatLogShowing:Bool = false;
 
+	var mChatPromptVisible:Bool = true;
+
+	var mStarlingPrompt:ASFunction;
+
 	var mHeroOwner:HeroGameObjectOwner;
 
 	var mEnabledChatEnterEvent:Bool = true;
+
+	var mRenderedVersion:Int = -1;
+
+	var mRenderedLength:Int = -1;
+
+	var mDefaultFormat:TextFormat;
 
 	var mPreviousHeight:Float = 1;
 
@@ -107,6 +123,48 @@ class UIChatLog {
 		enable();
 	}
 
+	static function growToFloor(field:TextField, sizeModifier:Float) {
+		var _loc3_ = field.defaultTextFormat;
+		var _loc5_ = ASCompat.toNumber(_loc3_.size);
+		_loc3_.size = ASCompat.toInt(Math.fround(_loc5_ * TextUtil.scaleToFloor(_loc5_, sizeModifier)));
+		field.defaultTextFormat = _loc3_;
+		if (field.multiline) {
+			return;
+		}
+		var _loc4_ = field.height * ASCompat.toNumber(_loc3_.size) / _loc5_;
+		field.y -= (_loc4_ - field.height) / 2;
+		field.height = _loc4_;
+	}
+
+	public static function growLogUp(chatLogContainer:MovieClip, scale:Float) {
+		var _loc7_ = 0;
+		var _loc4_:DisplayObject = null;
+		var _loc5_ = ASCompat.coerce((chatLogContainer : ASAny).chatLog, flash.text.TextField);
+		var _loc3_ = ASCompat.coerce((chatLogContainer : ASAny).slider, flash.display.MovieClip);
+		var _loc6_:Float = 0;
+		_loc7_ = 0;
+		while (_loc7_ < chatLogContainer.numChildren) {
+			_loc4_ = chatLogContainer.getChildAt(_loc7_);
+			if (!(_loc4_ == _loc5_ || _loc4_ == _loc3_)) {
+				if (!ASCompat.floatAsBool(_loc6_)) {
+					_loc6_ = _loc4_.height * (scale - 1);
+				}
+				stretchUp(_loc4_, _loc6_);
+			}
+			_loc7_++;
+		}
+		stretchUp(_loc5_, _loc6_);
+		_loc3_.y -= _loc6_;
+		var __tmpAssignObj26:ASAny = (_loc3_ : ASAny).back;
+		ASCompat.setProperty(__tmpAssignObj26, "height", __tmpAssignObj26.height + _loc6_ / _loc3_.scaleY);
+	}
+
+	static function stretchUp(object:DisplayObject, extra:Float) {
+		var _loc3_ = object.getBounds(object.parent).bottom;
+		object.height += extra;
+		object.y += _loc3_ - object.getBounds(object.parent).bottom;
+	}
+
 	@:isVar public var heroOwner(never, set):HeroGameObjectOwner;
 
 	public function set_heroOwner(hero:HeroGameObjectOwner):HeroGameObjectOwner {
@@ -116,16 +174,34 @@ class UIChatLog {
 	public function enable() {
 		this.disable();
 		mEventComponent.addListener("CHAT_LOG_EVENT", chatEventHandler);
-		mChatInputText.root.addEventListener("focusIn", onChatTextFieldFocus);
-		mChatInputText.root.addEventListener("focusOut", onChatTextFieldLoseFocus);
-		mDBFacade.stageRef.addEventListener("keyDown", checkKeyEvent);
+		EventListeners.add(mChatInputText.root, "focusIn", onChatTextFieldFocus);
+		EventListeners.add(mChatInputText.root, "focusOut", onChatTextFieldLoseFocus);
+		EventListeners.add(mDBFacade.stageRef, "keyDown", checkKeyEvent);
+		EventListeners.add(mDBFacade.mSteamworks, SteamEvent.STEAM_RESPONSE, onSteamResponse);
 	}
 
 	public function disable() {
 		mEventComponent.removeListener("CHAT_LOG_EVENT");
-		mChatInputText.root.removeEventListener("focusIn", onChatTextFieldFocus);
-		mChatInputText.root.removeEventListener("focusOut", onChatTextFieldLoseFocus);
-		mDBFacade.stageRef.removeEventListener("keyDown", checkKeyEvent);
+		EventListeners.remove(mChatInputText.root, "focusIn", onChatTextFieldFocus);
+		EventListeners.remove(mChatInputText.root, "focusOut", onChatTextFieldLoseFocus);
+		EventListeners.remove(mDBFacade.stageRef, "keyDown", checkKeyEvent);
+		EventListeners.remove(mDBFacade.mSteamworks, SteamEvent.STEAM_RESPONSE, onSteamResponse);
+	}
+
+	function onSteamResponse(event:SteamEvent) {
+		if (event.req_type != 35 && event.req_type != 34) {
+			return;
+		}
+		if (mChatInputText == null || mDBFacade == null) {
+			return;
+		}
+		if (mDBFacade.stageRef.focus != mChatInputText.textField) {
+			return;
+		}
+		mToggledOpen = false;
+		mChatInputText.releaseKeyboardFocus();
+		hideChatLog();
+		mDBFacade.inputManager.clear();
 	}
 
 	function onChatTextFieldFocus(event:FocusEvent) {
@@ -146,11 +222,20 @@ class UIChatLog {
 		mChatInputText = new UIInputText(mDBFacade, chatTextField);
 		mChatInputText.defaultText = Locale.getString("DEFAULT_CHAT_PROMPT");
 		mChatInputText.enterCallback = sendChat;
+		mChatInputText.focusOutCallback = function() {
+			if (mChatInputText.text == "") {
+				resetChatPrompt();
+			}
+		};
 		mChatInputText.textField.maxChars = 169;
 		mChatLogButton = new UIButton(mDBFacade, chatLogButton);
 		mChatLogButton.releaseCallback = toggleChatLog;
 		mChatSendButton = new UIButton(mDBFacade, sendChatButton);
 		mChatSendButton.releaseCallback = function() {
+			if (mChatInputText.text == "") {
+				focusChatInput();
+				return;
+			}
 			sendChat(mChatInputText.text);
 		};
 	}
@@ -161,7 +246,63 @@ class UIChatLog {
 		mDBFacade.inputManager.clear();
 		if (ASCompat.stringAsBool(value)) {
 			mEventComponent.dispatchEvent(new ChatEvent("ChatEvent_OUTGOING_CHAT_UPDATE", (0 : UInt), value));
+		} else {
+			resetChatPrompt();
 		}
+	}
+
+	function resetChatPrompt() {
+		if (mStarlingPrompt != null) {
+			mChatInputText.defaultText = "";
+			updateStarlingPrompt();
+			return;
+		}
+		mChatInputText.defaultText = mChatPromptVisible ? Locale.getString("DEFAULT_CHAT_PROMPT") : "";
+	}
+
+	@:isVar public var starlingPrompt(never, set):ASFunction;
+
+	public function set_starlingPrompt(value:ASFunction):ASFunction {
+		mStarlingPrompt = value;
+		mChatInputText.focusInCallback = ASCompat.coerceFunction(value != null ? updateStarlingPrompt : null);
+		if (mChatInputText.showingDefaultText) {
+			resetChatPrompt();
+		}
+		return value;
+	}
+
+	@:isVar public var promptColor(get, never):UInt;
+
+	public function get_promptColor():UInt {
+		return mChatInputText.defaultTextColor;
+	}
+
+	function updateStarlingPrompt() {
+		if (mStarlingPrompt != null) {
+			mStarlingPrompt(mChatPromptVisible
+				&& mChatInputText.showingDefaultText
+				&& mDBFacade.stageRef.focus != mChatInputText.textField);
+		}
+	}
+
+	public function setChatPromptVisible(inVisible:Bool) {
+		mChatPromptVisible = inVisible;
+		if (mChatInputText.text == "") {
+			resetChatPrompt();
+		}
+	}
+
+	@:isVar public var textSizeModifier(never, set):Float;
+
+	public function set_textSizeModifier(value:Float):Float {
+		growToFloor(mChatLog, value);
+		growToFloor(mChatInputText.textField, value);
+		mDefaultFormat = null;
+		constructAndRenderNewChat();
+		if (mChatInputText.showingDefaultText) {
+			resetChatPrompt();
+		}
+		return value;
 	}
 
 	public function toggleChatLog() {
@@ -178,6 +319,9 @@ class UIChatLog {
 		if (mAutoShowChatLog) {
 			showChatLog();
 		}
+		if (mDBFacade.steamInputManager.usesSteamOnScreenKeyboard) {
+			mDBFacade.steamInputManager.showFloatingGamepadTextInputForField(mChatInputText.textField);
+		}
 	}
 
 	function chatTextFieldLostFocus() {
@@ -189,10 +333,18 @@ class UIChatLog {
 	function checkKeyEvent(event:KeyboardEvent) {
 		if (!Logger.isConsoleVisible()) {
 			if (event.keyCode == 13 && mEnabledChatEnterEvent) {
-				mDBFacade.stageRef.focus = mChatInputText.textField;
-			} else if (event.keyCode == 220 && mDBFacade.mainStateMachine.currentStateName == "RunState") {
-				toggleChatLog();
+				focusChatInput();
 			}
+		}
+	}
+
+	public function focusChatInput() {
+		mDBFacade.stageRef.focus = mChatInputText.textField;
+	}
+
+	public function tryToggleChatLog() {
+		if (mDBFacade.mainStateMachine.currentStateName == "RunState") {
+			toggleChatLog();
 		}
 	}
 
@@ -243,66 +395,96 @@ class UIChatLog {
 
 	function addChatLog(chat:String, color:UInt, playerName:String = "") {
 		var _loc4_:ChatTextFieldHelper;
-		var __ax4_iter_139:Vector<ChatTextFieldHelper>;
-		var _loc8_:ChatTextFieldHelper = null;
-		var _loc6_ = 0;
+		var __ax4_iter_134:Vector<ChatTextFieldHelper>;
+		var _loc10_:ChatTextFieldHelper = null;
 		if (mChatLog == null) {
 			return;
 		}
-		var _loc7_ = new ChatTextFieldHelper();
+		var _loc9_ = new ChatTextFieldHelper();
+		if (chat.indexOf("\r\n") >= 0) {
+			chat = chat.split("\r\n").join("\n");
+		}
 		chat += "\n";
 		var _loc5_ = (mChatLog.length : UInt);
-		_loc7_.chatText = chat;
-		_loc7_.color = color;
-		_loc7_.playerName = playerName;
-		_loc7_.colorStartIndex = _loc5_;
-		_loc7_.colorEndIndex = _loc5_ + chat.length;
-		mChats.push(_loc7_);
+		var _loc7_ = sChatsVersion++;
+		_loc9_.chatText = chat;
+		_loc9_.color = color;
+		_loc9_.playerName = playerName;
+		_loc9_.colorStartIndex = _loc5_;
+		_loc9_.colorEndIndex = _loc5_ + chat.length;
+		mChats.push(_loc9_);
+		var _loc6_ = (0 : UInt);
 		if ((mChats.length : UInt) > MAX_CHATS) {
-			_loc8_ = mChats.shift();
-			_loc6_ = _loc8_.colorEndIndex - _loc8_.colorStartIndex;
-			__ax4_iter_139 = mChats;
-			if (checkNullIteratee(__ax4_iter_139))
-				for (_tmp_ in __ax4_iter_139) {
+			_loc10_ = mChats.shift();
+			_loc6_ = _loc10_.colorEndIndex - _loc10_.colorStartIndex;
+			__ax4_iter_134 = mChats;
+			if (checkNullIteratee(__ax4_iter_134))
+				for (_tmp_ in __ax4_iter_134) {
 					_loc4_ = _tmp_;
-					_loc4_.colorEndIndex -= (_loc6_ : UInt);
-					_loc4_.colorStartIndex -= (_loc6_ : UInt);
+					_loc4_.colorEndIndex -= _loc6_;
+					_loc4_.colorStartIndex -= _loc6_;
 				}
 		}
-		constructAndRenderNewChat();
+		if (mRenderedVersion != _loc7_ || mChatLog.length != mRenderedLength) {
+			constructAndRenderNewChat();
+			return;
+		}
+		if (_loc6_ > 0) {
+			mChatLog.replaceText(0, (_loc6_ : Int), "");
+		}
+		var _loc8_ = mChatLog.length;
+		mChatLog.appendText(chat);
+		if (mDefaultFormat == null) {
+			mDefaultFormat = mChatLog.defaultTextFormat;
+		}
+		mChatLog.setTextFormat(mDefaultFormat, _loc8_, mChatLog.length);
+		formatChat(_loc9_);
+		mRenderedVersion = sChatsVersion;
+		mRenderedLength = mChatLog.length;
+		checkToShowSlider();
+		adjustSlider();
 	}
 
 	function constructAndRenderNewChat() {
-		var _loc1_:TextFormat = null;
-		var _loc2_ = 0;
 		mChatLog.text = "";
-		var _loc3_:ChatTextFieldHelper;
-		final __ax4_iter_140 = mChats;
-		if (checkNullIteratee(__ax4_iter_140))
-			for (_tmp_ in __ax4_iter_140) {
-				_loc3_ = _tmp_;
-				mChatLog.text = mChatLog.text + _loc3_.chatText;
+		var _loc1_ = (0 : UInt);
+		var _loc2_:ChatTextFieldHelper;
+		final __ax4_iter_135 = mChats;
+		if (checkNullIteratee(__ax4_iter_135))
+			for (_tmp_ in __ax4_iter_135) {
+				_loc2_ = _tmp_;
+				mChatLog.text = mChatLog.text + _loc2_.chatText;
+				_loc2_.colorStartIndex = _loc1_;
+				_loc1_ += (_loc2_.chatText.length : UInt);
+				_loc2_.colorEndIndex = _loc1_;
 			}
-		final __ax4_iter_141 = mChats;
-		if (checkNullIteratee(__ax4_iter_141))
-			for (_tmp_ in __ax4_iter_141) {
-				_loc3_ = _tmp_;
-				_loc2_ = (_loc3_.colorStartIndex : Int);
-				if (_loc3_.playerName != "") {
-					_loc1_ = new TextFormat();
-					_loc1_.color = PlayerSpecialStatus.getSpecialTextColor(_loc3_.playerName, NAME_CHAT_COLOR);
-					mChatLog.setTextFormat(_loc1_, _loc2_, _loc2_ + _loc3_.playerName.length + 1);
-					_loc2_ += _loc3_.playerName.length + 1;
-					_loc1_ = null;
-				}
-				if (_loc3_.color != 0) {
-					_loc1_ = new TextFormat();
-					_loc1_.color = _loc3_.color;
-					mChatLog.setTextFormat(_loc1_, _loc2_, (_loc3_.colorEndIndex : Int));
-				}
+		final __ax4_iter_136 = mChats;
+		if (checkNullIteratee(__ax4_iter_136))
+			for (_tmp_ in __ax4_iter_136) {
+				_loc2_ = _tmp_;
+				formatChat(_loc2_);
 			}
+		mRenderedVersion = sChatsVersion;
+		mRenderedLength = mChatLog.length;
 		checkToShowSlider();
 		adjustSlider();
+	}
+
+	function formatChat(chat:ChatTextFieldHelper) {
+		var _loc2_:TextFormat = null;
+		var _loc3_ = chat.colorStartIndex;
+		if (chat.playerName != "") {
+			_loc2_ = new TextFormat();
+			_loc2_.color = PlayerSpecialStatus.getSpecialTextColor(chat.playerName, NAME_CHAT_COLOR);
+			mChatLog.setTextFormat(_loc2_, (_loc3_ : Int), (_loc3_ + chat.playerName.length + 1 : Int));
+			_loc3_ += (chat.playerName.length + 1:UInt);
+		}
+		if (chat.color == 0) {
+			return;
+		}
+		_loc2_ = new TextFormat();
+		_loc2_.color = chat.color;
+		mChatLog.setTextFormat(_loc2_, (_loc3_ : Int), (chat.colorEndIndex : Int));
 	}
 
 	function adjustSlider() {
@@ -333,11 +515,11 @@ class UIChatLog {
 			return;
 		}
 		mChatLogShowing = false;
-		if (mFadeTween != null && mFadeTween.currentProgress != 1) {
-			mFadeTween.complete();
+		if (mFadeTween != null && mDBFacade.mTween.getCurrentProgress(mFadeTween) != 1) {
+			mDBFacade.mTween.completeTween(mFadeTween);
 		}
 		mChatLogContainer.alpha = 1;
-		mFadeTween = TweenMax.to(mChatLogContainer, 0.3, {
+		mFadeTween = mDBFacade.mTween.tweenMaxTo(mChatLogContainer, 0.3, {
 			"alpha": 0,
 			"onComplete": function() {
 				mChatLogContainer.visible = false;
@@ -351,12 +533,12 @@ class UIChatLog {
 			return;
 		}
 		mChatLogShowing = true;
-		if (mFadeTween != null && mFadeTween.currentProgress != 1) {
-			mFadeTween.complete();
+		if (mFadeTween != null && mDBFacade.mTween.getCurrentProgress(mFadeTween) != 1) {
+			mDBFacade.mTween.completeTween(mFadeTween);
 		}
 		mChatLogContainer.visible = true;
 		mChatLogContainer.alpha = 0;
-		mFadeTween = TweenMax.to(mChatLogContainer, 0.3, {"alpha": 1});
+		mFadeTween = mDBFacade.mTween.tweenMaxTo(mChatLogContainer, 0.3, {"alpha": 1});
 		constructAndRenderNewChat();
 		checkToShowSlider();
 	}
@@ -368,8 +550,8 @@ class UIChatLog {
 	}
 
 	public function destroy() {
-		if (mFadeTween != null && mFadeTween.currentProgress != 1) {
-			mFadeTween.complete();
+		if (mFadeTween != null && mDBFacade.mTween.getCurrentProgress(mFadeTween) != 1) {
+			mDBFacade.mTween.completeTween(mFadeTween);
 		}
 		disable();
 		if (mAssetLoadingComponent != null) {
@@ -400,6 +582,17 @@ class UIChatLog {
 			mChatLogButton.destroy();
 		}
 		mChatLogButton = null;
+		if (mChatSendButton != null) {
+			mChatSendButton.destroy();
+		}
+		mChatSendButton = null;
+		mStarlingPrompt = null;
+		if (mChatInputText != null) {
+			mChatInputText.destroy();
+		}
+		mChatInputText = null;
+		mHeroOwner = null;
+		mFadeTween = null;
 		mEventComponent = null;
 		mDBFacade = null;
 		mChatLog = null;
@@ -414,6 +607,18 @@ class UIChatLog {
 
 	function get_enabledChatEnterEvent():Bool {
 		return mEnabledChatEnterEvent;
+	}
+
+	@:isVar public var chatLogButton(get, never):UIButton;
+
+	public function get_chatLogButton():UIButton {
+		return mChatLogButton;
+	}
+
+	@:isVar public var chatSendButton(get, never):UIButton;
+
+	public function get_chatSendButton():UIButton {
+		return mChatSendButton;
 	}
 }
 

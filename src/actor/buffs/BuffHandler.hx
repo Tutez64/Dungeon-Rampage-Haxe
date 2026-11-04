@@ -5,14 +5,15 @@ import brain.clock.GameClock;
 import brain.event.EventComponent;
 import brain.utils.MemoryTracker;
 import brain.workLoop.DoLater;
+import collections.IMapIterator;
+import collections.Map;
+import dBGlobals.DBGlobal;
 import distributedObjects.HeroGameObjectOwner;
 import events.ActorInvulnerableEvent;
 import events.GameObjectEvent;
 import events.XPBonusEvent;
 import facade.DBFacade;
 import gameMasterDictionary.StatVector;
-import org.as3commons.collections.Map;
-import org.as3commons.collections.framework.IMapIterator;
 
 class BuffHandler {
 	public static var ACTOR_INVULNERABLE:String = "ACTOR_INVULNERABLE";
@@ -49,13 +50,17 @@ class BuffHandler {
 		mFacade = facade;
 		mActorGameObject = actorGameObject;
 		mMultiplier = new StatVector();
-		mMultiplier.setConstant(1);
+		resetMultiplier();
 		mExpMultiplier = 1;
 		mEventExpMultiplier = 1;
 		mAttackCooldownMultiplier = 1;
 		mBuffs = new Map();
 		mEventComponent = new EventComponent(mFacade);
 		mSwappableBuffs = new Vector<BuffGameObject>();
+	}
+
+	static function isAdditiveSlot(slot:UInt):Bool {
+		return slot == (DBGlobal.MELEE_DEF : UInt) || slot == (DBGlobal.SHOOT_DEF : UInt) || slot == (DBGlobal.MAGIC_DEF : UInt);
 	}
 
 	public function destroy() {
@@ -112,6 +117,7 @@ class BuffHandler {
 		} else {
 			_loc2_.instanceCount += (1 : UInt);
 			_loc2_.updateInstanceCountOnHud();
+			recalcBuffMultiplier();
 		}
 		dBuff.buffHandler = this;
 		if (mActorGameObject.isOwner && IsDisabledControls()) {
@@ -159,16 +165,23 @@ class BuffHandler {
 					}
 					_loc5_++;
 				}
+				if (mCurrentSwappableBuff > mSwappableBuffs.length) {
+					mCurrentSwappableBuff = mSwappableBuffs.length;
+				}
 				if (mSwappableBuffDisplayTask != null && mSwappableBuffs.length < 2) {
 					mSwappableBuffDisplayTask.destroy();
 					mSwappableBuffDisplayTask = null;
+					mCurrentSwappableBuff = 0;
+					if (mSwappableBuffs.length == 1) {
+						mSwappableBuffs[0].buffView.show(0.5);
+					}
 				}
 				mBuffs.remove(_loc2_);
 				_loc2_.destroy();
 				_loc2_ = null;
-				recalcBuffMultiplier();
 				recalcBuffAbility();
 			}
+			recalcBuffMultiplier();
 		}
 		if (_loc7_ && !IsInvulnerable()) {
 			mEventComponent.dispatchEvent(new ActorInvulnerableEvent(ACTOR_INVULNERABLE, mActorGameObject.id, false));
@@ -181,14 +194,11 @@ class BuffHandler {
 	function processSwappableBuffDisplays(gameClock:GameClock = null) {
 		var _loc1_:BuffGameObject = null;
 		var _loc2_:BuffGameObject = null;
-		if (mSwappableBuffs == null || mSwappableBuffs.length < 2) {
+		if (mSwappableBuffs == null || mSwappableBuffs.length == 0) {
 			mCurrentSwappableBuff = 0;
 			return;
 		}
-		if (mCurrentSwappableBuff > mSwappableBuffs.length) {
-			mCurrentSwappableBuff = 0;
-		}
-		if (mCurrentSwappableBuff == mSwappableBuffs.length) {
+		if (mCurrentSwappableBuff >= mSwappableBuffs.length) {
 			mCurrentSwappableBuff = 0;
 			_loc1_ = mSwappableBuffs[mSwappableBuffs.length - 1];
 			if (_loc1_ != null && _loc1_.buffView != null) {
@@ -207,22 +217,44 @@ class BuffHandler {
 		mCurrentSwappableBuff = mCurrentSwappableBuff + 1;
 	}
 
-	public function recalcBuffMultiplier() {
-		var _loc2_:BuffGameObject = null;
-		var _loc1_ = 0;
+	function resetMultiplier() {
 		mMultiplier.setConstant(1);
+		mMultiplier.values[DBGlobal.MELEE_DEF] = 0;
+		mMultiplier.values[DBGlobal.SHOOT_DEF] = 0;
+		mMultiplier.values[DBGlobal.MAGIC_DEF] = 0;
+	}
+
+	public function recalcBuffMultiplier() {
+		var _loc5_:Float;
+		var _loc6_:Float;
+		var _loc3_:BuffGameObject = null;
+		var _loc1_ = (0 : UInt);
+		var _loc2_ = (0 : UInt);
+		resetMultiplier();
 		mExpMultiplier = 1;
 		mEventExpMultiplier = 1;
 		mAttackCooldownMultiplier = 1;
-		var _loc3_ = ASCompat.reinterpretAs(mBuffs.iterator(), IMapIterator);
-		while (_loc3_.hasNext()) {
-			_loc2_ = ASCompat.coerce(_loc3_.next(), actor.buffs.BuffGameObject);
-			_loc1_ = 0;
-			while ((_loc1_ : UInt) < _loc2_.instanceCount) {
-				mMultiplier = StatVector.multiply(mMultiplier, _loc2_.deltaValues);
-				mExpMultiplier *= _loc2_.ExpMult;
-				mEventExpMultiplier *= _loc2_.EventExpMult;
-				mAttackCooldownMultiplier *= _loc2_.attackCooldownMultiplier;
+		var _loc4_ = ASCompat.reinterpretAs(mBuffs.iterator(), IMapIterator);
+		while (_loc4_.hasNext()) {
+			_loc3_ = ASCompat.coerce(_loc4_.next(), actor.buffs.BuffGameObject);
+			_loc1_ = (0 : UInt);
+			while (_loc1_ < _loc3_.instanceCount) {
+				_loc2_ = (0 : UInt);
+				while (_loc2_ < StatVector.slotCount) {
+					if (isAdditiveSlot(_loc2_)) {
+						_loc5_ = _loc2_;
+						_loc6_ = mMultiplier.values[ASCompat.floatToInt(_loc5_)] + _loc3_.deltaValues.values[(_loc2_ : Int)];
+						mMultiplier.values[ASCompat.floatToInt(_loc5_)] = _loc6_;
+					} else {
+						_loc6_ = _loc2_;
+						_loc5_ = mMultiplier.values[ASCompat.floatToInt(_loc6_)] * _loc3_.deltaValues.values[(_loc2_ : Int)];
+						mMultiplier.values[ASCompat.floatToInt(_loc6_)] = _loc5_;
+					}
+					_loc2_++;
+				}
+				mExpMultiplier *= _loc3_.ExpMult;
+				mEventExpMultiplier *= _loc3_.EventExpMult;
+				mAttackCooldownMultiplier *= _loc3_.attackCooldownMultiplier;
 				_loc1_++;
 			}
 		}
@@ -236,13 +268,13 @@ class BuffHandler {
 
 	public function recalcBuffAbility() {
 		var _loc2_:BuffGameObject = null;
-		var _loc1_ = 0;
+		var _loc1_ = (0 : UInt);
 		Ability = (0 : UInt);
 		var _loc3_ = ASCompat.reinterpretAs(mBuffs.iterator(), IMapIterator);
 		while (_loc3_.hasNext()) {
 			_loc2_ = ASCompat.coerce(_loc3_.next(), actor.buffs.BuffGameObject);
-			_loc1_ = 0;
-			while ((_loc1_ : UInt) < _loc2_.instanceCount) {
+			_loc1_ = (0 : UInt);
+			while (_loc1_ < _loc2_.instanceCount) {
 				Ability = ((Ability | _loc2_.Ability : UInt) : UInt);
 				_loc1_++;
 			}
@@ -254,31 +286,31 @@ class BuffHandler {
 	}
 
 	public function IsInvulnerable():Bool {
-		return ((Ability : Int) & 0x0E) != 0;
+		return ((Ability : Int) & (DBGlobal.ABILITY_INVULNERABLE_ALL : Int)) != 0;
 	}
 
 	public function IsDisabledControls():Bool {
-		return ((Ability : Int) & 0x0200) != 0;
+		return ((Ability : Int) & (DBGlobal.ABILITY_DISABLE_CONTROLS : Int)) != 0;
 	}
 
 	public function IsInvulnerableMelee():Bool {
-		return ((Ability : Int) & 2) != 0;
+		return ((Ability : Int) & (DBGlobal.ABILITY_INVULNERABLE_MELEE : Int)) != 0;
 	}
 
 	public function IsInvulnerableMagic():Bool {
-		return ((Ability : Int) & 4) != 0;
+		return ((Ability : Int) & (DBGlobal.ABILITY_INVULNERABLE_MAGIC : Int)) != 0;
 	}
 
 	public function IsInvulnerableShoot():Bool {
-		return ((Ability : Int) & 8) != 0;
+		return ((Ability : Int) & (DBGlobal.ABILITY_INVULNERABLE_SHOOT : Int)) != 0;
 	}
 
 	public function CanStun():Bool {
-		return ((Ability : Int) & 1) == 0;
+		return ((Ability : Int) & (DBGlobal.ABILITY_SUFFER_IMMUNITY : Int)) == 0;
 	}
 
 	public function IsBerserk():Bool {
-		return ((Ability : Int) & 0x10) != 0;
+		return ((Ability : Int) & (DBGlobal.ABILITY_BERSERK_MODE : Int)) != 0;
 	}
 
 	@:isVar public var multiplier(get, never):StatVector;

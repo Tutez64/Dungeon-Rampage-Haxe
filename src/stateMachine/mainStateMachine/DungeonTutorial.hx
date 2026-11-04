@@ -2,19 +2,29 @@ package stateMachine.mainStateMachine;
 
 import actor.player.input.DungeonBusterControlActivatedEvent;
 import brain.assetRepository.AssetLoadingComponent;
+import brain.clock.GameClock;
 import brain.event.EventComponent;
+import brain.event.EventListeners;
 import brain.render.MovieClipRenderer;
 import brain.sceneGraph.SceneGraphComponent;
 import brain.uI.UIButton;
+import brain.utils.TextUtil;
 import brain.workLoop.LogicalWorkComponent;
+import brain.workLoop.Task;
 import facade.DBFacade;
 import facade.Locale;
-import com.greensock.TimelineMax;
-import com.greensock.TweenMax;
+import input.keyBindings.InputAction;
+import steamInput.OnSteamInputButtonPressedEvent;
+import flash.display.Bitmap;
+import flash.display.DisplayObject;
 import flash.display.MovieClip;
+import flash.display.Shape;
+import flash.display.Sprite;
 import flash.events.Event;
 import flash.events.KeyboardEvent;
 import flash.events.MouseEvent;
+import flash.geom.Rectangle;
+import flash.text.TextField;
 
 class DungeonTutorial {
 	public static inline final MOVEMENT_TUTORIAL = "MOVEMENT_TUTORIAL";
@@ -49,6 +59,18 @@ class DungeonTutorial {
 
 	static inline final TUTORIAL_SWF = "Resources/Art2D/UI/db_UI_screens.swf";
 
+	static inline final CARD_SCALE:Float = 1;
+
+	static inline final LOOT_CARD_SCALE:Float = 1.1764705882352942;
+
+	static inline final CONTROLLER_GLYPH_SIZE:Float = 56;
+
+	static inline final CONTROLLER_STICK_GLYPH_SIZE:Float = 80;
+
+	static inline final GAMEPAD_MOVEMENT_DEADZONE:Float = 0.05;
+
+	static var ATTACK_ACTIONS:Array<ASAny>;
+
 	var mDBFacade:DBFacade;
 
 	var mAssetLoadingComponent:AssetLoadingComponent;
@@ -62,6 +84,8 @@ class DungeonTutorial {
 	var mMovementTutorialDone:Bool = false;
 
 	var mMovementPopup:MovieClip;
+
+	var mGamepadMovementTask:Task;
 
 	var mAttackTutorialDone:Bool = false;
 
@@ -115,6 +139,8 @@ class DungeonTutorial {
 
 	var mLootSharingPopup:MovieClip;
 
+	var mLootSharingChestRenderer:MovieClipRenderer;
+
 	var mSuperWeakTutorialDone:Bool = false;
 
 	var mSuperWeakCloseButton:UIButton;
@@ -129,18 +155,31 @@ class DungeonTutorial {
 		mSceneGraphComponent = new SceneGraphComponent(mDBFacade, "DungeonTutorial");
 		mLogicalWorkComponent = new LogicalWorkComponent(mDBFacade, "DungeonTutorial");
 		mEventComponent = new EventComponent(mDBFacade);
-		mDBFacade.stageRef.addEventListener("keyDown", handleKeyDown);
-		mDBFacade.stageRef.addEventListener("mouseDown", handleMouseDown);
+		EventListeners.add(mDBFacade.stageRef, "keyDown", handleKeyDown);
+		EventListeners.add(mDBFacade.stageRef, "mouseDown", handleMouseDown);
 		mEventComponent.addListener("DungeonBusterControlActivatedEvent", handleBuster);
 		mEventComponent.addListener("REVIVE_SPACEBAR_PRESSED", handleRevive);
+		mEventComponent.addListener("OnSteamInputButtonPressedEvent", handleSteamInputButtonPressed);
 		if (mDBFacade.dbAccountInfo.dbAccountParams.hasMovementTutorialParam()) {
 			mMovementTutorialDone = true;
 		}
 	}
 
+	static function isKeyboardArt(child:DisplayObject, hideUnnamedClips:Bool):Bool {
+		if (Std.isOfType(child, Shape)) {
+			return true;
+		}
+		var _loc3_ = ASCompat.reinterpretAs(child, TextField);
+		if (_loc3_ != null) {
+			return new compat.RegExp("\\s", "g").replace(_loc3_.text, "").length <= 2;
+		}
+		return hideUnnamedClips && Std.isOfType(child, Sprite) && child.name.indexOf("instance") == 0;
+	}
+
 	public function destroy() {
-		mDBFacade.stageRef.removeEventListener("keyDown", handleKeyDown);
-		mDBFacade.stageRef.removeEventListener("mouseDown", handleMouseDown);
+		stopGamepadMovementCheck();
+		EventListeners.remove(mDBFacade.stageRef, "keyDown", handleKeyDown);
+		EventListeners.remove(mDBFacade.stageRef, "mouseDown", handleMouseDown);
 		this.destroyChestTutorial();
 		this.destroyMovementTutorial();
 		this.destroyAttackTutorial();
@@ -167,60 +206,165 @@ class DungeonTutorial {
 	}
 
 	function handleKeyDown(event:KeyboardEvent) {
-		switch (event.keyCode) {
-			case 27:
-				if (mAttackPopup != null && !mAttackTutorialDone) {
-					this.finishAttackTutorial();
-				}
-				if (mMovementPopup != null && !mMovementTutorialDone) {
-					this.advanceToAttackTutorial();
-				}
-				if (mChestPopup != null && !mChestTutorialDone) {
-					this.finishChestTutorial();
-				}
-				if (mChestPopup != null && !mCooldownTutorialDone) {
-					this.finishCooldownTutorial();
-				}
-				if (mChestPopup != null && !mScalingTutorialDone) {
-					this.finishScalingTutorial();
-				}
-				if (mChestPopup != null && !mRepeaterTutorialDone) {
-					this.finishRepeaterTutorial();
-				}
-				if (mBusterPopup != null && !mBusterTutorialDone) {
-					this.finishBusterTutorial();
-				}
-				if (mChargePopup != null && !mChargeTutorialDone) {
-					this.finishChargeTutorial();
-				}
-
-			case 90 | 88 | 67 | 74 | 75 | 76:
-				if (mAttackPopup != null && !mAttackTutorialDone) {
-					this.finishAttackTutorial();
-				}
-				if (mChestPopup != null && !mCooldownTutorialDone) {
-					this.finishCooldownTutorial();
-				}
-				if (mChestPopup != null && !mScalingTutorialDone) {
-					this.finishScalingTutorial();
-				}
-				if (mChestPopup != null && !mRepeaterTutorialDone) {
-					this.finishRepeaterTutorial();
-				}
-				if (mChargePopup != null && !mChargeTutorialDone) {
-					this.finishChargeTutorial();
-				}
-
-			case 66:
-				if (mBusterPopup != null && !mBusterTutorialDone) {
-					this.finishBusterTutorial();
-				}
-
-			case 38 | 40 | 39 | 87 | 83 | 68 | 65 | 37:
-				if (mMovementPopup != null && !mMovementTutorialDone) {
-					this.advanceToAttackTutorial();
-				}
+		if (event.keyCode == 27) {
+			if (mAttackPopup != null && !mAttackTutorialDone) {
+				this.finishAttackTutorial();
+			}
+			if (mMovementPopup != null && !mMovementTutorialDone) {
+				this.advanceToAttackTutorial();
+			}
+			if (mChestPopup != null && !mChestTutorialDone) {
+				this.finishChestTutorial();
+			}
+			if (mChestPopup != null && !mCooldownTutorialDone) {
+				this.finishCooldownTutorial();
+			}
+			if (mChestPopup != null && !mScalingTutorialDone) {
+				this.finishScalingTutorial();
+			}
+			if (mChestPopup != null && !mRepeaterTutorialDone) {
+				this.finishRepeaterTutorial();
+			}
+			if (mBusterPopup != null && !mBusterTutorialDone) {
+				this.finishBusterTutorial();
+			}
+			if (mChargePopup != null && !mChargeTutorialDone) {
+				this.finishChargeTutorial();
+			}
+			return;
 		}
+		var _loc2_ = mDBFacade.keyBindings.actionForKey((event.keyCode : Int));
+		if (_loc2_ == null) {
+			return;
+		}
+		if (InputAction.isWeaponAttack(_loc2_)) {
+			handleAttackInput();
+		} else if (_loc2_ == "useDungeonBuster") {
+			if (mBusterPopup != null && !mBusterTutorialDone) {
+				this.finishBusterTutorial();
+			}
+		} else if (InputAction.isMovement(_loc2_)) {
+			if (mMovementPopup != null && !mMovementTutorialDone) {
+				this.advanceToAttackTutorial();
+			}
+		}
+	}
+
+	function handleAttackInput() {
+		if (mAttackPopup != null && !mAttackTutorialDone) {
+			this.finishAttackTutorial();
+		}
+		if (mChestPopup != null && !mCooldownTutorialDone) {
+			this.finishCooldownTutorial();
+		}
+		if (mChestPopup != null && !mScalingTutorialDone) {
+			this.finishScalingTutorial();
+		}
+		if (mChestPopup != null && !mRepeaterTutorialDone) {
+			this.finishRepeaterTutorial();
+		}
+		if (mChargePopup != null && !mChargeTutorialDone) {
+			this.finishChargeTutorial();
+		}
+	}
+
+	function handleSteamInputButtonPressed(event:OnSteamInputButtonPressedEvent) {
+		if (ATTACK_ACTIONS.indexOf(event.actionName) != -1) {
+			handleAttackInput();
+		} else if (event.actionName == "use_dungeon_buster") {
+			if (mBusterPopup != null && !mBusterTutorialDone) {
+				this.finishBusterTutorial();
+			}
+		}
+	}
+
+	function checkGamepadMovement(gameClock:GameClock) {
+		if (mMovementPopup == null || mMovementTutorialDone) {
+			stopGamepadMovementCheck();
+			return;
+		}
+		var _loc2_ = mDBFacade.steamInputManager.getAnalogAction("game_movement");
+		if (_loc2_.lengthSquared > 0.05) {
+			stopGamepadMovementCheck();
+			advanceToAttackTutorial();
+		}
+	}
+
+	function stopGamepadMovementCheck() {
+		if (mGamepadMovementTask != null) {
+			mGamepadMovementTask.destroy();
+		}
+		mGamepadMovementTask = null;
+	}
+
+	function showControllerPrompts(popup:MovieClip, glyphFilePaths:Array<ASAny>, glyphSize:Float, hideUnnamedClips:Bool) {
+		var _loc6_ = 0;
+		var _loc14_:DisplayObject = null;
+		var _loc12_:Rectangle = null;
+		var _loc5_ = 0;
+		if (!mDBFacade.steamInputManager.wantsControllerPrompts) {
+			return;
+		}
+		var _loc11_:Array<ASAny> = [];
+		var _loc7_:String;
+		if (checkNullIteratee(glyphFilePaths))
+			for (_tmp_ in glyphFilePaths) {
+				_loc7_ = _tmp_;
+				if (_loc7_ != null && _loc7_ != "" && _loc7_ != "error1" && _loc11_.indexOf(_loc7_) == -1) {
+					_loc11_.push(_loc7_);
+				}
+			}
+		if (_loc11_.length == 0) {
+			return;
+		}
+		var _loc13_:Rectangle = null;
+		_loc6_ = popup.getChildIndex(ASCompat.coerce((popup : ASAny).title, flash.display.DisplayObject)) + 1;
+		while (_loc6_ < popup.numChildren) {
+			_loc14_ = popup.getChildAt(_loc6_);
+			if (isKeyboardArt(_loc14_, hideUnnamedClips)) {
+				_loc14_.visible = false;
+				_loc12_ = _loc14_.getBounds(popup);
+				_loc13_ = _loc13_ != null ? _loc13_.union(_loc12_) : _loc12_;
+			}
+			_loc6_++;
+		}
+		if (_loc13_ == null) {
+			return;
+		}
+		var _loc8_ = glyphSize * 0.25;
+		var _loc10_ = _loc13_.x + (_loc13_.width - (_loc11_.length * glyphSize + (_loc11_.length - 1) * _loc8_)) / 2;
+		var _loc9_ = _loc13_.y + (_loc13_.height - glyphSize) / 2;
+		_loc5_ = 0;
+		while (_loc5_ < _loc11_.length) {
+			addControllerGlyph(popup, _loc11_[_loc5_], _loc10_ + _loc5_ * (glyphSize + _loc8_), _loc9_, glyphSize);
+			_loc5_++;
+		}
+	}
+
+	function addControllerGlyph(popup:MovieClip, glyphFilePath:String, x:Float, y:Float, size:Float) {
+		mAssetLoadingComponent.getImageAsset(glyphFilePath, function(param1:brain.assetRepository.ImageAsset) {
+			var _loc2_ = new Bitmap(param1.image.bitmapData, param1.image.pixelSnapping, param1.image.smoothing);
+			_loc2_.x = x;
+			_loc2_.y = y;
+			_loc2_.width = size;
+			_loc2_.height = size;
+			popup.addChild(_loc2_);
+		});
+	}
+
+	function getAttackGlyphFilePaths():Array<ASAny> {
+		var _loc1_:Array<ASAny> = [];
+		if (!mDBFacade.steamInputManager.isSteamInputReady) {
+			return _loc1_;
+		}
+		var _loc2_:String;
+		final __ax4_iter_129 = ATTACK_ACTIONS;
+		if (checkNullIteratee(__ax4_iter_129))
+			for (_tmp_ in __ax4_iter_129) {
+				_loc2_ = _tmp_;
+				_loc1_.push(mDBFacade.steamInputManager.getGlyphFilePathForAction(_loc2_));
+			}
+		return _loc1_;
 	}
 
 	function handleBuster(event:DungeonBusterControlActivatedEvent) {
@@ -246,27 +390,28 @@ class DungeonTutorial {
 		var _loc1_ = mMovementPopup.x;
 		var _loc3_ = mDBFacade.viewWidth + mMovementPopup.width;
 		var _loc2_ = mDBFacade.viewHeight * 0.5;
-		new TimelineMax({
+		mDBFacade.mTween.createTimeline({
 			"tweens": [
-				TweenMax.to(mMovementPopup, 0.08333333333333333, {
+				mDBFacade.mTween.tweenMaxTo(mMovementPopup, 0.08333333333333333, {
 					"delay": 1,
 					"x": _loc1_ - 20,
 					"y": _loc2_
 				}),
-				TweenMax.to(mMovementPopup, 0.3333333333333333, {
+				mDBFacade.mTween.tweenMaxTo(mMovementPopup, 0.3333333333333333, {
 					"x": _loc3_,
 					"y": _loc2_
 				}),
-				TweenMax.delayedCall(1.5, timelineAttackAdvance)
+				mDBFacade.mTween.delayedCall(1.5, timelineAttackAdvance)
 			],
 			"align": "sequence"
 		});
 	}
 
 	function destroyMovementTutorial() {
+		stopGamepadMovementCheck();
 		if (mMovementPopup != null) {
-			TweenMax.killDelayedCallsTo(timelineAttackAdvance);
-			TweenMax.killTweensOf(mMovementPopup);
+			mDBFacade.mTween.killDelayedCallsTo(timelineAttackAdvance);
+			mDBFacade.mTween.killTweensOf(mMovementPopup);
 			mSceneGraphComponent.removeChild(mMovementPopup);
 			mMovementPopup = null;
 		}
@@ -280,21 +425,24 @@ class DungeonTutorial {
 					return;
 				}
 				mMovementPopup = ASCompat.coerce(ASCompat.createInstance(_loc3_, []), flash.display.MovieClip);
-				ASCompat.setProperty((mMovementPopup : ASAny).title, "text", Locale.getString("TUTORIAL_MOVEMENT_TITLE"));
+				Locale.setText(ASCompat.coerce((mMovementPopup : ASAny).title, flash.text.TextField), "TUTORIAL_MOVEMENT_TITLE");
 				ASCompat.setProperty((mMovementPopup : ASAny).check, "visible", false);
+				showControllerPrompts(mMovementPopup, [mDBFacade.steamInputManager.getGlyphFilePathForAnalogAction("game_movement")], 80, true);
+				stopGamepadMovementCheck();
+				mGamepadMovementTask = mLogicalWorkComponent.doEveryFrame(checkGamepadMovement);
 				mSceneGraphComponent.addChild(mMovementPopup, (105 : UInt));
-				mMovementPopup.scaleX = mMovementPopup.scaleY = 0.85;
+				mMovementPopup.scaleX = mMovementPopup.scaleY = 1;
 				var _loc2_ = mDBFacade.viewWidth - mMovementPopup.width * 0.5 - 50;
 				var _loc4_ = mDBFacade.viewHeight * 0.5;
 				mMovementPopup.x = mDBFacade.viewWidth + mMovementPopup.width;
 				mMovementPopup.y = _loc4_;
-				new TimelineMax({
+				mDBFacade.mTween.createTimeline({
 					"tweens": [
-						TweenMax.to(mMovementPopup, 0.3333333333333333, {
+						mDBFacade.mTween.tweenMaxTo(mMovementPopup, 0.3333333333333333, {
 							"x": _loc2_ - 20,
 							"y": _loc4_
 						}),
-						TweenMax.to(mMovementPopup, 0.08333333333333333, {
+						mDBFacade.mTween.tweenMaxTo(mMovementPopup, 0.08333333333333333, {
 							"x": _loc2_,
 							"y": _loc4_
 						})
@@ -320,14 +468,14 @@ class DungeonTutorial {
 		curX = mAttackPopup.x;
 		offscreenX = -mAttackPopup.width;
 		offscreenY = mDBFacade.viewHeight * 0.5;
-		new TimelineMax({
+		mDBFacade.mTween.createTimeline({
 			"tweens": [
-				TweenMax.to(mAttackPopup, 0.08333333333333333, {
+				mDBFacade.mTween.tweenMaxTo(mAttackPopup, 0.08333333333333333, {
 					"delay": 1,
 					"x": curX + 20,
 					"y": offscreenY
 				}),
-				TweenMax.to(mAttackPopup, 0.3333333333333333, {
+				mDBFacade.mTween.tweenMaxTo(mAttackPopup, 0.3333333333333333, {
 					"x": offscreenX,
 					"y": offscreenY,
 					"onComplete": advanceFunc
@@ -339,7 +487,7 @@ class DungeonTutorial {
 
 	function destroyAttackTutorial() {
 		if (mAttackPopup != null) {
-			TweenMax.killTweensOf(mAttackPopup);
+			mDBFacade.mTween.killTweensOf(mAttackPopup);
 			mSceneGraphComponent.removeChild(mAttackPopup);
 			mAttackPopup = null;
 		}
@@ -354,21 +502,22 @@ class DungeonTutorial {
 					return;
 				}
 				mAttackPopup = ASCompat.coerce(ASCompat.createInstance(_loc3_, []), flash.display.MovieClip);
-				ASCompat.setProperty((mAttackPopup : ASAny).title, "text", Locale.getString("TUTORIAL_ATTACK_TITLE"));
+				Locale.setText(ASCompat.coerce((mAttackPopup : ASAny).title, flash.text.TextField), "TUTORIAL_ATTACK_TITLE");
 				ASCompat.setProperty((mAttackPopup : ASAny).check, "visible", false);
+				showControllerPrompts(mAttackPopup, getAttackGlyphFilePaths(), 56, false);
 				mSceneGraphComponent.addChild(mAttackPopup, (105 : UInt));
-				mAttackPopup.scaleX = mAttackPopup.scaleY = 0.85;
+				mAttackPopup.scaleX = mAttackPopup.scaleY = 1;
 				var _loc2_ = mAttackPopup.width * 0.5 + 10;
 				var _loc4_ = mDBFacade.viewHeight * 0.5;
 				mAttackPopup.x = -mAttackPopup.width;
 				mAttackPopup.y = _loc4_;
-				new TimelineMax({
+				mDBFacade.mTween.createTimeline({
 					"tweens": [
-						TweenMax.to(mAttackPopup, 0.3333333333333333, {
+						mDBFacade.mTween.tweenMaxTo(mAttackPopup, 0.3333333333333333, {
 							"x": _loc2_ + 20,
 							"y": _loc4_
 						}),
-						TweenMax.to(mAttackPopup, 0.08333333333333333, {
+						mDBFacade.mTween.tweenMaxTo(mAttackPopup, 0.08333333333333333, {
 							"x": _loc2_,
 							"y": _loc4_
 						})
@@ -396,13 +545,13 @@ class DungeonTutorial {
 			destX = -mRevivePopup.width;
 			bounceOffset = 20;
 		}
-		new TimelineMax({
+		mDBFacade.mTween.createTimeline({
 			"tweens": [
-				TweenMax.to(mRevivePopup, 0.08333333333333333, {
+				mDBFacade.mTween.tweenMaxTo(mRevivePopup, 0.08333333333333333, {
 					"delay": 1,
 					"x": curX + bounceOffset
 				}),
-				TweenMax.to(mRevivePopup, 0.3333333333333333, {
+				mDBFacade.mTween.tweenMaxTo(mRevivePopup, 0.3333333333333333, {
 					"x": destX,
 					"onComplete": advanceFunc
 				})
@@ -413,7 +562,7 @@ class DungeonTutorial {
 
 	function destroyReviveTutorial() {
 		if (mRevivePopup != null) {
-			TweenMax.killTweensOf(mRevivePopup);
+			mDBFacade.mTween.killTweensOf(mRevivePopup);
 			mSceneGraphComponent.removeChild(mRevivePopup);
 			mRevivePopup = null;
 		}
@@ -437,13 +586,13 @@ class DungeonTutorial {
 					return;
 				}
 				mRevivePopup = ASCompat.coerce(ASCompat.createInstance(_loc4_, []), flash.display.MovieClip);
-				ASCompat.setProperty((mRevivePopup : ASAny).title, "text", Locale.getString("TUTORIAL_REVIVE_TITLE"));
-				ASCompat.setProperty((mRevivePopup : ASAny).description, "text", Locale.getString("TUTORIAL_REVIVE_DESCRIPTION"));
+				Locale.setText(ASCompat.coerce((mRevivePopup : ASAny).title, flash.text.TextField), "TUTORIAL_REVIVE_TITLE");
+				Locale.setText(ASCompat.coerce((mRevivePopup : ASAny).description, flash.text.TextField), "TUTORIAL_REVIVE_DESCRIPTION");
 				ASCompat.setProperty((mRevivePopup : ASAny).check, "visible", false);
 				mReviveCloseButton = new UIButton(mDBFacade, ASCompat.coerce((mRevivePopup : ASAny).close, flash.display.MovieClip));
 				mReviveCloseButton.releaseCallback = finishReviveTutorial;
 				mSceneGraphComponent.addChild(mRevivePopup, (105 : UInt));
-				mRevivePopup.scaleX = mRevivePopup.scaleY = 0.85;
+				mRevivePopup.scaleX = mRevivePopup.scaleY = 1;
 				mRevivePopup.y = mDBFacade.viewHeight * 0.5;
 				if (mRevivePopupPosition == "TUTORIAL_PANEL_RIGHT") {
 					mRevivePopup.x = mDBFacade.viewWidth + mRevivePopup.width / 2;
@@ -454,10 +603,10 @@ class DungeonTutorial {
 					_loc3_ = mRevivePopup.width / 2;
 					_loc2_ = 20;
 				}
-				new TimelineMax({
+				mDBFacade.mTween.createTimeline({
 					"tweens": [
-						TweenMax.to(mRevivePopup, 0.3333333333333333, {"x": _loc3_ + _loc2_}),
-						TweenMax.to(mRevivePopup, 0.08333333333333333, {"x": _loc3_})
+						mDBFacade.mTween.tweenMaxTo(mRevivePopup, 0.3333333333333333, {"x": _loc3_ + _loc2_}),
+						mDBFacade.mTween.tweenMaxTo(mRevivePopup, 0.08333333333333333, {"x": _loc3_})
 					],
 					"align": "sequence"
 				});
@@ -475,16 +624,16 @@ class DungeonTutorial {
 			destroyLootSharingTutorial();
 		};
 		curX = mLootSharingPopup.x;
-		offscreenX = mDBFacade.stageRef.stageWidth;
+		offscreenX = mDBFacade.viewWidth;
 		offscreenY = mDBFacade.viewHeight * 0.3;
-		new TimelineMax({
+		mDBFacade.mTween.createTimeline({
 			"tweens": [
-				TweenMax.to(mLootSharingPopup, 0.08333333333333333, {
+				mDBFacade.mTween.tweenMaxTo(mLootSharingPopup, 0.08333333333333333, {
 					"delay": 1,
 					"x": curX - 40,
 					"y": offscreenY
 				}),
-				TweenMax.to(mLootSharingPopup, 0.3333333333333333, {
+				mDBFacade.mTween.tweenMaxTo(mLootSharingPopup, 0.3333333333333333, {
 					"x": offscreenX - 40,
 					"y": offscreenY,
 					"onComplete": advanceFunc
@@ -495,8 +644,12 @@ class DungeonTutorial {
 	}
 
 	function destroyLootSharingTutorial() {
+		if (mLootSharingChestRenderer != null) {
+			mLootSharingChestRenderer.destroy();
+			mLootSharingChestRenderer = null;
+		}
 		if (mLootSharingPopup != null) {
-			TweenMax.killTweensOf(mLootSharingPopup);
+			mDBFacade.mTween.killTweensOf(mLootSharingPopup);
 			mSceneGraphComponent.removeChild(mLootSharingPopup);
 			mLootSharingPopup = null;
 		}
@@ -526,14 +679,14 @@ class DungeonTutorial {
 		sign = isRight ? 1 : -1;
 		offscreenX = isRight ? 900 : -100;
 		offscreenY = mSuperWeakPopup.y;
-		new TimelineMax({
+		mDBFacade.mTween.createTimeline({
 			"tweens": [
-				TweenMax.to(mSuperWeakPopup, 0.08333333333333333, {
+				mDBFacade.mTween.tweenMaxTo(mSuperWeakPopup, 0.08333333333333333, {
 					"delay": 1,
 					"x": curX - sign * 40,
 					"y": offscreenY
 				}),
-				TweenMax.to(mSuperWeakPopup, 0.3333333333333333, {
+				mDBFacade.mTween.tweenMaxTo(mSuperWeakPopup, 0.3333333333333333, {
 					"x": offscreenX,
 					"y": offscreenY,
 					"onComplete": advanceFunc
@@ -545,7 +698,7 @@ class DungeonTutorial {
 
 	function destroySuperWeakTutorial() {
 		if (mSuperWeakPopup != null) {
-			TweenMax.killTweensOf(mSuperWeakPopup);
+			mDBFacade.mTween.killTweensOf(mSuperWeakPopup);
 			mSceneGraphComponent.removeChild(mSuperWeakPopup);
 			mSuperWeakPopup = null;
 		}
@@ -564,9 +717,9 @@ class DungeonTutorial {
 					return;
 				}
 				mLootSharingPopup = ASCompat.coerce(ASCompat.createInstance(popupClass, []), flash.display.MovieClip);
-				ASCompat.setProperty((mLootSharingPopup : ASAny).title, "text", Locale.getString("TUTORIAL_LOOT_TITLE"));
-				ASCompat.setProperty((mLootSharingPopup : ASAny).shared_text, "text", Locale.getString("TUTORIAL_LOOT_SHARED"));
-				ASCompat.setProperty((mLootSharingPopup : ASAny).not_shared_text, "text", Locale.getString("TUTORIAL_LOOT_NOT_SHARED"));
+				Locale.setText(ASCompat.coerce((mLootSharingPopup : ASAny).title, flash.text.TextField), "TUTORIAL_LOOT_TITLE");
+				Locale.setText(ASCompat.coerce((mLootSharingPopup : ASAny).shared_text, flash.text.TextField), "TUTORIAL_LOOT_SHARED");
+				Locale.setText(ASCompat.coerce((mLootSharingPopup : ASAny).not_shared_text, flash.text.TextField), "TUTORIAL_LOOT_NOT_SHARED");
 				ASCompat.setProperty((mLootSharingPopup : ASAny).check, "visible", false);
 				mLootSharingCloseButton = new UIButton(mDBFacade, ASCompat.coerce((mLootSharingPopup : ASAny).close, flash.display.MovieClip));
 				mLootSharingCloseButton.releaseCallback = finishLootSharingTutorial;
@@ -582,7 +735,7 @@ class DungeonTutorial {
 						var gold3 = swfAsset2.getClass("doober_currency_coin");
 						var xp = swfAsset2.getClass("doober_xp_star");
 						var db = swfAsset2.getClass("doober_db_star");
-						var treasure = swfAsset2.getClass("db_doobers_treasure_chest_basic_static");
+						var treasure = swfAsset2.getClass("db_doobers_treasure_chest_basic");
 						var foodClass = swfAsset2.getClass("doober_health_burger");
 						var gold = ASCompat.coerce(ASCompat.createInstance(gold3, []), flash.display.MovieClip);
 						gold.scaleX = gold.scaleY = 0.75;
@@ -604,26 +757,29 @@ class DungeonTutorial {
 						(mLootSharingPopup : ASAny).xp.addChild(xpStar);
 						(mLootSharingPopup : ASAny).db.addChild(dbStar);
 						(mLootSharingPopup : ASAny).treasure.addChild(treasureMC);
+						mLootSharingChestRenderer = new MovieClipRenderer(mDBFacade, treasureMC);
+						mLootSharingChestRenderer.play((0 : UInt), true);
 						(mLootSharingPopup : ASAny).food.addChild(food);
 						mSceneGraphComponent.addChild(mLootSharingPopup, (105 : UInt));
-						destX = mDBFacade.stageRef.stageWidth - mLootSharingPopup.width;
+						mLootSharingPopup.scaleX = mLootSharingPopup.scaleY = 1.1764705882352942;
+						destX = mDBFacade.viewWidth - mLootSharingPopup.width;
 						destY = mDBFacade.viewHeight * 0.3;
 						mLootSharingPopup.x = destX;
 						mLootSharingPopup.y = destY;
-						new TimelineMax({
+						mDBFacade.mTween.createTimeline({
 							"tweens": [
-								TweenMax.to(mLootSharingPopup, 0.3333333333333333, {
+								mDBFacade.mTween.tweenMaxTo(mLootSharingPopup, 0.3333333333333333, {
 									"x": destX + 20,
 									"y": destY
 								}),
-								TweenMax.to(mLootSharingPopup, 0.08333333333333333, {
+								mDBFacade.mTween.tweenMaxTo(mLootSharingPopup, 0.08333333333333333, {
 									"x": destX,
 									"y": destY
 								})
 							],
 							"align": "sequence"
 						});
-						mLogicalWorkComponent.doLater(10, function(param1:brain.clock.GameClock) {
+						mLogicalWorkComponent.doLater(10, function(param1:GameClock) {
 							if (!mLootSharingTutorialDone) {
 								finishLootSharingTutorial();
 							}
@@ -644,7 +800,7 @@ class DungeonTutorial {
 					return;
 				}
 				mSuperWeakPopup = ASCompat.coerce(ASCompat.createInstance(popupClass, []), flash.display.MovieClip);
-				ASCompat.setProperty((mSuperWeakPopup : ASAny).title, "text", Locale.getString("TUTORIAL_SUPER_WEAK_TITLE"));
+				Locale.setText(ASCompat.coerce((mSuperWeakPopup : ASAny).title, flash.text.TextField), "TUTORIAL_SUPER_WEAK_TITLE");
 				ASCompat.setProperty((mSuperWeakPopup : ASAny).check, "visible", false);
 				mSuperWeakCloseButton = new UIButton(mDBFacade, ASCompat.coerce((mSuperWeakPopup : ASAny).close, flash.display.MovieClip));
 				mSuperWeakCloseButton.releaseCallback = function() {
@@ -659,19 +815,19 @@ class DungeonTutorial {
 						var destY:Float;
 						var swfAsset2 = param1;
 						mSceneGraphComponent.addChild(mSuperWeakPopup, (105 : UInt));
-						destXCaseRight = mDBFacade.stageRef.stageWidth - mSuperWeakPopup.width / 1.6;
+						destXCaseRight = mDBFacade.viewWidth - mSuperWeakPopup.width / 1.6;
 						destXCaseLeft = mSuperWeakPopup.width / 3;
 						destX = isRight ? destXCaseRight : destXCaseLeft;
 						destY = mDBFacade.viewHeight * 0.5;
 						mSuperWeakPopup.x = destX;
 						mSuperWeakPopup.y = destY;
-						new TimelineMax({
+						mDBFacade.mTween.createTimeline({
 							"tweens": [
-								TweenMax.to(mSuperWeakPopup, 0.3333333333333333, {
+								mDBFacade.mTween.tweenMaxTo(mSuperWeakPopup, 0.3333333333333333, {
 									"x": destX + 20,
 									"y": destY
 								}),
-								TweenMax.to(mSuperWeakPopup, 0.08333333333333333, {
+								mDBFacade.mTween.tweenMaxTo(mSuperWeakPopup, 0.08333333333333333, {
 									"x": destX,
 									"y": destY
 								})
@@ -679,7 +835,7 @@ class DungeonTutorial {
 							"align": "sequence"
 						});
 						mLogicalWorkComponent.clear();
-						mLogicalWorkComponent.doLater(5, function(param1:brain.clock.GameClock) {
+						mLogicalWorkComponent.doLater(5, function(param1:GameClock) {
 							if (!mSuperWeakTutorialDone) {
 								finishSuperWeakTutorial(className, isRight);
 							}
@@ -705,14 +861,14 @@ class DungeonTutorial {
 		curX = mChestPopup.x;
 		offscreenX = mDBFacade.viewWidth + mChestPopup.width;
 		offscreenY = mDBFacade.viewHeight * 0.5;
-		new TimelineMax({
+		mDBFacade.mTween.createTimeline({
 			"tweens": [
-				TweenMax.to(mChestPopup, 0.08333333333333333, {
+				mDBFacade.mTween.tweenMaxTo(mChestPopup, 0.08333333333333333, {
 					"delay": 1,
 					"x": curX + 20,
 					"y": offscreenY
 				}),
-				TweenMax.to(mChestPopup, 0.3333333333333333, {
+				mDBFacade.mTween.tweenMaxTo(mChestPopup, 0.3333333333333333, {
 					"x": offscreenX,
 					"y": offscreenY,
 					"onComplete": advanceFunc
@@ -738,14 +894,14 @@ class DungeonTutorial {
 		curX = mChestPopup.x;
 		offscreenX = mDBFacade.viewWidth + mChestPopup.width;
 		offscreenY = mDBFacade.viewHeight * 0.5;
-		new TimelineMax({
+		mDBFacade.mTween.createTimeline({
 			"tweens": [
-				TweenMax.to(mChestPopup, 0.08333333333333333, {
+				mDBFacade.mTween.tweenMaxTo(mChestPopup, 0.08333333333333333, {
 					"delay": 1,
 					"x": curX + 20,
 					"y": offscreenY
 				}),
-				TweenMax.to(mChestPopup, 0.3333333333333333, {
+				mDBFacade.mTween.tweenMaxTo(mChestPopup, 0.3333333333333333, {
 					"x": offscreenX,
 					"y": offscreenY,
 					"onComplete": advanceFunc
@@ -771,14 +927,14 @@ class DungeonTutorial {
 		curX = mChestPopup.x;
 		offscreenX = mDBFacade.viewWidth + mChestPopup.width;
 		offscreenY = mDBFacade.viewHeight * 0.5;
-		new TimelineMax({
+		mDBFacade.mTween.createTimeline({
 			"tweens": [
-				TweenMax.to(mChestPopup, 0.08333333333333333, {
+				mDBFacade.mTween.tweenMaxTo(mChestPopup, 0.08333333333333333, {
 					"delay": 1,
 					"x": curX + 20,
 					"y": offscreenY
 				}),
-				TweenMax.to(mChestPopup, 0.3333333333333333, {
+				mDBFacade.mTween.tweenMaxTo(mChestPopup, 0.3333333333333333, {
 					"x": offscreenX,
 					"y": offscreenY,
 					"onComplete": advanceFunc
@@ -804,14 +960,14 @@ class DungeonTutorial {
 		curX = mChestPopup.x;
 		offscreenX = mDBFacade.viewWidth + mChestPopup.width;
 		offscreenY = mDBFacade.viewHeight * 0.5;
-		new TimelineMax({
+		mDBFacade.mTween.createTimeline({
 			"tweens": [
-				TweenMax.to(mChestPopup, 0.08333333333333333, {
+				mDBFacade.mTween.tweenMaxTo(mChestPopup, 0.08333333333333333, {
 					"delay": 1,
 					"x": curX + 20,
 					"y": offscreenY
 				}),
-				TweenMax.to(mChestPopup, 0.3333333333333333, {
+				mDBFacade.mTween.tweenMaxTo(mChestPopup, 0.3333333333333333, {
 					"x": offscreenX,
 					"y": offscreenY,
 					"onComplete": advanceFunc
@@ -837,14 +993,14 @@ class DungeonTutorial {
 		curX = mBusterPopup.x;
 		offscreenX = mDBFacade.viewWidth + mBusterPopup.width;
 		offscreenY = mDBFacade.viewHeight * 0.5;
-		new TimelineMax({
+		mDBFacade.mTween.createTimeline({
 			"tweens": [
-				TweenMax.to(mBusterPopup, 0.08333333333333333, {
+				mDBFacade.mTween.tweenMaxTo(mBusterPopup, 0.08333333333333333, {
 					"delay": 1,
 					"x": curX + 20,
 					"y": offscreenY
 				}),
-				TweenMax.to(mBusterPopup, 0.3333333333333333, {
+				mDBFacade.mTween.tweenMaxTo(mBusterPopup, 0.3333333333333333, {
 					"x": offscreenX,
 					"y": offscreenY,
 					"onComplete": advanceFunc
@@ -861,7 +1017,7 @@ class DungeonTutorial {
 				mCooldownRenderer.destroy();
 				mCooldownRenderer = null;
 			}
-			TweenMax.killTweensOf(mChestPopup);
+			mDBFacade.mTween.killTweensOf(mChestPopup);
 			mSceneGraphComponent.removeChild(mChestPopup);
 			mChestCloseButton.destroy();
 			mChestCloseButton = null;
@@ -872,7 +1028,7 @@ class DungeonTutorial {
 
 	function destroyBusterTutorial() {
 		if (mBusterPopup != null) {
-			TweenMax.killTweensOf(mBusterPopup);
+			mDBFacade.mTween.killTweensOf(mBusterPopup);
 			mSceneGraphComponent.removeChild(mBusterPopup);
 			mBusterCloseButton.destroy();
 			mBusterCloseButton = null;
@@ -890,24 +1046,24 @@ class DungeonTutorial {
 					return;
 				}
 				mChestPopup = ASCompat.coerce(ASCompat.createInstance(_loc3_, []), flash.display.MovieClip);
-				ASCompat.setProperty((mChestPopup : ASAny).title, "text", Locale.getString("TUTORIAL_CHEST_TITLE"));
-				ASCompat.setProperty((mChestPopup : ASAny).title1, "text", Locale.getString("TUTORIAL_CHEST_DESC").toUpperCase());
+				Locale.setText(ASCompat.coerce((mChestPopup : ASAny).title, flash.text.TextField), "TUTORIAL_CHEST_TITLE");
+				TextUtil.setText(ASCompat.coerce((mChestPopup : ASAny).title1, flash.text.TextField), Locale.getString("TUTORIAL_CHEST_DESC").toUpperCase());
 				ASCompat.setProperty((mChestPopup : ASAny).check, "visible", false);
 				mChestCloseButton = new UIButton(mDBFacade, ASCompat.coerce((mChestPopup : ASAny).close, flash.display.MovieClip));
 				mChestCloseButton.releaseCallback = finishChestTutorial;
 				mSceneGraphComponent.addChild(mChestPopup, (105 : UInt));
-				mChestPopup.scaleX = mChestPopup.scaleY = 0.85;
+				mChestPopup.scaleX = mChestPopup.scaleY = 1;
 				var _loc2_ = mDBFacade.viewWidth - mChestPopup.width / 1.6;
 				var _loc4_ = mDBFacade.viewHeight * 0.5;
 				mChestPopup.x = _loc2_;
 				mChestPopup.y = _loc4_;
-				new TimelineMax({
+				mDBFacade.mTween.createTimeline({
 					"tweens": [
-						TweenMax.to(mChestPopup, 0.3333333333333333, {
+						mDBFacade.mTween.tweenMaxTo(mChestPopup, 0.3333333333333333, {
 							"x": _loc2_ + 20,
 							"y": _loc4_
 						}),
-						TweenMax.to(mChestPopup, 0.08333333333333333, {
+						mDBFacade.mTween.tweenMaxTo(mChestPopup, 0.08333333333333333, {
 							"x": _loc2_,
 							"y": _loc4_
 						})
@@ -929,34 +1085,35 @@ class DungeonTutorial {
 					return;
 				}
 				mChestPopup = ASCompat.coerce(ASCompat.createInstance(popupClass, []), flash.display.MovieClip);
-				ASCompat.setProperty((mChestPopup : ASAny).title, "text", Locale.getString("TUTORIAL_COOLDOWN_TITLE"));
-				ASCompat.setProperty((mChestPopup : ASAny).description, "text", Locale.getString("TUTORIAL_COOLDOWN_DESC").toUpperCase());
+				Locale.setText(ASCompat.coerce((mChestPopup : ASAny).title, flash.text.TextField), "TUTORIAL_COOLDOWN_TITLE");
+				TextUtil.setText(ASCompat.coerce((mChestPopup : ASAny).description, flash.text.TextField),
+					Locale.getString("TUTORIAL_COOLDOWN_DESC").toUpperCase());
 				ASCompat.setProperty((mChestPopup : ASAny).check, "visible", false);
 				mChestCloseButton = new UIButton(mDBFacade, ASCompat.coerce((mChestPopup : ASAny).close, flash.display.MovieClip));
 				mChestCloseButton.releaseCallback = finishCooldownTutorial;
 				mSceneGraphComponent.addChild(mChestPopup, (105 : UInt));
-				mChestPopup.scaleX = mChestPopup.scaleY = 0.85;
+				mChestPopup.scaleX = mChestPopup.scaleY = 1;
 				destX = mDBFacade.viewWidth - mChestPopup.width / 1.6;
 				destY = mDBFacade.viewHeight * 0.5;
 				mChestPopup.x = destX;
 				mChestPopup.y = destY;
-				new TimelineMax({
+				mDBFacade.mTween.createTimeline({
 					"tweens": [
-						TweenMax.to(mChestPopup, 0.3333333333333333, {
+						mDBFacade.mTween.tweenMaxTo(mChestPopup, 0.3333333333333333, {
 							"x": destX + 20,
 							"y": destY
 						}),
-						TweenMax.to(mChestPopup, 0.08333333333333333, {
+						mDBFacade.mTween.tweenMaxTo(mChestPopup, 0.08333333333333333, {
 							"x": destX,
 							"y": destY
 						})
 					],
 					"align": "sequence"
 				});
-				mLogicalWorkComponent.doLater(3, function(param1:brain.clock.GameClock) {
+				mLogicalWorkComponent.doLater(3, function(param1:GameClock) {
 					mCooldownTutorialReadyToClose = true;
 				});
-				mLogicalWorkComponent.doLater(6.5, function(param1:brain.clock.GameClock) {
+				mLogicalWorkComponent.doLater(6.5, function(param1:GameClock) {
 					if (mCooldownTutorialReadyToClose && !mCooldownTutorialDone) {
 						finishCooldownTutorial();
 					}
@@ -978,34 +1135,35 @@ class DungeonTutorial {
 					return;
 				}
 				mChestPopup = ASCompat.coerce(ASCompat.createInstance(popupClass, []), flash.display.MovieClip);
-				ASCompat.setProperty((mChestPopup : ASAny).title, "text", Locale.getString("TUTORIAL_SCALING_TITLE"));
-				ASCompat.setProperty((mChestPopup : ASAny).description, "text", Locale.getString("TUTORIAL_SCALING_DESC").toUpperCase());
+				Locale.setText(ASCompat.coerce((mChestPopup : ASAny).title, flash.text.TextField), "TUTORIAL_SCALING_TITLE");
+				TextUtil.setText(ASCompat.coerce((mChestPopup : ASAny).description, flash.text.TextField),
+					Locale.getString("TUTORIAL_SCALING_DESC").toUpperCase());
 				ASCompat.setProperty((mChestPopup : ASAny).check, "visible", false);
 				mChestCloseButton = new UIButton(mDBFacade, ASCompat.coerce((mChestPopup : ASAny).close, flash.display.MovieClip));
 				mChestCloseButton.releaseCallback = finishScalingTutorial;
 				mSceneGraphComponent.addChild(mChestPopup, (105 : UInt));
-				mChestPopup.scaleX = mChestPopup.scaleY = 0.85;
+				mChestPopup.scaleX = mChestPopup.scaleY = 1;
 				destX = mDBFacade.viewWidth - mChestPopup.width / 1.6;
 				destY = mDBFacade.viewHeight * 0.5;
 				mChestPopup.x = destX;
 				mChestPopup.y = destY;
-				new TimelineMax({
+				mDBFacade.mTween.createTimeline({
 					"tweens": [
-						TweenMax.to(mChestPopup, 0.3333333333333333, {
+						mDBFacade.mTween.tweenMaxTo(mChestPopup, 0.3333333333333333, {
 							"x": destX + 20,
 							"y": destY
 						}),
-						TweenMax.to(mChestPopup, 0.08333333333333333, {
+						mDBFacade.mTween.tweenMaxTo(mChestPopup, 0.08333333333333333, {
 							"x": destX,
 							"y": destY
 						})
 					],
 					"align": "sequence"
 				});
-				mLogicalWorkComponent.doLater(3, function(param1:brain.clock.GameClock) {
+				mLogicalWorkComponent.doLater(3, function(param1:GameClock) {
 					mScalingTutorialReadyToClose = true;
 				});
-				mLogicalWorkComponent.doLater(6.5, function(param1:brain.clock.GameClock) {
+				mLogicalWorkComponent.doLater(6.5, function(param1:GameClock) {
 					if (mScalingTutorialReadyToClose && !mScalingTutorialDone) {
 						finishScalingTutorial();
 					}
@@ -1025,34 +1183,35 @@ class DungeonTutorial {
 					return;
 				}
 				mChestPopup = ASCompat.coerce(ASCompat.createInstance(popupClass, []), flash.display.MovieClip);
-				ASCompat.setProperty((mChestPopup : ASAny).title, "text", Locale.getString("TUTORIAL_REPEATER_TITLE"));
-				ASCompat.setProperty((mChestPopup : ASAny).description, "text", Locale.getString("TUTORIAL_REPEATER_DESC").toUpperCase());
+				Locale.setText(ASCompat.coerce((mChestPopup : ASAny).title, flash.text.TextField), "TUTORIAL_REPEATER_TITLE");
+				TextUtil.setText(ASCompat.coerce((mChestPopup : ASAny).description, flash.text.TextField),
+					Locale.getString("TUTORIAL_REPEATER_DESC").toUpperCase());
 				ASCompat.setProperty((mChestPopup : ASAny).check, "visible", false);
 				mChestCloseButton = new UIButton(mDBFacade, ASCompat.coerce((mChestPopup : ASAny).close, flash.display.MovieClip));
 				mChestCloseButton.releaseCallback = finishRepeaterTutorial;
 				mSceneGraphComponent.addChild(mChestPopup, (105 : UInt));
-				mChestPopup.scaleX = mChestPopup.scaleY = 0.85;
+				mChestPopup.scaleX = mChestPopup.scaleY = 1;
 				destX = mDBFacade.viewWidth - mChestPopup.width / 1.6;
 				destY = mDBFacade.viewHeight * 0.5;
 				mChestPopup.x = destX;
 				mChestPopup.y = destY;
-				new TimelineMax({
+				mDBFacade.mTween.createTimeline({
 					"tweens": [
-						TweenMax.to(mChestPopup, 0.3333333333333333, {
+						mDBFacade.mTween.tweenMaxTo(mChestPopup, 0.3333333333333333, {
 							"x": destX + 20,
 							"y": destY
 						}),
-						TweenMax.to(mChestPopup, 0.08333333333333333, {
+						mDBFacade.mTween.tweenMaxTo(mChestPopup, 0.08333333333333333, {
 							"x": destX,
 							"y": destY
 						})
 					],
 					"align": "sequence"
 				});
-				mLogicalWorkComponent.doLater(3, function(param1:brain.clock.GameClock) {
+				mLogicalWorkComponent.doLater(3, function(param1:GameClock) {
 					mRepeaterTutorialReadyToClose = true;
 				});
-				mLogicalWorkComponent.doLater(6.5, function(param1:brain.clock.GameClock) {
+				mLogicalWorkComponent.doLater(6.5, function(param1:GameClock) {
 					if (mRepeaterTutorialReadyToClose && !mRepeaterTutorialDone) {
 						finishRepeaterTutorial();
 					}
@@ -1068,23 +1227,26 @@ class DungeonTutorial {
 					return;
 				}
 				mBusterPopup = ASCompat.coerce(ASCompat.createInstance(_loc3_, []), flash.display.MovieClip);
-				ASCompat.setProperty((mBusterPopup : ASAny).title, "text", Locale.getString("TUTORIAL_BUSTER_TITLE"));
+				Locale.setText(ASCompat.coerce((mBusterPopup : ASAny).title, flash.text.TextField), "TUTORIAL_BUSTER_TITLE");
 				ASCompat.setProperty((mBusterPopup : ASAny).check, "visible", false);
+				showControllerPrompts(mBusterPopup,
+					mDBFacade.steamInputManager.isSteamInputReady ? [mDBFacade.steamInputManager.getGlyphFilePathForAction("use_dungeon_buster")] : [], 56,
+					false);
 				mBusterCloseButton = new UIButton(mDBFacade, ASCompat.coerce((mBusterPopup : ASAny).close, flash.display.MovieClip));
 				mBusterCloseButton.releaseCallback = finishBusterTutorial;
 				mSceneGraphComponent.addChild(mBusterPopup, (105 : UInt));
-				mBusterPopup.scaleX = mBusterPopup.scaleY = 0.85;
+				mBusterPopup.scaleX = mBusterPopup.scaleY = 1;
 				var _loc2_ = mDBFacade.viewWidth - mBusterPopup.width * 0.5 - 50;
 				var _loc4_ = mDBFacade.viewHeight * 0.5;
 				mBusterPopup.x = mDBFacade.viewWidth;
 				mBusterPopup.y = _loc4_;
-				new TimelineMax({
+				mDBFacade.mTween.createTimeline({
 					"tweens": [
-						TweenMax.to(mBusterPopup, 0.3333333333333333, {
+						mDBFacade.mTween.tweenMaxTo(mBusterPopup, 0.3333333333333333, {
 							"x": _loc2_ + 20,
 							"y": _loc4_
 						}),
-						TweenMax.to(mBusterPopup, 0.08333333333333333, {
+						mDBFacade.mTween.tweenMaxTo(mBusterPopup, 0.08333333333333333, {
 							"x": _loc2_,
 							"y": _loc4_
 						})
@@ -1110,14 +1272,14 @@ class DungeonTutorial {
 		curX = mChargePopup.x;
 		offscreenX = -mChargePopup.width;
 		offscreenY = mDBFacade.viewHeight * 0.5;
-		new TimelineMax({
+		mDBFacade.mTween.createTimeline({
 			"tweens": [
-				TweenMax.to(mChargePopup, 0.08333333333333333, {
+				mDBFacade.mTween.tweenMaxTo(mChargePopup, 0.08333333333333333, {
 					"delay": 1,
 					"x": curX + 20,
 					"y": offscreenY
 				}),
-				TweenMax.to(mChargePopup, 0.3333333333333333, {
+				mDBFacade.mTween.tweenMaxTo(mChargePopup, 0.3333333333333333, {
 					"x": offscreenX,
 					"y": offscreenY,
 					"onComplete": advanceFunc
@@ -1129,7 +1291,7 @@ class DungeonTutorial {
 
 	function destroyChargeTutorial() {
 		if (mChargePopup != null) {
-			TweenMax.killTweensOf(mChargePopup);
+			mDBFacade.mTween.killTweensOf(mChargePopup);
 			mSceneGraphComponent.removeChild(mChargePopup);
 			mChargeCloseButton.destroy();
 			mChargeCloseButton = null;
@@ -1150,33 +1312,34 @@ class DungeonTutorial {
 					return;
 				}
 				mChargePopup = ASCompat.coerce(ASCompat.createInstance(popupClass, []), flash.display.MovieClip);
-				ASCompat.setProperty((mChargePopup : ASAny).title, "text", Locale.getString("TUTORIAL_CHARGE_TITLE"));
+				Locale.setText(ASCompat.coerce((mChargePopup : ASAny).title, flash.text.TextField), "TUTORIAL_CHARGE_TITLE");
 				ASCompat.setProperty((mChargePopup : ASAny).check, "visible", false);
+				showControllerPrompts(mChargePopup, getAttackGlyphFilePaths(), 56, false);
 				mChargeCloseButton = new UIButton(mDBFacade, ASCompat.coerce((mChargePopup : ASAny).close, flash.display.MovieClip));
 				mChargeCloseButton.releaseCallback = finishChargeTutorial;
 				mSceneGraphComponent.addChild(mChargePopup, (105 : UInt));
-				mChargePopup.scaleX = mChargePopup.scaleY = 0.85;
+				mChargePopup.scaleX = mChargePopup.scaleY = 1;
 				destX = mChargePopup.width * 0.5 + 10;
 				destY = mDBFacade.viewHeight * 0.5;
 				mChargePopup.x = -mChargePopup.width;
 				mChargePopup.y = destY;
-				new TimelineMax({
+				mDBFacade.mTween.createTimeline({
 					"tweens": [
-						TweenMax.to(mChargePopup, 0.3333333333333333, {
+						mDBFacade.mTween.tweenMaxTo(mChargePopup, 0.3333333333333333, {
 							"x": destX + 20,
 							"y": destY
 						}),
-						TweenMax.to(mChargePopup, 0.08333333333333333, {
+						mDBFacade.mTween.tweenMaxTo(mChargePopup, 0.08333333333333333, {
 							"x": destX,
 							"y": destY
 						})
 					],
 					"align": "sequence"
 				});
-				mLogicalWorkComponent.doLater(3, function(param1:brain.clock.GameClock) {
+				mLogicalWorkComponent.doLater(3, function(param1:GameClock) {
 					mChargeTutorialReadyToClose = true;
 				});
-				mLogicalWorkComponent.doLater(6.5, function(param1:brain.clock.GameClock) {
+				mLogicalWorkComponent.doLater(6.5, function(param1:GameClock) {
 					if (mChargeTutorialReadyToClose && !mChargeTutorialDone) {
 						finishChargeTutorial();
 					}
@@ -1188,5 +1351,9 @@ class DungeonTutorial {
 
 	public function get_isTutorialComplete():Bool {
 		return mTutorialComplete;
+	}
+
+	static function __init__() {
+		ATTACK_ACTIONS = ["attack_weapon_1", "attack_weapon_2", "attack_weapon_3"];
 	}
 }

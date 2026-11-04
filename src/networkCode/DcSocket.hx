@@ -1,11 +1,11 @@
 package networkCode;
 
 import brain.clock.GameClock;
+import brain.event.EventListeners;
 import brain.gameObject.GameObject;
 import brain.logger.Logger;
 import brain.workLoop.LogicalWorkComponent;
 import facade.DBFacade;
-import generatedCode.*;
 import networkCode.transport.ConnectDiagnostics;
 import networkCode.transport.GameEndpoints;
 import networkCode.transport.GameTransportEvent;
@@ -14,14 +14,16 @@ import networkCode.transport.SessionCredential;
 import networkCode.transport.TransportFailureText;
 import networkCode.transport.TransportSelector;
 import networkCode.transport.TransportSettings;
-import flash.errors.*;
-import flash.events.*;
 import flash.utils.ByteArray;
 
 class DcSocket {
 	static inline final RETRY_PASS_DELAY_MS = 1500;
 
 	var input_double_buffer:DcNetworkPacket;
+
+	var mPacket:DcNetworkPacket = new DcNetworkPacket();
+
+	var mPacketInUse:Bool = false;
 
 	var Doid_NetInterfaces:ASObject;
 
@@ -106,13 +108,13 @@ class DcSocket {
 	}
 
 	static function fromArray(array:ByteArray, colons:Bool = false):String {
-		var _loc4_ = 0;
+		var _loc4_ = (0 : UInt);
 		var _loc3_ = "";
-		_loc4_ = 0;
-		while ((_loc4_ : UInt) < array.length) {
+		_loc4_ = (0 : UInt);
+		while (_loc4_ < array.length) {
 			_loc3_ += ("0" + ASCompat.toRadix(array[_loc4_], (16 : UInt))).substr(-2, 2);
 			if (colons) {
-				if ((_loc4_ : UInt) < array.length - 1) {
+				if (_loc4_ < (array.length:Float) - 1) {
 					_loc3_ += ":";
 				}
 			}
@@ -122,7 +124,7 @@ class DcSocket {
 	}
 
 	static function sorter(x:DcNetworkClass, y:DcNetworkClass):Float {
-		return y.creationOrder - x.creationOrder;
+		return (y.creationOrder : Float) - (x.creationOrder : Float);
 	}
 
 	public function beginConnect(endpoints:GameEndpoints, experimentalWebSocketReconnects:Bool) {
@@ -236,26 +238,26 @@ class DcSocket {
 	}
 
 	function configureListeners() {
-		mTransport.addEventListener("gameTransportConnected", connectHandler);
-		mTransport.addEventListener("gameTransportData", socketDataHandler);
-		mTransport.addEventListener("gameTransportClosed", closeHandler);
-		mTransport.addEventListener("gameTransportFailed", failedHandler);
-		mTransport.addEventListener("gameTransportReconnecting", reconnectingHandler);
-		mTransport.addEventListener("gameTransportReconnectAttempt", reconnectAttemptHandler);
-		mTransport.addEventListener("gameTransportResumed", resumedHandler);
+		EventListeners.add(mTransport, "gameTransportConnected", connectHandler);
+		EventListeners.add(mTransport, "gameTransportData", socketDataHandler);
+		EventListeners.add(mTransport, "gameTransportClosed", closeHandler);
+		EventListeners.add(mTransport, "gameTransportFailed", failedHandler);
+		EventListeners.add(mTransport, "gameTransportReconnecting", reconnectingHandler);
+		EventListeners.add(mTransport, "gameTransportReconnectAttempt", reconnectAttemptHandler);
+		EventListeners.add(mTransport, "gameTransportResumed", resumedHandler);
 	}
 
 	function detachTransport(closeIt:Bool) {
 		if (mTransport == null) {
 			return;
 		}
-		mTransport.removeEventListener("gameTransportConnected", connectHandler);
-		mTransport.removeEventListener("gameTransportData", socketDataHandler);
-		mTransport.removeEventListener("gameTransportClosed", closeHandler);
-		mTransport.removeEventListener("gameTransportFailed", failedHandler);
-		mTransport.removeEventListener("gameTransportReconnecting", reconnectingHandler);
-		mTransport.removeEventListener("gameTransportReconnectAttempt", reconnectAttemptHandler);
-		mTransport.removeEventListener("gameTransportResumed", resumedHandler);
+		EventListeners.remove(mTransport, "gameTransportConnected", connectHandler);
+		EventListeners.remove(mTransport, "gameTransportData", socketDataHandler);
+		EventListeners.remove(mTransport, "gameTransportClosed", closeHandler);
+		EventListeners.remove(mTransport, "gameTransportFailed", failedHandler);
+		EventListeners.remove(mTransport, "gameTransportReconnecting", reconnectingHandler);
+		EventListeners.remove(mTransport, "gameTransportReconnectAttempt", reconnectAttemptHandler);
+		EventListeners.remove(mTransport, "gameTransportResumed", resumedHandler);
 		if (closeIt) {
 			mTransport.close();
 		}
@@ -596,8 +598,9 @@ class DcSocket {
 	}
 
 	function ProcessMoreSocketData(chunk:ByteArray) {
-		var _loc3_ = 0;
+		var _loc3_ = (0 : UInt);
 		var _loc2_:DcNetworkPacket = null;
+		var _loc5_ = false;
 		if (chunk == null || chunk.length == 0) {
 			return;
 		}
@@ -606,17 +609,33 @@ class DcSocket {
 		input_double_buffer.writeBytes(chunk, (0 : UInt), chunk.length);
 		input_double_buffer.position = _loc4_;
 		while (input_double_buffer.bytesAvailable >= 2) {
-			_loc3_ = (input_double_buffer.readUnsignedShort() : Int);
+			_loc3_ = input_double_buffer.readUnsignedShort();
 			if (_loc3_ == 0) {
 				Logger.warn("DcSocket discarding a zero-length packet from the wire");
 			} else {
-				if ((_loc3_ : UInt) > input_double_buffer.bytesAvailable) {
+				if (_loc3_ > input_double_buffer.bytesAvailable) {
 					input_double_buffer.position -= (2 : UInt);
 					break;
 				}
-				_loc2_ = new DcNetworkPacket();
-				input_double_buffer.readBytes(_loc2_, (0 : UInt), (_loc3_ : UInt));
-				ProcessPacketFromWire(_loc2_);
+				_loc2_ = mPacketInUse ? new DcNetworkPacket() : mPacket;
+					(_loc2_ : ByteArray).length = (0 : UInt);
+				input_double_buffer.readBytes(_loc2_, (0 : UInt), _loc3_);
+				_loc2_.position = (0 : UInt);
+				_loc5_ = mPacketInUse;
+				mPacketInUse = true;
+				{
+					try {
+						ProcessPacketFromWire(_loc2_);
+					} catch (__finallyError0:Dynamic) {
+						{
+							mPacketInUse = _loc5_;
+						};
+						throw __finallyError0;
+					};
+					{
+						mPacketInUse = _loc5_;
+					};
+				}
 			}
 		}
 		input_double_buffer.do_slide();
@@ -697,7 +716,7 @@ class DcSocket {
 
 	public function destroy() {
 		var _loc1_:ASObject = null;
-		var _loc2_ = 0;
+		var _loc2_ = (0 : UInt);
 		Logger.debugch("WS", "DcSocket destroy");
 		if (mDBFacade.metrics != null) {
 			mDBFacade.metrics.log("DcSocketDestroy");
@@ -710,9 +729,9 @@ class DcSocket {
 		}
 		var _loc4_ = new Vector<DcNetworkClass>();
 		var _loc3_:String;
-		final __ax4_iter_162:ASObject = Doid_NetInterfaces;
-		if (checkNullIteratee(__ax4_iter_162))
-			for (_tmp_ in __ax4_iter_162.___keys()) {
+		final __ax4_iter_155:ASObject = Doid_NetInterfaces;
+		if (checkNullIteratee(__ax4_iter_155))
+			for (_tmp_ in __ax4_iter_155.___keys()) {
 				_loc3_ = _tmp_;
 				_loc1_ = Doid_NetInterfaces[_loc3_];
 				if (Std.isOfType(_loc1_, DcNetworkClass)) {
@@ -722,9 +741,9 @@ class DcSocket {
 				}
 			}
 		ASCompat.ASVector.sort(_loc4_, sorter);
-		_loc2_ = 0;
-		while (_loc2_ < _loc4_.length) {
-			_loc4_[_loc2_].destroy();
+		_loc2_ = (0 : UInt);
+		while (_loc2_ < (_loc4_.length:UInt)) {
+			_loc4_[(_loc2_ : Int)].destroy();
 			_loc2_++;
 		}
 		Doid_NetInterfaces = null;

@@ -4,14 +4,15 @@ import actor.ActorGameObject;
 import brain.logger.Logger;
 import brain.workLoop.LogicalWorkComponent;
 import brain.workLoop.Task;
+import collections.IMapIterator;
+import collections.Map;
 import combat.CombatGameObject;
+import dBGlobals.DBGlobal;
 import distributedObjects.DistributedDungeonFloor;
 import facade.DBFacade;
 import gameMasterDictionary.GMAttack;
 import generatedCode.Attack;
 import generatedCode.CombatResult;
-import org.as3commons.collections.Map;
-import org.as3commons.collections.framework.IMapIterator;
 
 class CollisionComponent {
 	var mDBFacade:DBFacade;
@@ -57,7 +58,7 @@ class CollisionComponent {
 	var mMarkedForDeletion:Bool = false;
 
 	public function new(dbFacade:DBFacade, projectile:ProjectileGameObject, parentActorId:UInt, dungeonFloor:DistributedDungeonFloor, weaponType:UInt,
-			weaponPower:UInt, gmAttck:GMAttack, combatResultCallback:ASFunction, weaponSlot:Int, additiveHits:Float, isPierceProjectile:Bool,
+			weaponPower:UInt, gmAttack:GMAttack, combatResultCallback:ASFunction, weaponSlot:Int, additiveHits:Float, isPierceProjectile:Bool,
 			generation:UInt = (0 : UInt)) {
 		mDBFacade = dbFacade;
 		mLogicalWorkComponent = new LogicalWorkComponent(mDBFacade, "CollisionComponent");
@@ -77,7 +78,7 @@ class CollisionComponent {
 		mHitsPerActor = (ASCompat.floatToInt(mProjectile.gmProjectile.HitsPerActor) : UInt);
 		mMaxCollisions = (ASCompat.floatToInt(mProjectile.gmProjectile.MaxCollisions + additiveHits) : UInt);
 		mRecurringHitDelayTasks = new Map();
-		mGMAttack = gmAttck;
+		mGMAttack = gmAttack;
 		mIsPierceProjectile = isPierceProjectile;
 	}
 
@@ -95,12 +96,12 @@ class CollisionComponent {
 
 	public function destroy() {
 		var _loc3_:Task = null;
-		var _loc2_ = 0;
+		var _loc2_ = (0 : UInt);
 		mDungeonFloor = null;
 		mCombatResultCallback = null;
 		var _loc1_ = ASCompat.reinterpretAs(mRecurringHitDelayTasks.iterator(), IMapIterator);
 		while (ASCompat.toBool(_loc1_.next())) {
-			_loc2_ = (ASCompat.asUint(_loc1_.key) : Int);
+			_loc2_ = ASCompat.asUint(_loc1_.key);
 			_loc3_ = ASCompat.dynamicAs(mRecurringHitDelayTasks.itemFor(_loc2_), Task);
 			if (_loc3_ != null) {
 				_loc3_.destroy();
@@ -122,15 +123,15 @@ class CollisionComponent {
 	}
 
 	public function hitActor(actor:ActorGameObject):Bool {
-		var _loc2_ = 0;
+		var _loc2_ = (0 : UInt);
 		var _loc6_ = Math.NaN;
 		var _loc3_ = Math.NaN;
 		mProjectile.onHitActor(actor);
 		var _loc5_ = ASCompat.dynamicAs(mActorCollisions.itemFor(actor.id), CollisionHelper);
 		if (_loc5_ != null) {
 			_loc5_ = ASCompat.dynamicAs(mActorCollisions.itemFor(actor.id), CollisionHelper);
-			_loc2_ = (_loc5_.hits : Int);
-			if ((_loc2_ : UInt) >= mHitsPerActor) {
+			_loc2_ = _loc5_.hits;
+			if (_loc2_ >= mHitsPerActor) {
 				return false;
 			}
 		}
@@ -180,10 +181,10 @@ class CollisionComponent {
 		if (mCombatResultCallback != null) {
 			mCombatResultCallback(_loc7_);
 		}
-		if (mHitsPerActor > (_loc2_ : UInt) && mNumCollisions < mMaxCollisions) {
+		if (mHitsPerActor > _loc2_ && mNumCollisions < mMaxCollisions) {
 			addRecurringHitDelayTask(actor, mHitRecurDelay);
 		}
-		if (mNumCollisions >= mMaxCollisions || actor.hasAbility((16777216 : UInt)) && mIsPierceProjectile) {
+		if (mNumCollisions >= mMaxCollisions || actor.hasAbility(DBGlobal.ABILITY_PIERCE_IMMUNE) && mIsPierceProjectile) {
 			mMarkedForDeletion = true;
 		}
 		return true;

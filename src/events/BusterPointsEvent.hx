@@ -7,9 +7,9 @@ class BusterPointsEvent extends GameObjectEvent {
 
 	public var maxBusterPoints:UInt = 0;
 
-	public function new(type:String, id:UInt, busterPoints:UInt, maxBusterPoints:UInt, bubbles:Bool = false, cancelable:Bool = false) {
+	public function new(busterPointsEventType:String, id:UInt, busterPoints:UInt, maxBusterPoints:UInt, bubbles:Bool = false, cancelable:Bool = false) {
 		this.busterPoints = busterPoints;
 		this.maxBusterPoints = maxBusterPoints;
-		super(type, id, bubbles, cancelable);
+		super(busterPointsEventType, id, bubbles, cancelable);
 	}
 }

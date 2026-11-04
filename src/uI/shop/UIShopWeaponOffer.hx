@@ -2,6 +2,8 @@ package uI.shop;
 
 import account.AvatarInfo;
 import brain.uI.UIObject;
+import brain.utils.TextUtil;
+import dBGlobals.DBGlobal;
 import facade.DBFacade;
 import facade.GameMasterLocale;
 import facade.Locale;
@@ -17,7 +19,6 @@ import flash.display.MovieClip;
 import flash.events.MouseEvent;
 import flash.geom.Point;
 import flash.text.TextField;
-import flash.text.TextFormat;
 
 class UIShopWeaponOffer extends UIShopOffer {
 	public static inline final WEAPON_CARD_ROLL_OVER_SCALE:Float = 1.845;
@@ -59,7 +60,7 @@ class UIShopWeaponOffer extends UIShopOffer {
 		mPower = ASCompat.coerce((mRoot : ASAny).power, flash.display.MovieClip);
 		if (mPower != null) {
 			mPowerLabel = ASCompat.coerce((mPower : ASAny).label, flash.text.TextField);
-			ASCompat.setProperty((mPower : ASAny).attack_label, "text", Locale.getString("POWER"));
+			Locale.setText(ASCompat.coerce((mPower : ASAny).attack_label, flash.text.TextField), "POWER");
 		}
 		mTapIcon = new UIObject(mDBFacade, ASCompat.coerce((mRoot : ASAny).tap_icon, flash.display.MovieClip));
 		mTapTooltip = new UITapHoldTooltip(mDBFacade, chargeTooltipClass);
@@ -72,15 +73,15 @@ class UIShopWeaponOffer extends UIShopOffer {
 		mWeaponDescTooltip = new UIWeaponDescTooltip(mDBFacade, descTooltipClass);
 		mIconParent.tooltip = mWeaponDescTooltip;
 		mWeaponDescTooltip.visible = false;
-		ASCompat.setProperty((mRoot : ASAny).label_tap, "text", Locale.getString("TAP"));
-		ASCompat.setProperty((mRoot : ASAny).label_charge, "text", Locale.getString("HOLD"));
-		ASCompat.setProperty((mRoot : ASAny).label_modifier, "text", Locale.getString("MODIFIERS"));
+		Locale.setText(ASCompat.coerce((mRoot : ASAny).label_tap, flash.text.TextField), "TAP");
+		Locale.setText(ASCompat.coerce((mRoot : ASAny).label_charge, flash.text.TextField), "HOLD");
+		Locale.setText(ASCompat.coerce((mRoot : ASAny).label_modifier, flash.text.TextField), "MODIFIERS");
 		mUIModifierList = new Vector<UIModifier>();
 	}
 
 	override public function destroy() {
 		var _loc1_:UIModifier;
-		var __ax4_iter_131:Vector<UIModifier>;
+		var __ax4_iter_429:Vector<UIModifier>;
 		mTapTooltip.destroy();
 		mTapIcon.destroy();
 		mTapIcon = null;
@@ -91,9 +92,9 @@ class UIShopWeaponOffer extends UIShopOffer {
 		mRollOutCallback = null;
 		mWeaponDescTooltip.destroy();
 		if (mUIModifierList != null) {
-			__ax4_iter_131 = mUIModifierList;
-			if (checkNullIteratee(__ax4_iter_131))
-				for (_tmp_ in __ax4_iter_131) {
+			__ax4_iter_429 = mUIModifierList;
+			if (checkNullIteratee(__ax4_iter_429))
+				for (_tmp_ in __ax4_iter_429) {
 					_loc1_ = _tmp_;
 					_loc1_.destroy();
 				}
@@ -103,7 +104,7 @@ class UIShopWeaponOffer extends UIShopOffer {
 	}
 
 	override function get_nativeIconSize():Float {
-		return 100;
+		return DBGlobal.WEAPON_ICON_NATIVE_SIZE;
 	}
 
 	public function setRolloverCallbacks(over:ASFunction, out:ASFunction) {
@@ -140,14 +141,11 @@ class UIShopWeaponOffer extends UIShopOffer {
 		var preNameModifiers:String;
 		var i:Int;
 		var avatarInfo:AvatarInfo;
-		var format:TextFormat;
-		var sizeMult:Float;
 		var rarity:GMRarity;
 		this.offer = gmOffer;
 		mGMOfferDetail = this.offer.Details[0];
 		mGMWeaponItem = ASCompat.coerce(mDBFacade.gameMaster.weaponItemById.itemFor(mGMOfferDetail.WeaponId), gameMasterDictionary.GMWeaponItem);
 		super.showOffer(gmOffer, gmHero);
-		weaponName = "";
 		weaponName = GameMasterLocale.getGameMasterSubString("WEAPON_AESTHETIC_NAME", gmOffer.getOfferItemConstant(mDBFacade.gameMaster));
 		mWeaponDescTooltip.setWeaponItem(mGMWeaponItem, mGMOfferDetail.Level);
 		if (mGMOfferDetail.Rarity == "LEGENDARY") {
@@ -204,7 +202,7 @@ class UIShopWeaponOffer extends UIShopOffer {
 			}
 		}
 		mPower.visible = true;
-		mPowerLabel.text = Std.string(mGMOfferDetail.WeaponPower);
+		TextUtil.setText(mPowerLabel, Std.string(mGMOfferDetail.WeaponPower));
 		if (mGMOfferDetail.Modifier1 != null) {
 			mUIModifierList.push(new UIModifier(mDBFacade, ASCompat.coerce((mRoot : ASAny).modifier_icon_1, flash.display.MovieClip),
 				mGMOfferDetail.Modifier1));
@@ -235,38 +233,33 @@ class UIShopWeaponOffer extends UIShopOffer {
 			if (this.offer.LimitedQuantity > 0) {
 				mRibbonA.visible = false;
 				mRibbonB.visible = true;
-				ASCompat.setProperty((mRibbonB : ASAny).timer, "text", getDateString());
-				ASCompat.setProperty((mRibbonB : ASAny).limit_label, "text", getQuantityString());
+				setRibbonTimerText(ASCompat.coerce((mRibbonB : ASAny).timer, flash.text.TextField));
+				TextUtil.setText(ASCompat.coerce((mRibbonB : ASAny).limit_label, flash.text.TextField), getQuantityString());
 			} else {
 				mRibbonA.visible = true;
 				mRibbonB.visible = false;
-				ASCompat.setProperty((mRibbonA : ASAny).timer, "text", getDateString());
+				setRibbonTimerText(ASCompat.coerce((mRibbonA : ASAny).timer, flash.text.TextField));
 			}
 		}
 		avatarInfo = mDBFacade.dbAccountInfo.inventoryInfo.getAvatarInfoForHeroType(gmHero.Id);
-		if (avatarInfo == null || avatarInfo.level < mGMOfferDetail.Level) {
+		if (avatarInfo == null || avatarInfo.levelForWeaponComparison < mGMOfferDetail.Level) {
 			mLevelStarLabel.textColor = mRequiresLabel.textColor = (15535124 : UInt);
-		}
-		format = new TextFormat();
-		sizeMult = 0.1;
-		if (weaponName.length <= 32) {
-			format.size = 13;
-			sizeMult = weaponName.length < 16 ? 0.2 : 0.1;
-			mTitle.y = mTitleY + mTitle.height * sizeMult;
-		} else {
-			format.size = 11;
-			mTitle.y = mTitleY;
 		}
 		if (mGMOfferDetail.Rarity == "LEGENDARY") {
 			weaponName = GameMasterLocale.getGameMasterSubString("WEAPON_AESTHETIC_NAME", gmOffer.getOfferItemConstant(mDBFacade.gameMaster, "LEGENDARY", true))
 				.toUpperCase();
 		}
-		mTitle.defaultTextFormat = format;
-		mTitle.text = weaponName;
+		TextUtil.setText(mTitle, weaponName);
+		mTitle.y = mTitle.numLines == 1 ? mTitleY + mTitle.height * 0.2 : mTitleY;
 		rarity = ASCompat.coerce(mDBFacade.gameMaster.rarityByConstant.itemFor(mGMOfferDetail.Rarity), gameMasterDictionary.GMRarity);
 		if (rarity != null && rarity.TextColor != 0) {
 			mTitle.textColor = rarity.TextColor;
 		}
+	}
+
+	function setRibbonTimerText(timer:TextField) {
+		TextUtil.setText(timer, getDateString(), 1.55);
+		TextUtil.fitToField(timer);
 	}
 
 	override function get_offerDescription():String {

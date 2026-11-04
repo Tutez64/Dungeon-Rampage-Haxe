@@ -3,9 +3,10 @@ package sound;
 import brain.logger.Logger;
 import brain.sound.SoundHandle;
 import brain.sound.SoundManager;
+import collections.Set;
 import dBGlobals.DBGlobal;
 import facade.DBFacade;
-import org.as3commons.collections.Set;
+import settings.model.LocalSettingsFile;
 
 class DBSoundManager extends SoundManager {
 	public static inline final MUSIC_MIXER_CATEGORY = "music";
@@ -14,10 +15,26 @@ class DBSoundManager extends SoundManager {
 
 	var mCurrentMusic:SoundHandle;
 
+	var mDBFacade:DBFacade;
+
 	public function new(dbFacade:DBFacade) {
 		super(dbFacade);
+		mDBFacade = dbFacade;
 		setVolumeScaleForCategory("music", DBGlobal.MUSIC_VOLUME);
 		setVolumeScaleForCategory("sfx", DBGlobal.SFX_VOLUME);
+	}
+
+	public function applyStoredVolumeSettings() {
+		var _loc1_:ASObject = new LocalSettingsFile().read();
+		if (_loc1_ == null) {
+			return;
+		}
+		if (_loc1_.hasOwnProperty("sfxVolume") && Std.isOfType(_loc1_["sfxVolume"], Float)) {
+			sfxVolumeScale = ASCompat.toNumber(_loc1_["sfxVolume"]);
+		}
+		if (_loc1_.hasOwnProperty("musicVolume") && Std.isOfType(_loc1_["musicVolume"], Float)) {
+			musicVolumeScale = ASCompat.toNumber(_loc1_["musicVolume"]);
+		}
 	}
 
 	@:isVar public var musicVolumeScale(get, set):Float;

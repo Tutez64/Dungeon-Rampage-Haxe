@@ -1,6 +1,9 @@
 package uI;
 
 import brain.clock.GameClock;
+import brain.event.EventListeners;
+import brain.utils.TextUtil;
+import brain.utils.Timers;
 import flash.events.TimerEvent;
 import flash.text.TextField;
 import flash.utils.Timer;
@@ -54,15 +57,15 @@ class CountdownTextTimer {
 	}
 
 	public function start() {
-		mTimer = new Timer(1000);
-		mTimer.addEventListener("timer", onTick);
+		mTimer = Timers.create(1000, 0, "CountdownTextTimer.mTimer");
+		EventListeners.add(mTimer, "timer", onTick);
 		mTimer.start();
 		onTick(null);
 	}
 
 	public function stop() {
 		if (mTimer != null) {
-			mTimer.removeEventListener("timer", onTick);
+			EventListeners.remove(mTimer, "timer", onTick);
 			mTimer.stop();
 			mTimer = null;
 		}
@@ -83,7 +86,7 @@ class CountdownTextTimer {
 		var _loc4_ = 0;
 		var _loc3_ = 0;
 		if (getTimeLeft() <= 0) {
-			mCountdownText.text = mExpireText;
+			TextUtil.setText(mCountdownText, mExpireText);
 			if (mOnFinishFunc != null) {
 				mOnFinishFunc();
 			}
@@ -94,7 +97,7 @@ class CountdownTextTimer {
 			_loc4_ = ASCompat.floatToInt(_loc5_ / 60000);
 			_loc5_ -= _loc4_ * 60000;
 			_loc3_ = ASCompat.floatToInt(_loc5_ / 1000);
-			mCountdownText.text = mPrefixText + Std.string(_loc2_) + ":" + zeroPad(_loc4_, 2) + ":" + zeroPad(_loc3_, 2) + mPostfixText;
+			TextUtil.setText(mCountdownText, mPrefixText + Std.string(_loc2_) + ":" + zeroPad(_loc4_, 2) + ":" + zeroPad(_loc3_, 2) + mPostfixText);
 		}
 	}
 

@@ -3,8 +3,8 @@ package brain.render;
 import brain.clock.GameClock;
 import brain.facade.Facade;
 import brain.logger.Logger;
+import collections.Map;
 import flash.display.MovieClip;
-import org.as3commons.collections.Map;
 
 class MovieClipRandomRenderer extends MovieClipRenderer {
 	static inline final RANDOM_SUBSTRING_LABEL = "random";
@@ -34,16 +34,11 @@ class MovieClipRandomRenderer extends MovieClipRenderer {
 		if (!mIsPlaying) {
 			return;
 		}
-		var previousFrame = Math.fround(mPlayHead);
-		var forceUpdate = false;
 		mPlayHead += mFrameRate * gameClock.tickLength * mPlayRate;
 		if (mPlayHead >= mCurrentRandomLabel.endFrameNumber) {
 			playNewRandomLabel();
-			forceUpdate = true;
 		}
-		if (forceUpdate || previousFrame != Math.fround(mPlayHead)) {
-			this.updateClip(mClip);
-		}
+		this.updateClip(mClip);
 	}
 
 	function playNewRandomLabel() {
@@ -55,24 +50,24 @@ class MovieClipRandomRenderer extends MovieClipRenderer {
 
 	override function determineFrames(clip:MovieClip) {
 		var _loc2_:RandomLabelObject = null;
-		var _loc3_ = 0;
+		var _loc3_ = (0 : UInt);
 		if (clip.currentLabels.length > 0) {
-			_loc3_ = 1;
-			while (_loc3_ <= clip.totalFrames) {
+			_loc3_ = (1 : UInt);
+			while (_loc3_ <= (clip.totalFrames : UInt)) {
 				clip.gotoAndStop(_loc3_);
 				if (ASCompat.stringAsBool(clip.currentFrameLabel) && clip.currentFrameLabel.indexOf("random") >= 0) {
 					if (_loc2_ != null && _loc2_.endFrameNumber == 0) {
-						_loc2_.endFrameNumber = (_loc3_ - 1 : UInt);
+						_loc2_.endFrameNumber = _loc3_ - 1;
 					}
 					_loc2_ = new RandomLabelObject();
-					_loc2_.startFrameNumber = (_loc3_ : UInt);
+					_loc2_.startFrameNumber = _loc3_;
 					_loc2_.labelName = clip.currentFrameLabel;
 					mRandomLabels.add(clip.currentFrameLabel, _loc2_);
 				}
 				_loc3_++;
 			}
 			if (_loc2_ != null && _loc2_.endFrameNumber == 0) {
-				_loc2_.endFrameNumber = (_loc3_ - 1 : UInt);
+				_loc2_.endFrameNumber = _loc3_ - 1;
 			}
 		}
 		playNewRandomLabel();

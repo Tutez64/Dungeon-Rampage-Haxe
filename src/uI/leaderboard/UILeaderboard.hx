@@ -4,21 +4,24 @@ import account.FriendInfo;
 import brain.assetRepository.AssetLoadingComponent;
 import brain.assetRepository.SwfAsset;
 import brain.event.EventComponent;
+import brain.event.EventListeners;
 import brain.render.MovieClipRenderController;
 import brain.sceneGraph.SceneGraphComponent;
 import brain.sceneGraph.SceneGraphManager;
 import brain.uI.UIButton;
 import brain.utils.MemoryTracker;
+import brain.utils.TextUtil;
 import brain.workLoop.LogicalWorkComponent;
 import brain.jsonRPC.JSONRPCService;
 import facade.DBFacade;
 import facade.Locale;
 import town.TownStateMachine;
-import uI.popup.DBUIOneButtonPopup;
 import uI.popup.DBUITwoButtonPopup;
+import flash.display.DisplayObject;
 import flash.display.MovieClip;
 import flash.events.Event;
 import flash.events.MouseEvent;
+import flash.text.TextField;
 import flash.text.TextFormat;
 
 class UILeaderboard {
@@ -29,6 +32,10 @@ class UILeaderboard {
 	public static inline final REFRESH_FRIENDS_EVENT_NAME = "REFRESH_FRIENDS_EVENT";
 
 	public static inline final REVERSE_FRIEND_SLOT = false;
+
+	public static inline final FRIEND_SLOTS_PER_TOWN_BUTTON = 3;
+
+	public static inline final ONLINE_POPUP_TITLE_MAX_LINES = 2;
 
 	var mAssetLoadingComponent:AssetLoadingComponent;
 
@@ -50,6 +57,16 @@ class UILeaderboard {
 
 	var mOfflinePopup:MovieClip;
 
+	var mOnlinePopupBg:DisplayObject;
+
+	var mOnlinePopupBgScaleY:Float = Math.NaN;
+
+	var mOnlinePopupBgY:Float = Math.NaN;
+
+	var mOnlinePopupTitleY:Float = Math.NaN;
+
+	var mOnlinePopupTitleHeight:Float = Math.NaN;
+
 	var mMessageFriendButton:UIButton;
 
 	var mRemoveOnlineFriendButton:UIButton;
@@ -65,8 +82,6 @@ class UILeaderboard {
 	var mScrollPageRightButton:UIButton;
 
 	var mScrollPageLeftButton:UIButton;
-
-	var mFBRemoveFriendPopup:DBUIOneButtonPopup;
 
 	var mDRRemoveFriendPopup:DBUITwoButtonPopup;
 
@@ -100,6 +115,8 @@ class UILeaderboard {
 
 	var mFriendManagementButton:UIButton;
 
+	var mTownButtons:Array<ASAny>;
+
 	var mAlert:MovieClip;
 
 	var mAlertRenderer:MovieClipRenderController;
@@ -118,6 +135,9 @@ class UILeaderboard {
 		mLogicalWorkComponent = new LogicalWorkComponent(dbFacade, "UILeaderboard");
 		mEventComponent = new EventComponent(mDBFacade);
 		mTownStateMachine = townStateMachine;
+	}
+
+	public function preLoadSWF() {
 		mAssetLoadingComponent.getSwfAsset(DBFacade.buildFullDownloadPath("Resources/Art2D/UI/db_UI_leaderboard.swf"), leaderboardLoaded);
 	}
 
@@ -125,29 +145,20 @@ class UILeaderboard {
 		var tf:TextFormat;
 		var mcClass = townSwf.getClass("popup");
 		var colorizeStart = (Locale.getString("LEADERBOARD_DR_REMOVE_FRIEND_POPUP_DESC_1").length : UInt);
-		if (info.isDRFriend) {
-			mDRRemoveFriendPopup = new DBUITwoButtonPopup(mDBFacade, Locale.getString("LEADERBOARD_DR_REMOVE_FRIEND_POPUP_TITLE"),
-				Locale.getString("LEADERBOARD_DR_REMOVE_FRIEND_POPUP_DESC_1") + info.name + Locale.getString("LEADERBOARD_DR_REMOVE_FRIEND_POPUP_DESC_2"),
-				Locale.getString("REMOVE"), function() {
-					var _loc2_:Array<ASAny> = [];
-					_loc2_.push(info.id);
-					var _loc1_ = JSONRPCService.getFunction("DRFriendRemove", mDBFacade.rpcRoot + "friendrequests");
-					_loc1_(mDBFacade.accountId, _loc2_, mDBFacade.validationToken, mDBFacade.dbAccountInfo.removeFriendCallback);
-					mDBFacade.metrics.log("DRFriendRemove", {"friendId": Std.string(info.id)});
-			}, Locale.getString("CANCEL"), null);
-			MemoryTracker.track(mDRRemoveFriendPopup, "DBUITwoButtonPopup - created in UILeaderboard.loadRemoveFriendPopup()");
-			tf = new TextFormat();
-			tf.color = FRIEND_NAME_HIGHLIGHT_COLOR;
-			mDRRemoveFriendPopup.colorizeMessage(tf, (colorizeStart : Int), (colorizeStart + info.name.length : Int));
-		} else if (info.facebookId != null && info.facebookId != "") {
-			mFBRemoveFriendPopup = new DBUIOneButtonPopup(mDBFacade, Locale.getString("LEADERBOARD_FB_REMOVE_FRIEND_POPUP_TITLE"),
-				Locale.getString("LEADERBOARD_FB_REMOVE_FRIEND_POPUP_DESC"), Locale.getString("OK"), null);
-			MemoryTracker.track(mFBRemoveFriendPopup, "DBUIOneButtonPopup - created in UILeaderboard.loadRemoveFriendPopup()");
-		} else if (info.kongregateId != null && info.kongregateId != "") {
-			mFBRemoveFriendPopup = new DBUIOneButtonPopup(mDBFacade, Locale.getString("LEADERBOARD_KG_REMOVE_FRIEND_POPUP_TITLE"),
-				Locale.getString("LEADERBOARD_KG_REMOVE_FRIEND_POPUP_DESC"), Locale.getString("OK"), null);
-			MemoryTracker.track(mFBRemoveFriendPopup, "DBUIOneButtonPopup - created in UILeaderboard.loadRemoveFriendPopup()");
-		}
+		mDRRemoveFriendPopup = new DBUITwoButtonPopup(mDBFacade, "LEADERBOARD_REMOVE_FRIEND_POPUP",
+			Locale.getString("LEADERBOARD_DR_REMOVE_FRIEND_POPUP_TITLE"),
+			Locale.getString("LEADERBOARD_DR_REMOVE_FRIEND_POPUP_DESC_1") + info.name + Locale.getString("LEADERBOARD_DR_REMOVE_FRIEND_POPUP_DESC_2"),
+			Locale.getString("REMOVE"), function() {
+				var _loc2_:Array<ASAny> = [];
+				_loc2_.push(info.id);
+				var _loc1_ = JSONRPCService.getFunction("DRFriendRemove", mDBFacade.rpcRoot + "friendrequests");
+				_loc1_(mDBFacade.accountId, _loc2_, mDBFacade.validationToken, mDBFacade.dbAccountInfo.removeFriendCallback);
+				mDBFacade.metrics.log("DRFriendRemove", {"friendId": Std.string(info.id)});
+		}, Locale.getString("CANCEL"), null);
+		MemoryTracker.track(mDRRemoveFriendPopup, "DBUITwoButtonPopup - created in UILeaderboard.loadRemoveFriendPopup()");
+		tf = new TextFormat();
+		tf.color = FRIEND_NAME_HIGHLIGHT_COLOR;
+		mDRRemoveFriendPopup.colorizeMessage(tf, (colorizeStart : Int), (colorizeStart + info.name.length : Int));
 	}
 
 	function leaderboardLoaded(swfAsset:SwfAsset) {
@@ -164,6 +175,9 @@ class UILeaderboard {
 	}
 
 	function loadOnlinePopup(swfAsset:SwfAsset) {
+		var title:TextField;
+		var i:Int;
+		var child:DisplayObject;
 		var mcClass = swfAsset.getClass("DR_leaderboard_online_tooltip");
 		mOnlinePopup = ASCompat.coerce(ASCompat.createInstance(mcClass, []), flash.display.MovieClip);
 		if (mOnlinePopup == null) {
@@ -172,25 +186,42 @@ class UILeaderboard {
 		mRootMovieClip.addChild(mOnlinePopup);
 		mOnlinePopup.visible = false;
 		mGiftFriendButton = new UIButton(mDBFacade, ASCompat.coerce((mOnlinePopup : ASAny).join_friend, flash.display.MovieClip));
-		mGiftFriendButton.label.text = Locale.getString("LEADERBOARD_GIFT_FRIEND_BUTTON");
+		Locale.setText(mGiftFriendButton.label, "LEADERBOARD_GIFT_FRIEND_BUTTON");
+		mGiftFriendButton.navigationSelectedInteraction = callStopOnPopupTimeToLiveTask;
 		mGiftFriendButton.releaseCallback = function() {
-			if (mDBFacade.dbConfigManager.getConfigBoolean("FUFB", false)) {
-				mDBFacade.errorPopup("GIFTING CURRENTLY DISABLED", "Sorry for the inconvenience, we are looking into resolving the issue.");
-				return;
-			}
 			if (mStoreCallback != null) {
 				mStoreCallback();
 			}
 		};
 		mRemoveOnlineFriendButton = new UIButton(mDBFacade, ASCompat.coerce((mOnlinePopup : ASAny).remove_friend, flash.display.MovieClip));
-		mRemoveOnlineFriendButton.label.text = Locale.getString("LEADERBOARD_REMOVE_FRIEND_BUTTON");
+		Locale.setText(mRemoveOnlineFriendButton.label, "LEADERBOARD_REMOVE_FRIEND_BUTTON");
+		mRemoveOnlineFriendButton.navigationSelectedInteraction = callStopOnPopupTimeToLiveTask;
 		mRemoveOnlineFriendButton.releaseCallback = removeFriends;
+		title = ASCompat.coerce((mOnlinePopup : ASAny).title_label, flash.text.TextField);
+		title.mouseEnabled = false;
+		title.multiline = true;
+		title.wordWrap = true;
+		mOnlinePopupTitleY = title.y;
+		mOnlinePopupTitleHeight = title.height;
+		i = 0;
+		while (i < mOnlinePopup.numChildren) {
+			child = mOnlinePopup.getChildAt(i);
+			if (child.name.indexOf("instance") == 0) {
+				mOnlinePopupBg = child;
+				break;
+			}
+			i = i + 1;
+		}
+		if (mOnlinePopupBg != null) {
+			mOnlinePopupBgScaleY = mOnlinePopupBg.scaleY;
+			mOnlinePopupBgY = mOnlinePopupBg.y;
+		}
 		ASCompat.setProperty((mOnlinePopup : ASAny).nextassist, "mouseEnabled", false);
-		ASCompat.setProperty((mOnlinePopup : ASAny).nextassist, "text", Locale.getString("LEADERBOARD_NEXT_ASSIST"));
+		Locale.setText(ASCompat.coerce((mOnlinePopup : ASAny).nextassist, flash.text.TextField), "LEADERBOARD_NEXT_ASSIST");
 		ASCompat.setProperty((mOnlinePopup : ASAny).nextassist, "visible", false);
 		ASCompat.setProperty((mOnlinePopup : ASAny).assist_time, "visible", false);
-		mOnlinePopup.addEventListener("rollOver", callStopOnPopupTimeToLiveTask);
-		mOnlinePopup.addEventListener("rollOut", hidePopup);
+		EventListeners.add(mOnlinePopup, "rollOver", callStopOnPopupTimeToLiveTask);
+		EventListeners.add(mOnlinePopup, "rollOut", hidePopup);
 	}
 
 	function loadOfflinePopup(swfAsset:SwfAsset) {
@@ -203,21 +234,23 @@ class UILeaderboard {
 		mOfflinePopup.visible = false;
 		SceneGraphManager.setGrayScaleSaturation(ASCompat.coerce((mOfflinePopup : ASAny).join_friend, flash.display.DisplayObject), 10);
 		ASCompat.setProperty((mOfflinePopup : ASAny).title_label, "mouseEnabled", false);
-		ASCompat.setProperty((mOfflinePopup : ASAny).title_label, "text", Locale.getString("LEADERBOARD_OFFLINE_TEXT"));
+		Locale.setText(ASCompat.coerce((mOfflinePopup : ASAny).title_label, flash.text.TextField), "LEADERBOARD_OFFLINE_TEXT");
 		ASCompat.setProperty((mOfflinePopup : ASAny).join_friend.label, "mouseEnabled", false);
-		ASCompat.setProperty((mOfflinePopup : ASAny).join_friend.label, "text", Locale.getString("LEADERBOARD_JOIN_FRIEND_BUTTON"));
+		Locale.setText(ASCompat.coerce((mOfflinePopup : ASAny).join_friend.label, flash.text.TextField), "LEADERBOARD_JOIN_FRIEND_BUTTON");
 		ASCompat.setProperty((mOfflinePopup : ASAny).nextassist, "mouseEnabled", false);
-		ASCompat.setProperty((mOfflinePopup : ASAny).nextassist, "text", Locale.getString("LEADERBOARD_NEXT_ASSIST"));
+		Locale.setText(ASCompat.coerce((mOfflinePopup : ASAny).nextassist, flash.text.TextField), "LEADERBOARD_NEXT_ASSIST");
 		mMessageFriendButton = new UIButton(mDBFacade, ASCompat.coerce((mOfflinePopup : ASAny).message_friend, flash.display.MovieClip));
-		mMessageFriendButton.label.text = Locale.getString("LEADERBOARD_MESSAGE_FRIEND_BUTTON");
+		Locale.setText(mMessageFriendButton.label, "LEADERBOARD_MESSAGE_FRIEND_BUTTON");
+		mMessageFriendButton.navigationSelectedInteraction = callStopOnPopupTimeToLiveTask;
 		disableMessageFriendButton();
 		mRemoveOfflineFriendButton = new UIButton(mDBFacade, ASCompat.coerce((mOfflinePopup : ASAny).remove_friend, flash.display.MovieClip));
-		mRemoveOfflineFriendButton.label.text = Locale.getString("LEADERBOARD_REMOVE_FRIEND_BUTTON");
+		Locale.setText(mRemoveOfflineFriendButton.label, "LEADERBOARD_REMOVE_FRIEND_BUTTON");
+		mRemoveOfflineFriendButton.navigationSelectedInteraction = callStopOnPopupTimeToLiveTask;
 		mRemoveOfflineFriendButton.releaseCallback = removeFriends;
 		ASCompat.setProperty((mOfflinePopup : ASAny).nextassist, "visible", false);
 		ASCompat.setProperty((mOfflinePopup : ASAny).assist_time, "visible", false);
-		mOfflinePopup.addEventListener("rollOver", callStopOnPopupTimeToLiveTask);
-		mOfflinePopup.addEventListener("rollOut", hidePopup);
+		EventListeners.add(mOfflinePopup, "rollOver", callStopOnPopupTimeToLiveTask);
+		EventListeners.add(mOfflinePopup, "rollOut", hidePopup);
 	}
 
 	function loadLeaderboard(swfAsset:SwfAsset) {
@@ -234,15 +267,9 @@ class UILeaderboard {
 		mFriendSlots.push(new LeaderboardFriendSlot(mDBFacade, ASCompat.coerce((mLeaderboard : ASAny).slot_6, flash.display.MovieClip), this, 6));
 		mFriendSlots.push(new LeaderboardFriendSlot(mDBFacade, ASCompat.coerce((mLeaderboard : ASAny).slot_7, flash.display.MovieClip), this, 7));
 		mFriendSlots.push(new LeaderboardFriendSlot(mDBFacade, ASCompat.coerce((mLeaderboard : ASAny).slot_8, flash.display.MovieClip), this, 8));
-		mFriendSlots.push(new LeaderboardFriendSlot(mDBFacade, ASCompat.coerce((mLeaderboard : ASAny).slot_9, flash.display.MovieClip), this, 9));
-		mFriendSlots.push(new LeaderboardFriendSlot(mDBFacade, ASCompat.coerce((mLeaderboard : ASAny).slot_10, flash.display.MovieClip), this, 10));
 		mInviteFriendButton = new UIButton(mDBFacade, ASCompat.coerce((mLeaderboard : ASAny).invite_friend, flash.display.MovieClip));
-		mInviteFriendButton.label.text = Locale.getString("INVITE_POPUP_BUTTON");
-		if (mDBFacade.isFacebookPlayer) {
-			mInviteFriendButton.releaseCallback = inviteFriendFB;
-		} else {
-			mInviteFriendButton.releaseCallback = inviteFriendDR;
-		}
+		Locale.setText(mInviteFriendButton.label, "INVITE_POPUP_BUTTON");
+		mInviteFriendButton.releaseCallback = inviteFriendDR;
 		mScrollRightButton = new UIButton(mDBFacade, ASCompat.coerce((mLeaderboard : ASAny).scrollRight, flash.display.MovieClip));
 		mScrollLeftButton = new UIButton(mDBFacade, ASCompat.coerce((mLeaderboard : ASAny).scrollLeft, flash.display.MovieClip));
 		mScrollPageRightButton = new UIButton(mDBFacade, ASCompat.coerce((mLeaderboard : ASAny).scrollPageRight, flash.display.MovieClip));
@@ -261,7 +288,7 @@ class UILeaderboard {
 		};
 		mDBFacade.dbAccountInfo.getIgnoredFriendData();
 		mFriendManagementButton = new UIButton(mDBFacade, ASCompat.coerce((mLeaderboard : ASAny).block_button, flash.display.MovieClip));
-		mFriendManagementButton.label.text = Locale.getString("FRIEND_MANAGEMENT_HEADING_FRIENDS");
+		Locale.setText(mFriendManagementButton.label, "FRIEND_MANAGEMENT_HEADING_FRIENDS");
 		mFriendManagementButton.releaseCallback = function() {
 			mTownStateMachine.enterFriendManagementState();
 		};
@@ -277,18 +304,216 @@ class UILeaderboard {
 		showDRInvitePopup();
 	}
 
-	public function inviteFriendFB() {
-		hidePopup();
-		if (mDBFacade.dbConfigManager.getConfigBoolean("FUFB", false)) {
-			mDBFacade.errorPopup("INVITE CURRENTLY DISABLED", "Sorry for the inconvenience, we are looking into resolving the issue.");
-			return;
+	public function setupNavigationlinks() {
+		var _loc5_ = 0;
+		mFriendManagementButton.clearLeftNavigation();
+		mFriendManagementButton.clearRightNavigation();
+		mInviteFriendButton.clearLeftNavigation();
+		mInviteFriendButton.clearRightNavigation();
+		var _loc2_:Array<ASAny> = [
+			mScrollLeftButton,
+			mScrollPageLeftButton,
+			mScrollRightButton,
+			mScrollPageRightButton
+		];
+		var _loc6_:UIButton;
+		if (checkNullIteratee(_loc2_))
+			for (_tmp_ in _loc2_) {
+				_loc6_ = ASCompat.coerce(_tmp_, brain.uI.UIButton);
+				_loc6_.clearLeftNavigation();
+				_loc6_.clearRightNavigation();
+				_loc6_.clearUpNavigation();
+				_loc6_.clearDownNavigation();
+			}
+		var _loc4_:LeaderboardFriendSlot;
+		final __ax4_iter_142 = mFriendSlots;
+		if (checkNullIteratee(__ax4_iter_142))
+			for (_tmp_ in __ax4_iter_142) {
+				_loc4_ = _tmp_;
+				_loc4_.friendPicButton.clearLeftNavigation();
+				_loc4_.friendPicButton.clearRightNavigation();
+			}
+		var _loc3_ = mFriendSlots[mFriendSlots.length - 1].friendPicButton;
+		var _loc1_ = mFriendSlots[0].friendPicButton;
+		mFriendManagementButton.isToTheLeftOf(mScrollLeftButton);
+		mScrollLeftButton.isToTheLeftOf(_loc3_);
+		mScrollLeftButton.isAbove(mScrollPageLeftButton);
+		mScrollPageLeftButton.leftNavigation = mFriendManagementButton;
+		mScrollPageLeftButton.rightNavigation = _loc3_;
+		_loc5_ = mFriendSlots.length - 1;
+		while (_loc5_ > 0) {
+			mFriendSlots[_loc5_].friendPicButton.isToTheLeftOf(mFriendSlots[_loc5_ - 1].friendPicButton);
+			_loc5_--;
 		}
-		mDBFacade.metrics.log("InviteLeaderboardClickedFB");
-		mDBFacade.facebookController.genericFriendRequests();
+		_loc1_.isToTheLeftOf(mScrollRightButton);
+		mScrollRightButton.isToTheLeftOf(mInviteFriendButton);
+		mScrollRightButton.isAbove(mScrollPageRightButton);
+		mScrollPageRightButton.leftNavigation = _loc1_;
+		mScrollPageRightButton.rightNavigation = mInviteFriendButton;
+		_loc3_.leftNavigationAdditionalInteraction = minimizeCurrentPopup;
+		_loc1_.rightNavigationAdditionalInteraction = minimizeCurrentPopup;
 	}
 
-	public function setupNavigationlinks() {
-		mFriendManagementButton.isToTheLeftOf(mInviteFriendButton);
+	public function focusPreviousFriendSlot() {
+		focusAdjacentFriendSlot(1);
+	}
+
+	public function focusNextFriendSlot() {
+		focusAdjacentFriendSlot(-1);
+	}
+
+	function focusAdjacentFriendSlot(direction:Int) {
+		var _loc3_ = (0 : UInt);
+		var _loc5_ = 0;
+		if (mFriendSlots.length == 0) {
+			return;
+		}
+		var _loc2_ = -1;
+		_loc3_ = (0 : UInt);
+		while (_loc3_ < (mFriendSlots.length:UInt)) {
+			if (mFriendSlots[(_loc3_ : Int)].friendPicButton.isFocused()) {
+				_loc2_ = _loc3_;
+				break;
+			}
+			_loc3_++;
+		}
+		if (_loc2_ < 0
+			&& (mGiftFriendButton.isFocused()
+				|| mRemoveOnlineFriendButton.isFocused()
+				|| mMessageFriendButton.isFocused()
+				|| mRemoveOfflineFriendButton.isFocused())) {
+			_loc2_ = mCurrentPopupIndex;
+		}
+		if (_loc2_ < 0) {
+			_loc5_ = direction < 0 ? mFriendSlots.length - 1 : 0;
+		} else if (mFriendsLength <= (mFriendSlots.length : UInt)) {
+			_loc5_ = (_loc2_ + direction + mFriendSlots.length) % mFriendSlots.length;
+		} else {
+			_loc5_ = scrollFriendIntoView(_loc2_ + mScrollIndex + direction);
+		}
+		var _loc4_ = mFriendSlots[_loc5_].friendPicButton;
+		mDBFacade.menuNavigationController.setFocusedUiObject(_loc4_);
+		if (_loc4_.navigationSelectedInteraction != null) {
+			_loc4_.navigationSelectedInteraction();
+		}
+	}
+
+	function scrollFriendIntoView(friendIndex:Int):Int {
+		var _loc5_ = 0;
+		var _loc2_:Int = mFriendsLength;
+		var _loc3_ = mFriendSlots.length;
+		if (friendIndex < 0) {
+			friendIndex = _loc2_ - 1;
+		} else if (friendIndex >= _loc2_) {
+			friendIndex = 0;
+		}
+		var _loc4_ = mScrollIndex;
+		if (friendIndex < mScrollIndex) {
+			_loc4_ = friendIndex;
+		} else if (friendIndex > mScrollIndex + _loc3_ - 1) {
+			_loc4_ = friendIndex - _loc3_ + 1;
+		}
+		if (_loc4_ != mScrollIndex) {
+			_loc5_ = _loc4_ - mScrollIndex;
+			scrollLeaderboard(_loc5_);
+		}
+		return friendIndex - mScrollIndex;
+	}
+
+	public function setupTooltipNavigation(friendPicButton:UIButton, firstButton:UIButton, secondButton:UIButton = null) {
+		var _loc5_:LeaderboardFriendSlot;
+		final __ax4_iter_143 = mFriendSlots;
+		if (checkNullIteratee(__ax4_iter_143))
+			for (_tmp_ in __ax4_iter_143) {
+				_loc5_ = _tmp_;
+				resetFriendSlotUpNavigation(_loc5_.friendPicButton);
+			}
+		var _loc6_:Array<ASAny> = [
+			mGiftFriendButton,
+			mRemoveOnlineFriendButton,
+			mMessageFriendButton,
+			mRemoveOfflineFriendButton
+		];
+		var _loc8_:UIButton;
+		if (checkNullIteratee(_loc6_))
+			for (_tmp_ in _loc6_) {
+				_loc8_ = ASCompat.coerce(_tmp_, brain.uI.UIButton);
+				_loc8_.clearLeftNavigation();
+				_loc8_.clearRightNavigation();
+				_loc8_.clearUpNavigation();
+				_loc8_.clearDownNavigation();
+			}
+		friendPicButton.clearUpNavigation();
+		friendPicButton.upNavigation = firstButton;
+		firstButton.downNavigation = friendPicButton;
+		if (secondButton != null) {
+			secondButton.isAbove(firstButton);
+		}
+		var _loc4_ = secondButton != null ? secondButton : firstButton;
+		var _loc7_ = townButtonAbove((mCurrentPopupIndex : Int));
+		if (_loc7_ != null) {
+			_loc4_.upNavigation = _loc7_;
+			_loc4_.upNavigationAdditionalInteraction = minimizeCurrentPopup;
+		}
+	}
+
+	public function linkTownButtons(townButtons:Array<ASAny>) {
+		var _loc4_ = 0;
+		var _loc3_:UIButton = null;
+		mTownButtons = townButtons;
+		_loc4_ = 0;
+		while (_loc4_ < townButtons.length) {
+			_loc3_ = ASCompat.coerce(townButtons[_loc4_], brain.uI.UIButton);
+			_loc3_.clearDownNavigation();
+			_loc3_.downNavigation = mFriendSlots[mFriendSlots.length - 1 - _loc4_ * 3].friendPicButton;
+			_loc4_++;
+		}
+		var _loc2_:LeaderboardFriendSlot;
+		final __ax4_iter_144 = mFriendSlots;
+		if (checkNullIteratee(__ax4_iter_144))
+			for (_tmp_ in __ax4_iter_144) {
+				_loc2_ = _tmp_;
+				resetFriendSlotUpNavigation(_loc2_.friendPicButton);
+			}
+		mFriendManagementButton.clearUpNavigation();
+		mFriendManagementButton.upNavigation = ASCompat.coerce(townButtons[0], brain.uI.UIObject);
+		mInviteFriendButton.clearUpNavigation();
+		mInviteFriendButton.upNavigation = ASCompat.coerce(townButtons[townButtons.length - 1], brain.uI.UIObject);
+	}
+
+	function townButtonAbove(friendSlotIndex:Int):UIButton {
+		if (mTownButtons == null || friendSlotIndex < 0) {
+			return null;
+		}
+		var _loc2_ = mFriendSlots.length - 1 - friendSlotIndex;
+		return ASCompat.coerce(mTownButtons[
+			ASCompat.floatToInt(Math.min(ASCompat.floatToInt(_loc2_ / 3), mTownButtons.length - 1))
+		], brain.uI.UIButton);
+	}
+
+	function minimizeCurrentPopup() {
+		callStopOnPopupTimeToLiveTask();
+		mFriendSlots[(mCurrentPopupIndex : Int)].minimizePopup();
+	}
+
+	public function resetFriendSlotUpNavigation(friendPicButton:UIButton) {
+		friendPicButton.clearUpNavigation();
+		var _loc2_ = townButtonAbove(friendSlotIndexOf(friendPicButton));
+		if (_loc2_ != null) {
+			friendPicButton.upNavigation = _loc2_;
+		}
+	}
+
+	function friendSlotIndexOf(friendPicButton:UIButton):Int {
+		var _loc2_ = 0;
+		_loc2_ = 0;
+		while (_loc2_ < mFriendSlots.length) {
+			if (mFriendSlots[_loc2_].friendPicButton == friendPicButton) {
+				return _loc2_;
+			}
+			_loc2_++;
+		}
+		return -1;
 	}
 
 	public function showDRInvitePopup() {
@@ -318,18 +543,18 @@ class UILeaderboard {
 	}
 
 	function populateFriendSlots() {
-		var _loc1_ = 0;
-		var _loc2_ = 0;
+		var _loc1_ = (0 : UInt);
+		var _loc2_ = (0 : UInt);
 		var _loc4_ = (0 : UInt);
 		var _loc3_ = (0 : UInt);
-		_loc1_ = 0;
-		while (_loc1_ < mFriendSlots.length) {
-			mFriendSlots[_loc1_].populateSlot(null);
+		_loc1_ = (0 : UInt);
+		while (_loc1_ < (mFriendSlots.length:UInt)) {
+			mFriendSlots[(_loc1_ : Int)].populateSlot(null);
 			_loc2_ = _loc1_ + mScrollIndex;
-			if (_loc2_ < mOnlineFriends.length) {
-				mFriendSlots[_loc1_].populateSlot(mOnlineFriends[_loc2_]);
-			} else if (_loc2_ - mOnlineFriends.length < mOfflineFriends.length) {
-				mFriendSlots[_loc1_].populateSlot(mOfflineFriends[_loc2_ - mOnlineFriends.length]);
+			if (_loc2_ < (mOnlineFriends.length:UInt)) {
+				mFriendSlots[(_loc1_ : Int)].populateSlot(mOnlineFriends[(_loc2_ : Int)]);
+			} else if ((_loc2_ : Float) - mOnlineFriends.length < mOfflineFriends.length) {
+				mFriendSlots[(_loc1_ : Int)].populateSlot(mOfflineFriends[(_loc2_ - mOnlineFriends.length : Int)]);
 			}
 			_loc1_++;
 		}
@@ -338,7 +563,7 @@ class UILeaderboard {
 	function scrollLeaderboard(value:Int) {
 		hidePopup();
 		mScrollIndex += value;
-		if ((mScrollIndex : UInt) > mFriendsLength - mFriendSlots.length) {
+		if (mScrollIndex > (mFriendsLength : Float) - mFriendSlots.length) {
 			mScrollIndex = (mFriendsLength - mFriendSlots.length : Int);
 		}
 		if (mScrollIndex < 0 || mFriendsLength < (mFriendSlots.length:UInt)) {
@@ -351,7 +576,7 @@ class UILeaderboard {
 			mScrollRightButton.enabled = true;
 			mScrollPageRightButton.enabled = true;
 		}
-		if ((mScrollIndex : UInt) == mFriendsLength - mFriendSlots.length) {
+		if (mScrollIndex == (mFriendsLength : Float) - mFriendSlots.length) {
 			mScrollLeftButton.enabled = false;
 			mScrollPageLeftButton.enabled = false;
 		} else {
@@ -359,6 +584,15 @@ class UILeaderboard {
 			mScrollPageLeftButton.enabled = true;
 		}
 		populateFriendSlots();
+		moveFocusOffSpentScrollButton();
+	}
+
+	function moveFocusOffSpentScrollButton() {
+		if (!mScrollLeftButton.enabled && (mScrollLeftButton.isFocused() || mScrollPageLeftButton.isFocused())) {
+			mDBFacade.menuNavigationController.setFocusedUiObject(mFriendSlots[mFriendSlots.length - 1].friendPicButton);
+		} else if (!mScrollRightButton.enabled && (mScrollRightButton.isFocused() || mScrollPageRightButton.isFocused())) {
+			mDBFacade.menuNavigationController.setFocusedUiObject(mFriendSlots[0].friendPicButton);
+		}
 	}
 
 	function loadFriends() {
@@ -406,6 +640,7 @@ class UILeaderboard {
 	}
 
 	public function hidePopup(event:MouseEvent = null) {
+		releaseTooltipFocus();
 		if (mRefreshLeaderboard) {
 			refreshLeaderboard();
 		}
@@ -415,6 +650,25 @@ class UILeaderboard {
 		if (mOfflinePopup != null) {
 			mOfflinePopup.visible = false;
 		}
+	}
+
+	public function releaseTooltipFocus() {
+		if (mFriendSlots.length == 0) {
+			return;
+		}
+		if (mGiftFriendButton.isFocused()
+			|| mRemoveOnlineFriendButton.isFocused()
+			|| mMessageFriendButton.isFocused()
+			|| mRemoveOfflineFriendButton.isFocused()) {
+			mDBFacade.menuNavigationController.setFocusedUiObject(mFriendSlots[(mCurrentPopupIndex : Int)].friendPicButton);
+		}
+		var _loc1_:LeaderboardFriendSlot;
+		final __ax4_iter_145 = mFriendSlots;
+		if (checkNullIteratee(__ax4_iter_145))
+			for (_tmp_ in __ax4_iter_145) {
+				_loc1_ = _tmp_;
+				resetFriendSlotUpNavigation(_loc1_.friendPicButton);
+			}
 	}
 
 	@:isVar public var alert(never, set):Bool;
@@ -427,6 +681,27 @@ class UILeaderboard {
 
 	public function get_onlinePopup():MovieClip {
 		return mOnlinePopup;
+	}
+
+	public function setOnlinePopupTitle(text:String) {
+		var _loc2_ = Math.NaN;
+		var _loc3_ = ASCompat.coerce((mOnlinePopup : ASAny).title_label, flash.text.TextField);
+		_loc3_.y = mOnlinePopupTitleY;
+		_loc3_.height = mOnlinePopupTitleHeight * 2;
+		if (mOnlinePopupBg != null) {
+			mOnlinePopupBg.scaleY = mOnlinePopupBgScaleY;
+			mOnlinePopupBg.y = mOnlinePopupBgY;
+		}
+		TextUtil.setText(_loc3_, text);
+		var _loc4_ = ASCompat.floatToInt(Math.max(0, _loc3_.numLines - 1));
+		var _loc5_ = _loc4_ > 0 ? _loc4_ * _loc3_.getLineMetrics(0).height * Math.abs(_loc3_.scaleY) : 0;
+		_loc3_.height = mOnlinePopupTitleHeight + _loc5_;
+		_loc3_.y -= _loc5_;
+		if (mOnlinePopupBg != null && _loc5_ > 0) {
+			_loc2_ = mOnlinePopupBg.getBounds(mOnlinePopup).bottom;
+			mOnlinePopupBg.height += _loc5_;
+			mOnlinePopupBg.y += _loc2_ - mOnlinePopupBg.getBounds(mOnlinePopup).bottom;
+		}
 	}
 
 	@:isVar public var offlinePopup(get, never):MovieClip;
@@ -457,12 +732,6 @@ class UILeaderboard {
 
 	public function get_giftFriend():UIButton {
 		return mGiftFriendButton;
-	}
-
-	@:isVar public var FBRemoveFriendPopup(get, never):DBUIOneButtonPopup;
-
-	public function get_FBRemoveFriendPopup():DBUIOneButtonPopup {
-		return mFBRemoveFriendPopup;
 	}
 
 	public function setRootMovieClip(root:MovieClip) {
@@ -514,16 +783,22 @@ class UILeaderboard {
 	}
 
 	public function callStopOnPopupTimeToLiveTask(event:MouseEvent = null) {
-		mFriendSlots[(mCurrentPopupIndex : Int)].stopPopupTimeToLiveTask();
+		var _loc2_:LeaderboardFriendSlot;
+		final __ax4_iter_146 = mFriendSlots;
+		if (checkNullIteratee(__ax4_iter_146))
+			for (_tmp_ in __ax4_iter_146) {
+				_loc2_ = _tmp_;
+				_loc2_.stopPopupTimeToLiveTask();
+			}
 	}
 
 	public function destroy() {
 		initialized = false;
 		mDBFacade = null;
 		var _loc2_:LeaderboardFriendSlot;
-		final __ax4_iter_159 = mFriendSlots;
-		if (checkNullIteratee(__ax4_iter_159))
-			for (_tmp_ in __ax4_iter_159) {
+		final __ax4_iter_147 = mFriendSlots;
+		if (checkNullIteratee(__ax4_iter_147))
+			for (_tmp_ in __ax4_iter_147) {
 				_loc2_ = _tmp_;
 				_loc2_.destroy();
 				_loc2_ = null;
@@ -541,16 +816,16 @@ class UILeaderboard {
 		}
 		mAlertRenderer = null;
 		var _loc3_:FriendInfo;
-		final __ax4_iter_160 = mOnlineFriends;
-		if (checkNullIteratee(__ax4_iter_160))
-			for (_tmp_ in __ax4_iter_160) {
+		final __ax4_iter_148 = mOnlineFriends;
+		if (checkNullIteratee(__ax4_iter_148))
+			for (_tmp_ in __ax4_iter_148) {
 				_loc3_ = _tmp_;
 				_loc3_ = null;
 			}
 		var _loc1_:FriendInfo;
-		final __ax4_iter_161 = mOfflineFriends;
-		if (checkNullIteratee(__ax4_iter_161))
-			for (_tmp_ in __ax4_iter_161) {
+		final __ax4_iter_149 = mOfflineFriends;
+		if (checkNullIteratee(__ax4_iter_149))
+			for (_tmp_ in __ax4_iter_149) {
 				_loc1_ = _tmp_;
 				_loc1_ = null;
 			}
@@ -604,6 +879,7 @@ class UILeaderboard {
 		mScrollPageLeftButton = null;
 		mRootMovieClip = null;
 		mLeaderboard = null;
+		mOnlinePopupBg = null;
 		mOnlinePopup = null;
 		mOfflinePopup = null;
 		mStoreCallback = null;

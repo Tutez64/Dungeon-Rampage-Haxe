@@ -31,8 +31,6 @@ class DBAccountParams {
 
 	static inline final KEY_INTRO = (12 : UInt);
 
-	static inline final LIFESTREET = (13 : UInt);
-
 	static inline final ACHIEVEMENT_1 = (14 : UInt);
 
 	static inline final ACHIEVEMENT_2 = (15 : UInt);
@@ -190,53 +188,6 @@ class DBAccountParams {
 
 	public function setKeyIntroParam() {
 		setParam((12 : UInt), true);
-	}
-
-	public function hasLifestreetParam():Bool {
-		return hasParam((13 : UInt));
-	}
-
-	public function setLifestreetParam() {
-		setParam((13 : UInt), true);
-	}
-
-	public function hasAchievement(achievementNum:UInt):Bool {
-		switch (achievementNum - 1) {
-			case 0:
-				return hasParam((14 : UInt));
-			case 1:
-				return hasParam((15 : UInt));
-			case 2:
-				return hasParam((16 : UInt));
-			case 3:
-				return hasParam((17 : UInt));
-			case 4:
-				return hasParam((18 : UInt));
-			case 5:
-				return hasParam((19 : UInt));
-			default:
-				return false;
-		}
-		return false;
-	}
-
-	public function setAchievement(achievementNum:UInt) {
-		switch (achievementNum - 1) {
-			case 0:
-				return setParam((14 : UInt), true);
-			case 1:
-				return setParam((15 : UInt), true);
-			case 2:
-				return setParam((16 : UInt), true);
-			case 3:
-				return setParam((17 : UInt), true);
-			case 4:
-				return setParam((18 : UInt), true);
-			case 5:
-				return setParam((19 : UInt), true);
-			default:
-				return;
-		}
 	}
 
 	public function hasSuperWeakParam():Bool {

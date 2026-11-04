@@ -19,6 +19,12 @@ class MenuControlsActionSetData {
 
 	public static inline final returnActionName = "menu_return";
 
+	public static inline final previousCategoryActionName = "menu_previous_category";
+
+	public static inline final nextCategoryActionName = "menu_next_category";
+
+	public static inline final optionsMenuActionName = "menu_options";
+
 	public function new() {}
 
 	public static function gatherAnalogActionNames():Vector<String> {
@@ -36,6 +42,9 @@ class MenuControlsActionSetData {
 		_loc1_.push("menu_select");
 		_loc1_.push("menu_cancel");
 		_loc1_.push("menu_return");
+		_loc1_.push("menu_previous_category");
+		_loc1_.push("menu_next_category");
+		_loc1_.push("menu_options");
 		return _loc1_;
 	}
 }

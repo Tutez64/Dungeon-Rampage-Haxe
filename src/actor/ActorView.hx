@@ -4,11 +4,13 @@ import brain.assetRepository.AssetLoadingComponent;
 import brain.event.EventComponent;
 import brain.logger.Logger;
 import brain.sound.SoundAsset;
+import brain.starling.swfConverter.BakeScheduler;
 import brain.utils.ColorMatrix;
 import brain.utils.MemoryTracker;
 import brain.workLoop.LogicalWorkComponent;
 import brain.workLoop.PreRenderWorkComponent;
 import combat.weapon.WeaponView;
+import dBGlobals.DBGlobal;
 import distributedObjects.HeroGameObject;
 import distributedObjects.NPCGameObject;
 import effects.EffectGameObject;
@@ -16,6 +18,7 @@ import effects.EffectView;
 import facade.DBFacade;
 import dr_floor.FloorObject;
 import dr_floor.FloorView;
+import gameMasterDictionary.GMActor;
 import gameMasterDictionary.GMAttack;
 import generatedCode.CombatResult;
 import sound.DBSoundComponent;
@@ -24,10 +27,13 @@ import flash.display.MovieClip;
 import flash.display.Sprite;
 import flash.filters.GlowFilter;
 import flash.geom.ColorTransform;
+import flash.geom.Rectangle;
 import flash.geom.Vector3D;
 
 class ActorView extends FloorView {
 	public static var BODY_Y_OFFSET:Float = -45;
+
+	static inline final DEBUG_HEADING = false;
 
 	static var mMouseOverEffect:GlowFilter = new GlowFilter((16633879 : UInt), 1, 16, 16, 5);
 
@@ -67,25 +73,39 @@ class ActorView extends FloorView {
 
 	var mBodyFilters:Array<ASAny>;
 
+	var mStatusTintColor:UInt = 0;
+
+	var mStatusTintAmount:Float = 0;
+
+	var mStatusTintAttachments:Vector<EffectView>;
+
 	var mDeathSoundEffect:SoundAsset;
 
 	var mDeathSoundVolume:Float = Math.NaN;
+
+	var mMouseHitRect:Rectangle;
+
+	var mMouseHitRectFixed:Bool = false;
+
+	var mMousePickable:Bool = true;
+
+	public var mousePickedCentrally:Bool = false;
 
 	var specialVFXObject_Back:EffectGameObject;
 
 	var specialVFXObject_Front:EffectGameObject;
 
-	public function new(facade:DBFacade, actorGameObject:ActorGameObject) {
-		super(facade, actorGameObject);
+	public function new(dbFacade:DBFacade, actorGameObject:ActorGameObject) {
+		super(dbFacade, actorGameObject);
 		mParentActorObject = actorGameObject;
 		mBodyFilters = [];
 		mVelocity = new Vector3D(0, 0, 0);
-		mEventComponent = new EventComponent(mFacade);
-		mPreRenderWorkComponent = new PreRenderWorkComponent(mFacade, "ActorView");
-		mLogicalWorkComponent = new LogicalWorkComponent(mFacade, "ActorView");
-		mSoundComponent = new DBSoundComponent(facade);
+		mEventComponent = new EventComponent(mDBFacade);
+		mPreRenderWorkComponent = new PreRenderWorkComponent(mDBFacade, "ActorView");
+		mLogicalWorkComponent = new LogicalWorkComponent(mDBFacade, "ActorView");
+		mSoundComponent = new DBSoundComponent(dbFacade);
 		mRoot.name = "ActorView.mRoot_" + actorGameObject.id;
-		mAssetLoadingComponent = new AssetLoadingComponent(mFacade);
+		mAssetLoadingComponent = new AssetLoadingComponent(mDBFacade);
 		mBody = new Sprite();
 		mBody.name = "ActorView.mBody";
 		mRoot.addChild(mBody);
@@ -98,6 +118,9 @@ class ActorView extends FloorView {
 		var _loc3_ = mParentActorObject.actorData.brightness;
 		var _loc5_ = mParentActorObject.actorData.hue;
 		var _loc2_ = mParentActorObject.actorData.saturation;
+		if (_loc3_ == 0 && _loc5_ == 0 && _loc2_ == 0) {
+			return;
+		}
 		var _loc4_ = new ColorMatrix();
 		if (_loc3_ != 0) {
 			_loc4_.adjustBrightness(_loc3_);
@@ -109,6 +132,9 @@ class ActorView extends FloorView {
 			_loc4_.adjustSaturation(_loc2_);
 		}
 		node.filters = cast([_loc4_.filter]);
+		if (Std.isOfType(node, ActorRenderer)) {
+			cast(node, ActorRenderer).applyColorFilter(_loc4_.matrix);
+		}
 	}
 
 	@:isVar public var bodyAnimRenderer(get, never):ActorRenderer;
@@ -136,10 +162,22 @@ class ActorView extends FloorView {
 			if (mCurrentWeaponAnimRenderer.hasAnim(mAnimName)) {
 				this.bodyAnimRenderer.forceFrame(0);
 				mCurrentWeaponAnimRenderer.heading = this.heading;
-				mCurrentWeaponAnimRenderer.play(mAnimName, this.bodyAnimRenderer.currentFrame, this.bodyAnimRenderer.loop);
-				mBody.addChild(mCurrentWeaponAnimRenderer);
+				mCurrentWeaponAnimRenderer.play(mAnimName, this.bodyAnimRenderer.currentFrame, true, this.bodyAnimRenderer.loop);
 			} else {
 				mCurrentWeaponAnimRenderer.stop();
+			}
+			mBody.addChild(mCurrentWeaponAnimRenderer);
+			if (this.root.parent != null) {
+				mCurrentWeaponAnimRenderer.setLayer(this.layer);
+				mCurrentWeaponAnimRenderer.visible = this.root.visible;
+			}
+			if (mBodyFilters.length > 0) {
+				mCurrentWeaponAnimRenderer.setHighlightFilter(getDominantFilterColor());
+			}
+			if (mStatusTintAmount > 0) {
+				mCurrentWeaponAnimRenderer.applyStatusTint(mStatusTintColor, mStatusTintAmount);
+			} else {
+				mCurrentWeaponAnimRenderer.clearStatusTint();
 			}
 		}
 		return value;
@@ -152,13 +190,51 @@ class ActorView extends FloorView {
 	}
 
 	public function disableMouse() {
+		mMousePickable = false;
 		mRoot.mouseChildren = false;
 		mRoot.mouseEnabled = false;
 	}
 
 	public function enableMouse() {
+		mMousePickable = true;
+		if (mousePickedCentrally) {
+			return;
+		}
 		mRoot.mouseChildren = true;
 		mRoot.mouseEnabled = true;
+	}
+
+	@:isVar public var mousePickable(get, never):Bool;
+
+	public function get_mousePickable():Bool {
+		return mMousePickable;
+	}
+
+	@:isVar public var mouseHitRect(get, never):Rectangle;
+
+	public function get_mouseHitRect():Rectangle {
+		if (mMouseHitRect != null) {
+			return mMouseHitRect;
+		}
+		return ASCompat.coerce(mBody != null && mBody.width > 0 ? mBody.getBounds(mRoot) : null, flash.geom.Rectangle);
+	}
+
+	@:isVar public var fixedMouseHitRect(get, never):Rectangle;
+
+	public function get_fixedMouseHitRect():Rectangle {
+		return mMouseHitRect;
+	}
+
+	function setMouseHitRect(x:Float, y:Float, width:Float, height:Float) {
+		if (mMouseHitRect == null) {
+			mMouseHitRect = new Rectangle();
+		}
+		mMouseHitRect.setTo(x, y, width, height);
+	}
+
+	function setFixedMouseHitRect(x:Float, y:Float, width:Float, height:Float) {
+		setMouseHitRect(x, y, width, height);
+		mMouseHitRectFixed = true;
 	}
 
 	public function actionsForDeadState() {
@@ -179,7 +255,7 @@ class ActorView extends FloorView {
 
 	function buildNametag() {
 		if (mWantNametag) {
-			mNametag = new ActorNametag(mFacade, mAssetLoadingComponent, mLogicalWorkComponent, mParentActorObject.actorData.gMActor.NametagY);
+			mNametag = new ActorNametag(mDBFacade, mAssetLoadingComponent, mLogicalWorkComponent, mParentActorObject.actorData.gMActor.NametagY);
 			mNametag.cacheAsBitmap = true;
 			mNametag.hpBar.scaleX = mParentActorObject.actorData.gMActor.HealthbarScale / root.scaleX;
 			mNametag.hpBar.scaleY = mParentActorObject.actorData.gMActor.HealthbarScale / root.scaleY;
@@ -194,6 +270,77 @@ class ActorView extends FloorView {
 
 	public function get_body():Sprite {
 		return mBody;
+	}
+
+	public function applyStatusTint(color:UInt, amount:Float) {
+		var _loc3_:EffectView;
+		var __ax4_iter_17:Vector<EffectView>;
+		mStatusTintColor = color;
+		mStatusTintAmount = amount;
+		if (amount <= 0) {
+			clearStatusTint();
+			return;
+		}
+		if (mBodyAnimRenderer != null) {
+			mBodyAnimRenderer.applyStatusTint(color, amount);
+		}
+		if (mCurrentWeaponAnimRenderer != null) {
+			mCurrentWeaponAnimRenderer.applyStatusTint(color, amount);
+		}
+		if (mStatusTintAttachments != null) {
+			__ax4_iter_17 = mStatusTintAttachments;
+			if (checkNullIteratee(__ax4_iter_17))
+				for (_tmp_ in __ax4_iter_17) {
+					_loc3_ = _tmp_;
+					_loc3_.applyStatusTint(color, amount);
+				}
+		}
+	}
+
+	public function clearStatusTint() {
+		var _loc1_:EffectView;
+		var __ax4_iter_18:Vector<EffectView>;
+		mStatusTintAmount = 0;
+		if (mBodyAnimRenderer != null) {
+			mBodyAnimRenderer.clearStatusTint();
+		}
+		if (mCurrentWeaponAnimRenderer != null) {
+			mCurrentWeaponAnimRenderer.clearStatusTint();
+		}
+		if (mStatusTintAttachments != null) {
+			__ax4_iter_18 = mStatusTintAttachments;
+			if (checkNullIteratee(__ax4_iter_18))
+				for (_tmp_ in __ax4_iter_18) {
+					_loc1_ = _tmp_;
+					_loc1_.clearStatusTint();
+				}
+		}
+	}
+
+	public function registerStatusTintAttachment(effectView:EffectView) {
+		if (effectView == null) {
+			return;
+		}
+		if (mStatusTintAttachments == null) {
+			mStatusTintAttachments = new Vector<EffectView>();
+		}
+		if (mStatusTintAttachments.indexOf(effectView) == -1) {
+			mStatusTintAttachments.push(effectView);
+			if (mStatusTintAmount > 0) {
+				effectView.applyStatusTint(mStatusTintColor, mStatusTintAmount);
+			}
+		}
+	}
+
+	public function unregisterStatusTintAttachment(effectView:EffectView) {
+		if (mStatusTintAttachments == null || effectView == null) {
+			return;
+		}
+		var _loc2_ = mStatusTintAttachments.indexOf(effectView);
+		if (_loc2_ != -1) {
+			effectView.clearStatusTint();
+			mStatusTintAttachments.splice(_loc2_, (1 : UInt));
+		}
 	}
 
 	public function buildBuff(buff:MovieClip, sortLayer:String) {
@@ -224,14 +371,11 @@ class ActorView extends FloorView {
 		super.init();
 		mBodyAnimRenderer = new ActorRenderer(mDBFacade, mParentActorObject, true);
 		mBodyAnimRenderer.loadAssets();
-		if (mParentActorObject.actorData.assetType == "SPRITE_SHEET") {
-			mBody.scaleX = mBody.scaleY = mParentActorObject.actorData.scale3DModel;
-		}
 		mBody.addChild(mBodyAnimRenderer);
 		applyColor(mBodyAnimRenderer);
 		buildNametag();
 		if (ASCompat.stringAsBool(mParentActorObject.actorData.deathSound)) {
-			mAssetLoadingComponent.getSoundAsset(DBFacade.buildFullDownloadPath("Resources/Audio/soundEffects.swf"), mParentActorObject.actorData.deathSound,
+			mAssetLoadingComponent.getSoundAsset(DBFacade.buildFullDownloadPath(DBGlobal.SFX_PATH), mParentActorObject.actorData.deathSound,
 				function(param1:SoundAsset) {
 					mDeathSoundEffect = param1;
 					mDeathSoundVolume = mParentActorObject.actorData.deathVolume;
@@ -252,7 +396,7 @@ class ActorView extends FloorView {
 			+ ":"
 			+ className
 			+ "\' - created in ActorView.addSpecialBackEffect()");
-		root.addChildAt(specialVFXObject_Back.view.root, 0);
+		cast(specialVFXObject_Back.view, EffectView).attachToParent(root, true);
 		cast(specialVFXObject_Back.view, EffectView).play(true, function() {});
 	}
 
@@ -263,7 +407,7 @@ class ActorView extends FloorView {
 			+ ":"
 			+ className
 			+ "\' - created in ActorView.addSpecialFrontEffect()");
-		root.addChild(specialVFXObject_Front.view.root);
+		cast(specialVFXObject_Front.view, EffectView).attachToParent(root, false);
 		cast(specialVFXObject_Front.view, EffectView).play(true, function() {});
 	}
 
@@ -372,6 +516,17 @@ class ActorView extends FloorView {
 
 	public function set_heading(angle:Float):Float {
 		mHeading = angle;
+		if (false && Std.isOfType(mParentActorObject, NPCGameObject)) {
+			Logger.debugch("heading",
+				"ActorView set heading id="
+				+ mParentActorObject.id
+				+ " const="
+				+ (mParentActorObject.actorData != null ? mParentActorObject.actorData.constant : "?")
+				+ " heading="
+				+ mHeading
+				+ " anim="
+				+ mAnimName);
+		}
 		if (this.bodyAnimRenderer != null) {
 			this.bodyAnimRenderer.heading = angle;
 		}
@@ -385,6 +540,32 @@ class ActorView extends FloorView {
 		return mHeading;
 	}
 
+	override public function addToStage() {
+		super.addToStage();
+		var _loc1_ = this.bodyAnimRenderer;
+		if (_loc1_ != null) {
+			_loc1_.setLayer(this.layer);
+			_loc1_.visible = this.root.visible;
+		}
+		if (mCurrentWeaponAnimRenderer != null) {
+			mCurrentWeaponAnimRenderer.setLayer(this.layer);
+			mCurrentWeaponAnimRenderer.visible = this.root.visible;
+		}
+	}
+
+	override public function removeFromStage() {
+		var _loc1_ = this.bodyAnimRenderer;
+		if (_loc1_ != null) {
+			_loc1_.setLayer(0);
+			_loc1_.visible = false;
+		}
+		if (mCurrentWeaponAnimRenderer != null) {
+			mCurrentWeaponAnimRenderer.setLayer(0);
+			mCurrentWeaponAnimRenderer.visible = false;
+		}
+		super.removeFromStage();
+	}
+
 	override public function destroy() {
 		if (mNametag != null) {
 			mNametag.destroy();
@@ -392,6 +573,14 @@ class ActorView extends FloorView {
 		}
 		if (mDeathSoundEffect != null) {
 			mDeathSoundEffect = null;
+		}
+		if (specialVFXObject_Back != null) {
+			specialVFXObject_Back.destroy();
+			specialVFXObject_Back = null;
+		}
+		if (specialVFXObject_Front != null) {
+			specialVFXObject_Front.destroy();
+			specialVFXObject_Front = null;
 		}
 		mEventComponent.destroy();
 		mEventComponent = null;
@@ -410,6 +599,7 @@ class ActorView extends FloorView {
 		mCurrentWeaponView = null;
 		mCurrentWeaponAnimRenderer = null;
 		mBodyFilters = null;
+		mStatusTintAttachments = null;
 		mBody = null;
 		mEffect = null;
 		mParentActorObject = null;
@@ -441,6 +631,13 @@ class ActorView extends FloorView {
 		removeEffect(mMouseSelectedEffect);
 	}
 
+	public function setStarlingHitArea(bounds:Rectangle) {
+		if (mMouseHitRectFixed || bounds == null || bounds.width <= 0 || bounds.height <= 0) {
+			return;
+		}
+		setMouseHitRect(bounds.x, bounds.y, bounds.width, bounds.height);
+	}
+
 	public function reviveHighlight() {
 		var _loc1_ = new ColorTransform();
 		_loc1_.color = (16777215 : UInt);
@@ -455,6 +652,12 @@ class ActorView extends FloorView {
 		if (mBodyFilters.indexOf(effect) < 0) {
 			mBodyFilters.push(effect);
 			mBody.filters = cast(mBodyFilters);
+			if (mBodyAnimRenderer != null) {
+				mBodyAnimRenderer.setHighlightFilter(getDominantFilterColor());
+			}
+			if (mCurrentWeaponAnimRenderer != null) {
+				mCurrentWeaponAnimRenderer.setHighlightFilter(getDominantFilterColor());
+			}
 		}
 	}
 
@@ -463,7 +666,31 @@ class ActorView extends FloorView {
 		if (_loc2_ >= 0) {
 			mBodyFilters.splice(_loc2_, (1 : UInt));
 			mBody.filters = cast(mBodyFilters);
+			if (mBodyAnimRenderer != null) {
+				if (mBodyFilters.length > 0) {
+					mBodyAnimRenderer.setHighlightFilter(getDominantFilterColor());
+				} else {
+					mBodyAnimRenderer.clearHighlightFilter();
+				}
+			}
+			if (mCurrentWeaponAnimRenderer != null) {
+				if (mBodyFilters.length > 0) {
+					mCurrentWeaponAnimRenderer.setHighlightFilter(getDominantFilterColor());
+				} else {
+					mCurrentWeaponAnimRenderer.clearHighlightFilter();
+				}
+			}
 		}
+	}
+
+	function getDominantFilterColor():UInt {
+		if (mBodyFilters.indexOf(mMouseSelectedEffect) >= 0) {
+			return mMouseSelectedEffect.color;
+		}
+		if (mBodyFilters.indexOf(mMouseOverEffect) >= 0) {
+			return mMouseOverEffect.color;
+		}
+		return ASCompat.dynamicAs(mBodyFilters[mBodyFilters.length - 1], GlowFilter).color;
 	}
 
 	function playHitEffect(gmAttack:GMAttack, isAttackeeHero:Bool) {
@@ -562,25 +789,16 @@ class ActorView extends FloorView {
 
 	function isThisAProp(id:UInt):Bool {
 		var _loc2_ = ASCompat.reinterpretAs(mDBFacade.gameObjectManager.getReferenceFromId(id), ActorGameObject);
-		if (_loc2_ != null && _loc2_.actorData.gMActor.CharType == "PROP") {
-			return true;
-		}
-		return false;
+		return _loc2_ != null && _loc2_.actorData.gMActor.CharType == GMActor.CHAR_TYPE_PROP;
 	}
 
 	function doesCombatResultInvolveUserOrPetOfUser(combatResult:CombatResult):Bool {
-		if (isThisIdUserOrPetOfUser(combatResult.attacker) || isThisIdUserOrPetOfUser(combatResult.attackee)) {
-			return true;
-		}
-		return false;
+		return isThisIdUserOrPetOfUser(combatResult.attacker) || isThisIdUserOrPetOfUser(combatResult.attackee);
 	}
 
 	function doesCombatResultHaveShowHealFlag(combatResult:CombatResult):Bool {
 		var _loc2_ = ASCompat.reinterpretAs(mDBFacade.gameObjectManager.getReferenceFromId(combatResult.attackee), ActorGameObject);
-		if (_loc2_.hasShowHealNumbers) {
-			return true;
-		}
-		return false;
+		return _loc2_.hasShowHealNumbers;
 	}
 
 	function isThisIdUserOrPetOfUser(id:UInt):Bool {
@@ -605,8 +823,12 @@ class ActorView extends FloorView {
 	}
 
 	public function receiveDamage(combatResult:CombatResult, gmAttack:GMAttack) {
+		var attackerGameObject:ActorGameObject;
 		var impactSound:String;
-		var attackerGameObject = ASCompat.reinterpretAs(mDBFacade.gameObjectManager.getReferenceFromId(combatResult.attacker), ActorGameObject);
+		if (combatResult.damage != 0) {
+			BakeScheduler.noteCombat();
+		}
+		attackerGameObject = ASCompat.reinterpretAs(mDBFacade.gameObjectManager.getReferenceFromId(combatResult.attacker), ActorGameObject);
 		if (attackerGameObject != null) {
 			if (!attackerGameObject.isOwner) {
 				playHitEffect(gmAttack, attackerGameObject.isHeroType);
@@ -618,10 +840,10 @@ class ActorView extends FloorView {
 				}
 			}
 			if (ASCompat.stringAsBool(mParentActorObject.actorData.hitSound)) {
-				this.mAssetLoadingComponent.getSoundAsset(DBFacade.buildFullDownloadPath("Resources/Audio/soundEffects.swf"),
-					mParentActorObject.actorData.hitSound, function(param1:SoundAsset) {
+				this.mAssetLoadingComponent.getSoundAsset(DBFacade.buildFullDownloadPath(DBGlobal.SFX_PATH), mParentActorObject.actorData.hitSound,
+					function(param1:SoundAsset) {
 						mSoundComponent.playSfxOneShot(param1, worldCenter, 0, mParentActorObject.actorData.hitVolume);
-				});
+					});
 			}
 		}
 		if (gmAttack != null && ASCompat.stringAsBool(gmAttack.ImpactSound)) {
@@ -631,10 +853,9 @@ class ActorView extends FloorView {
 			} else if (combatResult.effectiveness > 0) {
 				impactSound = "StrongHit";
 			}
-			this.mAssetLoadingComponent.getSoundAsset(DBFacade.buildFullDownloadPath("Resources/Audio/soundEffects.swf"), impactSound,
-				function(param1:SoundAsset) {
-					mSoundComponent.playSfxOneShot(param1, worldCenter, 0, gmAttack.ImpactVolume);
-				});
+			this.mAssetLoadingComponent.getSoundAsset(DBFacade.buildFullDownloadPath(DBGlobal.SFX_PATH), impactSound, function(param1:SoundAsset) {
+				mSoundComponent.playSfxOneShot(param1, worldCenter, 0, gmAttack.ImpactVolume);
+			});
 		}
 	}
 
@@ -649,21 +870,25 @@ class ActorView extends FloorView {
 		}
 	}
 
-	public function spawnDamageFloater(isCriticalHit:Bool, delta:Int, attackerIsOwner:Bool, attackeeIsOwner:Bool, effectiveness:Int, type:UInt = (0 : UInt),
+	@:isVar var wantDamageFloaters(get, never):Bool;
+
+	function get_wantDamageFloaters():Bool {
+		return mDBFacade.featureFlags.getFlagValue("want-damage-floaters") && !mDBFacade.uiHideToggle.hidden;
+	}
+
+	public function spawnDamageFloater(isCriticalHit:Bool, delta:Int, attackerIsOwner:Bool, attackeeIsOwner:Bool, effectiveness:Int, inType:UInt = (0 : UInt),
 			floaterType:String = "DAMAGE_MOVEMENT_TYPE") {
-		var _loc8_:DamageFloater = null;
-		if (mDBFacade.featureFlags.getFlagValue("want-damage-floaters")) {
-			_loc8_ = new DamageFloater(mDBFacade, delta, mParentActorObject, (0 : UInt), (24 : UInt), 0.9, 90, null, attackerIsOwner, attackeeIsOwner, true,
-				isCriticalHit, effectiveness, type, floaterType);
+		if (wantDamageFloaters) {
+			DamageFloater.spawn(mDBFacade, delta, mParentActorObject, (0 : UInt), (24 : UInt), 0.9, 90, attackerIsOwner, attackeeIsOwner, isCriticalHit,
+				effectiveness, inType, floaterType);
 		}
 	}
 
-	public function spawnHealFloater(delta:Int, attackerIsOwner:Bool, attackeeIsOwner:Bool, effectiveness:Int, type:UInt = (0 : UInt),
+	public function spawnHealFloater(delta:Int, attackerIsOwner:Bool, attackeeIsOwner:Bool, effectiveness:Int, inType:UInt = (0 : UInt),
 			floaterType:String = "DAMAGE_MOVEMENT_TYPE") {
-		var _loc7_:DamageFloater = null;
-		if (mDBFacade.featureFlags.getFlagValue("want-damage-floaters")) {
-			_loc7_ = new DamageFloater(mDBFacade, delta, mParentActorObject, (4 : UInt), (24 : UInt), 0.9, 90, null, attackerIsOwner, attackeeIsOwner, true,
-				false, effectiveness, type, floaterType);
+		if (wantDamageFloaters) {
+			DamageFloater.spawn(mDBFacade, delta, mParentActorObject, (4 : UInt), (24 : UInt), 0.9, 90, attackerIsOwner, attackeeIsOwner, false,
+				effectiveness, inType, floaterType);
 		}
 	}
 

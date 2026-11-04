@@ -6,223 +6,290 @@ import com.junkbyte.console.vos.GraphInterest;
 import flash.geom.Rectangle;
 import flash.system.System;
 import flash.utils.ByteArray;
+import haxe.Constraints.IMap;
+import haxe.ds.StringMap;
 
 class Graphing extends ConsoleCore {
-	var _groups:Array<ASAny>;
+	public var _previousTime:Int = 0;
 
-	var _map:ASObject;
+	public var _memGroup:GraphGroup;
 
-	var _fpsGroup:GraphGroup;
+	public var _map:IMap<ASAny, ASAny>;
 
-	var _memGroup:GraphGroup;
+	public var _hadGraph:Bool = false;
 
-	var _hadGraph:Bool = false;
+	public var _groups:Array<ASAny>;
 
-	var _previousTime:Float = -1;
+	public var _fpsGroup:GraphGroup;
 
-	public function new(m:Console) {
-		this._groups = [];
-		this._map = {};
+	public function new(m:Console = /*undefined*/ null) {
+		var _gthis:Graphing;
+		_previousTime = -1;
+		_map = new StringMap<ASAny>();
+		_groups = [];
+		_gthis = this;
 		super(m);
-		remoter.registerCallback("fps", function(bytes:ByteArray) {
-			fpsMonitor = bytes.readBoolean();
+		get_remoter().registerCallback("fps", function(bytes:ByteArray) {
+			_gthis.set_fpsMonitor(bytes.readBoolean());
 		});
-		remoter.registerCallback("mem", function(bytes:ByteArray) {
-			memoryMonitor = bytes.readBoolean();
+		get_remoter().registerCallback("mem", function(bytes:ByteArray) {
+			_gthis.set_memoryMonitor(bytes.readBoolean());
 		});
-		remoter.registerCallback("removeGroup", function(bytes:ByteArray) {
-			removeGroup(bytes.readUTF());
+		get_remoter().registerCallback("removeGroup", function(bytes:ByteArray) {
+			_gthis.removeGroup(bytes.readUTF());
 		});
-		remoter.registerCallback("graph", this.handleRemoteGraph, true);
+		get_remoter().registerCallback("graph", handleRemoteGraph, true);
 	}
 
-	public function add(n:String, obj:ASObject, prop:String, col:Float = -1, key:String = null, rect:Rectangle = null, inverse:Bool = false) {
-		var group:GraphGroup;
-		var interests:Array<ASAny>;
-		var interest:GraphInterest;
-		var v:Float;
-		var newGroup = false;
-		var i:GraphInterest = null;
-		if (obj == null) {
-			report("ERROR: Graph [" + n + "] received a null object to graph property [" + prop + "].", 10);
-			return;
-		}
-		group = ASCompat.coerce(this._map[n], com.junkbyte.console.vos.GraphGroup);
-		if (group == null) {
-			newGroup = true;
-			group = new GraphGroup(n);
-		}
-		interests = group.interests;
-		if (Math.isNaN(col) || col < 0) {
-			if (interests.length <= 5) {
-				col = ASCompat.toNumber((config.style : ASAny)["priority" + (10 - interests.length * 2)]);
-			} else {
-				col = Math.random() * 16777215;
-			}
-		}
-		if (key == null) {
-			key = prop;
-		}
-		if (checkNullIteratee(interests))
-			for (_tmp_ in interests) {
-				i = ASCompat.coerce(_tmp_, com.junkbyte.console.vos.GraphInterest);
-				if (i.key == key) {
-					report("Graph with key [" + key + "] already exists in [" + n + "]", 10);
-					return;
-				}
-			}
-		if (rect != null) {
-			group.rect = rect;
-		}
-		if (inverse) {
-			group.inv = inverse;
-		}
-		interest = new GraphInterest(key, col);
-		v = Math.NaN;
-		try {
-			v = interest.setObject(obj, prop);
-		} catch (e:Dynamic) {
-			report("Error with graph value for [" + key + "] in [" + n + "]. " + e, 10);
-			return;
-		}
-		if (Math.isNaN(v)) {
-			report("Graph value for key [" + key + "] in [" + n + "] is not a number (NaN).", 10);
-		} else {
-			group.interests.push(interest);
-			if (newGroup) {
-				this._map[n] = group;
-				this._groups.push(group);
-			}
-		}
-	}
-
-	public function fixRange(n:String, low:Float = null, high:Float = null) {
-		if (low == null)
-			low = Math.NaN;
-		if (high == null)
-			high = Math.NaN;
-		var _loc4_ = ASCompat.coerce(this._map[n], com.junkbyte.console.vos.GraphGroup);
-		if (_loc4_ == null) {
-			return;
-		}
-		_loc4_.low = low;
-		_loc4_.hi = high;
-		_loc4_.fixed = !(Math.isNaN(low) || Math.isNaN(high));
-	}
-
-	public function remove(n:String, obj:ASObject = null, prop:String = null) {
-		var _loc4_:Array<ASAny> = null;
-		var _loc5_ = 0;
-		var _loc6_:GraphInterest = null;
-		if (obj == null && prop == null) {
-			this.removeGroup(n);
-		} else if (ASCompat.toBool(this._map[n])) {
-			_loc4_ = ASCompat.coerce(this._map[n].interests, Array);
-			_loc5_ = _loc4_.length - 1;
-			while (_loc5_ >= 0) {
-				_loc6_ = ASCompat.coerce(_loc4_[_loc5_], com.junkbyte.console.vos.GraphInterest);
-				if ((obj == null || _loc6_.obj == obj) && (prop == null || _loc6_.prop == prop)) {
-					_loc4_.splice(_loc5_, (1 : UInt));
-				}
-				_loc5_--;
-			}
-			if (_loc4_.length == 0) {
-				this.removeGroup(n);
-			}
-		}
-	}
-
-	function removeGroup(n:String) {
-		var _loc2_:ByteArray = null;
-		var _loc3_:GraphGroup = null;
-		var _loc4_ = 0;
-		if (remoter.remoting == Remoting.RECIEVER) {
-			_loc2_ = new ByteArray();
-			_loc2_.writeUTF(n);
-			remoter.send("removeGroup", _loc2_);
-		} else {
-			_loc3_ = ASCompat.coerce(this._map[n], com.junkbyte.console.vos.GraphGroup);
-			_loc4_ = this._groups.indexOf(_loc3_);
-			if (_loc4_ >= 0) {
-				this._groups.splice(_loc4_, (1 : UInt));
-			}
-			ASCompat.deleteProperty(this._map, n);
-		}
-	}
-
-	@:isVar public var fpsMonitor(get, set):Bool;
-
-	public function get_fpsMonitor():Bool {
-		if (remoter.remoting == Remoting.RECIEVER) {
-			return console.panels.fpsMonitor;
-		}
-		return this._fpsGroup != null;
-	}
-
-	function set_fpsMonitor(b:Bool):Bool {
-		var _loc2_:ByteArray = null;
+	public function updateExternalGraphGroup(group:GraphGroup) {
+		var _loc5_:ASAny = ASCompat.dynamicAs(null, GraphInterest);
+		var _loc6_ = Math.NaN;
+		var _loc7_ = ASCompat.dynamicAs(null, Error);
 		var _loc3_ = 0;
-		if (remoter.remoting == Remoting.RECIEVER) {
-			_loc2_ = new ByteArray();
-			_loc2_.writeBoolean(b);
-			remoter.send("fps", _loc2_);
-		} else if (b != this.fpsMonitor) {
-			if (b) {
-				this._fpsGroup = this.addSpecialGroup((GraphGroup.FPS : Int));
-				this._fpsGroup.low = 0;
-				this._fpsGroup.fixed = true;
-				this._fpsGroup.averaging = (30 : UInt);
-			} else {
-				this._previousTime = -1;
-				_loc3_ = this._groups.indexOf(this._fpsGroup);
-				if (_loc3_ >= 0) {
-					this._groups.splice(_loc3_, (1 : UInt));
-				}
-				this._fpsGroup = null;
+		var _loc4_ = group.interests;
+		while (_loc3_ < _loc4_.length) {
+			_loc5_ = _loc4_[_loc3_];
+			_loc3_++;
+			_loc6_ = 0;
+			try {
+				_loc6_ = ASCompat.toNumber(_loc5_.getCurrentValue());
+				_loc5_.setValue(_loc6_, group.averaging);
+			} catch (_loc_e_:Dynamic) {
+				_loc7_ = _loc_e_;
+				report("Error with graph value for key [" + Std.string(_loc5_.key) + "] in [" + group.name + "]. " + Std.string(_loc7_), 10);
+				remove(group.name, _loc5_.get_obj(), _loc5_.get_prop());
 			}
-			console.panels.mainPanel.updateMenu();
+			group.updateMinMax(_loc6_);
 		}
-		return b;
+	}
+
+	public function update(fps:Int = 0):Array<ASAny> {
+		var _loc2_:ASAny = ASCompat.dynamicAs(null, GraphInterest);
+		var _loc3_ = Math.NaN;
+		var _loc4_ = 0;
+		var _loc6_:ASAny = ASCompat.dynamicAs(null, GraphGroup);
+		var _loc7_ = false;
+		var _loc8_ = (0 : UInt);
+		var _loc9_ = (0 : UInt);
+		var _loc10_:ASAny = (ASCompat.dynamicAs(null, Array) : Array<ASAny>);
+		var _loc11_ = 0;
+		var _loc12_ = Math.NaN;
+		var _loc13_ = (null : ByteArray);
+		var _loc14_ = 0;
+		_loc4_ = 0;
+		var _loc5_ = _groups;
+		while (_loc4_ < _loc5_.length) {
+			_loc6_ = _loc5_[_loc4_];
+			_loc4_++;
+			_loc7_ = true;
+			if (ASCompat.toNumberField(_loc6_, "freq") > 1) {
+				_loc6_.idle = ASCompat.toInt(_loc6_.idle) + 1;
+				if (_loc6_.idle < _loc6_.freq) {
+					_loc7_ = false;
+				} else {
+					ASCompat.setProperty(_loc6_, "idle", 0);
+				}
+			}
+			if (_loc7_) {
+				_loc8_ = (ASCompat.toInt(_loc6_.type) : UInt);
+				_loc9_ = (ASCompat.toInt(_loc6_.averaging) : UInt);
+				_loc10_ = _loc6_.interests;
+				if (_loc8_ == 1) {
+					ASCompat.setProperty(_loc6_, "hi", fps);
+					_loc2_ = _loc10_[0];
+					_loc11_ = flash.Lib.getTimer();
+					if (_previousTime >= 0) {
+						_loc12_ = _loc11_ - _previousTime;
+						_loc3_ = 1000 / _loc12_;
+						_loc2_.setValue(_loc3_, _loc9_);
+					}
+					_previousTime = _loc11_;
+				} else if (_loc8_ == 2) {
+					_loc2_ = _loc10_[0];
+					_loc3_ = ASCompat.floatToInt(Math.fround(System.totalMemory / 10485.76)) / 100;
+					_loc6_.updateMinMax(_loc3_);
+					_loc2_.setValue(_loc3_, _loc9_);
+				} else {
+					updateExternalGraphGroup(ASCompat.coerce(_loc6_, com.junkbyte.console.vos.GraphGroup));
+				}
+			}
+		}
+		if (get_remoter().get_canSend() && (_hadGraph || _groups.length != 0)) {
+			_loc8_ = (_groups.length : UInt);
+			_loc13_ = new ByteArray();
+			_loc4_ = 0;
+			_loc11_ = _loc8_;
+			while (_loc4_ < _loc11_) {
+				_loc14_ = _loc4_++;
+				_groups[_loc14_].toBytes(_loc13_);
+			}
+			get_remoter().send("graph", _loc13_);
+			_hadGraph = _groups.length > 0;
+		}
+		return _groups;
 	}
 
 	@:isVar public var memoryMonitor(get, set):Bool;
 
-	public function get_memoryMonitor():Bool {
-		if (remoter.remoting == Remoting.RECIEVER) {
-			return console.panels.memoryMonitor;
-		}
-		return this._memGroup != null;
-	}
-
-	function set_memoryMonitor(b:Bool):Bool {
-		var _loc2_:ByteArray = null;
+	public function set_memoryMonitor(b:Bool):Bool {
+		var _loc2_ = (null : ByteArray);
 		var _loc3_ = 0;
-		if (remoter.remoting == Remoting.RECIEVER) {
+		if (get_remoter().get_remoting() == 2) {
 			_loc2_ = new ByteArray();
 			_loc2_.writeBoolean(b);
-			remoter.send("mem", _loc2_);
-		} else if (b != this.memoryMonitor) {
+			get_remoter().send("mem", _loc2_);
+		} else if (b != get_memoryMonitor()) {
 			if (b) {
-				this._memGroup = this.addSpecialGroup((GraphGroup.MEM : Int));
-				this._memGroup.freq = 20;
+				_memGroup = addSpecialGroup(2);
+				_memGroup.freq = 20;
 			} else {
-				_loc3_ = this._groups.indexOf(this._memGroup);
+				_loc3_ = _groups.indexOf(_memGroup);
 				if (_loc3_ >= 0) {
-					this._groups.splice(_loc3_, (1 : UInt));
+					_groups.splice(_loc3_, (1 : UInt));
 				}
-				this._memGroup = null;
+				_memGroup = null;
 			}
-			console.panels.mainPanel.updateMenu();
+			console.get_panels().get_mainPanel().updateMenu();
 		}
 		return b;
 	}
 
-	function addSpecialGroup(type:Int):GraphGroup {
+	@:isVar public var fpsMonitor(get, set):Bool;
+
+	public function set_fpsMonitor(b:Bool):Bool {
+		var _loc2_ = (null : ByteArray);
+		var _loc3_ = 0;
+		if (get_remoter().get_remoting() == 2) {
+			_loc2_ = new ByteArray();
+			_loc2_.writeBoolean(b);
+			get_remoter().send("fps", _loc2_);
+		} else if (b != get_fpsMonitor()) {
+			if (b) {
+				_fpsGroup = addSpecialGroup(1);
+				_fpsGroup.low = 0;
+				_fpsGroup.fixed = true;
+				_fpsGroup.averaging = (30 : UInt);
+			} else {
+				_previousTime = -1;
+				_loc3_ = _groups.indexOf(_fpsGroup);
+				if (_loc3_ >= 0) {
+					_groups.splice(_loc3_, (1 : UInt));
+				}
+				_fpsGroup = null;
+			}
+			console.get_panels().get_mainPanel().updateMenu();
+		}
+		return b;
+	}
+
+	public function removeGroup(n:String) {
+		var _loc2_ = (null : ByteArray);
+		var _loc3_ = ASCompat.dynamicAs(null, StringMap);
+		var _loc4_:ASAny = ASCompat.dynamicAs(null, GraphGroup);
+		var _loc5_ = 0;
+		if (get_remoter().get_remoting() == 2) {
+			_loc2_ = new ByteArray();
+			_loc2_.writeUTF(n);
+			get_remoter().send("removeGroup", _loc2_);
+		} else {
+			_loc3_ = cast(_map, StringMap<Dynamic>);
+			_loc4_ = _loc3_.get(n);
+			_loc5_ = _groups.indexOf(_loc4_);
+			if (_loc5_ >= 0) {
+				_groups.splice(_loc5_, (1 : UInt));
+			}
+			cast(_map, StringMap<Dynamic>).remove(n);
+		}
+	}
+
+	public function remove(n:String, obj:ASAny = /*undefined*/ null, prop:String = /*undefined*/ null) {
+		var _loc4_ = ASCompat.dynamicAs(null, StringMap);
+		var _loc5_ = ASCompat.dynamicAs(null, StringMap);
+		var _loc6_:ASAny = (ASCompat.dynamicAs(null, Array) : Array<ASAny>);
+		var _loc7_ = 0;
+		var _loc8_:ASAny = ASCompat.dynamicAs(null, GraphInterest);
+		if (obj == null && prop == null) {
+			removeGroup(n);
+		} else {
+			_loc4_ = cast(_map, StringMap<Dynamic>);
+			if (_loc4_.get(n) != null) {
+				_loc5_ = cast(_map, StringMap<Dynamic>);
+				_loc6_ = _loc5_.get(n).interests;
+				_loc7_ = ASCompat.toInt(_loc6_.length) - 1;
+				while (_loc7_ >= 0) {
+					_loc8_ = _loc6_[_loc7_];
+					if ((obj == null || _loc8_.get_obj() == obj) && (prop == null || _loc8_.get_prop() == prop)) {
+						ASCompat.dynSplice(_loc6_, _loc7_, 1);
+					}
+					_loc7_--;
+				}
+				if (ASCompat.toInt(_loc6_.length) == 0) {
+					removeGroup(n);
+				}
+			}
+		}
+	}
+
+	public function handleRemoteGraph(bytes:ByteArray = /*undefined*/ null) {
+		var _loc2_ = (ASCompat.dynamicAs(null, Array) : Array<ASAny>);
+		if (bytes != null && bytes.length != 0) {
+			bytes.position = (0 : UInt);
+			_loc2_ = [];
+			while (bytes.bytesAvailable != 0) {
+				_loc2_.push(GraphGroup.FromBytes(bytes));
+			}
+			console.get_panels().updateGraphs(_loc2_);
+		} else {
+			console.get_panels().updateGraphs([]);
+		}
+	}
+
+	public function get_memoryMonitor():Bool {
+		if (get_remoter().get_remoting() == 2) {
+			return console.get_panels().get_memoryMonitor();
+		}
+		return _memGroup != null;
+	}
+
+	public function get_fpsMonitor():Bool {
+		if (get_remoter().get_remoting() == 2) {
+			return console.get_panels().get_fpsMonitor();
+		}
+		return _fpsGroup != null;
+	}
+
+	public function fixRange(n:String, low:ASObject = /*undefined*/ null, high:ASObject = /*undefined*/ null) {
+		var _loc6_ = false;
+		var _loc8_ = Math.NaN;
+		if (low == null) {
+			low = Math.NaN;
+		}
+		if (high == null) {
+			high = Math.NaN;
+		}
+		var _loc4_ = cast(_map, StringMap<Dynamic>);
+		var _loc5_ = ASCompat.coerce(_loc4_.get(n), com.junkbyte.console.vos.GraphGroup);
+		if (_loc5_ == null) {
+			return;
+		}
+		_loc5_.low = ASCompat.toNumber(low);
+		_loc5_.hi = ASCompat.toNumber(high);
+		var _loc7_ = ASCompat.toNumber(low);
+		if (_loc7_ == _loc7_) {
+			_loc8_ = ASCompat.toNumber(high);
+			_loc6_ = _loc8_ != _loc8_;
+		} else {
+			_loc6_ = true;
+		}
+		_loc5_.fixed = !_loc6_;
+	}
+
+	public function addSpecialGroup(type:Int):GraphGroup {
 		var _loc2_ = new GraphGroup("special");
 		_loc2_.type = (type : UInt);
-		this._groups.push(_loc2_);
+		_groups.push(_loc2_);
 		var _loc3_ = new GraphInterest("special");
-		if ((type : UInt) == GraphGroup.FPS) {
+		if (type == 1) {
 			_loc3_.col = 16724787;
 		} else {
 			_loc3_.col = 5267711;
@@ -231,99 +298,68 @@ class Graphing extends ConsoleCore {
 		return _loc2_;
 	}
 
-	public function update(fps:Float = 0):Array<ASAny> {
-		var _loc2_:GraphInterest = null;
-		var _loc3_ = Math.NaN;
-		var _loc4_:GraphGroup = null;
-		var _loc5_ = false;
-		var _loc6_ = (0 : UInt);
-		var _loc7_ = (0 : UInt);
-		var _loc8_:Array<ASAny> = null;
-		var _loc9_ = 0;
-		var _loc10_ = Math.NaN;
-		var _loc11_ = (0 : UInt);
-		var _loc12_:ByteArray = null;
-		var _loc13_ = (0 : UInt);
-		final __ax4_iter_121 = this._groups;
-		if (checkNullIteratee(__ax4_iter_121))
-			for (_tmp_ in __ax4_iter_121) {
-				_loc4_ = ASCompat.coerce(_tmp_, com.junkbyte.console.vos.GraphGroup);
-				_loc5_ = true;
-				if (_loc4_.freq > 1) {
-					++_loc4_.idle;
-					if (_loc4_.idle < _loc4_.freq) {
-						_loc5_ = false;
-					} else {
-						_loc4_.idle = 0;
-					}
-				}
-				if (_loc5_) {
-					_loc6_ = _loc4_.type;
-					_loc7_ = _loc4_.averaging;
-					_loc8_ = _loc4_.interests;
-					if (_loc6_ == GraphGroup.FPS) {
-						_loc4_.hi = fps;
-						_loc2_ = ASCompat.coerce(_loc8_[0], com.junkbyte.console.vos.GraphInterest);
-						_loc9_ = flash.Lib.getTimer();
-						if (this._previousTime >= 0) {
-							_loc10_ = _loc9_ - this._previousTime;
-							_loc3_ = 1000 / _loc10_;
-							_loc2_.setValue(_loc3_, _loc7_);
-						}
-						this._previousTime = _loc9_;
-					} else if (_loc6_ == GraphGroup.MEM) {
-						_loc2_ = ASCompat.coerce(_loc8_[0], com.junkbyte.console.vos.GraphInterest);
-						_loc3_ = Math.fround(System.totalMemory / 10485.76) / 100;
-						_loc4_.updateMinMax(_loc3_);
-						_loc2_.setValue(_loc3_, _loc7_);
-					} else {
-						this.updateExternalGraphGroup(_loc4_);
-					}
-				}
-			}
-		if (remoter.canSend && (this._hadGraph || this._groups.length != 0)) {
-			_loc11_ = (this._groups.length : UInt);
-			_loc12_ = new ByteArray();
-			_loc13_ = (0 : UInt);
-			while (_loc13_ < _loc11_) {
-				cast(this._groups[(_loc13_ : Int)], GraphGroup).toBytes(_loc12_);
-				_loc13_++;
-			}
-			remoter.send("graph", _loc12_);
-			this._hadGraph = this._groups.length > 0;
+	public function add(n:String, obj:ASAny, prop:String, col:Int = -1, key:String = /*undefined*/ null, rect:Rectangle = /*undefined*/ null,
+			inverse:Bool = false) {
+		var _loc14_:ASAny = ASCompat.dynamicAs(null, GraphInterest);
+		var _loc16_ = ASCompat.dynamicAs(null, Error);
+		var _loc17_ = ASCompat.dynamicAs(null, StringMap);
+		if (obj == null) {
+			report("ERROR: Graph [" + n + "] received a null object to graph property [" + prop + "].", 10);
+			return;
 		}
-		return this._groups;
-	}
-
-	function updateExternalGraphGroup(group:GraphGroup) {
-		var i:GraphInterest = null;
-		var v = Math.NaN;
-		final __ax4_iter_122 = group.interests;
-		if (checkNullIteratee(__ax4_iter_122))
-			for (_tmp_ in __ax4_iter_122) {
-				i = ASCompat.coerce(_tmp_, com.junkbyte.console.vos.GraphInterest);
-				try {
-					v = i.getCurrentValue();
-					i.setValue(v, group.averaging);
-				} catch (e:Dynamic) {
-					report("Error with graph value for key [" + i.key + "] in [" + group.name + "]. " + e, 10);
-					remove(group.name, i.obj, i.prop);
-				}
-				group.updateMinMax(v);
+		var _loc9_ = cast(_map, StringMap<Dynamic>);
+		var _loc10_ = ASCompat.coerce(_loc9_.get(n), com.junkbyte.console.vos.GraphGroup);
+		var _loc11_ = false;
+		if (_loc10_ == null) {
+			_loc11_ = true;
+			_loc10_ = new GraphGroup(n);
+		}
+		var _loc12_ = _loc10_.interests;
+		if (col != col || col < 0) {
+			if (_loc12_.length <= 5) {
+				col = ASCompat.toInt(Reflect.field(config.get_style(), "priority" + (10 - _loc12_.length * 2)));
+			} else {
+				col = ASCompat.floatToInt(Math.random() * 16777215);
 			}
-	}
-
-	function handleRemoteGraph(bytes:ByteArray = null) {
-		var _loc2_:Array<ASAny> = null;
-		if (bytes != null && bytes.length != 0) {
-			bytes.position = (0 : UInt);
-			_loc2_ = new Array<ASAny>();
-			while (bytes.bytesAvailable != 0) {
-				_loc2_.push(GraphGroup.FromBytes(bytes));
+		}
+		if (key == null) {
+			key = prop;
+		}
+		var _loc13_ = 0;
+		while (_loc13_ < _loc12_.length) {
+			_loc14_ = _loc12_[_loc13_];
+			_loc13_++;
+			if (_loc14_.key == key) {
+				report("Graph with key [" + key + "] already exists in [" + n + "]", 10);
+				return;
 			}
-			console.panels.updateGraphs(_loc2_);
+		}
+		if (rect != null) {
+			_loc10_.rect = rect;
+		}
+		if (inverse) {
+			_loc10_.inv = inverse;
+		}
+		_loc14_ = new GraphInterest(key, col);
+		var _loc15_ = Math.NaN;
+		try {
+			_loc15_ = ASCompat.toNumber(_loc14_.setObject(obj, prop));
+		} catch (_loc_e_:Dynamic) {
+			_loc16_ = _loc_e_;
+			report("Error with graph value for [" + key + "] in [" + n + "]. " + Std.string(_loc16_), 10);
+			return;
+		}
+		if (_loc15_ != _loc15_) {
+			report("Graph value for key [" + key + "] in [" + n + "] is not a number (NaN).", 10);
 		} else {
-			console.panels.updateGraphs(new Array<ASAny>());
+			_loc10_.interests.push(_loc14_);
+			if (_loc11_) {
+				_loc17_ = cast(_map, StringMap<Dynamic>);
+				{
+					_loc17_.set(n, _loc10_);
+				}
+				_groups.push(_loc10_);
+			}
 		}
 	}
 }

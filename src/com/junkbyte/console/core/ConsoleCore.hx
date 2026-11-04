@@ -5,23 +5,26 @@ import com.junkbyte.console.ConsoleConfig;
 import flash.events.EventDispatcher;
 
 class ConsoleCore extends EventDispatcher {
-	var console:Console;
+	public var console:Console;
 
-	var config:ConsoleConfig;
+	public var config:ConsoleConfig;
 
-	public function new(c:Console) {
+	public function new(c:Console = /*undefined*/ null) {
 		super();
-		this.console = c;
-		this.config = this.console.config;
+		console = c;
+		config = console.get_config();
 	}
 
-	@:isVar var remoter(get, never):Remoting;
-
-	function get_remoter():Remoting {
-		return this.console.remoter;
+	public function report(obj:ASAny = /*undefined*/ null, priority:Int = 0, skipSafe:Bool = true, ch:String = /*undefined*/ null) {
+		if (obj == null) {
+			obj = "";
+		}
+		console.report(obj, priority, skipSafe, ch);
 	}
 
-	function report(obj:ASAny = "", priority:Int = 0, skipSafe:Bool = true, ch:String = null) {
-		this.console.report(obj, priority, skipSafe, ch);
+	@:isVar public var remoter(get, never):Remoting;
+
+	public function get_remoter():Remoting {
+		return console.get_remoter();
 	}
 }

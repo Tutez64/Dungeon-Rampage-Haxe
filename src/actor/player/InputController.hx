@@ -27,8 +27,6 @@ class InputController {
 
 	var mLogicalWorkComponent:LogicalWorkComponent;
 
-	var mAbortAstarPathWalk:Bool = false;
-
 	var mWantCameraZoom:Bool = false;
 
 	var mKeyboardController:KeyboardController;
@@ -40,6 +38,8 @@ class InputController {
 	var mInputType:String = "free";
 
 	var mCombatDisabled:Bool = false;
+
+	var mStillVelocity:Vector3D = new Vector3D();
 
 	public function new(heroGameObject:HeroGameObjectOwner, dbFacade:DBFacade) {
 		mDBFacade = dbFacade;
@@ -77,6 +77,10 @@ class InputController {
 	public function perFrameUpCall() {
 		var _loc5_ = false;
 		mHeroGameObject.position = mHeroGameObject.navCollisions[0].position;
+		if (mDBFacade.heroInputSuspended) {
+			holdStill();
+			return;
+		}
 		var _loc3_:Float = mDBFacade.inputManager.mouseWheelDelta;
 		if (_loc3_ != 0) {
 			_loc5_ = _loc3_ > 0;
@@ -94,6 +98,7 @@ class InputController {
 			mHeroGameObject.PlayerAttack.weaponCommandQueueUpCall();
 		}
 		translateInputIntoConsumableUse();
+		translateInputIntoMenuUse();
 		if (!canMoveXY(mInputType)) {
 			_loc1_.scaleBy(0);
 			mMouseController.clearMovement();
@@ -103,6 +108,13 @@ class InputController {
 		if (canMoveR(mInputType) && (_loc4_.x != 0 || _loc4_.y != 0)) {
 			mHeroGameObject.heading = _loc2_;
 		}
+	}
+
+	function holdStill() {
+		mStillVelocity.setTo(0, 0, 0);
+		mHeroGameObject.inputVelocity = mStillVelocity;
+		mHeroGameObject.autoMoveVelocity.setTo(0, 0, 0);
+		mHeroGameObject.setViewVelocity();
 	}
 
 	public function doFrameUpCallsOnInputControllers() {
@@ -130,20 +142,20 @@ class InputController {
 
 	function translateInputIntoAttacks() {
 		var _loc3_ = 0;
-		var _loc4_ = 0;
+		var _loc4_ = (0 : UInt);
 		var _loc6_:Array<ASAny> = null;
 		var _loc2_:Tuple = null;
 		var _loc7_ = false;
 		var _loc1_ = mKeyboardController.pressedCombatKeysThisFrame;
 		var _loc11_ = mKeyboardController.releasedCombatKeysThisFrame;
-		_loc4_ = 0;
-		while (_loc4_ < _loc1_.length) {
-			_loc3_ = mKeyboardController.KeyIndexToAttack(_loc4_);
-			if (_loc1_[_loc4_] != 0) {
+		_loc4_ = (0 : UInt);
+		while (_loc4_ < (_loc1_.length:UInt)) {
+			_loc3_ = (_loc4_ : Int);
+			if (_loc1_[(_loc4_ : Int)] != 0) {
 				mHeroGameObject.PlayerAttack.addToPotentialWeaponInputQueue((_loc3_ : UInt), true, true);
 				_loc7_ = true;
 			}
-			if (_loc11_[_loc4_] != 0) {
+			if (_loc11_[(_loc4_ : Int)] != 0) {
 				mHeroGameObject.PlayerAttack.addToPotentialWeaponInputQueue((_loc3_ : UInt), false, true);
 				_loc7_ = true;
 			}
@@ -167,9 +179,9 @@ class InputController {
 			}
 		if (!_loc7_) {
 			_loc6_ = mMouseController.potentialAttacksThisFrame;
-			_loc4_ = 0;
-			while (_loc4_ < _loc6_.length) {
-				_loc2_ = ASCompat.coerce(_loc6_[_loc4_], brain.utils.Tuple);
+			_loc4_ = (0 : UInt);
+			while (_loc4_ < (_loc6_.length:UInt)) {
+				_loc2_ = ASCompat.coerce(_loc6_[(_loc4_ : Int)], brain.utils.Tuple);
 				mHeroGameObject.PlayerAttack.addToPotentialWeaponInputQueue((ASCompat.toInt(_loc2_.first) : UInt), ASCompat.toBool(_loc2_.second), false);
 				_loc7_ = true;
 				_loc4_++;
@@ -179,27 +191,50 @@ class InputController {
 
 	function translateInputIntoConsumableUse() {
 		var _loc2_ = 0;
-		var _loc3_ = 0;
-		var _loc4_ = 0;
+		var _loc3_ = (0 : UInt);
+		var _loc4_ = (0 : UInt);
 		var _loc1_ = false;
 		var _loc6_ = mKeyboardController.releasedConsumableKeysThisFrame;
-		_loc3_ = 0;
-		while (_loc3_ < _loc6_.length) {
-			_loc2_ = mKeyboardController.KeyIndexToConsumable(_loc3_);
-			if (_loc6_[_loc3_] != 0) {
+		_loc3_ = (0 : UInt);
+		while (_loc3_ < (_loc6_.length:UInt)) {
+			_loc2_ = (_loc3_ : Int);
+			if (_loc6_[(_loc3_ : Int)] != 0) {
 				mHeroGameObject.tryToUseConsumable((_loc2_ : UInt));
 				_loc1_ = true;
 			}
 			_loc3_++;
 		}
 		var _loc5_ = mGamepadController.releasedConsumableButtonsThisFrame;
-		_loc4_ = 0;
-		while (_loc4_ < _loc5_.length) {
-			_loc2_ = _loc5_[_loc4_];
+		_loc4_ = (0 : UInt);
+		while (_loc4_ < (_loc5_.length:UInt)) {
+			_loc2_ = _loc5_[(_loc4_ : Int)];
 			mHeroGameObject.tryToUseConsumable((_loc2_ : UInt));
 			_loc1_ = true;
 			_loc4_++;
 		}
+	}
+
+	function translateInputIntoMenuUse() {
+		var _loc1_ = 0;
+		var _loc2_ = (0 : UInt);
+		var _loc3_ = (0 : UInt);
+		var _loc5_ = mKeyboardController.releasedMenuKeysThisFrame;
+		_loc2_ = (0 : UInt);
+		while (_loc2_ < (_loc5_.length:UInt)) {
+			_loc1_ = (_loc2_ : Int);
+			if (_loc5_[(_loc2_ : Int)] != 0) {
+				mDBFacade.hud.handleMenuButtonPressed((_loc1_ : UInt));
+				return;
+			}
+			_loc2_++;
+		}
+		var _loc4_ = mGamepadController.releasedMenuButtonsThisFrame;
+		_loc3_ = (0 : UInt);
+		if (_loc3_ >= (_loc4_.length : UInt)) {
+			return;
+		}
+		_loc1_ = _loc4_[(_loc3_ : Int)];
+		mDBFacade.hud.handleMenuButtonPressed((_loc1_ : UInt));
 	}
 
 	function determineInputVelocity():Vector3D {
@@ -233,7 +268,7 @@ class InputController {
 	}
 
 	public function canMoveXY(inputType:String):Bool {
-		return inputType != "lock_xy" && inputType != "lock_xy_r" && !mDBFacade.inputManager.check(16);
+		return inputType != "lock_xy" && inputType != "lock_xy_r" && !mDBFacade.keyBindings.isDown("holdInPlace");
 	}
 
 	@:isVar public var directionVector(get, never):Vector3D;

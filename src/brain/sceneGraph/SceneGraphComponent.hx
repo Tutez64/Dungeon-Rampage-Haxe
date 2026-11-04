@@ -3,26 +3,26 @@ package brain.sceneGraph;
 import brain.component.Component;
 import brain.facade.Facade;
 import brain.logger.Logger;
+import brain.render.tweens.TweenHandle;
 import brain.utils.MemoryTracker;
-import com.greensock.TweenMax;
+import collections.ISetIterator;
+import collections.Set;
 import flash.display.DisplayObject;
 import flash.display.Sprite;
-import org.as3commons.collections.Set;
-import org.as3commons.collections.framework.ISetIterator;
 
 class SceneGraphComponent extends Component {
 	static var mFadeSprite:Sprite;
 
-	static var mFadeTween:TweenMax;
+	static var mFadeTween:TweenHandle;
 
 	var mDisplayObjects:Set;
 
 	var mCurtainActive:Bool = false;
 
-	public function new(facade:Facade, ownerName:String = null) {
+	public function new(facade:Facade, ownerName:String = null, category:String = "brain") {
 		super(facade);
 		mDisplayObjects = new Set();
-		MemoryTracker.track(this, "SceneGraphComponent - " + (if (ASCompat.stringAsBool(ownerName)) ownerName else "unknown"), "brain");
+		MemoryTracker.track(this, "SceneGraphComponent - " + (if (ASCompat.stringAsBool(ownerName)) ownerName else "unknown"), category);
 	}
 
 	public static function bringToFront(child:DisplayObject) {
@@ -89,7 +89,7 @@ class SceneGraphComponent extends Component {
 
 	function killFadeTween() {
 		if (mFadeTween != null) {
-			mFadeTween.kill();
+			mFacade.mTween.killTween(mFadeTween);
 			mFadeTween = null;
 		}
 	}
@@ -104,7 +104,7 @@ class SceneGraphComponent extends Component {
 			return;
 		}
 		this.addChild(mFadeSprite, (100 : UInt));
-		mFadeTween = TweenMax.to(mFadeSprite, fadeLength, {
+		mFadeTween = mFacade.mTween.tweenMaxTo(mFadeSprite, fadeLength, {
 			"alpha": 0,
 			"onComplete": finishFadeIn
 		});
@@ -126,7 +126,7 @@ class SceneGraphComponent extends Component {
 			mFadeSprite.alpha = 1;
 			return;
 		}
-		mFadeTween = TweenMax.to(mFadeSprite, fadeLength, {
+		mFadeTween = mFacade.mTween.tweenMaxTo(mFadeSprite, fadeLength, {
 			"alpha": alphaValue,
 			"onComplete": finishFadeOut
 		});

@@ -1,5 +1,6 @@
 package brain.sceneGraph;
 
+import brain.event.EventListeners;
 import brain.facade.Facade;
 import brain.logger.Logger;
 import brain.render.Layer;
@@ -7,13 +8,13 @@ import brain.render.LayerGroup;
 import brain.render.SortOnAddLayer;
 import brain.render.SortedLayer;
 import brain.utils.MemoryTracker;
+import collections.IMapIterator;
+import collections.Map;
 import flash.display.DisplayObject;
 import flash.display.DisplayObjectContainer;
 import flash.display.Sprite;
 import flash.events.Event;
 import flash.filters.ColorMatrixFilter;
-import org.as3commons.collections.Map;
-import org.as3commons.collections.framework.IMapIterator;
 
 class SceneGraphManager {
 	public static var BOTTOM_HEIGHT:Float = 160;
@@ -33,6 +34,10 @@ class SceneGraphManager {
 	public static inline final OVERFADE = 46;
 
 	public static inline final UI = 50;
+
+	public static inline final STARLING_OVERLAY = 36;
+
+	public static inline final STARLING_HUD = 64;
 
 	public static inline final UITopCenterBackGround = 51;
 
@@ -211,7 +216,7 @@ class SceneGraphManager {
 		mPopupCurtain.graphics.drawRect(0, 0, mFacade.viewWidth, mFacade.viewHeight);
 		mPopupCurtain.graphics.endFill();
 		mPopupCurtain.mouseEnabled = mFacade.popupCurtainBlockMouse;
-		mFacade.stageRef.addEventListener("resize", onResize);
+		EventListeners.add(mFacade.stageRef, "resize", onResize);
 		onResize();
 		MemoryTracker.track(this, "SceneGraphManager - created in SceneGraphManager()", "brain");
 	}
@@ -257,9 +262,9 @@ class SceneGraphManager {
 		var _loc4_:Array<ASAny> = [0, 0, 0, 1, 0];
 		var _loc5_:Array<ASAny> = [0.3, 0.59, 0.11, 0, 0];
 		var _loc7_:Array<ASAny> = [];
-		_loc7_ = _loc7_.concat(ASCompat.coerce(interpolateArrays(_loc5_, _loc2_, amount), Array));
-		_loc7_ = _loc7_.concat(ASCompat.coerce(interpolateArrays(_loc5_, _loc3_, amount), Array));
-		_loc7_ = _loc7_.concat(ASCompat.coerce(interpolateArrays(_loc5_, _loc8_, amount), Array));
+		_loc7_ = ASCompat.ASArray.concat(_loc7_, [interpolateArrays(_loc5_, _loc2_, amount)]);
+		_loc7_ = ASCompat.ASArray.concat(_loc7_, [interpolateArrays(_loc5_, _loc3_, amount)]);
+		_loc7_ = ASCompat.ASArray.concat(_loc7_, [interpolateArrays(_loc5_, _loc8_, amount)]);
 		_loc7_ = _loc7_.concat(_loc4_);
 		_loc6_.matrix = cast(_loc7_);
 		return _loc6_;
@@ -375,6 +380,12 @@ class SceneGraphManager {
 				Logger.error("Curtain reference count is greater than one but no curtain was up.");
 			}
 		}
+	}
+
+	@:isVar public var popupCurtainShown(get, never):Bool;
+
+	public function get_popupCurtainShown():Bool {
+		return mUIPopUpCurtainLayer.contains(mPopupCurtain);
 	}
 
 	public function removePopupCurtain() {
@@ -522,16 +533,16 @@ class SceneGraphManager {
 	public function debugPrint() {
 		var _loc4_:Layer = null;
 		var _loc5_:DisplayObject = null;
-		var _loc1_ = 0;
-		var _loc3_ = 0;
+		var _loc1_ = (0 : UInt);
+		var _loc3_ = (0 : UInt);
 		var _loc2_ = ASCompat.reinterpretAs(mLayers.iterator(), IMapIterator);
 		while (_loc2_.hasNext()) {
 			_loc4_ = ASCompat.coerce(_loc2_.next(), brain.render.Layer);
 			Logger.debug("Layer: " + _loc4_.name + " children: " + Std.string(_loc4_.numChildren));
-			_loc3_ = 0;
-			while (_loc3_ < _loc4_.numChildren) {
-				_loc5_ = _loc4_.getChildAt(_loc3_);
-				_loc1_ = Std.isOfType(_loc5_, DisplayObjectContainer) ? cast(_loc5_, DisplayObjectContainer).numChildren : 0;
+			_loc3_ = (0 : UInt);
+			while (_loc3_ < (_loc4_.numChildren:UInt)) {
+				_loc5_ = _loc4_.getChildAt((_loc3_ : Int));
+				_loc1_ = (Std.isOfType(_loc5_, DisplayObjectContainer) ? cast(_loc5_, DisplayObjectContainer).numChildren : 0:UInt);
 				Logger.debug("    child " + Std.string(_loc3_) + ": " + _loc5_.toString() + " name: " + _loc5_.name + " children: " + _loc1_);
 				_loc3_++;
 			}

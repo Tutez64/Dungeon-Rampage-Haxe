@@ -1,78 +1,77 @@
 package com.junkbyte.console.vos;
 
-/*use*/ /*namespace*/ /*flash_proxy*/ /*dynamic*/
-class WeakObject extends ASProxyBase {
-	var _item:Array<ASAny>;
+import haxe.Constraints.IMap;
+import haxe.ds.IntMap;
 
-	var _dir:ASObject;
+class WeakObject {
+	public var _dict:IMap<ASAny, ASAny>;
 
 	public function new() {
-		super();
-		this._dir = new ASObject();
+		_dict = new IntMap<ASAny>();
 	}
 
-	public function set(n:String, obj:ASObject, strong:Bool = false) {
-		if (obj == null) {
-			ASCompat.deleteProperty(this._dir, n);
-		} else {
-			this._dir[n] = new WeakRef(obj, strong);
+	public function set(_tmp_n:ASObject, obj:ASAny, strong:Bool = false) {
+		var _loc5_ = ASCompat.dynamicAs(null, IMap);
+		var _loc6_ = ASCompat.dynamicAs(null, WeakRef);
+		var _loc4_:ASObject = _tmp_n;
+		remove(_loc4_);
+		if (obj != null) {
+			_loc5_ = _dict;
+			_loc6_ = new WeakRef(obj, strong);
+			_loc5_.set(ASCompat.toInt(_loc4_), _loc6_);
 		}
 	}
 
-	public function get(n:String):ASAny {
-		var _loc2_ = this.getWeakRef(n);
-		return _loc2_ != null ? _loc2_.reference : /*undefined*/ null;
+	public function remove(_tmp_n:ASObject) {
+		var _loc2_:ASObject = _tmp_n;
+		cast(_dict, IntMap<Dynamic>).remove(ASCompat.toInt(_loc2_));
 	}
 
-	public function getWeakRef(n:String):WeakRef {
-		return ASCompat.dynamicAs(this._dir[n], WeakRef);
-	}
-
-	@:ns("http://www.adobe.com/2006/actionscript/flash/proxy") override public function getProperty(n:Dynamic):Dynamic {
-		return this.get(n);
-	}
-
-	@:ns("http://www.adobe.com/2006/actionscript/flash/proxy") override public function callProperty(n:Dynamic, ..._rest:Dynamic):Dynamic {
-		var rest = ASCompat.restToArray(_rest);
-		var _loc3_:ASObject = this.get(n);
-		return Reflect.callMethod(this, _loc3_, rest);
-	}
-
-	@:ns("http://www.adobe.com/2006/actionscript/flash/proxy") override public function setProperty(n:Dynamic, v:Dynamic) {
-		this.set(n, v);
-	}
-
-	@:ns("http://www.adobe.com/2006/actionscript/flash/proxy") override public function nextName(index:Int):String {
-		return this._item[index - 1];
-	}
-
-	@:ns("http://www.adobe.com/2006/actionscript/flash/proxy") override public function nextValue(index:Int):Dynamic {
-		return (this : ASAny)[this.nextName(index)];
-	}
-
-	@:ns("http://www.adobe.com/2006/actionscript/flash/proxy") override public function nextNameIndex(index:Int):Int {
-		var __ax4_iter_46:ASObject;
-		var _loc2_:String = /*undefined*/ null;
-		if (index == 0) {
-			this._item = new Array<ASAny>();
-			__ax4_iter_46 = this._dir;
-			if (checkNullIteratee(__ax4_iter_46))
-				for (_tmp_ in __ax4_iter_46.___keys()) {
-					_loc2_ = _tmp_;
-					this._item.push(_loc2_);
-				}
+	public function keys():Array<ASAny> {
+		var _loc3_:ASAny = (null : ASObject);
+		var _loc1_:Array<ASAny> = [];
+		var _loc2_:ASAny = cast(_dict, IntMap<Dynamic>).keys();
+		while (ASCompat.toBool(_loc2_.hasNext())) {
+			_loc3_ = _loc2_.next();
+			_loc1_.push(_loc3_);
 		}
-		if (index < this._item.length) {
-			return index + 1;
+		return _loc1_;
+	}
+
+	public function getWeakRef(_tmp_n:ASObject):WeakRef {
+		var _loc2_:ASObject = _tmp_n;
+		return ASCompat.coerce(cast(_dict, IntMap<Dynamic>).get(ASCompat.toInt(_loc2_)), com.junkbyte.console.vos.WeakRef);
+	}
+
+	public function getReferenceIndex(reference:ASAny):ASObject {
+		var _loc3_:ASAny = (null : ASObject);
+		var _loc4_:ASAny = ASCompat.dynamicAs(null, WeakRef);
+		var _loc2_:ASAny = cast(_dict, IntMap<Dynamic>).keys();
+		while (ASCompat.toBool(_loc2_.hasNext())) {
+			_loc3_ = _loc2_.next();
+			_loc4_ = cast(_dict, IntMap<Dynamic>).get(ASCompat.toInt(_loc3_));
+			if (_loc4_.get_reference() == reference) {
+				return _loc3_;
+			}
 		}
-		return 0;
+		return null;
 	}
 
-	@:ns("http://www.adobe.com/2006/actionscript/flash/proxy") override public function deleteProperty(name:Dynamic):Bool {
-		return ASCompat.deleteProperty(this._dir, name);
+	public function get(_tmp_n:ASObject):ASAny {
+		var _loc2_:ASObject = _tmp_n;
+		var _loc3_ = getWeakRef(_loc2_);
+		if (_loc3_ != null) {
+			return _loc3_.get_reference();
+		}
+		return null;
 	}
 
-	public function toString():String {
-		return "[WeakObject]";
+	public function exists(_tmp_n:ASObject):Bool {
+		var _loc2_:ASObject = _tmp_n;
+		var _loc3_ = _dict;
+		if (cast(_loc3_, IntMap<Dynamic>).exists(ASCompat.toInt(_loc2_))) {
+			return get(_loc2_) != null;
+		}
+		return false;
 	}
 }

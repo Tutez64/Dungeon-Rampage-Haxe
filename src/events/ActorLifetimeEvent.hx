@@ -9,8 +9,8 @@ class ActorLifetimeEvent extends Event {
 
 	var mActorId:UInt = 0;
 
-	public function new(type:String, actorId:UInt, bubbles:Bool = false, cancelable:Bool = false) {
-		super(type, bubbles, cancelable);
+	public function new(actorLifetimeEventType:String, actorId:UInt, bubbles:Bool = false, cancelable:Bool = false) {
+		super(actorLifetimeEventType, bubbles, cancelable);
 		mActorId = actorId;
 	}
 

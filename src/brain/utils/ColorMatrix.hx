@@ -19,18 +19,9 @@ class ColorMatrix {
 
 	static inline final RAD:Float = 0.017453292519943295;
 
-	public static final COLOR_DEFICIENCY_TYPES:Array<ASAny> = [
-		"Protanopia",
-		"Protanomaly",
-		"Deuteranopia",
-		"Deuteranomaly",
-		"Tritanopia",
-		"Tritanomaly",
-		"Achromatopsia",
-		"Achromatomaly"
-	];
+	public static var COLOR_DEFICIENCY_TYPES:Array<ASAny>;
 
-	static final IDENTITY:Array<ASAny> = [1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0];
+	static var IDENTITY:Array<ASAny>;
 
 	public var matrix:Array<ASAny>;
 
@@ -616,5 +607,19 @@ class ColorMatrix {
 			postHue.rotateGreen(_loc2_);
 			postHue.rotateRed(-45);
 		}
+	}
+
+	static function __init__() {
+		COLOR_DEFICIENCY_TYPES = [
+			"Protanopia",
+			"Protanomaly",
+			"Deuteranopia",
+			"Deuteranomaly",
+			"Tritanopia",
+			"Tritanomaly",
+			"Achromatopsia",
+			"Achromatomaly"
+		];
+		IDENTITY = [1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0];
 	}
 }

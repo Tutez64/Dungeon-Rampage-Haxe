@@ -2,6 +2,7 @@ package uI.equipPicker;
 
 import account.ItemInfo;
 import account.StackableInfo;
+import brain.utils.TextUtil;
 import facade.DBFacade;
 import gameMasterDictionary.GMStackable;
 import flash.display.MovieClip;
@@ -10,8 +11,8 @@ class ConsumableEquipElement extends AvatarEquipElement {
 	var mStackableInfo:StackableInfo;
 
 	public function new(dbFacade:DBFacade, keyLabel:String, root:MovieClip, tooltipClass:Dynamic, unequipCallback:ASFunction, handleDropCallback:ASFunction,
-			equipSlot:UInt, clickedEquipedWeaponCallback:ASFunction = null, equipResponseCallback:ASFunction = null, allowEquipmentSwapping:Bool = false) {
-		super(dbFacade, keyLabel, root, tooltipClass, unequipCallback, handleDropCallback, equipSlot, clickedEquipedWeaponCallback, equipResponseCallback,
+			equipSlot:UInt, clickedEquippedWeaponCallback:ASFunction = null, equipResponseCallback:ASFunction = null, allowEquipmentSwapping:Bool = false) {
+		super(dbFacade, keyLabel, root, tooltipClass, unequipCallback, handleDropCallback, equipSlot, clickedEquippedWeaponCallback, equipResponseCallback,
 			allowEquipmentSwapping);
 		ASCompat.setProperty((mRoot : ASAny).textx, "visible", false);
 		ASCompat.setProperty((mRoot : ASAny).quantity, "visible", false);
@@ -41,7 +42,7 @@ class ConsumableEquipElement extends AvatarEquipElement {
 		}
 		ASCompat.setProperty((mRoot : ASAny).textx, "visible", true);
 		ASCompat.setProperty((mRoot : ASAny).quantity, "visible", true);
-		ASCompat.setProperty((mRoot : ASAny).quantity, "text", Std.string(count));
+		TextUtil.setText(ASCompat.coerce((mRoot : ASAny).quantity, flash.text.TextField), Std.string(count));
 	}
 
 	@:isVar public var stackableInfo(get, never):StackableInfo;

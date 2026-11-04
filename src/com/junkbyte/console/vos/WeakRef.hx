@@ -1,38 +1,27 @@
 package com.junkbyte.console.vos;
 
+import haxe.ds.WeakMap;
+
 class WeakRef {
-	var _val:ASAny;
+	public var _val:ASAny;
 
-	var _strong:Bool = false;
+	public var _strong:Bool = false;
 
-	public function new(ref:ASAny, strong:Bool = false) {
-		this._strong = strong;
-		this.reference = ref;
+	public function new(ref:ASAny = /*undefined*/ null, strong:Bool = false) {
+		_strong = strong;
+		set_reference(ref);
 	}
 
 	@:isVar public var reference(get, set):ASAny;
 
-	public function get_reference():ASAny {
-		var _loc1_:ASAny = /*undefined*/ null;
-		if (this._strong) {
-			return this._val;
-		}
-		var _loc2_ = 0;
-		var _loc3_:ASAny = this._val;
-		if (checkNullIteratee(_loc3_))
-			for (_tmp_ in _loc3_.___keys()) {
-				_loc1_ = _tmp_;
-				return _loc1_;
-			}
-		return null;
-	}
-
-	function set_reference(ref:ASAny):ASAny {
-		if (this._strong) {
-			this._val = ref;
+	public function set_reference(ref:ASAny):ASAny {
+		var _loc2_ = ASCompat.dynamicAs(null, WeakMap);
+		if (_strong) {
+			_val = ref;
 		} else {
-			this._val = new ASDictionary<ASAny, ASAny>(true);
-			this._val[ref] = null;
+			_loc2_ = new WeakMap<{}, ASAny>();
+			(_loc2_ : ASAny)[ref] = null;
+			_val = _loc2_;
 		}
 		return ref;
 	}
@@ -40,6 +29,21 @@ class WeakRef {
 	@:isVar public var strong(get, never):Bool;
 
 	public function get_strong():Bool {
-		return this._strong;
+		return _strong;
+	}
+
+	public function get_reference():ASAny {
+		var _loc1_:ASAny = ASCompat.dynamicAs(null, WeakMap);
+		var _loc2_:ASAny = null;
+		var _loc3_:ASAny = null;
+		if (_strong) {
+			return _val;
+		}
+		_loc1_ = _val;
+		_loc2_ = _loc1_.keys();
+		if (!ASCompat.toBool(_loc2_.hasNext())) {
+			return null;
+		}
+		return _loc2_.next();
 	}
 }

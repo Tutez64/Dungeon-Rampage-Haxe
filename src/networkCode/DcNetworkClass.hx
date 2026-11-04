@@ -30,14 +30,14 @@ class DcNetworkClass {
 	}
 
 	public function recvByIdLoop(packet:DcNetworkPacket) {
-		var _loc4_ = 0;
-		var _loc2_ = 0;
+		var _loc4_ = (0 : UInt);
+		var _loc2_ = (0 : UInt);
 		var _loc3_ = ASCompat.reinterpretAs(this, DcNetworkInterface);
 		if (!packet.eof()) {
-			_loc4_ = (packet.readUnsignedShort() : Int);
+			_loc4_ = packet.readUnsignedShort();
 			while (!packet.eof()) {
-				_loc2_ = (packet.readUnsignedShort() : Int);
-				_loc3_.recvById(packet, (_loc2_ : UInt));
+				_loc2_ = packet.readUnsignedShort();
+				_loc3_.recvById(packet, _loc2_);
 			}
 		}
 	}

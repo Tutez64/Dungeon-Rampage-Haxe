@@ -1,25 +1,35 @@
 package box2D.dynamics;
 
 class B2TimeStep {
-	public var dt:Float = Math.NaN;
-
-	public var inv_dt:Float = Math.NaN;
-
-	public var dtRatio:Float = Math.NaN;
+	public var warmStarting:Bool = false;
 
 	public var velocityIterations:Int = 0;
 
 	public var positionIterations:Int = 0;
 
-	public var warmStarting:Bool = false;
+	public var inv_dt:Float = Math.NaN;
 
-	public function new() {}
+	public var dtRatio:Float = Math.NaN;
+
+	public var dt:Float = Math.NaN;
+
+	public function new() {
+		positionIterations = 0;
+		velocityIterations = 0;
+		dtRatio = 0;
+		inv_dt = 0;
+		dt = 0;
+	}
+
+	public function set(step:B2TimeStep) {
+		Set(step);
+	}
 
 	public function Set(step:B2TimeStep) {
-		this.dt = step.dt;
-		this.inv_dt = step.inv_dt;
-		this.positionIterations = step.positionIterations;
-		this.velocityIterations = step.velocityIterations;
-		this.warmStarting = step.warmStarting;
+		dt = step.dt;
+		inv_dt = step.inv_dt;
+		positionIterations = step.positionIterations;
+		velocityIterations = step.velocityIterations;
+		warmStarting = step.warmStarting;
 	}
 }

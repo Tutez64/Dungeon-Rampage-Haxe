@@ -19,6 +19,8 @@ class FeatureFlag {
 
 	var _configFileAttributeName:String;
 
+	var storedSettingValue:UInt = 0;
+
 	var configFileValue:UInt = 0;
 
 	var dbValue:UInt = 0;
@@ -50,6 +52,7 @@ class FeatureFlag {
 		if (_configFileAttributeName.indexOf(" ") != -1) {
 			throw new ArgumentError("ConfigFileAttributeName  must not contain spaces");
 		}
+		this.storedSettingValue = (0 : UInt);
 		this.configFileValue = (0 : UInt);
 		this.dbValue = (0 : UInt);
 		this.cliValue = (0 : UInt);
@@ -59,6 +62,17 @@ class FeatureFlag {
 	public static function featureFlagFactory(name:String, defaultValue:Bool, commandLineFlag:String = null,
 			configFileAttributeName:String = null):FeatureFlag {
 		return new FeatureFlag(name, defaultValue, commandLineFlag, configFileAttributeName);
+	}
+
+	public function setStoredSettingValue(value:Bool) {
+		this.storedSettingValue = (value ? (2 : UInt) : (1 : UInt) : UInt);
+		this.updateCurrentValue();
+	}
+
+	public function clearPlayerValues() {
+		this.overrideValue = (0 : UInt);
+		this.storedSettingValue = (0 : UInt);
+		this.updateCurrentValue();
 	}
 
 	public function setConfigFileValue(value:Bool) {
@@ -90,6 +104,10 @@ class FeatureFlag {
 			this._currentValue = this.cliValue == 2;
 			return;
 		}
+		if (this.storedSettingValue != 0) {
+			this._currentValue = this.storedSettingValue == 2;
+			return;
+		}
 		if (this.dbValue != 0) {
 			this._currentValue = this.dbValue == 2;
 			return;
@@ -98,6 +116,7 @@ class FeatureFlag {
 			this._currentValue = this.configFileValue == 2;
 			return;
 		}
+		this._currentValue = this.defaultValue;
 	}
 
 	@:isVar public var currentValue(get, never):Bool;

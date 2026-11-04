@@ -8,7 +8,7 @@ import facade.DBFacade;
 class DBConfigManager extends ConfigManager {
 	var mFilePathsToOpen:Array<ASAny> = ["./DbConfiguration/Config.json"];
 
-	var mConfigsToLoad:Array<ASAny>;
+	var mConfigsToLoad:Array<ASAny> = [];
 
 	var mEventComponent:EventComponent;
 
@@ -17,7 +17,13 @@ class DBConfigManager extends ConfigManager {
 	public function new(dbFacade:DBFacade) {
 		mDBFacade = dbFacade;
 		mEventComponent = new EventComponent(mDBFacade);
-		mConfigsToLoad = mDBFacade.mAdditionalConfigFilesToLoad.concat(mFilePathsToOpen);
+		var _loc2_:String;
+		final __ax4_iter_518 = mFilePathsToOpen.concat(mDBFacade.mAdditionalConfigFilesToLoad);
+		if (checkNullIteratee(__ax4_iter_518))
+			for (_tmp_ in __ax4_iter_518) {
+				_loc2_ = _tmp_;
+				mConfigsToLoad.push(DBFacade.buildFullDownloadPath(_loc2_));
+			}
 		super(dbFacade, mConfigsToLoad, null, handleFailure);
 	}
 

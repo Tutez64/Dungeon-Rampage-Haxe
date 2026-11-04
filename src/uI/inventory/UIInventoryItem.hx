@@ -7,6 +7,7 @@ import brain.assetRepository.AssetLoadingComponent;
 import brain.logger.Logger;
 import brain.render.MovieClipRenderer;
 import brain.uI.UIButton;
+import brain.utils.TextUtil;
 import brain.workLoop.LogicalWorkComponent;
 import brain.workLoop.Task;
 import dBGlobals.DBGlobal;
@@ -65,7 +66,7 @@ class UIInventoryItem extends UIButton {
 		this.tooltipPos = new Point(0, this.root.height * -0.4);
 		mWeaponTooltip.visible = false;
 		mLogicalWorkComponent = new LogicalWorkComponent(mDBFacade, "UIInventoryItem");
-		mPressCallback = function() {
+		mReleaseCallback = function() {
 			mClickedCallback(mInfo);
 		};
 		equippable = mEquippable;
@@ -95,7 +96,7 @@ class UIInventoryItem extends UIButton {
 
 	public function set_info(info:InventoryBaseInfo):InventoryBaseInfo {
 		var _loc3_:ItemInfo = null;
-		var _loc2_ = 0;
+		var _loc2_ = (0 : UInt);
 		mInfo = info;
 		while (mIcon.numChildren != 0) {
 			mIcon.removeChildAt(0);
@@ -105,7 +106,7 @@ class UIInventoryItem extends UIButton {
 		if (mInfo != null) {
 			loadItemIcon();
 			mNewLabel.visible = mInfo.isNew;
-			mNewLabel.text = Locale.getString("INV_NEW");
+			Locale.setText(mNewLabel, "INV_NEW");
 			this.enabled = true;
 			_loc3_ = ASCompat.reinterpretAs(mInfo, ItemInfo);
 			if (_loc3_ != null && _loc3_.gmWeaponItem != null) {
@@ -113,8 +114,8 @@ class UIInventoryItem extends UIButton {
 				mWeaponTooltip.visible = true;
 			}
 			if (ASCompat.reinterpretAs(mInfo, StackableInfo) != null) {
-				_loc2_ = cast(mInfo, StackableInfo).count;
-				mStackCountLabel.text = "x" + Std.string(_loc2_);
+				_loc2_ = (cast(mInfo, StackableInfo).count : UInt);
+				TextUtil.setText(mStackCountLabel, "x" + Std.string(_loc2_));
 				mStackCountLabel.visible = true;
 			}
 		} else {

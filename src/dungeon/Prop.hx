@@ -8,6 +8,8 @@ import dr_floor.FloorObject;
 import gameMasterDictionary.GMProp;
 import flash.display.MovieClip;
 import flash.geom.Vector3D;
+import starling.extensions.animate.Animation;
+import starling.textures.Texture;
 
 class Prop extends FloorObject {
 	var mPropView:PropView;
@@ -15,6 +17,8 @@ class Prop extends FloorObject {
 	var mAssetClassName:String;
 
 	var mConstant:String;
+
+	var mDisposed:Bool = false;
 
 	public function new(dbFacade:DBFacade, remoteId:UInt = (0 : UInt)) {
 		super(dbFacade, remoteId);
@@ -79,13 +83,48 @@ class Prop extends FloorObject {
 
 	override public function set_distributedDungeonFloor(value:DistributedDungeonFloor):DistributedDungeonFloor {
 		super.distributedDungeonFloor = value;
-		this.distributedDungeonFloor.dungeonFloorFactory.tileFactory.propFactory.createProp(this.constant, assetLoaded);
+		this.distributedDungeonFloor.dungeonFloorFactory.tileFactory.propFactory.createProp(this.constant, assetLoaded, textureLoaded, animationLoaded);
 		return value;
 	}
 
 	override function updateTile() {}
 
+	function textureLoaded(propTexture:Texture) {
+		if (!checkValidCallback() || mDistributedDungeonFloor == null) {
+			return;
+		}
+		var _loc2_ = mDistributedDungeonFloor.dungeonFloorFactory.tileFactory.starlingViewFactory;
+		var _loc4_ = this.view.root.rotation * 3.141592653589793 / 180;
+		var _loc3_:String = this.layer == 5 ? "normal" : null;
+		var _loc5_ = _loc2_.onTextureAssetLoaded(propTexture, this.constant, mPosition.x, mPosition.y, this.view.root.scaleX, this.view.root.scaleY, _loc4_,
+			mTile.isOnStage, this.layer, _loc3_);
+		if (_loc5_ != null) {
+			mPropView.starlingView = _loc5_;
+			mTile.expandBoundsRect(_loc5_.getBounds(_loc5_.parent));
+		}
+		this.createNavCollisions(this.constant);
+	}
+
+	function animationLoaded(propAnimation:Animation) {
+		if (!checkValidCallback() || mDistributedDungeonFloor == null) {
+			return;
+		}
+		var _loc2_ = mDistributedDungeonFloor.dungeonFloorFactory.tileFactory.starlingViewFactory;
+		var _loc4_ = this.view.root.rotation * 3.141592653589793 / 180;
+		var _loc3_:String = this.layer == 5 ? "normal" : null;
+		var _loc5_ = _loc2_.onAnimationLoaded(propAnimation, this.constant, mPosition.x, mPosition.y, this.view.root.scaleX, this.view.root.scaleY, _loc4_,
+			mTile.isOnStage, this.layer, _loc3_);
+		if (_loc5_ != null) {
+			mPropView.starlingView = _loc5_;
+			mTile.expandBoundsRect(_loc5_.getBounds(_loc5_.parent));
+		}
+		this.createNavCollisions(this.constant);
+	}
+
 	function assetLoaded(propMovieClip:MovieClip) {
+		if (!checkValidCallback()) {
+			return;
+		}
 		mPropView.body = propMovieClip;
 		mPropView.root.name = "PropView_" + this.constant + "_" + this.id;
 		if (propMovieClip.totalFrames == 1 && !mDBFacade.featureFlags.getFlagValue("want-zoom")) {
@@ -101,6 +140,13 @@ class Prop extends FloorObject {
 		this.createNavCollisions(this.constant);
 	}
 
+	function checkValidCallback():Bool {
+		if (mDisposed || mPropView == null) {
+			return false;
+		}
+		return true;
+	}
+
 	override function buildView() {
 		mPropView = new PropView(mDBFacade, this);
 		MemoryTracker.track(mPropView, "PropView - created in Prop.buildView()");
@@ -108,6 +154,7 @@ class Prop extends FloorObject {
 	}
 
 	override public function destroy() {
+		mDisposed = true;
 		mPropView = null;
 		super.destroy();
 	}

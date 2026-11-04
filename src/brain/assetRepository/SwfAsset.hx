@@ -3,7 +3,6 @@ package brain.assetRepository;
 import brain.logger.Logger;
 import flash.display.MovieClip;
 #if cpp
-import brain.clock.GameClock;
 import flash.display.DisplayObject;
 import flash.display.DisplayObjectContainer;
 import flash.media.Sound;
@@ -41,15 +40,9 @@ class SwfAsset extends Asset {
 
 	var mSwfPath:String;
 
-	var mHdRootClip:MovieClip = null;
-
-	var mHdSwfPath:String = null;
-
 	#if cpp
 	var mPreprocessedLibraryName:String = null;
 	var mPreprocessedLibrary:AssetLibrary = null;
-	var mHdPreprocessedLibraryName:String = null;
-	var mHdPreprocessedLibrary:AssetLibrary = null;
 	var mPreprocessedRootObject:MovieClip = null;
 	var mRootInstancePropertiesApplied:Bool = false;
 	#end
@@ -69,23 +62,13 @@ class SwfAsset extends Asset {
 		mRootClip = null;
 		mSwfPath = null;
 		mPreprocessedLibrary = null;
-		mHdPreprocessedLibrary = null;
 		if (mPreprocessedRootObject != null) {
 			unloadSwfRoot(mPreprocessedRootObject);
 			mPreprocessedRootObject = null;
 		}
-		if (mHdRootClip != null) {
-			unloadSwfRoot(mHdRootClip);
-			mHdRootClip = null;
-		}
-		mHdSwfPath = null;
 		#else
 		mRootClip.loaderInfo.loader.unloadAndStop();
 		mRootClip = null;
-		if (mHdRootClip != null) {
-			mHdRootClip.loaderInfo.loader.unloadAndStop();
-			mHdRootClip = null;
-		}
 		#end
 	}
 
@@ -93,26 +76,6 @@ class SwfAsset extends Asset {
 
 	public function get_swfPath():String {
 		return mSwfPath;
-	}
-
-	public function setHdAsset(hdRootClip:MovieClip, hdSwfPath:String) {
-		mHdRootClip = hdRootClip;
-		mHdSwfPath = hdSwfPath;
-		#if cpp
-		mHdPreprocessedLibraryName = getPreprocessedLibraryId(hdSwfPath);
-		#end
-	}
-
-	@:isVar public var hasHdAsset(get, never):Bool;
-
-	public function get_hasHdAsset():Bool {
-		return mHdRootClip != null;
-	}
-
-	@:isVar public var hdSwfPath(get, never):String;
-
-	public function get_hdSwfPath():String {
-		return mHdSwfPath;
 	}
 
 	@:isVar public var root(get, never):MovieClip;
@@ -143,11 +106,7 @@ class SwfAsset extends Asset {
 
 	public function getClass(className:String, suppressWarnings:Bool = false):Dynamic {
 		#if cpp
-		var hdDomain = getApplicationDomain(mHdRootClip);
 		var rootDomain = getApplicationDomain(mRootClip);
-		if (hdDomain != null && hdDomain.hasDefinition(className)) {
-			return (hdDomain.getDefinition(className) : Dynamic);
-		}
 		if (rootDomain != null && rootDomain.hasDefinition(className)) {
 			return (rootDomain.getDefinition(className) : Dynamic);
 		}
@@ -161,28 +120,19 @@ class SwfAsset extends Asset {
 					+ " while looking for class: "
 					+ className
 					+ ". rootType="
-					+ objectTypeName(mRootClip)
-					+ (mHdRootClip != null ? " hdRootType=" + objectTypeName(mHdRootClip) : ""));
+					+ objectTypeName(mRootClip));
 			} else {
 				Logger.warn("Could not find class name: "
 					+ className
 					+ " in SwfAsset "
-					+ mSwfPath
-					+ (mHdSwfPath != null ? " or HD asset " + mHdSwfPath : ""));
+					+ mSwfPath);
 			}
 		}
 		return Type.resolveClass(className);
 		#else
-		if (mHdRootClip != null && mHdRootClip.loaderInfo.applicationDomain.hasDefinition(className)) {
-			return (mHdRootClip.loaderInfo.applicationDomain.getDefinition(className) : Dynamic);
-		}
 		if (!mRootClip.loaderInfo.applicationDomain.hasDefinition(className)) {
 			if (!suppressWarnings) {
-				Logger.warn("Could not find class name: "
-					+ className
-					+ " in SwfAsset "
-					+ mRootClip.loaderInfo.url
-					+ (mHdRootClip != null ? " or HD asset " + mHdRootClip.loaderInfo.url : ""));
+				Logger.warn("Could not find class name: \'" + className + "\' in SwfAsset " + mRootClip.loaderInfo.url);
 			}
 			return null;
 		}
@@ -244,7 +194,7 @@ class SwfAsset extends Asset {
 		if (className == null) {
 			return false;
 		}
-		return libraryHasPreprocessedSymbol(mHdPreprocessedLibrary, className) || libraryHasPreprocessedSymbol(mPreprocessedLibrary, className);
+		return libraryHasPreprocessedSymbol(mPreprocessedLibrary, className);
 	}
 
 	function libraryHasPreprocessedSymbol(library:AssetLibrary, className:String):Bool {
@@ -256,10 +206,6 @@ class SwfAsset extends Asset {
 
 	function instantiatePreprocessedSymbol(className:String):Dynamic {
 		ensurePreprocessedLibrariesLoaded();
-		var instance = instantiatePreprocessedFromSource(mHdPreprocessedLibrary, mHdPreprocessedLibraryName, className);
-		if (instance != null) {
-			return instance;
-		}
 		return instantiatePreprocessedFromSource(mPreprocessedLibrary, mPreprocessedLibraryName, className);
 	}
 
@@ -294,9 +240,6 @@ class SwfAsset extends Asset {
 	}
 
 	function ensurePreprocessedLibrariesLoaded():Void {
-		if (mHdPreprocessedLibrary == null && mHdPreprocessedLibraryName != null) {
-			mHdPreprocessedLibrary = loadPreprocessedLibrarySync(mHdPreprocessedLibraryName, mHdSwfPath);
-		}
 		if (mPreprocessedLibrary == null && mPreprocessedLibraryName != null) {
 			mPreprocessedLibrary = loadPreprocessedLibrarySync(mPreprocessedLibraryName, mSwfPath);
 		}
@@ -718,7 +661,6 @@ class SwfAsset extends Asset {
 		}
 		library = cast Assets.getLibrary(libraryId);
 		if (library != null) {
-			applyLegacyTimelineFrameRate(library);
 			sLoadedPreprocessedLibraries.set(libraryId, library);
 			return library;
 		}
@@ -730,7 +672,6 @@ class SwfAsset extends Asset {
 			if (Std.isOfType(library, AnimateLibrary)) {
 				cast(library, AnimateLibrary).load();
 			}
-			applyLegacyTimelineFrameRate(library);
 			Assets.registerLibrary(libraryId, library);
 			sLoadedPreprocessedLibraries.set(libraryId, library);
 			return library;
@@ -746,13 +687,6 @@ class SwfAsset extends Asset {
 		}
 		sFailedPreprocessedLibraries.set(libraryId, true);
 		return null;
-	}
-
-	static function applyLegacyTimelineFrameRate(library:AssetLibrary):Void {
-		var animateLibrary:AnimateLibrary = Std.isOfType(library, AnimateLibrary) ? cast library : null;
-		if (animateLibrary != null) {
-			@:privateAccess animateLibrary.frameRate = GameClock.LEGACY_STAGE_FRAME_RATE;
-		}
 	}
 
 	static function getPreprocessedBundlePath(libraryId:String):String {
@@ -794,9 +728,6 @@ class SwfAsset extends Asset {
 		var found:DisplayObject = null;
 		var simpleName:String = null;
 		container = ASCompat.dynamicAs(mRootClip, DisplayObjectContainer);
-		if (container == null) {
-			container = ASCompat.dynamicAs(mHdRootClip, DisplayObjectContainer);
-		}
 		if (container == null) {
 			return null;
 		}

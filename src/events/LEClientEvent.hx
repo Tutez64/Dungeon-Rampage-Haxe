@@ -7,8 +7,8 @@ class LEClientEvent extends Event {
 
 	public var eventName:String = "";
 
-	public function new(type:String, bubbles:Bool = false, cancelable:Bool = false) {
+	public function new(inType:String, bubbles:Bool = false, cancelable:Bool = false) {
 		super("SEND_EVENT", bubbles, cancelable);
-		eventName = type;
+		eventName = inType;
 	}
 }

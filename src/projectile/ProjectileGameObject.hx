@@ -19,6 +19,7 @@ import combat.weapon.WeaponGameObject;
 import dBGlobals.DBGlobal;
 import distributedObjects.DistributedDungeonFloor;
 import distributedObjects.HeroGameObjectOwner;
+import distributedObjects.NPCGameObject;
 import dungeon.NavCollider;
 import facade.DBFacade;
 import dr_floor.FloorObject;
@@ -90,9 +91,11 @@ class ProjectileGameObject extends FloorObject implements IContactResolver {
 
 	var mLastHitWall:Bool = false;
 
+	var mFloorIsShuttingDown:Bool = false;
+
 	var mRange:Float = 0;
 
-	public function new(dbFacade:DBFacade, actorId:UInt, actorTeam:UInt, attackType:UInt, weapon:WeaponGameObject, distDungeonfloor:DistributedDungeonFloor,
+	public function new(dbFacade:DBFacade, actorId:UInt, actorTeam:UInt, attackType:UInt, weapon:WeaponGameObject, distDungeonFloor:DistributedDungeonFloor,
 			collisionPosition:Vector3D, directionVector:Vector3D, visualOffset:Vector3D, range:Float = 0, effectObject:ASObject = null,
 			combatResultCallback:ASFunction = null, autoAim:Bool = true, dontRotate:Bool = false, generation:UInt = (0 : UInt)) {
 		mCombatResultCallback = combatResultCallback;
@@ -118,7 +121,7 @@ class ProjectileGameObject extends FloorObject implements IContactResolver {
 		mCollisionScale = weapon != null ? weapon.collisionScale() : 1;
 		mRange = range == 0 ? mGMProjectile.Range : range;
 		super(dbFacade);
-		this.layer = mGMProjectile.NoFade == true ? 46 : 20;
+		this.layer = mGMProjectile.NoFade ? 46 : 20;
 		if (mEffectObject.layer == "foreground") {
 			this.layer = 30;
 		} else if (mEffectObject.layer == "background") {
@@ -126,7 +129,8 @@ class ProjectileGameObject extends FloorObject implements IContactResolver {
 		} else if (mEffectObject.layer == "sorted") {
 			this.layer = 20;
 		}
-		distributedDungeonFloor = distDungeonfloor;
+		distributedDungeonFloor = distDungeonFloor;
+		mDistributedDungeonFloor.registerProjectile(this);
 		mWeaponGameObject = weapon;
 		var _loc22_ = (0 : UInt);
 		var _loc23_ = (0 : UInt);
@@ -146,19 +150,19 @@ class ProjectileGameObject extends FloorObject implements IContactResolver {
 		var _loc17_ = new B2CircleShape(mGMProjectile.CollisionSize * mCollisionScale / 50);
 		_loc19_.shape = _loc17_;
 		var _loc20_ = new B2FilterData();
-		_loc20_.categoryBits = (2 : UInt);
-		_loc20_.maskBits = (0 : UInt);
+		_loc20_.categoryBits = (DBGlobal.B2D_COMBAT_MASK : Int);
+		_loc20_.maskBits = 0;
 		_loc20_.groupIndex = -1;
 		if (mGMProjectile.CollisionSize > 0) {
 			switch (mGMAttack.Team) {
 				case "FRIENDLY":
-					_loc20_.maskBits = ((_loc20_.maskBits | DBGlobal.b2dMaskForTeam(mParentActorTeam):UInt) : UInt);
+					_loc20_.maskBits = _loc20_.maskBits | (DBGlobal.b2dMaskForTeam(mParentActorTeam) : Int);
 
 				case "HOSTILE":
-					_loc20_.maskBits = ((_loc20_.maskBits | DBGlobal.b2dMaskForAllTeamsBut(mParentActorTeam):UInt) : UInt);
+					_loc20_.maskBits = _loc20_.maskBits | (DBGlobal.b2dMaskForAllTeamsBut(mParentActorTeam) : Int);
 			}
 		}
-		_loc20_.maskBits = ((_loc20_.maskBits | (1 : UInt):UInt) : UInt);
+		_loc20_.maskBits = _loc20_.maskBits | (DBGlobal.B2D_ENVIRONMENT_MASK : Int);
 		_loc19_.filter = _loc20_;
 		_loc19_.isSensor = true;
 		_loc19_.userData = this.id;
@@ -422,20 +426,34 @@ class ProjectileGameObject extends FloorObject implements IContactResolver {
 		}
 	}
 
+	public function destroyForFloorShutdown() {
+		mFloorIsShuttingDown = true;
+		destroy();
+	}
+
 	override public function destroy() {
+		var _loc1_:ActorGameObject = null;
 		var _loc2_:GMNpc = null;
 		var _loc3_:HeroGameObjectOwner = null;
-		if (mGMAttack.SetTeleport) {
-			setTeleDest();
+		if (mIsDestroyed) {
+			return;
 		}
-		if (ASCompat.stringAsBool(mGMAttack.AttackOnHit)) {
-			doAttackOnHit();
+		if (!mFloorIsShuttingDown) {
+			if (mGMAttack.SetTeleport) {
+				setTeleDest();
+			}
+			if (ASCompat.stringAsBool(mGMAttack.AttackOnHit)) {
+				doAttackOnHit();
+			}
+			_loc1_ = mDistributedDungeonFloor.getActor(mParentActorId);
+			if (_loc1_ != null && _loc1_.isOwner && mGMProjectile != null && ASCompat.stringAsBool(mGMProjectile.OnDeathNPC)) {
+				_loc2_ = ASCompat.coerce(mDBFacade.gameMaster.npcByConstant.itemFor(mGMProjectile.OnDeathNPC), gameMasterDictionary.GMNpc);
+				_loc3_ = ASCompat.reinterpretAs(_loc1_, HeroGameObjectOwner);
+				_loc3_.ProposeCreateNPC(_loc2_.Id, (this.weapon.slot : UInt), ASCompat.floatToInt(position.x), ASCompat.floatToInt(position.y));
+			}
 		}
-		var _loc1_ = mDistributedDungeonFloor.getActor(mParentActorId);
-		if (_loc1_ != null && _loc1_.isOwner && mGMProjectile != null && ASCompat.stringAsBool(mGMProjectile.OnDeathNPC)) {
-			_loc2_ = ASCompat.coerce(mDBFacade.gameMaster.npcByConstant.itemFor(mGMProjectile.OnDeathNPC), gameMasterDictionary.GMNpc);
-			_loc3_ = ASCompat.reinterpretAs(_loc1_, HeroGameObjectOwner);
-			_loc3_.ProposeCreateNPC(_loc2_.Id, (this.weapon.slot : UInt), ASCompat.floatToInt(position.x), ASCompat.floatToInt(position.y));
+		if (mDistributedDungeonFloor != null) {
+			mDistributedDungeonFloor.unregisterProjectile(this);
 		}
 		mIsAlive = false;
 		mWeaponGameObject = null;
@@ -468,6 +486,20 @@ class ProjectileGameObject extends FloorObject implements IContactResolver {
 			mCollisionComponent = null;
 		}
 		super.destroy();
+	}
+
+	@:isVar public var belongsToRemotePlayer(get, never):Bool;
+
+	public function get_belongsToRemotePlayer():Bool {
+		var _loc1_ = ASCompat.coerce(mDistributedDungeonFloor != null ? mDistributedDungeonFloor.getActor(mParentActorId) : null, actor.ActorGameObject);
+		return _loc1_ != null && _loc1_.belongsToRemotePlayer;
+	}
+
+	@:isVar public var backgroundLoadTier(get, never):Int;
+
+	public function get_backgroundLoadTier():Int {
+		var _loc1_ = ASCompat.coerce(mDistributedDungeonFloor != null ? mDistributedDungeonFloor.getActor(mParentActorId) : null, actor.ActorGameObject);
+		return Std.isOfType(_loc1_, NPCGameObject) ? 4 : 2;
 	}
 
 	@:isVar public var parentActorSkinId(get, never):UInt;

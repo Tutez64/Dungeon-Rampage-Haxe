@@ -1,6 +1,7 @@
 package uI.shop;
 
 import brain.uI.UIButton;
+import dBGlobals.DBGlobal;
 import facade.DBFacade;
 import facade.GameMasterLocale;
 import gameMasterDictionary.GMHero;
@@ -30,7 +31,7 @@ class UIShopSkinOffer extends UIShopOffer {
 	}
 
 	override function get_nativeIconSize():Float {
-		return 72;
+		return DBGlobal.HERO_ICON_NATIVE_SIZE;
 	}
 
 	override function get_offerDescription():String {

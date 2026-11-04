@@ -6,10 +6,12 @@ import brain.assetRepository.AssetLoadingComponent;
 import brain.assetRepository.SwfAsset;
 import brain.logger.Logger;
 import brain.uI.UIObject;
+import brain.utils.TextUtil;
 import facade.DBFacade;
 import gameMasterDictionary.GMRarity;
 import gameMasterDictionary.GMWeaponItem;
 import uI.inventory.UIWeaponTooltip;
+import uI.portrait.PlayerPortraits;
 import flash.display.MovieClip;
 import flash.geom.Point;
 
@@ -18,6 +20,8 @@ class II_UIChampionsboardSlot {
 
 	public static inline final LINKAGE_NAME = "leaderboard_slot";
 
+	var mPortraits:PlayerPortraits = new PlayerPortraits();
+
 	var mDBFacade:DBFacade;
 
 	var mNum:Int = 0;
@@ -25,8 +29,6 @@ class II_UIChampionsboardSlot {
 	var mRoot:MovieClip;
 
 	var mAssetLoadingComponent:AssetLoadingComponent;
-
-	var mIconMC:MovieClip;
 
 	var mWeaponSlotA:UIObject;
 
@@ -57,8 +59,8 @@ class II_UIChampionsboardSlot {
 	}
 
 	public function setDungeonDetails(nodeId:Int, friendInfo:FriendInfo, isLocalPlayer:Bool) {
-		ASCompat.setProperty((mRoot : ASAny).friend_name, "text", friendInfo.name);
-		ASCompat.setProperty((mRoot : ASAny).player01_number, "text", friendInfo.getIILeaderboardScoreForNode(nodeId));
+		TextUtil.setText(ASCompat.coerce((mRoot : ASAny).friend_name, flash.text.TextField), friendInfo.name);
+		TextUtil.setText(ASCompat.coerce((mRoot : ASAny).player01_number, flash.text.TextField), Std.string(friendInfo.getIILeaderboardScoreForNode(nodeId)));
 		ASCompat.setProperty((mRoot : ASAny).friend_pic.you_online, "visible", isLocalPlayer);
 		loadAvatarSkinPic(friendInfo.getIILeaderboardAvatarSkinForNode(nodeId));
 		loadWeaponsUsed(friendInfo.getWeaponsUsedForNode((nodeId : UInt)));
@@ -123,22 +125,15 @@ class II_UIChampionsboardSlot {
 	}
 
 	public function setDungeonDetailsForTopTwenty(playerName:String, playerScore:Int, playerAvatarSkin:Int, weaponsJson:Array<Dynamic>) {
-		ASCompat.setProperty((mRoot : ASAny).friend_name, "text", playerName);
-		ASCompat.setProperty((mRoot : ASAny).player01_number, "text", playerScore);
+		TextUtil.setText(ASCompat.coerce((mRoot : ASAny).friend_name, flash.text.TextField), playerName);
+		TextUtil.setText(ASCompat.coerce((mRoot : ASAny).player01_number, flash.text.TextField), Std.string(playerScore));
 		loadAvatarSkinPic(playerAvatarSkin);
 		loadWeaponsUsed(weaponsJson);
 	}
 
 	function loadAvatarSkinPic(skinId:Int) {
-		var gmSkin = mDBFacade.gameMaster.getSkinByType((skinId : UInt));
-		var swfPath = gmSkin.UISwfFilepath;
-		var iconName = gmSkin.IconName;
-		mAssetLoadingComponent.getSwfAsset(DBFacade.buildFullDownloadPath(swfPath), function(param1:SwfAsset) {
-			var _loc2_ = param1.getClass(iconName);
-			mIconMC = ASCompat.dynamicAs(ASCompat.createInstance(_loc2_, []), MovieClip);
-			(mRoot : ASAny).friend_pic.default_pic.addChild(mIconMC);
-			mIconMC.scaleX = mIconMC.scaleY = 0.5;
-		});
+		var _loc2_ = mPortraits.show(ASCompat.coerce((mRoot : ASAny).friend_pic.default_pic, flash.display.DisplayObjectContainer), mDBFacade, (skinId : UInt));
+		_loc2_.scaleX = _loc2_.scaleY = 0.5;
 	}
 
 	@:isVar public var root(get, never):MovieClip;
@@ -148,10 +143,7 @@ class II_UIChampionsboardSlot {
 	}
 
 	public function destroy() {
-		if (mIconMC != null) {
-			(mRoot : ASAny).friend_pic.default_pic.removeChild(mIconMC);
-			mIconMC = null;
-		}
+		mPortraits.destroy();
 		mAssetLoadingComponent.destroy();
 		mAssetLoadingComponent = null;
 		mRoot = null;

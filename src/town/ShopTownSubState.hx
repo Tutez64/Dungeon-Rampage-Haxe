@@ -21,10 +21,8 @@ class ShopTownSubState extends TownSubState {
 			mUIShop.animateEntry();
 		}
 		mTownStateMachine.townHeader.showCloseButton(true);
-		super.resetHeaderLinks();
-		super.setupHeaderLinks();
 		mDBFacade.menuNavigationController.pushNewLayer("SHOP_MENU", mTownStateMachine.townHeader.determineCallback, mTownStateMachine.townHeader.closeButton,
-			mTownStateMachine.townHeader.closeButton);
+			mTownStateMachine.townHeader.closeButton, mUIShop.showPreviousCategory, mUIShop.showNextCategory);
 	}
 
 	override function setupHeaderLinks() {}
@@ -43,7 +41,9 @@ class ShopTownSubState extends TownSubState {
 
 	override function setupState() {
 		super.setupState();
-		mUIShop = new UIShop(mDBFacade, mTownStateMachine.townSwf, mRootMovieClip, mTownStateMachine.townHeader);
+		mUIShop = new UIShop(mDBFacade, mTownStateMachine.townSwf, mRootMovieClip, mTownStateMachine.townHeader, function():Bool {
+			return mTownStateMachine.currentStateName == "ShopTownSubState";
+		});
 	}
 
 	@:isVar public var startAtCategoryTab(never, set):String;

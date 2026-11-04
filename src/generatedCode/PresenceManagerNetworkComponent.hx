@@ -8,9 +8,9 @@ import networkCode.DcNetworkPacket;
 class PresenceManagerNetworkComponent extends DcNetworkClass implements DcNetworkInterface {
 	var the_instance:PresenceManager;
 
-	public static inline final FLID_friendState = (188 : UInt);
+	public static inline final FLID_friendState = (196 : UInt);
 
-	public static inline final FLID_addFriends = (189 : UInt);
+	public static inline final FLID_addFriends = (197 : UInt);
 
 	public function new(Inst:PresenceManager, gs:GeneratedDcSocket, id:UInt) {
 		super(Inst, gs, id);
@@ -27,7 +27,7 @@ class PresenceManagerNetworkComponent extends DcNetworkClass implements DcNetwor
 	}
 
 	override public function recvById(packet:DcNetworkPacket, fieldid:UInt) {
-		switch (fieldid - 188) {
+		switch (fieldid - 196) {
 			case 0:
 				recv_friendState(packet);
 
@@ -54,15 +54,15 @@ class PresenceManagerNetworkComponent extends DcNetworkClass implements DcNetwor
 	public function send_addFriends(who:Vector<UInt>) {
 		var whofunc:ASFunction;
 		var outpacket = new DcNetworkPacket();
-		Prepare_FieldUpdate(outpacket, (189 : UInt));
+		Prepare_FieldUpdate(outpacket, (197 : UInt));
 		whofunc = function() {
-			var _loc2_ = 0;
+			var _loc2_ = (0 : UInt);
 			var _loc3_ = (who.length : UInt);
 			var _loc1_ = outpacket;
 			outpacket = new DcNetworkPacket();
-			_loc2_ = 0;
-			while ((_loc2_ : UInt) < _loc3_) {
-				outpacket.writeUnsignedInt(who[_loc2_]);
+			_loc2_ = (0 : UInt);
+			while (_loc2_ < _loc3_) {
+				outpacket.writeUnsignedInt(who[(_loc2_ : Int)]);
 				_loc2_++;
 			}
 			_loc1_.writeShort((outpacket.length : Int));

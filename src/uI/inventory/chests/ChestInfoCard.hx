@@ -15,6 +15,7 @@ import brain.sceneGraph.SceneGraphComponent;
 import brain.uI.UIButton;
 import brain.uI.UIObject;
 import brain.utils.MemoryTracker;
+import brain.utils.TextUtil;
 import facade.DBFacade;
 import facade.GameMasterLocale;
 import facade.Locale;
@@ -89,12 +90,15 @@ class ChestInfoCard extends UIObject {
 
 	var mKeepChestCallbackDS:ASFunction;
 
+	var mIsActiveCallback:ASFunction;
+
 	var mDontUpdateChestInfo:Bool = false;
 
 	public var selectedHeroId:UInt = 0;
 
 	public function new(dbFacade:DBFacade, sceneGraphComponent:SceneGraphComponent, root:MovieClip, abandonChestCallback:ASFunction,
-			openChestCallback:ASFunction, abandonChestCallbackDS:ASFunction, openChestCallbackDS:ASFunction, keepChestCallbackDS:ASFunction) {
+			openChestCallback:ASFunction, abandonChestCallbackDS:ASFunction, openChestCallbackDS:ASFunction, keepChestCallbackDS:ASFunction,
+			isActiveCallback:ASFunction = null) {
 		super(dbFacade, root);
 		mDBFacade = dbFacade;
 		mSceneGraphComponent = sceneGraphComponent;
@@ -105,6 +109,7 @@ class ChestInfoCard extends UIObject {
 		mOpenChestCallbackDS = openChestCallbackDS;
 		mAbandonChestCallbackDS = abandonChestCallbackDS;
 		mKeepChestCallbackDS = keepChestCallbackDS;
+		mIsActiveCallback = isActiveCallback;
 		setupChestCardUI();
 		setupKeyCardUI();
 		hide();
@@ -115,27 +120,27 @@ class ChestInfoCard extends UIObject {
 		ASCompat.setProperty((mChestCardMC : ASAny).selection_01, "visible", true);
 		ASCompat.setProperty((mChestCardMC : ASAny).selection_02, "visible", false);
 		mChestCardAbandonButton = new UIButton(mDBFacade, ASCompat.coerce((mChestCardMC : ASAny).selection_01.abandon, flash.display.MovieClip));
-		mChestCardAbandonButton.label.text = Locale.getString("ABANDON");
+		Locale.setText(mChestCardAbandonButton.label, "ABANDON");
 		mChestCardAbandonButton.releaseCallback = function() {
 			mAbandonChestCallback(mChestInfo);
 		};
 		mChestCardOpenButton = new UIButton(mDBFacade, ASCompat.coerce((mChestCardMC : ASAny).selection_01.open, flash.display.MovieClip));
-		mChestCardOpenButton.label.text = Locale.getString("UNLOCK");
+		Locale.setText(mChestCardOpenButton.label, "UNLOCK");
 		mChestCardOpenButton.releaseCallback = function() {
 			mOpenChestCallback(mChestInfo);
 		};
 		mChestCardAbandonButtonDS = new UIButton(mDBFacade, ASCompat.coerce((mChestCardMC : ASAny).selection_02.abandon, flash.display.MovieClip));
-		mChestCardAbandonButtonDS.label.text = Locale.getString("ABANDON");
+		Locale.setText(mChestCardAbandonButtonDS.label, "ABANDON");
 		mChestCardAbandonButtonDS.releaseCallback = function() {
 			mAbandonChestCallbackDS(mChestInfo);
 		};
 		mChestCardOpenButtonDS = new UIButton(mDBFacade, ASCompat.coerce((mChestCardMC : ASAny).selection_02.open, flash.display.MovieClip));
-		mChestCardOpenButtonDS.label.text = Locale.getString("UNLOCK");
+		Locale.setText(mChestCardOpenButtonDS.label, "UNLOCK");
 		mChestCardOpenButtonDS.releaseCallback = function() {
 			mOpenChestCallbackDS(mChestInfo);
 		};
 		mChestCardKeepButtonDS = new UIButton(mDBFacade, ASCompat.coerce((mChestCardMC : ASAny).selection_02.keep, flash.display.MovieClip));
-		mChestCardKeepButtonDS.label.text = Locale.getString("KEEP");
+		Locale.setText(mChestCardKeepButtonDS.label, "KEEP");
 		mChestCardKeepButtonDS.releaseCallback = function() {
 			mKeepChestCallbackDS(mChestInfo);
 		};
@@ -147,7 +152,7 @@ class ChestInfoCard extends UIObject {
 	function setupKeyCardUI() {
 		if (ASCompat.toBool((root : ASAny).chest_card_keys)) {
 			mChestKeysMC = ASCompat.coerce((root : ASAny).chest_card_keys, flash.display.MovieClip);
-			ASCompat.setProperty((mChestKeysMC : ASAny).label, "text", Locale.getString("KEYS_OWNED"));
+			Locale.setText(ASCompat.coerce((mChestKeysMC : ASAny).label, flash.text.TextField), "KEYS_OWNED");
 			mChestKeySlots = new Vector<ChestKeySlot>();
 		}
 	}
@@ -182,7 +187,8 @@ class ChestInfoCard extends UIObject {
 
 	public function refreshChestInfoUI() {
 		loadIcon();
-		ASCompat.setProperty((mChestCardMC : ASAny).label, "text", GameMasterLocale.getGameMasterSubString("CHEST_NAME", mChestInfo.gmChestInfo.Rarity));
+		TextUtil.setText(ASCompat.coerce((mChestCardMC : ASAny).label, flash.text.TextField),
+			GameMasterLocale.getGameMasterSubString("CHEST_NAME", mChestInfo.gmChestInfo.Rarity));
 		if (mChestInfo.isFromDungeonSummary()) {
 			ASCompat.setProperty((mChestCardMC : ASAny).selection_01, "visible", false);
 			ASCompat.setProperty((mChestCardMC : ASAny).selection_02, "visible", true);
@@ -190,6 +196,57 @@ class ChestInfoCard extends UIObject {
 			ASCompat.setProperty((mChestCardMC : ASAny).selection_01, "visible", true);
 			ASCompat.setProperty((mChestCardMC : ASAny).selection_02, "visible", false);
 		}
+	}
+
+	public function setupMenuNavigation(returnObject:UIObject) {
+		mChestCardAbandonButton.clearNavigationAndInteractions();
+		mChestCardOpenButton.clearNavigationAndInteractions();
+		mChestCardAbandonButtonDS.clearNavigationAndInteractions();
+		mChestCardOpenButtonDS.clearNavigationAndInteractions();
+		mChestCardKeepButtonDS.clearNavigationAndInteractions();
+		if (mChestInfo == null || returnObject == null) {
+			return;
+		}
+		if (mChestInfo.isFromDungeonSummary()) {
+			mChestCardOpenButtonDS.downNavigation = mChestCardKeepButtonDS;
+			mChestCardKeepButtonDS.upNavigation = mChestCardOpenButtonDS;
+			mChestCardAbandonButtonDS.upNavigation = mChestCardOpenButtonDS;
+			mChestCardAbandonButtonDS.isToTheLeftOf(mChestCardKeepButtonDS);
+		} else {
+			mChestCardOpenButton.isAbove(mChestCardAbandonButton);
+			mChestCardOpenButton.rightNavigation = returnObject;
+			mChestCardAbandonButton.rightNavigation = returnObject;
+		}
+	}
+
+	@:isVar public var menuEntryButton(get, never):UIButton;
+
+	public function get_menuEntryButton():UIButton {
+		return mChestInfo != null && mChestInfo.isFromDungeonSummary() ? mChestCardKeepButtonDS : mChestCardOpenButton;
+	}
+
+	@:isVar public var dungeonSummaryAbandonButton(get, never):UIButton;
+
+	public function get_dungeonSummaryAbandonButton():UIButton {
+		return mChestCardAbandonButtonDS;
+	}
+
+	@:isVar public var inventoryAbandonButton(get, never):UIButton;
+
+	public function get_inventoryAbandonButton():UIButton {
+		return mChestCardAbandonButton;
+	}
+
+	@:isVar public var dungeonSummaryUnlockButton(get, never):UIButton;
+
+	public function get_dungeonSummaryUnlockButton():UIButton {
+		return mChestCardOpenButtonDS;
+	}
+
+	@:isVar public var dungeonSummaryKeepButton(get, never):UIButton;
+
+	public function get_dungeonSummaryKeepButton():UIButton {
+		return mChestCardKeepButtonDS;
 	}
 
 	public function refreshKeyInfoUI() {
@@ -236,7 +293,7 @@ class ChestInfoCard extends UIObject {
 		if (mc == null) {
 			mc = mChestCardMC;
 		}
-		ASCompat.setProperty((mc : ASAny).hero_label, "text", Locale.getString("OPENING_WITH"));
+		Locale.setText(ASCompat.coerce((mc : ASAny).hero_label, flash.text.TextField), "OPENING_WITH");
 		mSelectedHero = mDBFacade.gameMaster.Heroes[(selectedHeroId : Int)];
 		mHeroInfo = mDBFacade.dbAccountInfo.inventoryInfo.getAvatarInfoForHeroType(mSelectedHero.Id);
 		if (mHeroInfo == null) {
@@ -333,15 +390,15 @@ class ChestInfoCard extends UIObject {
 		}
 	}
 
-	public function showBuyKeysPopUp(swfAsset:SwfAsset) {
+	public function showBuyKeysPopUp() {
 		mSceneGraphComponent.fadeOut(0.5, 0.75);
-		mChestBuyKeysPopUp = new ChestBuyKeysPopUp(mDBFacade, mAssetLoadingComponent, mSceneGraphComponent, swfAsset, mChestInfo.gmChestInfo,
-			chestBuyCoinCallback, chestBuyGemCallback, closeBuyKeysPopUp, refreshHeroInfoUI);
+		mChestBuyKeysPopUp = new ChestBuyKeysPopUp(mDBFacade, mChestInfo.gmChestInfo, chestBuyCoinCallback, chestBuyGemCallback, closeBuyKeysPopUp,
+			refreshHeroInfoUI);
 	}
 
 	function chestBuyCoinCallback(val:Float):ASFunction {
 		return function() {
-			var _loc1_ = 0;
+			var _loc1_ = (0 : UInt);
 			mDBFacade.metrics.log("ChestUnlockCoinTry", {
 				"chestId": mChestInfo.gmId,
 				"rarity": mChestInfo.rarity,
@@ -354,11 +411,11 @@ class ChestInfoCard extends UIObject {
 					"category": "storage"
 				});
 				closeBuyKeysPopUp();
-				mPurchasingPopUp = new DBUIPopup(mDBFacade, Locale.getString("PURCHASING..."));
+				mPurchasingPopUp = new DBUIPopup(mDBFacade, "", Locale.getString("PURCHASING..."));
 				MemoryTracker.track(mPurchasingPopUp, "DBUIPopup - created in ChestInfoCard.chestBuyCoinCallback()");
 				mSceneGraphComponent.addChild(mPurchasingPopUp.root, (50 : UInt));
-				_loc1_ = (mKeyThatCanOpenChest.gmKeyOffer.Id : Int);
-				StoreServices.purchaseOffer(mDBFacade, (_loc1_ : UInt), boughtKey, boughtKeyError, (0 : UInt), false);
+				_loc1_ = mKeyThatCanOpenChest.gmKeyOffer.Id;
+				StoreServices.purchaseOffer(mDBFacade, _loc1_, boughtKey, boughtKeyError, (0 : UInt), false);
 			} else {
 				mDontUpdateChestInfo = true;
 				StoreServicesController.showCoinPage(mDBFacade);
@@ -368,7 +425,7 @@ class ChestInfoCard extends UIObject {
 
 	function chestBuyGemCallback(val:Float):ASFunction {
 		return function() {
-			var _loc1_ = 0;
+			var _loc1_ = (0 : UInt);
 			mDBFacade.metrics.log("ChestUnlockGemTry", {
 				"chestId": mChestInfo.gmId,
 				"rarity": mChestInfo.rarity,
@@ -381,11 +438,11 @@ class ChestInfoCard extends UIObject {
 					"category": "storage"
 				});
 				closeBuyKeysPopUp();
-				mPurchasingPopUp = new DBUIPopup(mDBFacade, Locale.getString("PURCHASING..."));
+				mPurchasingPopUp = new DBUIPopup(mDBFacade, "", Locale.getString("PURCHASING..."));
 				MemoryTracker.track(mPurchasingPopUp, "DBUIPopup - created in ChestInfoCard.chestBuyGemCallback()");
 				mSceneGraphComponent.addChild(mPurchasingPopUp.root, (50 : UInt));
-				_loc1_ = (mKeyThatCanOpenChest.gmKeyOffer.Id : Int);
-				StoreServices.purchaseOffer(mDBFacade, (_loc1_ : UInt), boughtKey, boughtKeyError, (0 : UInt), false);
+				_loc1_ = mKeyThatCanOpenChest.gmKeyOffer.Id;
+				StoreServices.purchaseOffer(mDBFacade, _loc1_, boughtKey, boughtKeyError, (0 : UInt), false);
 			} else {
 				mDontUpdateChestInfo = true;
 				StoreServicesController.showCashPage(mDBFacade, "chestOpenWithGemsAttemptStorage");
@@ -394,15 +451,23 @@ class ChestInfoCard extends UIObject {
 	}
 
 	function boughtKey(details:ASAny) {
-		mSceneGraphComponent.removeChild(mPurchasingPopUp.root);
-		mPurchasingPopUp.destroy();
-		mPurchasingPopUp = null;
+		if (mSceneGraphComponent == null) {
+			return;
+		}
+		if (mPurchasingPopUp != null) {
+			mSceneGraphComponent.removeChild(mPurchasingPopUp.root);
+			mPurchasingPopUp.destroy();
+			mPurchasingPopUp = null;
+		}
+		if (mIsActiveCallback != null && !ASCompat.toBool(mIsActiveCallback())) {
+			return;
+		}
 		mChestCanBeOpened = true;
 		mOpenChestCallback(mChestInfo);
 	}
 
 	function boughtKeyError(err:ASAny) {
-		mPurchasingPopUp = new DBUIPopup(mDBFacade, Locale.getString("Error with Key Purchase. Server Error!"));
+		mPurchasingPopUp = new DBUIPopup(mDBFacade, "", Locale.getString("Error with Key Purchase. Server Error!"));
 		MemoryTracker.track(mPurchasingPopUp, "DBUIPopup - created in ChestInfoCard.boughtKeyError()");
 		mSceneGraphComponent.addChild(mPurchasingPopUp.root, (50 : UInt));
 	}

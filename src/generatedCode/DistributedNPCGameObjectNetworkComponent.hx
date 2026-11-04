@@ -9,37 +9,37 @@ import flash.geom.Vector3D;
 class DistributedNPCGameObjectNetworkComponent extends DcNetworkClass implements DcNetworkInterface {
 	var the_instance:DistributedNPCGameObject;
 
-	public static inline final FLID_type = (130 : UInt);
+	public static inline final FLID_type = (131 : UInt);
 
-	public static inline final FLID_level = (131 : UInt);
+	public static inline final FLID_level = (132 : UInt);
 
-	public static inline final FLID_position = (132 : UInt);
+	public static inline final FLID_position = (133 : UInt);
 
-	public static inline final FLID_heading = (133 : UInt);
+	public static inline final FLID_heading = (134 : UInt);
 
-	public static inline final FLID_scale = (134 : UInt);
+	public static inline final FLID_scale = (135 : UInt);
 
-	public static inline final FLID_flip = (135 : UInt);
+	public static inline final FLID_flip = (136 : UInt);
 
-	public static inline final FLID_hitPoints = (136 : UInt);
+	public static inline final FLID_hitPoints = (137 : UInt);
 
-	public static inline final FLID_weaponDetails = (137 : UInt);
+	public static inline final FLID_weaponDetails = (138 : UInt);
 
-	public static inline final FLID_state = (138 : UInt);
+	public static inline final FLID_state = (139 : UInt);
 
-	public static inline final FLID_team = (139 : UInt);
+	public static inline final FLID_team = (140 : UInt);
 
-	public static inline final FLID_layer = (140 : UInt);
+	public static inline final FLID_layer = (141 : UInt);
 
-	public static inline final FLID_remoteTriggerState = (141 : UInt);
+	public static inline final FLID_remoteTriggerState = (142 : UInt);
 
-	public static inline final FLID_masterId = (142 : UInt);
+	public static inline final FLID_masterId = (143 : UInt);
 
-	public static inline final FLID_ReceiveAttackChoreography = (143 : UInt);
+	public static inline final FLID_ReceiveAttackChoreography = (144 : UInt);
 
-	public static inline final FLID_ReceiveCombatResult = (144 : UInt);
+	public static inline final FLID_ReceiveCombatResult = (145 : UInt);
 
-	public static inline final FLID_ReceiveTimelineAction = (145 : UInt);
+	public static inline final FLID_ReceiveTimelineAction = (146 : UInt);
 
 	public function new(Inst:DistributedNPCGameObject, gs:GeneratedDcSocket, id:UInt) {
 		super(Inst, gs, id);
@@ -56,7 +56,7 @@ class DistributedNPCGameObjectNetworkComponent extends DcNetworkClass implements
 	}
 
 	override public function recvById(packet:DcNetworkPacket, fieldid:UInt) {
-		switch (fieldid - 130) {
+		switch (fieldid - 131) {
 			case 0:
 				recv_type(packet);
 
@@ -173,12 +173,12 @@ class DistributedNPCGameObjectNetworkComponent extends DcNetworkClass implements
 
 	public function recv_weaponDetails(packet:DcNetworkPacket) {
 		var v_weaponDetails = (function(param1:DcNetworkPacket):Vector<WeaponDetails> {
-			var _loc3_ = 0;
+			var _loc3_ = (0 : UInt);
 			var _loc5_:WeaponDetails = null;
 			var _loc4_ = new Vector<WeaponDetails>();
 			var _loc2_ = (4 : UInt);
-			_loc3_ = 0;
-			while ((_loc3_ : UInt) < _loc2_) {
+			_loc3_ = (0 : UInt);
+			while (_loc3_ < _loc2_) {
 				_loc5_ = WeaponDetails.readFromPacket(param1);
 				_loc4_.push(_loc5_);
 				_loc3_++;

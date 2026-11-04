@@ -3,9 +3,9 @@ package actor.nPC;
 import actor.ActorRenderer;
 import actor.ActorView;
 import brain.sound.SoundAsset;
+import dBGlobals.DBGlobal;
 import distributedObjects.NPCGameObject;
 import facade.DBFacade;
-import flash.display.Sprite;
 import flash.geom.Vector3D;
 
 class NPCView extends ActorView {
@@ -23,8 +23,8 @@ class NPCView extends ActorView {
 
 	var mDeactivateSoundEffect:SoundAsset;
 
-	public function new(facade:DBFacade, npcGameObject:NPCGameObject) {
-		super(facade, npcGameObject);
+	public function new(dbFacade:DBFacade, npcGameObject:NPCGameObject) {
+		super(dbFacade, npcGameObject);
 		mParentNPCObject = npcGameObject;
 		HIT_AREA_HALF_WIDTH = mDBFacade.dbConfigManager.getConfigNumber("enemy_hit_area_half_width", 100);
 		HIT_AREA_HALF_HEIGHT = mDBFacade.dbConfigManager.getConfigNumber("enemy_hit_area_half_height", 100);
@@ -32,7 +32,6 @@ class NPCView extends ActorView {
 	}
 
 	override public function init() {
-		var hitSprite:Sprite;
 		mWantNametag = mParentNPCObject.gmNpc.HasHealthbar;
 		super.init();
 		if (!mParentNPCObject.isAttackable) {
@@ -40,25 +39,18 @@ class NPCView extends ActorView {
 			mRoot.mouseChildren = false;
 		}
 		if (mParentNPCObject.gmNpc.IsMover) {
-			hitSprite = new Sprite();
-			hitSprite.mouseEnabled = false;
-			hitSprite.graphics.beginFill((0 : UInt), 0);
-			hitSprite.graphics.drawRect(-HIT_AREA_HALF_WIDTH, -HIT_AREA_HALF_HEIGHT + ActorView.BODY_Y_OFFSET + HIT_AREA_Y_OFFSET, HIT_AREA_HALF_WIDTH * 2,
+			setFixedMouseHitRect(-HIT_AREA_HALF_WIDTH, -HIT_AREA_HALF_HEIGHT + ActorView.BODY_Y_OFFSET + HIT_AREA_Y_OFFSET, HIT_AREA_HALF_WIDTH * 2,
 				HIT_AREA_HALF_HEIGHT * 2);
-			hitSprite.graphics.endFill();
-			hitSprite.name = "NPCViewRoot.hitArea";
 			root.mouseChildren = false;
-			root.hitArea = hitSprite;
-			root.addChild(root.hitArea);
 		}
 		if (ASCompat.stringAsBool(mParentNPCObject.gmNpc.ActivateSound)) {
-			mAssetLoadingComponent.getSoundAsset(DBFacade.buildFullDownloadPath("Resources/Audio/soundEffects.swf"), mParentNPCObject.gmNpc.ActivateSound,
+			mAssetLoadingComponent.getSoundAsset(DBFacade.buildFullDownloadPath(DBGlobal.SFX_PATH), mParentNPCObject.gmNpc.ActivateSound,
 				function(param1:SoundAsset) {
 					mActivateSoundEffect = param1;
 				});
 		}
 		if (ASCompat.stringAsBool(mParentNPCObject.gmNpc.DeactivateSound)) {
-			mAssetLoadingComponent.getSoundAsset(DBFacade.buildFullDownloadPath("Resources/Audio/soundEffects.swf"), mParentNPCObject.gmNpc.DeactivateSound,
+			mAssetLoadingComponent.getSoundAsset(DBFacade.buildFullDownloadPath(DBGlobal.SFX_PATH), mParentNPCObject.gmNpc.DeactivateSound,
 				function(param1:SoundAsset) {
 					mDeactivateSoundEffect = param1;
 				});
@@ -84,7 +76,6 @@ class NPCView extends ActorView {
 			mBodyOffAnimRenderer = null;
 		}
 		mParentNPCObject = null;
-		root.hitArea = null;
 		super.destroy();
 	}
 
@@ -129,9 +120,15 @@ class NPCView extends ActorView {
 			}
 			if (mBodyOffAnimRenderer != null) {
 				mBodyOffAnimRenderer.stop();
+				mBodyOffAnimRenderer.setLayer(0);
+				mBodyOffAnimRenderer.visible = false;
 			}
 			if (mBodyAnimRenderer != null) {
-				mBodyAnimRenderer.play(mAnimName, 0, true);
+				if (mSceneGraphComponent.contains(root, (this.layer : UInt))) {
+					mBodyAnimRenderer.setLayer(this.layer);
+				}
+				mBodyAnimRenderer.visible = true;
+				mBodyAnimRenderer.play(mAnimName, 0, _loc2_, mBodyAnimRenderer.loop);
 			}
 		} else {
 			initOffRenderer();
@@ -145,9 +142,15 @@ class NPCView extends ActorView {
 			}
 			if (mBodyAnimRenderer != null) {
 				mBodyAnimRenderer.stop();
+				mBodyAnimRenderer.setLayer(0);
+				mBodyAnimRenderer.visible = false;
 			}
 			if (mBodyOffAnimRenderer != null) {
-				mBodyOffAnimRenderer.play(mAnimName, 0, true);
+				if (mSceneGraphComponent.contains(root, (this.layer : UInt))) {
+					mBodyOffAnimRenderer.setLayer(this.layer);
+				}
+				mBodyOffAnimRenderer.visible = true;
+				mBodyOffAnimRenderer.play(mAnimName, 0, _loc2_, mBodyOffAnimRenderer.loop);
 			}
 			if (_loc2_) {
 				mouseOverUnhighlight();

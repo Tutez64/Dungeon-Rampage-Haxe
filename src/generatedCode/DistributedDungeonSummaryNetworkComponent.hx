@@ -8,29 +8,29 @@ import networkCode.DcNetworkPacket;
 class DistributedDungeonSummaryNetworkComponent extends DcNetworkClass implements DcNetworkInterface {
 	var the_instance:DistributedDungeonSummary;
 
-	public static inline final FLID_map_node_id = (274 : UInt);
+	public static inline final FLID_map_node_id = (283 : UInt);
 
-	public static inline final FLID_report = (275 : UInt);
+	public static inline final FLID_report = (284 : UInt);
 
-	public static inline final FLID_dungeon_name = (276 : UInt);
+	public static inline final FLID_dungeon_name = (285 : UInt);
 
-	public static inline final FLID_dungeonSuccess = (277 : UInt);
+	public static inline final FLID_dungeonSuccess = (286 : UInt);
 
-	public static inline final FLID_dungeonMod1 = (278 : UInt);
+	public static inline final FLID_dungeonMod1 = (287 : UInt);
 
-	public static inline final FLID_dungeonMod2 = (279 : UInt);
+	public static inline final FLID_dungeonMod2 = (288 : UInt);
 
-	public static inline final FLID_dungeonMod3 = (280 : UInt);
+	public static inline final FLID_dungeonMod3 = (289 : UInt);
 
-	public static inline final FLID_dungeonMod4 = (281 : UInt);
+	public static inline final FLID_dungeonMod4 = (290 : UInt);
 
-	public static inline final FLID_OpenChest = (282 : UInt);
+	public static inline final FLID_OpenChest = (291 : UInt);
 
-	public static inline final FLID_TakeChest = (283 : UInt);
+	public static inline final FLID_TakeChest = (292 : UInt);
 
-	public static inline final FLID_DropChest = (284 : UInt);
+	public static inline final FLID_DropChest = (293 : UInt);
 
-	public static inline final FLID_TransactionResponse = (285 : UInt);
+	public static inline final FLID_TransactionResponse = (294 : UInt);
 
 	public function new(Inst:DistributedDungeonSummary, gs:GeneratedDcSocket, id:UInt) {
 		super(Inst, gs, id);
@@ -47,7 +47,7 @@ class DistributedDungeonSummaryNetworkComponent extends DcNetworkClass implement
 	}
 
 	override public function recvById(packet:DcNetworkPacket, fieldid:UInt) {
-		switch (fieldid - 274) {
+		switch (fieldid - 283) {
 			case 0:
 				recv_map_node_id(packet);
 
@@ -148,7 +148,7 @@ class DistributedDungeonSummaryNetworkComponent extends DcNetworkClass implement
 
 	public function send_OpenChest(account_id:UInt, slot:UInt) {
 		var _loc3_ = new DcNetworkPacket();
-		Prepare_FieldUpdate(_loc3_, (282 : UInt));
+		Prepare_FieldUpdate(_loc3_, (291 : UInt));
 		_loc3_.writeUnsignedInt(account_id);
 		_loc3_.writeUnsignedInt(slot);
 		Send_packet(_loc3_);
@@ -156,7 +156,7 @@ class DistributedDungeonSummaryNetworkComponent extends DcNetworkClass implement
 
 	public function send_TakeChest(account_id:UInt, slot:UInt) {
 		var _loc3_ = new DcNetworkPacket();
-		Prepare_FieldUpdate(_loc3_, (283 : UInt));
+		Prepare_FieldUpdate(_loc3_, (292 : UInt));
 		_loc3_.writeUnsignedInt(account_id);
 		_loc3_.writeUnsignedInt(slot);
 		Send_packet(_loc3_);
@@ -164,7 +164,7 @@ class DistributedDungeonSummaryNetworkComponent extends DcNetworkClass implement
 
 	public function send_DropChest(account_id:UInt, slot:UInt) {
 		var _loc3_ = new DcNetworkPacket();
-		Prepare_FieldUpdate(_loc3_, (284 : UInt));
+		Prepare_FieldUpdate(_loc3_, (293 : UInt));
 		_loc3_.writeUnsignedInt(account_id);
 		_loc3_.writeUnsignedInt(slot);
 		Send_packet(_loc3_);

@@ -5,6 +5,7 @@ import brain.assetRepository.SwfAsset;
 import brain.logger.Logger;
 import brain.uI.UIButton;
 import brain.utils.MemoryTracker;
+import brain.utils.TextUtil;
 import dBGlobals.DBGlobal;
 import facade.DBFacade;
 import flash.display.MovieClip;
@@ -23,7 +24,7 @@ class UIWhatsNewPopup extends DBUITwoButtonPopup {
 
 	var mLoadingPopUp:DBUIPopup;
 
-	var mImageRetreived:Bool = false;
+	var mImageRetrieved:Bool = false;
 
 	var mUseCurtain:Bool = true;
 
@@ -40,9 +41,9 @@ class UIWhatsNewPopup extends DBUITwoButtonPopup {
 			};
 		}
 		mUseCurtain = !showPagination;
-		super(dbFacade, titleText, messageText, mainText, mainCallback, webText, webCallback);
-		if (!mImageRetreived) {
-			mLoadingPopUp = new DBUIPopup(mDBFacade, "LOADING");
+		super(dbFacade, "WHATS_NEW_POPUP", titleText, messageText, mainText, mainCallback, webText, webCallback);
+		if (!mImageRetrieved) {
+			mLoadingPopUp = new DBUIPopup(mDBFacade, "", "LOADING");
 			MemoryTracker.track(mLoadingPopUp, "DBUIPopup - created in UIWhatsNewPopup.UIWhatsNewPopup()");
 		}
 		if (!showPagination) {
@@ -52,7 +53,7 @@ class UIWhatsNewPopup extends DBUITwoButtonPopup {
 			ASCompat.setProperty((mPopup : ASAny).left_button, "visible", false);
 			mLeftButton = new UIButton(mDBFacade, ASCompat.coerce((mPopup : ASAny).left_button_news, flash.display.MovieClip));
 			mLeftButton.rolloverFilter = DBGlobal.UI_ROLLOVER_FILTER;
-			mLeftButton.label.text = mLeftText;
+			TextUtil.setText(mLeftButton.label, mLeftText);
 			mLeftButton.releaseCallback = function() {
 				close(mLeftCallback);
 			};
@@ -91,7 +92,7 @@ class UIWhatsNewPopup extends DBUITwoButtonPopup {
 			mImageLocator.addChild(param1.image);
 			param1.image.x = param1.image.width * -0.5;
 			param1.image.y = param1.image.height * -0.5;
-			mImageRetreived = true;
+			mImageRetrieved = true;
 		}, function() {
 			if (mLoadingPopUp != null) {
 				mLoadingPopUp.destroy();

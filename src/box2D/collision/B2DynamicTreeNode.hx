@@ -1,19 +1,33 @@
 package box2D.collision;
 
 class B2DynamicTreeNode {
-	public var userData:ASAny;
+	public static var currentID:Int = 0;
 
-	public var aabb:B2AABB = new B2AABB();
+	public var userData:ASAny;
 
 	public var parent:B2DynamicTreeNode;
 
-	public var child1:B2DynamicTreeNode;
+	public var id:Int = 0;
 
 	public var child2:B2DynamicTreeNode;
 
-	public function new() {}
+	public var child1:B2DynamicTreeNode;
+
+	public var aabb:B2AABB;
+
+	public function new() {
+		aabb = new B2AABB();
+		var _temp_1 = B2DynamicTreeNode;
+		var _loc1_:Int;
+		ASCompat.setProperty(_temp_1, "currentID", (_loc1_ = ASCompat.toInt(_temp_1.currentID)) + 1);
+		id = _loc1_;
+	}
+
+	public function isLeaf():Bool {
+		return IsLeaf();
+	}
 
 	public function IsLeaf():Bool {
-		return this.child1 == null;
+		return child1 == null;
 	}
 }

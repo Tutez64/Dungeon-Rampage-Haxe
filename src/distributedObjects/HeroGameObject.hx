@@ -2,6 +2,7 @@ package distributedObjects;
 
 import actor.ActorData;
 import actor.ActorGameObject;
+import actor.DamageCurve;
 import actor.HeroData;
 import actor.player.HeroStateMachine;
 import actor.player.HeroView;
@@ -10,11 +11,12 @@ import brain.logger.Logger;
 import brain.utils.MemoryTracker;
 import combat.attack.AttackTimeline;
 import combat.weapon.ConsumableWeaponGameObject;
+import dBGlobals.DBGlobal;
 import events.BusterPointsEvent;
 import events.ExperienceEvent;
-import events.FacebookLevelUpPostEvent;
 import events.GameObjectEvent;
 import events.HpEvent;
+import events.LevelUpPostEvent;
 import events.ManaEvent;
 import facade.DBFacade;
 import facade.Locale;
@@ -37,6 +39,16 @@ class HeroGameObject extends ActorGameObject implements IHeroGameObject {
 
 	public static inline final LEGENDARY_MOD_ACCELERATION = (3 : UInt);
 
+	public static inline final LEGENDARY_MOD_BEASTMASTER = (4 : UInt);
+
+	public static inline final LEGENDARY_MOD_BARRIER = (10 : UInt);
+
+	public static inline final LEGENDARY_MOD_COVER = (11 : UInt);
+
+	public static inline final LEGENDARY_MOD_COMPREHENSION = (12 : UInt);
+
+	static inline final LEGENDARY_MOD_DEFENSE:Float = 0.5;
+
 	public static inline final MAX_HEALTH_BOMBS_PER_DUNGEON = (3 : UInt);
 
 	public static inline final MAX_PARTY_BOMBS_PER_DUNGEON = (3 : UInt);
@@ -52,6 +64,8 @@ class HeroGameObject extends ActorGameObject implements IHeroGameObject {
 	var mBusterPoints:UInt = 0;
 
 	var mExperiencePoints:UInt = 0;
+
+	var mAscensionLevel:UInt = 0;
 
 	var mHeroView:HeroView;
 
@@ -73,11 +87,19 @@ class HeroGameObject extends ActorGameObject implements IHeroGameObject {
 
 	var mHealthBombsUsed:UInt = (0 : UInt);
 
-	var mStaminaModMultiplier:Float = Math.NaN;
+	var mStaminaModMultiplier:Float = 0;
 
-	var mAptitudeModMultiplier:Float = Math.NaN;
+	var mAptitudeModMultiplier:Float = 0;
 
-	var mAccelerationModMultiplier:Float = Math.NaN;
+	var mAccelerationModMultiplier:Float = 0;
+
+	var mBeastMasterModMultiplier:Float = 0;
+
+	var mBarrierModMultiplier:Float = 0;
+
+	var mCoverModMultiplier:Float = 0;
+
+	var mComprehensionModMultiplier:Float = 0;
 
 	var mConsumableDetails:Vector<ConsumableDetails>;
 
@@ -92,6 +114,10 @@ class HeroGameObject extends ActorGameObject implements IHeroGameObject {
 
 	override function processJsonNavCollisions(navCollisions:Array<ASAny>, addFunc:ASFunction) {
 		super.processJsonNavCollisions(navCollisions, addFunc);
+	}
+
+	override public function get_belongsToRemotePlayer():Bool {
+		return !isOwner;
 	}
 
 	override function buildView() {
@@ -150,9 +176,9 @@ class HeroGameObject extends ActorGameObject implements IHeroGameObject {
 		mHeroStateMachine.destroy();
 		mHeroStateMachine = null;
 		var _loc1_:ConsumableWeaponGameObject;
-		final __ax4_iter_227 = mConsumableWeapons;
-		if (checkNullIteratee(__ax4_iter_227))
-			for (_tmp_ in __ax4_iter_227) {
+		final __ax4_iter_317 = mConsumableWeapons;
+		if (checkNullIteratee(__ax4_iter_317))
+			for (_tmp_ in __ax4_iter_317) {
 				_loc1_ = _tmp_;
 				if (_loc1_ != null) {
 					_loc1_.destroy();
@@ -188,7 +214,6 @@ class HeroGameObject extends ActorGameObject implements IHeroGameObject {
 			mGMSkin = mDBFacade.gameMaster.getSkinByConstant(gMHero.DefaultSkin);
 			if (mGMSkin == null) {
 				Logger.error("Unable to find default skin with constant: " + gMHero.DefaultSkin);
-				return val;
 			}
 		}
 		return val;
@@ -223,15 +248,19 @@ class HeroGameObject extends ActorGameObject implements IHeroGameObject {
 
 	public function set_experiencePoints(exp:UInt):UInt {
 		var _loc2_ = mLevel;
+		var _loc3_ = (ASCompat.toInt(actorData != null ? this.gMHero.getBaseLevelFromExp(mExperiencePoints) : 0) : UInt);
 		mExperiencePoints = exp;
 		if (actorData != null) {
-			this.level = this.gMHero.getLevelFromExp(mExperiencePoints);
+			this.level = this.gMHero.getLevelFromExp(mExperiencePoints, mAscensionLevel);
+			if (this.gMHero.getBaseLevelFromExp(mExperiencePoints) != _loc3_) {
+				refreshStatVector();
+			}
 		}
 		if (mLevel != _loc2_) {
 			mHeroView.playHeroLevelUpEffects();
-			mDBFacade.steamAchievementsManager.setHeroLevelStat(mLevel, this.gMHero);
 			if (Std.isOfType(this, HeroGameObjectOwner)) {
-				mFacade.eventManager.dispatchEvent(new FacebookLevelUpPostEvent("FacebookLevelUpPostEvent", mLevel));
+				mDBFacade.steamAchievementsHelper.updateHeroLevelStat(this.gMHero.Constant, mLevel, mAscensionLevel);
+				mFacade.eventManager.dispatchEvent(new LevelUpPostEvent("LevelUpPostEvent", mLevel));
 			}
 		}
 		mFacade.eventManager.dispatchEvent(new ExperienceEvent("ExperienceEvent_EXPERIENCE_UPDATE", id, mExperiencePoints));
@@ -254,6 +283,16 @@ class HeroGameObject extends ActorGameObject implements IHeroGameObject {
 		return mExperiencePoints;
 	}
 
+	@:isVar public var ascensionLevel(get, set):UInt;
+
+	public function set_ascensionLevel(val:UInt):UInt {
+		return mAscensionLevel = val;
+	}
+
+	function get_ascensionLevel():UInt {
+		return mAscensionLevel;
+	}
+
 	@:isVar public var maxBusterPoints(get, set):UInt;
 
 	public function set_maxBusterPoints(val:UInt):UInt {
@@ -269,7 +308,7 @@ class HeroGameObject extends ActorGameObject implements IHeroGameObject {
 	@:isVar public var healthBombUsesRemaining(get, never):Int;
 
 	public function get_healthBombUsesRemaining():Int {
-		var _loc1_:Float = 3 - mHealthBombsUsed;
+		var _loc1_ = 3 - (mHealthBombsUsed : Float);
 		if (_loc1_ < 0) {
 			Logger.warn("More healthbombs have been consumed than allowed in limited use dungeons.");
 			_loc1_ = 0;
@@ -280,7 +319,7 @@ class HeroGameObject extends ActorGameObject implements IHeroGameObject {
 	@:isVar public var partyBombUsesRemaining(get, never):Int;
 
 	public function get_partyBombUsesRemaining():Int {
-		var _loc1_:Float = 3 - mPartyBombsUsed;
+		var _loc1_ = 3 - (mPartyBombsUsed : Float);
 		if (_loc1_ < 0) {
 			Logger.warn("More partybombs have been consumed than allowed in limited use dungeons.");
 			_loc1_ = 0;
@@ -291,7 +330,11 @@ class HeroGameObject extends ActorGameObject implements IHeroGameObject {
 	@:isVar public var healthBombsUsed(never, set):UInt;
 
 	public function set_healthBombsUsed(val:UInt):UInt {
-		return mHealthBombsUsed = val;
+		mHealthBombsUsed = val;
+		if (isOwner) {
+			mDBFacade.steamAchievementsHelper.setHighestStatValueAchieved((mHealthBombsUsed : Int), "MOST_HEALTH_BOMBS_IN_DUNGEON");
+		}
+		return val;
 	}
 
 	@:isVar public var partyBombsUsed(never, set):UInt;
@@ -315,6 +358,7 @@ class HeroGameObject extends ActorGameObject implements IHeroGameObject {
 	}
 
 	override public function postGenerate() {
+		processLegendaryModifiers();
 		super.postGenerate();
 		mFacade.eventManager.dispatchEvent(new ManaEvent("ManaEvent_MANA_UPDATE", id, mMana, (ASCompat.floatToInt(this.maxManaPoints) : UInt)));
 		mFacade.eventManager.dispatchEvent(new BusterPointsEvent("BusterPointEvent_BUSTER_POINTS_UPDATE", id, mBusterPoints, mMaxBusterPoints));
@@ -330,17 +374,20 @@ class HeroGameObject extends ActorGameObject implements IHeroGameObject {
 				ShowPlayerisTyping(false);
 			}
 		});
-		processLegendaryModifiers();
 	}
 
 	public function processLegendaryModifiers() {
 		mStaminaModMultiplier = 0;
 		mAptitudeModMultiplier = 0;
 		mAccelerationModMultiplier = 0;
+		mBeastMasterModMultiplier = 0;
+		mBarrierModMultiplier = 0;
+		mCoverModMultiplier = 0;
+		mComprehensionModMultiplier = 0;
 		var _loc1_:WeaponDetails;
-		final __ax4_iter_228 = mWeaponDetails;
-		if (checkNullIteratee(__ax4_iter_228))
-			for (_tmp_ in __ax4_iter_228) {
+		final __ax4_iter_318 = mWeaponDetails;
+		if (checkNullIteratee(__ax4_iter_318))
+			for (_tmp_ in __ax4_iter_318) {
 				_loc1_ = _tmp_;
 				switch (_loc1_.legendarymodifier - 1) {
 					case 0:
@@ -351,8 +398,26 @@ class HeroGameObject extends ActorGameObject implements IHeroGameObject {
 
 					case 2:
 						mAccelerationModMultiplier += 0.1;
+
+					case 3:
+						mBeastMasterModMultiplier += 10 + _loc1_.requiredlevel * 0.9;
+
+					case 9:
+						mBarrierModMultiplier = 0.5;
+
+					case 10:
+						mCoverModMultiplier = 0.5;
+
+					case 11:
+						mComprehensionModMultiplier = 0.5;
 				}
 			}
+	}
+
+	@:isVar public var beastMasterModMultiplier(get, never):Float;
+
+	public function get_beastMasterModMultiplier():Float {
+		return mBeastMasterModMultiplier;
 	}
 
 	override public function get_maxHitPoints():Float {
@@ -402,31 +467,43 @@ class HeroGameObject extends ActorGameObject implements IHeroGameObject {
 	}
 
 	override function refreshStatVector() {
-		var _loc7_:Int;
-		var _loc8_:Float;
-		var _loc3_ = 0;
-		var _loc5_ = 0;
-		var _loc1_ = gMHero;
-		this.level = _loc1_.getLevelFromExp(mExperiencePoints);
-		var _loc2_ = new StatVector();
-		_loc3_ = 0;
-		while (_loc3_ < 4) {
-			_loc5_ = 0;
-			while (_loc5_ < _loc1_.UpgradeToSlotOffset[_loc3_].length) {
-				_loc7_ = _loc1_.UpgradeToSlotOffset[_loc3_][_loc5_];
-				_loc8_ = _loc2_.values[_loc7_] + mSlotPoints[_loc3_];
-				_loc2_.values[_loc7_] = _loc8_;
-				_loc5_++;
+		var _loc12_:Int;
+		var _loc13_:Float;
+		var _loc7_ = 0;
+		var _loc9_ = 0;
+		var _loc2_ = gMHero;
+		this.level = _loc2_.getLevelFromExp(mExperiencePoints, mAscensionLevel);
+		var _loc3_ = _loc2_.getBaseLevelFromExp(mExperiencePoints);
+		var _loc5_ = new StatVector();
+		_loc7_ = 0;
+		while (_loc7_ < 4) {
+			_loc9_ = 0;
+			while (_loc9_ < _loc2_.UpgradeToSlotOffset[_loc7_].length) {
+				_loc12_ = _loc2_.UpgradeToSlotOffset[_loc7_][_loc9_];
+				_loc13_ = _loc5_.values[_loc12_] + mSlotPoints[_loc7_];
+				_loc5_.values[_loc12_] = _loc13_;
+				_loc9_++;
 			}
-			_loc3_++;
+			_loc7_++;
 		}
-		var _loc6_ = StatVector.add(mActorData.baseValues, StatVector.multiplyScalar(mActorData.levelValues, mLevel));
-		_loc6_ = StatVector.add(_loc6_, StatVector.multiply(_loc1_.Normalized_upgrades, _loc2_));
-		var _loc4_ = StatVector.add(StatVector.multiply(_loc6_, mDBFacade.gameMaster.stat_BonusMultiplier), mDBFacade.gameMaster.stat_bias);
-		mStats = StatVector.clone(_loc4_);
-		mStats.values[0] = mActorData.hp + _loc4_.values[0];
-		mStats.values[1] = mActorData.mp + _loc4_.values[1];
-		mStats.values[13] = _loc1_.BaseMove * _loc4_.values[13];
+		var _loc11_ = StatVector.multiply(_loc2_.Normalized_upgrades, _loc5_);
+		var _loc10_ = StatVector.add(mActorData.baseValues, StatVector.multiplyScalar(mActorData.levelValues, _loc3_));
+		_loc10_ = StatVector.add(_loc10_, _loc11_);
+		var _loc8_ = StatVector.add(StatVector.multiply(_loc10_, mDBFacade.gameMaster.stat_BonusMultiplier), mDBFacade.gameMaster.stat_bias);
+		var _loc4_ = StatVector.add(mActorData.baseValues, StatVector.multiplyScalar(mActorData.levelValues, DamageCurve.heroAttackCurve(_loc3_)));
+		_loc4_ = StatVector.add(_loc4_, _loc11_);
+		var _loc6_ = StatVector.add(StatVector.multiply(_loc4_, mDBFacade.gameMaster.stat_BonusMultiplier), mDBFacade.gameMaster.stat_bias);
+		var _loc1_ = StatVector.clone(_loc8_);
+		_loc1_.values[DBGlobal.HP_BOOST] = mActorData.hp + _loc8_.values[DBGlobal.HP_BOOST];
+		_loc1_.values[DBGlobal.MP_BOOST] = mActorData.mp + _loc8_.values[DBGlobal.MP_BOOST];
+		_loc1_.values[DBGlobal.MELEE_ATK] = _loc6_.values[DBGlobal.MELEE_ATK];
+		_loc1_.values[DBGlobal.SHOOT_ATK] = _loc6_.values[DBGlobal.SHOOT_ATK];
+		_loc1_.values[DBGlobal.MAGIC_ATK] = _loc6_.values[DBGlobal.MAGIC_ATK];
+		_loc1_.values[DBGlobal.MELEE_DEF] += mBarrierModMultiplier;
+		_loc1_.values[DBGlobal.SHOOT_DEF] += mCoverModMultiplier;
+		_loc1_.values[DBGlobal.MAGIC_DEF] += mComprehensionModMultiplier;
+		_loc1_.values[DBGlobal.MOVEMENT] = _loc2_.BaseMove * _loc8_.values[DBGlobal.MOVEMENT];
+		stats = _loc1_;
 	}
 
 	public function IsInvulnerable():Bool {
@@ -478,9 +555,9 @@ class HeroGameObject extends ActorGameObject implements IHeroGameObject {
 	override function setupConsumables() {
 		var _loc4_:ConsumableWeaponGameObject = null;
 		var _loc2_:ConsumableWeaponGameObject;
-		final __ax4_iter_229 = mConsumableWeapons;
-		if (checkNullIteratee(__ax4_iter_229))
-			for (_tmp_ in __ax4_iter_229) {
+		final __ax4_iter_319 = mConsumableWeapons;
+		if (checkNullIteratee(__ax4_iter_319))
+			for (_tmp_ in __ax4_iter_319) {
 				_loc2_ = _tmp_;
 				if (_loc2_ != null) {
 					_loc2_.destroy();
@@ -489,9 +566,9 @@ class HeroGameObject extends ActorGameObject implements IHeroGameObject {
 		var _loc1_ = (0 : UInt);
 		mConsumableWeapons = new Vector<ConsumableWeaponGameObject>();
 		var _loc3_:ConsumableDetails;
-		final __ax4_iter_230 = mConsumableDetails;
-		if (checkNullIteratee(__ax4_iter_230))
-			for (_tmp_ in __ax4_iter_230) {
+		final __ax4_iter_320 = mConsumableDetails;
+		if (checkNullIteratee(__ax4_iter_320))
+			for (_tmp_ in __ax4_iter_320) {
 				_loc3_ = _tmp_;
 				if (_loc3_.type != 0) {
 					_loc4_ = new ConsumableWeaponGameObject(_loc3_, this, mActorView, mDBFacade, mDistributedDungeonFloor, _loc1_);

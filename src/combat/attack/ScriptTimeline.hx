@@ -6,16 +6,16 @@ import brain.clock.GameClock;
 import brain.logger.Logger;
 import brain.workLoop.LogicalWorkComponent;
 import brain.workLoop.Task;
+import collections.ArrayList;
+import collections.ILinkedListIterator;
+import collections.IListIterator;
+import collections.IMapIterator;
+import collections.LinkedList;
+import collections.Map;
 import distributedObjects.DistributedDungeonFloor;
 import facade.DBFacade;
 import gameMasterDictionary.GMAttack;
 import generatedCode.CombatResult;
-import org.as3commons.collections.ArrayList;
-import org.as3commons.collections.LinkedList;
-import org.as3commons.collections.Map;
-import org.as3commons.collections.framework.ILinkedListIterator;
-import org.as3commons.collections.framework.IListIterator;
-import org.as3commons.collections.framework.IMapIterator;
 
 class ScriptTimeline {
 	var mActorGameObject:ActorGameObject;
@@ -40,8 +40,6 @@ class ScriptTimeline {
 
 	var mLastExecutedFrame:Int = -1;
 
-	var mExecutingFrame:Int = -1;
-
 	var mFinishedFrame:Int = 0;
 
 	var mLoop:Bool = false;
@@ -53,6 +51,8 @@ class ScriptTimeline {
 	var mIsPlaying:Bool = false;
 
 	var mIsLooping:Bool = false;
+
+	var mFinishedNaturally:Bool = false;
 
 	var mTotalFrames:UInt = 0;
 
@@ -106,8 +106,8 @@ class ScriptTimeline {
 	}
 
 	public function getTimeRemaining():Float {
-		var _loc1_:Float = mTotalFrames - mLastExecutedFrame;
-		return _loc1_ * GameClock.ANIMATION_FRAME_DURATION / playSpeed;
+		var _loc1_ = (mTotalFrames : Float) - mLastExecutedFrame;
+		return _loc1_ * mDBFacade.gameClock.tickLength / playSpeed;
 	}
 
 	function parseJson(jsonObj:ASObject) {
@@ -115,9 +115,9 @@ class ScriptTimeline {
 		var _loc11_:LinkedList = null;
 		var _loc7_ = 0;
 		var _loc5_:ASObject = null;
-		var _loc3_ = 0;
+		var _loc3_ = (0 : UInt);
 		var _loc10_:Array<ASAny> = null;
-		var _loc8_ = 0;
+		var _loc8_ = (0 : UInt);
 		var _loc9_ = 0;
 		var _loc2_:ASObject = null;
 		var _loc12_:Array<ASAny> = ASCompat.coerce(jsonObj.frames, Array);
@@ -126,12 +126,12 @@ class ScriptTimeline {
 		_loc7_ = 0;
 		while ((_loc7_ : UInt) < _loc4_) {
 			_loc5_ = _loc12_[_loc7_];
-			_loc3_ = ASCompat.toInt(_loc5_.frame);
+			_loc3_ = (ASCompat.toInt(_loc5_.frame) : UInt);
 			_loc10_ = ASCompat.coerce(_loc5_.actions, Array);
-			_loc8_ = _loc10_.length;
+			_loc8_ = (_loc10_.length : UInt);
 			_loc11_ = new LinkedList();
 			_loc9_ = 0;
-			while (_loc9_ < _loc8_) {
+			while ((_loc9_ : UInt) < _loc8_) {
 				_loc2_ = (_loc10_[_loc9_] : ASObject);
 				_loc6_ = parseAction(_loc2_);
 				if (_loc6_ != null) {
@@ -151,76 +151,78 @@ class ScriptTimeline {
 
 	function parseAction(actionObj:ASObject):AttackTimelineAction {
 		mHasGoto = false;
-		var _loc3_ = ASCompat.asString(actionObj.type);
-		var _loc2_:AttackTimelineAction = null;
-		switch (_loc3_) {
+		var _loc2_ = ASCompat.asString(actionObj.type);
+		var _loc3_:AttackTimelineAction = null;
+		switch (_loc2_) {
 			case "attackSound":
-				_loc2_ = SoundAttackTimelineAction.buildFromJson(mActorGameObject, mActorView, mDBFacade, actionObj);
+				_loc3_ = SoundAttackTimelineAction.buildFromJson(mActorGameObject, mActorView, mDBFacade, actionObj);
 
 			case "sound":
-				_loc2_ = SoundTimelineAction.buildFromJson(mActorGameObject, mActorView, mDBFacade, actionObj);
+				_loc3_ = SoundTimelineAction.buildFromJson(mActorGameObject, mActorView, mDBFacade, actionObj);
 
 			case "animFrame":
-				_loc2_ = AnimationFrameAttackTimelineAction.buildFromJson(mActorGameObject, mActorView, mDBFacade, actionObj);
+				_loc3_ = AnimationFrameAttackTimelineAction.buildFromJson(mActorGameObject, mActorView, mDBFacade, actionObj);
 
 			case "playAnim":
-				_loc2_ = PlayAnimationAttackTimelineAction.buildFromJson(this, mActorGameObject, mActorView, mDBFacade, actionObj);
+				_loc3_ = PlayAnimationAttackTimelineAction.buildFromJson(this, mActorGameObject, mActorView, mDBFacade, actionObj);
 
 			case "move":
-				_loc2_ = MovementAttackTimelineAction.buildFromJson(mActorGameObject, mActorView, mDBFacade, actionObj);
+				_loc3_ = MovementAttackTimelineAction.buildFromJson(mActorGameObject, mActorView, mDBFacade, actionObj);
 
 			case "runIdleMonitor":
-				_loc2_ = RunIdleMonitorTimelineAction.buildFromJson(mActorGameObject, mActorView, mDBFacade, actionObj);
+				_loc3_ = RunIdleMonitorTimelineAction.buildFromJson(mActorGameObject, mActorView, mDBFacade, actionObj);
 
 			case "goto":
 				mHasGoto = true;
-				_loc2_ = GotoTimelineAction.buildFromJson(mActorGameObject, mActorView, mDBFacade, actionObj, gotoFrame);
+				_loc3_ = GotoTimelineAction.buildFromJson(mActorGameObject, mActorView, mDBFacade, actionObj, gotoFrame);
 
 			case "knockback":
-				_loc2_ = KnockBackTimelineAction.buildFromJson(mActorGameObject, mActorView, mDBFacade);
+				_loc3_ = KnockBackTimelineAction.buildFromJson(mActorGameObject, mActorView, mDBFacade);
 
 			case "shake":
-				_loc2_ = CameraShakeTimelineAction.buildFromJson(mActorGameObject, mActorView, mDBFacade, actionObj);
+				_loc3_ = CameraShakeTimelineAction.buildFromJson(mActorGameObject, mActorView, mDBFacade, actionObj);
 
 			case "effect":
-				_loc2_ = PlayEffectTimelineAction.buildFromJson(mActorGameObject, mActorView, mDBFacade, actionObj);
+				_loc3_ = PlayEffectTimelineAction.buildFromJson(mActorGameObject, mActorView, mDBFacade, actionObj);
 
 			case "color":
-				_loc2_ = ColorShiftTimelineAction.buildFromJson(mActorGameObject, mActorView, mDBFacade, actionObj);
+				_loc3_ = ColorShiftTimelineAction.buildFromJson(mActorGameObject, mActorView, mDBFacade, actionObj);
 
 			case "glow":
-				_loc2_ = GlowTimelineAction.buildFromJson(mActorGameObject, mActorView, mDBFacade, actionObj);
+				_loc3_ = GlowTimelineAction.buildFromJson(mActorGameObject, mActorView, mDBFacade, actionObj);
 
 			case "fadebackground":
-				_loc2_ = FadeBackgroundTimelineAction.buildFromJson(mActorGameObject, mActorView, mDBFacade, actionObj);
+				_loc3_ = FadeBackgroundTimelineAction.buildFromJson(mActorGameObject, mActorView, mDBFacade, actionObj);
 
 			case "visible":
-				_loc2_ = HideTimelineAction.buildFromJson(mActorGameObject, mActorView, mDBFacade, actionObj);
+				_loc3_ = HideTimelineAction.buildFromJson(mActorGameObject, mActorView, mDBFacade, actionObj);
 
 			case "hideSpecialEffect":
-				_loc2_ = HideSpecialEffectTimelineAction.buildFromJson(mActorGameObject, mActorView, mDBFacade, actionObj);
+				_loc3_ = HideSpecialEffectTimelineAction.buildFromJson(mActorGameObject, mActorView, mDBFacade, actionObj);
 
 			case "scale":
-				_loc2_ = ScaleAttackTimelineAction.buildFromJson(mActorGameObject, mActorView, mDBFacade, actionObj);
-				_loc2_ = SufferImmunityTimeLineAction.buildFromJson(mActorGameObject, mActorView, mDBFacade, actionObj);
+				_loc3_ = ScaleAttackTimelineAction.buildFromJson(mActorGameObject, mActorView, mDBFacade, actionObj);
+				_loc3_ = SufferImmunityTimeLineAction.buildFromJson(mActorGameObject, mActorView, mDBFacade, actionObj);
 
 			case "zoom" | "timeScale" | "circleCollider" | "rectangleCollider" | "inputType" | "sufferImmunity":
-				_loc2_ = SufferImmunityTimeLineAction.buildFromJson(mActorGameObject, mActorView, mDBFacade, actionObj);
+				_loc3_ = SufferImmunityTimeLineAction.buildFromJson(mActorGameObject, mActorView, mDBFacade, actionObj);
 
 			case "knockbackImmunity":
-				_loc2_ = KnockbackImmunityTimeLineAction.buildFromJson(mActorGameObject, mActorView, mDBFacade, actionObj);
+				_loc3_ = KnockbackImmunityTimeLineAction.buildFromJson(mActorGameObject, mActorView, mDBFacade, actionObj);
 
 			case "attemptRevive" | "proposeRevive" | "spawndoober" | "spawnnpc" | "invulnerable":
 
 			case "teleport":
-				_loc2_ = TeleportTimelineAction.buildFromJson(mActorGameObject, mActorView, mDBFacade, actionObj);
+				_loc3_ = TeleportTimelineAction.buildFromJson(mActorGameObject, mActorView, mDBFacade, actionObj);
+
+			case "rumbleEffect":
 
 			default:
-				if (_loc3_.charAt(0) != "#") {
-					Logger.debug("No handle for attack timeline action type: " + _loc3_);
+				if (_loc2_.charAt(0) != "#") {
+					Logger.debug("No handle for attack timeline action actionType: " + _loc2_);
 				}
 		}
-		return _loc2_;
+		return _loc3_;
 	}
 
 	@:isVar public var currentAttackType(never, set):UInt;
@@ -280,11 +282,12 @@ class ScriptTimeline {
 		mPlayHeadTime = 0;
 		mTargetActor = targetActor;
 		mIsPlaying = true;
+		mFinishedNaturally = false;
 		mLoop = loop;
 		mPlaySpeed = playSpeed;
 		if (mPlayTimelineTask != null) {
 			mPlayTimelineTask.destroy();
-			mPlayTimelineTask == null;
+			mPlayTimelineTask = null;
 		}
 		mFinishedCallback = finishedCallback;
 		mStopCallback = stopCallback;
@@ -320,7 +323,7 @@ class ScriptTimeline {
 	}
 
 	public function stop() {
-		var _loc1_ = 0;
+		var _loc1_ = (0 : UInt);
 		mIsPlaying = false;
 		stopAllActions();
 		if (mStopCallback != null) {
@@ -333,8 +336,8 @@ class ScriptTimeline {
 		}
 		var _loc2_ = ASCompat.reinterpretAs(mManagedEffects.iterator(), IListIterator);
 		while (_loc2_.hasNext()) {
-			_loc1_ = (ASCompat.asUint(_loc2_.next()) : Int);
-			mActorGameObject.distributedDungeonFloor.effectManager.endManagedEffect((_loc1_ : UInt));
+			_loc1_ = ASCompat.asUint(_loc2_.next());
+			mActorGameObject.distributedDungeonFloor.effectManager.endManagedEffect(_loc1_);
 		}
 		mManagedEffects.clear();
 	}
@@ -373,11 +376,6 @@ class ScriptTimeline {
 	}
 
 	function gotoFrame(gotoFrame:Int) {
-		// At the official 24 Hz tick, a timeline advancing at least as many frames per tick as the goto jumps back resumed past
-		// the goto and played on: fast charge holds end that way, which lets other weapons attack while charged.
-		if (mPlaySpeed * mLogicalWorkComponent.gameClock.timeScale >= mExecutingFrame - gotoFrame) {
-			return;
-		}
 		mPlayHeadTime = gotoFrame;
 		mIsLooping = true;
 	}
@@ -390,7 +388,7 @@ class ScriptTimeline {
 			return;
 		}
 		if (timelineActionMap.hasKey(currentFrame)) {
-			_loc5_ = ASCompat.coerce(timelineActionMap.itemFor(currentFrame), org.as3commons.collections.LinkedList);
+			_loc5_ = ASCompat.coerce(timelineActionMap.itemFor(currentFrame), collections.LinkedList);
 			_loc6_ = ASCompat.reinterpretAs(_loc5_.iterator(), ILinkedListIterator);
 			while (_loc6_.hasNext()) {
 				_loc4_ = ASCompat.dynamicAs(_loc6_.next(), AttackTimelineAction);
@@ -411,7 +409,6 @@ class ScriptTimeline {
 		}
 		_loc3_ = (_loc2_ : Int);
 		while (_loc3_ <= mPlayHeadTime) {
-			mExecutingFrame = _loc3_;
 			processTimelineActions(_loc3_, gameClock);
 			mLastExecutedFrame = _loc3_;
 			_loc3_++;
@@ -420,7 +417,7 @@ class ScriptTimeline {
 	}
 
 	function updatePlayHead(gameClock:GameClock) {
-		mPlayHeadTime += mPlaySpeed * (gameClock.tickLength / GameClock.ANIMATION_FRAME_DURATION);
+		mPlayHeadTime += mPlaySpeed * gameClock.timeScale;
 	}
 
 	function processTimelineActions(frame:Int, gameClock:GameClock) {
@@ -433,7 +430,14 @@ class ScriptTimeline {
 			mPlayHeadTime = 0;
 			return;
 		}
+		mFinishedNaturally = true;
 		stopAndFinish();
+	}
+
+	@:isVar public var finishedNaturally(get, never):Bool;
+
+	public function get_finishedNaturally():Bool {
+		return mFinishedNaturally;
 	}
 
 	public function destroy() {
@@ -446,7 +450,7 @@ class ScriptTimeline {
 		mDistributedDungeonFloor = null;
 		var _loc3_ = ASCompat.reinterpretAs(mTimelineActions.iterator(), IMapIterator);
 		while (_loc3_.hasNext()) {
-			_loc4_ = ASCompat.coerce(_loc3_.next(), org.as3commons.collections.LinkedList);
+			_loc4_ = ASCompat.coerce(_loc3_.next(), collections.LinkedList);
 			_loc1_ = ASCompat.reinterpretAs(_loc4_.iterator(), ILinkedListIterator);
 			while (_loc1_.hasNext()) {
 				_loc2_ = ASCompat.coerce(_loc1_.next(), combat.attack.AttackTimelineAction);

@@ -1,7 +1,10 @@
 package distributedObjects;
 
 import brain.event.EventComponent;
+import brain.event.EventListeners;
 import brain.gameObject.GameObject;
+import brain.utils.Timers;
+import collections.Map;
 import events.FriendStatusEvent;
 import facade.DBFacade;
 import generatedCode.IPresenceManager;
@@ -9,7 +12,6 @@ import generatedCode.PresenceManagerNetworkComponent;
 import flash.events.Event;
 import flash.events.TimerEvent;
 import flash.utils.Timer;
-import org.as3commons.collections.Map;
 
 class PresenceManager extends GameObject implements IPresenceManager {
 	static var mInstance:PresenceManager;
@@ -61,7 +63,7 @@ class PresenceManager extends GameObject implements IPresenceManager {
 	}
 
 	public function friendState(yesno:UInt, who:UInt, state:UInt) {
-		var _loc4_ = 0;
+		var _loc4_ = (0 : UInt);
 		if (yesno == 0) {
 			if (mPresence.hasKey(who)) {
 				mPresence.removeKey(who);
@@ -71,8 +73,8 @@ class PresenceManager extends GameObject implements IPresenceManager {
 			mPresence.add(who, state);
 			mEventComponent.dispatchEvent(new FriendStatusEvent("FRIEND_STATUS_EVENT", who, true));
 		} else {
-			_loc4_ = ASCompat.toInt(mPresence.itemFor(who));
-			if ((_loc4_ : UInt) != state) {
+			_loc4_ = (ASCompat.toInt(mPresence.itemFor(who)) : UInt);
+			if (_loc4_ != state) {
 				mPresence.replaceFor(who, state);
 			}
 		}
@@ -83,10 +85,10 @@ class PresenceManager extends GameObject implements IPresenceManager {
 		mPendingAccountIds = who;
 		if (mAddFriendsTimer != null) {
 			mAddFriendsTimer.stop();
-			mAddFriendsTimer.removeEventListener("timer", onAddFriendsTimerComplete);
+			EventListeners.remove(mAddFriendsTimer, "timer", onAddFriendsTimerComplete);
 		}
-		mAddFriendsTimer = new Timer(2000, 1);
-		mAddFriendsTimer.addEventListener("timer", onAddFriendsTimerComplete);
+		mAddFriendsTimer = Timers.create(2000, 1, "PresenceManager.mAddFriendsTimer");
+		EventListeners.add(mAddFriendsTimer, "timer", onAddFriendsTimerComplete);
 		mAddFriendsTimer.start();
 	}
 

@@ -5,7 +5,7 @@ class GMKey {
 
 	public var ChestId:UInt = 0;
 
-	public function new(jsonAsset:ASObject) {
+	public function new(jsonAsset:ASObject = /*undefined*/ null) {
 		OfferId = (ASCompat.toInt(jsonAsset.OfferId) : UInt);
 		ChestId = (ASCompat.toInt(jsonAsset.ChestId) : UInt);
 	}

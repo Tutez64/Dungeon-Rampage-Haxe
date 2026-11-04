@@ -2,6 +2,7 @@ package uI.inventory;
 
 import account.ItemInfo;
 import brain.assetRepository.AssetLoadingComponent;
+import brain.utils.TextUtil;
 import combat.weapon.WeaponGameObject;
 import facade.DBFacade;
 import facade.GameMasterLocale;
@@ -41,12 +42,18 @@ class UIWeaponTooltip extends MovieClip {
 		mRoot = ASCompat.coerce(ASCompat.createInstance(templateClass, []), flash.display.MovieClip);
 		this.addChild(mRoot);
 		mNameLabel = ASCompat.coerce((mRoot : ASAny).title_label, flash.text.TextField);
+		mRoot.scaleX = mRoot.scaleY = tooltipScale(mNameLabel, 1.09);
 		mPowerLabel = ASCompat.coerce((mRoot : ASAny).power.label, flash.text.TextField);
-		ASCompat.setProperty((mRoot : ASAny).power.attack_label, "text", Locale.getString("POWER"));
+		Locale.setText(ASCompat.coerce((mRoot : ASAny).power.attack_label, flash.text.TextField), "POWER");
 		mTapIcon = ASCompat.coerce((mRoot : ASAny).tap_icon, flash.display.MovieClip);
 		mHoldIcon = ASCompat.coerce((mRoot : ASAny).icon, flash.display.MovieClip);
 		mLevelLabel = ASCompat.coerce((mRoot : ASAny).level_label, flash.text.TextField);
 		mModifiersList = new Vector<UIModifier>();
+	}
+
+	public static function tooltipScale(field:TextField, sizeModifier:Float):Float {
+		var _loc3_ = ASCompat.toNumber(field.defaultTextFormat.size);
+		return TextUtil.scaleToFloor(_loc3_ * TextUtil.scaleToFloor(_loc3_), sizeModifier);
 	}
 
 	public function destroy() {
@@ -63,8 +70,8 @@ class UIWeaponTooltip extends MovieClip {
 		var _loc6_ = ASCompat.coerce(mDBFacade.gameMaster.rarityById.itemFor(weaponGameObject.rarity), gameMasterDictionary.GMRarity);
 		var _loc4_ = (ASCompat.toInt(_loc6_ != null && _loc6_.TextColor != 0 ? _loc6_.TextColor : 15463921) : UInt);
 		mNameLabel.textColor = _loc4_;
-		mPowerLabel.text = Std.string(weaponGameObject.power);
-		mLevelLabel.text = Locale.getString("ITEM_CARD_LEVEL_REQUIREMENT") + weaponGameObject.requiredLevel;
+		TextUtil.setText(mPowerLabel, Std.string(weaponGameObject.power));
+		TextUtil.setText(mLevelLabel, Locale.getString("ITEM_CARD_LEVEL_REQUIREMENT") + weaponGameObject.requiredLevel);
 		loadIcon(weaponGameObject.weaponData.TapIcon, mTapIcon);
 		loadIcon(weaponGameObject.weaponData.HoldIcon, mHoldIcon);
 		var _loc2_ = "";
@@ -83,7 +90,7 @@ class UIWeaponTooltip extends MovieClip {
 			mNameLabel.text = GameMasterLocale.getGameMasterSubString("WEAPON_AESTHETIC_NAME",
 				weaponGameObject.weaponData.getWeaponAesthetic((0 : UInt), true).Constant);
 		}
-		mNameLabel.text = mNameLabel.text.toUpperCase();
+		TextUtil.setText(mNameLabel, mNameLabel.text.toUpperCase());
 	}
 
 	public function setWeaponItemFromItemInfo(itemInfo:ItemInfo) {
@@ -91,8 +98,8 @@ class UIWeaponTooltip extends MovieClip {
 		clearAllIcons();
 		mNameLabel.text = GameMasterLocale.getGameMasterSubString("WEAPON_AESTHETIC_NAME", itemInfo.gmWeaponAesthetic.Constant).toUpperCase();
 		mNameLabel.textColor = itemInfo.getTextColor();
-		mPowerLabel.text = Std.string(itemInfo.power);
-		mLevelLabel.text = Locale.getString("ITEM_CARD_LEVEL_REQUIREMENT") + itemInfo.requiredLevel;
+		TextUtil.setText(mPowerLabel, Std.string(itemInfo.power));
+		TextUtil.setText(mLevelLabel, Locale.getString("ITEM_CARD_LEVEL_REQUIREMENT") + itemInfo.requiredLevel);
 		loadIcon(itemInfo.gmWeaponItem.TapIcon, mTapIcon);
 		loadIcon(itemInfo.gmWeaponItem.HoldIcon, mHoldIcon);
 		var _loc2_ = "";
@@ -111,7 +118,7 @@ class UIWeaponTooltip extends MovieClip {
 			mNameLabel.text = GameMasterLocale.getGameMasterSubString("WEAPON_AESTHETIC_NAME",
 				itemInfo.gmWeaponItem.getWeaponAesthetic((0 : UInt), true).Constant);
 		}
-		mNameLabel.text = mNameLabel.text.toUpperCase();
+		TextUtil.setText(mNameLabel, mNameLabel.text.toUpperCase());
 	}
 
 	public function setWeaponItemFromData(name:String, power:UInt, tapIcon:String, holdIcon:String, mod1:UInt, mod2:UInt, legendaryMod:UInt, rarityVal:UInt,
@@ -125,8 +132,8 @@ class UIWeaponTooltip extends MovieClip {
 		var _loc15_ = ASCompat.coerce(mDBFacade.gameMaster.rarityById.itemFor(rarityVal), gameMasterDictionary.GMRarity);
 		var _loc12_ = (ASCompat.toInt(_loc15_ != null && _loc15_.TextColor != 0 ? _loc15_.TextColor : 15463921) : UInt);
 		mNameLabel.textColor = _loc12_;
-		mPowerLabel.text = Std.string(power);
-		mLevelLabel.text = Locale.getString("ITEM_CARD_LEVEL_REQUIREMENT") + level;
+		TextUtil.setText(mPowerLabel, Std.string(power));
+		TextUtil.setText(mLevelLabel, Locale.getString("ITEM_CARD_LEVEL_REQUIREMENT") + level);
 		loadIcon(tapIcon, mTapIcon);
 		loadIcon(holdIcon, mHoldIcon);
 		var _loc14_ = "";
@@ -150,7 +157,7 @@ class UIWeaponTooltip extends MovieClip {
 		} else {
 			mNameLabel.text = _loc14_ + mNameLabel.text;
 		}
-		mNameLabel.text = mNameLabel.text.toUpperCase();
+		TextUtil.setText(mNameLabel, mNameLabel.text.toUpperCase());
 	}
 
 	function clearAllIcons() {

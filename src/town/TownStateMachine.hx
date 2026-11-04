@@ -114,7 +114,7 @@ class TownStateMachine extends StateMachine {
 		mHomeState.rootMovieClip = ASCompat.dynamicAs(ASCompat.createInstance(_loc7_, []), MovieClip);
 		var _loc4_ = mTownSwfAsset.getClass("UI_town_tavern");
 		mTavernState.rootMovieClip = ASCompat.dynamicAs(ASCompat.createInstance(_loc4_, []), MovieClip);
-		var _loc1_ = mTownSwfAsset.getClass("DR_UI_town_inventory");
+		var _loc1_ = mTownSwfAsset.getClass("UI_town_skills");
 		mInventoryState.rootMovieClip = ASCompat.dynamicAs(ASCompat.createInstance(_loc1_, []), MovieClip);
 		var _loc9_ = mTownSwfAsset.getClass("DR_UI_town_shop");
 		mShopState.rootMovieClip = ASCompat.dynamicAs(ASCompat.createInstance(_loc9_, []), MovieClip);
@@ -129,6 +129,7 @@ class TownStateMachine extends StateMachine {
 		_loc3_ = mMapSwfAsset.getClass("Map_2_1");
 		mMapState.rootMovieClip = ASCompat.dynamicAs(ASCompat.createInstance(_loc3_, []), MovieClip);
 		mUILeaderboard = new UILeaderboard(mDBFacade, mTownSwfAsset, callbackToFriendManager, getGifts, this);
+		mUILeaderboard.preLoadSWF();
 	}
 
 	function buildStates() {
@@ -158,15 +159,14 @@ class TownStateMachine extends StateMachine {
 		this.transitionToState(mHomeState);
 	}
 
-	public function enterInventoryState(returnToMapStateOnClose:Bool = false, tabCategory:String = "", type:UInt = (0 : UInt), offerId:UInt = (0 : UInt),
-			showEquipOption:Bool = false) {
+	public function enterInventoryState(returnToMapStateOnClose:Bool = false, tabCategory:String = "", revealItemTypeId:UInt = (0 : UInt),
+			offerId:UInt = (0 : UInt), showEquipOption:Bool = false) {
 		mInventoryState.startAtCategoryTab = tabCategory;
 		mTownHeader.jumpToMapState = returnToMapStateOnClose;
-		mInventoryState.setRevlealedState(type, offerId, showEquipOption);
+		mInventoryState.setRevealedState(revealItemTypeId, offerId, showEquipOption);
 		this.transitionToState(mInventoryState);
-		if (mDBFacade.steamAchievementsManager != null) {
-			mDBFacade.steamAchievementsManager.checkStorageAchievements();
-		}
+		var _loc6_:Int = mDBFacade.dbAccountInfo.inventoryInfo.storageLimitWeapon;
+		mDBFacade.steamAchievementsHelper.checkStorageAchievements(_loc6_);
 	}
 
 	public function enterTavernState(returnToMapStateOnClose:Bool = false) {

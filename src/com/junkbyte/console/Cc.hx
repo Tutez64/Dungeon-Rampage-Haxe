@@ -7,299 +7,797 @@ import flash.events.Event;
 import flash.geom.Rectangle;
 
 class Cc {
-	static var _console:Console;
+	public static var _console:Console;
 
-	static var _config:ConsoleConfig;
+	public static var _config:ConsoleConfig;
 
 	public function new() {}
 
 	@:isVar public static var config(get, never):ConsoleConfig;
 
 	static public function get_config():ConsoleConfig {
-		if (_config == null) {
-			_config = new ConsoleConfig();
+		if (Cc._config == null) {
+			Cc._config = new ConsoleConfig();
 		}
-		return _config;
+		return Cc._config;
 	}
 
-	public static function start(container:DisplayObjectContainer, password:String = "") {
-		if (_console != null) {
-			if (container != null && _console.parent == null) {
-				container.addChild(_console);
+	public static function start(container:DisplayObjectContainer, password:String = /*undefined*/ null) {
+		if (password == null) {
+			password = "";
+		}
+		if (Cc._console != null) {
+			if (container != null && Cc._console.parent == null) {
+				container.addChild(Cc._console);
 			}
 		} else {
-			_console = new Console(password, config);
+			Cc._console = new Console(password, Cc.get_config());
 			if (container != null) {
-				container.addChild(_console);
+				container.addChild(Cc._console);
 			}
 		}
 	}
 
-	public static function startOnStage(display:DisplayObject, password:String = "") {
-		if (_console != null) {
-			if (display != null && display.stage != null && _console.parent != display.stage) {
-				display.stage.addChild(_console);
+	public static function startOnStage(display:DisplayObject = /*undefined*/ null, password:String = /*undefined*/ null) {
+		if (password == null) {
+			password = "";
+		}
+		if (Cc._console != null) {
+			if (display != null && display.stage != null && Cc._console.parent != display.stage) {
+				display.stage.addChild(Cc._console);
 			}
 		} else if (display != null && display.stage != null) {
-			start(display.stage, password);
+			Cc.start(display.stage, password);
 		} else {
-			_console = new Console(password, config);
+			Cc._console = new Console(password, Cc.get_config());
 			if (display != null) {
-				display.addEventListener(Event.ADDED_TO_STAGE, addedToStageHandle);
+				display.addEventListener(Event.ADDED_TO_STAGE, Cc.addedToStageHandle);
 			}
+		}
+	}
+
+	public static function addedToStageHandle(e:Event) {
+		var _loc2_ = cast(e.currentTarget, DisplayObject);
+		_loc2_.removeEventListener(Event.ADDED_TO_STAGE, Cc.addedToStageHandle);
+		if (Cc._console != null && Cc._console.parent == null) {
+			_loc2_.stage.addChild(Cc._console);
 		}
 	}
 
 	public static function add(string:ASAny, priority:Int = 2, isRepeating:Bool = false) {
-		if (_console != null) {
-			_console.add(string, priority, isRepeating);
+		if (Cc._console != null) {
+			Cc._console.add(string, priority, isRepeating);
 		}
 	}
 
 	public static function ch(channel:ASAny, string:ASAny, priority:Int = 2, isRepeating:Bool = false) {
-		if (_console != null) {
-			_console.ch(channel, string, priority, isRepeating);
+		if (Cc._console != null) {
+			Cc._console.ch(channel, string, priority, isRepeating);
 		}
 	}
 
 	public static function log(..._rest:ASAny) {
 		var rest = ASCompat.restToArray(_rest);
-		if (_console != null) {
-			ASCompatMacro.applyBoundMethod(_console, "log", rest);
+		if (Cc._console != null) {
+			if (rest.length == 0) {
+				Cc._console.log();
+			} else if (rest.length == 1) {
+				Cc._console.log(rest[0]);
+			} else if (rest.length == 2) {
+				Cc._console.log(rest[0], rest[1]);
+			} else if (rest.length == 3) {
+				Cc._console.log(rest[0], rest[1], rest[2]);
+			} else if (rest.length == 4) {
+				Cc._console.log(rest[0], rest[1], rest[2], rest[3]);
+			} else if (rest.length == 5) {
+				Cc._console.log(rest[0], rest[1], rest[2], rest[3], rest[4]);
+			} else if (rest.length == 6) {
+				Cc._console.log(rest[0], rest[1], rest[2], rest[3], rest[4], rest[5]);
+			} else if (rest.length == 7) {
+				Cc._console.log(rest[0], rest[1], rest[2], rest[3], rest[4], rest[5], rest[6]);
+			} else if (rest.length == 8) {
+				Cc._console.log(rest[0], rest[1], rest[2], rest[3], rest[4], rest[5], rest[6], rest[7]);
+			} else if (rest.length == 9) {
+				Cc._console.log(rest[0], rest[1], rest[2], rest[3], rest[4], rest[5], rest[6], rest[7], rest[8]);
+			} else if (rest.length == 10) {
+				Cc._console.log(rest[0], rest[1], rest[2], rest[3], rest[4], rest[5], rest[6], rest[7], rest[8], rest[9]);
+			} else if (rest.length == 11) {
+				Cc._console.log(rest[0], rest[1], rest[2], rest[3], rest[4], rest[5], rest[6], rest[7], rest[8], rest[9], rest[10]);
+			} else if (rest.length == 12) {
+				Cc._console.log(rest[0], rest[1], rest[2], rest[3], rest[4], rest[5], rest[6], rest[7], rest[8], rest[9], rest[10], rest[11]);
+			} else if (rest.length == 13) {
+				Cc._console.log(rest[0], rest[1], rest[2], rest[3], rest[4], rest[5], rest[6], rest[7], rest[8], rest[9], rest[10], rest[11], rest[12]);
+			} else if (rest.length == 14) {
+				Cc._console.log(rest[0], rest[1], rest[2], rest[3], rest[4], rest[5], rest[6], rest[7], rest[8], rest[9], rest[10], rest[11], rest[12],
+					rest[13]);
+			} else if (rest.length == 15) {
+				Cc._console.log(rest[0], rest[1], rest[2], rest[3], rest[4], rest[5], rest[6], rest[7], rest[8], rest[9], rest[10], rest[11], rest[12],
+					rest[13], rest[14]);
+			} else if (rest.length == 16) {
+				Cc._console.log(rest[0], rest[1], rest[2], rest[3], rest[4], rest[5], rest[6], rest[7], rest[8], rest[9], rest[10], rest[11], rest[12],
+					rest[13], rest[14], rest[15]);
+			} else if (rest.length == 17) {
+				Cc._console.log(rest[0], rest[1], rest[2], rest[3], rest[4], rest[5], rest[6], rest[7], rest[8], rest[9], rest[10], rest[11], rest[12],
+					rest[13], rest[14], rest[15], rest[16]);
+			} else if (rest.length == 18) {
+				Cc._console.log(rest[0], rest[1], rest[2], rest[3], rest[4], rest[5], rest[6], rest[7], rest[8], rest[9], rest[10], rest[11], rest[12],
+					rest[13], rest[14], rest[15], rest[16], rest[17]);
+			} else if (rest.length == 19) {
+				Cc._console.log(rest[0], rest[1], rest[2], rest[3], rest[4], rest[5], rest[6], rest[7], rest[8], rest[9], rest[10], rest[11], rest[12],
+					rest[13], rest[14], rest[15], rest[16], rest[17], rest[18]);
+			} else {
+				if (rest.length != 20) {
+					throw "Too many rest arguments";
+				}
+				Cc._console.log(rest[0], rest[1], rest[2], rest[3], rest[4], rest[5], rest[6], rest[7], rest[8], rest[9], rest[10], rest[11], rest[12],
+					rest[13], rest[14], rest[15], rest[16], rest[17], rest[18], rest[19]);
+			}
 		}
 	}
 
 	public static function info(..._rest:ASAny) {
 		var rest = ASCompat.restToArray(_rest);
-		if (_console != null) {
-			ASCompatMacro.applyBoundMethod(_console, "info", rest);
+		if (Cc._console != null) {
+			if (rest.length == 0) {
+				Cc._console.info();
+			} else if (rest.length == 1) {
+				Cc._console.info(rest[0]);
+			} else if (rest.length == 2) {
+				Cc._console.info(rest[0], rest[1]);
+			} else if (rest.length == 3) {
+				Cc._console.info(rest[0], rest[1], rest[2]);
+			} else if (rest.length == 4) {
+				Cc._console.info(rest[0], rest[1], rest[2], rest[3]);
+			} else if (rest.length == 5) {
+				Cc._console.info(rest[0], rest[1], rest[2], rest[3], rest[4]);
+			} else if (rest.length == 6) {
+				Cc._console.info(rest[0], rest[1], rest[2], rest[3], rest[4], rest[5]);
+			} else if (rest.length == 7) {
+				Cc._console.info(rest[0], rest[1], rest[2], rest[3], rest[4], rest[5], rest[6]);
+			} else if (rest.length == 8) {
+				Cc._console.info(rest[0], rest[1], rest[2], rest[3], rest[4], rest[5], rest[6], rest[7]);
+			} else if (rest.length == 9) {
+				Cc._console.info(rest[0], rest[1], rest[2], rest[3], rest[4], rest[5], rest[6], rest[7], rest[8]);
+			} else if (rest.length == 10) {
+				Cc._console.info(rest[0], rest[1], rest[2], rest[3], rest[4], rest[5], rest[6], rest[7], rest[8], rest[9]);
+			} else if (rest.length == 11) {
+				Cc._console.info(rest[0], rest[1], rest[2], rest[3], rest[4], rest[5], rest[6], rest[7], rest[8], rest[9], rest[10]);
+			} else if (rest.length == 12) {
+				Cc._console.info(rest[0], rest[1], rest[2], rest[3], rest[4], rest[5], rest[6], rest[7], rest[8], rest[9], rest[10], rest[11]);
+			} else if (rest.length == 13) {
+				Cc._console.info(rest[0], rest[1], rest[2], rest[3], rest[4], rest[5], rest[6], rest[7], rest[8], rest[9], rest[10], rest[11], rest[12]);
+			} else if (rest.length == 14) {
+				Cc._console.info(rest[0], rest[1], rest[2], rest[3], rest[4], rest[5], rest[6], rest[7], rest[8], rest[9], rest[10], rest[11], rest[12],
+					rest[13]);
+			} else if (rest.length == 15) {
+				Cc._console.info(rest[0], rest[1], rest[2], rest[3], rest[4], rest[5], rest[6], rest[7], rest[8], rest[9], rest[10], rest[11], rest[12],
+					rest[13], rest[14]);
+			} else if (rest.length == 16) {
+				Cc._console.info(rest[0], rest[1], rest[2], rest[3], rest[4], rest[5], rest[6], rest[7], rest[8], rest[9], rest[10], rest[11], rest[12],
+					rest[13], rest[14], rest[15]);
+			} else if (rest.length == 17) {
+				Cc._console.info(rest[0], rest[1], rest[2], rest[3], rest[4], rest[5], rest[6], rest[7], rest[8], rest[9], rest[10], rest[11], rest[12],
+					rest[13], rest[14], rest[15], rest[16]);
+			} else if (rest.length == 18) {
+				Cc._console.info(rest[0], rest[1], rest[2], rest[3], rest[4], rest[5], rest[6], rest[7], rest[8], rest[9], rest[10], rest[11], rest[12],
+					rest[13], rest[14], rest[15], rest[16], rest[17]);
+			} else if (rest.length == 19) {
+				Cc._console.info(rest[0], rest[1], rest[2], rest[3], rest[4], rest[5], rest[6], rest[7], rest[8], rest[9], rest[10], rest[11], rest[12],
+					rest[13], rest[14], rest[15], rest[16], rest[17], rest[18]);
+			} else {
+				if (rest.length != 20) {
+					throw "Too many rest arguments";
+				}
+				Cc._console.info(rest[0], rest[1], rest[2], rest[3], rest[4], rest[5], rest[6], rest[7], rest[8], rest[9], rest[10], rest[11], rest[12],
+					rest[13], rest[14], rest[15], rest[16], rest[17], rest[18], rest[19]);
+			}
 		}
 	}
 
 	public static function debug(..._rest:ASAny) {
 		var rest = ASCompat.restToArray(_rest);
-		if (_console != null) {
-			ASCompatMacro.applyBoundMethod(_console, "debug", rest);
+		if (Cc._console != null) {
+			if (rest.length == 0) {
+				Cc._console.debug();
+			} else if (rest.length == 1) {
+				Cc._console.debug(rest[0]);
+			} else if (rest.length == 2) {
+				Cc._console.debug(rest[0], rest[1]);
+			} else if (rest.length == 3) {
+				Cc._console.debug(rest[0], rest[1], rest[2]);
+			} else if (rest.length == 4) {
+				Cc._console.debug(rest[0], rest[1], rest[2], rest[3]);
+			} else if (rest.length == 5) {
+				Cc._console.debug(rest[0], rest[1], rest[2], rest[3], rest[4]);
+			} else if (rest.length == 6) {
+				Cc._console.debug(rest[0], rest[1], rest[2], rest[3], rest[4], rest[5]);
+			} else if (rest.length == 7) {
+				Cc._console.debug(rest[0], rest[1], rest[2], rest[3], rest[4], rest[5], rest[6]);
+			} else if (rest.length == 8) {
+				Cc._console.debug(rest[0], rest[1], rest[2], rest[3], rest[4], rest[5], rest[6], rest[7]);
+			} else if (rest.length == 9) {
+				Cc._console.debug(rest[0], rest[1], rest[2], rest[3], rest[4], rest[5], rest[6], rest[7], rest[8]);
+			} else if (rest.length == 10) {
+				Cc._console.debug(rest[0], rest[1], rest[2], rest[3], rest[4], rest[5], rest[6], rest[7], rest[8], rest[9]);
+			} else if (rest.length == 11) {
+				Cc._console.debug(rest[0], rest[1], rest[2], rest[3], rest[4], rest[5], rest[6], rest[7], rest[8], rest[9], rest[10]);
+			} else if (rest.length == 12) {
+				Cc._console.debug(rest[0], rest[1], rest[2], rest[3], rest[4], rest[5], rest[6], rest[7], rest[8], rest[9], rest[10], rest[11]);
+			} else if (rest.length == 13) {
+				Cc._console.debug(rest[0], rest[1], rest[2], rest[3], rest[4], rest[5], rest[6], rest[7], rest[8], rest[9], rest[10], rest[11], rest[12]);
+			} else if (rest.length == 14) {
+				Cc._console.debug(rest[0], rest[1], rest[2], rest[3], rest[4], rest[5], rest[6], rest[7], rest[8], rest[9], rest[10], rest[11], rest[12],
+					rest[13]);
+			} else if (rest.length == 15) {
+				Cc._console.debug(rest[0], rest[1], rest[2], rest[3], rest[4], rest[5], rest[6], rest[7], rest[8], rest[9], rest[10], rest[11], rest[12],
+					rest[13], rest[14]);
+			} else if (rest.length == 16) {
+				Cc._console.debug(rest[0], rest[1], rest[2], rest[3], rest[4], rest[5], rest[6], rest[7], rest[8], rest[9], rest[10], rest[11], rest[12],
+					rest[13], rest[14], rest[15]);
+			} else if (rest.length == 17) {
+				Cc._console.debug(rest[0], rest[1], rest[2], rest[3], rest[4], rest[5], rest[6], rest[7], rest[8], rest[9], rest[10], rest[11], rest[12],
+					rest[13], rest[14], rest[15], rest[16]);
+			} else if (rest.length == 18) {
+				Cc._console.debug(rest[0], rest[1], rest[2], rest[3], rest[4], rest[5], rest[6], rest[7], rest[8], rest[9], rest[10], rest[11], rest[12],
+					rest[13], rest[14], rest[15], rest[16], rest[17]);
+			} else if (rest.length == 19) {
+				Cc._console.debug(rest[0], rest[1], rest[2], rest[3], rest[4], rest[5], rest[6], rest[7], rest[8], rest[9], rest[10], rest[11], rest[12],
+					rest[13], rest[14], rest[15], rest[16], rest[17], rest[18]);
+			} else {
+				if (rest.length != 20) {
+					throw "Too many rest arguments";
+				}
+				Cc._console.debug(rest[0], rest[1], rest[2], rest[3], rest[4], rest[5], rest[6], rest[7], rest[8], rest[9], rest[10], rest[11], rest[12],
+					rest[13], rest[14], rest[15], rest[16], rest[17], rest[18], rest[19]);
+			}
 		}
 	}
 
 	public static function warn(..._rest:ASAny) {
 		var rest = ASCompat.restToArray(_rest);
-		if (_console != null) {
-			ASCompatMacro.applyBoundMethod(_console, "warn", rest);
+		if (Cc._console != null) {
+			if (rest.length == 0) {
+				Cc._console.warn();
+			} else if (rest.length == 1) {
+				Cc._console.warn(rest[0]);
+			} else if (rest.length == 2) {
+				Cc._console.warn(rest[0], rest[1]);
+			} else if (rest.length == 3) {
+				Cc._console.warn(rest[0], rest[1], rest[2]);
+			} else if (rest.length == 4) {
+				Cc._console.warn(rest[0], rest[1], rest[2], rest[3]);
+			} else if (rest.length == 5) {
+				Cc._console.warn(rest[0], rest[1], rest[2], rest[3], rest[4]);
+			} else if (rest.length == 6) {
+				Cc._console.warn(rest[0], rest[1], rest[2], rest[3], rest[4], rest[5]);
+			} else if (rest.length == 7) {
+				Cc._console.warn(rest[0], rest[1], rest[2], rest[3], rest[4], rest[5], rest[6]);
+			} else if (rest.length == 8) {
+				Cc._console.warn(rest[0], rest[1], rest[2], rest[3], rest[4], rest[5], rest[6], rest[7]);
+			} else if (rest.length == 9) {
+				Cc._console.warn(rest[0], rest[1], rest[2], rest[3], rest[4], rest[5], rest[6], rest[7], rest[8]);
+			} else if (rest.length == 10) {
+				Cc._console.warn(rest[0], rest[1], rest[2], rest[3], rest[4], rest[5], rest[6], rest[7], rest[8], rest[9]);
+			} else if (rest.length == 11) {
+				Cc._console.warn(rest[0], rest[1], rest[2], rest[3], rest[4], rest[5], rest[6], rest[7], rest[8], rest[9], rest[10]);
+			} else if (rest.length == 12) {
+				Cc._console.warn(rest[0], rest[1], rest[2], rest[3], rest[4], rest[5], rest[6], rest[7], rest[8], rest[9], rest[10], rest[11]);
+			} else if (rest.length == 13) {
+				Cc._console.warn(rest[0], rest[1], rest[2], rest[3], rest[4], rest[5], rest[6], rest[7], rest[8], rest[9], rest[10], rest[11], rest[12]);
+			} else if (rest.length == 14) {
+				Cc._console.warn(rest[0], rest[1], rest[2], rest[3], rest[4], rest[5], rest[6], rest[7], rest[8], rest[9], rest[10], rest[11], rest[12],
+					rest[13]);
+			} else if (rest.length == 15) {
+				Cc._console.warn(rest[0], rest[1], rest[2], rest[3], rest[4], rest[5], rest[6], rest[7], rest[8], rest[9], rest[10], rest[11], rest[12],
+					rest[13], rest[14]);
+			} else if (rest.length == 16) {
+				Cc._console.warn(rest[0], rest[1], rest[2], rest[3], rest[4], rest[5], rest[6], rest[7], rest[8], rest[9], rest[10], rest[11], rest[12],
+					rest[13], rest[14], rest[15]);
+			} else if (rest.length == 17) {
+				Cc._console.warn(rest[0], rest[1], rest[2], rest[3], rest[4], rest[5], rest[6], rest[7], rest[8], rest[9], rest[10], rest[11], rest[12],
+					rest[13], rest[14], rest[15], rest[16]);
+			} else if (rest.length == 18) {
+				Cc._console.warn(rest[0], rest[1], rest[2], rest[3], rest[4], rest[5], rest[6], rest[7], rest[8], rest[9], rest[10], rest[11], rest[12],
+					rest[13], rest[14], rest[15], rest[16], rest[17]);
+			} else if (rest.length == 19) {
+				Cc._console.warn(rest[0], rest[1], rest[2], rest[3], rest[4], rest[5], rest[6], rest[7], rest[8], rest[9], rest[10], rest[11], rest[12],
+					rest[13], rest[14], rest[15], rest[16], rest[17], rest[18]);
+			} else {
+				if (rest.length != 20) {
+					throw "Too many rest arguments";
+				}
+				Cc._console.warn(rest[0], rest[1], rest[2], rest[3], rest[4], rest[5], rest[6], rest[7], rest[8], rest[9], rest[10], rest[11], rest[12],
+					rest[13], rest[14], rest[15], rest[16], rest[17], rest[18], rest[19]);
+			}
 		}
 	}
 
 	public static function error(..._rest:ASAny) {
 		var rest = ASCompat.restToArray(_rest);
-		if (_console != null) {
-			ASCompatMacro.applyBoundMethod(_console, "error", rest);
+		if (Cc._console != null) {
+			if (rest.length == 0) {
+				Cc._console.error();
+			} else if (rest.length == 1) {
+				Cc._console.error(rest[0]);
+			} else if (rest.length == 2) {
+				Cc._console.error(rest[0], rest[1]);
+			} else if (rest.length == 3) {
+				Cc._console.error(rest[0], rest[1], rest[2]);
+			} else if (rest.length == 4) {
+				Cc._console.error(rest[0], rest[1], rest[2], rest[3]);
+			} else if (rest.length == 5) {
+				Cc._console.error(rest[0], rest[1], rest[2], rest[3], rest[4]);
+			} else if (rest.length == 6) {
+				Cc._console.error(rest[0], rest[1], rest[2], rest[3], rest[4], rest[5]);
+			} else if (rest.length == 7) {
+				Cc._console.error(rest[0], rest[1], rest[2], rest[3], rest[4], rest[5], rest[6]);
+			} else if (rest.length == 8) {
+				Cc._console.error(rest[0], rest[1], rest[2], rest[3], rest[4], rest[5], rest[6], rest[7]);
+			} else if (rest.length == 9) {
+				Cc._console.error(rest[0], rest[1], rest[2], rest[3], rest[4], rest[5], rest[6], rest[7], rest[8]);
+			} else if (rest.length == 10) {
+				Cc._console.error(rest[0], rest[1], rest[2], rest[3], rest[4], rest[5], rest[6], rest[7], rest[8], rest[9]);
+			} else if (rest.length == 11) {
+				Cc._console.error(rest[0], rest[1], rest[2], rest[3], rest[4], rest[5], rest[6], rest[7], rest[8], rest[9], rest[10]);
+			} else if (rest.length == 12) {
+				Cc._console.error(rest[0], rest[1], rest[2], rest[3], rest[4], rest[5], rest[6], rest[7], rest[8], rest[9], rest[10], rest[11]);
+			} else if (rest.length == 13) {
+				Cc._console.error(rest[0], rest[1], rest[2], rest[3], rest[4], rest[5], rest[6], rest[7], rest[8], rest[9], rest[10], rest[11], rest[12]);
+			} else if (rest.length == 14) {
+				Cc._console.error(rest[0], rest[1], rest[2], rest[3], rest[4], rest[5], rest[6], rest[7], rest[8], rest[9], rest[10], rest[11], rest[12],
+					rest[13]);
+			} else if (rest.length == 15) {
+				Cc._console.error(rest[0], rest[1], rest[2], rest[3], rest[4], rest[5], rest[6], rest[7], rest[8], rest[9], rest[10], rest[11], rest[12],
+					rest[13], rest[14]);
+			} else if (rest.length == 16) {
+				Cc._console.error(rest[0], rest[1], rest[2], rest[3], rest[4], rest[5], rest[6], rest[7], rest[8], rest[9], rest[10], rest[11], rest[12],
+					rest[13], rest[14], rest[15]);
+			} else if (rest.length == 17) {
+				Cc._console.error(rest[0], rest[1], rest[2], rest[3], rest[4], rest[5], rest[6], rest[7], rest[8], rest[9], rest[10], rest[11], rest[12],
+					rest[13], rest[14], rest[15], rest[16]);
+			} else if (rest.length == 18) {
+				Cc._console.error(rest[0], rest[1], rest[2], rest[3], rest[4], rest[5], rest[6], rest[7], rest[8], rest[9], rest[10], rest[11], rest[12],
+					rest[13], rest[14], rest[15], rest[16], rest[17]);
+			} else if (rest.length == 19) {
+				Cc._console.error(rest[0], rest[1], rest[2], rest[3], rest[4], rest[5], rest[6], rest[7], rest[8], rest[9], rest[10], rest[11], rest[12],
+					rest[13], rest[14], rest[15], rest[16], rest[17], rest[18]);
+			} else {
+				if (rest.length != 20) {
+					throw "Too many rest arguments";
+				}
+				Cc._console.error(rest[0], rest[1], rest[2], rest[3], rest[4], rest[5], rest[6], rest[7], rest[8], rest[9], rest[10], rest[11], rest[12],
+					rest[13], rest[14], rest[15], rest[16], rest[17], rest[18], rest[19]);
+			}
 		}
 	}
 
 	public static function fatal(..._rest:ASAny) {
 		var rest = ASCompat.restToArray(_rest);
-		if (_console != null) {
-			ASCompatMacro.applyBoundMethod(_console, "fatal", rest);
+		if (Cc._console != null) {
+			if (rest.length == 0) {
+				Cc._console.fatal();
+			} else if (rest.length == 1) {
+				Cc._console.fatal(rest[0]);
+			} else if (rest.length == 2) {
+				Cc._console.fatal(rest[0], rest[1]);
+			} else if (rest.length == 3) {
+				Cc._console.fatal(rest[0], rest[1], rest[2]);
+			} else if (rest.length == 4) {
+				Cc._console.fatal(rest[0], rest[1], rest[2], rest[3]);
+			} else if (rest.length == 5) {
+				Cc._console.fatal(rest[0], rest[1], rest[2], rest[3], rest[4]);
+			} else if (rest.length == 6) {
+				Cc._console.fatal(rest[0], rest[1], rest[2], rest[3], rest[4], rest[5]);
+			} else if (rest.length == 7) {
+				Cc._console.fatal(rest[0], rest[1], rest[2], rest[3], rest[4], rest[5], rest[6]);
+			} else if (rest.length == 8) {
+				Cc._console.fatal(rest[0], rest[1], rest[2], rest[3], rest[4], rest[5], rest[6], rest[7]);
+			} else if (rest.length == 9) {
+				Cc._console.fatal(rest[0], rest[1], rest[2], rest[3], rest[4], rest[5], rest[6], rest[7], rest[8]);
+			} else if (rest.length == 10) {
+				Cc._console.fatal(rest[0], rest[1], rest[2], rest[3], rest[4], rest[5], rest[6], rest[7], rest[8], rest[9]);
+			} else if (rest.length == 11) {
+				Cc._console.fatal(rest[0], rest[1], rest[2], rest[3], rest[4], rest[5], rest[6], rest[7], rest[8], rest[9], rest[10]);
+			} else if (rest.length == 12) {
+				Cc._console.fatal(rest[0], rest[1], rest[2], rest[3], rest[4], rest[5], rest[6], rest[7], rest[8], rest[9], rest[10], rest[11]);
+			} else if (rest.length == 13) {
+				Cc._console.fatal(rest[0], rest[1], rest[2], rest[3], rest[4], rest[5], rest[6], rest[7], rest[8], rest[9], rest[10], rest[11], rest[12]);
+			} else if (rest.length == 14) {
+				Cc._console.fatal(rest[0], rest[1], rest[2], rest[3], rest[4], rest[5], rest[6], rest[7], rest[8], rest[9], rest[10], rest[11], rest[12],
+					rest[13]);
+			} else if (rest.length == 15) {
+				Cc._console.fatal(rest[0], rest[1], rest[2], rest[3], rest[4], rest[5], rest[6], rest[7], rest[8], rest[9], rest[10], rest[11], rest[12],
+					rest[13], rest[14]);
+			} else if (rest.length == 16) {
+				Cc._console.fatal(rest[0], rest[1], rest[2], rest[3], rest[4], rest[5], rest[6], rest[7], rest[8], rest[9], rest[10], rest[11], rest[12],
+					rest[13], rest[14], rest[15]);
+			} else if (rest.length == 17) {
+				Cc._console.fatal(rest[0], rest[1], rest[2], rest[3], rest[4], rest[5], rest[6], rest[7], rest[8], rest[9], rest[10], rest[11], rest[12],
+					rest[13], rest[14], rest[15], rest[16]);
+			} else if (rest.length == 18) {
+				Cc._console.fatal(rest[0], rest[1], rest[2], rest[3], rest[4], rest[5], rest[6], rest[7], rest[8], rest[9], rest[10], rest[11], rest[12],
+					rest[13], rest[14], rest[15], rest[16], rest[17]);
+			} else if (rest.length == 19) {
+				Cc._console.fatal(rest[0], rest[1], rest[2], rest[3], rest[4], rest[5], rest[6], rest[7], rest[8], rest[9], rest[10], rest[11], rest[12],
+					rest[13], rest[14], rest[15], rest[16], rest[17], rest[18]);
+			} else {
+				if (rest.length != 20) {
+					throw "Too many rest arguments";
+				}
+				Cc._console.fatal(rest[0], rest[1], rest[2], rest[3], rest[4], rest[5], rest[6], rest[7], rest[8], rest[9], rest[10], rest[11], rest[12],
+					rest[13], rest[14], rest[15], rest[16], rest[17], rest[18], rest[19]);
+			}
 		}
 	}
 
 	public static function logch(channel:ASAny, ..._rest:ASAny) {
 		var rest = ASCompat.restToArray(_rest);
-		if (_console != null) {
-			_console.addCh(channel, rest, (Console.LOG : Int));
+		if (Cc._console != null) {
+			Cc._console.addCh(channel, ASCompat.coerce(rest.copy(), Array), 1);
 		}
 	}
 
 	public static function infoch(channel:ASAny, ..._rest:ASAny) {
 		var rest = ASCompat.restToArray(_rest);
-		if (_console != null) {
-			_console.addCh(channel, rest, (Console.INFO : Int));
+		if (Cc._console != null) {
+			Cc._console.addCh(channel, ASCompat.coerce(rest.copy(), Array), 3);
 		}
 	}
 
 	public static function debugch(channel:ASAny, ..._rest:ASAny) {
 		var rest = ASCompat.restToArray(_rest);
-		if (_console != null) {
-			_console.addCh(channel, rest, (Console.DEBUG : Int));
+		if (Cc._console != null) {
+			Cc._console.addCh(channel, ASCompat.coerce(rest.copy(), Array), 6);
 		}
 	}
 
 	public static function warnch(channel:ASAny, ..._rest:ASAny) {
 		var rest = ASCompat.restToArray(_rest);
-		if (_console != null) {
-			_console.addCh(channel, rest, (Console.WARN : Int));
+		if (Cc._console != null) {
+			Cc._console.addCh(channel, ASCompat.coerce(rest.copy(), Array), 8);
 		}
 	}
 
 	public static function errorch(channel:ASAny, ..._rest:ASAny) {
 		var rest = ASCompat.restToArray(_rest);
-		if (_console != null) {
-			_console.addCh(channel, rest, (Console.ERROR_cpp : Int));
+		if (Cc._console != null) {
+			Cc._console.addCh(channel, ASCompat.coerce(rest.copy(), Array), 9);
 		}
 	}
 
 	public static function fatalch(channel:ASAny, ..._rest:ASAny) {
 		var rest = ASCompat.restToArray(_rest);
-		if (_console != null) {
-			_console.addCh(channel, rest, (Console.FATAL : Int));
+		if (Cc._console != null) {
+			Cc._console.addCh(channel, ASCompat.coerce(rest.copy(), Array), 10);
 		}
 	}
 
 	public static function stack(string:ASAny, depth:Int = -1, priority:Int = 5) {
-		if (_console != null) {
-			_console.stack(string, depth, priority);
+		if (Cc._console != null) {
+			Cc._console.stack(string, depth, priority);
 		}
 	}
 
 	public static function stackch(channel:ASAny, string:ASAny, depth:Int = -1, priority:Int = 5) {
-		if (_console != null) {
-			_console.stackch(channel, string, depth, priority);
+		if (Cc._console != null) {
+			Cc._console.stackch(channel, string, depth, priority);
 		}
 	}
 
-	public static function inspect(obj:ASObject, showInherit:Bool = true) {
-		if (_console != null) {
-			_console.inspect(obj, showInherit);
+	public static function inspect(obj:ASAny, showInherit:Bool = true) {
+		if (Cc._console != null) {
+			Cc._console.inspect(obj, showInherit);
 		}
 	}
 
-	public static function inspectch(channel:ASAny, obj:ASObject, showInherit:Bool = true) {
-		if (_console != null) {
-			_console.inspectch(channel, obj, showInherit);
+	public static function inspectch(channel:ASAny, obj:ASAny, showInherit:Bool = true) {
+		if (Cc._console != null) {
+			Cc._console.inspectch(channel, obj, showInherit);
 		}
 	}
 
-	public static function explode(obj:ASObject, depth:Int = 3) {
-		if (_console != null) {
-			_console.explode(obj, depth);
+	public static function explode(obj:ASAny, depth:Int = 3) {
+		if (Cc._console != null) {
+			Cc._console.explode(obj, depth);
 		}
 	}
 
-	public static function explodech(channel:ASAny, obj:ASObject, depth:Int = 3) {
-		if (_console != null) {
-			_console.explodech(channel, obj, depth);
+	public static function explodech(channel:ASAny, obj:ASAny, depth:Int = 3) {
+		if (Cc._console != null) {
+			Cc._console.explodech(channel, obj, depth);
 		}
 	}
 
 	public static function addHTML(..._rest:ASAny) {
 		var rest = ASCompat.restToArray(_rest);
-		if (_console != null) {
-			ASCompatMacro.applyBoundMethod(_console, "addHTML", rest);
+		if (Cc._console != null) {
+			if (rest.length == 0) {
+				Cc._console.addHTML();
+			} else if (rest.length == 1) {
+				Cc._console.addHTML(rest[0]);
+			} else if (rest.length == 2) {
+				Cc._console.addHTML(rest[0], rest[1]);
+			} else if (rest.length == 3) {
+				Cc._console.addHTML(rest[0], rest[1], rest[2]);
+			} else if (rest.length == 4) {
+				Cc._console.addHTML(rest[0], rest[1], rest[2], rest[3]);
+			} else if (rest.length == 5) {
+				Cc._console.addHTML(rest[0], rest[1], rest[2], rest[3], rest[4]);
+			} else if (rest.length == 6) {
+				Cc._console.addHTML(rest[0], rest[1], rest[2], rest[3], rest[4], rest[5]);
+			} else if (rest.length == 7) {
+				Cc._console.addHTML(rest[0], rest[1], rest[2], rest[3], rest[4], rest[5], rest[6]);
+			} else if (rest.length == 8) {
+				Cc._console.addHTML(rest[0], rest[1], rest[2], rest[3], rest[4], rest[5], rest[6], rest[7]);
+			} else if (rest.length == 9) {
+				Cc._console.addHTML(rest[0], rest[1], rest[2], rest[3], rest[4], rest[5], rest[6], rest[7], rest[8]);
+			} else if (rest.length == 10) {
+				Cc._console.addHTML(rest[0], rest[1], rest[2], rest[3], rest[4], rest[5], rest[6], rest[7], rest[8], rest[9]);
+			} else if (rest.length == 11) {
+				Cc._console.addHTML(rest[0], rest[1], rest[2], rest[3], rest[4], rest[5], rest[6], rest[7], rest[8], rest[9], rest[10]);
+			} else if (rest.length == 12) {
+				Cc._console.addHTML(rest[0], rest[1], rest[2], rest[3], rest[4], rest[5], rest[6], rest[7], rest[8], rest[9], rest[10], rest[11]);
+			} else if (rest.length == 13) {
+				Cc._console.addHTML(rest[0], rest[1], rest[2], rest[3], rest[4], rest[5], rest[6], rest[7], rest[8], rest[9], rest[10], rest[11], rest[12]);
+			} else if (rest.length == 14) {
+				Cc._console.addHTML(rest[0], rest[1], rest[2], rest[3], rest[4], rest[5], rest[6], rest[7], rest[8], rest[9], rest[10], rest[11], rest[12],
+					rest[13]);
+			} else if (rest.length == 15) {
+				Cc._console.addHTML(rest[0], rest[1], rest[2], rest[3], rest[4], rest[5], rest[6], rest[7], rest[8], rest[9], rest[10], rest[11], rest[12],
+					rest[13], rest[14]);
+			} else if (rest.length == 16) {
+				Cc._console.addHTML(rest[0], rest[1], rest[2], rest[3], rest[4], rest[5], rest[6], rest[7], rest[8], rest[9], rest[10], rest[11], rest[12],
+					rest[13], rest[14], rest[15]);
+			} else if (rest.length == 17) {
+				Cc._console.addHTML(rest[0], rest[1], rest[2], rest[3], rest[4], rest[5], rest[6], rest[7], rest[8], rest[9], rest[10], rest[11], rest[12],
+					rest[13], rest[14], rest[15], rest[16]);
+			} else if (rest.length == 18) {
+				Cc._console.addHTML(rest[0], rest[1], rest[2], rest[3], rest[4], rest[5], rest[6], rest[7], rest[8], rest[9], rest[10], rest[11], rest[12],
+					rest[13], rest[14], rest[15], rest[16], rest[17]);
+			} else if (rest.length == 19) {
+				Cc._console.addHTML(rest[0], rest[1], rest[2], rest[3], rest[4], rest[5], rest[6], rest[7], rest[8], rest[9], rest[10], rest[11], rest[12],
+					rest[13], rest[14], rest[15], rest[16], rest[17], rest[18]);
+			} else {
+				if (rest.length != 20) {
+					throw "Too many rest arguments";
+				}
+				Cc._console.addHTML(rest[0], rest[1], rest[2], rest[3], rest[4], rest[5], rest[6], rest[7], rest[8], rest[9], rest[10], rest[11], rest[12],
+					rest[13], rest[14], rest[15], rest[16], rest[17], rest[18], rest[19]);
+			}
 		}
 	}
 
 	public static function addHTMLch(channel:ASAny, priority:Int, ..._rest:ASAny) {
 		var rest = ASCompat.restToArray(_rest);
-		if (_console != null) {
-			ASCompatMacro.applyBoundMethod(_console, "addHTMLch", ([channel, priority] : Array<ASAny>).concat(rest));
+		var _loc5_:Console = null;
+		var _loc6_:ASFunction = null;
+		var _loc7_ = (ASCompat.dynamicAs(null, Array) : Array<ASAny>);
+		if (Cc._console != null) {
+			_loc5_ = Cc._console;
+			_loc6_ = Cc._console.addHTMLch;
+			_loc7_ = ASCompat.ASArray.concat(([channel, priority] : Array<ASAny>), [rest.copy()]);
+			Reflect.callMethod(_loc5_, _loc6_, _loc7_);
 		}
 	}
 
 	public static function map(container:DisplayObjectContainer, maxDepth:UInt = (0 : UInt)) {
-		if (_console != null) {
-			_console.map(container, maxDepth);
+		if (Cc._console != null) {
+			Cc._console.map(container, maxDepth);
 		}
 	}
 
 	public static function mapch(channel:ASAny, container:DisplayObjectContainer, maxDepth:UInt = (0 : UInt)) {
-		if (_console != null) {
-			_console.mapch(channel, container, maxDepth);
+		if (Cc._console != null) {
+			Cc._console.mapch(channel, container, maxDepth);
 		}
 	}
 
-	public static function clear(channel:String = null) {
-		if (_console != null) {
-			_console.clear(channel);
+	public static function clear(channel:String = /*undefined*/ null) {
+		if (Cc._console != null) {
+			Cc._console.clear(channel);
 		}
 	}
 
-	public static function bindKey(key:KeyBind, callback:ASFunction = null, args:Array<ASAny> = null) {
-		if (_console != null) {
-			_console.bindKey(key, callback, args);
+	public static function bindKey(key:KeyBind, callback:ASAny = /*undefined*/ null, args:Array<ASAny> = /*undefined*/ null) {
+		if (Cc._console != null) {
+			Cc._console.bindKey(key, callback, args);
 		}
 	}
 
-	public static function addMenu(key:String, callback:ASFunction, args:Array<ASAny> = null, rollover:String = null) {
-		if (_console != null) {
-			_console.addMenu(key, callback, args, rollover);
+	public static function addMenu(key:String, callback:ASAny, args:Array<ASAny> = /*undefined*/ null, rollover:String = /*undefined*/ null) {
+		if (Cc._console != null) {
+			Cc._console.addMenu(key, callback, args, rollover);
 		}
 	}
 
 	public static function listenUncaughtErrors(loaderinfo:LoaderInfo) {
-		if (_console != null) {
-			_console.listenUncaughtErrors(loaderinfo);
+		if (Cc._console != null) {
+			Cc._console.listenUncaughtErrors(loaderinfo);
 		}
 	}
 
-	public static function store(name:String, obj:ASObject, useStrong:Bool = false) {
-		if (_console != null) {
-			_console.store(name, obj, useStrong);
+	public static function store(name:String, obj:ASAny, useStrong:Bool = false) {
+		if (Cc._console != null) {
+			Cc._console.store(name, obj, useStrong);
 		}
 	}
 
-	public static function addSlashCommand(name:String, callback:ASFunction, description:String = "", alwaysAvailable:Bool = true,
-			endOfArgsMarker:String = ";") {
-		if (_console != null) {
-			_console.addSlashCommand(name, callback, description, alwaysAvailable, endOfArgsMarker);
+	public static function addSlashCommand(name:String, callback:ASAny, description:String = /*undefined*/ null, alwaysAvailable:Bool = true,
+			endOfArgsMarker:String = /*undefined*/ null) {
+		if (description == null) {
+			description = "";
+		}
+		if (endOfArgsMarker == null) {
+			endOfArgsMarker = ";";
+		}
+		if (Cc._console != null) {
+			Cc._console.addSlashCommand(name, callback, description, alwaysAvailable, endOfArgsMarker);
 		}
 	}
 
-	public static function watch(obj:ASObject, name:String = null):String {
-		if (_console != null) {
-			return _console.watch(obj, name);
+	public static function watch(obj:ASAny, name:String = /*undefined*/ null):String {
+		if (Cc._console != null) {
+			return Cc._console.watch(obj, name);
 		}
 		return null;
 	}
 
 	public static function unwatch(name:String) {
-		if (_console != null) {
-			_console.unwatch(name);
+		if (Cc._console != null) {
+			Cc._console.unwatch(name);
 		}
 	}
 
-	public static function addGraph(panelName:String, obj:ASObject, property:String, color:Float = -1, idKey:String = null, rectArea:Rectangle = null,
-			inverse:Bool = false) {
-		if (_console != null) {
-			_console.addGraph(panelName, obj, property, color, idKey, rectArea, inverse);
+	public static function addGraph(panelName:String, obj:ASAny, property:String, color:Int = -1, idKey:String = /*undefined*/ null,
+			rectArea:Rectangle = /*undefined*/ null, inverse:Bool = false) {
+		if (Cc._console != null) {
+			Cc._console.addGraph(panelName, obj, property, color, idKey, rectArea, inverse);
 		}
 	}
 
-	public static function fixGraphRange(panelName:String, min:Float = null, max:Float = null) {
-		if (min == null)
+	public static function fixGraphRange(panelName:String, min:ASObject = /*undefined*/ null, max:ASObject = /*undefined*/ null) {
+		if (min == null) {
 			min = Math.NaN;
-		if (max == null)
+		}
+		if (max == null) {
 			max = Math.NaN;
-		if (_console != null) {
-			_console.fixGraphRange(panelName, min, max);
+		}
+		if (Cc._console != null) {
+			Cc._console.fixGraphRange(panelName, min, max);
 		}
 	}
 
-	public static function removeGraph(panelName:String, obj:ASObject = null, property:String = null) {
-		if (_console != null) {
-			_console.removeGraph(panelName, obj, property);
+	public static function removeGraph(panelName:String, obj:ASAny = /*undefined*/ null, property:String = /*undefined*/ null) {
+		if (Cc._console != null) {
+			Cc._console.removeGraph(panelName, obj, property);
 		}
 	}
 
 	public static function setViewingChannels(..._rest:ASAny) {
 		var rest = ASCompat.restToArray(_rest);
-		if (_console != null) {
-			ASCompatMacro.applyBoundMethod(_console, "setViewingChannels", rest);
+		if (Cc._console != null) {
+			if (rest.length == 0) {
+				Cc._console.setViewingChannels();
+			} else if (rest.length == 1) {
+				Cc._console.setViewingChannels(rest[0]);
+			} else if (rest.length == 2) {
+				Cc._console.setViewingChannels(rest[0], rest[1]);
+			} else if (rest.length == 3) {
+				Cc._console.setViewingChannels(rest[0], rest[1], rest[2]);
+			} else if (rest.length == 4) {
+				Cc._console.setViewingChannels(rest[0], rest[1], rest[2], rest[3]);
+			} else if (rest.length == 5) {
+				Cc._console.setViewingChannels(rest[0], rest[1], rest[2], rest[3], rest[4]);
+			} else if (rest.length == 6) {
+				Cc._console.setViewingChannels(rest[0], rest[1], rest[2], rest[3], rest[4], rest[5]);
+			} else if (rest.length == 7) {
+				Cc._console.setViewingChannels(rest[0], rest[1], rest[2], rest[3], rest[4], rest[5], rest[6]);
+			} else if (rest.length == 8) {
+				Cc._console.setViewingChannels(rest[0], rest[1], rest[2], rest[3], rest[4], rest[5], rest[6], rest[7]);
+			} else if (rest.length == 9) {
+				Cc._console.setViewingChannels(rest[0], rest[1], rest[2], rest[3], rest[4], rest[5], rest[6], rest[7], rest[8]);
+			} else if (rest.length == 10) {
+				Cc._console.setViewingChannels(rest[0], rest[1], rest[2], rest[3], rest[4], rest[5], rest[6], rest[7], rest[8], rest[9]);
+			} else if (rest.length == 11) {
+				Cc._console.setViewingChannels(rest[0], rest[1], rest[2], rest[3], rest[4], rest[5], rest[6], rest[7], rest[8], rest[9], rest[10]);
+			} else if (rest.length == 12) {
+				Cc._console.setViewingChannels(rest[0], rest[1], rest[2], rest[3], rest[4], rest[5], rest[6], rest[7], rest[8], rest[9], rest[10], rest[11]);
+			} else if (rest.length == 13) {
+				Cc._console.setViewingChannels(rest[0], rest[1], rest[2], rest[3], rest[4], rest[5], rest[6], rest[7], rest[8], rest[9], rest[10], rest[11],
+					rest[12]);
+			} else if (rest.length == 14) {
+				Cc._console.setViewingChannels(rest[0], rest[1], rest[2], rest[3], rest[4], rest[5], rest[6], rest[7], rest[8], rest[9], rest[10], rest[11],
+					rest[12], rest[13]);
+			} else if (rest.length == 15) {
+				Cc._console.setViewingChannels(rest[0], rest[1], rest[2], rest[3], rest[4], rest[5], rest[6], rest[7], rest[8], rest[9], rest[10], rest[11],
+					rest[12], rest[13], rest[14]);
+			} else if (rest.length == 16) {
+				Cc._console.setViewingChannels(rest[0], rest[1], rest[2], rest[3], rest[4], rest[5], rest[6], rest[7], rest[8], rest[9], rest[10], rest[11],
+					rest[12], rest[13], rest[14], rest[15]);
+			} else if (rest.length == 17) {
+				Cc._console.setViewingChannels(rest[0], rest[1], rest[2], rest[3], rest[4], rest[5], rest[6], rest[7], rest[8], rest[9], rest[10], rest[11],
+					rest[12], rest[13], rest[14], rest[15], rest[16]);
+			} else if (rest.length == 18) {
+				Cc._console.setViewingChannels(rest[0], rest[1], rest[2], rest[3], rest[4], rest[5], rest[6], rest[7], rest[8], rest[9], rest[10], rest[11],
+					rest[12], rest[13], rest[14], rest[15], rest[16], rest[17]);
+			} else if (rest.length == 19) {
+				Cc._console.setViewingChannels(rest[0], rest[1], rest[2], rest[3], rest[4], rest[5], rest[6], rest[7], rest[8], rest[9], rest[10], rest[11],
+					rest[12], rest[13], rest[14], rest[15], rest[16], rest[17], rest[18]);
+			} else {
+				if (rest.length != 20) {
+					throw "Too many rest arguments";
+				}
+				Cc._console.setViewingChannels(rest[0], rest[1], rest[2], rest[3], rest[4], rest[5], rest[6], rest[7], rest[8], rest[9], rest[10], rest[11],
+					rest[12], rest[13], rest[14], rest[15], rest[16], rest[17], rest[18], rest[19]);
+			}
 		}
 	}
 
 	public static function setIgnoredChannels(..._rest:ASAny) {
 		var rest = ASCompat.restToArray(_rest);
-		if (_console != null) {
-			ASCompatMacro.applyBoundMethod(_console, "setIgnoredChannels", rest);
+		if (Cc._console != null) {
+			if (rest.length == 0) {
+				Cc._console.setIgnoredChannels();
+			} else if (rest.length == 1) {
+				Cc._console.setIgnoredChannels(rest[0]);
+			} else if (rest.length == 2) {
+				Cc._console.setIgnoredChannels(rest[0], rest[1]);
+			} else if (rest.length == 3) {
+				Cc._console.setIgnoredChannels(rest[0], rest[1], rest[2]);
+			} else if (rest.length == 4) {
+				Cc._console.setIgnoredChannels(rest[0], rest[1], rest[2], rest[3]);
+			} else if (rest.length == 5) {
+				Cc._console.setIgnoredChannels(rest[0], rest[1], rest[2], rest[3], rest[4]);
+			} else if (rest.length == 6) {
+				Cc._console.setIgnoredChannels(rest[0], rest[1], rest[2], rest[3], rest[4], rest[5]);
+			} else if (rest.length == 7) {
+				Cc._console.setIgnoredChannels(rest[0], rest[1], rest[2], rest[3], rest[4], rest[5], rest[6]);
+			} else if (rest.length == 8) {
+				Cc._console.setIgnoredChannels(rest[0], rest[1], rest[2], rest[3], rest[4], rest[5], rest[6], rest[7]);
+			} else if (rest.length == 9) {
+				Cc._console.setIgnoredChannels(rest[0], rest[1], rest[2], rest[3], rest[4], rest[5], rest[6], rest[7], rest[8]);
+			} else if (rest.length == 10) {
+				Cc._console.setIgnoredChannels(rest[0], rest[1], rest[2], rest[3], rest[4], rest[5], rest[6], rest[7], rest[8], rest[9]);
+			} else if (rest.length == 11) {
+				Cc._console.setIgnoredChannels(rest[0], rest[1], rest[2], rest[3], rest[4], rest[5], rest[6], rest[7], rest[8], rest[9], rest[10]);
+			} else if (rest.length == 12) {
+				Cc._console.setIgnoredChannels(rest[0], rest[1], rest[2], rest[3], rest[4], rest[5], rest[6], rest[7], rest[8], rest[9], rest[10], rest[11]);
+			} else if (rest.length == 13) {
+				Cc._console.setIgnoredChannels(rest[0], rest[1], rest[2], rest[3], rest[4], rest[5], rest[6], rest[7], rest[8], rest[9], rest[10], rest[11],
+					rest[12]);
+			} else if (rest.length == 14) {
+				Cc._console.setIgnoredChannels(rest[0], rest[1], rest[2], rest[3], rest[4], rest[5], rest[6], rest[7], rest[8], rest[9], rest[10], rest[11],
+					rest[12], rest[13]);
+			} else if (rest.length == 15) {
+				Cc._console.setIgnoredChannels(rest[0], rest[1], rest[2], rest[3], rest[4], rest[5], rest[6], rest[7], rest[8], rest[9], rest[10], rest[11],
+					rest[12], rest[13], rest[14]);
+			} else if (rest.length == 16) {
+				Cc._console.setIgnoredChannels(rest[0], rest[1], rest[2], rest[3], rest[4], rest[5], rest[6], rest[7], rest[8], rest[9], rest[10], rest[11],
+					rest[12], rest[13], rest[14], rest[15]);
+			} else if (rest.length == 17) {
+				Cc._console.setIgnoredChannels(rest[0], rest[1], rest[2], rest[3], rest[4], rest[5], rest[6], rest[7], rest[8], rest[9], rest[10], rest[11],
+					rest[12], rest[13], rest[14], rest[15], rest[16]);
+			} else if (rest.length == 18) {
+				Cc._console.setIgnoredChannels(rest[0], rest[1], rest[2], rest[3], rest[4], rest[5], rest[6], rest[7], rest[8], rest[9], rest[10], rest[11],
+					rest[12], rest[13], rest[14], rest[15], rest[16], rest[17]);
+			} else if (rest.length == 19) {
+				Cc._console.setIgnoredChannels(rest[0], rest[1], rest[2], rest[3], rest[4], rest[5], rest[6], rest[7], rest[8], rest[9], rest[10], rest[11],
+					rest[12], rest[13], rest[14], rest[15], rest[16], rest[17], rest[18]);
+			} else {
+				if (rest.length != 20) {
+					throw "Too many rest arguments";
+				}
+				Cc._console.setIgnoredChannels(rest[0], rest[1], rest[2], rest[3], rest[4], rest[5], rest[6], rest[7], rest[8], rest[9], rest[10], rest[11],
+					rest[12], rest[13], rest[14], rest[15], rest[16], rest[17], rest[18], rest[19]);
+			}
 		}
 	}
 
 	@:isVar public static var minimumPriority(never, set):UInt;
 
 	static public function set_minimumPriority(level:UInt):UInt {
-		if (_console != null) {
-			_console.minimumPriority = level;
+		if (Cc._console != null) {
+			Cc._console.set_minimumPriority(level);
 		}
 		return level;
 	}
@@ -307,15 +805,15 @@ class Cc {
 	@:isVar public static var width(get, set):Float;
 
 	static public function get_width():Float {
-		if (_console != null) {
-			return _console.width;
+		if (Cc._console != null) {
+			return Cc._console.get_width();
 		}
 		return 0;
 	}
 
-	static function set_width(v:Float):Float {
-		if (_console != null) {
-			_console.width = v;
+	static public function set_width(v:Float):Float {
+		if (Cc._console != null) {
+			Cc._console.set_width(v);
 		}
 		return v;
 	}
@@ -323,15 +821,15 @@ class Cc {
 	@:isVar public static var height(get, set):Float;
 
 	static public function get_height():Float {
-		if (_console != null) {
-			return _console.height;
+		if (Cc._console != null) {
+			return Cc._console.get_height();
 		}
 		return 0;
 	}
 
-	static function set_height(v:Float):Float {
-		if (_console != null) {
-			_console.height = v;
+	static public function set_height(v:Float):Float {
+		if (Cc._console != null) {
+			Cc._console.set_height(v);
 		}
 		return v;
 	}
@@ -339,15 +837,15 @@ class Cc {
 	@:isVar public static var x(get, set):Float;
 
 	static public function get_x():Float {
-		if (_console != null) {
-			return _console.x;
+		if (Cc._console != null) {
+			return Cc._console.get_x();
 		}
 		return 0;
 	}
 
-	static function set_x(v:Float):Float {
-		if (_console != null) {
-			_console.x = v;
+	static public function set_x(v:Float):Float {
+		if (Cc._console != null) {
+			Cc._console.set_x(v);
 		}
 		return v;
 	}
@@ -355,15 +853,15 @@ class Cc {
 	@:isVar public static var y(get, set):Float;
 
 	static public function get_y():Float {
-		if (_console != null) {
-			return _console.y;
+		if (Cc._console != null) {
+			return Cc._console.get_y();
 		}
 		return 0;
 	}
 
-	static function set_y(v:Float):Float {
-		if (_console != null) {
-			_console.y = v;
+	static public function set_y(v:Float):Float {
+		if (Cc._console != null) {
+			Cc._console.set_y(v);
 		}
 		return v;
 	}
@@ -371,15 +869,15 @@ class Cc {
 	@:isVar public static var visible(get, set):Bool;
 
 	static public function get_visible():Bool {
-		if (_console != null) {
-			return _console.visible;
+		if (Cc._console != null) {
+			return Cc._console.visible;
 		}
 		return false;
 	}
 
-	static function set_visible(v:Bool):Bool {
-		if (_console != null) {
-			_console.visible = v;
+	static public function set_visible(v:Bool):Bool {
+		if (Cc._console != null) {
+			Cc._console.set_visible(v);
 		}
 		return v;
 	}
@@ -387,15 +885,15 @@ class Cc {
 	@:isVar public static var fpsMonitor(get, set):Bool;
 
 	static public function get_fpsMonitor():Bool {
-		if (_console != null) {
-			return _console.fpsMonitor;
+		if (Cc._console != null) {
+			return Cc._console.get_fpsMonitor();
 		}
 		return false;
 	}
 
-	static function set_fpsMonitor(v:Bool):Bool {
-		if (_console != null) {
-			_console.fpsMonitor = v;
+	static public function set_fpsMonitor(v:Bool):Bool {
+		if (Cc._console != null) {
+			Cc._console.set_fpsMonitor(v);
 		}
 		return v;
 	}
@@ -403,15 +901,15 @@ class Cc {
 	@:isVar public static var memoryMonitor(get, set):Bool;
 
 	static public function get_memoryMonitor():Bool {
-		if (_console != null) {
-			return _console.memoryMonitor;
+		if (Cc._console != null) {
+			return Cc._console.get_memoryMonitor();
 		}
 		return false;
 	}
 
-	static function set_memoryMonitor(v:Bool):Bool {
-		if (_console != null) {
-			_console.memoryMonitor = v;
+	static public function set_memoryMonitor(v:Bool):Bool {
+		if (Cc._console != null) {
+			Cc._console.set_memoryMonitor(v);
 		}
 		return v;
 	}
@@ -419,15 +917,15 @@ class Cc {
 	@:isVar public static var commandLine(get, set):Bool;
 
 	static public function get_commandLine():Bool {
-		if (_console != null) {
-			return _console.commandLine;
+		if (Cc._console != null) {
+			return Cc._console.get_commandLine();
 		}
 		return false;
 	}
 
-	static function set_commandLine(v:Bool):Bool {
-		if (_console != null) {
-			_console.commandLine = v;
+	static public function set_commandLine(v:Bool):Bool {
+		if (Cc._console != null) {
+			Cc._console.set_commandLine(v);
 		}
 		return v;
 	}
@@ -435,59 +933,62 @@ class Cc {
 	@:isVar public static var displayRoller(get, set):Bool;
 
 	static public function get_displayRoller():Bool {
-		if (_console != null) {
-			return _console.displayRoller;
+		if (Cc._console != null) {
+			return Cc._console.get_displayRoller();
 		}
 		return false;
 	}
 
-	static function set_displayRoller(v:Bool):Bool {
-		if (_console != null) {
-			_console.displayRoller = v;
+	static public function set_displayRoller(v:Bool):Bool {
+		if (Cc._console != null) {
+			Cc._console.set_displayRoller(v);
 		}
 		return v;
 	}
 
 	public static function setRollerCaptureKey(character:String, ctrl:Bool = false, alt:Bool = false, shift:Bool = false) {
-		if (_console != null) {
-			_console.setRollerCaptureKey(character, shift, ctrl, alt);
+		if (Cc._console != null) {
+			Cc._console.setRollerCaptureKey(character, shift, ctrl, alt);
 		}
 	}
 
 	@:isVar public static var remoting(get, set):Bool;
 
 	static public function get_remoting():Bool {
-		if (_console != null) {
-			return _console.remoting;
+		if (Cc._console != null) {
+			return Cc._console.get_remoting();
 		}
 		return false;
 	}
 
-	static function set_remoting(v:Bool):Bool {
-		if (_console != null) {
-			_console.remoting = v;
+	static public function set_remoting(v:Bool):Bool {
+		if (Cc._console != null) {
+			Cc._console.set_remoting(v);
 		}
 		return v;
 	}
 
 	public static function remotingSocket(host:String, port:Int) {
-		if (_console != null) {
-			_console.remotingSocket(host, port);
+		if (Cc._console != null) {
+			Cc._console.remotingSocket(host, port);
 		}
 	}
 
 	public static function remove() {
-		if (_console != null) {
-			if (_console.parent != null) {
-				_console.parent.removeChild(_console);
+		if (Cc._console != null) {
+			if (Cc._console.parent != null) {
+				Cc._console.parent.removeChild(Cc._console);
 			}
-			_console = null;
+			Cc._console = null;
 		}
 	}
 
-	public static function getAllLog(splitter:String = "\r\n"):String {
-		if (_console != null) {
-			return _console.getAllLog(splitter);
+	public static function getAllLog(splitter:String = /*undefined*/ null):String {
+		if (splitter == null) {
+			splitter = "\r\n";
+		}
+		if (Cc._console != null) {
+			return Cc._console.getAllLog(splitter);
 		}
 		return "";
 	}
@@ -495,14 +996,6 @@ class Cc {
 	@:isVar public static var instance(get, never):Console;
 
 	static public function get_instance():Console {
-		return _console;
-	}
-
-	static function addedToStageHandle(e:Event) {
-		var _loc2_ = ASCompat.dynamicAs(e.currentTarget, DisplayObjectContainer);
-		_loc2_.removeEventListener(Event.ADDED_TO_STAGE, addedToStageHandle);
-		if (_console != null && _console.parent == null) {
-			_loc2_.stage.addChild(_console);
-		}
+		return Cc._console;
 	}
 }

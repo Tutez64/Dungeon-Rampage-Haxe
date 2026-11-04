@@ -18,36 +18,30 @@ class ActorMovieClipRenderer extends MovieClipRenderController implements IRende
 		super(dbFacade, movieClip);
 		mDBFacade = dbFacade;
 		var _loc3_:DisplayObject;
-		final __ax4_iter_25 = FloorView.findNavCollisions(movieClip);
-		if (checkNullIteratee(__ax4_iter_25))
-			for (_tmp_ in __ax4_iter_25) {
+		final __ax4_iter_21 = FloorView.findNavCollisions(movieClip);
+		if (checkNullIteratee(__ax4_iter_21))
+			for (_tmp_ in __ax4_iter_21) {
 				_loc3_ = ASCompat.coerce(_tmp_, flash.display.DisplayObject);
 				_loc3_.parent.removeChild(_loc3_);
 			}
 		var _loc4_:DisplayObject;
-		final __ax4_iter_26 = FloorView.findCombatCollisions(movieClip);
-		if (checkNullIteratee(__ax4_iter_26))
-			for (_tmp_ in __ax4_iter_26) {
+		final __ax4_iter_22 = FloorView.findCombatCollisions(movieClip);
+		if (checkNullIteratee(__ax4_iter_22))
+			for (_tmp_ in __ax4_iter_22) {
 				_loc4_ = ASCompat.coerce(_tmp_, flash.display.DisplayObject);
 				_loc4_.parent.removeChild(_loc4_);
 			}
 	}
 
-	@:isVar public var displayObject(get, never):DisplayObject;
-
-	public function get_displayObject():DisplayObject {
+	override public function get_displayObject():DisplayObject {
 		return mClip;
 	}
 
-	@:isVar public var rendererType(get, never):String;
-
-	public function get_rendererType():String {
+	override public function get_rendererType():String {
 		return MOVIE_CLIP_RENDERER_TYPE;
 	}
 
-	@:isVar public var heading(never, set):Float;
-
-	public function set_heading(value:Float):Float {
+	override public function set_heading(value:Float):Float {
 		return mHeading = value;
 	}
 

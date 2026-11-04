@@ -1,17 +1,17 @@
 package box2D.dynamics.joints;
 
-/*use*/ /*namespace*/ /*b2internal*/ class B2GearJointDef extends B2JointDef {
-	public var joint1:B2Joint;
+class B2GearJointDef extends B2JointDef {
+	public var ratio:Float = Math.NaN;
 
 	public var joint2:B2Joint;
 
-	public var ratio:Float = Math.NaN;
+	public var joint1:B2Joint;
 
 	public function new() {
 		super();
-		type = B2Joint.e_gearJoint;
-		this.joint1 = null;
-		this.joint2 = null;
-		this.ratio = 1;
+		type = 6;
+		joint1 = null;
+		joint2 = null;
+		ratio = 1;
 	}
 }

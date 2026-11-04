@@ -5,7 +5,9 @@ import brain.assetRepository.AssetLoadingComponent;
 import brain.clock.GameClock;
 import brain.sceneGraph.SceneGraphComponent;
 import brain.uI.UIObject;
+import brain.utils.TextUtil;
 import brain.workLoop.LogicalWorkComponent;
+import dBGlobals.DBGlobal;
 import facade.DBFacade;
 import facade.GameMasterLocale;
 import facade.Locale;
@@ -52,6 +54,7 @@ class UIStacksHud {
 	}
 
 	public function initializeHud(rootClass:Dynamic) {
+		hide();
 		mUIRootClass = rootClass;
 		mUIRoot = ASCompat.coerce(ASCompat.createInstance(mUIRootClass, []), flash.display.MovieClip);
 		mUIRoot.x = 480;
@@ -78,12 +81,12 @@ class UIStacksHud {
 			new UIObject(mDBFacade, ASCompat.coerce((mUIRoot : ASAny).potion_slot_C, flash.display.MovieClip))
 		]);
 		mStackTimersUI = Vector.ofArray(([null, null, null] : Array<CountdownTextTimer>));
-		final __ax4_iter_88 = mStacksUI;
-		if (checkNullIteratee(__ax4_iter_88))
-			for (_tmp_ in __ax4_iter_88) {
+		final __ax4_iter_421 = mStacksUI;
+		if (checkNullIteratee(__ax4_iter_421))
+			for (_tmp_ in __ax4_iter_421) {
 				_loc1_ = _tmp_;
-				ASCompat.setProperty(_loc1_, "enabled", false);
-				ASCompat.setProperty(_loc1_, "dontKillMyChildren", true);
+				_loc1_.enabled = false;
+				_loc1_.dontKillMyChildren = true;
 			}
 	}
 
@@ -120,9 +123,10 @@ class UIStacksHud {
 			xpStack = mStacksUI[(slot : Int)];
 			xpStack.enabled = true;
 			xpStack.tooltipDelay = 0.5;
-			ASCompat.setProperty((xpStack.tooltip : ASAny).title_label, "text",
+			TextUtil.setText(ASCompat.coerce((xpStack.tooltip : ASAny).title_label, flash.text.TextField),
 				GameMasterLocale.getGameMasterSubString("STACKABLE_NAME", boosterInfo.StackInfo.Constant).toUpperCase());
-			ASCompat.setProperty((xpStack.tooltip : ASAny).description_label, "text", Locale.getString("TIME_REMAINING") + boosterInfo.getDisplayTimeLeft());
+			TextUtil.setText(ASCompat.coerce((xpStack.tooltip : ASAny).description_label, flash.text.TextField),
+				Locale.getString("TIME_REMAINING") + boosterInfo.getDisplayTimeLeft());
 			mStackTimersUI[(slot : Int)] = new CountdownTextTimer(ASCompat.coerce((xpStack.tooltip : ASAny).description_label, flash.text.TextField),
 				boosterInfo.getEndDate(), GameClock.getWebServerDate, checkBoosters, Locale.getString("BOOSTER_REMAINING"), "", Locale.getString("EXPIRED"));
 			mStackTimersUI[(slot : Int)].start();
@@ -133,7 +137,7 @@ class UIStacksHud {
 						return;
 					}
 					var _loc3_ = ASCompat.coerce(ASCompat.createInstance(_loc2_, []), flash.display.MovieClip);
-					_loc3_.scaleX = _loc3_.scaleY = 80 / 100;
+					_loc3_.scaleX = _loc3_.scaleY = 80 / DBGlobal.WEAPON_ICON_NATIVE_SIZE;
 					(mStacksUI[(slot : Int)].root : ASAny).graphic.addChildAt(_loc3_, 0);
 				});
 		}
@@ -161,14 +165,14 @@ class UIStacksHud {
 	}
 
 	function removeStacks() {
-		var __ax4_iter_89:Vector<UIObject>;
-		var __ax4_iter_90:Vector<CountdownTextTimer>;
+		var __ax4_iter_422:Vector<UIObject>;
+		var __ax4_iter_423:Vector<CountdownTextTimer>;
 		var _loc2_:UIObject = null;
 		var _loc1_:CountdownTextTimer = null;
 		if (mStacksUI != null) {
-			__ax4_iter_89 = mStacksUI;
-			if (checkNullIteratee(__ax4_iter_89))
-				for (_tmp_ in __ax4_iter_89) {
+			__ax4_iter_422 = mStacksUI;
+			if (checkNullIteratee(__ax4_iter_422))
+				for (_tmp_ in __ax4_iter_422) {
 					_loc2_ = _tmp_;
 					if (ASCompat.toNumberField((_loc2_.root : ASAny).graphic, "numChildren") > 0) {
 						(_loc2_.root : ASAny).graphic.removeChildAt(0);
@@ -178,9 +182,9 @@ class UIStacksHud {
 			mStacksUI = null;
 		}
 		if (mStackTimersUI != null) {
-			__ax4_iter_90 = mStackTimersUI;
-			if (checkNullIteratee(__ax4_iter_90))
-				for (_tmp_ in __ax4_iter_90) {
+			__ax4_iter_423 = mStackTimersUI;
+			if (checkNullIteratee(__ax4_iter_423))
+				for (_tmp_ in __ax4_iter_423) {
 					_loc1_ = _tmp_;
 					if (_loc1_ != null) {
 						_loc1_.destroy();

@@ -27,71 +27,76 @@ class OwnerAttackTimeline extends AttackTimeline {
 	}
 
 	override function parseAction(actionObj:ASObject):AttackTimelineAction {
-		var __ax4_iter_39:Vector<WeaponController> = null;
-		var __ax4_iter_40:Vector<WeaponController>;
-		var _loc3_:WeaponController = null;
-		var _loc4_ = ASCompat.asString(actionObj.type);
-		var _loc2_:AttackTimelineAction = null;
-		switch (_loc4_) {
+		var __ax4_iter_23:Vector<WeaponController> = null;
+		var __ax4_iter_24:Vector<WeaponController>;
+		var _loc5_:WeaponController = null;
+		var _loc3_:RumbleTimelineAction = null;
+		var _loc2_ = ASCompat.asString(actionObj.type);
+		var _loc4_:AttackTimelineAction = null;
+		switch (_loc2_) {
 			case "attemptRevive":
-				_loc2_ = AttemptReviveTimeLineAction.buildFromJson(mActorGameObject, mActorView, mDBFacade, actionObj);
+				_loc4_ = AttemptReviveTimeLineAction.buildFromJson(mActorGameObject, mActorView, mDBFacade, actionObj);
 
 			case "proposeRevive":
-				_loc2_ = ProposeReviveTimeLineAction.buildFromJson(mActorGameObject, mActorView, mDBFacade, actionObj);
+				_loc4_ = ProposeReviveTimeLineAction.buildFromJson(mActorGameObject, mActorView, mDBFacade, actionObj);
 
 			case "lockAttack":
-				_loc2_ = LockAttackTimeLineAction.buildFromJson(mActorGameObject, mActorView, mDBFacade);
+				_loc4_ = LockAttackTimeLineAction.buildFromJson(mActorGameObject, mActorView, mDBFacade);
 
 			case "circleCollider":
-				_loc2_ = CircleColliderAttackTimelineAction.buildFromJson(mWeapon, mActorGameObject, mActorView, mDBFacade, mDistributedDungeonFloor,
+				_loc4_ = CircleColliderAttackTimelineAction.buildFromJson(mWeapon, mActorGameObject, mActorView, mDBFacade, mDistributedDungeonFloor,
 					actionObj, combatResultCallback);
 
 			case "rectangleCollider":
-				_loc2_ = RectangleColliderTimelineAction.buildFromJson(mWeapon, mActorGameObject, mActorView, mDBFacade, mDistributedDungeonFloor, actionObj,
+				_loc4_ = RectangleColliderTimelineAction.buildFromJson(mWeapon, mActorGameObject, mActorView, mDBFacade, mDistributedDungeonFloor, actionObj,
 					combatResultCallback);
 
 			case "zoom":
-				_loc2_ = CameraZoomTimelineAction.buildFromJson(mActorGameObject, mActorView, mDBFacade, actionObj);
+				_loc4_ = CameraZoomTimelineAction.buildFromJson(mActorGameObject, mActorView, mDBFacade, actionObj);
 
 			case "timeScale":
 
 			case "projectile":
-				_loc2_ = ProjectileAttackTimelineAction.buildFromJson(mActorGameObject, mActorView, mDBFacade, mDistributedDungeonFloor, actionObj, mWeapon,
+				_loc4_ = ProjectileAttackTimelineAction.buildFromJson(mActorGameObject, mActorView, mDBFacade, mDistributedDungeonFloor, actionObj, mWeapon,
 					combatResultCallback);
 
 			case "inputType":
-				_loc2_ = InputTypeTimelineAction.buildFromJson(mHeroGameObjectOwner, mActorView, mDBFacade, actionObj);
+				_loc4_ = InputTypeTimelineAction.buildFromJson(mHeroGameObjectOwner, mActorView, mDBFacade, actionObj);
 
 			case "startCooldown":
-				final __ax4_iter_39 = mHeroGameObjectOwner.weaponControllers;
-				if (checkNullIteratee(__ax4_iter_39))
-					for (_tmp_ in __ax4_iter_39) {
-						_loc3_ = _tmp_;
-						if (_loc3_.weapon == mWeapon) {
-							mWeaponController = _loc3_;
+				final __ax4_iter_23 = mHeroGameObjectOwner.weaponControllers;
+				if (checkNullIteratee(__ax4_iter_23))
+					for (_tmp_ in __ax4_iter_23) {
+						_loc5_ = _tmp_;
+						if (_loc5_.weapon == mWeapon) {
+							mWeaponController = _loc5_;
 							break;
 						}
 					}
-				_loc2_ = CoolDownAttackTimelineAction.buildFromJson(mActorGameObject, mActorView, mDBFacade, mWeaponController, actionObj);
+				_loc4_ = CoolDownAttackTimelineAction.buildFromJson(mActorGameObject, mActorView, mDBFacade, mWeaponController, actionObj);
 
 			case "queueAttack":
 				if (mHeroGameObjectOwner != null && mHeroGameObjectOwner.weaponControllers != null) {
-					__ax4_iter_40 = mHeroGameObjectOwner.weaponControllers;
-					if (checkNullIteratee(__ax4_iter_40))
-						for (_tmp_ in __ax4_iter_40) {
-							_loc3_ = _tmp_;
-							if (_loc3_.weapon == mWeapon) {
-								mWeaponController = _loc3_;
+					__ax4_iter_24 = mHeroGameObjectOwner.weaponControllers;
+					if (checkNullIteratee(__ax4_iter_24))
+						for (_tmp_ in __ax4_iter_24) {
+							_loc5_ = _tmp_;
+							if (_loc5_ != null && _loc5_.weapon == mWeapon) {
+								mWeaponController = _loc5_;
 								break;
 							}
 						}
-					_loc2_ = QueueAttackTimelineAction.buildFromJson(mActorGameObject, mActorView, mDBFacade, mWeaponController, actionObj);
+					_loc4_ = QueueAttackTimelineAction.buildFromJson(mActorGameObject, mActorView, mDBFacade, mWeaponController, actionObj);
 				}
+
+			case "rumbleEffect":
+				_loc3_ = RumbleTimelineAction.buildFromJson(mActorGameObject, mActorView, mDBFacade, actionObj);
+				_loc4_ = _loc3_;
 
 			default:
 				return super.parseAction(actionObj);
 		}
-		return _loc2_;
+		return _loc4_;
 	}
 
 	override public function play(playSpeed:Float, target:ActorGameObject, finishedCallback:ASFunction = null, stopCallback:ASFunction = null,

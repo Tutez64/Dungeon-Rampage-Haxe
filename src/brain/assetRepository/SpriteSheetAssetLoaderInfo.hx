@@ -1,6 +1,6 @@
 package brain.assetRepository;
 
-import org.as3commons.collections.Map;
+import collections.Map;
 
 class SpriteSheetAssetLoaderInfo extends AssetLoaderInfo {
 	static var mLoadedJson:Map = new Map();

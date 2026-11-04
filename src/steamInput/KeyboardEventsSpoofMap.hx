@@ -1,20 +1,16 @@
 package steamInput;
 
+import input.keyBindings.KeyBindings;
+
 class KeyboardEventsSpoofMap {
-	var mActionNamesToKeyCodes:ASDictionary<ASAny, ASAny> = new ASDictionary();
+	var mKeyBindings:KeyBindings;
 
 	var mActionNames:Vector<String> = new Vector();
 
-	public function new() {
-		mActionNamesToKeyCodes["revive_ally"] = 32;
-		mActionNamesToKeyCodes["toggle_menu"] = 27;
-		var _loc1_:String;
-		final __ax4_iter_92 = mActionNamesToKeyCodes;
-		if (checkNullIteratee(__ax4_iter_92))
-			for (_tmp_ in __ax4_iter_92.keys()) {
-				_loc1_ = _tmp_;
-				mActionNames.push(_loc1_);
-			}
+	public function new(keyBindings:KeyBindings) {
+		mKeyBindings = keyBindings;
+		mActionNames.push("revive_ally");
+		mActionNames.push("toggle_menu");
 	}
 
 	@:isVar public var actionNames(get, never):Vector<String>;
@@ -24,6 +20,16 @@ class KeyboardEventsSpoofMap {
 	}
 
 	public function getKeyCode(action:String):Int {
-		return ASCompat.toInt(mActionNamesToKeyCodes[action]);
+		var _loc2_ = 0;
+		switch (action) {
+			case "revive_ally":
+				_loc2_ = mKeyBindings.getPrimary("reviveAlly");
+				return _loc2_ != 0 ? _loc2_ : mKeyBindings.getAlternate("reviveAlly");
+			case "toggle_menu":
+				return 27;
+			default:
+				return 0;
+		}
+		return 0;
 	}
 }

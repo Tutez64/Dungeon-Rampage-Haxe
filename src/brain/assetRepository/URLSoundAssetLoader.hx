@@ -1,5 +1,6 @@
 package brain.assetRepository;
 
+import brain.event.EventListeners;
 import brain.facade.Facade;
 import brain.logger.Logger;
 import brain.sound.SoundAsset;
@@ -28,9 +29,9 @@ class URLSoundAssetLoader extends AssetLoader {
 		}
 		mSound = new Sound();
 		mSound.load(_loc4_);
-		mSound.addEventListener("complete", soundLoadComplete);
-		mSound.addEventListener("ioError", soundLoadIOError);
-		mSound.addEventListener("securityError", soundLoadSecurityError);
+		EventListeners.add(mSound, "complete", soundLoadComplete);
+		EventListeners.add(mSound, "ioError", soundLoadIOError);
+		EventListeners.add(mSound, "securityError", soundLoadSecurityError);
 		if (AssetLoader.mCollectingTrackLoads) {
 			AssetLoader.mTrackedLoads.add(mAssetLoaderInfo.getRawAssetPath());
 		}

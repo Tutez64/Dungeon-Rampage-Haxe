@@ -26,7 +26,7 @@ class ActorMacroStateMachine extends ActorStateMachine {
 	public function enterAttackChoreographyState(playSpeed:Float, targetActor:ActorGameObject, attackTimeline:AttackTimeline,
 			attackChoreography:AttackChoreography, finishedCallback:ASFunction = null, stopCallback:ASFunction = null, loop:Bool = false) {
 		attackTimeline.appendChoreography(attackChoreography);
-		var _loc8_ = attackChoreography.loop == 1 ? true : false;
+		var _loc8_ = attackChoreography.loop == 1;
 		attackTimeline.currentAttackType = attackChoreography.attack.attackType;
 		attackTimeline.projectileMultiplier = (ASCompat.floatToInt(attackChoreography.scalingMaxProjectiles) : UInt);
 		enterChoreographyState(playSpeed, targetActor, attackTimeline, finishedCallback, stopCallback, loop);

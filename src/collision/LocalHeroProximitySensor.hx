@@ -30,7 +30,7 @@ class LocalHeroProximitySensor implements IContactResolver {
 		mCollisionCallback = onCollisionCallback;
 		mHasCollidedFirstTime = false;
 		var _loc8_ = new B2FilterData();
-		_loc8_.categoryBits = (2 : UInt);
+		_loc8_.categoryBits = 2;
 		var _loc9_ = new B2CircleShape(radius / 50);
 		var _loc11_ = new B2FixtureDef();
 		_loc11_.isSensor = true;

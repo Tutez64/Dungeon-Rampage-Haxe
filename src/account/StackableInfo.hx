@@ -28,7 +28,7 @@ class StackableInfo extends InventoryBaseInfo {
 	}
 
 	override public function get_isEquipped():Bool {
-		return this.gmStackable != null && mConsumableSlot != -1 && this.gmStackable.AccountBooster == false;
+		return this.gmStackable != null && mConsumableSlot != -1 && !this.gmStackable.AccountBooster;
 	}
 
 	@:isVar public var equipSlot(get, never):Int;

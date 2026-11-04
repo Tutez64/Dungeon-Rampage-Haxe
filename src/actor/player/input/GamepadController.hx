@@ -6,6 +6,14 @@ import steamInput.SteamInputManager;
 import flash.geom.Vector3D;
 
 class GamepadController {
+	public static inline final TOGGLE_MENU_ACTION = (0 : UInt);
+
+	public static inline final OPEN_OPTIONS_MENU = (1 : UInt);
+
+	public static inline final TOGGLE_CHAT_LOG_ACTION = (2 : UInt);
+
+	public static inline final OPEN_CHAT_KEYBOARD_OPTION = (3 : UInt);
+
 	var mDBFacade:DBFacade;
 
 	var mHeroOwner:HeroGameObjectOwner;
@@ -25,6 +33,8 @@ class GamepadController {
 	var mReleasedCombatButtonsThisFrame:Vector<Int> = new Vector();
 
 	var mReleasedConsumableButtonsThisFrame:Vector<Int> = new Vector();
+
+	var mReleasedMenuButtonsThisFrame:Vector<Int> = new Vector();
 
 	public function new(dbFacade:DBFacade, heroOwner:HeroGameObjectOwner, steamInputManager:SteamInputManager) {
 		mDBFacade = dbFacade;
@@ -63,10 +73,17 @@ class GamepadController {
 		return mReleasedConsumableButtonsThisFrame;
 	}
 
+	@:isVar public var releasedMenuButtonsThisFrame(get, never):Vector<Int>;
+
+	public function get_releasedMenuButtonsThisFrame():Vector<Int> {
+		return mReleasedMenuButtonsThisFrame;
+	}
+
 	public function init() {
 		mPressedCombatButtonsThisFrame.length = 0;
 		mReleasedCombatButtonsThisFrame.length = 0;
 		mReleasedConsumableButtonsThisFrame.length = 0;
+		mReleasedMenuButtonsThisFrame.length = 0;
 	}
 
 	public function destroy() {
@@ -78,6 +95,8 @@ class GamepadController {
 		mReleasedCombatButtonsThisFrame = null;
 		mReleasedConsumableButtonsThisFrame.length = 0;
 		mReleasedConsumableButtonsThisFrame = null;
+		mReleasedMenuButtonsThisFrame.length = 0;
+		mReleasedMenuButtonsThisFrame = null;
 	}
 
 	@:isVar public var combatDisabled(never, set):Bool;
@@ -105,6 +124,7 @@ class GamepadController {
 		}
 		handleAttackInputs();
 		handleConsumableInputs();
+		handleMenuInputs();
 	}
 
 	function calcMovementInput():Vector3D {
@@ -155,6 +175,26 @@ class GamepadController {
 		var _loc2_ = mSteamInputManager.releasedAction("use_consumable_two");
 		if (_loc2_) {
 			mReleasedConsumableButtonsThisFrame.push(1);
+		}
+	}
+
+	function handleMenuInputs() {
+		mReleasedMenuButtonsThisFrame.length = 0;
+		var _loc2_ = mSteamInputManager.releasedAction("toggle_menu");
+		if (_loc2_) {
+			mReleasedMenuButtonsThisFrame.push(0);
+		}
+		var _loc3_ = mSteamInputManager.releasedAction("open_options_menu");
+		if (_loc3_) {
+			mReleasedMenuButtonsThisFrame.push(1);
+		}
+		var _loc4_ = mSteamInputManager.releasedAction("toggle_chat_log");
+		if (_loc4_) {
+			mReleasedMenuButtonsThisFrame.push(2);
+		}
+		var _loc1_ = mSteamInputManager.releasedAction("open_chat_keyboard");
+		if (_loc1_) {
+			mReleasedMenuButtonsThisFrame.push(3);
 		}
 	}
 }

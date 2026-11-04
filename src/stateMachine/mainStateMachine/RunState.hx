@@ -122,7 +122,7 @@ class RunState extends State {
 				mTutorialController.queueTutorial("SUPER_WEAK_TUTORIAL");
 			}
 		}
-		mDBFacade.eventManager.addEventListener("SEND_EVENT", receivedClientEvent);
+		mEventComponent.addListener("SEND_EVENT", receivedClientEvent);
 	}
 
 	function receivedClientEvent(lecEvt:LEClientEvent) {
@@ -154,6 +154,7 @@ class RunState extends State {
 	override public function exitState() {
 		mNewsFeedController.stopFeedTask();
 		mEventComponent.removeAllListeners();
+		mDBFacade.uiHideToggle.reveal();
 		mDBFacade.assetRepository.removeCacheForAllSpriteSheetAssets();
 		super.exitState();
 	}

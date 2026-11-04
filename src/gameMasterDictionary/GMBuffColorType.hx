@@ -5,7 +5,7 @@ class GMBuffColorType {
 
 	public var ColorHex:UInt = 0;
 
-	public function new(jsonAsset:ASObject) {
+	public function new(jsonAsset:ASObject = /*undefined*/ null) {
 		Id = (ASCompat.toInt(jsonAsset.Id) : UInt);
 		ColorHex = (ASCompat.toInt(jsonAsset.TextColor) : UInt);
 	}

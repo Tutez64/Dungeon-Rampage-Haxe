@@ -23,6 +23,12 @@ class InGameControlsActionSetData {
 
 	public static inline final toggleMenuAction = "toggle_menu";
 
+	public static inline final openChatKeyboardAction = "open_chat_keyboard";
+
+	public static inline final toggleChatLogAction = "toggle_chat_log";
+
+	public static inline final openOptionsMenuAction = "open_options_menu";
+
 	public function new() {}
 
 	public static function gatherAnalogActionNames():Vector<String> {
@@ -42,6 +48,9 @@ class InGameControlsActionSetData {
 		_loc1_.push("use_consumable_two");
 		_loc1_.push("revive_ally");
 		_loc1_.push("toggle_menu");
+		_loc1_.push("open_chat_keyboard");
+		_loc1_.push("toggle_chat_log");
+		_loc1_.push("open_options_menu");
 		return _loc1_;
 	}
 }

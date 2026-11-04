@@ -1,521 +1,399 @@
 package com.junkbyte.console.core;
 
+import com.junkbyte.console.compat.ConsoleLib;
+import com.junkbyte.console.utils.FlashRegex;
 import com.junkbyte.console.vos.WeakObject;
 import flash.events.Event;
 import flash.events.EventDispatcher;
+import flash.events.IEventDispatcher;
+import haxe.Constraints.IMap;
+import haxe.ds.StringMap;
+import haxe.rtti.Rtti;
+import flash.utils.Namespace;
+import flash.utils.QName;
 
 class Executer extends EventDispatcher {
-	public static inline final RETURNED = "returned";
+	public static var RETURNED:String = "returned";
 
-	public static inline final CLASSES = "ExeValue|((com.junkbyte.console.core::)?Executer)";
+	public static var CLASSES:String = "((com.junkbyte.console.core::)?(ExeValue|Executer))";
 
-	static inline final VALKEY = "#";
+	public static var VALKEY:String = "#";
 
-	var _values:Array<ASAny>;
-
-	var _running:Bool = false;
-
-	var _scope:ASAny;
-
-	var _returned:ASAny;
-
-	var _saved:ASObject;
-
-	var _reserved:Array<ASAny>;
+	public static var AS3_NAMESPACE:String = "http://adobe.com/AS3/2006/builtin";
 
 	public var autoScope:Bool = false;
 
-	public function new() {
-		super();
+	public var _values:Array<ASAny>;
+
+	public var _scope:ASAny;
+
+	public var _saved:ASAny;
+
+	public var _running:Bool = false;
+
+	public var _returned:ASAny;
+
+	public var _reserved:Array<ASAny>;
+
+	public function new(target:IEventDispatcher = /*undefined*/ null) {
+		super(target);
 	}
 
-	public static function Exec(scope:ASObject, str:String, saved:ASObject = null):ASAny {
+	public static function Exec(scope:ASAny, str:String, saved:ASAny = /*undefined*/ null):ASAny {
 		var _loc4_ = new Executer();
 		_loc4_.setStored(saved);
 		return _loc4_.exec(scope, str);
 	}
 
-	@:isVar public var returned(get, never):ASAny;
-
-	public function get_returned():ASAny {
-		return this._returned;
-	}
-
-	@:isVar public var scope(get, never):ASAny;
-
-	public function get_scope():ASAny {
-		return this._scope;
-	}
-
-	public function setStored(o:ASObject) {
-		this._saved = o;
-	}
-
-	public function setReserved(a:Array<ASAny>) {
-		this._reserved = a;
-	}
-
-	public function exec(s:ASAny, str:String):ASAny {
-		if (this._running) {
-			throw new Error("CommandExec.exec() is already runnnig. Does not support loop backs.");
-		}
-		this._running = true;
-		this._scope = s;
-		this._values = [];
-		if (!ASCompat.toBool(this._saved)) {
-			this._saved = new ASObject();
-		}
-		if (this._reserved == null) {
-			this._reserved = new Array<ASAny>();
-		}
-		try {
-			this._exec(str);
-		} catch (e:Dynamic) {
-			reset();
-			throw e;
-		}
-		this.reset();
-		return this._returned;
-	}
-
-	function reset() {
-		this._saved = null;
-		this._reserved = null;
-		this._values = null;
-		this._running = false;
-	}
-
-	function _exec(str:String) {
-		var _loc5_:String = null;
-		var _loc6_:String = null;
-		var _loc7_:String = null;
-		var _loc8_ = 0;
-		var _loc9_ = 0;
-		var _loc10_:String = null;
-		var _loc11_:ASAny = /*undefined*/ null;
-		var _loc2_ = new compat.RegExp("''|\"\"|('(.*?)[^\\\\]')|(\"(.*?)[^\\\\]\")");
-		var _loc3_:ASObject = _loc2_.exec(str);
-		while (_loc3_ != null) {
-			_loc6_ = _loc3_[Std.string(0)];
-			_loc7_ = _loc6_.charAt(0);
-			_loc8_ = _loc6_.indexOf(_loc7_);
-			_loc9_ = _loc6_.lastIndexOf(_loc7_);
-			_loc10_ = new compat.RegExp("\\\\(.)", "g").replace(_loc6_.substring(_loc8_ + 1, _loc9_), "$1");
-			str = this.tempValue(str, new ExeValue(_loc10_), ASCompat.toInt(_loc3_.index + _loc8_), ASCompat.toInt(_loc3_.index + _loc9_ + 1));
-			_loc3_ = _loc2_.exec(str);
-		}
-		if (new compat.RegExp("'|\"").search(str) >= 0) {
-			throw new Error("Bad syntax extra quotation marks");
-		}
-		var _loc4_:Array<ASAny> = (cast new compat.RegExp("\\s*;\\s*").split(str));
-		if (checkNullIteratee(_loc4_))
-			for (_tmp_ in _loc4_) {
-				_loc5_ = _tmp_;
-				if (_loc5_.length != 0) {
-					_loc11_ = this._saved[RETURNED];
-					if (ASCompat.toBool(_loc11_) && _loc5_ == "/") {
-						this._scope = _loc11_;
-						dispatchEvent(new Event(Event.COMPLETE));
-					} else {
-						this.execNest(_loc5_);
-					}
-				}
-			}
-	}
-
-	function execNest(line:String):ASAny {
-		var _loc3_ = 0;
+	public static function resolveAllFields(resolveClass:Dynamic):ASAny {
 		var _loc4_ = 0;
-		var _loc5_ = 0;
-		var _loc6_:String = null;
-		var _loc7_ = false;
+		var _loc5_ = (ASCompat.dynamicAs(null, Array) : Array<ASAny>);
+		var _loc6_:ASAny = (ASCompat.dynamicAs(null, Array) : Array<ASAny>);
+		var _loc7_:ASAny = (ASCompat.dynamicAs(null, Array) : Array<ASAny>);
 		var _loc8_ = 0;
-		var _loc9_:String = null;
-		var _loc10_:Array<ASAny> = null;
-		var _loc11_:String = null;
-		var _loc12_:ExeValue = null;
-		var _loc13_:String = null;
-		line = this.ignoreWhite(line);
-		var _loc2_ = line.lastIndexOf("(");
-		while (_loc2_ >= 0) {
-			_loc3_ = line.indexOf(")", _loc2_);
-			if (new compat.RegExp("\\w").search(line.substring(_loc2_ + 1, _loc3_)) >= 0) {
-				_loc4_ = _loc2_;
-				_loc5_ = _loc2_ + 1;
-				while (_loc4_ >= 0 && _loc4_ < _loc5_) {
-					_loc4_++;
-					_loc4_ = line.indexOf("(", _loc4_);
-					_loc5_ = line.indexOf(")", _loc5_ + 1);
-				}
-				_loc6_ = line.substring(_loc2_ + 1, _loc5_);
-				_loc7_ = false;
-				_loc8_ = _loc2_ - 1;
-				while (true) {
-					_loc9_ = line.charAt(_loc8_);
-					if (new compat.RegExp("[^\\s]").match(_loc9_) != null || _loc8_ <= 0) {
-						break;
-					}
-					_loc8_--;
-				}
-				if (new compat.RegExp("\\w").match(_loc9_) != null) {
-					_loc7_ = true;
-				}
-				if (_loc7_) {
-					_loc10_ = (cast _loc6_.split(","));
-					line = this.tempValue(line, new ExeValue(_loc10_), _loc2_ + 1, _loc5_);
-					if (checkNullIteratee(_loc10_))
-						for (_tmp_ in 0..._loc10_.length) {
-							_loc11_ = Std.string(_tmp_);
-							(_loc10_ : ASAny)[ASCompat.toInt(_loc11_)] = this.execOperations(this.ignoreWhite((_loc10_ : ASAny)[ASCompat.toInt(_loc11_)]))
-								.value;
+		var _loc9_:ASAny = null;
+		var _loc10_:ASObject = null;
+		var _loc11_ = false;
+		var _loc12_ = false;
+		var _loc13_:ASAny = ASCompat.asString(null);
+		var _loc14_:ASAny = ASCompat.dynamicAs(null, IMap);
+		var _loc15_:ASAny = ASCompat.asString(null);
+		var _loc16_:ASAny = ASCompat.asString(null);
+		var _loc17_:ASAny = (ASCompat.dynamicAs(null, Array) : Array<ASAny>);
+		var _loc18_ = 0;
+		var _loc19_ = 0;
+		var _loc20_ = 0;
+		var _loc21_:ASAny = null;
+		var _loc22_:ASAny = ASCompat.asString(null);
+		var _loc23_:ASAny = (ASCompat.dynamicAs(null, Array) : Array<ASAny>);
+		var _loc24_ = 0;
+		var _loc25_ = 0;
+		var _loc26_ = 0;
+		var _loc27_:ASAny = ASCompat.asString(null);
+		var _loc28_:ASAny = null;
+		if (resolveClass == null) {
+			return null;
+		}
+		var _loc2_:ASObject = {};
+		ASCompat.setProperty(_loc2_, "staticVariables", []);
+		ASCompat.setProperty(_loc2_, "staticFunctions", []);
+		ASCompat.setProperty(_loc2_, "variables", []);
+		ASCompat.setProperty(_loc2_, "functions", []);
+		ASCompat.setProperty(_loc2_, "superClasses", []);
+		if (!Rtti.hasRtti(resolveClass)) {
+			return null;
+		}
+		var _loc3_:ASAny = Rtti.getRtti(resolveClass);
+		while (_loc3_ != null && Rtti.hasRtti(resolveClass)) {
+			_loc4_ = 0;
+			_loc5_ = [_loc3_.statics, _loc3_.fields];
+			while (_loc4_ < ASCompat.toInt(_loc5_.length)) {
+				_loc6_ = _loc5_[_loc4_];
+				_loc4_++;
+				_loc7_ = _loc6_;
+				_loc8_ = 0;
+				while (_loc8_ < ASCompat.toInt(_loc7_.length)) {
+					_loc9_ = _loc7_[_loc8_];
+					_loc8_++;
+					if (_loc9_.name != "new") {
+						_loc10_ = {};
+						_loc11_ = Reflect.hasField(_loc9_.type, "args");
+						_loc12_ = _loc7_ == _loc3_.statics;
+						_loc13_ = "Dynamic";
+						ASCompat.setProperty(_loc10_, "name", _loc9_.name);
+						ASCompat.setProperty(_loc10_, "isFunction", _loc11_);
+						ASCompat.setProperty(_loc10_, "isPublic", _loc9_.isPublic);
+						ASCompat.setProperty(_loc10_, "isFinal", _loc9_.isFinal);
+						ASCompat.setProperty(_loc10_, "isOverride", _loc9_.isOverride);
+						ASCompat.setProperty(_loc10_, "isStatic", _loc12_);
+						if (_loc11_) {
+							_loc14_ = new StringMap<ASAny>();
+							_loc15_ = "";
+							_loc16_ = "Dynamic";
+							_loc17_ = _loc9_.type.args;
+							_loc18_ = 0;
+							_loc19_ = ASCompat.toInt(_loc17_.length);
+							while (_loc18_ < _loc19_) {
+								_loc20_ = _loc18_++;
+								_loc21_ = _loc17_[_loc20_];
+								_loc22_ = "";
+								if (_loc21_.name != null) {
+									_loc23_ = null;
+									_loc15_ = _loc21_.name;
+									if (_loc21_.t.params != null) {
+										_loc23_ = _loc21_.t.params;
+										_loc22_ = _loc21_.t.name;
+									}
+									if (_loc21_.params != null) {
+										_loc23_ = _loc21_.params;
+									}
+									if (_loc23_ != null && ASCompat.toInt(_loc23_.length) > 0) {
+										_loc22_ += "<";
+										_loc24_ = 0;
+										_loc25_ = ASCompat.toInt(_loc23_.length);
+										while (_loc24_ < _loc25_) {
+											_loc26_ = _loc24_++;
+											_loc27_ = _loc23_[_loc26_].name;
+											if (_loc27_ == null) {
+												_loc27_ = "Dynamic";
+											}
+											if (_loc26_ == 0) {
+												_loc22_ += _loc27_;
+											} else {
+												_loc22_ += ", " + Std.string(_loc27_);
+											}
+										}
+										_loc22_ += ">";
+									}
+								}
+								_loc28_ = {
+									"type": _loc22_,
+									"optional": ASCompat.toBool(_loc21_.opt),
+									"value": (_loc21_.value != null ? _loc21_.value : null)
+								};
+								{
+									_loc14_.set(_loc15_, _loc28_);
+								}
+								if (_loc9_.type.ret.name != null) {
+									_loc16_ = _loc9_.type.ret.name;
+									_loc23_ = _loc9_.type.ret.params;
+									if (_loc23_ != null && ASCompat.toInt(_loc23_.length) > 0) {
+										_loc16_ += "<";
+										_loc24_ = 0;
+										_loc25_ = ASCompat.toInt(_loc23_.length);
+										while (_loc24_ < _loc25_) {
+											_loc26_ = _loc24_++;
+											_loc28_ = _loc23_[_loc26_];
+											_loc27_ = _loc28_.name;
+											if (_loc27_ == null) {
+												_loc27_ = "Dynamic";
+											}
+											if (_loc26_ == 0) {
+												_loc16_ += _loc27_;
+											} else {
+												_loc16_ += ", " + Std.string(_loc27_);
+											}
+										}
+										_loc16_ += ">";
+									}
+								}
+							}
+							ASCompat.setProperty(_loc10_, "variables", _loc14_);
+						} else {
+							if (Reflect.hasField(_loc9_.type, "name")) {
+								_loc13_ = _loc9_.type.name;
+							}
+							_loc17_ = _loc9_.type.params;
+							if (_loc17_ != null && ASCompat.toInt(_loc17_.length) > 0) {
+								_loc13_ += "<";
+								_loc18_ = 0;
+								_loc19_ = ASCompat.toInt(_loc9_.type.params.length);
+								while (_loc18_ < _loc19_) {
+									_loc20_ = _loc18_++;
+									_loc21_ = _loc9_.type.params[_loc20_];
+									_loc15_ = _loc21_.name;
+									if (_loc15_ == null) {
+										_loc15_ = "Dynamic";
+									}
+									if (_loc20_ == 0) {
+										_loc13_ += _loc15_;
+									} else {
+										_loc13_ += ", " + Std.string(_loc15_);
+									}
+								}
+								_loc13_ += ">";
+							}
 						}
-				} else {
-					_loc12_ = new ExeValue(_loc12_);
-					line = this.tempValue(line, _loc12_, _loc2_, _loc5_ + 1);
-					_loc12_.setValue(this.execOperations(this.ignoreWhite(_loc6_)).value);
+						ASCompat.setProperty(_loc10_, "type", _loc13_);
+						if (_loc11_) {
+							if (_loc12_) {
+								ASCompat.dynPush(_loc2_.staticFunctions, _loc10_);
+							} else {
+								ASCompat.dynPush(_loc2_.functions, _loc10_);
+							}
+						} else if (_loc12_) {
+							ASCompat.dynPush(_loc2_.staticVariables, _loc10_);
+						} else {
+							ASCompat.dynPush(_loc2_.variables, _loc10_);
+						}
+					}
 				}
 			}
-			_loc2_ = line.lastIndexOf("(", _loc2_ - 1);
-		}
-		this._returned = this.execOperations(line).value;
-		if (ASCompat.toBool(this._returned) && this.autoScope) {
-			_loc13_ = ASCompat.typeof(this._returned);
-			if (_loc13_ == "object" || _loc13_ == "xml") {
-				this._scope = this._returned;
+			if (_loc3_.superClass != null) {
+				resolveClass = Type.resolveClass(_loc3_.superClass.path);
+				if (resolveClass != null && Rtti.hasRtti(resolveClass)) {
+					ASCompat.dynPush(_loc2_.superClasses, _loc3_.superClass.path);
+					_loc3_ = Rtti.getRtti(resolveClass);
+				} else {
+					_loc3_ = null;
+				}
+			} else {
+				_loc3_ = null;
 			}
 		}
-		dispatchEvent(new Event(Event.COMPLETE));
-		return this._returned;
+		return _loc2_;
 	}
 
-	function tempValue(str:String, v:ASAny, indOpen:Int, indClose:Int):String {
-		str = str.substring(0, indOpen) + VALKEY + this._values.length + str.substring(indClose);
-		this._values.push(v);
+	public function tempValue(str:String, v:ASAny, indOpen:Int, indClose:Int):String {
+		str = str.substring(0, indOpen) + "#" + _values.length + str.substring(indClose);
+		_values.push(v);
 		return str;
 	}
 
-	function execOperations(str:String):ExeValue {
-		var _loc7_:String = null;
-		var _loc8_:ASAny = /*undefined*/ null;
-		var _loc11_ = 0;
-		var _loc12_ = 0;
-		var _loc13_:String = null;
-		var _loc14_:ExeValue = null;
-		var _loc15_:ExeValue = null;
-		var _loc2_ = new compat.RegExp("\\s*(((\\|\\||\\&\\&|[+|\\-|*|\\/|\\%|\\||\\&|\\^]|\\=\\=?|\\!\\=|\\>\\>?\\>?|\\<\\<?)\\=?)|=|\\~|\\sis\\s|typeof|delete\\s)\\s*",
-			"g");
-		var _loc3_:ASObject = _loc2_.exec(str);
-		var _loc4_:Array<ASAny> = [];
-		if (_loc3_ == null) {
-			_loc4_.push(str);
-		} else {
-			_loc11_ = 0;
-			while (_loc3_ != null) {
-				_loc12_ = ASCompat.toInt(_loc3_.index);
-				_loc13_ = _loc3_[Std.string(0)];
-				_loc3_ = _loc2_.exec(str);
-				if (_loc3_ == null) {
-					_loc4_.push(str.substring(_loc11_, _loc12_));
-					_loc4_.push(this.ignoreWhite(_loc13_));
-					_loc4_.push(str.substring(_loc12_ + _loc13_.length));
-				} else {
-					_loc4_.push(str.substring(_loc11_, _loc12_));
-					_loc4_.push(this.ignoreWhite(_loc13_));
-					_loc11_ = _loc12_ + _loc13_.length;
-				}
-			}
-		}
-		var _loc5_ = _loc4_.length;
-		var _loc6_ = 0;
-		while (_loc6_ < _loc5_) {
-			_loc4_[_loc6_] = this.execSimple(_loc4_[_loc6_]);
-			_loc6_ += 2;
-		}
-		var _loc9_ = new compat.RegExp("((\\|\\||\\&\\&|[+|\\-|*|\\/|\\%|\\||\\&|\\^]|\\>\\>\\>?|\\<\\<)\\=)|=");
-		_loc6_ = 1;
-		while (_loc6_ < _loc5_) {
-			_loc7_ = _loc4_[_loc6_];
-			if (_loc9_.replace(_loc7_, "") != "") {
-				_loc8_ = this.operate(ASCompat.coerce(_loc4_[_loc6_ - 1], ExeValue), _loc7_, ASCompat.coerce(_loc4_[_loc6_ + 1], ExeValue));
-				_loc14_ = cast(_loc4_[_loc6_ - 1], ExeValue);
-				_loc14_.setValue(_loc8_);
-				_loc4_.splice(_loc6_, (2 : UInt));
-				_loc6_ -= 2;
-				_loc5_ -= 2;
-			}
-			_loc6_ += 2;
-		}
-		ASCompat.ASArray.reverse(_loc4_);
-		var _loc10_ = ASCompat.coerce(_loc4_[0], ExeValue);
-		_loc6_ = 1;
-		while (_loc6_ < _loc5_) {
-			_loc7_ = _loc4_[_loc6_];
-			if (_loc9_.replace(_loc7_, "") == "") {
-				_loc10_ = ASCompat.coerce(_loc4_[_loc6_ - 1], ExeValue);
-				_loc15_ = ASCompat.coerce(_loc4_[_loc6_ + 1], ExeValue);
-				if (_loc7_.length > 1) {
-					_loc7_ = _loc7_.substring(0, _loc7_.length - 1);
-				}
-				_loc8_ = this.operate(_loc15_, _loc7_, _loc10_);
-				_loc15_.setValue(_loc8_);
-			}
-			_loc6_ += 2;
-		}
-		return _loc10_;
+	public function setStored(o:ASAny) {
+		_saved = o;
 	}
 
-	function execSimple(str:String):ExeValue {
-		var reg:compat.RegExp;
-		var result:ASObject;
-		var previndex:Int;
-		var firstparts:Array<ASAny> = null;
-		var newstr:String = null;
-		var defclose = 0;
-		var newobj:ASAny = /*undefined*/ null;
-		var classstr:String = null;
-		var def:Dynamic = /*undefined*/ null;
-		var havemore = false;
-		var index = 0;
-		var isFun = false;
-		var basestr:String = null;
-		var newv:ExeValue = null;
-		var newbase:ASAny = /*undefined*/ null;
-		var closeindex = 0;
-		var paramstr:String = null;
-		var params:Array<ASAny> = null;
-		var nss:Array<ASAny> = null;
-		var ns:ASAny = null;
-		var nsv:ASAny = /*undefined*/ null;
-		var v = new ExeValue(this._scope);
-		if (str.indexOf("new ") == 0) {
-			newstr = str;
-			defclose = str.indexOf(")");
-			if (defclose >= 0) {
-				newstr = str.substring(0, defclose + 1);
-			}
-			newobj = this.makeNew(newstr.substring(4));
-			str = this.tempValue(str, new ExeValue(newobj), 0, newstr.length);
-		}
-		reg = new compat.RegExp("\\.|\\(", "g");
-		result = reg.exec(str);
-		if (result == null || !Math.isNaN(ASCompat.toNumber(str))) {
-			return this.execValue(str, this._scope);
-		}
-		firstparts = (cast str.split("(")[0].split("."));
-		if (firstparts.length > 0) {
-			while (firstparts.length != 0) {
-				classstr = firstparts.join(".");
-				try {
-					def = Type.resolveClass(this.ignoreWhite(classstr));
-					havemore = str.length > classstr.length;
-					str = this.tempValue(str, new ExeValue(def), 0, classstr.length);
-					if (havemore) {
-						reg.lastIndex = 0;
-						result = reg.exec(str);
-						break;
-					}
-					return this.execValue(str);
-				} catch (e:Dynamic) {
-					firstparts.pop();
-				}
-			}
-		}
-		previndex = 0;
-		while (result != null) {
-			index = ASCompat.toInt(result.index);
-			isFun = str.charAt(index) == "(";
-			basestr = this.ignoreWhite(str.substring(previndex, index));
-			newv = previndex == 0 ? this.execValue(basestr, v.value) : new ExeValue(v.value, basestr);
-			if (isFun) {
-				newbase = newv.value;
-				closeindex = str.indexOf(")", index);
-				paramstr = str.substring(index + 1, closeindex);
-				paramstr = this.ignoreWhite(paramstr);
-				params = [];
-				if (ASCompat.stringAsBool(paramstr)) {
-					params = ASCompat.coerce(this.execValue(paramstr).value, Array);
-				}
-				if (!Reflect.isFunction(newbase)) {
-					try {
-						nss = [null];
-						if (checkNullIteratee(nss))
-							for (_tmp_ in nss) {
-								ns = _tmp_;
-								nsv = v.obj /*ns::*/ [basestr];
-								if (Reflect.isFunction(nsv)) {
-									newbase = nsv;
-									break;
-								}
-							}
-					} catch (e:Dynamic) {}
-					if (!Reflect.isFunction(newbase)) {
-						throw new Error(basestr + " is not a function.");
-					}
-				}
-				v.obj = Reflect.callMethod(v.value, ASCompat.asFunction(newbase), params);
-				v.prop = null;
-				index = closeindex + 1;
-			} else {
-				v = newv;
-			}
-			previndex = index + 1;
-			reg.lastIndex = index + 1;
-			result = reg.exec(str);
-			if (result == null) {
-				if (index + 1 < str.length) {
-					reg.lastIndex = str.length;
-					result = {"index": str.length};
-				}
-			}
-		}
-		return v;
+	public function setReserved(a:Array<ASAny>) {
+		_reserved = a;
 	}
 
-	function execValue(str:String, base:ASAny = null):ExeValue {
-		var v:ExeValue = null;
-		var vv:ExeValue = null;
-		var key:String = null;
-		v = new ExeValue();
-		if (str == "true") {
-			v.obj = true;
-		} else if (str == "false") {
-			v.obj = false;
-		} else if (str == "this") {
-			v.obj = this._scope;
-		} else if (str == "null") {
-			v.obj = null;
-		} else if (!Math.isNaN(ASCompat.toNumber(str))) {
-			v.obj = ASCompat.toNumber(str);
-		} else if (str.indexOf(VALKEY) == 0) {
-			vv = ASCompat.coerce((this._values : ASAny)[ASCompat.toInt(str.substring(VALKEY.length))], ExeValue);
-			v.obj = vv.value;
-		} else if (str.charAt(0) == "$") {
-			key = str.substring(1);
-			if (this._reserved.indexOf(key) < 0) {
-				v.obj = this._saved;
-				v.prop = key;
-			} else if (Std.isOfType(this._saved, WeakObject)) {
-				v.obj = cast(this._saved, WeakObject).get(key);
-			} else {
-				v.obj = this._saved[key];
-			}
-		} else {
-			try {
-				v.obj = Type.resolveClass(str);
-			} catch (e:Dynamic) {
-				v.obj = base;
-				v.prop = str;
-			}
-		}
-		return v;
+	public function reset() {
+		_saved = null;
+		_reserved = null;
+		_values = null;
+		_running = false;
 	}
 
-	function operate(v1:ExeValue, op:String, v2:ExeValue):ASAny {
-		switch (op) {
-			case "=":
-				return v2.value;
-			case "+":
-				return v1.value + v2.value;
-			case "-":
-				return ASCompat.toNumberField(v1, "value") - ASCompat.toNumberField(v2, "value");
-			case "*":
-				return ASCompat.toNumberField(v1, "value") * ASCompat.toNumberField(v2, "value");
-			case "/":
-				return ASCompat.toNumberField(v1, "value") / ASCompat.toNumberField(v2, "value");
-			case "%":
-				return ASCompat.toNumberField(v1, "value") % ASCompat.toNumberField(v2, "value");
-			case "^":
-				return ASCompat.toInt(v1.value) ^ ASCompat.toInt(v2.value);
-			case "&":
-				return ASCompat.toInt(v1.value) & ASCompat.toInt(v2.value);
-			case ">>":
-				return ASCompat.toInt(v1.value) >> ASCompat.toInt(v2.value);
-			case ">>>":
-				return ASCompat.toInt(v1.value) >>> ASCompat.toInt(v2.value);
-			case "<<":
-				return ASCompat.toInt(v1.value) << ASCompat.toInt(v2.value);
-			case "~":
-				return ~ASCompat.toInt(v2.value);
-			case "|":
-				return ASCompat.toInt(v1.value) | ASCompat.toInt(v2.value);
-			case "!":
-				return !ASCompat.toBool(v2.value);
-			case ">":
-				return v1.value > v2.value;
-			case ">=":
-				return v1.value >= v2.value;
-			case "<":
-				return v1.value < v2.value;
-			case "<=":
-				return v1.value <= v2.value;
-			case "||":
-				return if (ASCompat.toBool(v1.value)) v1.value else v2.value;
-			case "&&":
-				return v1.value && v2.value;
-			case "is":
-				return Std.isOfType(v1.value, v2.value);
-			case "typeof":
-				return ASCompat.typeof(v2.value);
-			case "delete":
-				return ASCompat.deleteProperty(v2.obj, v2.prop);
-			case "==":
-				return v1.value == v2.value;
-			case "===":
-				return v1.value == v2.value;
-			case "!=":
-				return v1.value != v2.value;
-			case "!==":
-				return v1.value != v2.value;
-			default:
-				return null;
+	public function operate(v1:ExeValue, op:String, v2:ExeValue):ASAny {
+		var _loc5_:ASAny = null;
+		var _loc4_ = op;
+		if (_loc4_ == "!") {
+			return !ConsoleLib.truthy(v2.get_value());
+		}
+		if (_loc4_ == "!=") {
+			return v1.get_value() != v2.get_value();
+		}
+		if (_loc4_ == "!==") {
+			return !ConsoleLib.strictEquals(v1.get_value(), v2.get_value());
+		}
+		if (_loc4_ == "%") {
+			return ASCompat.toNumber(v1.get_value()) % ASCompat.toNumber(v2.get_value());
+		}
+		if (_loc4_ == "&") {
+			return ASCompat.toInt(v1.get_value()) & ASCompat.toInt(v2.get_value());
+		}
+		if (_loc4_ == "&&") {
+			_loc5_ = v1.get_value();
+			if (ConsoleLib.truthy(_loc5_)) {
+				return v2.get_value();
+			}
+			return _loc5_;
+		}
+		if (_loc4_ == "*") {
+			return ASCompat.toNumber(v1.get_value()) * ASCompat.toNumber(v2.get_value());
+		}
+		if (_loc4_ == "+") {
+			return v1.get_value() + v2.get_value();
+		}
+		if (_loc4_ == "-") {
+			return ASCompat.toNumber(v1.get_value()) - ASCompat.toNumber(v2.get_value());
+		}
+		if (_loc4_ == "/") {
+			return ASCompat.toNumber(v1.get_value()) / ASCompat.toNumber(v2.get_value());
+		}
+		if (_loc4_ == "<") {
+			return v1.get_value() < v2.get_value();
+		}
+		if (_loc4_ == "<<") {
+			return ASCompat.toInt(v1.get_value()) << ASCompat.toInt(v2.get_value());
+		}
+		if (_loc4_ == "<=") {
+			return v1.get_value() <= v2.get_value();
+		}
+		if (_loc4_ == "=") {
+			return v2.get_value();
+		}
+		if (_loc4_ == "==") {
+			return v1.get_value() == v2.get_value();
+		}
+		if (_loc4_ == "===") {
+			return ConsoleLib.strictEquals(v1.get_value(), v2.get_value());
+		}
+		if (_loc4_ == ">") {
+			return v1.get_value() > v2.get_value();
+		}
+		if (_loc4_ == ">=") {
+			return v1.get_value() >= v2.get_value();
+		}
+		if (_loc4_ == ">>") {
+			return ASCompat.toInt(v1.get_value()) >> ASCompat.toInt(v2.get_value());
+		}
+		if (_loc4_ == ">>>") {
+			return (ASCompat.toInt(v1.get_value()) >>> ASCompat.toInt(v2.get_value()):UInt);
+		}
+		if (_loc4_ == "^") {
+			return ASCompat.toInt(v1.get_value()) ^ ASCompat.toInt(v2.get_value());
+		}
+		if (_loc4_ == "delete") {
+			return ASCompat.deleteProperty(v2.obj, v2.prop);
+		}
+		if (_loc4_ == "is") {
+			return Std.isOfType(v1.get_value(), v2.get_value());
+		}
+		if (_loc4_ == "typeof") {
+			return ConsoleLib.typeOf(v2.get_value());
+		}
+		if (_loc4_ == "|") {
+			return ASCompat.toInt(v1.get_value()) | ASCompat.toInt(v2.get_value());
+		}
+		if (_loc4_ == "||") {
+			_loc5_ = v1.get_value();
+			if (ConsoleLib.truthy(_loc5_)) {
+				return _loc5_;
+			}
+			return v2.get_value();
+		}
+		if (_loc4_ == "~") {
+			return ~ASCompat.toInt(v2.get_value());
 		}
 		return null;
 	}
 
-	function makeNew(str:String):ASAny {
+	public function makeNew(str:String):ASAny {
 		var _loc5_ = 0;
-		var _loc6_:String = null;
-		var _loc7_:Array<ASAny> = null;
+		var _loc6_ = ASCompat.asString(null);
+		var _loc7_:ASAny = (ASCompat.dynamicAs(null, Array) : Array<ASAny>);
 		var _loc8_ = 0;
 		var _loc2_ = str.indexOf("(");
 		var _loc3_ = _loc2_ > 0 ? str.substring(0, _loc2_) : str;
-		_loc3_ = this.ignoreWhite(_loc3_);
-		var _loc4_:ASAny = this.execValue(_loc3_).value;
+		_loc3_ = ignoreWhite(_loc3_);
+		var _loc4_ = (execValue(_loc3_).get_value() : Dynamic);
 		if (_loc2_ > 0) {
 			_loc5_ = str.indexOf(")", _loc2_);
 			_loc6_ = str.substring(_loc2_ + 1, _loc5_);
-			_loc6_ = this.ignoreWhite(_loc6_);
+			_loc6_ = ignoreWhite(_loc6_);
 			_loc7_ = [];
-			if (ASCompat.stringAsBool(_loc6_)) {
-				_loc7_ = ASCompat.coerce(this.execValue(_loc6_).value, Array);
+			if (_loc6_ != null && _loc6_ != "") {
+				_loc7_ = execValue(_loc6_).get_value();
 			}
-			_loc8_ = _loc7_.length;
+			_loc8_ = ASCompat.toInt(_loc7_.length);
 			if (_loc8_ == 0) {
-				return ASCompat.createInstance(_loc4_, []);
+				return Type.createInstance(_loc4_, []);
 			}
 			if (_loc8_ == 1) {
-				return ASCompat.createInstance(_loc4_, [_loc7_[0]]);
+				return Type.createInstance(_loc4_, [_loc7_[0]]);
 			}
 			if (_loc8_ == 2) {
-				return ASCompat.createInstance(_loc4_, [_loc7_[0], _loc7_[1]]);
+				return Type.createInstance(_loc4_, [_loc7_[0], _loc7_[1]]);
 			}
 			if (_loc8_ == 3) {
-				return ASCompat.createInstance(_loc4_, [_loc7_[0], _loc7_[1], _loc7_[2]]);
+				return Type.createInstance(_loc4_, [_loc7_[0], _loc7_[1], _loc7_[2]]);
 			}
 			if (_loc8_ == 4) {
-				return ASCompat.createInstance(_loc4_, [_loc7_[0], _loc7_[1], _loc7_[2], _loc7_[3]]);
+				return Type.createInstance(_loc4_, [_loc7_[0], _loc7_[1], _loc7_[2], _loc7_[3]]);
 			}
 			if (_loc8_ == 5) {
-				return ASCompat.createInstance(_loc4_, [_loc7_[0], _loc7_[1], _loc7_[2], _loc7_[3], _loc7_[4]]);
+				return Type.createInstance(_loc4_, [_loc7_[0], _loc7_[1], _loc7_[2], _loc7_[3], _loc7_[4]]);
 			}
 			if (_loc8_ == 6) {
-				return ASCompat.createInstance(_loc4_, [_loc7_[0], _loc7_[1], _loc7_[2], _loc7_[3], _loc7_[4], _loc7_[5]]);
+				return Type.createInstance(_loc4_, [_loc7_[0], _loc7_[1], _loc7_[2], _loc7_[3], _loc7_[4], _loc7_[5]]);
 			}
 			if (_loc8_ == 7) {
-				return ASCompat.createInstance(_loc4_, [_loc7_[0], _loc7_[1], _loc7_[2], _loc7_[3], _loc7_[4], _loc7_[5], _loc7_[6]]);
+				return Type.createInstance(_loc4_, [_loc7_[0], _loc7_[1], _loc7_[2], _loc7_[3], _loc7_[4], _loc7_[5], _loc7_[6]]);
 			}
 			if (_loc8_ == 8) {
-				return ASCompat.createInstance(_loc4_, [
+				return Type.createInstance(_loc4_, [
 					_loc7_[0],
 					_loc7_[1],
 					_loc7_[2],
@@ -527,7 +405,7 @@ class Executer extends EventDispatcher {
 				]);
 			}
 			if (_loc8_ == 9) {
-				return ASCompat.createInstance(_loc4_, [
+				return Type.createInstance(_loc4_, [
 					_loc7_[0],
 					_loc7_[1],
 					_loc7_[2],
@@ -540,7 +418,7 @@ class Executer extends EventDispatcher {
 				]);
 			}
 			if (_loc8_ == 10) {
-				return ASCompat.createInstance(_loc4_, [
+				return Type.createInstance(_loc4_, [
 					_loc7_[0], _loc7_[1], _loc7_[2], _loc7_[3], _loc7_[4], _loc7_[5], _loc7_[6], _loc7_[7], _loc7_[8], _loc7_[9]]);
 			}
 			throw new Error("CommandLine can\'t create new class instances with more than 10 arguments.");
@@ -548,41 +426,387 @@ class Executer extends EventDispatcher {
 		return null;
 	}
 
-	function ignoreWhite(str:String):String {
-		str = new compat.RegExp("\\s*(.*)").replace(str, "$1");
-		var _loc2_ = str.length - 1;
+	public function ignoreWhite(str:String):String {
+		str = FlashRegex.replace(str, new EReg("\\s*(.*)", ""), "$1");
+		var _loc2_:Float = str.length - 1;
 		while (_loc2_ > 0) {
-			if (new compat.RegExp("\\s").match(str.charAt(_loc2_)) == null) {
+			if (!FlashRegex.match(str.charAt(ASCompat.floatToInt(_loc2_)), new EReg("\\s", ""))) {
 				break;
 			}
-			str = str.substring(0, _loc2_);
+			str = str.substring(0, ASCompat.floatToInt(_loc2_));
 			_loc2_--;
 		}
 		return str;
 	}
-}
 
-private class ExeValue {
-	public var obj:ASAny;
+	@:isVar public var scope(get, never):ASAny;
 
-	public var prop:String;
-
-	public function new(b:ASObject = null, p:String = null) {
-		this.obj = b;
-		this.prop = p;
+	public function get_scope():ASAny {
+		return _scope;
 	}
 
-	@:isVar public var value(get, never):ASAny;
+	@:isVar public var returned(get, never):ASAny;
 
-	public function get_value():ASAny {
-		return ASCompat.stringAsBool(this.prop) ? this.obj[this.prop] : this.obj;
+	public function get_returned():ASAny {
+		return _returned;
 	}
 
-	public function setValue(v:ASAny) {
-		if (ASCompat.stringAsBool(this.prop)) {
-			this.obj[this.prop] = v;
+	public function execValue(str:String, base:ASAny = /*undefined*/ null):ExeValue {
+		var _loc5_ = Math.NaN;
+		var _loc6_:ASAny = ASCompat.dynamicAs(null, ExeValue);
+		var _loc7_ = ASCompat.asString(null);
+		var _loc8_:ASAny = ASCompat.dynamicAs(null, WeakObject);
+		var _loc9_:ASAny = null;
+		var _loc4_ = new ExeValue();
+		if (str == "true") {
+			_loc4_.obj = true;
+		} else if (str == "false") {
+			_loc4_.obj = false;
+		} else if (str == "this") {
+			_loc4_.obj = _scope;
+		} else if (str == "null") {
+			_loc4_.obj = null;
 		} else {
-			this.obj = v;
+			_loc5_ = ConsoleLib.toNumber(str);
+			if (_loc5_ == _loc5_) {
+				_loc4_.obj = ConsoleLib.toNumber(str);
+			} else if (str.indexOf("#") == 0) {
+				_loc6_ = _values[ASCompat.toInt(ConsoleLib.parseInt(str.substring("#".length)))];
+				_loc4_.obj = _loc6_.get_value();
+			} else if (str.charAt(0) == "$") {
+				_loc7_ = str.substring(1);
+				if (_reserved.indexOf(_loc7_) < 0) {
+					_loc4_.obj = _saved;
+					_loc4_.prop = _loc7_;
+				} else if (Std.isOfType(_saved, WeakObject)) {
+					_loc8_ = _saved;
+					_loc4_.obj = _loc8_.get(_loc7_);
+				} else {
+					_loc4_.obj = Reflect.field(_saved, _loc7_);
+				}
+			} else {
+				try {
+					_loc4_.obj = ConsoleLib.getDefinitionByName(str);
+				} catch (_loc_e_:ASAny) {
+					_loc9_ = _loc_e_;
+					_loc4_.obj = base;
+					_loc4_.prop = str;
+				}
+			}
+		}
+		return _loc4_;
+	}
+
+	public function execSimple(str:String):ExeValue {
+		var _loc4_ = ASCompat.asString(null);
+		var _loc5_ = 0;
+		var _loc6_:ASAny = null;
+		var _loc8_ = false;
+		var _loc9_ = Math.NaN;
+		var _loc11_:ASAny = null;
+		var _loc12_ = false;
+		var _loc15_ = 0;
+		var _loc16_ = ASCompat.dynamicAs(null, ExeValue);
+		var _loc17_ = 0;
+		var _loc18_ = ASCompat.asString(null);
+		var _loc19_:ASAny = (ASCompat.dynamicAs(null, Array) : Array<ASAny>);
+		var _loc20_:ASAny = null;
+		var _loc3_ = new ExeValue(_scope);
+		if (str.indexOf("new ") == 0) {
+			_loc4_ = str;
+			_loc5_ = str.indexOf(")");
+			if (_loc5_ >= 0) {
+				_loc4_ = str.substring(0, _loc5_ + 1);
+			}
+			_loc6_ = makeNew(_loc4_.substring(4));
+			str = tempValue(str, new ExeValue(_loc6_), 0, ASCompat.toInt(_loc4_.length));
+		}
+		var _loc7_ = new EReg("\\.|\\(", "g");
+		_loc6_ = FlashRegex.exec(str, _loc7_);
+		if (_loc6_ != null) {
+			_loc9_ = ConsoleLib.toNumber(str);
+			_loc8_ = _loc9_ == _loc9_;
+		} else {
+			_loc8_ = true;
+		}
+		if (_loc8_) {
+			return execValue(str, _scope);
+		}
+		var _loc10_:Array<ASAny> = (cast str.split("(")[0].split("."));
+		if (_loc10_.length > 0) {
+			while (_loc10_.length != 0) {
+				_loc4_ = _loc10_.join(".");
+				try {
+					_loc11_ = ConsoleLib.getDefinitionByName(ignoreWhite(_loc4_));
+					_loc12_ = str.length > ASCompat.toNumberField(_loc4_, "length");
+					str = tempValue(str, new ExeValue(_loc11_), 0, ASCompat.toInt(_loc4_.length));
+					if (_loc12_) {
+						_loc6_ = FlashRegex.exec(str, _loc7_, 0);
+						break;
+					}
+					return execValue(str);
+				} catch (_loc_e_:ASAny) {
+					_loc11_ = _loc_e_;
+					_loc10_.pop();
+				}
+			}
+		}
+		_loc5_ = 0;
+		var _loc13_ = 0;
+		var _loc14_ = ASCompat.toInt(_loc6_.index);
+		while (_loc6_ != null) {
+			_loc15_ = ASCompat.toInt(_loc6_.index);
+			_loc12_ = str.charAt(_loc15_) == "(";
+			_loc4_ = ignoreWhite(str.substring(_loc5_, _loc15_));
+			_loc16_ = _loc5_ == 0 ? execValue(_loc4_, _loc3_.get_value()) : new ExeValue(_loc3_.get_value(), _loc4_);
+			if (_loc12_) {
+				_loc11_ = _loc16_.get_value();
+				_loc17_ = str.indexOf(")", _loc15_);
+				_loc18_ = str.substring(_loc15_ + 1, _loc17_);
+				_loc18_ = ignoreWhite(_loc18_);
+				_loc19_ = [];
+				if (_loc18_ != null && _loc18_ != "") {
+					_loc19_ = execValue(_loc18_).get_value();
+				}
+				if (!Reflect.isFunction(_loc11_)) {
+					try {
+						_loc20_ = _loc3_.obj[new QName(new Namespace("http://adobe.com/AS3/2006/builtin"), _loc4_)];
+						if (Reflect.isFunction(_loc20_)) {
+							_loc11_ = _loc20_;
+						}
+					} catch (_loc_e_:ASAny) {
+						_loc20_ = _loc_e_;
+						null;
+					}
+					if (!Reflect.isFunction(_loc11_)) {
+						throw new Error(_loc4_ + " is not a function.");
+					}
+				}
+				_loc20_ = _loc3_.get_value();
+				_loc3_.obj = Reflect.callMethod(_loc20_, _loc11_, _loc19_);
+				_loc3_.prop = null;
+				_loc15_ = _loc17_ + 1;
+			} else {
+				_loc3_ = _loc16_;
+			}
+			_loc5_ = _loc15_ + 1;
+			_loc13_ = _loc15_ + 1;
+			_loc6_ = FlashRegex.exec(str, _loc7_, _loc13_);
+			if (_loc6_ == null) {
+				if (_loc15_ + 1 < str.length) {
+					_loc13_ = str.length;
+					_loc6_ = {"index": str.length};
+				}
+			}
+		}
+		return _loc3_;
+	}
+
+	public function execOperations(str:String):ExeValue {
+		var _loc5_ = 0;
+		var _loc6_ = 0;
+		var _loc7_:ASAny = ASCompat.asString(null);
+		var _loc8_:ASAny = null;
+		var _loc11_:ASAny = ASCompat.dynamicAs(null, ExeValue);
+		var _loc13_:ASAny = ASCompat.dynamicAs(null, ExeValue);
+		var _loc2_ = new EReg("\\s*(((\\|\\||\\&\\&|[+|\\-|*|\\/|\\%|\\||\\&|\\^]|\\=\\=?|\\!\\=|\\>\\>?\\>?|\\<\\<?)\\=?)|=|\\~|\\sis\\s|typeof|delete\\s)\\s*",
+			"g");
+		var _loc3_ = FlashRegex.exec(str, _loc2_);
+		var _loc4_:Array<ASAny> = [];
+		if (_loc3_ == null) {
+			_loc4_.push(str);
+		} else {
+			_loc5_ = 0;
+			while (_loc3_ != null) {
+				_loc6_ = _loc3_.index;
+				_loc7_ = _loc3_.elements[0];
+				_loc3_ = FlashRegex.exec(str, _loc2_, ASCompat.toInt(_loc6_ + _loc7_.length));
+				if (_loc3_ == null) {
+					_loc4_.push(str.substring(_loc5_, _loc6_));
+					_loc4_.push(ignoreWhite(_loc7_));
+					_loc4_.push(str.substring(ASCompat.toInt(_loc6_ + _loc7_.length)));
+				} else {
+					_loc4_.push(str.substring(_loc5_, _loc6_));
+					_loc4_.push(ignoreWhite(_loc7_));
+					_loc5_ = ASCompat.toInt(_loc6_ + _loc7_.length);
+				}
+			}
+		}
+		_loc5_ = _loc4_.length;
+		_loc6_ = 0;
+		while (_loc6_ < _loc5_) {
+			_loc4_[_loc6_] = execSimple(_loc4_[_loc6_]);
+			_loc6_ += 2;
+		}
+		var _loc9_ = new EReg("((\\|\\||\\&\\&|[+|\\-|*|\\/|\\%|\\||\\&|\\^]|\\>\\>\\>?|\\<\\<)\\=)|=", "");
+		var _loc10_ = 1;
+		while (_loc10_ < _loc5_) {
+			_loc7_ = _loc4_[_loc10_];
+			if (FlashRegex.replace(_loc7_, _loc9_, "") != "") {
+				_loc8_ = operate(ASCompat.coerce(_loc4_[_loc10_ - 1], com.junkbyte.console.core.ExeValue), _loc7_,
+					ASCompat.coerce(_loc4_[_loc10_ + 1], com.junkbyte.console.core.ExeValue));
+				_loc11_ = _loc4_[_loc10_ - 1];
+				_loc11_.setValue(_loc8_);
+				_loc4_.splice(_loc10_, (2 : UInt));
+				_loc10_ -= 2;
+				_loc5_ -= 2;
+			}
+			_loc10_ += 2;
+		}
+		ASCompat.ASArray.reverse(_loc4_);
+		_loc11_ = _loc4_[0];
+		var _loc12_ = 1;
+		while (_loc12_ < _loc5_) {
+			_loc7_ = _loc4_[_loc12_];
+			if (FlashRegex.replace(_loc7_, _loc9_, "") == "") {
+				_loc11_ = _loc4_[_loc12_ - 1];
+				_loc13_ = _loc4_[_loc12_ + 1];
+				if (ASCompat.toNumberField(_loc7_, "length") > 1) {
+					_loc7_ = Std.string(_loc7_).substring(0, ASCompat.toInt(ASCompat.toNumberField(_loc7_, "length") - 1));
+				}
+				_loc8_ = operate(ASCompat.coerce(_loc13_, com.junkbyte.console.core.ExeValue), _loc7_,
+					ASCompat.coerce(_loc11_, com.junkbyte.console.core.ExeValue));
+				_loc13_.setValue(_loc8_);
+			}
+			_loc12_ += 2;
+		}
+		return ASCompat.coerce(_loc11_, com.junkbyte.console.core.ExeValue);
+	}
+
+	public function execNest(line:String):ASAny {
+		var _loc3_ = 0;
+		var _loc4_ = 0;
+		var _loc5_ = 0;
+		var _loc6_ = ASCompat.asString(null);
+		var _loc7_ = false;
+		var _loc8_ = 0;
+		var _loc9_ = ASCompat.asString(null);
+		var _loc10_:ASAny = (ASCompat.dynamicAs(null, Array) : Array<ASAny>);
+		var _loc11_ = (ASCompat.dynamicAs(null, Array) : Array<ASAny>);
+		var _loc12_ = 0;
+		var _loc13_:ASAny = null;
+		var _loc14_ = ASCompat.dynamicAs(null, ExeValue);
+		line = ignoreWhite(line);
+		var _loc2_ = line.lastIndexOf("(");
+		while (_loc2_ >= 0) {
+			_loc3_ = line.indexOf(")", _loc2_);
+			if (FlashRegex.search(line.substring(_loc2_ + 1, _loc3_), new EReg("\\w", "")) >= 0) {
+				_loc4_ = _loc2_;
+				_loc5_ = _loc2_ + 1;
+				while (_loc4_ >= 0 && _loc4_ < _loc5_) {
+					_loc4_++;
+					_loc4_ = line.indexOf("(", _loc4_);
+					_loc5_ = line.indexOf(")", _loc5_ + 1);
+				}
+				_loc6_ = line.substring(_loc2_ + 1, _loc5_);
+				_loc7_ = false;
+				_loc8_ = _loc2_ - 1;
+				while (true) {
+					_loc9_ = line.charAt(_loc8_);
+					if (FlashRegex.match(_loc9_, new EReg("[^\\s]", "")) || _loc8_ <= 0) {
+						break;
+					}
+					_loc8_--;
+				}
+				if (FlashRegex.match(_loc9_, new EReg("\\w", ""))) {
+					_loc7_ = true;
+				}
+				if (_loc7_) {
+					_loc10_ = _loc6_.split(",");
+					line = tempValue(line, new ExeValue(_loc10_), _loc2_ + 1, _loc5_);
+					_loc11_ = [];
+					_loc12_ = 0;
+					while (_loc12_ < ASCompat.toInt(_loc10_.length)) {
+						_loc13_ = _loc10_[_loc12_];
+						_loc12_++;
+						_loc11_.push(execOperations(ignoreWhite(_loc13_)).get_value());
+					}
+					ASCompat.dynSplice(_loc10_, 0, ASCompat.toInt(_loc10_.length));
+					_loc12_ = 0;
+					while (_loc12_ < ASCompat.toInt(_loc11_.length)) {
+						_loc13_ = _loc11_[_loc12_];
+						_loc12_++;
+						ASCompat.dynPush(_loc10_, _loc13_);
+					}
+				} else {
+					_loc14_ = new ExeValue();
+					line = tempValue(line, _loc14_, _loc2_, _loc5_ + 1);
+					_loc14_.setValue(execOperations(ignoreWhite(_loc6_)).get_value());
+				}
+			}
+			_loc2_ = line.lastIndexOf("(", _loc2_ - 1);
+		}
+		_returned = execOperations(line).get_value();
+		if (ConsoleLib.truthy(_returned) && autoScope) {
+			_loc6_ = ConsoleLib.typeOf(_returned);
+			if (_loc6_ == "object" || _loc6_ == "xml") {
+				_scope = _returned;
+			}
+		}
+		dispatchEvent(new Event(Event.COMPLETE));
+		return _returned;
+	}
+
+	public function exec(s:ASAny, str:String):ASAny {
+		var _loc4_ = ASCompat.dynamicAs(null, Error);
+		if (_running) {
+			throw new Error("CommandExec.exec() is already runnnig. Does not support loop backs.");
+		}
+		_running = true;
+		_scope = s;
+		_values = [];
+		if (_saved == null) {
+			_saved = {};
+		}
+		if (_reserved == null) {
+			_reserved = [];
+		}
+		try {
+			_exec(str);
+		} catch (_loc_e_:Dynamic) {
+			_loc4_ = _loc_e_;
+			reset();
+			throw _loc4_;
+		}
+		reset();
+		return _returned;
+	}
+
+	public function _exec(str:String) {
+		var _loc4_:ASAny = ASCompat.asString(null);
+		var _loc5_:ASAny = ASCompat.asString(null);
+		var _loc6_ = 0;
+		var _loc7_ = 0;
+		var _loc8_ = ASCompat.asString(null);
+		var _loc10_:ASAny = null;
+		var _loc2_ = new EReg("\'\'|\"\"|(\'(.*?)[^\\\\]\')|(\"(.*?)[^\\\\]\")", "");
+		var _loc3_ = FlashRegex.exec(str, _loc2_);
+		while (_loc3_ != null) {
+			_loc4_ = _loc3_.elements[0];
+			_loc5_ = Std.string(_loc4_).charAt(0);
+			_loc6_ = ASCompat.toInt(_loc4_.indexOf(_loc5_));
+			_loc7_ = ASCompat.toInt(_loc4_.lastIndexOf(_loc5_));
+			_loc8_ = FlashRegex.replace(Std.string(_loc4_).substring(_loc6_ + 1, _loc7_), new EReg("\\\\(.)", "g"), "$1");
+			str = tempValue(str, new ExeValue(_loc8_), _loc3_.index + _loc6_, _loc3_.index + _loc7_ + 1);
+			_loc3_ = FlashRegex.exec(str, _loc2_);
+		}
+		if (FlashRegex.search(str, new EReg("\'|\"", "")) >= 0) {
+			throw new Error("Bad syntax extra quotation marks");
+		}
+		var _loc9_ = FlashRegex.split(str, new EReg("\\s*;\\s*", ""));
+		_loc6_ = 0;
+		while (_loc6_ < _loc9_.length) {
+			_loc4_ = _loc9_[_loc6_];
+			_loc6_++;
+			if (ASCompat.toNumberField(_loc4_, "length") != 0) {
+				_loc10_ = new ExeValue(_saved, "returned").get_value();
+				if (ConsoleLib.truthy(_loc10_) && _loc4_ == "/") {
+					_scope = _loc10_;
+					dispatchEvent(new Event(Event.COMPLETE));
+				} else {
+					execNest(_loc4_);
+				}
+			}
 		}
 	}
 }

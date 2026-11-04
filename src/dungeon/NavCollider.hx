@@ -21,6 +21,8 @@ class NavCollider {
 
 	var mB2World:B2World;
 
+	var mSetPositionScratch:B2Vec2 = new B2Vec2();
+
 	public function new(dbFacade:DBFacade, parentObject:FloorObject, offset:Vector3D, box2DWorld:B2World) {
 		mDBFacade = dbFacade;
 		mParentObject = parentObject;
@@ -92,8 +94,11 @@ class NavCollider {
 	@:isVar public var position(get, set):Vector3D;
 
 	public function set_position(val:Vector3D):Vector3D {
-		var _loc2_ = new Vector3D(val.x + mWorldSpaceOffset.x, val.y + mWorldSpaceOffset.y);
-		mB2Body.SetPosition(convertToB2Vec2(_loc2_));
+		var _loc2_ = (val.x + mWorldSpaceOffset.x) / 50;
+		var _loc3_ = (val.y + mWorldSpaceOffset.y) / 50;
+		mSetPositionScratch.x = _loc2_;
+		mSetPositionScratch.y = _loc3_;
+		mB2Body.SetPosition(mSetPositionScratch);
 		return val;
 	}
 

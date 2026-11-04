@@ -3,6 +3,7 @@ package distributedObjects;
 import brain.event.EventComponent;
 import brain.gameObject.GameObject;
 import brain.logger.Logger;
+import collections.Map;
 import events.ClientExitCompleteEvent;
 import events.MatchMakerLoadedEvent;
 import events.RequestEntryFailedEvent;
@@ -12,7 +13,6 @@ import generatedCode.IMatchMaker;
 import generatedCode.InfiniteMapNodeDetail;
 import generatedCode.MatchMakerNetworkComponent;
 import flash.events.Event;
-import org.as3commons.collections.Map;
 
 class MatchMaker extends GameObject implements IMatchMaker {
 	public static var EPOCH_ROLL_OVER_EVENT_NAME:String = "EPOCH_ROLL_OVER_EVENT_NAME";
@@ -46,9 +46,9 @@ class MatchMaker extends GameObject implements IMatchMaker {
 	function setInfiniteDungeonDetails() {
 		var _loc1_:InfiniteMapNodeDetail = null;
 		mInfiniteDungeonDetails = new Map();
-		final __ax4_iter_222 = mInfiniteMapNodeDetails;
-		if (checkNullIteratee(__ax4_iter_222))
-			for (_tmp_ in __ax4_iter_222) {
+		final __ax4_iter_307 = mInfiniteMapNodeDetails;
+		if (checkNullIteratee(__ax4_iter_307))
+			for (_tmp_ in __ax4_iter_307) {
 				_loc1_ = _tmp_;
 				if (_loc1_ != null) {
 					mInfiniteDungeonDetails.add(_loc1_.nodeId, _loc1_);

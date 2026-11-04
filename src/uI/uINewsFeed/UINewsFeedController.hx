@@ -12,7 +12,6 @@ import events.FriendStatusEvent;
 import events.FriendSummaryNewsFeedEvent;
 import events.GenericNewsFeedEvent;
 import facade.DBFacade;
-import com.greensock.TweenMax;
 
 class UINewsFeedController {
 	public static inline final MAX_VISIBLE_FEEDS = (1 : UInt);
@@ -126,7 +125,7 @@ class UINewsFeedController {
 		var _loc2_ = mQueuedFeeds.shift();
 		mVisibleFeeds.push(_loc2_);
 		_loc2_.root.x = mDBFacade.viewWidth;
-		_loc2_.root.y = (mVisibleFeeds.length + 1) * 75;
+		_loc2_.root.y = (mVisibleFeeds.length + 1) * 75 + _loc2_.topShift;
 		_loc2_.lerpIntoScreen();
 	}
 
@@ -138,21 +137,21 @@ class UINewsFeedController {
 
 	function lerpAllfeedsUp() {
 		var _loc1_:UINewsFeed;
-		final __ax4_iter_68 = mVisibleFeeds;
-		if (checkNullIteratee(__ax4_iter_68))
-			for (_tmp_ in __ax4_iter_68) {
+		final __ax4_iter_44 = mVisibleFeeds;
+		if (checkNullIteratee(__ax4_iter_44))
+			for (_tmp_ in __ax4_iter_44) {
 				_loc1_ = _tmp_;
 				if (_loc1_ != null) {
-					TweenMax.to(_loc1_.root, 0.16666666666666666, {"y": _loc1_.root.y - 75});
+					mDBFacade.mTween.tweenMaxTo(_loc1_.root, 0.16666666666666666, {"y": _loc1_.root.y - 75});
 				}
 			}
 	}
 
 	function flushFeeds() {
 		var _loc1_:UINewsFeed;
-		final __ax4_iter_69 = mQueuedFeeds;
-		if (checkNullIteratee(__ax4_iter_69))
-			for (_tmp_ in __ax4_iter_69) {
+		final __ax4_iter_45 = mQueuedFeeds;
+		if (checkNullIteratee(__ax4_iter_45))
+			for (_tmp_ in __ax4_iter_45) {
 				_loc1_ = _tmp_;
 				if (_loc1_ != null) {
 					_loc1_.destroy();
@@ -160,9 +159,9 @@ class UINewsFeedController {
 				_loc1_ = null;
 			}
 		mQueuedFeeds.splice(0, (mQueuedFeeds.length : UInt));
-		final __ax4_iter_70 = mVisibleFeeds;
-		if (checkNullIteratee(__ax4_iter_70))
-			for (_tmp_ in __ax4_iter_70) {
+		final __ax4_iter_46 = mVisibleFeeds;
+		if (checkNullIteratee(__ax4_iter_46))
+			for (_tmp_ in __ax4_iter_46) {
 				_loc1_ = _tmp_;
 				if (_loc1_ != null) {
 					_loc1_.destroy();

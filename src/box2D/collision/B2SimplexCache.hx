@@ -3,11 +3,16 @@ package box2D.collision;
 class B2SimplexCache {
 	public var metric:Float = Math.NaN;
 
-	public var count:UInt = 0;
+	public var indexB:Array<ASAny>;
 
-	public var indexA:Vector<Int> = new Vector((3 : UInt));
+	public var indexA:Array<ASAny>;
 
-	public var indexB:Vector<Int> = new Vector((3 : UInt));
+	public var count:Int = 0;
 
-	public function new() {}
+	public function new() {
+		count = 0;
+		metric = 0;
+		indexA = [];
+		indexB = [];
+	}
 }

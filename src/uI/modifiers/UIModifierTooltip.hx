@@ -2,7 +2,9 @@ package uI.modifiers;
 
 import brain.assetRepository.SwfAsset;
 import brain.sceneGraph.SceneGraphComponent;
+import brain.utils.TextUtil;
 import facade.DBFacade;
+import uI.inventory.UIWeaponTooltip;
 import flash.display.MovieClip;
 import flash.geom.Point;
 
@@ -11,33 +13,47 @@ class UIModifierTooltip extends MovieClip {
 
 	var mSceneGraphComponent:SceneGraphComponent;
 
+	var mFacade:DBFacade;
+
+	var mAnchor:MovieClip;
+
 	public function new(facade:DBFacade, parentMC:MovieClip, swfAsset:SwfAsset, title:String, desc:String) {
 		super();
+		mFacade = facade;
+		mAnchor = parentMC;
 		var _loc6_ = swfAsset.getClass("modifier_tooltip");
 		mRoot = ASCompat.dynamicAs(ASCompat.createInstance(_loc6_, []), MovieClip);
-		ASCompat.setProperty((mRoot : ASAny).title_label, "text", title.toUpperCase());
-		ASCompat.setProperty((mRoot : ASAny).title_description, "text", desc);
+		mRoot.scaleX = mRoot.scaleY = UIWeaponTooltip.tooltipScale(ASCompat.coerce((mRoot : ASAny).title_description, flash.text.TextField), 1.55);
+		TextUtil.setText(ASCompat.coerce((mRoot : ASAny).title_label, flash.text.TextField), title.toUpperCase());
+		TextUtil.setText(ASCompat.coerce((mRoot : ASAny).title_description, flash.text.TextField), desc);
 		mRoot.mouseChildren = false;
 		mRoot.mouseEnabled = false;
-		parentMC.addChild(mRoot);
-		var _loc7_ = parentMC.localToGlobal(new Point());
-		mRoot.x = _loc7_.x;
-		mRoot.y = _loc7_.y + 20;
 		mSceneGraphComponent = new SceneGraphComponent(facade, "UIModifierTooltip");
 		mSceneGraphComponent.addChild(mRoot, (107 : UInt));
 	}
 
 	public function show() {
+		if (mRoot == null || mAnchor == null) {
+			return;
+		}
+		var _loc1_ = mAnchor.getBounds(mAnchor).top;
+		var _loc2_ = mFacade.designLocalToGlobal(mAnchor, new Point(0, _loc1_));
+		mRoot.x = _loc2_.x;
+		mRoot.y = _loc2_.y;
 		mRoot.visible = true;
 	}
 
 	public function hide() {
-		mRoot.visible = false;
+		if (mRoot != null) {
+			mRoot.visible = false;
+		}
 	}
 
 	public function destroy() {
 		mSceneGraphComponent.destroy();
 		mSceneGraphComponent = null;
 		mRoot = null;
+		mAnchor = null;
+		mFacade = null;
 	}
 }

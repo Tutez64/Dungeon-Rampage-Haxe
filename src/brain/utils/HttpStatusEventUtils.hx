@@ -11,9 +11,9 @@ class HttpStatusEventUtils {
 			return null;
 		}
 		var _loc2_:URLRequestHeader;
-		final __ax4_iter_63 = e.responseHeaders;
-		if (checkNullIteratee(__ax4_iter_63))
-			for (_tmp_ in __ax4_iter_63) {
+		final __ax4_iter_40 = e.responseHeaders;
+		if (checkNullIteratee(__ax4_iter_40))
+			for (_tmp_ in __ax4_iter_40) {
 				_loc2_ = _tmp_;
 				if (_loc2_.name.toLowerCase() == "x-trace-id") {
 					return _loc2_.value;

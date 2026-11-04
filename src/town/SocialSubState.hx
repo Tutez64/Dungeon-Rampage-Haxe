@@ -30,6 +30,10 @@ class SocialSubState extends TownSubState {
 		if (mPendingFriendRequest && !mAcknowledgedPendingFriendRequest) {
 			mAcknowledgedPendingFriendRequest = true;
 		}
+		super.resetHeaderLinks();
+		super.setupHeaderLinks();
+		mDBFacade.menuNavigationController.pushNewLayer("FRIENDS_MENU", mTownStateMachine.townHeader.determineCallback,
+			mTownStateMachine.townHeader.closeButton, mTownStateMachine.townHeader.closeButton, mUIFriendManager.showPreviousTab, mUIFriendManager.showNextTab);
 		if (mUIFriendManager != null) {
 			mUIFriendManager.init(mTabCategory);
 			mUIFriendManager.animateEntry();
@@ -37,10 +41,9 @@ class SocialSubState extends TownSubState {
 		mTownStateMachine.townHeader.title = Locale.getString("FM_HEADER");
 		mTownStateMachine.townHeader.showCloseButton(true);
 		checkForFriendMessages();
-		super.resetHeaderLinks();
-		super.setupHeaderLinks();
-		mDBFacade.menuNavigationController.pushNewLayer("FRIENDS_MENU", mTownStateMachine.townHeader.determineCallback,
-			mTownStateMachine.townHeader.closeButton, mTownStateMachine.townHeader.closeButton);
+		if (mUIFriendManager != null) {
+			mUIFriendManager.setupMenuNavigation();
+		}
 	}
 
 	public function setTabCategory(newValue:UInt) {
@@ -51,6 +54,7 @@ class SocialSubState extends TownSubState {
 		mDBFacade.menuNavigationController.popLayer("FRIENDS_MENU");
 		super.exitState();
 		if (mUIFriendManager != null) {
+			mUIFriendManager.resetMenuNavigation();
 			mUIFriendManager.cleanUp();
 		}
 	}
@@ -69,6 +73,10 @@ class SocialSubState extends TownSubState {
 
 	override function setupState() {
 		super.setupState();
+		if (mUIFriendManager != null) {
+			mUIFriendManager.destroy();
+			mUIFriendManager = null;
+		}
 		mUIFriendManager = new UIFriendManager(mDBFacade, mTownStateMachine, mRootMovieClip);
 		setTabCategory((1 : UInt));
 		checkForFriendMessages();

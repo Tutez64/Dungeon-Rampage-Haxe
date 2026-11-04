@@ -9,15 +9,15 @@ import flash.geom.Vector3D;
 class DistributedDooberGameObjectNetworkComponent extends DcNetworkClass implements DcNetworkInterface {
 	var the_instance:DistributedDooberGameObject;
 
-	public static inline final FLID_type = (287 : UInt);
+	public static inline final FLID_type = (296 : UInt);
 
-	public static inline final FLID_position = (288 : UInt);
+	public static inline final FLID_position = (297 : UInt);
 
-	public static inline final FLID_layer = (289 : UInt);
+	public static inline final FLID_layer = (298 : UInt);
 
-	public static inline final FLID_spawnFrom = (290 : UInt);
+	public static inline final FLID_spawnFrom = (299 : UInt);
 
-	public static inline final FLID_collectedBy = (291 : UInt);
+	public static inline final FLID_collectedBy = (300 : UInt);
 
 	public function new(Inst:DistributedDooberGameObject, gs:GeneratedDcSocket, id:UInt) {
 		super(Inst, gs, id);
@@ -34,7 +34,7 @@ class DistributedDooberGameObjectNetworkComponent extends DcNetworkClass impleme
 	}
 
 	override public function recvById(packet:DcNetworkPacket, fieldid:UInt) {
-		switch (fieldid - 287) {
+		switch (fieldid - 296) {
 			case 0:
 				recv_type(packet);
 

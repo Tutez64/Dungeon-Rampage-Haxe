@@ -4,9 +4,9 @@ import brain.clock.GameClock;
 import brain.event.EventComponent;
 import brain.workLoop.LogicalWorkComponent;
 import brain.workLoop.Task;
+import collections.Map;
 import facade.DBFacade;
 import stateMachine.mainStateMachine.DungeonTutorial;
-import org.as3commons.collections.Map;
 
 class UITutorialController {
 	var mDBFacade:DBFacade;
@@ -35,11 +35,11 @@ class UITutorialController {
 		});
 	}
 
-	public function queueTutorial(type:String) {
-		if (ASCompat.toBool(mTutorialEventMap.itemFor(type))) {
+	public function queueTutorial(tutorialType:String) {
+		if (ASCompat.toBool(mTutorialEventMap.itemFor(tutorialType))) {
 			return;
 		}
-		switch (type) {
+		switch (tutorialType) {
 			case "COOLDOWN_TUTORIAL":
 				mTutorialsCallbackQueue.push(startCooldownTutorial);
 
@@ -67,7 +67,7 @@ class UITutorialController {
 			case "SUPER_WEAK_TUTORIAL":
 				mTutorialsCallbackQueue.push(startSuperWeakTutorial);
 		}
-		mTutorialEventMap.add(type, 1);
+		mTutorialEventMap.add(tutorialType, 1);
 		if (mTutorialTask == null) {
 			mTutorialTask = mLogicalWorkComponent.doEverySeconds(1, checkTutorials);
 		}
@@ -151,14 +151,14 @@ class UITutorialController {
 	}
 
 	public function flushTutorialQueue() {
-		var _loc2_ = 0;
+		var _loc2_ = (0 : UInt);
 		var _loc1_:ASFunction = null;
 		if (mTutorialTask != null) {
 			mTutorialTask.destroy();
 		}
 		mTutorialTask = null;
-		_loc2_ = 0;
-		while (_loc2_ < mTutorialsCallbackQueue.length) {
+		_loc2_ = (0 : UInt);
+		while (_loc2_ < (mTutorialsCallbackQueue.length:UInt)) {
 			_loc1_ = mTutorialsCallbackQueue.shift();
 			_loc1_ = null;
 		}

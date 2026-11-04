@@ -1,6 +1,6 @@
 package uI.infiniteIsland;
 
-import com.maccherone.json.JSON;
+import json.JsonCodec;
 
 class II_ChampionsboardTopScore {
 	public var name:String;
@@ -17,17 +17,17 @@ class II_ChampionsboardTopScore {
 		skinId = skinVal;
 		mWeaponsJson = new Array<Dynamic>();
 		if (weapon1 != null) {
-			mWeaponsJson.push(com.maccherone.json.JSON.decode(weapon1));
+			mWeaponsJson.push(JsonCodec.decode(weapon1));
 		} else {
 			mWeaponsJson.push(null);
 		}
 		if (weapon1 != null) {
-			mWeaponsJson.push(com.maccherone.json.JSON.decode(weapon2));
+			mWeaponsJson.push(JsonCodec.decode(weapon2));
 		} else {
 			mWeaponsJson.push(null);
 		}
 		if (weapon1 != null) {
-			mWeaponsJson.push(com.maccherone.json.JSON.decode(weapon3));
+			mWeaponsJson.push(JsonCodec.decode(weapon3));
 		} else {
 			mWeaponsJson.push(null);
 		}

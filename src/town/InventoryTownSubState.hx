@@ -32,11 +32,13 @@ class InventoryTownSubState extends TownSubState {
 
 	override function setupState() {
 		super.setupState();
-		mUIInventory = new UIInventory(mDBFacade, mTownStateMachine.townHeader);
+		mUIInventory = new UIInventory(mDBFacade, mTownStateMachine.townHeader, null, function():Bool {
+			return mTownStateMachine.currentStateName == "InventoryTownSubState";
+		});
 	}
 
-	public function setRevlealedState(type:UInt, offerId:UInt, showEquipOption:Bool = false) {
-		mUIInventory.setRevealedState(type, offerId, showEquipOption);
+	public function setRevealedState(revealItemTypeId:UInt, offerId:UInt, showEquipOption:Bool = false) {
+		mUIInventory.setRevealedState(revealItemTypeId, offerId, showEquipOption);
 	}
 
 	override public function enterState() {
@@ -49,12 +51,13 @@ class InventoryTownSubState extends TownSubState {
 		mEventComponent.addListener("DB_ACCOUNT_INFO_RESPONSE", function(param1:events.DBAccountResponseEvent) {
 			mUIInventory.refresh();
 		});
-		mUIInventory.refresh(true);
-		mUIInventory.animateEntry();
 		super.resetHeaderLinks();
 		super.setupHeaderLinks();
 		mDBFacade.menuNavigationController.pushNewLayer("INVENTORY_MENU", mTownStateMachine.townHeader.determineCallback,
 			mTownStateMachine.townHeader.closeButton, mTownStateMachine.townHeader.closeButton);
+		mUIInventory.refresh(true);
+		mUIInventory.animateEntry();
+		mUIInventory.setupCategoryNavigation("INVENTORY_MENU");
 	}
 
 	override public function exitState() {

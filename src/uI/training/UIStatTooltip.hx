@@ -4,43 +4,30 @@ import facade.DBFacade;
 import facade.GameMasterLocale;
 import gameMasterDictionary.GMStat;
 import gameMasterDictionary.GMSuperStat;
-import flash.display.MovieClip;
-import flash.text.TextField;
 
-class UIStatTooltip extends MovieClip {
+class UIStatTooltip extends UIStatTooltipBox {
 	var mDBFacade:DBFacade;
-
-	var mRoot:MovieClip;
 
 	var mGMStatItem:GMStat;
 
 	var mGMSuperStatItem:GMSuperStat;
 
-	var mTitleLabel:TextField;
-
-	var mDescription:TextField;
-
 	public function new(dbFacade:DBFacade, templateClass:Dynamic) {
-		super();
+		super(templateClass);
 		mDBFacade = dbFacade;
-		mRoot = ASCompat.coerce(ASCompat.createInstance(templateClass, []), flash.display.MovieClip);
-		this.addChild(mRoot);
-		mTitleLabel = ASCompat.coerce((mRoot : ASAny).title_label, flash.text.TextField);
-		mDescription = ASCompat.coerce((mRoot : ASAny).stat_description_label, flash.text.TextField);
 	}
 
-	public function destroy() {
+	override public function destroy() {
 		mDBFacade = null;
-		this.removeChild(mRoot);
-		mRoot = null;
+		super.destroy();
 	}
 
 	@:isVar public var statItem(never, set):GMStat;
 
 	public function set_statItem(value:GMStat):GMStat {
 		mGMStatItem = value;
-		mTitleLabel.text = GameMasterLocale.getGameMasterSubString("STATS_NAME", mGMStatItem.Constant).toUpperCase();
-		mDescription.text = GameMasterLocale.getGameMasterSubString("STATS_DESCRIPTION", mGMStatItem.Constant);
+		setTexts(GameMasterLocale.getGameMasterSubString("STATS_NAME", mGMStatItem.Constant).toUpperCase(),
+			GameMasterLocale.getGameMasterSubString("STATS_DESCRIPTION", mGMStatItem.Constant), 1.55);
 		return value;
 	}
 
@@ -48,8 +35,8 @@ class UIStatTooltip extends MovieClip {
 
 	public function set_superStatItem(value:GMSuperStat):GMSuperStat {
 		mGMSuperStatItem = value;
-		mTitleLabel.text = GameMasterLocale.getGameMasterSubString("STATS_NAME", mGMSuperStatItem.Constant).toUpperCase();
-		mDescription.text = GameMasterLocale.getGameMasterSubString("STATS_DESCRIPTION", mGMSuperStatItem.Constant);
+		setTexts(GameMasterLocale.getGameMasterSubString("STATS_NAME", mGMSuperStatItem.Constant).toUpperCase(),
+			GameMasterLocale.getGameMasterSubString("STATS_DESCRIPTION", mGMSuperStatItem.Constant), 1.55);
 		return value;
 	}
 }

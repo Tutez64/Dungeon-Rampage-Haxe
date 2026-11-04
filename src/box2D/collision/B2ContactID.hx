@@ -1,37 +1,44 @@
 package box2D.collision;
 
-/*use*/ /*namespace*/ /*b2internal*/ class B2ContactID {
-	public var features:Features = new Features();
+class B2ContactID {
+	public var features:Features;
 
-	/*b2internal*/
-	public var _key:UInt = 0;
+	public var _key:Int = 0;
 
 	public function new() {
-		this.features._m_id = this;
+		_key = 0;
+		features = new Features();
+		features._m_id = this;
+	}
+
+	public function set_key(value:Int):Int {
+		_key = value;
+		features._referenceEdge = _key & 0xFF;
+		features._incidentEdge = (_key & 0xFF00) >> 8 & 0xFF;
+		features._incidentVertex = (_key & 0xFF0000) >> 16 & 0xFF;
+		features._flip = (_key & -16777216) >> 24 & 0xFF;
+		return _key;
+	}
+
+	public function set(id:B2ContactID) {
+		Set(id);
+	}
+
+	public function get_key():Int {
+		return _key;
+	}
+
+	public function copy():B2ContactID {
+		return Copy();
 	}
 
 	public function Set(id:B2ContactID) {
-		this.key = id._key;
+		set_key(id._key);
 	}
 
 	public function Copy():B2ContactID {
 		var _loc1_ = new B2ContactID();
-		_loc1_.key = this.key;
+		_loc1_.set_key(get_key());
 		return _loc1_;
-	}
-
-	@:isVar public var key(get, set):UInt;
-
-	public function get_key():UInt {
-		return this._key;
-	}
-
-	function set_key(value:UInt):UInt {
-		this._key = value;
-		this.features._referenceEdge = (this._key : Int) & 0xFF;
-		this.features._incidentEdge = ((this._key : Int) & 0xFF00) >> 8 & 0xFF;
-		this.features._incidentVertex = ((this._key : Int) & 0xFF0000) >> 16 & 0xFF;
-		this.features._flip = ((this._key : Int) & ASCompat.floatToInt(0xFF000000)) >> 24 & 0xFF;
-		return value;
 	}
 }

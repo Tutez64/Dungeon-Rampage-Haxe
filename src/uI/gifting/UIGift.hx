@@ -2,9 +2,12 @@ package uI.gifting;
 
 import brain.assetRepository.AssetLoadingComponent;
 import brain.assetRepository.SwfAsset;
+import brain.event.EventListeners;
 import brain.sceneGraph.SceneGraphComponent;
 import brain.sceneGraph.SceneGraphManager;
 import brain.uI.UIButton;
+import brain.utils.TextUtil;
+import dBGlobals.DBGlobal;
 import facade.DBFacade;
 import facade.Locale;
 import flash.display.MovieClip;
@@ -55,24 +58,24 @@ class UIGift {
 		mAssetLoadingComponent = new AssetLoadingComponent(mDBFacade);
 		mSceneGraphComponent = new SceneGraphComponent(mDBFacade, "UIGift");
 		mAssetLoadingComponent.getSwfAsset(DBFacade.buildFullDownloadPath("Resources/Art2D/UI/db_UI_town.swf"), giftPopupLoaded);
-		mDBFacade.stageRef.addEventListener("keyDown", handleKeyDown);
+		EventListeners.add(mDBFacade.stageRef, "keyDown", handleKeyDown);
 	}
 
 	function giftPopupLoaded(swfAsset:SwfAsset) {
 		var popupClass = swfAsset.getClass("gift_popup");
 		mGiftPopup = ASCompat.coerce(ASCompat.createInstance(popupClass, []), flash.display.MovieClip);
-		ASCompat.setProperty((mGiftPopup : ASAny).title_label, "text", Locale.getString("GIFT_POPUP_TITLE"));
-		mGiftPopup.scaleY = mGiftPopup.scaleX = 1.8;
+		Locale.setText(ASCompat.coerce((mGiftPopup : ASAny).title_label, flash.text.TextField), "GIFT_POPUP_TITLE");
+		mGiftPopup.scaleY = mGiftPopup.scaleX = DBGlobal.UI_16_TO_9_PORT_OBJECT_SCALE;
 		mGiftPopup.x = 300;
 		mSendGiftButton = new UIButton(mDBFacade, ASCompat.coerce((mGiftPopup : ASAny).left_button, flash.display.MovieClip));
-		mSendGiftButton.label.text = Locale.getString("GIFT_POPUP_SEND_GIFT");
+		Locale.setText(mSendGiftButton.label, "GIFT_POPUP_SEND_GIFT");
 		mSendGiftButton.releaseCallback = function() {
 			if (mStoreCallback != null) {
 				mStoreCallback();
 			}
 		};
 		mAcceptAllGiftsButton = new UIButton(mDBFacade, ASCompat.coerce((mGiftPopup : ASAny).right_button, flash.display.MovieClip));
-		mAcceptAllGiftsButton.label.text = Locale.getString("GIFT_POPUP_ACCEPT_ALL");
+		Locale.setText(mAcceptAllGiftsButton.label, "GIFT_POPUP_ACCEPT_ALL");
 		if (mDBFacade.dbAccountInfo.gifts.size > 0) {
 			mAcceptAllGiftsButton.releaseCallback = function() {
 				mDBFacade.dbAccountInfo.acceptAllGifts(refresh);
@@ -105,7 +108,39 @@ class UIGift {
 		showCurtain();
 		scrollIndex = 0;
 		mInfoMessageTF = ASCompat.coerce((mGiftPopup : ASAny).message_label, flash.text.TextField);
-		mInfoMessageTF.text = Locale.getString("GIFT_POPUP_INFO_MESSAGE");
+		Locale.setText(mInfoMessageTF, "GIFT_POPUP_INFO_MESSAGE", null, 1.55);
+		TextUtil.fitToField(mInfoMessageTF);
+		setupMenuNavigation();
+	}
+
+	function setupMenuNavigation() {
+		var _loc3_ = (0 : UInt);
+		var _loc2_:UIGiftMessage = null;
+		mDBFacade.menuNavigationController.pushNewLayer("RECEIVED_GIFTS_POPUP", destroy, mCloseButton);
+		_loc3_ = (0 : UInt);
+		while (_loc3_ < (mGiftsVector.length:UInt)) {
+			_loc2_ = mGiftsVector[(_loc3_ : Int)];
+			_loc2_.acceptAndSendButton.isToTheLeftOf(_loc2_.declineButton);
+			if (_loc3_ + 1 < (mGiftsVector.length : UInt)) {
+				_loc2_.acceptAndSendButton.isAbove(mGiftsVector[(_loc3_ + 1 : Int)].acceptAndSendButton);
+				_loc2_.declineButton.isAbove(mGiftsVector[(_loc3_ + 1 : Int)].declineButton);
+			}
+			_loc3_++;
+		}
+		var _loc4_ = mGiftsVector[0];
+		var _loc1_ = mGiftsVector[mGiftsVector.length - 1];
+		mScrollUpButton.isAbove(_loc4_.acceptAndSendButton);
+		_loc4_.declineButton.upNavigation = mScrollUpButton;
+		_loc1_.acceptAndSendButton.isAbove(mScrollDownButton);
+		_loc1_.declineButton.downNavigation = mScrollDownButton;
+		mScrollUpButton.isToTheLeftOf(mCloseButton);
+		mCloseButton.downNavigation = mScrollUpButton;
+		mAcceptAllGiftsButton.isToTheLeftOf(mScrollDownButton);
+		mScrollDownButton.isToTheLeftOf(mSendGiftButton);
+		mAcceptAllGiftsButton.upNavigation = _loc1_.declineButton;
+		mSendGiftButton.upNavigation = _loc1_.acceptAndSendButton;
+		mScrollUpButton.upNavigation = mCloseButton;
+		mScrollDownButton.downNavigation = mAcceptAllGiftsButton;
 	}
 
 	function showCurtain() {
@@ -123,20 +158,20 @@ class UIGift {
 	}
 
 	function populateGiftMessages() {
-		var _loc2_ = 0;
-		var _loc3_ = 0;
+		var _loc2_ = (0 : UInt);
+		var _loc3_ = (0 : UInt);
 		var _loc1_ = mDBFacade.dbAccountInfo.gifts.keysToArray();
 		if (_loc1_.length < mGiftsVector.length) {
 			hideGiftMessages();
 		}
-		_loc2_ = 0;
-		while (_loc2_ < mGiftsVector.length) {
+		_loc2_ = (0 : UInt);
+		while (_loc2_ < (mGiftsVector.length:UInt)) {
 			_loc3_ = _loc2_ + mScrollIndex;
-			if (_loc3_ >= _loc1_.length) {
+			if (_loc3_ >= (_loc1_.length : UInt)) {
 				break;
 			}
-			mGiftsVector[_loc2_].root.visible = true;
-			mGiftsVector[_loc2_].populateGiftMessage(ASCompat.coerce(mDBFacade.dbAccountInfo.gifts.itemFor(_loc1_[_loc3_]), account.GiftInfo));
+			mGiftsVector[(_loc2_ : Int)].visible = true;
+			mGiftsVector[(_loc2_ : Int)].populateGiftMessage(ASCompat.coerce(mDBFacade.dbAccountInfo.gifts.itemFor(_loc1_[(_loc3_ : Int)]), account.GiftInfo));
 			_loc2_++;
 		}
 	}
@@ -170,10 +205,10 @@ class UIGift {
 	}
 
 	function hideGiftMessages() {
-		var _loc1_ = 0;
-		_loc1_ = 0;
-		while (_loc1_ < mGiftsVector.length) {
-			mGiftsVector[_loc1_].root.visible = false;
+		var _loc1_ = (0 : UInt);
+		_loc1_ = (0 : UInt);
+		while (_loc1_ < (mGiftsVector.length:UInt)) {
+			mGiftsVector[(_loc1_ : Int)].visible = false;
 			_loc1_++;
 		}
 	}
@@ -192,7 +227,11 @@ class UIGift {
 	}
 
 	public function destroy() {
-		mDBFacade.stageRef.removeEventListener("keyDown", handleKeyDown);
+		if (mDBFacade == null) {
+			return;
+		}
+		EventListeners.remove(mDBFacade.stageRef, "keyDown", handleKeyDown);
+		mDBFacade.menuNavigationController.popLayer("RECEIVED_GIFTS_POPUP");
 		mDBFacade = null;
 		if (mGiftPopup != null) {
 			mSceneGraphComponent.removeChild(mGiftPopup);
@@ -215,9 +254,9 @@ class UIGift {
 		}
 		mSendGiftButton = null;
 		var _loc1_:UIGiftMessage;
-		final __ax4_iter_19 = mGiftsVector;
-		if (checkNullIteratee(__ax4_iter_19))
-			for (_tmp_ in __ax4_iter_19) {
+		final __ax4_iter_1 = mGiftsVector;
+		if (checkNullIteratee(__ax4_iter_1))
+			for (_tmp_ in __ax4_iter_1) {
 				_loc1_ = _tmp_;
 				_loc1_.destroy();
 				_loc1_ = null;

@@ -1,8 +1,6 @@
 package uI;
 
 import facade.DBFacade;
-import com.greensock.TimelineMax;
-import com.greensock.TweenMax;
 import flash.display.MovieClip;
 
 class UITownTweens {
@@ -14,24 +12,24 @@ class UITownTweens {
 
 	public function new() {}
 
-	public static function avatarFadeInTweenSequence(clip:MovieClip) {
+	public static function avatarFadeInTweenSequence(clip:MovieClip, dbFacade:DBFacade) {
 		clip.alpha = 0;
-		TweenMax.to(clip, 0.2916666666666667, {"alpha": 1});
+		dbFacade.mTween.tweenMaxTo(clip, 0.2916666666666667, {"alpha": 1});
 	}
 
 	public static function headerTweenSequence(clip:MovieClip, dbFacade:DBFacade) {
 		var _loc4_ = clip.y;
 		clip.y = 0 - clip.height;
 		clip.visible = true;
-		var _loc3_ = new TimelineMax({
+		var _loc3_ = dbFacade.mTween.createTimeline({
 			"tweens": [
-				TweenMax.to(clip, 0.08333333333333333, {"y": _loc4_}),
-				TweenMax.to(clip, 0.08333333333333333, {"scaleY": 1.25}),
-				TweenMax.to(clip, 0.08333333333333333, {
+				dbFacade.mTween.tweenMaxTo(clip, 0.08333333333333333, {"y": _loc4_}),
+				dbFacade.mTween.tweenMaxTo(clip, 0.08333333333333333, {"scaleY": 1.25}),
+				dbFacade.mTween.tweenMaxTo(clip, 0.08333333333333333, {
 					"scaleY": 0.85,
 					"y": _loc4_ * 0.85
 				}),
-				TweenMax.to(clip, 0.041666666666666664, {
+				dbFacade.mTween.tweenMaxTo(clip, 0.041666666666666664, {
 					"scaleY": 1,
 					"y": _loc4_
 				})
@@ -45,15 +43,15 @@ class UITownTweens {
 		var _loc3_ = clip.height;
 		clip.y = dbFacade.viewHeight + clip.height;
 		clip.visible = true;
-		var _loc4_ = new TimelineMax({
+		var _loc4_ = dbFacade.mTween.createTimeline({
 			"tweens": [
-				TweenMax.to(clip, 0.125, {"y": _loc5_}),
-				TweenMax.to(clip, 0.08333333333333333, {"scaleY": 1.25}),
-				TweenMax.to(clip, 0.041666666666666664, {
+				dbFacade.mTween.tweenMaxTo(clip, 0.125, {"y": _loc5_}),
+				dbFacade.mTween.tweenMaxTo(clip, 0.08333333333333333, {"scaleY": 1.25}),
+				dbFacade.mTween.tweenMaxTo(clip, 0.041666666666666664, {
 					"scaleY": 0.85,
 					"y": _loc5_ + _loc3_ * 0.15
 				}),
-				TweenMax.to(clip, 0.041666666666666664, {
+				dbFacade.mTween.tweenMaxTo(clip, 0.041666666666666664, {
 					"scaleY": 1,
 					"y": _loc5_
 				})
@@ -67,14 +65,15 @@ class UITownTweens {
 		clip.x = dbFacade.viewWidth + clip.width;
 		clip.scaleX = 1.25;
 		clip.visible = true;
-		var _loc3_ = new TimelineMax({
+		var _loc3_ = dbFacade.mTween.createTimeline({
 			"tweens": [
-				TweenMax.to(clip, 0.2916666666666667, {
-					"scaleX": 1,
-					"x": _loc4_ - 10
-				}),
-				TweenMax.to(clip, 0.041666666666666664, {"x": _loc4_ + 10}),
-				TweenMax.to(clip, 0.041666666666666664, {"x": _loc4_})
+				dbFacade.mTween.tweenMaxTo(clip, 0.2916666666666667,
+					{
+						"scaleX": 1,
+						"x": _loc4_ - 10
+					}),
+				dbFacade.mTween.tweenMaxTo(clip, 0.041666666666666664, {"x": _loc4_ + 10}),
+				dbFacade.mTween.tweenMaxTo(clip, 0.041666666666666664, {"x": _loc4_})
 			],
 			"align": "sequence"
 		});

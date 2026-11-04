@@ -24,7 +24,7 @@ class HeroOwnerSensor implements IContactResolver {
 		mDBFacade = dbFacade;
 		var _loc5_ = new B2FilterData();
 		_loc5_.groupIndex = -1;
-		_loc5_.maskBits = DBGlobal.b2dMaskForTeam(team);
+		_loc5_.maskBits = (DBGlobal.b2dMaskForTeam(team) : Int);
 		var _loc7_ = new B2FixtureDef();
 		_loc7_.isSensor = true;
 		_loc7_.shape = shape;

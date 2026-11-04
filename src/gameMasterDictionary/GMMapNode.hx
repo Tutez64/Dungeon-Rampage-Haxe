@@ -1,67 +1,67 @@
 package gameMasterDictionary;
 
 class GMMapNode extends GMItem {
-	public static inline final DUNGEON_NODE_TYPE = "DUNGEON";
+	public static var DUNGEON_NODE_TYPE:String = "DUNGEON";
 
-	public static inline final BOSS_NODE_TYPE = "BOSS";
+	public static var BOSS_NODE_TYPE:String = "BOSS";
 
-	public static inline final INFINITE_NODE_TYPE = "INFINITE";
+	public static var INFINITE_NODE_TYPE:String = "INFINITE";
 
-	public static inline final TAVERN_NODE_TYPE = "TAVERN";
+	public static var TAVERN_NODE_TYPE:String = "TAVERN";
 
-	public var DifficultyName:String;
-
-	public var ColiseumType:UInt = 0;
-
-	public var NodeType:String;
+	public var TrophyRequirement:UInt = 0;
 
 	public var TierRank:String;
 
-	public var InfiniteDungeon:String;
-
-	public var BasicKeys:UInt = 0;
-
-	public var PremiumKeys:UInt = 0;
-
-	public var PayEverytime:Bool = false;
-
-	public var RevealNodes:Array<ASAny>;
-
-	public var ChildNodes:Array<ASAny>;
-
-	public var ParentNodes:Array<ASAny>;
-
-	public var PrefixupParentNode:String;
-
 	public var StorySwfPath:String;
-
-	public var StoryAssetClass:String;
 
 	public var StoryPlayEverytime:Bool = false;
 
+	public var StoryAssetClass:String;
+
+	public var RevealNodes:Array<ASAny>;
+
+	public var PremiumKeys:UInt = 0;
+
+	public var PrefixupParentNode:String;
+
+	public var PayEverytime:Bool = false;
+
+	public var ParentNodes:Array<ASAny>;
+
+	public var NodeType:String;
+
 	public var NodeIcon:String;
+
+	public var MinTreasure:UInt = 0;
+
+	public var LevelRequirement:UInt = 0;
+
+	public var IsWeeklyChallenge:Bool = false;
+
+	public var IsInfiniteDungeon:Bool = false;
+
+	public var InfiniteDungeon:String;
 
 	public var GoalRoomTileset:String;
 
 	public var GoalRoom:String;
 
-	public var LevelRequirement:UInt = 0;
-
-	public var TrophyRequirement:UInt = 0;
+	public var DifficultyName:String;
 
 	public var CompletionXPBonus:UInt = 0;
 
-	public var IsWeeklyChallenge:Bool = false;
+	public var ColiseumType:UInt = 0;
 
-	public var AlwaysVisible:Bool = false;
-
-	public var MinTreasure:UInt = 0;
+	public var ChildNodes:Array<ASAny>;
 
 	public var BitIndex:UInt = 0;
 
-	public var IsInfiniteDungeon:Bool = false;
+	public var BasicKeys:UInt = 0;
 
-	public function new(jsonAsset:ASObject) {
+	public var AlwaysVisible:Bool = false;
+
+	public function new(jsonAsset:ASObject = /*undefined*/ null) {
 		super(jsonAsset);
 		BitIndex = (ASCompat.toInt(jsonAsset.BitIndex) : UInt);
 		DifficultyName = jsonAsset.DifficultyName;
@@ -102,7 +102,7 @@ class GMMapNode extends GMItem {
 		MinTreasure = (ASCompat.toInt(jsonAsset.MinTreasure) : UInt);
 	}
 
-	function mapColiseumType(type:String):UInt {
+	public function mapColiseumType(type:String):UInt {
 		if (type == "DINO_JUNGLE") {
 			return (2 : UInt);
 		}

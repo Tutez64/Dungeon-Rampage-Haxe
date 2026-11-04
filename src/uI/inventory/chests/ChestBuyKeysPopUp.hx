@@ -1,34 +1,29 @@
 package uI.inventory.chests;
 
 import account.ChestInfo;
-import brain.assetRepository.AssetLoadingComponent;
 import brain.assetRepository.SwfAsset;
 import brain.render.MovieClipRenderer;
-import brain.sceneGraph.SceneGraphComponent;
 import brain.uI.UIButton;
+import brain.uI.UIObject;
+import brain.utils.TextUtil;
+import dBGlobals.DBGlobal;
 import facade.DBFacade;
 import facade.GameMasterLocale;
 import facade.Locale;
 import gameMasterDictionary.GMChest;
 import gameMasterDictionary.GMRarity;
 import uI.hud.UIHud;
+import uI.popup.DBUIPopup;
+import uI.popup.UITreasureFoundPopup;
 import flash.display.MovieClip;
 import flash.geom.Rectangle;
 
-class ChestBuyKeysPopUp {
-	var mDBFacade:DBFacade;
-
-	var mAssetLoadingComponent:AssetLoadingComponent;
-
-	var mSceneGraphComponent:SceneGraphComponent;
-
-	var mRoot:MovieClip;
+class ChestBuyKeysPopUp extends DBUIPopup {
+	static inline final SCORE_REPORT_PATH = "Resources/Art2D/UI/db_UI_score_report.swf";
 
 	var mBuyCoinButton:UIButton;
 
 	var mBuyGemButton:UIButton;
-
-	var mCloseButton:UIButton;
 
 	var mRenderer:MovieClipRenderer;
 
@@ -38,10 +33,22 @@ class ChestBuyKeysPopUp {
 
 	var mCoinIconCenteredPosition:Int = -50;
 
-	public function new(dbFacade:DBFacade, assetLoadingComponent:AssetLoadingComponent, sceneGraphComponent:SceneGraphComponent, swfAsset:SwfAsset,
-			selectedGMChest:GMChest, chestBuyCoinCallback:ASFunction, chestBuyGemCallback:ASFunction, closeKeylessChestPopup:ASFunction,
-			refreshHeroInfoCallback:ASFunction, isFromSummary:Bool = false) {
-		var openKeyChestClass:Dynamic;
+	public function new(dbFacade:DBFacade, selectedGMChest:GMChest, chestBuyCoinCallback:ASFunction, chestBuyGemCallback:ASFunction,
+			closeKeylessChestPopup:ASFunction, refreshHeroInfoCallback:ASFunction, isFromSummary:Bool = false) {
+		super(dbFacade, "POPUP_KEYLESS", "", {
+			"chest": selectedGMChest,
+			"buyCoinCallback": chestBuyCoinCallback,
+			"buyGemCallback": chestBuyGemCallback,
+			"refreshHeroInfoCallback": refreshHeroInfoCallback,
+			"isFromSummary": isFromSummary
+		}, true, true, closeKeylessChestPopup, false, false);
+	}
+
+	override function getSwfPath():String {
+		return "Resources/Art2D/UI/db_UI_score_report.swf";
+	}
+
+	override function setupUI(swfAsset:SwfAsset, titleText:String, content:ASAny, allowClose:Bool, closeCallback:ASFunction) {
 		var bounds:Rectangle;
 		var swfPath:String;
 		var iconName:String;
@@ -52,28 +59,28 @@ class ChestBuyKeysPopUp {
 		var coinCostForChestKey:Float;
 		var cashCostForChestKey:Float;
 		var i:Int;
-
-		mDBFacade = dbFacade;
-		mAssetLoadingComponent = assetLoadingComponent;
-		mSceneGraphComponent = sceneGraphComponent;
-		openKeyChestClass = UIHud.isThisAConsumbleChestId((selectedGMChest.Id : Int)) ? swfAsset.getClass("popup_itemBox_open") : swfAsset.getClass("popup_chest_keyless");
-		mRoot = ASCompat.coerce(ASCompat.createInstance(openKeyChestClass, []), flash.display.MovieClip);
-		mRoot.scaleX = mRoot.scaleY = 1.8;
-		bounds = mRoot.getBounds(mDBFacade.stageRef);
-		mRoot.x = mDBFacade.stageRef.stageWidth / 2 - bounds.width / 2 - bounds.x;
-		mRoot.y = mDBFacade.stageRef.stageHeight / 2 - bounds.height / 2 - bounds.y;
-		ASCompat.setProperty((mRoot : ASAny).title_label, "text",
-			isFromSummary ? Locale.getString("TREASURE_FOUND") : GameMasterLocale.getGameMasterSubString("CHEST_NAME", selectedGMChest.Rarity));
-		if (ASCompat.toBool((mRoot : ASAny).description_label)) {
-			ASCompat.setProperty((mRoot : ASAny).description_label, "text",
-				Locale.getString("BUY_KEY_TO_OPEN") + selectedGMChest.Rarity + Locale.getString("CHEST_!"));
+		mSwfAsset = swfAsset;
+		var selectedGMChest = ASCompat.dynamicAs(content.chest, GMChest);
+		var openKeyChestClass = UIHud.isThisAConsumbleChestId((selectedGMChest.Id : Int)) ? swfAsset.getClass("popup_itemBox_open") : swfAsset.getClass("popup_chest_keyless");
+		mPopup = ASCompat.coerce(ASCompat.createInstance(openKeyChestClass, []), flash.display.MovieClip);
+		mRoot.addChild(mPopup);
+		mPopup.scaleX = mPopup.scaleY = DBGlobal.UI_16_TO_9_PORT_OBJECT_SCALE;
+		bounds = mPopup.getBounds(mDBFacade.scalingRoot);
+		mPopup.x = mDBFacade.viewWidth / 2 - bounds.width / 2 - bounds.x;
+		mPopup.y = mDBFacade.viewHeight / 2 - bounds.height / 2 - bounds.y;
+		TextUtil.setText(ASCompat.coerce((mPopup : ASAny).title_label, flash.text.TextField),
+			ASCompat.toBool(content.isFromSummary) ? Locale.getString("TREASURE_FOUND") : GameMasterLocale.getGameMasterSubString("CHEST_NAME",
+				selectedGMChest.Rarity));
+		if (ASCompat.toBool((mPopup : ASAny).description_label)) {
+			Locale.setText(ASCompat.coerce((mPopup : ASAny).description_label, flash.text.TextField), "BUY_KEY_TO_OPEN",
+				{"CHEST": GameMasterLocale.getGameMasterSubString("CHEST_NAME", selectedGMChest.Rarity)});
 		}
 		swfPath = selectedGMChest.IconSwf;
 		iconName = selectedGMChest.IconName;
-		ChestInfo.loadItemIcon(swfPath, iconName, ASCompat.coerce((mRoot : ASAny).content, flash.display.DisplayObjectContainer), mDBFacade, (150 : UInt),
+		ChestInfo.loadItemIcon(swfPath, iconName, ASCompat.coerce((mPopup : ASAny).content, flash.display.DisplayObjectContainer), mDBFacade, (150 : UInt),
 			(150 : UInt), mAssetLoadingComponent);
-		ASCompat.setProperty((mRoot : ASAny).content, "y", UIHud.isThisAConsumbleChestId((selectedGMChest.Id : Int)) ? -6 : -35);
-		mRenderer = new MovieClipRenderer(mDBFacade, ASCompat.coerce((mRoot : ASAny).content, flash.display.MovieClip));
+		ASCompat.setProperty((mPopup : ASAny).content, "y", UIHud.isThisAConsumbleChestId((selectedGMChest.Id : Int)) ? -6 : -35);
+		mRenderer = new MovieClipRenderer(mDBFacade, ASCompat.coerce((mPopup : ASAny).content, flash.display.MovieClip));
 		mRenderer.play((0 : UInt), true);
 		rarity = ASCompat.coerce(mDBFacade.gameMaster.rarityByConstant.itemFor(selectedGMChest.Rarity), gameMasterDictionary.GMRarity);
 		bgColoredExists = rarity.HasColoredBackground;
@@ -85,7 +92,7 @@ class ChestBuyKeysPopUp {
 				var _loc2_ = param1.getClass(bgIconName);
 				if (_loc2_ != null) {
 					_loc3_ = ASCompat.dynamicAs(ASCompat.createInstance(_loc2_, []), MovieClip);
-					(mRoot : ASAny).content.addChildAt(_loc3_, 0);
+					(mPopup : ASAny).content.addChildAt(_loc3_, 0);
 					_loc3_.scaleX = _loc3_.scaleY = 1.5;
 				}
 			});
@@ -99,26 +106,28 @@ class ChestBuyKeysPopUp {
 			}
 			i = i + 1;
 		}
-		ASCompat.setProperty((mRoot : ASAny).coin_button, "x", mCoinButtonCenteredPosition);
-		ASCompat.setProperty((mRoot : ASAny).coin_icon, "x", mCoinIconCenteredPosition);
-		mBuyCoinButton = new UIButton(mDBFacade, ASCompat.coerce((mRoot : ASAny).coin_button, flash.display.MovieClip));
-		mBuyCoinButton.releaseCallback = ASCompat.coerceFunction(chestBuyCoinCallback(coinCostForChestKey));
-		mBuyCoinButton.label.text = Std.string(coinCostForChestKey);
-		mBuyGemButton = new UIButton(mDBFacade, ASCompat.coerce((mRoot : ASAny).gem_button, flash.display.MovieClip));
-		ASCompat.setProperty((mRoot : ASAny).gem_icon, "visible", false);
+		ASCompat.setProperty((mPopup : ASAny).coin_button, "x", mCoinButtonCenteredPosition);
+		ASCompat.setProperty((mPopup : ASAny).coin_icon, "x", mCoinIconCenteredPosition);
+		mBuyCoinButton = new UIButton(mDBFacade, ASCompat.coerce((mPopup : ASAny).coin_button, flash.display.MovieClip));
+		mBuyCoinButton.releaseCallback = ASCompat.coerceFunction(content.buyCoinCallback(coinCostForChestKey));
+		TextUtil.setText(mBuyCoinButton.label, Std.string(coinCostForChestKey));
+		mBuyGemButton = new UIButton(mDBFacade, ASCompat.coerce((mPopup : ASAny).gem_button, flash.display.MovieClip));
+		ASCompat.setProperty((mPopup : ASAny).gem_icon, "visible", false);
 		mBuyGemButton.visible = false;
-		mCloseButton = new UIButton(mDBFacade, ASCompat.coerce((mRoot : ASAny).close, flash.display.MovieClip));
-		mCloseButton.releaseCallback = closeKeylessChestPopup;
-		ASCompat.setProperty((mRoot : ASAny).coin_icon, "mouseEnabled", false);
-		ASCompat.setProperty((mRoot : ASAny).coin_icon, "mouseChildren", false);
-		ASCompat.setProperty((mRoot : ASAny).gem_icon, "mouseEnabled", false);
-		ASCompat.setProperty((mRoot : ASAny).gem_icon, "mouseChildren", false);
+		mCloseButton = new UIButton(mDBFacade, ASCompat.coerce((mPopup : ASAny).close, flash.display.MovieClip));
+		mCloseButton.releaseCallback = handleInputCalledClosed;
+		ASCompat.setProperty((mPopup : ASAny).coin_icon, "mouseEnabled", false);
+		ASCompat.setProperty((mPopup : ASAny).coin_icon, "mouseChildren", false);
+		ASCompat.setProperty((mPopup : ASAny).gem_icon, "mouseEnabled", false);
+		ASCompat.setProperty((mPopup : ASAny).gem_icon, "mouseChildren", false);
 		if (!UIHud.isThisAConsumbleChestId((selectedGMChest.Id : Int))) {
 			createKeySlots(selectedGMChest);
-			refreshHeroInfoCallback(mRoot);
+			content.refreshHeroInfoCallback(mPopup);
+			UITreasureFoundPopup.fitHeroLabel(ASCompat.coerce((mPopup : ASAny).hero_label, flash.text.TextField));
 		}
-		mSceneGraphComponent.addChild(mRoot, (105 : UInt));
-		mDBFacade.menuNavigationController.pushNewLayer("POPUP_KEYLESS", closeKeylessChestPopup, mCloseButton, mBuyCoinButton);
+	}
+
+	override function setupMenuNavigation() {
 		mCloseButton.isAbove(mBuyCoinButton);
 		mBuyCoinButton.isToTheLeftOf(mBuyGemButton);
 	}
@@ -129,7 +138,7 @@ class ChestBuyKeysPopUp {
 		mChestKeySlots = new Vector<ChestKeySlot>();
 		_loc3_ = 0;
 		while (_loc3_ < 4) {
-			_loc2_ = ASCompat.reinterpretAs(mRoot.getChildByName("slot_" + Std.string(_loc3_)), MovieClip);
+			_loc2_ = ASCompat.reinterpretAs(mPopup.getChildByName("slot_" + Std.string(_loc3_)), MovieClip);
 			mChestKeySlots.push(new ChestKeySlot(mDBFacade, _loc2_, mDBFacade.dbAccountInfo.inventoryInfo.keys[_loc3_], mAssetLoadingComponent));
 			if (selectedGMChest.Id == mChestKeySlots[_loc3_].keyInfo.gmKey.ChestId) {
 				mChestKeySlots[_loc3_].setSelected(true);
@@ -140,23 +149,30 @@ class ChestBuyKeysPopUp {
 		}
 	}
 
-	@:isVar public var root(get, never):MovieClip;
-
-	public function get_root():MovieClip {
-		return mRoot;
+	override function getDefaultNavigationObject():UIObject {
+		return mCloseButton;
 	}
 
-	public function destroy() {
+	override function getInitialFocusedNavigationObject():UIObject {
+		return mBuyCoinButton;
+	}
+
+	override public function destroy() {
 		var _loc1_ = 0;
-		mSceneGraphComponent.removeChild(mRoot);
-		mDBFacade.menuNavigationController.popLayer("POPUP_KEYLESS");
-		mDBFacade = null;
-		mAssetLoadingComponent = null;
-		mBuyCoinButton.destroy();
+		if (mDBFacade == null) {
+			return;
+		}
+		if (mBuyCoinButton != null) {
+			mBuyCoinButton.destroy();
+		}
 		mBuyCoinButton = null;
-		mBuyGemButton.destroy();
+		if (mBuyGemButton != null) {
+			mBuyGemButton.destroy();
+		}
 		mBuyGemButton = null;
-		mRenderer.destroy();
+		if (mRenderer != null) {
+			mRenderer.destroy();
+		}
 		mRenderer = null;
 		if (mChestKeySlots != null) {
 			_loc1_ = 0;
@@ -167,6 +183,6 @@ class ChestBuyKeysPopUp {
 			mChestKeySlots.splice(0, (mChestKeySlots.length : UInt));
 			mChestKeySlots = null;
 		}
-		mRoot = null;
+		super.destroy();
 	}
 }

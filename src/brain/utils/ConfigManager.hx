@@ -51,13 +51,15 @@ class ConfigManager {
 		if (_loc1_ != null) {
 			Logger.info("Loading Configs From HTML host = " + Std.string(_loc1_));
 			mTotalFilePathsToOpen = 1;
+			mJsonDictionaries.resize(1);
 			_loc2_ = new JsonAsset(_loc1_);
-			jsonFileLoaded(_loc2_);
+			jsonFileLoaded(0, _loc2_);
 		} else {
+			mJsonDictionaries.resize(mFilePathsToOpen__Brain_Utils_ConfigManager.length);
 			_loc3_ = 0;
 			while (_loc3_ < mFilePathsToOpen__Brain_Utils_ConfigManager.length) {
 				Logger.info("Loading Config " + Std.string(mFilePathsToOpen__Brain_Utils_ConfigManager[_loc3_]));
-				mAssetLoadingComponent.getJsonAsset(mFilePathsToOpen__Brain_Utils_ConfigManager[_loc3_], jsonFileLoaded,
+				mAssetLoadingComponent.getJsonAsset(mFilePathsToOpen__Brain_Utils_ConfigManager[_loc3_], wrappedJsonFileLoadedCallback(_loc3_),
 					wrappedJsonFileFailedCallback(mFilePathsToOpen__Brain_Utils_ConfigManager[_loc3_]), false);
 				_loc3_++;
 			}
@@ -74,6 +76,12 @@ class ConfigManager {
 		};
 	}
 
+	function wrappedJsonFileLoadedCallback(index:Int):ASFunction {
+		return function(param1:JsonAsset) {
+			jsonFileLoaded(index, param1);
+		};
+	}
+
 	function jsonFileFailedCallback(configFilePath:String) {
 		mIsInError = true;
 		if (mFailureCallback != null) {
@@ -84,9 +92,9 @@ class ConfigManager {
 		}
 	}
 
-	function jsonFileLoaded(asset:JsonAsset) {
-		var _loc2_ = asset;
-		mJsonDictionaries.push(_loc2_.json);
+	function jsonFileLoaded(index:Int, asset:JsonAsset) {
+		var _loc3_ = asset;
+		mJsonDictionaries[index] = _loc3_.json;
 		networkId = getConfigNumber("NetworkId", 1);
 		Logger.info("App launched from network: " + networkId);
 		mLoadedFiles = mLoadedFiles + 1;
@@ -97,12 +105,12 @@ class ConfigManager {
 
 	function findValue(configString:String):ASAny {
 		var _loc2_ = 0;
-		_loc2_ = 0;
-		while (_loc2_ < mJsonDictionaries.length) {
-			if (mJsonDictionaries[_loc2_][configString] != null) {
+		_loc2_ = mJsonDictionaries.length - 1;
+		while (_loc2_ >= 0) {
+			if (mJsonDictionaries[_loc2_] != null && mJsonDictionaries[_loc2_][configString] != null) {
 				return mJsonDictionaries[_loc2_][configString];
 			}
-			_loc2_++;
+			_loc2_--;
 		}
 		return null;
 	}

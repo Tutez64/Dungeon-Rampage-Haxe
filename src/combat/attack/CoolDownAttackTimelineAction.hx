@@ -25,7 +25,7 @@ class CoolDownAttackTimelineAction extends AttackTimelineAction {
 
 	override public function execute(timeline:ScriptTimeline) {
 		super.execute(timeline);
-		mWeaponController.startCooldown();
+		mWeaponController.startCooldown(timeline.currentGMAttack);
 	}
 
 	override public function destroy() {

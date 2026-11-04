@@ -3,9 +3,9 @@ package uI.popup;
 import brain.assetRepository.SwfAsset;
 import brain.render.MovieClipRenderController;
 import brain.uI.UIButton;
+import brain.utils.TextUtil;
 import facade.DBFacade;
 import facade.Locale;
-import gameMasterDictionary.GMFeedPosts;
 import gameMasterDictionary.GMSkin;
 import flash.display.MovieClip;
 
@@ -16,18 +16,36 @@ class UIDungeonSummaryLevelUpPopup extends DBUIOneButtonPopup {
 
 	static inline final AVATAR_PIC_SCALE:Float = 0.45;
 
+	public static final LEVELS:Vector<UInt> = Vector.ofArray(([
+		(3 : UInt),
+		(4 : UInt),
+		(5 : UInt),
+		(10 : UInt),
+		(15 : UInt),
+		(20 : UInt),
+		(25 : UInt),
+		(30 : UInt),
+		(40 : UInt),
+		(50 : UInt),
+		(60 : UInt),
+		(70 : UInt),
+		(80 : UInt),
+		(90 : UInt),
+		(100 : UInt)
+	] : Array<UInt>));
+
 	var mGMSkin:GMSkin;
 
-	var mLevelUpPost:GMFeedPosts;
+	var mLevel:UInt = 0;
 
 	var mPicClass:Dynamic;
 
-	public function new(dbFacade:DBFacade, centerCallback:ASFunction, gmSkin:GMSkin, levelUpPost:GMFeedPosts, avatarClass:Dynamic) {
+	public function new(dbFacade:DBFacade, centerCallback:ASFunction, gmSkin:GMSkin, level:UInt, avatarClass:Dynamic) {
 		mGMSkin = gmSkin;
-		mLevelUpPost = levelUpPost;
+		mLevel = level;
 		mPicClass = avatarClass;
-		super(dbFacade, Locale.getString("INVITE_POPUP_TITLE"), Locale.getString("INVITE_POPUP_MESSAGE"), null, centerCallback, true, null, null, null, true,
-			"DUNGEON_SUMMARY_LEVEL_UP_POPUP");
+		super(dbFacade, "DUNGEON_SUMMARY_LEVEL_UP_POPUP", Locale.getString("INVITE_POPUP_TITLE"), Locale.getString("INVITE_POPUP_MESSAGE"), null,
+			centerCallback);
 		mDBFacade.metrics.log("InvitePopupPresented");
 	}
 
@@ -55,15 +73,11 @@ class UIDungeonSummaryLevelUpPopup extends DBUIOneButtonPopup {
 		movieClipRenderer.play();
 		avatarPic.scaleX = avatarPic.scaleY = 0.45;
 		(mPopup : ASAny).avatar.addChildAt(avatarPic, 0);
-		ASCompat.setProperty((mPopup : ASAny).level_text, "text", mLevelUpPost.LevelTrigger);
-		ASCompat.setProperty((mPopup : ASAny).congrats_label, "text", Locale.getString("LEVEL_UP_SHARE_TITLE"));
-		ASCompat.setProperty((mPopup : ASAny).label, "text", Locale.getString("LEVEL_UP_SHARE_TEXT") + mLevelUpPost.LevelTrigger);
+		TextUtil.setText(ASCompat.coerce((mPopup : ASAny).level_text, flash.text.TextField), Std.string(mLevel));
+		Locale.setText(ASCompat.coerce((mPopup : ASAny).congrats_label, flash.text.TextField), "LEVEL_UP_SHARE_TITLE");
+		TextUtil.setText(ASCompat.coerce((mPopup : ASAny).label, flash.text.TextField), Locale.getString("LEVEL_UP_SHARE_TEXT") + mLevel);
 		levelUpButton = new UIButton(mDBFacade, ASCompat.coerce((mPopup : ASAny).share, flash.display.MovieClip));
-		if (mDBFacade.isDRPlayer) {
-			levelUpButton.label.text = Locale.getString("SWEET");
-		} else {
-			levelUpButton.label.text = Locale.getString("LEVEL_UP_SHARE_BUTTON_TEXT");
-		}
+		Locale.setText(levelUpButton.label, "SWEET");
 		levelUpButton.releaseCallback = function() {
 			close(null);
 		};

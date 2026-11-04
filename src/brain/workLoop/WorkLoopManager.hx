@@ -2,12 +2,13 @@ package brain.workLoop;
 
 import brain.clock.GameClock;
 import brain.utils.MemoryTracker;
+import collections.Set;
 import flash.display.Sprite;
-import org.as3commons.collections.Set;
-import org.as3commons.collections.framework.ISetIterator;
 
 class WorkLoopManager extends Sprite {
 	var mTasks:Set = new Set();
+
+	var mTaskSnapshot:Array<ASAny>;
 
 	var mCurrentGameClock:GameClock;
 
@@ -35,6 +36,7 @@ class WorkLoopManager extends Sprite {
 		var _loc3_ = new Task();
 		_loc3_.callback = callback;
 		mTasks.add(_loc3_);
+		mTaskSnapshot = null;
 		var _loc4_ = ASCompat.stringAsBool(ownerLabel) ? "Task - " + ownerLabel + " every frame" : "Task - every frame task in WorkLoopManager.doEveryFrame()";
 		MemoryTracker.track(_loc3_, _loc4_, "brain");
 		return _loc3_;
@@ -63,13 +65,14 @@ class WorkLoopManager extends Sprite {
 		return _loc6_;
 	}
 
-	function removeDoLater(doLaterTask:DoLater):Bool {
+	public function removeDoLater(doLaterTask:DoLater):Bool {
 		doLaterTask.destroy();
 		return doLaterQueue.remove(doLaterTask);
 	}
 
 	function removeTask(task:Task):Bool {
 		task.destroy();
+		mTaskSnapshot = null;
 		return mTasks.remove(task);
 	}
 
@@ -79,19 +82,25 @@ class WorkLoopManager extends Sprite {
 	}
 
 	function processTasks() {
-		var _loc2_:Task = null;
+		var _loc1_:Task = null;
+		var _loc3_ = 0;
 		if (mTasks.size == 0) {
 			return;
 		}
-		var _loc1_ = ASCompat.reinterpretAs(mTasks.iterator(), ISetIterator);
-		while (_loc1_.hasNext()) {
-			_loc2_ = ASCompat.coerce(_loc1_.next(), brain.workLoop.Task);
-			if (_loc2_.isDestroyed()) {
-				_loc1_.remove();
-				removeTask(_loc2_);
-			} else if (_loc2_.callback != null) {
-				_loc2_.callback(mCurrentGameClock);
+		if (mTaskSnapshot == null) {
+			mTaskSnapshot = mTasks.toArray();
+		}
+		var _loc4_ = mTaskSnapshot;
+		var _loc2_ = _loc4_.length;
+		_loc3_ = 0;
+		while (_loc3_ < _loc2_) {
+			_loc1_ = ASCompat.coerce(_loc4_[_loc3_], brain.workLoop.Task);
+			if (_loc1_.isDestroyed()) {
+				removeTask(_loc1_);
+			} else if (_loc1_.callback != null) {
+				_loc1_.callback(mCurrentGameClock);
 			}
+			_loc3_++;
 		}
 	}
 
@@ -106,7 +115,7 @@ class WorkLoopManager extends Sprite {
 				if (_loc1_.callback != null) {
 					_loc1_.callback(mCurrentGameClock);
 				}
-				if (_loc1_.repeat) {
+				if (_loc1_.repeat && !_loc1_.isDestroyed()) {
 					_loc1_.dueTime += (ASCompat.floatToInt(_loc1_.delay * 1000) : UInt);
 					doLaterQueue.enqueue(_loc1_);
 				}

@@ -4,8 +4,12 @@ import actor.ActorGameObject;
 import box2D.common.math.B2Vec2;
 import box2D.dynamics.B2Fixture;
 import brain.logger.Logger;
+import collections.IIterator;
+import collections.IMapIterator;
+import collections.Map;
 import combat.attack.CombatCollider;
 import combat.weapon.WeaponGameObject;
+import dBGlobals.DBGlobal;
 import distributedObjects.DistributedDungeonFloor;
 import distributedObjects.HeroGameObjectOwner;
 import distributedObjects.NPCGameObject;
@@ -17,9 +21,6 @@ import gameMasterDictionary.GMAttack;
 import generatedCode.Attack;
 import generatedCode.CombatResult;
 import flash.geom.Vector3D;
-import org.as3commons.collections.Map;
-import org.as3commons.collections.framework.IIterator;
-import org.as3commons.collections.framework.IMapIterator;
 
 class CombatGameObject extends FloorObject {
 	var mCombatCollider:CombatCollider;
@@ -215,7 +216,7 @@ class CombatGameObject extends FloorObject {
 			_loc7_.blocked = (0 : UInt);
 		}
 		if (_loc7_.blocked == 0) {
-			if (actorGameObject.hasAbility((1 : UInt))) {
+			if (actorGameObject.hasAbility(DBGlobal.ABILITY_SUFFER_IMMUNITY)) {
 				_loc7_.suffer = (0 : UInt);
 			} else {
 				_loc7_.suffer = (Math.random() <= _loc6_.StunChance ? (1 : UInt) : (0 : UInt):UInt);
@@ -261,7 +262,8 @@ class CombatGameObject extends FloorObject {
 
 	function updateRecurringHits() {
 		var _loc1_ = ASCompat.reinterpretAs(mCurrentHitMap.iterator(), IMapIterator);
-		while (ASCompat.toBool(_loc1_.next())) {
+		while (_loc1_.hasNext()) {
+			_loc1_.next();
 			mCurrentHitMap.replaceFor(_loc1_.key, ASCompat.toNumber(mCurrentHitMap.itemFor(_loc1_.key)) - 1);
 		}
 	}

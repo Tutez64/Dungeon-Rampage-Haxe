@@ -1,46 +1,20 @@
 package uI.shop;
 
-import brain.uI.UIButton;
-import brain.utils.MemoryTracker;
+import dBGlobals.DBGlobal;
 import facade.DBFacade;
 import facade.GameMasterLocale;
 import gameMasterDictionary.GMHero;
 import gameMasterDictionary.GMOffer;
 import gameMasterDictionary.GMOfferDetail;
 import gameMasterDictionary.GMSkin;
-import town.TownHeader;
-import uI.*;
-import uI.popup.UIHeroUpsellPopup;
 
 class UIShopHeroOffer extends UIShopOffer {
 	var mGMOfferDetail:GMOfferDetail;
 
 	var mGMOfferHero:GMHero;
 
-	var mInfoButton:UIButton;
-
-	var mTownHeader:TownHeader;
-
-	public function new(townHeader:TownHeader, dbFacade:DBFacade, templateClass:Dynamic, buyCallback:ASFunction = null) {
+	public function new(dbFacade:DBFacade, templateClass:Dynamic, buyCallback:ASFunction = null) {
 		super(dbFacade, templateClass, buyCallback);
-		mInfoButton = new UIButton(mDBFacade, ASCompat.coerce((mRoot : ASAny).icon, flash.display.MovieClip));
-		mInfoButton.releaseCallback = this.showInfo;
-		mTownHeader = townHeader;
-	}
-
-	function showInfo() {
-		var _loc1_:UIHeroUpsellPopup = null;
-		if (this.requirementsMetForPurchase()) {
-			_loc1_ = new UIHeroUpsellPopup(mTownHeader, mDBFacade, this.offer, null);
-			MemoryTracker.track(_loc1_, "UIHeroUpsellPopup - created in UIShopHeroOffer.showInfo()");
-		}
-	}
-
-	override public function destroy() {
-		if (mInfoButton != null) {
-			mInfoButton.destroy();
-			mInfoButton = null;
-		}
 	}
 
 	override public function showOffer(gmOffer:GMOffer, gmHero:GMHero) {
@@ -55,7 +29,7 @@ class UIShopHeroOffer extends UIShopOffer {
 	}
 
 	override function get_nativeIconSize():Float {
-		return 72;
+		return DBGlobal.HERO_ICON_NATIVE_SIZE;
 	}
 
 	override function get_offerDescription():String {

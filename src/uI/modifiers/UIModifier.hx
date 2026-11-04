@@ -1,6 +1,7 @@
 package uI.modifiers;
 
 import brain.assetRepository.AssetLoadingComponent;
+import brain.event.EventListeners;
 import brain.logger.Logger;
 import facade.DBFacade;
 import facade.GameMasterLocale;
@@ -110,8 +111,8 @@ class UIModifier {
 					mGMLegendaryModifier != null ? GameMasterLocale.getGameMasterSubString("LEGENDARY_MODIFIER_DESCRIPTION",
 						mGMLegendaryModifier.Constant) : GameMasterLocale.getGameMasterSubString("MODIFIER_DESCRIPTION", mGMModifier.Constant));
 				mToolTip.hide();
-				mRoot.addEventListener("rollOver", onMouseOver);
-				mRoot.addEventListener("rollOut", onMouseOut);
+				EventListeners.add(mRoot, "rollOver", onMouseOver);
+				EventListeners.add(mRoot, "rollOut", onMouseOut);
 			});
 	}
 
@@ -128,8 +129,8 @@ class UIModifier {
 			ASCompat.setProperty((mParentMC : ASAny).modifier_icon_frame, "visible", true);
 		}
 		if (mRoot != null) {
-			mRoot.removeEventListener("rollOver", onMouseOver);
-			mRoot.removeEventListener("rollOut", onMouseOut);
+			EventListeners.remove(mRoot, "rollOver", onMouseOver);
+			EventListeners.remove(mRoot, "rollOut", onMouseOut);
 			mParentMC.removeChild(mRoot);
 		}
 		mRoot = null;

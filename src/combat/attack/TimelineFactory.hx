@@ -2,11 +2,12 @@ package combat.attack;
 
 import actor.ActorGameObject;
 import brain.assetRepository.JsonAsset;
+import brain.utils.MemoryTracker;
+import collections.Map;
 import combat.weapon.WeaponGameObject;
 import distributedObjects.DistributedDungeonFloor;
 import distributedObjects.HeroGameObjectOwner;
 import facade.DBFacade;
-import org.as3commons.collections.Map;
 
 class TimelineFactory {
 	static inline final TIMELINE_FILE_PATH = "Resources/Combat/AttackTimeline.json";
@@ -28,9 +29,9 @@ class TimelineFactory {
 		var _loc5_ = 0;
 		mSecurityValue = 0;
 		var _loc4_:ASObject;
-		final __ax4_iter_45:Array<ASAny> = jsonAsset.json.attacks;
-		if (checkNullIteratee(__ax4_iter_45))
-			for (_tmp_ in __ax4_iter_45) {
+		final __ax4_iter_29:Array<ASAny> = jsonAsset.json.attacks;
+		if (checkNullIteratee(__ax4_iter_29))
+			for (_tmp_ in __ax4_iter_29) {
 				_loc4_ = _tmp_;
 				_loc3_ = _loc4_.attackName;
 				mTimelines.add(_loc3_, _loc4_);
@@ -67,6 +68,13 @@ class TimelineFactory {
 		return mSecurityValue;
 	}
 
+	public function getTimelineJson(timelineName:String):ASObject {
+		if (timelineName == null) {
+			return null;
+		}
+		return mTimelines.itemFor(timelineName);
+	}
+
 	public function createAttackTimeline(timelineName:String, weapon:WeaponGameObject, actor:ActorGameObject, floor:DistributedDungeonFloor):AttackTimeline {
 		var _loc6_:AttackTimeline = null;
 		var _loc5_:ASObject = mTimelines.itemFor(timelineName);
@@ -75,12 +83,14 @@ class TimelineFactory {
 		} else {
 			_loc6_ = new AttackTimeline(weapon, actor, actor.actorView, _loc5_, mDBFacade, floor);
 		}
+		MemoryTracker.track(_loc6_, "AttackTimeline \'" + timelineName + "\' - created in TimelineFactory.createAttackTimeline()");
 		return _loc6_;
 	}
 
 	public function createScriptTimeline(timelineName:String, actor:ActorGameObject, floor:DistributedDungeonFloor):ScriptTimeline {
-		var _loc5_:ASAny = null;
 		var _loc4_:ASObject = mTimelines.itemFor(timelineName);
-		return new ScriptTimeline(actor, actor.actorView, _loc4_, mDBFacade, floor);
+		var _loc5_ = new ScriptTimeline(actor, actor.actorView, _loc4_, mDBFacade, floor);
+		MemoryTracker.track(_loc5_, "ScriptTimeline \'" + timelineName + "\' - created in TimelineFactory.createScriptTimeline()");
+		return _loc5_;
 	}
 }

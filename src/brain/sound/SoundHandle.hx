@@ -2,6 +2,7 @@ package brain.sound;
 
 import brain.clock.GameClock;
 import brain.event.EventComponent;
+import brain.event.EventListeners;
 import brain.facade.Facade;
 import brain.logger.Logger;
 import brain.utils.MemoryTracker;
@@ -73,6 +74,9 @@ class SoundHandle {
 		mSoundTransform = buildSoundTransform();
 		mSoundChannel = mSound.play(0, mLoopCount, mSoundTransform);
 		if (mSoundChannel == null) {
+			if (!mManaged) {
+				destroy();
+			}
 			return false;
 		}
 		var _loc3_ = (mSound.length - startPosition) / 1000;
@@ -135,7 +139,7 @@ class SoundHandle {
 			return;
 		}
 		mSoundChannel.stop();
-		mSoundChannel.removeEventListener("soundComplete", soundComplete);
+		EventListeners.remove(mSoundChannel, "soundComplete", soundComplete);
 		mPausePosition = 0;
 		if (mSoundCompleteTask != null) {
 			mSoundCompleteTask.destroy();

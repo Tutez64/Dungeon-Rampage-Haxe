@@ -5,8 +5,10 @@ import brain.event.EventComponent;
 import brain.render.MovieClipRenderer;
 import brain.uI.UIObject;
 import brain.uI.UIProgressBar;
+import brain.utils.TextUtil;
 import brain.workLoop.LogicalWorkComponent;
 import brain.workLoop.Task;
+import dBGlobals.DBGlobal;
 import distributedObjects.NPCGameObject;
 import events.GameObjectEvent;
 import facade.DBFacade;
@@ -47,8 +49,8 @@ class PetPortraitUI extends UIObject {
 		if (petPortraitNoneClip != null) {
 			mNoPetUI = new UIObject(mDBFacade, petPortraitNoneClip, 0, true);
 			if (mNoPetUI.tooltip != null) {
-				ASCompat.setProperty((mNoPetUI.tooltip : ASAny).title_label, "text", Locale.getString("NO_PET_EQUIPPED_TOOLTIP_TITLE"));
-				ASCompat.setProperty((mNoPetUI.tooltip : ASAny).description_label, "text", Locale.getString("NO_PET_EQUIPPED_TOOLTIP_DESCRIPTION"));
+				Locale.setText(ASCompat.coerce((mNoPetUI.tooltip : ASAny).title_label, flash.text.TextField), "NO_PET_EQUIPPED_TOOLTIP_TITLE");
+				Locale.setText(ASCompat.coerce((mNoPetUI.tooltip : ASAny).description_label, flash.text.TextField), "NO_PET_EQUIPPED_TOOLTIP_DESCRIPTION");
 			}
 		}
 		mLogicalWorkComponent = new LogicalWorkComponent(mDBFacade, "PetPortraitUI");
@@ -71,16 +73,17 @@ class PetPortraitUI extends UIObject {
 			mNoPetUI.visible = false;
 		}
 		if (mPetNPCGameObject != null) {
-			ASCompat.setProperty((mRoot : ASAny).tooltip.description_label, "text",
+			TextUtil.setText(ASCompat.coerce((mRoot : ASAny).tooltip.description_label, flash.text.TextField),
 				GameMasterLocale.getGameMasterSubString("PET_DESCRIPTION", mPetNPCGameObject.gmNpc.Constant));
-			ASCompat.setProperty((mRoot : ASAny).tooltip.title_label, "text",
+			TextUtil.setText(ASCompat.coerce((mRoot : ASAny).tooltip.title_label, flash.text.TextField),
 				GameMasterLocale.getGameMasterSubString("PET_NAME", mPetNPCGameObject.gmNpc.Constant).toUpperCase());
 			mEventComponent.addListener(GameObjectEvent.uniqueEvent("HpEvent_HP_UPDATE", mPetNPCGameObject.id), function(param1:events.HpEvent) {
 				setHp(param1.hp, param1.maxHp);
 			});
 			setHp(mPetNPCGameObject.hitPoints, (ASCompat.floatToInt(mPetNPCGameObject.maxHitPoints) : UInt));
 			ItemInfo.loadItemIcon(mPetNPCGameObject.actorData.gMActor.IconSwfFilepath, mPetNPCGameObject.actorData.gMActor.IconName,
-				ASCompat.coerce((root : ASAny).graphic, flash.display.DisplayObjectContainer), mDBFacade, (80 : UInt), (68 : UInt));
+				ASCompat.coerce((root : ASAny).graphic, flash.display.DisplayObjectContainer), mDBFacade, (80 : UInt),
+				(ASCompat.floatToInt(DBGlobal.PET_ICON_NATIVE_SIZE) : UInt));
 			if (mNoPetUI != null) {
 				mNoPetUI.visible = false;
 			}
@@ -96,7 +99,7 @@ class PetPortraitUI extends UIObject {
 		}
 		mCoolDownRenderer = new MovieClipRenderer(mDBFacade, ASCompat.coerce((root : ASAny).cooldown, flash.display.MovieClip));
 		mCoolDownRenderer.clip.visible = false;
-		mCoolDownClipLength = ASCompat.toNumberField((root : ASAny).cooldown, "totalFrames") * brain.clock.GameClock.ANIMATION_FRAME_DURATION;
+		mCoolDownClipLength = ASCompat.toNumberField((root : ASAny).cooldown, "totalFrames") * mDBFacade.gameClock.tickLength;
 	}
 
 	function setHp(current:UInt, max:UInt) {
@@ -118,11 +121,13 @@ class PetPortraitUI extends UIObject {
 
 	function handleRespawningPetDeath(respawnTimer:Float) {
 		ItemInfo.loadItemIcon(mPetNPCGameObject.actorData.gMActor.IconSwfFilepath, mPetNPCGameObject.actorData.gMActor.IconName,
-			ASCompat.coerce((root : ASAny).graphic, flash.display.DisplayObjectContainer), mDBFacade, (80 : UInt), (68 : UInt));
+			ASCompat.coerce((root : ASAny).graphic, flash.display.DisplayObjectContainer), mDBFacade, (80 : UInt),
+			(ASCompat.floatToInt(DBGlobal.PET_ICON_NATIVE_SIZE) : UInt));
 		ASCompat.setProperty((mRoot : ASAny).hp_death, "visible", true);
-		ASCompat.setProperty((root : ASAny).tooltip.title_label, "text",
+		TextUtil.setText(ASCompat.coerce((root : ASAny).tooltip.title_label, flash.text.TextField),
 			GameMasterLocale.getGameMasterSubString("PET_NAME", mPetNPCGameObject.gmNpc.Constant).toUpperCase());
-		ASCompat.setProperty((root : ASAny).tooltip.description_label, "text", Locale.getString("PET_RESPAWNS_IN") + ": " + Std.string(respawnTimer));
+		TextUtil.setText(ASCompat.coerce((root : ASAny).tooltip.description_label, flash.text.TextField),
+			Locale.getString("PET_RESPAWNS_IN") + ": " + Std.string(respawnTimer));
 		mCoolDownRenderer.playRate = mCoolDownClipLength / respawnTimer;
 		mCoolDownRenderer.clip.visible = true;
 		mCoolDownRenderer.play();
@@ -131,7 +136,8 @@ class PetPortraitUI extends UIObject {
 		}
 		mRespawnTask = mLogicalWorkComponent.doEverySeconds(1, function(param1:brain.clock.GameClock) {
 			respawnTimer = respawnTimer - 1;
-			ASCompat.setProperty((root : ASAny).tooltip.description_label, "text", Locale.getString("PET_RESPAWNS_IN") + Std.string(respawnTimer));
+			TextUtil.setText(ASCompat.coerce((root : ASAny).tooltip.description_label, flash.text.TextField),
+				Locale.getString("PET_RESPAWNS_IN") + Std.string(respawnTimer));
 			if (respawnTimer == 0) {
 				if (mRespawnTask != null) {
 					mRespawnTask.destroy();
@@ -172,6 +178,10 @@ class PetPortraitUI extends UIObject {
 			mCoolDownRenderer.destroy();
 		}
 		mCoolDownRenderer = null;
+		if (mHpBar != null) {
+			mHpBar.dontKillMyChildren = true;
+			mHpBar.destroy();
+		}
 		mHpBar = null;
 		if (mEventComponent != null) {
 			mEventComponent.destroy();

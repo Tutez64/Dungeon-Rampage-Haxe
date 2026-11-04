@@ -2,6 +2,7 @@ package account;
 
 import brain.assetRepository.AssetLoadingComponent;
 import brain.logger.Logger;
+import dBGlobals.DBGlobal;
 import facade.DBFacade;
 import facade.GameMasterLocale;
 import gameMasterDictionary.GMInventoryBase;
@@ -121,7 +122,7 @@ class ItemInfo extends InventoryBaseInfo {
 	}
 
 	override public function get_iconScale():Float {
-		return 100;
+		return DBGlobal.WEAPON_ICON_NATIVE_SIZE;
 	}
 
 	@:isVar public var power(get, never):UInt;
@@ -233,7 +234,7 @@ class ItemInfo extends InventoryBaseInfo {
 
 	override public function get_sellCoins():Int {
 		var _loc5_:GMModifier;
-		var __ax4_iter_8:Vector<GMModifier>;
+		var __ax4_iter_341:Vector<GMModifier>;
 		var _loc1_ = Math.NaN;
 		var _loc7_ = mGMWeapon;
 		var _loc3_ = mGMRarity;
@@ -247,14 +248,14 @@ class ItemInfo extends InventoryBaseInfo {
 		var _loc4_:Float = 1;
 		if (_loc3_.NumberOfModifiers > 0) {
 			_loc4_ = _loc3_.NumberOfModifiers * 3;
-			__ax4_iter_8 = mModifiers;
-			if (checkNullIteratee(__ax4_iter_8))
-				for (_tmp_ in __ax4_iter_8) {
+			__ax4_iter_341 = mModifiers;
+			if (checkNullIteratee(__ax4_iter_341))
+				for (_tmp_ in __ax4_iter_341) {
 					_loc5_ = _tmp_;
 					_loc2_ += _loc5_.MODIFIER_LEVEL;
 				}
 		}
-		var _loc6_ = mRequiredLevel / 100 * _loc3_.LevelWeight + _loc2_ * 1 / _loc4_ * _loc3_.ModifierWeight;
+		var _loc6_ = mRequiredLevel / 100 * _loc3_.LevelWeight + _loc2_ / _loc4_ * _loc3_.ModifierWeight;
 		if (_loc8_ != null) {
 			_loc1_ = _loc8_.Price;
 		}
@@ -263,9 +264,9 @@ class ItemInfo extends InventoryBaseInfo {
 
 	public function hasModifier(constant:String):Bool {
 		var _loc2_:GMModifier;
-		final __ax4_iter_9 = mModifiers;
-		if (checkNullIteratee(__ax4_iter_9))
-			for (_tmp_ in __ax4_iter_9) {
+		final __ax4_iter_342 = mModifiers;
+		if (checkNullIteratee(__ax4_iter_342))
+			for (_tmp_ in __ax4_iter_342) {
 				_loc2_ = _tmp_;
 				if (_loc2_.Constant == constant) {
 					return true;

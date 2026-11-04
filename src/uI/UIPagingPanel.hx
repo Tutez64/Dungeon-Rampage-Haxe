@@ -1,11 +1,16 @@
 package uI;
 
 import brain.uI.UIButton;
+import brain.utils.TextUtil;
 import dBGlobals.DBGlobal;
 import facade.DBFacade;
 import flash.display.MovieClip;
 
 class UIPagingPanel {
+	static inline final PAGE_BUTTON_PAD = (8 : UInt);
+
+	static inline final MAX_PAGE_BUTTONS = (8 : UInt);
+
 	var mDBFacade:DBFacade;
 
 	var mRoot:MovieClip;
@@ -24,6 +29,8 @@ class UIPagingPanel {
 
 	var mPageButtons:Vector<UIButton>;
 
+	var mVisiblePageButtonCount:UInt = 0;
+
 	public function new(dbFacade:DBFacade, numPages:UInt, rootClip:MovieClip, pageButtonClass:Dynamic, callback:ASFunction) {
 		mDBFacade = dbFacade;
 		mNumPages = numPages;
@@ -39,6 +46,15 @@ class UIPagingPanel {
 	public function destroy() {
 		mDBFacade = null;
 		mCallback = null;
+		var _loc1_:UIButton;
+		final __ax4_iter_133 = mPageButtons;
+		if (checkNullIteratee(__ax4_iter_133))
+			for (_tmp_ in __ax4_iter_133) {
+				_loc1_ = _tmp_;
+				_loc1_.detach();
+				_loc1_.destroy();
+			}
+		mPageButtons.length = 0;
 		mPageLeftButton.destroy();
 		mPageRightButton.destroy();
 	}
@@ -63,6 +79,11 @@ class UIPagingPanel {
 
 	public function set_numPages(value:UInt):UInt {
 		mNumPages = value;
+		if (mNumPages == 0) {
+			mCurrentPage = (0 : UInt);
+		} else if (mCurrentPage >= mNumPages) {
+			mCurrentPage = mNumPages - 1;
+		}
 		this.updatePageArrows();
 		return value;
 	}
@@ -74,6 +95,7 @@ class UIPagingPanel {
 	@:isVar public var currentPage(get, set):UInt;
 
 	public function set_currentPage(value:UInt):UInt {
+		value = (ASCompat.floatToInt(mNumPages == 0 ? (0 : UInt) : (ASCompat.floatToInt(Math.min(value, (mNumPages : Float) - 1)) : UInt)) : UInt);
 		if (value == mCurrentPage) {
 			return value;
 		}
@@ -102,14 +124,15 @@ class UIPagingPanel {
 	}
 
 	function pageLeft() {
-		this.currentPage = (ASCompat.floatToInt(Math.max(0, mCurrentPage - 1)) : UInt);
+		this.currentPage = (ASCompat.floatToInt(Math.max(0, (mCurrentPage : Float) - 1)) : UInt);
 		if (mCallback != null) {
 			mCallback(mCurrentPage);
 		}
 	}
 
 	function pageRight() {
-		this.currentPage = (ASCompat.floatToInt(Math.min(mNumPages, mCurrentPage + 1)) : UInt);
+		this.currentPage = (ASCompat.floatToInt(mNumPages == 0 ? (0 : UInt) : (ASCompat.floatToInt(Math.min((mNumPages : Float) - 1,
+			mCurrentPage + 1)) : UInt)) : UInt);
 		if (mCallback != null) {
 			mCallback(mCurrentPage);
 		}
@@ -118,44 +141,31 @@ class UIPagingPanel {
 	function updatePageArrows() {
 		var pageButton:UIButton;
 		var pageButtonMC:MovieClip;
-		var PAD:UInt;
-		var MAX_BUTTONS:UInt;
+		var maxStartPage:Int;
+		var centeredStartPage:Int;
 		var startPage:UInt;
 		var endPage:UInt;
 		var numPagesShowing:UInt;
 		var even:Bool;
-		var i:UInt;
+		var buttonIndex:UInt;
+		var pageIndex:UInt;
 		var buttonWidth:Float;
 		var leftEdge:Float;
 		var offset:Float;
 		mPageLeftButton.enabled = mCurrentPage != 0;
-		mPageRightButton.enabled = mCurrentPage < mNumPages - 1;
-		final __ax4_iter_138 = mPageButtons;
-		if (checkNullIteratee(__ax4_iter_138))
-			for (_tmp_ in __ax4_iter_138) {
-				pageButton = _tmp_;
-				pageButton.detach();
-				pageButton.destroy();
-			}
-		mPageButtons.length = 0;
-		PAD = (8 : UInt);
-		MAX_BUTTONS = (9 : UInt);
-		startPage = (ASCompat.floatToInt(Math.max(0, Math.min(mNumPages - MAX_BUTTONS, mCurrentPage - MAX_BUTTONS / 2 + 1))) : UInt);
-		endPage = (ASCompat.floatToInt(Math.min(startPage + MAX_BUTTONS, mNumPages)) : UInt);
+		mPageRightButton.enabled = mNumPages > 0 && mCurrentPage < (mNumPages:Float) - 1;
+		maxStartPage = ASCompat.floatToInt(Math.max(0, mNumPages - 8));
+		centeredStartPage = mCurrentPage - 4 + 1;
+		startPage = (ASCompat.floatToInt(Math.max(0, Math.min(maxStartPage, centeredStartPage))) : UInt);
+		endPage = (ASCompat.floatToInt(Math.min(startPage + 8, mNumPages)) : UInt);
 		numPagesShowing = endPage - startPage;
+		mVisiblePageButtonCount = numPagesShowing;
 		even = numPagesShowing % 2 == 0;
-		i = startPage;
-		while (i < endPage) {
+		while ((mPageButtons.length : UInt) < numPagesShowing) {
 			pageButtonMC = ASCompat.coerce(ASCompat.createInstance(mPageButtonClass, []), flash.display.MovieClip);
 			mRoot.addChild(pageButtonMC);
 			pageButton = new UIButton(mDBFacade, pageButtonMC);
 			pageButton.rolloverFilter = DBGlobal.UI_ROLLOVER_FILTER;
-			pageButton.label.text = Std.string((i + 1));
-			buttonWidth = pageButton.root.width + PAD;
-			leftEdge = numPagesShowing * buttonWidth * -0.5;
-			offset = even ? buttonWidth * 0.5 : 0;
-			pageButton.root.x = leftEdge + offset + (i - startPage) * buttonWidth;
-			ASCompat.setProperty(pageButton.root, "pageIndex", i);
 			pageButton.releaseCallbackThis = function(param1:UIButton) {
 				param1.bringToFront();
 				currentPage = (ASCompat.toInt((param1.root : ASAny).pageIndex) : UInt);
@@ -164,19 +174,75 @@ class UIPagingPanel {
 				}
 			};
 			mPageButtons.push(pageButton);
-			if (i == mCurrentPage) {
-				pageButton.enabled = false;
-				pageButton.root.scaleX = pageButton.root.scaleY = 1.2;
-				pageButton.root.filters = cast([DBGlobal.UI_SELECTED_FILTER]);
-			} else {
-				pageButton.enabled = true;
-				pageButton.root.scaleX = pageButton.root.scaleY = 1;
-				pageButton.root.filters = cast([]);
-			}
-			i = i + 1;
 		}
-		if ((mPageButtons.length : UInt) > mCurrentPage - startPage) {
+		buttonIndex = (0 : UInt);
+		while (buttonIndex < (mPageButtons.length:UInt)) {
+			pageButton = mPageButtons[(buttonIndex : Int)];
+			pageButton.clearNavigationAndInteractions();
+			pageButton.visible = buttonIndex < numPagesShowing;
+			if (pageButton.visible) {
+				pageIndex = startPage + buttonIndex;
+				pageButton.root.scaleX = pageButton.root.scaleY = 1;
+				TextUtil.setText(pageButton.label, Std.string((pageIndex + 1)));
+				buttonWidth = pageButton.root.width + 8;
+				leftEdge = numPagesShowing * buttonWidth * -0.5;
+				offset = even ? buttonWidth * 0.5 : 0;
+				pageButton.root.x = leftEdge + offset + buttonIndex * buttonWidth;
+				ASCompat.setProperty(pageButton.root, "pageIndex", pageIndex);
+				if (pageIndex == mCurrentPage) {
+					pageButton.enabled = false;
+					pageButton.root.scaleX = pageButton.root.scaleY = 1.2;
+					pageButton.root.filters = cast([DBGlobal.UI_SELECTED_FILTER]);
+				} else {
+					pageButton.enabled = true;
+					pageButton.root.scaleX = pageButton.root.scaleY = 1;
+					pageButton.root.filters = cast([]);
+				}
+			}
+			buttonIndex = buttonIndex + 1;
+		}
+		if (mVisiblePageButtonCount > (mCurrentPage : Float) - (startPage : Float)) {
 			mPageButtons[(mCurrentPage - startPage : Int)].bringToFront();
 		}
+	}
+
+	@:isVar public var getPageLeftButton(get, never):UIButton;
+
+	public function get_getPageLeftButton():UIButton {
+		return mPageLeftButton;
+	}
+
+	@:isVar public var getPageRightButton(get, never):UIButton;
+
+	public function get_getPageRightButton():UIButton {
+		return mPageRightButton;
+	}
+
+	public function getPageButton(buttonIndex:Int):UIButton {
+		if (mPageButtons[buttonIndex] == null) {
+			return null;
+		}
+		return mPageButtons[buttonIndex];
+	}
+
+	@:isVar public var numPageButtons(get, never):UInt;
+
+	public function get_numPageButtons():UInt {
+		return mVisiblePageButtonCount;
+	}
+
+	public function getNextPageButton():UIButton {
+		var _loc1_ = (0 : UInt);
+		if (mVisiblePageButtonCount < 2) {
+			return null;
+		}
+		_loc1_ = (0 : UInt);
+		while (_loc1_ < mVisiblePageButtonCount) {
+			if (ASCompat.toNumberField((mPageButtons[(_loc1_ : Int)].root : ASAny), "pageIndex") == mCurrentPage) {
+				return _loc1_ + 1 < mVisiblePageButtonCount ? mPageButtons[(_loc1_ + 1 : Int)] : mPageButtons[0];
+			}
+			_loc1_++;
+		}
+		return mPageButtons[0];
 	}
 }

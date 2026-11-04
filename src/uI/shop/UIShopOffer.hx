@@ -10,6 +10,7 @@ import brain.sceneGraph.SceneGraphManager;
 import brain.uI.UIButton;
 import brain.uI.UIObject;
 import brain.utils.MemoryTracker;
+import brain.utils.TextUtil;
 import dBGlobals.DBGlobal;
 import facade.DBFacade;
 import facade.GameMasterLocale;
@@ -60,19 +61,19 @@ class UIShopOffer extends UIObject {
 
 	var mCashIcon:MovieClip;
 
+	var mGemIcon:MovieClip;
+
 	var mCoinIcon:MovieClip;
 
-	var mBuyButton:UIButton;
+	@:allow(uI.shop) var mBuyButton:UIButton;
 
-	var mBuyButtonCoin:UIButton;
+	@:allow(uI.shop) var mBuyButtonCoin:UIButton;
 
-	var mBuyButtonCash:UIButton;
+	@:allow(uI.shop) var mBuyButtonCash:UIButton;
 
-	var mExclusiveOfferButton:UIButton;
+	@:allow(uI.shop) var mExclusiveOfferButton:UIButton;
 
-	var mBuyButtonTimerBasedSale:UIButton;
-
-	var mDLCBuyButton:UIButton;
+	@:allow(uI.shop) var mBuyButtonTimerBasedSale:UIButton;
 
 	var mGiftIcon:MovieClip;
 
@@ -135,6 +136,7 @@ class UIShopOffer extends UIObject {
 		mOriginalPrice = ASCompat.coerce((mRoot : ASAny).buy_button.original_price, flash.text.TextField);
 		mStrikePrice = ASCompat.coerce((mRoot : ASAny).buy_button.strike, flash.display.Sprite);
 		mCashIcon = ASCompat.coerce((mRoot : ASAny).buy_button.icons_bundle.cash, flash.display.MovieClip);
+		mGemIcon = ASCompat.coerce((mRoot : ASAny).buy_button.icons_bundle.gem, flash.display.MovieClip);
 		mCoinIcon = ASCompat.coerce((mRoot : ASAny).buy_button.icons_bundle.coin, flash.display.MovieClip);
 		mGiftIcon = ASCompat.coerce((mRoot : ASAny).buy_button.icons_bundle.gift_icon, flash.display.MovieClip);
 		mStar = ASCompat.coerce((mRoot : ASAny).star, flash.display.MovieClip);
@@ -152,7 +154,7 @@ class UIShopOffer extends UIObject {
 		mAlreadyOwnedLabel = ASCompat.coerce((mRoot : ASAny).already_owned_label, flash.text.TextField);
 		mAlreadyOwnedLabel.visible = false;
 		mHeroRequiredLabel = ASCompat.coerce((mRoot : ASAny).shop_herorequired, flash.display.MovieClip);
-		ASCompat.setProperty((mHeroRequiredLabel : ASAny).hero_label, "text", Locale.getString("PURCHASE_HERO_BEFORE_BUYING_SYTLE_TAVERN_LABEL"));
+		Locale.setText(ASCompat.coerce((mHeroRequiredLabel : ASAny).hero_label, flash.text.TextField), "PURCHASE_HERO_BEFORE_BUYING_SYTLE_TAVERN_LABEL");
 		mHeroRequiredLabel.visible = false;
 		if (ASCompat.toBool((mRoot : ASAny).timer)) {
 			ASCompat.setProperty((mRoot : ASAny).timer, "visible", false);
@@ -161,6 +163,7 @@ class UIShopOffer extends UIObject {
 		mBuyButtonCoin.rolloverFilter = DBGlobal.UI_ROLLOVER_FILTER;
 		mBuyButtonCoin.releaseCallback = this.buyButtonCoinCallback;
 		ASCompat.setProperty((mBuyButtonCoin.root : ASAny).icons_bundle.cash, "visible", false);
+		ASCompat.setProperty((mBuyButtonCoin.root : ASAny).icons_bundle.gem, "visible", false);
 		ASCompat.setProperty((mBuyButtonCoin.root : ASAny).icons_bundle.gift_icon, "visible", false);
 		ASCompat.setProperty((mBuyButtonCoin.root : ASAny).original_price, "visible", false);
 		ASCompat.setProperty((mBuyButtonCoin.root : ASAny).strike, "visible", false);
@@ -168,6 +171,7 @@ class UIShopOffer extends UIObject {
 		mBuyButtonCash.rolloverFilter = DBGlobal.UI_ROLLOVER_FILTER;
 		mBuyButtonCash.releaseCallback = this.buyButtonCallback;
 		ASCompat.setProperty((mBuyButtonCash.root : ASAny).icons_bundle.coin, "visible", false);
+		ASCompat.setProperty((mBuyButtonCash.root : ASAny).icons_bundle.cash, "visible", false);
 		ASCompat.setProperty((mBuyButtonCash.root : ASAny).icons_bundle.gift_icon, "visible", false);
 		ASCompat.setProperty((mBuyButtonCash.root : ASAny).original_price, "visible", false);
 		ASCompat.setProperty((mBuyButtonCash.root : ASAny).strike, "visible", false);
@@ -175,6 +179,7 @@ class UIShopOffer extends UIObject {
 		mBuyButtonTimerBasedSale.rolloverFilter = DBGlobal.UI_ROLLOVER_FILTER;
 		mBuyButtonTimerBasedSale.releaseCallback = this.buyButtonCallback;
 		ASCompat.setProperty((mBuyButtonTimerBasedSale.root : ASAny).icons_bundle.coin, "visible", false);
+		ASCompat.setProperty((mBuyButtonTimerBasedSale.root : ASAny).icons_bundle.cash, "visible", false);
 		ASCompat.setProperty((mBuyButtonTimerBasedSale.root : ASAny).icons_bundle.gift_icon, "visible", false);
 		ASCompat.setProperty((mBuyButtonTimerBasedSale.root : ASAny).original_price, "visible", false);
 		ASCompat.setProperty((mBuyButtonTimerBasedSale.root : ASAny).strike, "visible", false);
@@ -194,6 +199,27 @@ class UIShopOffer extends UIObject {
 		}
 	}
 
+	@:isVar public var navigationButton(get, never):UIButton;
+
+	public function get_navigationButton():UIButton {
+		var _loc2_:Array<ASAny> = [
+			mBuyButton,
+			mBuyButtonCoin,
+			mBuyButtonCash,
+			mExclusiveOfferButton,
+			mBuyButtonTimerBasedSale
+		];
+		var _loc1_:UIButton;
+		if (checkNullIteratee(_loc2_))
+			for (_tmp_ in _loc2_) {
+				_loc1_ = ASCompat.coerce(_tmp_, brain.uI.UIButton);
+				if (_loc1_ != null && _loc1_.canBeFocused()) {
+					return _loc1_;
+				}
+			}
+		return null;
+	}
+
 	function buyButtonCallback() {
 		return this.buyButtonInternal(this.offer);
 	}
@@ -208,6 +234,10 @@ class UIShopOffer extends UIObject {
 		if (buyOffer == null) {
 			return;
 		}
+		if (mGMOffer.CurrencyType == GMOffer.DLC_CURRENCY) {
+			mDBFacade.overlaySteamBasedOnAppId(mGMOffer.SteamAppId);
+			return;
+		}
 		if (IsCashPageExclusiveOffer()) {
 			StoreServicesController.showCashPage(mDBFacade, "shopBuyButtonExclusiveOfferDragonKnight");
 		} else if (this.canBuyOffer()) {
@@ -220,8 +250,8 @@ class UIShopOffer extends UIObject {
 				}
 			});
 		} else if (this.canGiftOffer()) {
-			popup = new DBUIOneButtonPopup(mDBFacade, Locale.getString("SHOP_GIFT_CONFIRM_TITLE"), Locale.getString("SHOP_GIFT_CONFIRM_DESC"),
-				Locale.getString("OK"), null);
+			popup = new DBUIOneButtonPopup(mDBFacade, "SHOP_GIFT_CONFIRM_POPUP", Locale.getString("SHOP_GIFT_CONFIRM_TITLE"),
+				Locale.getString("SHOP_GIFT_CONFIRM_DESC"), Locale.getString("OK"), null);
 			MemoryTracker.track(popup, "DBUIOneButtonPopup - created in UIShopOffer.buyOffer()");
 			if (callback != null) {
 				callback(buyOffer);
@@ -457,7 +487,7 @@ class UIShopOffer extends UIObject {
 	@:isVar var nativeIconSize(get, never):Float;
 
 	function get_nativeIconSize():Float {
-		return 100;
+		return DBGlobal.WEAPON_ICON_NATIVE_SIZE;
 	}
 
 	function hasRequirements():Bool {
@@ -481,13 +511,13 @@ class UIShopOffer extends UIObject {
 
 	function greyOffer(value:Bool) {
 		var _loc3_:DisplayObject;
-		var __ax4_iter_130:Vector<DisplayObject>;
+		var __ax4_iter_428:Vector<DisplayObject>;
 		var _loc2_:ColorMatrixFilter = null;
 		if (value) {
 			_loc2_ = SceneGraphManager.getGrayScaleSaturationFilter(5);
-			__ax4_iter_130 = this.nodesToGrey;
-			if (checkNullIteratee(__ax4_iter_130))
-				for (_tmp_ in __ax4_iter_130) {
+			__ax4_iter_428 = this.nodesToGrey;
+			if (checkNullIteratee(__ax4_iter_428))
+				for (_tmp_ in __ax4_iter_428) {
 					_loc3_ = _tmp_;
 					if (_loc3_ != null) {
 						_loc3_.filters = cast([_loc2_]);
@@ -503,9 +533,6 @@ class UIShopOffer extends UIObject {
 				mDescriptionLabel.textColor = (15535124 : UInt);
 			}
 			mTitle.textColor = (8947848 : UInt);
-			if (this.mGMOffer.CurrencyType == "DLC") {
-				mDLCBuyButton.enabled = false;
-			}
 		}
 	}
 
@@ -550,47 +577,47 @@ class UIShopOffer extends UIObject {
 	}
 
 	public function showOffer(gmOffer:GMOffer, gmHero:GMHero) {
-		var canBuy:Bool;
-		var canGift:Bool;
-		var gemVisible:Bool;
-		var coinVisible:Bool;
-		var levelReq:UInt;
-		var buyButtonEnabled:Bool;
+		var _loc5_ = false;
+		var _loc6_ = false;
+		var _loc7_ = false;
 		this.offer = gmOffer;
 		mGMHero = gmHero;
+		var _loc9_:String = null;
 		if (gmOffer.Details[0].HeroId != 0 || gmOffer.Details[0].SkinId != 0) {
-			mTitle.text = GameMasterLocale.getGameMasterSubString("SKIN_NAME", this.offer.getOfferItemConstant(mDBFacade.gameMaster));
+			_loc9_ = GameMasterLocale.getGameMasterSubString("SKIN_NAME", this.offer.getOfferItemConstant(mDBFacade.gameMaster));
 		} else if (gmOffer.Details[0].PetId != 0) {
-			mTitle.text = GameMasterLocale.getGameMasterSubString("PET_NAME", this.offer.getOfferItemConstant(mDBFacade.gameMaster));
+			_loc9_ = GameMasterLocale.getGameMasterSubString("PET_NAME", this.offer.getOfferItemConstant(mDBFacade.gameMaster));
 		} else if (gmOffer.Details[0].WeaponId == 0) {
 			if (gmOffer.Details[0].OfferId != 0) {
-				mTitle.text = GameMasterLocale.getGameMasterSubString("BUNDLE_OFFER_NAME", Std.string(this.offer.Id));
+				_loc9_ = GameMasterLocale.getGameMasterSubString("BUNDLE_OFFER_NAME", Std.string(this.offer.Id));
 			} else {
 				Logger.debug(Std.string(gmOffer.Id));
 			}
 		}
-		mTitle.textColor = this.getTextRarityColor();
-		if (mTitle.numLines == 1) {
-			mTitle.y = mTitleY + mTitle.height * 0.2;
-		} else {
-			mTitle.y = mTitleY;
+		if (_loc9_ != null) {
+			TextUtil.setText(mTitle, _loc9_, 1.45);
+			TextUtil.fitToField(mTitle);
 		}
+		mTitle.textColor = this.getTextRarityColor();
+		var _loc10_ = mTitle.getLineMetrics(0);
+		var _loc4_ = mTitle.numLines == 1 ? _loc10_.ascent + _loc10_.descent : mTitle.textHeight;
+		mTitle.y = mTitleY + Math.max(0, mTitle.height - (_loc4_ + 4) * mTitle.scaleY) / 2;
 		loadOfferIcon();
 		if (gmOffer.Details.length > 0) {
 			if (gmOffer.Details[0].StackableId != 0) {
 				mStackCountTF.visible = true;
-				mStackCountTF.text = "x" + Std.string(gmOffer.Details[0].StackableCount);
+				TextUtil.setText(mStackCountTF, "x" + Std.string(gmOffer.Details[0].StackableCount));
 			}
 		}
-		mRequiresLabel.text = Locale.getString("REQUIRES");
+		Locale.setText(mRequiresLabel, "REQUIRES");
 		mRequiresLabel.visible = this.hasRequirements();
 		if (mDescriptionLabel != null) {
-			mDescriptionLabel.text = this.offerDescription;
+			TextUtil.setText(mDescriptionLabel, this.offerDescription, 1.55);
 		}
 		if (IsCashPageExclusiveOffer()) {
 			mBuyButton.visible = false;
 			mExclusiveOfferButton.visible = true;
-			mExclusiveOfferButton.label.text = Locale.getString("UI_SHOP_CASH_PAGE_EXCLUSIVE");
+			Locale.setText(mExclusiveOfferButton.label, "UI_SHOP_CASH_PAGE_EXCLUSIVE");
 			mBuyButtonCoin.visible = false;
 			mBuyButtonCash.visible = false;
 			ASCompat.setProperty((mRoot : ASAny).label_or, "visible", false);
@@ -600,26 +627,18 @@ class UIShopOffer extends UIObject {
 			mBuyButtonCash.visible = true;
 			ASCompat.setProperty((mRoot : ASAny).label_or, "visible", true);
 			mExclusiveOfferButton.visible = false;
-			mBuyButtonCash.label.text = this.offer.Price > 0 ? Std.string(this.offer.Price) : Locale.getString("SHOP_FREE");
-			mBuyButtonCoin.label.text = this.coinOffer.Price > 0 ? Std.string(this.coinOffer.Price) : Locale.getString("SHOP_FREE");
-		} else if (this.mGMOffer.CurrencyType == "DLC") {
-			mBuyButton.visible = false;
-			mBuyButtonCoin.visible = false;
-			mBuyButtonCash.visible = false;
-			ASCompat.setProperty((mRoot : ASAny).label_or, "visible", false);
-			mExclusiveOfferButton.visible = false;
-			mDLCBuyButton = new UIButton(mDBFacade, ASCompat.coerce((mRoot : ASAny).dlc_button, flash.display.MovieClip));
-			mDLCBuyButton.rolloverFilter = DBGlobal.UI_ROLLOVER_FILTER;
-			mDLCBuyButton.releaseCallback = function() {
-				mDBFacade.overlaySteamBasedOnAppId(gmOffer.SteamAppId);
-			};
+			TextUtil.setText(mBuyButtonCash.label, this.offer.Price > 0 ? Std.string(this.offer.Price) : Locale.getString("SHOP_FREE"));
+			TextUtil.setText(mBuyButtonCoin.label, this.coinOffer.Price > 0 ? Std.string(this.coinOffer.Price) : Locale.getString("SHOP_FREE"));
 		} else {
 			mBuyButton.visible = true;
 			mBuyButtonCoin.visible = false;
 			mBuyButtonCash.visible = false;
 			ASCompat.setProperty((mRoot : ASAny).label_or, "visible", false);
 			mExclusiveOfferButton.visible = false;
-			mBuyButton.label.text = this.offer.Price > 0 ? Std.string(this.offer.Price) : Locale.getString("SHOP_FREE");
+			TextUtil.setText(mBuyButton.label, this.offer.Price > 0 ? Std.string(this.offer.Price) : Locale.getString("SHOP_FREE"));
+			if (this.offer.CurrencyType == GMOffer.DLC_CURRENCY) {
+				Locale.setText(mBuyButton.label, "BUY");
+			}
 		}
 		if (mSaleOffer != null) {
 			ASCompat.setProperty((mRoot : ASAny).sale_ribbon_label, "visible", true);
@@ -627,9 +646,9 @@ class UIShopOffer extends UIObject {
 			ASCompat.setProperty((mRoot : ASAny).new_ribbon_label, "visible", false);
 			if (mSaleOffer.percentOff != 0) {
 				mSaleLabel.visible = true;
-				mSaleLabel.text = Std.string(mSaleOffer.percentOff) + Locale.getString("SHOP_PERCENT_OFF");
+				TextUtil.setText(mSaleLabel, Std.string(mSaleOffer.percentOff) + Locale.getString("SHOP_PERCENT_OFF"));
 				mOriginalPrice.visible = true;
-				mOriginalPrice.text = Std.string(mGMOffer.Price);
+				TextUtil.setText(mOriginalPrice, Std.string(mGMOffer.Price));
 				mStrikePrice.visible = true;
 				mStrikePrice.width = mOriginalPrice.textWidth + 4;
 			} else {
@@ -638,30 +657,30 @@ class UIShopOffer extends UIObject {
 				mOriginalPrice.visible = false;
 			}
 			ASCompat.setProperty((mBuyButtonTimerBasedSale.root : ASAny).original_price, "visible", true);
-			ASCompat.setProperty((mBuyButtonTimerBasedSale.root : ASAny).original_price, "text", Std.string(mGMOffer.Price));
+			TextUtil.setText(ASCompat.coerce((mBuyButtonTimerBasedSale.root : ASAny).original_price, flash.text.TextField), Std.string(mGMOffer.Price));
 			ASCompat.setProperty((mBuyButtonTimerBasedSale.root : ASAny).strike, "visible", true);
 			ASCompat.setProperty((mBuyButtonTimerBasedSale.root : ASAny).strike, "width", (mBuyButtonTimerBasedSale.root : ASAny).original_price.textWidth
 				+ 4);
 			if (mCoinOffer != null && mCoinSaleOffer != null && mCoinOffer.Price != mCoinSaleOffer.Price) {
 				ASCompat.setProperty((mBuyButtonCoin.root : ASAny).original_price, "visible", true);
-				ASCompat.setProperty((mBuyButtonCoin.root : ASAny).original_price, "text", Std.string(mCoinOffer.Price));
+				TextUtil.setText(ASCompat.coerce((mBuyButtonCoin.root : ASAny).original_price, flash.text.TextField), Std.string(mCoinOffer.Price));
 				ASCompat.setProperty((mBuyButtonCoin.root : ASAny).strike, "visible", true);
 				ASCompat.setProperty((mBuyButtonCoin.root : ASAny).strike, "width", (mBuyButtonCoin.root : ASAny).original_price.textWidth + 4);
 			}
 			ASCompat.setProperty((mBuyButtonCash.root : ASAny).original_price, "visible", true);
-			ASCompat.setProperty((mBuyButtonCash.root : ASAny).original_price, "text", Std.string(mGMOffer.Price));
+			TextUtil.setText(ASCompat.coerce((mBuyButtonCash.root : ASAny).original_price, flash.text.TextField), Std.string(mGMOffer.Price));
 			ASCompat.setProperty((mBuyButtonCash.root : ASAny).strike, "visible", true);
 			ASCompat.setProperty((mBuyButtonCash.root : ASAny).strike, "width", (mBuyButtonCash.root : ASAny).original_price.textWidth + 4);
 		} else {
 			if (mGMOffer.LimitedQuantity > 0) {
 				ASCompat.setProperty((mRoot : ASAny).sale_ribbon, "visible", true);
 				ASCompat.setProperty((mRoot : ASAny).sale_ribbon_label, "visible", false);
-				ASCompat.setProperty((mRoot : ASAny).new_ribbon_label, "text", Locale.getString("SHOP_RARE"));
+				Locale.setText(ASCompat.coerce((mRoot : ASAny).new_ribbon_label, flash.text.TextField), "SHOP_RARE");
 				ASCompat.setProperty((mRoot : ASAny).new_ribbon_label, "visible", true);
 			} else if (mGMOffer.isNew) {
 				ASCompat.setProperty((mRoot : ASAny).sale_ribbon, "visible", true);
 				ASCompat.setProperty((mRoot : ASAny).sale_ribbon_label, "visible", false);
-				ASCompat.setProperty((mRoot : ASAny).new_ribbon_label, "text", Locale.getString("SHOP_NEW"));
+				Locale.setText(ASCompat.coerce((mRoot : ASAny).new_ribbon_label, flash.text.TextField), "SHOP_NEW");
 				ASCompat.setProperty((mRoot : ASAny).new_ribbon_label, "visible", true);
 			} else {
 				ASCompat.setProperty((mRoot : ASAny).sale_ribbon, "visible", false);
@@ -675,28 +694,32 @@ class UIShopOffer extends UIObject {
 		if (this.offer.LimitedQuantity > 0) {
 			mNumSold = StoreServices.getOfferQuantitySold(this.offer);
 		}
-		canBuy = this.canBuyOffer();
-		canGift = this.canGiftOffer();
-		if (canGift) {
+		var _loc12_ = this.canBuyOffer();
+		var _loc11_ = this.canGiftOffer();
+		if (_loc11_) {
 			mGiftIcon.visible = true;
 			mCashIcon.visible = false;
+			mGemIcon.visible = false;
 			mCoinIcon.visible = false;
 		} else {
 			mGiftIcon.visible = false;
-			gemVisible = this.offer.Price > 0 && this.offer.CurrencyType == "PREMIUM";
-			coinVisible = this.offer.Price > 0 && this.offer.CurrencyType == "BASIC";
-			mCashIcon.visible = gemVisible;
-			mCoinIcon.visible = coinVisible;
-			ASCompat.setProperty((mBuyButtonTimerBasedSale.root : ASAny).icons_bundle.cash, "visible", gemVisible);
-			ASCompat.setProperty((mBuyButtonTimerBasedSale.root : ASAny).icons_bundle.coin, "visible", coinVisible);
+			_loc5_ = this.offer.Price > 0 && this.offer.CurrencyType == GMOffer.PREMIUM_CURRENCY;
+			_loc6_ = this.offer.Price > 0 && this.offer.CurrencyType == GMOffer.BASIC_CURRENCY;
+			_loc7_ = this.offer.Price > 0 && this.offer.CurrencyType == GMOffer.DLC_CURRENCY;
+			mGemIcon.visible = _loc5_;
+			mCoinIcon.visible = _loc6_;
+			mCashIcon.visible = _loc7_;
+			ASCompat.setProperty((mBuyButtonTimerBasedSale.root : ASAny).icons_bundle.gem, "visible", _loc5_);
+			ASCompat.setProperty((mBuyButtonTimerBasedSale.root : ASAny).icons_bundle.coin, "visible", _loc6_);
+			ASCompat.setProperty((mBuyButtonTimerBasedSale.root : ASAny).icons_bundle.cash, "visible", _loc7_);
 		}
-		levelReq = StoreServicesController.getOfferLevelReq(mDBFacade, this.offer);
-		mLevelStarLabel.text = Std.string(levelReq);
+		var _loc8_ = StoreServicesController.getOfferLevelReq(mDBFacade, this.offer);
+		TextUtil.setText(mLevelStarLabel, Std.string(_loc8_));
 		mLevelStarLabel.visible = mStar.visible = false;
 		if (getStartDate() != null || getEndDate() != null) {
 			if (ASCompat.toBool((mRoot : ASAny).timer)) {
 				ASCompat.setProperty((mRoot : ASAny).timer, "visible", true);
-				ASCompat.setProperty((mRoot : ASAny).timer, "text", getDateString());
+				TextUtil.setText(ASCompat.coerce((mRoot : ASAny).timer, flash.text.TextField), getDateString());
 			}
 			mBuyButton.visible = false;
 			if (this.coinOffer != null) {
@@ -707,24 +730,24 @@ class UIShopOffer extends UIObject {
 				mBuyButtonCoin.visible = false;
 				mBuyButtonCash.visible = false;
 				mBuyButtonTimerBasedSale.visible = true;
-				mBuyButtonTimerBasedSale.label.text = Std.string(this.offer.Price);
+				TextUtil.setText(mBuyButtonTimerBasedSale.label, Std.string(this.offer.Price));
 			}
 		}
 		if (this.offer.LimitedQuantity > 0) {
 			if (mLimitLabel != null) {
 				mLimitLabel.visible = true;
-				mLimitLabel.text = getQuantityString();
+				TextUtil.setText(mLimitLabel, getQuantityString());
 			}
 		} else if (mLimitLabel != null) {
 			mLimitLabel.visible = false;
 		}
 		mAlreadyOwnedLabel.visible = !this.requirementsMetForPurchase();
-		buyButtonEnabled = canBuy || canGift;
-		mBuyButton.enabled = buyButtonEnabled;
-		mBuyButtonCoin.enabled = buyButtonEnabled;
-		mBuyButtonCash.enabled = buyButtonEnabled;
-		mBuyButtonTimerBasedSale.enabled = buyButtonEnabled;
-		this.greyOffer(!canBuy && !canGift || this.shouldGreyOffer(mGMHero));
+		var _loc3_ = _loc12_ || _loc11_;
+		mBuyButton.enabled = _loc3_;
+		mBuyButtonCoin.enabled = _loc3_;
+		mBuyButtonCash.enabled = _loc3_;
+		mBuyButtonTimerBasedSale.enabled = _loc3_;
+		this.greyOffer(!_loc12_ && !_loc11_ || this.shouldGreyOffer(mGMHero));
 	}
 
 	function requirementsMetForPurchase():Bool {
@@ -776,5 +799,24 @@ class UIShopOffer extends UIObject {
 			return false;
 		}
 		return true;
+	}
+
+	public function getPrimaryBuyButton():UIButton {
+		if (mBuyButton.visible) {
+			return mBuyButton;
+		}
+		if (mBuyButtonCoin.visible) {
+			return mBuyButtonCoin;
+		}
+		if (mBuyButtonCash.visible) {
+			return mBuyButtonCash;
+		}
+		if (mBuyButtonTimerBasedSale.visible) {
+			return mBuyButtonTimerBasedSale;
+		}
+		if (mExclusiveOfferButton.visible) {
+			return mExclusiveOfferButton;
+		}
+		return null;
 	}
 }

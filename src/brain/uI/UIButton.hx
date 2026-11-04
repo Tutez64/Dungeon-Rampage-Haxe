@@ -1,6 +1,7 @@
 package brain.uI;
 
 import brain.clock.GameClock;
+import brain.event.EventListeners;
 import brain.facade.Facade;
 import brain.render.MovieClipRenderController;
 import flash.display.Bitmap;
@@ -70,6 +71,8 @@ class UIButton extends UIObject {
 	var mSelectedFilter:GlowFilter;
 
 	var mFiltersBeforeRollover:Array<ASAny>;
+
+	var mFiltersCaptured:Bool = false;
 
 	var mMouseDown:Bool = false;
 
@@ -190,7 +193,7 @@ class UIButton extends UIObject {
 		if (mSelectedFilter != null) {
 			mSelectedState.filters = cast(value ? [mSelectedFilter] : []);
 		}
-		this.showState(upState);
+		refreshVisualState();
 		return value;
 	}
 
@@ -306,8 +309,8 @@ class UIButton extends UIObject {
 
 	override function addListeners() {
 		super.addListeners();
-		mRoot.addEventListener("mouseDown", onPress);
-		mRoot.addEventListener("keyDown", onKey);
+		EventListeners.add(mRoot, "mouseDown", onPress);
+		EventListeners.add(mRoot, "keyDown", onKey);
 	}
 
 	function popRollOverMouseCursor() {
@@ -317,38 +320,76 @@ class UIButton extends UIObject {
 		}
 	}
 
+	function applyRolloverFilter() {
+		if (mRolloverFilter == null || mFiltersCaptured || mRoot == null) {
+			return;
+		}
+		mFiltersBeforeRollover = mRoot.filters.slice(0);
+		mFiltersCaptured = true;
+		mRoot.filters = cast([mRolloverFilter]);
+	}
+
+	function restoreFiltersBeforeRollover() {
+		if (!mFiltersCaptured) {
+			return;
+		}
+		if (mRoot != null) {
+			mRoot.filters = cast(mFiltersBeforeRollover);
+		}
+		mFiltersBeforeRollover = null;
+		mFiltersCaptured = false;
+	}
+
+	function refreshVisualState() {
+		if (mRoot == null) {
+			return;
+		}
+		if (!mEnabled) {
+			showState((3 : UInt));
+			return;
+		}
+		if (mMouseDown && mIsHovered) {
+			showState(downState);
+			return;
+		}
+		if (isHighlighted) {
+			showState(overState);
+		} else {
+			showState(upState);
+		}
+	}
+
 	override function removeListeners() {
 		super.removeListeners();
-		mRoot.removeEventListener("mouseDown", onPress);
-		mRoot.removeEventListener("keyDown", onKey);
-		mRoot.removeEventListener("mouseUp", onMouseUp);
-		mFacade.stageRef.removeEventListener("mouseUp", onMouseUp);
-		mFacade.stageRef.removeEventListener("mouseLeave", onStageMouseLeave);
+		EventListeners.remove(mRoot, "mouseDown", onPress);
+		EventListeners.remove(mRoot, "keyDown", onKey);
+		EventListeners.remove(mRoot, "mouseUp", onMouseUp);
+		EventListeners.remove(mFacade.stageRef, "mouseUp", onMouseUp);
+		EventListeners.remove(mFacade.stageRef, "mouseLeave", onStageMouseLeave);
 	}
 
 	override public function set_enabled(value:Bool):Bool {
 		super.enabled = value;
 		mRoot.buttonMode = mEnabled;
 		mRoot.tabEnabled = false;
-		showState(mEnabled ? upState : (3 : UInt));
 		mMouseDown = false;
 		if (!value) {
-			if (mRolloverFilter != null) {
-				mRoot.filters = cast(mFiltersBeforeRollover);
-				mFiltersBeforeRollover = null;
-			}
+			restoreFiltersBeforeRollover();
 			popRollOverMouseCursor();
 		}
+		refreshVisualState();
 		return value;
 	}
 
 	override public function destroy() {
 		popRollOverMouseCursor();
+		mFiltersBeforeRollover = null;
+		mFiltersCaptured = false;
 		mStates = null;
 		var _loc1_:MovieClipRenderController;
-		final __ax4_iter_166 = mRenderers;
-		if (checkNullIteratee(__ax4_iter_166))
-			for (_tmp_ in __ax4_iter_166) {
+		final __ax4_iter_157 = mRenderers;
+		if (checkNullIteratee(__ax4_iter_157))
+			for (_tmp_ in __ax4_iter_157) {
 				_loc1_ = ASCompat.coerce(_tmp_, brain.render.MovieClipRenderController);
 				if (_loc1_ != null) {
 					_loc1_.destroy();
@@ -373,18 +414,18 @@ class UIButton extends UIObject {
 
 	function showState(i:UInt) {
 		var _loc3_:MovieClip;
-		final __ax4_iter_167 = mStates;
-		if (checkNullIteratee(__ax4_iter_167))
-			for (_tmp_ in __ax4_iter_167) {
+		final __ax4_iter_158 = mStates;
+		if (checkNullIteratee(__ax4_iter_158))
+			for (_tmp_ in __ax4_iter_158) {
 				_loc3_ = ASCompat.coerce(_tmp_, flash.display.MovieClip);
 				if (_loc3_ != null) {
 					_loc3_.visible = false;
 				}
 			}
 		var _loc2_:MovieClipRenderController;
-		final __ax4_iter_168 = mRenderers;
-		if (checkNullIteratee(__ax4_iter_168))
-			for (_tmp_ in __ax4_iter_168) {
+		final __ax4_iter_159 = mRenderers;
+		if (checkNullIteratee(__ax4_iter_159))
+			for (_tmp_ in __ax4_iter_159) {
 				_loc2_ = ASCompat.coerce(_tmp_, brain.render.MovieClipRenderController);
 				if (_loc2_ != null) {
 					_loc2_.stop();
@@ -409,25 +450,28 @@ class UIButton extends UIObject {
 
 	override function onFocused() {
 		super.onFocused();
-		showState(overState);
+		refreshVisualState();
 	}
 
 	override function onUnfocused() {
 		super.onUnfocused();
-		showState(upState);
+		refreshVisualState();
 	}
 
 	function onPress(event:MouseEvent) {
 		if (mDisableEventPropogation) {
 			event.stopImmediatePropagation();
 		}
-		mRoot.addEventListener("mouseUp", onMouseUp);
-		mFacade.stageRef.addEventListener("mouseUp", onMouseUp);
-		mFacade.stageRef.addEventListener("mouseLeave", onStageMouseLeave);
+		EventListeners.add(mRoot, "mouseUp", onMouseUp);
+		EventListeners.add(mFacade.stageRef, "mouseUp", onMouseUp);
+		EventListeners.add(mFacade.stageRef, "mouseLeave", onStageMouseLeave);
 		if (mDraggable) {
-			mFacade.stageRef.addEventListener("mouseMove", onMouseMove);
+			EventListeners.add(mFacade.stageRef, "mouseMove", onMouseMove);
 		}
 		mMouseDown = true;
+		if (!mIsHovered) {
+			onMouseRollOver(event);
+		}
 		showState(downState);
 		if (mDraggable) {
 			mDragged = false;
@@ -439,7 +483,7 @@ class UIButton extends UIObject {
 
 	function onMouseMove(event:MouseEvent) {
 		if (mDraggable) {
-			mFacade.stageRef.removeEventListener("mouseMove", onMouseMove);
+			EventListeners.remove(mFacade.stageRef, "mouseMove", onMouseMove);
 			startDrag();
 		}
 	}
@@ -456,7 +500,7 @@ class UIButton extends UIObject {
 		mDragged = true;
 		mDragStartPos = new Point(mRoot.x, mRoot.y);
 		mDragStartParent = mRoot.parent;
-		var _loc1_ = mRoot.localToGlobal(new Point(0, 0));
+		var _loc1_ = mFacade.designLocalToGlobal(mRoot, new Point(0, 0));
 		mFacade.sceneGraphManager.addChild(mRoot, 75);
 		mRoot.x = _loc1_.x;
 		mRoot.y = _loc1_.y;
@@ -481,11 +525,11 @@ class UIButton extends UIObject {
 			return;
 		}
 		if (mDraggable) {
-			mFacade.stageRef.removeEventListener("mouseMove", onMouseMove);
+			EventListeners.remove(mFacade.stageRef, "mouseMove", onMouseMove);
 		}
-		mRoot.removeEventListener("mouseUp", onMouseUp);
-		mFacade.stageRef.removeEventListener("mouseUp", onMouseUp);
-		mFacade.stageRef.removeEventListener("mouseLeave", onStageMouseLeave);
+		EventListeners.remove(mRoot, "mouseUp", onMouseUp);
+		EventListeners.remove(mFacade.stageRef, "mouseUp", onMouseUp);
+		EventListeners.remove(mFacade.stageRef, "mouseLeave", onStageMouseLeave);
 		if (!mEnabled || !mMouseDown) {
 			return;
 		}
@@ -550,7 +594,7 @@ class UIButton extends UIObject {
 
 	function onRelease(event:MouseEvent) {
 		mMouseDown = false;
-		showState(overState);
+		refreshVisualState();
 		if (mReleaseCallback != null) {
 			mReleaseCallback();
 		}
@@ -561,7 +605,7 @@ class UIButton extends UIObject {
 			return;
 		}
 		mMouseDown = false;
-		showState(overState);
+		refreshVisualState();
 		if (mDragReleaseCallback != null) {
 			mDragReleaseCallback();
 		}
@@ -569,21 +613,8 @@ class UIButton extends UIObject {
 
 	override function onRollOver(event:MouseEvent) {
 		super.onRollOver(event);
-		if (mMouseDown) {
-			showState(downState);
-		} else {
-			showState(overState);
-		}
-		if (mRolloverFilter != null) {
-			mFiltersBeforeRollover = mRoot.filters.slice(0);
-			mRoot.filters = cast([mRolloverFilter]);
-		}
-		if (mRollOverCallback != null) {
-			mRollOverCallback();
-		}
-		if (ASCompat.stringAsBool(mRollOverCursor)) {
-			mRollOverCursorKey = mFacade.mouseCursorManager.pushMouseCursor(mRollOverCursor, true);
-		}
+		refreshVisualState();
+		applyRolloverFilter();
 	}
 
 	@:isVar var downState(get, never):UInt;
@@ -606,33 +637,52 @@ class UIButton extends UIObject {
 
 	override function onRollOut(event:MouseEvent) {
 		super.onRollOut(event);
-		showState(upState);
-		if (mMouseDown) {
-			if (mPressRollOutCallback != null) {
-				mPressRollOutCallback();
-			}
+		refreshVisualState();
+		restoreFiltersBeforeRollover();
+	}
+
+	override function onMouseRollOver(event:MouseEvent) {
+		var _loc2_ = mIsHovered;
+		super.onMouseRollOver(event);
+		refreshVisualState();
+		if (_loc2_) {
+			return;
 		}
-		if (mRolloverFilter != null) {
-			if (mRoot != null) {
-				mRoot.filters = cast(mFiltersBeforeRollover);
-			}
-			mFiltersBeforeRollover = null;
+		if (ASCompat.stringAsBool(mRollOverCursor)) {
+			popRollOverMouseCursor();
+			mRollOverCursorKey = mFacade.mouseCursorManager.pushMouseCursor(mRollOverCursor, true);
 		}
+		if (mRollOverCallback != null) {
+			mRollOverCallback();
+		}
+	}
+
+	override function onMouseRollOut(event:MouseEvent) {
+		var _loc2_ = mIsHovered;
+		if (mIsHovered && mMouseDown && mPressRollOutCallback != null) {
+			mPressRollOutCallback();
+		}
+		super.onMouseRollOut(event);
+		refreshVisualState();
+		if (!_loc2_) {
+			return;
+		}
+		popRollOverMouseCursor();
 		if (mRollOutCallback != null) {
 			mRollOutCallback();
 		}
-		popRollOverMouseCursor();
 	}
 
 	function onStageMouseLeave(event:Event) {
 		hideTooltip();
-		mRoot.removeEventListener("mouseUp", onMouseUp);
-		mFacade.stageRef.removeEventListener("mouseUp", onMouseUp);
-		mFacade.stageRef.removeEventListener("mouseLeave", onStageMouseLeave);
-		showState(upState);
+		EventListeners.remove(mRoot, "mouseUp", onMouseUp);
+		EventListeners.remove(mFacade.stageRef, "mouseUp", onMouseUp);
+		EventListeners.remove(mFacade.stageRef, "mouseLeave", onStageMouseLeave);
+		onMouseRollOut(null);
+		refreshVisualState();
 	}
 
-	override public function onSelected() {
+	override public function onSelected(fromController:Bool = false) {
 		if (mReleaseCallback != null) {
 			mReleaseCallback();
 		}

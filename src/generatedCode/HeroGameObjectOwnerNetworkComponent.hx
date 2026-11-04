@@ -24,7 +24,7 @@ class HeroGameObjectOwnerNetworkComponent extends HeroGameObjectNetworkComponent
 	}
 
 	override public function recvById(packet:DcNetworkPacket, fieldid:UInt) {
-		switch (fieldid - 168) {
+		switch (fieldid - 170) {
 			case 0:
 				recv_ReportBuffEffect(packet);
 
@@ -63,12 +63,13 @@ class HeroGameObjectOwnerNetworkComponent extends HeroGameObjectNetworkComponent
 		recv_slotPoints(packet);
 		recv_dungeonBusterPoints(packet);
 		recv_setAFK(packet);
+		recv_ascensionLevel(packet);
 		recvByIdLoop(packet);
 	}
 
 	public function send_position(position:Vector3D) {
 		var _loc2_ = new DcNetworkPacket();
-		Prepare_FieldUpdate(_loc2_, (147 : UInt));
+		Prepare_FieldUpdate(_loc2_, (148 : UInt));
 		_loc2_.writeFloat(position.x);
 		_loc2_.writeFloat(position.y);
 		Send_packet(_loc2_);
@@ -76,14 +77,14 @@ class HeroGameObjectOwnerNetworkComponent extends HeroGameObjectNetworkComponent
 
 	public function send_heading(heading:Float) {
 		var _loc2_ = new DcNetworkPacket();
-		Prepare_FieldUpdate(_loc2_, (148 : UInt));
+		Prepare_FieldUpdate(_loc2_, (149 : UInt));
 		_loc2_.writeFloat(heading);
 		Send_packet(_loc2_);
 	}
 
 	public function send_ReceiveAttackChoreography(attackChoreography:AttackChoreography) {
 		var _loc2_ = new DcNetworkPacket();
-		Prepare_FieldUpdate(_loc2_, (159 : UInt));
+		Prepare_FieldUpdate(_loc2_, (160 : UInt));
 		attackChoreography.writeToPacket(_loc2_);
 		Send_packet(_loc2_);
 	}
@@ -111,15 +112,15 @@ class HeroGameObjectOwnerNetworkComponent extends HeroGameObjectNetworkComponent
 	public function send_ProposeCombatResults(combatResults:Vector<CombatResult>) {
 		var combatResultsfunc:ASFunction;
 		var outpacket = new DcNetworkPacket();
-		Prepare_FieldUpdate(outpacket, (171 : UInt));
+		Prepare_FieldUpdate(outpacket, (173 : UInt));
 		combatResultsfunc = function() {
-			var _loc2_ = 0;
+			var _loc2_ = (0 : UInt);
 			var _loc1_ = (combatResults.length : UInt);
 			var _loc3_ = outpacket;
 			outpacket = new DcNetworkPacket();
-			_loc2_ = 0;
-			while ((_loc2_ : UInt) < _loc1_) {
-				combatResults[_loc2_].writeToPacket(outpacket);
+			_loc2_ = (0 : UInt);
+			while (_loc2_ < _loc1_) {
+				combatResults[(_loc2_ : Int)].writeToPacket(outpacket);
 				_loc2_++;
 			}
 			_loc3_.writeShort((outpacket.length : Int));
@@ -132,21 +133,21 @@ class HeroGameObjectOwnerNetworkComponent extends HeroGameObjectNetworkComponent
 
 	public function send_ProposeAttackChoreography(attackChoreography:AttackChoreography) {
 		var _loc2_ = new DcNetworkPacket();
-		Prepare_FieldUpdate(_loc2_, (172 : UInt));
+		Prepare_FieldUpdate(_loc2_, (174 : UInt));
 		attackChoreography.writeToPacket(_loc2_);
 		Send_packet(_loc2_);
 	}
 
 	public function send_ProposeRevive(revivee:UInt) {
 		var _loc2_ = new DcNetworkPacket();
-		Prepare_FieldUpdate(_loc2_, (173 : UInt));
+		Prepare_FieldUpdate(_loc2_, (175 : UInt));
 		_loc2_.writeUnsignedInt(revivee);
 		Send_packet(_loc2_);
 	}
 
 	public function send_ProposeSelfRevive(isParty:UInt) {
 		var _loc2_ = new DcNetworkPacket();
-		Prepare_FieldUpdate(_loc2_, (174 : UInt));
+		Prepare_FieldUpdate(_loc2_, (176 : UInt));
 		_loc2_.writeByte((isParty : Int));
 		Send_packet(_loc2_);
 	}
@@ -159,7 +160,7 @@ class HeroGameObjectOwnerNetworkComponent extends HeroGameObjectNetworkComponent
 
 	public function send_ProposeCreateNPC(npcId:UInt, weaponSlot:UInt, x:Float, y:Float) {
 		var _loc5_ = new DcNetworkPacket();
-		Prepare_FieldUpdate(_loc5_, (177 : UInt));
+		Prepare_FieldUpdate(_loc5_, (179 : UInt));
 		_loc5_.writeUnsignedInt(npcId);
 		_loc5_.writeUnsignedInt(weaponSlot);
 		_loc5_.writeFloat(x);
@@ -169,7 +170,7 @@ class HeroGameObjectOwnerNetworkComponent extends HeroGameObjectNetworkComponent
 
 	public function send_StopChoreography() {
 		var _loc1_ = new DcNetworkPacket();
-		Prepare_FieldUpdate(_loc1_, (179 : UInt));
+		Prepare_FieldUpdate(_loc1_, (181 : UInt));
 		Send_packet(_loc1_);
 	}
 }

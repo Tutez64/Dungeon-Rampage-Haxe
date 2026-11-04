@@ -3,6 +3,7 @@ package uI.infiniteIsland;
 import brain.assetRepository.SwfAsset;
 import brain.event.EventComponent;
 import brain.render.MovieClipRenderController;
+import brain.utils.TextUtil;
 import distributedObjects.HeroGameObjectOwner;
 import facade.DBFacade;
 import facade.Locale;
@@ -10,9 +11,11 @@ import gameMasterDictionary.GMChest;
 import gameMasterDictionary.GMDoober;
 import generatedCode.InfiniteRewardData;
 import uI.popup.DBUITwoButtonPopup;
+import uI.popup.ExitDungeonOptionsButton;
 import flash.display.DisplayObject;
 import flash.display.MovieClip;
 import flash.filters.ColorMatrixFilter;
+import flash.geom.Point;
 import flash.text.TextField;
 
 class II_UIExitDungeonPopUp extends DBUITwoButtonPopup {
@@ -35,6 +38,12 @@ class II_UIExitDungeonPopUp extends DBUITwoButtonPopup {
 	static inline final LOOT_SMALL_CLASS_NAME = "db_doobers_itemBox_small";
 
 	static inline final LOOT_ROYAL_CLASS_NAME = "db_doobers_itemBox_royal";
+
+	static final OPTIONS_BUTTON_POSITION:Point = new Point(140, 172);
+
+	var mOptionsCallback:ASFunction;
+
+	var mOptionsButton:ExitDungeonOptionsButton;
 
 	var mDooberAsset:SwfAsset;
 
@@ -62,9 +71,28 @@ class II_UIExitDungeonPopUp extends DBUITwoButtonPopup {
 
 	var mEventComponent:EventComponent;
 
-	public function new(dbFacade:DBFacade, leftCallback:ASFunction, rightCallback:ASFunction) {
-		super(dbFacade, Locale.getString("UI_HUD_EXIT_TITLE"), Locale.getString("II_UI_HUD_EXIT_MESSAGE"), Locale.getString("UI_HUD_EXIT_CONFIRM"),
-			leftCallback, Locale.getString("UI_HUD_EXIT_CANCEL"), rightCallback);
+	var mRewards:Vector<InfiniteRewardData>;
+
+	var mTotalGold:Int = 0;
+
+	public function new(dbFacade:DBFacade, leftCallback:ASFunction, rightCallback:ASFunction, optionsCallback:ASFunction = null) {
+		mOptionsCallback = optionsCallback;
+		super(dbFacade, "EXIT_INFINITE_DUNGEON", Locale.getString("UI_HUD_EXIT_TITLE"), Locale.getString("II_UI_HUD_EXIT_MESSAGE"),
+			Locale.getString("UI_HUD_EXIT_CONFIRM"), leftCallback, Locale.getString("UI_HUD_EXIT_CANCEL"), rightCallback);
+	}
+
+	override function setupUI(swfAsset:SwfAsset, titleText:String, content:ASAny, allowClose:Bool, closeCallback:ASFunction) {
+		var _loc6_ = ASCompat.reinterpretAs(mDBFacade.gameObjectManager.getReferenceFromId(mDBFacade.dbAccountInfo.activeAvatarInfo.id), HeroGameObjectOwner);
+		if (_loc6_ == null || _loc6_.distributedDungeonFloor == null || _loc6_.distributedDungeonFloor.parentArea == null) {
+			throw new Error("Infinite exit popup requires an active Infinite Dungeon");
+		}
+		mRewards = _loc6_.distributedDungeonFloor.parentArea.infiniteRewardData;
+		mTotalGold = _loc6_.distributedDungeonFloor.parentArea.infiniteTotalGold;
+		super.setupUI(swfAsset, titleText, content, allowClose, closeCallback);
+		if (mOptionsCallback != null) {
+			mOptionsButton = new ExitDungeonOptionsButton(mDBFacade, mAssetLoadingComponent, mPopup, OPTIONS_BUTTON_POSITION, mCloseButton, null,
+				mOptionsCallback);
+		}
 		mEventComponent = new EventComponent(mDBFacade);
 		mCurrentRewardTF = ASCompat.coerce((mPopup : ASAny).current_reward.label_currentReward, flash.text.TextField);
 		mCoinTF = ASCompat.coerce((mPopup : ASAny).coin_count, flash.text.TextField);
@@ -74,6 +102,13 @@ class II_UIExitDungeonPopUp extends DBUITwoButtonPopup {
 		mRewardSlots.push(ASCompat.coerce((mPopup : ASAny).current_reward.loot_03, flash.display.MovieClip));
 		mRewardSlots.push(ASCompat.coerce((mPopup : ASAny).current_reward.loot_04, flash.display.MovieClip));
 		mAssetLoadingComponent.getSwfAsset(DBFacade.buildFullDownloadPath("Resources/Art2D/Icons/Items/db_icons_items.swf"), itemsLoaded);
+	}
+
+	override function handleInputCalledClosed() {
+		if (mDBFacade.hud != null) {
+			mDBFacade.hud.suppressNextExitMenuToggle();
+		}
+		super.handleInputCalledClosed();
 	}
 
 	function itemsLoaded(swfAsset:SwfAsset) {
@@ -101,24 +136,22 @@ class II_UIExitDungeonPopUp extends DBUITwoButtonPopup {
 		var _loc9_:Dynamic = null;
 		var _loc5_:MovieClip = null;
 		var _loc7_:MovieClipRenderController = null;
-		mCurrentRewardTF.text = Locale.getString("II_DINGELPUS_EXIT_POPUP_CURRENT_REWARD");
+		Locale.setText(mCurrentRewardTF, "II_DINGELPUS_EXIT_POPUP_CURRENT_REWARD");
 		mRewardChests = new Vector<MovieClip>();
-		var _loc11_ = ASCompat.reinterpretAs(mDBFacade.gameObjectManager.getReferenceFromId(mDBFacade.dbAccountInfo.activeAvatarInfo.id), HeroGameObjectOwner);
-		var _loc10_ = _loc11_.distributedDungeonFloor.parentArea.infiniteRewardData;
-		var _loc12_ = _loc11_.distributedDungeonFloor.parentArea.infiniteTotalGold;
 		var _loc6_ = 0;
-		if (checkNullIteratee(_loc10_))
-			for (_tmp_ in _loc10_) {
+		final __ax4_iter_361 = mRewards;
+		if (checkNullIteratee(__ax4_iter_361))
+			for (_tmp_ in __ax4_iter_361) {
 				_loc1_ = _tmp_;
 				if (_loc6_ < mRewardSlots.length) {
 					_loc3_ = false;
-					if (ASCompat.toNumberField(_loc1_, "status") == 1) {
+					if (_loc1_.status == 1) {
 						_loc3_ = true;
 					} else {
-						if (ASCompat.toNumberField(_loc1_, "status") == 0) {
+						if (_loc1_.status == 0) {
 							break;
 						}
-						if (ASCompat.toNumberField(_loc1_, "status") == 3) {
+						if (_loc1_.status == 3) {
 							continue;
 						}
 					}
@@ -146,7 +179,7 @@ class II_UIExitDungeonPopUp extends DBUITwoButtonPopup {
 				}
 				_loc6_++;
 			}
-		ASCompat.setProperty((mPopup : ASAny).current_reward.coin_count, "text", Std.string(_loc12_));
+		TextUtil.setText(ASCompat.coerce((mPopup : ASAny).current_reward.coin_count, flash.text.TextField), Std.string(mTotalGold));
 	}
 
 	public function desaturate(obj:DisplayObject) {
@@ -190,10 +223,27 @@ class II_UIExitDungeonPopUp extends DBUITwoButtonPopup {
 	}
 
 	override public function destroy() {
+		if (mDBFacade == null) {
+			return;
+		}
 		if (mEventComponent != null) {
 			mEventComponent.destroy();
 			mEventComponent = null;
 		}
+		if (mOptionsButton != null) {
+			mOptionsButton.destroy();
+			mOptionsButton = null;
+		}
+		mOptionsCallback = null;
+		mRewards = null;
+		if (mDBFacade.hud != null) {
+			mDBFacade.hud.clearExitMenu();
+		}
 		super.destroy();
+	}
+
+	override function setupMenuNavigation() {
+		mCloseButton.isAbove(mRightButton);
+		mRightButton.isAbove(mLeftButton);
 	}
 }

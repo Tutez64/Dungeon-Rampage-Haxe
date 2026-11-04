@@ -1,6 +1,9 @@
 package uI.friendManager.states;
 
 import brain.uI.UIButton;
+import brain.uI.UIObject;
+import brain.utils.TextUtil;
+import dBGlobals.DBGlobal;
 import facade.DBFacade;
 import town.TownStateMachine;
 import uI.friendManager.UIFriendManager;
@@ -23,6 +26,16 @@ class UIFMState {
 
 	public function exit() {}
 
+	public function getFirstNavigationUIObject():UIObject {
+		return null;
+	}
+
+	public function destroy() {
+		mDBFacade = null;
+		mUIFriendManager = null;
+		mTownStateMachine = null;
+	}
+
 	public function createButton(btnStr:String, text:String, xPos:Int, yPos:Int, callbackFunc:ASFunction):UIButton {
 		var _loc7_ = mTownStateMachine.getTownAsset(btnStr);
 		var _loc8_ = ASCompat.dynamicAs(ASCompat.createInstance(_loc7_, []), MovieClip);
@@ -30,8 +43,8 @@ class UIFMState {
 		_loc6_.releaseCallback = callbackFunc;
 		_loc8_.x = xPos;
 		_loc8_.y = yPos;
-		_loc6_.root.scaleY = _loc6_.root.scaleX = 1.8;
-		_loc6_.label.text = text;
+		_loc6_.root.scaleY = _loc6_.root.scaleX = DBGlobal.UI_16_TO_9_PORT_OBJECT_SCALE;
+		TextUtil.setText(_loc6_.label, text);
 		mUIFriendManager.addToUI(_loc6_.root);
 		return _loc6_;
 	}

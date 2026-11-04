@@ -1,224 +1,258 @@
 package com.junkbyte.console;
 
-import flash.text.StyleSheet;
+import com.junkbyte.console.text.StyleSheet;
 
 class ConsoleStyle {
-	public var menuFont:String = "Arial";
+	public var traceFontSize:Int = 0;
 
-	public var menuFontSize:Int = 12;
+	public var traceFont:String;
 
-	public var traceFont:String = "Verdana";
+	public var topMenu:Bool = false;
 
-	public var traceFontSize:Int = 11;
+	public var showCommandLineScope:Bool = false;
+
+	public var roundBorder:Int = 0;
+
+	public var priorityC2:UInt = 0;
+
+	public var priorityC1:UInt = 0;
+
+	public var priority9:UInt = 0;
+
+	public var priority8:UInt = 0;
+
+	public var priority7:UInt = 0;
+
+	public var priority6:UInt = 0;
+
+	public var priority5:UInt = 0;
+
+	public var priority4:UInt = 0;
+
+	public var priority3:UInt = 0;
+
+	public var priority2:UInt = 0;
+
+	public var priority10:UInt = 0;
+
+	public var priority1:UInt = 0;
+
+	public var priority0:UInt = 0;
+
+	public var panelSnapping:Int = 0;
+
+	public var menuHighlightColor:UInt = 0;
+
+	public var menuFontSize:Int = 0;
+
+	public var menuFont:String;
+
+	public var menuColor:UInt = 0;
+
+	public var maxChannelsInMenu:Int = 0;
+
+	public var lowColor:UInt = 0;
+
+	public var logHeaderColor:UInt = 0;
+
+	public var highColor:UInt = 0;
+
+	public var controlSize:UInt = 0;
+
+	public var controlColor:UInt = 0;
+
+	public var commandLineColor:UInt = 0;
+
+	public var channelsColor:UInt = 0;
+
+	public var channelColor:UInt = 0;
 
 	public var backgroundColor:UInt = 0;
 
-	public var backgroundAlpha:Float = 0.9;
+	public var backgroundAlpha:Float = Math.NaN;
 
-	public var controlColor:UInt = (10027008 : UInt);
-
-	public var controlSize:UInt = (5 : UInt);
-
-	public var commandLineColor:UInt = (1092096 : UInt);
-
-	public var highColor:UInt = (16777215 : UInt);
-
-	public var lowColor:UInt = (12632256 : UInt);
-
-	public var logHeaderColor:UInt = (12632256 : UInt);
-
-	public var menuColor:UInt = (16746496 : UInt);
-
-	public var menuHighlightColor:UInt = (14505216 : UInt);
-
-	public var channelsColor:UInt = (16777215 : UInt);
-
-	public var channelColor:UInt = (39372 : UInt);
-
-	public var priority0:UInt = (3831610 : UInt);
-
-	public var priority1:UInt = (4495684 : UInt);
-
-	public var priority2:UInt = (7846775 : UInt);
-
-	public var priority3:UInt = (10539168 : UInt);
-
-	public var priority4:UInt = (14085846 : UInt);
-
-	public var priority5:UInt = (15329769 : UInt);
-
-	public var priority6:UInt = (16768477 : UInt);
-
-	public var priority7:UInt = (16755370 : UInt);
-
-	public var priority8:UInt = (16742263 : UInt);
-
-	public var priority9:UInt = (16720418 : UInt);
-
-	public var priority10:UInt = (16720418 : UInt);
-
-	public var priorityC1:UInt = (39372 : UInt);
-
-	public var priorityC2:UInt = (16746496 : UInt);
-
-	public var topMenu:Bool = true;
-
-	public var showCommandLineScope:Bool = true;
-
-	public var maxChannelsInMenu:Int = 7;
-
-	public var panelSnapping:Int = 3;
-
-	public var roundBorder:Int = 10;
-
-	var _css:StyleSheet;
+	public var _css:StyleSheet;
 
 	public function new() {
-		this._css = new StyleSheet();
+		roundBorder = 10;
+		panelSnapping = 3;
+		maxChannelsInMenu = 7;
+		showCommandLineScope = true;
+		topMenu = true;
+		priorityC2 = (16746496 : UInt);
+		priorityC1 = (39372 : UInt);
+		priority10 = (16720418 : UInt);
+		priority9 = (16720418 : UInt);
+		priority8 = (16742263 : UInt);
+		priority7 = (16755370 : UInt);
+		priority6 = (16768477 : UInt);
+		priority5 = (15329769 : UInt);
+		priority4 = (14085846 : UInt);
+		priority3 = (10539168 : UInt);
+		priority2 = (7846775 : UInt);
+		priority1 = (4495684 : UInt);
+		priority0 = (3831610 : UInt);
+		channelColor = (39372 : UInt);
+		channelsColor = (16777215 : UInt);
+		menuHighlightColor = (14505216 : UInt);
+		menuColor = (16746496 : UInt);
+		logHeaderColor = (12632256 : UInt);
+		lowColor = (12632256 : UInt);
+		highColor = (16777215 : UInt);
+		commandLineColor = (1092096 : UInt);
+		controlSize = (5 : UInt);
+		controlColor = (10027008 : UInt);
+		backgroundAlpha = 0.9;
+		backgroundColor = (0 : UInt);
+		traceFontSize = 11;
+		traceFont = "Verdana";
+		menuFontSize = 12;
+		menuFont = "Arial";
+		_css = new StyleSheet();
 	}
 
 	public function whiteBase() {
-		this.backgroundColor = (16777215 : UInt);
-		this.controlColor = (16724787 : UInt);
-		this.commandLineColor = (6736896 : UInt);
-		this.highColor = (0 : UInt);
-		this.lowColor = (3355443 : UInt);
-		this.logHeaderColor = (4473924 : UInt);
-		this.menuColor = (13373696 : UInt);
-		this.menuHighlightColor = (8917248 : UInt);
-		this.channelsColor = (0 : UInt);
-		this.channelColor = (26282 : UInt);
-		this.priority0 = (4497476 : UInt);
-		this.priority1 = (3379251 : UInt);
-		this.priority2 = (2258722 : UInt);
-		this.priority3 = (1135889 : UInt);
-		this.priority4 = (13056 : UInt);
-		this.priority5 = (0 : UInt);
-		this.priority6 = (6684672 : UInt);
-		this.priority7 = (10027008 : UInt);
-		this.priority8 = (12255232 : UInt);
-		this.priority9 = (14483456 : UInt);
-		this.priority10 = (14483456 : UInt);
-		this.priorityC1 = (39372 : UInt);
-		this.priorityC2 = (16737792 : UInt);
-	}
-
-	public function big() {
-		this.traceFontSize = 13;
-		this.menuFontSize = 14;
+		backgroundColor = (16777215 : UInt);
+		controlColor = (16724787 : UInt);
+		commandLineColor = (6736896 : UInt);
+		highColor = (0 : UInt);
+		lowColor = (3355443 : UInt);
+		logHeaderColor = (4473924 : UInt);
+		menuColor = (13373696 : UInt);
+		menuHighlightColor = (8917248 : UInt);
+		channelsColor = (0 : UInt);
+		channelColor = (26282 : UInt);
+		priority0 = (4497476 : UInt);
+		priority1 = (3379251 : UInt);
+		priority2 = (2258722 : UInt);
+		priority3 = (1135889 : UInt);
+		priority4 = (13056 : UInt);
+		priority5 = (0 : UInt);
+		priority6 = (6684672 : UInt);
+		priority7 = (10027008 : UInt);
+		priority8 = (12255232 : UInt);
+		priority9 = (14483456 : UInt);
+		priority10 = (14483456 : UInt);
+		priorityC1 = (39372 : UInt);
+		priorityC2 = (16737792 : UInt);
 	}
 
 	public function updateStyleSheet() {
-		this._css.setStyle("high", {
-			"color": this.hesh(this.highColor),
-			"fontFamily": this.menuFont,
-			"fontSize": this.menuFontSize,
+		_css.setStyle("high", {
+			"color": hesh(highColor),
+			"fontFamily": menuFont,
+			"fontSize": menuFontSize,
 			"display": "inline"
 		});
-		this._css.setStyle("low", {
-			"color": this.hesh(this.lowColor),
-			"fontFamily": this.menuFont,
-			"fontSize": this.menuFontSize - 2,
+		_css.setStyle("low", {
+			"color": hesh(lowColor),
+			"fontFamily": menuFont,
+			"fontSize": menuFontSize - 2,
 			"display": "inline"
 		});
-		this._css.setStyle("menu", {
-			"color": this.hesh(this.menuColor),
+		_css.setStyle("menu", {
+			"color": hesh(menuColor),
 			"display": "inline"
 		});
-		this._css.setStyle("menuHi", {
-			"color": this.hesh(this.menuHighlightColor),
+		_css.setStyle("menuHi", {
+			"color": hesh(menuHighlightColor),
 			"display": "inline"
 		});
-		this._css.setStyle("chs", {
-			"color": this.hesh(this.channelsColor),
-			"fontSize": this.menuFontSize,
+		_css.setStyle("chs", {
+			"color": hesh(channelsColor),
+			"fontSize": menuFontSize,
 			"leading": "2",
 			"display": "inline"
 		});
-		this._css.setStyle("ch", {
-			"color": this.hesh(this.channelColor),
+		_css.setStyle("ch", {
+			"color": hesh(channelColor),
 			"display": "inline"
 		});
-		this._css.setStyle("tt", {
-			"color": this.hesh(this.menuColor),
-			"fontFamily": this.menuFont,
-			"fontSize": this.menuFontSize,
+		_css.setStyle("tt", {
+			"color": hesh(menuColor),
+			"fontFamily": menuFont,
+			"fontSize": menuFontSize,
 			"textAlign": "center"
 		});
-		this._css.setStyle("r", {
+		_css.setStyle("r", {
 			"textAlign": "right",
 			"display": "inline"
 		});
-		this._css.setStyle("p", {
-			"fontFamily": this.traceFont,
-			"fontSize": this.traceFontSize
+		_css.setStyle("p", {
+			"fontFamily": traceFont,
+			"fontSize": traceFontSize
 		});
-		this._css.setStyle("p0", {
-			"color": this.hesh(this.priority0),
+		_css.setStyle("p0", {
+			"color": hesh(priority0),
 			"display": "inline"
 		});
-		this._css.setStyle("p1", {
-			"color": this.hesh(this.priority1),
+		_css.setStyle("p1", {
+			"color": hesh(priority1),
 			"display": "inline"
 		});
-		this._css.setStyle("p2", {
-			"color": this.hesh(this.priority2),
+		_css.setStyle("p2", {
+			"color": hesh(priority2),
 			"display": "inline"
 		});
-		this._css.setStyle("p3", {
-			"color": this.hesh(this.priority3),
+		_css.setStyle("p3", {
+			"color": hesh(priority3),
 			"display": "inline"
 		});
-		this._css.setStyle("p4", {
-			"color": this.hesh(this.priority4),
+		_css.setStyle("p4", {
+			"color": hesh(priority4),
 			"display": "inline"
 		});
-		this._css.setStyle("p5", {
-			"color": this.hesh(this.priority5),
+		_css.setStyle("p5", {
+			"color": hesh(priority5),
 			"display": "inline"
 		});
-		this._css.setStyle("p6", {
-			"color": this.hesh(this.priority6),
+		_css.setStyle("p6", {
+			"color": hesh(priority6),
 			"display": "inline"
 		});
-		this._css.setStyle("p7", {
-			"color": this.hesh(this.priority7),
+		_css.setStyle("p7", {
+			"color": hesh(priority7),
 			"display": "inline"
 		});
-		this._css.setStyle("p8", {
-			"color": this.hesh(this.priority8),
+		_css.setStyle("p8", {
+			"color": hesh(priority8),
 			"display": "inline"
 		});
-		this._css.setStyle("p9", {
-			"color": this.hesh(this.priority9),
+		_css.setStyle("p9", {
+			"color": hesh(priority9),
 			"display": "inline"
 		});
-		this._css.setStyle("p10", {
-			"color": this.hesh(this.priority10),
+		_css.setStyle("p10", {
+			"color": hesh(priority10),
 			"fontWeight": "bold",
 			"display": "inline"
 		});
-		this._css.setStyle("p-1", {
-			"color": this.hesh(this.priorityC1),
+		_css.setStyle("p-1", {
+			"color": hesh(priorityC1),
 			"display": "inline"
 		});
-		this._css.setStyle("p-2", {
-			"color": this.hesh(this.priorityC2),
+		_css.setStyle("p-2", {
+			"color": hesh(priorityC2),
 			"display": "inline"
 		});
-		this._css.setStyle("logs", {
-			"color": this.hesh(this.logHeaderColor),
+		_css.setStyle("logs", {
+			"color": hesh(logHeaderColor),
 			"display": "inline"
 		});
+	}
+
+	public function hesh(n:UInt):String {
+		return "#" + StringTools.hex((n : Int));
 	}
 
 	@:isVar public var styleSheet(get, never):StyleSheet;
 
 	public function get_styleSheet():StyleSheet {
-		return this._css;
+		return _css;
 	}
 
-	function hesh(n:Float):String {
-		return "#" + ASCompat.toRadix(n, (16 : UInt));
+	public function big() {
+		traceFontSize = 13;
+		menuFontSize = 14;
 	}
 }

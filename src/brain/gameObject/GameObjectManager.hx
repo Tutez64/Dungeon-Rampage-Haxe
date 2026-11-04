@@ -2,7 +2,7 @@ package brain.gameObject;
 
 import brain.facade.Facade;
 import brain.logger.Logger;
-import org.as3commons.collections.Map;
+import collections.Map;
 
 class GameObjectManager {
 	var mGameObjects:Map = new Map();

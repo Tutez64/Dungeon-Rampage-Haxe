@@ -9,19 +9,9 @@ final class SessionProtocol {
 
 	static inline final MAX_CONTROL_FRAME_CHARACTERS = 4096;
 
-	static final UNRECOVERABLE_CODES:Array<ASAny> = [4001, 4002, 4003, 4005, 4006, 4007, 4008, 4011];
+	static var UNRECOVERABLE_CODES:Array<ASAny>;
 
-	static final CLOSE_REASONS:ASObject = {
-		"4001": "session buffer full",
-		"4002": "bad control message",
-		"4003": "session expired",
-		"4004": "unknown session",
-		"4005": "replay window exceeded",
-		"4006": "superseded",
-		"4007": "upstream ended",
-		"4008": "unauthenticated",
-		"4011": "attached idle"
-	};
+	static var CLOSE_REASONS:ASObject;
 
 	public function new() {}
 
@@ -91,5 +81,20 @@ final class SessionProtocol {
 
 	static function formatCount(value:Float):String {
 		return ASCompat.toFixed(value, (0 : UInt));
+	}
+
+	static function __init__() {
+		UNRECOVERABLE_CODES = [4001, 4002, 4003, 4005, 4006, 4007, 4008, 4011];
+		CLOSE_REASONS = {
+			"4001": "session buffer full",
+			"4002": "bad control message",
+			"4003": "session expired",
+			"4004": "unknown session",
+			"4005": "replay window exceeded",
+			"4006": "superseded",
+			"4007": "upstream ended",
+			"4008": "unauthenticated",
+			"4011": "attached idle"
+		};
 	}
 }

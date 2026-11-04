@@ -17,22 +17,22 @@ class TileGrid {
 
 	var mTiles:Vector<Tile>;
 
-	var mEmptyTileColiders:Vector<RectangleNavCollider>;
+	var mEmptyTileColliders:Vector<RectangleNavCollider>;
 
 	public function new(gridWidth:UInt = (12 : UInt), gridHeight:UInt = (12 : UInt)) {
-		var _loc4_ = 0;
-		var _loc3_ = 0;
+		var _loc4_ = (0 : UInt);
+		var _loc3_ = (0 : UInt);
 
 		mGridWidth = gridWidth;
 		mGridHeight = gridHeight;
 		mTiles = new Vector<Tile>();
-		mEmptyTileColiders = new Vector<RectangleNavCollider>();
-		_loc4_ = 0;
-		while ((_loc4_ : UInt) < mGridHeight) {
-			_loc3_ = 0;
-			while ((_loc3_ : UInt) < mGridWidth) {
+		mEmptyTileColliders = new Vector<RectangleNavCollider>();
+		_loc4_ = (0 : UInt);
+		while (_loc4_ < mGridHeight) {
+			_loc3_ = (0 : UInt);
+			while (_loc3_ < mGridWidth) {
 				mTiles.push(null);
-				mEmptyTileColiders.push(null);
+				mEmptyTileColliders.push(null);
 				_loc3_++;
 			}
 			_loc4_++;
@@ -42,9 +42,9 @@ class TileGrid {
 	public function getNonFillTilePositions():Vector<Vector3D> {
 		var _loc1_ = new Vector<Vector3D>();
 		var _loc2_:Tile;
-		final __ax4_iter_146 = mTiles;
-		if (checkNullIteratee(__ax4_iter_146))
-			for (_tmp_ in __ax4_iter_146) {
+		final __ax4_iter_441 = mTiles;
+		if (checkNullIteratee(__ax4_iter_441))
+			for (_tmp_ in __ax4_iter_441) {
 				_loc2_ = _tmp_;
 				if (_loc2_ != null && !_loc2_.isFiller()) {
 					_loc1_.push(_loc2_.position.clone());
@@ -65,10 +65,13 @@ class TileGrid {
 			throw new Error("index out of range");
 		}
 		mTiles[(i + j * mGridWidth : Int)] = tile;
-		var _loc4_ = mEmptyTileColiders[(i + j * mGridWidth : Int)];
+		if (tile != null && tile.isGeneratedFiller) {
+			return;
+		}
+		var _loc4_ = mEmptyTileColliders[(i + j * mGridWidth : Int)];
 		if (_loc4_ != null) {
 			_loc4_.destroy();
-			mEmptyTileColiders[(i + j * mGridWidth : Int)] = null;
+			mEmptyTileColliders[(i + j * mGridWidth : Int)] = null;
 		}
 	}
 
@@ -76,14 +79,14 @@ class TileGrid {
 		if (i >= mGridWidth || j >= mGridHeight) {
 			throw new Error("index out of range");
 		}
-		mEmptyTileColiders[(i + j * mGridWidth : Int)] = col;
+		mEmptyTileColliders[(i + j * mGridWidth : Int)] = col;
 	}
 
 	public function getEmptyColliderAtIndex(i:UInt, j:UInt):RectangleNavCollider {
 		if (i >= mGridWidth || j >= mGridHeight) {
 			return null;
 		}
-		return mEmptyTileColiders[(i + j * mGridWidth : Int)];
+		return mEmptyTileColliders[(i + j * mGridWidth : Int)];
 	}
 
 	public function setTileAtPosition(pos:Vector3D, tile:Tile) {
@@ -150,9 +153,9 @@ class TileGrid {
 
 	public function removeAllFromWorld() {
 		var _loc1_:Tile;
-		final __ax4_iter_147 = mTiles;
-		if (checkNullIteratee(__ax4_iter_147))
-			for (_tmp_ in __ax4_iter_147) {
+		final __ax4_iter_442 = mTiles;
+		if (checkNullIteratee(__ax4_iter_442))
+			for (_tmp_ in __ax4_iter_442) {
 				_loc1_ = _tmp_;
 				if (_loc1_ != null) {
 					_loc1_.destroy();
@@ -172,21 +175,21 @@ class TileGrid {
 	}
 
 	public function destroy() {
-		var _loc2_ = 0;
+		var _loc2_ = (0 : UInt);
 		var _loc1_:RectangleNavCollider = null;
 		removeAllFromWorld();
-		if (mEmptyTileColiders != null) {
-			_loc2_ = 0;
-			while (_loc2_ < mEmptyTileColiders.length) {
-				_loc1_ = mEmptyTileColiders[_loc2_];
+		if (mEmptyTileColliders != null) {
+			_loc2_ = (0 : UInt);
+			while (_loc2_ < (mEmptyTileColliders.length:UInt)) {
+				_loc1_ = mEmptyTileColliders[(_loc2_ : Int)];
 				if (_loc1_ != null) {
 					_loc1_.destroy();
 					_loc1_ = null;
 				}
 				_loc2_++;
 			}
-			mEmptyTileColiders.length = 0;
-			mEmptyTileColiders = null;
+			mEmptyTileColliders.length = 0;
+			mEmptyTileColliders = null;
 		}
 		mTiles = null;
 	}

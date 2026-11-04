@@ -22,7 +22,7 @@ class AssetLoadingTracker {
 			pendingErrorCallback();
 		}
 		if (assetLoadingComponent != null) {
-			assetLoadingComponent.RemoveLoader(this);
+			assetLoadingComponent.removeLoader(this);
 		}
 	}
 
@@ -31,7 +31,7 @@ class AssetLoadingTracker {
 			pendingLoadCallback(asset);
 		}
 		if (assetLoadingComponent != null) {
-			assetLoadingComponent.RemoveLoader(this);
+			assetLoadingComponent.removeLoader(this);
 		}
 	}
 

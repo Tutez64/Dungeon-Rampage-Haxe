@@ -9,14 +9,17 @@ import brain.clock.GameClock;
 import brain.event.EventComponent;
 import brain.logger.Logger;
 import brain.sceneGraph.SceneGraphComponent;
+import brain.uI.UIButton;
 import brain.uI.UIRadioButton;
 import brain.utils.MemoryTracker;
+import brain.utils.TextUtil;
 import brain.utils.TimeSpan;
 import brain.workLoop.LogicalWorkComponent;
+import collections.IMapIterator;
+import collections.Map;
 import dBGlobals.DBGlobal;
 import facade.DBFacade;
 import facade.Locale;
-import facebookAPI.DBFacebookBragFeedPost;
 import gameMasterDictionary.GMHero;
 import gameMasterDictionary.GMNpc;
 import gameMasterDictionary.GMOffer;
@@ -27,8 +30,7 @@ import uI.equipPicker.HeroWithEquipPicker;
 import uI.popup.DBUIPopup;
 import flash.display.MovieClip;
 import flash.events.Event;
-import org.as3commons.collections.Map;
-import org.as3commons.collections.framework.IMapIterator;
+import flash.text.TextField;
 
 class UIShop {
 	public static inline final WEAPON_LEVEL_DISPLAY_RANGE = (10 : UInt);
@@ -70,6 +72,8 @@ class UIShop {
 	static inline final LIMITED_OFFER_REFRESH_TIME:Float = 60000;
 
 	static final CATEGORIES:Vector<String> = Vector.ofArray(["SPECIAL", "CHEST", "KEY", "HERO", "STUFF", "WEAPON", "PET", "SKIN"]);
+
+	static final CATEGORY_NAVIGATION_ORDER:Vector<String> = Vector.ofArray(["SPECIAL", "HERO", "SKIN", "WEAPON", "CHEST", "PET", "STUFF", "KEY"]);
 
 	var mDBFacade:DBFacade;
 
@@ -125,10 +129,29 @@ class UIShop {
 
 	var mWeaponTabEndDate:Date;
 
-	public function new(dbFacade:DBFacade, swfAsset:SwfAsset, rootClip:MovieClip, townHeader:TownHeader) {
+	var mSpecialCategoryButton:UIRadioButton;
+
+	var mChestCategoryButton:UIRadioButton;
+
+	var mKeyCategoryButton:UIRadioButton;
+
+	var mHeroCategoryButton:UIRadioButton;
+
+	var mSkinCategoryButton:UIRadioButton;
+
+	var mStuffCategoryButton:UIRadioButton;
+
+	var mWeaponCategoryButton:UIRadioButton;
+
+	var mPetCategoryButton:UIRadioButton;
+
+	var mIsActiveCallback:ASFunction;
+
+	public function new(dbFacade:DBFacade, swfAsset:SwfAsset, rootClip:MovieClip, townHeader:TownHeader, isActiveCallback:ASFunction = null) {
 		mDBFacade = dbFacade;
 		mSwfAsset = swfAsset;
 		mTownHeader = townHeader;
+		mIsActiveCallback = isActiveCallback;
 		mSceneGraphComponent = new SceneGraphComponent(mDBFacade, "UIShop");
 		mAssetLoadingComponent = new AssetLoadingComponent(mDBFacade);
 		mLogicalWorkComponent = new LogicalWorkComponent(mDBFacade, "UIShop");
@@ -182,6 +205,7 @@ class UIShop {
 		if (mEventComponent != null) {
 			mEventComponent.destroy();
 		}
+		mTownHeader = null;
 	}
 
 	@:isVar public var root(get, never):MovieClip;
@@ -196,6 +220,11 @@ class UIShop {
 		mTownHeader.title = Locale.getString("SHOP_HEADER");
 		if (!ASCompat.stringAsBool(mCurrentTab)) {
 			mCurrentTab = "SPECIAL";
+			mTownHeader.resetButtonLinks();
+			setupMenuNavigation();
+		} else {
+			mTownHeader.resetButtonLinks();
+			setupHeaderMenuNavigation();
 		}
 		if (startAtCategoryTab != "") {
 			mCurrentTab = startAtCategoryTab;
@@ -208,7 +237,7 @@ class UIShop {
 		this.heroSelected(mSelectedHero, owned);
 		if (mDBFacade.gameClock.realTime >= mNextLimitedOfferRefreshTime && !mDBFacade.mInDailyReward) {
 			mNextLimitedOfferRefreshTime = GameClock.getWebServerTime() + 60000;
-			popup = new DBUIPopup(mDBFacade, Locale.getString("SHOP_UPDATING"), null, false);
+			popup = new DBUIPopup(mDBFacade, "", Locale.getString("SHOP_UPDATING"), null, false);
 			MemoryTracker.track(popup, "DBUIPopup - created in UIShop.refresh()");
 			StoreServices.getLimitedOfferUsage(mDBFacade, null, function(param1:ASAny) {
 				popup.destroy();
@@ -219,9 +248,6 @@ class UIShop {
 		} else {
 			showTab(mCurrentTab);
 		}
-		if (mTownHeader != null) {
-			mTownHeader.refreshKeyPanel();
-		}
 	}
 
 	function processGMOffers() {
@@ -229,23 +255,23 @@ class UIShop {
 		var _loc2_:Vector<GMOffer> = /*undefined*/ null;
 		var _loc7_:GMOffer = null;
 		var _loc4_:ASAny = null;
-		var _loc5_ = 0;
+		var _loc5_ = (0 : UInt);
 		mCategorizedGMOffers = new Map();
-		final __ax4_iter_132 = CATEGORIES;
-		if (checkNullIteratee(__ax4_iter_132))
-			for (_tmp_ in __ax4_iter_132) {
+		final __ax4_iter_430 = CATEGORIES;
+		if (checkNullIteratee(__ax4_iter_430))
+			for (_tmp_ in __ax4_iter_430) {
 				_loc6_ = _tmp_;
 				mCategorizedGMOffers.add(_loc6_, new Vector<GMOffer>());
 			}
 		var _loc1_ = mDBFacade.gameMaster.Offers;
 		var _loc3_ = (mCategorizedGMOffers.itemFor("SPECIAL") : Vector<GMOffer>);
-		_loc5_ = 0;
-		while (_loc5_ < _loc1_.length) {
-			_loc7_ = _loc1_[_loc5_];
+		_loc5_ = (0 : UInt);
+		while (_loc5_ < (_loc1_.length:UInt)) {
+			_loc7_ = _loc1_[(_loc5_ : Int)];
 			if (_loc7_.Location == "STORE") {
 				if (!_loc7_.Gift) {
 					_loc6_ = _loc7_.Tab;
-					_loc2_ = mCategorizedGMOffers.itemFor(_loc6_);
+					_loc2_ = (mCategorizedGMOffers.itemFor(_loc6_) : Vector<GMOffer>);
 					if (_loc2_ != null) {
 						_loc2_.push(_loc7_);
 					} else {
@@ -355,21 +381,29 @@ class UIShop {
 		MemoryTracker.track(mPagination, "UIPagingPanel - created in UIShop.setupUI()");
 		ASCompat.setProperty((mRoot : ASAny).UI_town_shop_timer, "visible", false);
 		group = "UIShopTabGroup";
-		mTabButtons.add("SPECIAL", new UIRadioButton(mDBFacade, ASCompat.coerce((mRoot : ASAny).tab_special, flash.display.MovieClip), group));
-		mTabButtons.add("CHEST", new UIRadioButton(mDBFacade, ASCompat.coerce((mRoot : ASAny).tab_chests, flash.display.MovieClip), group));
-		mTabButtons.add("KEY", new UIRadioButton(mDBFacade, ASCompat.coerce((mRoot : ASAny).tab_keys, flash.display.MovieClip), group));
-		mTabButtons.add("HERO", new UIRadioButton(mDBFacade, ASCompat.coerce((mRoot : ASAny).tab_heroes, flash.display.MovieClip), group));
-		mTabButtons.add("SKIN", new UIRadioButton(mDBFacade, ASCompat.coerce((mRoot : ASAny).tab_skins, flash.display.MovieClip), group));
-		mTabButtons.add("STUFF", new UIRadioButton(mDBFacade, ASCompat.coerce((mRoot : ASAny).tab_stuff, flash.display.MovieClip), group));
-		mTabButtons.add("WEAPON", new UIRadioButton(mDBFacade, ASCompat.coerce((mRoot : ASAny).tab_melee, flash.display.MovieClip), group));
-		mTabButtons.add("PET", new UIRadioButton(mDBFacade, ASCompat.coerce((mRoot : ASAny).tab_pets, flash.display.MovieClip), group));
+		mSpecialCategoryButton = new UIRadioButton(mDBFacade, ASCompat.coerce((mRoot : ASAny).tab_special, flash.display.MovieClip), group);
+		mChestCategoryButton = new UIRadioButton(mDBFacade, ASCompat.coerce((mRoot : ASAny).tab_chests, flash.display.MovieClip), group);
+		mKeyCategoryButton = new UIRadioButton(mDBFacade, ASCompat.coerce((mRoot : ASAny).tab_keys, flash.display.MovieClip), group);
+		mHeroCategoryButton = new UIRadioButton(mDBFacade, ASCompat.coerce((mRoot : ASAny).tab_heroes, flash.display.MovieClip), group);
+		mSkinCategoryButton = new UIRadioButton(mDBFacade, ASCompat.coerce((mRoot : ASAny).tab_skins, flash.display.MovieClip), group);
+		mStuffCategoryButton = new UIRadioButton(mDBFacade, ASCompat.coerce((mRoot : ASAny).tab_stuff, flash.display.MovieClip), group);
+		mWeaponCategoryButton = new UIRadioButton(mDBFacade, ASCompat.coerce((mRoot : ASAny).tab_melee, flash.display.MovieClip), group);
+		mPetCategoryButton = new UIRadioButton(mDBFacade, ASCompat.coerce((mRoot : ASAny).tab_pets, flash.display.MovieClip), group);
+		mTabButtons.add("SPECIAL", mSpecialCategoryButton);
+		mTabButtons.add("CHEST", mChestCategoryButton);
+		mTabButtons.add("KEY", mKeyCategoryButton);
+		mTabButtons.add("HERO", mHeroCategoryButton);
+		mTabButtons.add("SKIN", mSkinCategoryButton);
+		mTabButtons.add("STUFF", mStuffCategoryButton);
+		mTabButtons.add("WEAPON", mWeaponCategoryButton);
+		mTabButtons.add("PET", mPetCategoryButton);
 		iter = ASCompat.reinterpretAs(mTabButtons.iterator(), IMapIterator);
 		while (iter.hasNext()) {
 			tabButton = ASCompat.coerce(iter.next(), brain.uI.UIRadioButton);
-			ASCompat.setProperty((tabButton.root : ASAny).new_label, "text", Locale.getString("SHOP_NEW"));
+			Locale.setText(ASCompat.coerce((tabButton.root : ASAny).new_label, flash.text.TextField), "SHOP_NEW");
 			ASCompat.setProperty((tabButton.root : ASAny).new_label, "visible", this.categoryHasAnyNewOffers(iter.key));
 			ASCompat.setProperty(tabButton.root, "category", iter.key);
-			tabButton.releaseCallbackThis = function(param1:brain.uI.UIButton) {
+			tabButton.releaseCallbackThis = function(param1:UIButton) {
 				showTab((param1.root : ASAny).category);
 			};
 			tabButton.rolloverFilter = DBGlobal.UI_ROLLOVER_FILTER;
@@ -389,12 +423,14 @@ class UIShop {
 		weaponTooltipClass = mSwfAsset.getClass("DR_weapon_tooltip");
 		heroTooltipClass = mSwfAsset.getClass("avatar_tooltip");
 		mHeroWithEquipPicker = new HeroWithEquipPicker(mDBFacade, ASCompat.coerce((mRoot : ASAny).hero_picker, flash.display.MovieClip), weaponTooltipClass,
-			heroTooltipClass, heroSelected);
+			heroTooltipClass, heroSelected, null, null, null, null, false, true, mIsActiveCallback);
 		mEventComponent.addListener("DB_ACCOUNT_INFO_RESPONSE", accountInfoUpdated);
 	}
 
 	function accountInfoUpdated(evt:Event) {
-		refresh();
+		if (mIsActiveCallback == null || ASCompat.toBool(mIsActiveCallback())) {
+			refresh();
+		}
 	}
 
 	public function animateEntry() {
@@ -461,10 +497,11 @@ class UIShop {
 				emptyOffer.parent.addChild(mZeroOfferClip);
 				mZeroOfferClip.x = emptyOffer.x;
 				mZeroOfferClip.y = emptyOffer.y;
-				mZeroOfferClip.scaleX = mZeroOfferClip.scaleY = 1.8;
-				ASCompat.setProperty((mZeroOfferClip : ASAny).title, "text", Locale.getString("ZERO_OFFER_TITLE"));
-				ASCompat.setProperty((mZeroOfferClip : ASAny).description, "text", Locale.getString("ZERO_OFFER_DESCRIPTION"));
+				mZeroOfferClip.scaleX = mZeroOfferClip.scaleY = DBGlobal.UI_16_TO_9_PORT_OBJECT_SCALE;
+				Locale.setText(ASCompat.coerce((mZeroOfferClip : ASAny).title, flash.text.TextField), "ZERO_OFFER_TITLE");
+				Locale.setText(ASCompat.coerce((mZeroOfferClip : ASAny).description, flash.text.TextField), "ZERO_OFFER_DESCRIPTION");
 			});
+			setupUIShopOfferNavigationLinks();
 			return;
 		}
 		chargeTooltipClass = mSwfAsset.getClass("DR_charge_tooltip");
@@ -478,9 +515,9 @@ class UIShop {
 			}
 			gmOffer = categoryOffers[(i : Int)];
 			onscreenIndex = i % numOffersPerPage;
-			if (gmOffer.CurrencyType == "PREMIUM" && ASCompat.floatAsBool(gmOffer.Price)) {
+			if (gmOffer.CurrencyType == GMOffer.PREMIUM_CURRENCY && ASCompat.floatAsBool(gmOffer.Price)) {
 				templateClass = mPremiumOfferTemplateClass;
-			} else if (gmOffer.CurrencyType == "DLC") {
+			} else if (gmOffer.CurrencyType == GMOffer.DLC_CURRENCY) {
 				templateClass = mDLCOfferTemplateClass;
 			} else {
 				templateClass = mOfferTemplateClass;
@@ -505,10 +542,10 @@ class UIShop {
 						if (_loc1_ == null) {
 							return;
 						}
-						DBFacebookBragFeedPost.buyHeroSuccess(mTownHeader, _loc1_, mDBFacade, mAssetLoadingComponent);
+						UIBragFeedPost.buyHeroSuccess(mTownHeader, _loc1_, mDBFacade, mAssetLoadingComponent);
 					};
 				};
-				uiShopOffer = new UIShopHeroOffer(mTownHeader, mDBFacade, templateClass, ASCompat.coerceFunction(successCallback(gmOffer.Details[0].HeroId)));
+				uiShopOffer = new UIShopHeroOffer(mDBFacade, templateClass, ASCompat.coerceFunction(successCallback(gmOffer.Details[0].HeroId)));
 			} else if (gmOffer.Details[0].PetId != 0) {
 				successCallback = function(param1:UInt):ASFunction {
 					var petId = param1;
@@ -520,7 +557,7 @@ class UIShop {
 						if (_loc1_ == null) {
 							return;
 						}
-						DBFacebookBragFeedPost.buyPetSuccess(_loc1_, mDBFacade, mAssetLoadingComponent);
+						UIBragFeedPost.buyPetSuccess(_loc1_, mDBFacade, mAssetLoadingComponent);
 					};
 				};
 				uiShopOffer = new UIShopPetOffer(mDBFacade, templateClass, ASCompat.coerceFunction(successCallback(gmOffer.Details[0].PetId)));
@@ -535,7 +572,7 @@ class UIShop {
 						if (_loc1_ == null) {
 							return;
 						}
-						DBFacebookBragFeedPost.buySkinSuccess(_loc1_, mDBFacade, mAssetLoadingComponent);
+						UIBragFeedPost.buySkinSuccess(_loc1_, mDBFacade, mAssetLoadingComponent);
 					};
 				};
 				uiShopOffer = new UIShopSkinOffer(mDBFacade, templateClass, ASCompat.coerceFunction(successCallback(gmOffer.Details[0].SkinId)));
@@ -549,7 +586,7 @@ class UIShop {
 			mUIOffers[(onscreenIndex : Int)] = uiShopOffer;
 			uiShopOffer.showOffer(gmOffer, mSelectedHero);
 			uiShopOffer.root.visible = true;
-			uiShopOffer.root.scaleX = uiShopOffer.root.scaleY = 1.8;
+			uiShopOffer.root.scaleX = uiShopOffer.root.scaleY = DBGlobal.UI_16_TO_9_PORT_OBJECT_SCALE;
 			mEmptyOffers[(onscreenIndex : Int)].visible = false;
 			if (mCurrentTab == "WEAPON") {
 				uiShopOffer.root.y += 72;
@@ -563,15 +600,19 @@ class UIShop {
 			ASCompat.setProperty((mRoot : ASAny).UI_town_shop_timer, "visible", false);
 			cleanUpTodaysShopTimerUI();
 		}
+		resetUIShopCategoriesNavigationLinks();
+		setupUIShopOfferNavigationLinks();
 	}
 
 	function createTodaysShopTimerUI(gmOffer:GMOffer) {
-		ASCompat.setProperty((mRoot : ASAny).UI_town_shop_timer.offer_title, "text", Locale.getString("TODAYS_WEAPONS"));
-		ASCompat.setProperty((mRoot : ASAny).UI_town_shop_timer.label_date, "text", getDate());
+		Locale.setText(ASCompat.coerce((mRoot : ASAny).UI_town_shop_timer.offer_title, flash.text.TextField), "TODAYS_WEAPONS");
+		TextUtil.setText(ASCompat.coerce((mRoot : ASAny).UI_town_shop_timer.label_date, flash.text.TextField), getDate(), 1.55);
+		TextUtil.fitToField(ASCompat.coerce((mRoot : ASAny).UI_town_shop_timer.label_date, flash.text.TextField));
 		if (gmOffer != null) {
 			ASCompat.setProperty((mRoot : ASAny).UI_town_shop_timer.label_timer, "visible", true);
 			ASCompat.setProperty((mRoot : ASAny).UI_town_shop_timer.label_remaining, "visible", true);
-			ASCompat.setProperty((mRoot : ASAny).UI_town_shop_timer.label_remaining, "text", Locale.getString("TODAYS_WEAPONS_REMAINING"));
+			Locale.setText(ASCompat.coerce((mRoot : ASAny).UI_town_shop_timer.label_remaining, flash.text.TextField), "TODAYS_WEAPONS_REMAINING", null, 1.55);
+			TextUtil.fitToField(ASCompat.coerce((mRoot : ASAny).UI_town_shop_timer.label_remaining, flash.text.TextField));
 			mWeaponTabEndDate = gmOffer.EndDate;
 			mWeaponsLogicalWorkComponent.doEverySeconds(1, updateRemainingTimeText);
 		} else {
@@ -592,7 +633,7 @@ class UIShop {
 		var _loc3_:String = null;
 		var _loc5_ = GameClock.getWebServerDate();
 		if (_loc5_.getTime() > mWeaponTabEndDate.getTime()) {
-			ASCompat.setProperty((mRoot : ASAny).UI_town_shop_timer.label_timer, "text", "00:00:00");
+			setCountdownText("00:00:00");
 			regenerateOffers();
 		} else {
 			_loc6_ = new TimeSpan(mWeaponTabEndDate.getTime() - _loc5_.getTime());
@@ -608,8 +649,16 @@ class UIShop {
 			if (_loc3_.length == 1) {
 				_loc3_ = "0" + _loc3_;
 			}
-			ASCompat.setProperty((mRoot : ASAny).UI_town_shop_timer.label_timer, "text", _loc2_ + ":" + _loc4_ + ":" + _loc3_);
+			setCountdownText(_loc2_ + ":" + _loc4_ + ":" + _loc3_);
 		}
+	}
+
+	function setCountdownText(text:String) {
+		var _loc2_ = ASCompat.coerce((mRoot : ASAny).UI_town_shop_timer.label_timer, flash.text.TextField);
+		var _loc3_ = ASCompat.coerce((mRoot : ASAny).UI_town_shop_timer.label_remaining, flash.text.TextField);
+		TextUtil.setText(_loc2_, text, 1.18);
+		TextUtil.fitToField(_loc2_);
+		_loc2_.y = _loc3_.y + _loc3_.getLineMetrics(0).ascent - _loc2_.getLineMetrics(0).ascent;
 	}
 
 	function chestRevealResponse(obj:ASObject) {}
@@ -679,7 +728,7 @@ class UIShop {
 				_loc2_ = "December";
 		}
 		var _loc1_ = Std.string(_loc5_.getDate());
-		return _loc4_ + " " + _loc2_ + " " + _loc1_;
+		return _loc4_ + " " + _loc2_.substr(0, 3) + " " + _loc1_;
 	}
 
 	function onWeaponRollOver(gmWeaponItem:GMWeaponItem, power:UInt) {
@@ -713,27 +762,51 @@ class UIShop {
 		displayCategoryPage();
 	}
 
+	public function showPreviousCategory() {
+		showAdjacentCategory(-1);
+	}
+
+	public function showNextCategory() {
+		showAdjacentCategory(1);
+	}
+
+	function showAdjacentCategory(direction:Int) {
+		var _loc2_:UIButton = null;
+		var _loc4_ = CATEGORY_NAVIGATION_ORDER.indexOf(mCurrentTab);
+		if (_loc4_ < 0) {
+			return;
+		}
+		var _loc3_ = (_loc4_ + direction + CATEGORY_NAVIGATION_ORDER.length) % CATEGORY_NAVIGATION_ORDER.length;
+		showTab(CATEGORY_NAVIGATION_ORDER[_loc3_]);
+		if (mUIOffers.length > 0) {
+			_loc2_ = mUIOffers[0].getPrimaryBuyButton();
+			if (_loc2_ != null && _loc2_.canBeFocused()) {
+				mDBFacade.menuNavigationController.setFocusedUiObject(_loc2_);
+			}
+		}
+	}
+
 	function firstWeaponPageForActiveHero():UInt {
-		var _loc1_ = 0;
+		var _loc1_ = (0 : UInt);
 		var _loc5_:Vector<GMOffer> = /*undefined*/ null;
-		var _loc3_ = 0;
-		var _loc6_ = 0;
+		var _loc3_ = (0 : UInt);
+		var _loc6_ = (0 : UInt);
 		var _loc8_:GMOffer = null;
 		var _loc2_:GMWeaponItem = null;
 		var _loc7_ = (0 : UInt);
 		var _loc4_ = ASCompat.coerce(mSelectedHero != null ? mDBFacade.dbAccountInfo.inventoryInfo.getAvatarInfoForHeroType(mSelectedHero.Id) : null,
 			account.AvatarInfo);
 		if (_loc4_ != null) {
-			_loc1_ = (_loc4_.level : Int);
-			_loc5_ = mFilteredGMOffers.itemFor(mCurrentTab);
-			_loc3_ = mCurrentTab == "WEAPON" ? 3 : 6;
-			_loc6_ = 0;
-			while (_loc6_ < ASCompat.toNumberField(_loc5_, "length")) {
-				_loc8_ = ASCompat.coerce(_loc5_[_loc6_], gameMasterDictionary.GMOffer);
+			_loc1_ = _loc4_.levelForWeaponComparison;
+			_loc5_ = (mFilteredGMOffers.itemFor(mCurrentTab) : Vector<GMOffer>);
+			_loc3_ = (mCurrentTab == "WEAPON" ? (3 : UInt) : (6 : UInt) : UInt);
+			_loc6_ = (0 : UInt);
+			while (_loc6_ < (_loc5_.length:UInt)) {
+				_loc8_ = _loc5_[(_loc6_ : Int)];
 				if (_loc8_.Details[0].WeaponId != 0) {
 					_loc2_ = ASCompat.coerce(mDBFacade.gameMaster.weaponItemById.itemFor(_loc8_.Details[0].WeaponId), gameMasterDictionary.GMWeaponItem);
 					_loc7_ = (Math.floor(_loc6_ / _loc3_) : UInt);
-					if (_loc8_.Details[0].Level >= (_loc1_ : UInt)) {
+					if (_loc8_.Details[0].Level >= _loc1_) {
 						return _loc7_;
 					}
 					return (0 : UInt);
@@ -746,7 +819,7 @@ class UIShop {
 
 	function refreshPagination(page:UInt) {
 		var _loc2_ = this.numPagesInCurrentCategory();
-		mPagination.currentPage = mCurrentPage = (ASCompat.floatToInt(_loc2_ != 0 ? (ASCompat.floatToInt(Math.min(_loc2_ - 1,
+		mPagination.currentPage = mCurrentPage = (ASCompat.floatToInt(_loc2_ != 0 ? (ASCompat.floatToInt(Math.min((_loc2_ : Float) - 1,
 			page)) : UInt) : (0 : UInt)) : UInt);
 		mPagination.numPages = _loc2_;
 		mPagination.visible = _loc2_ > 1;
@@ -786,7 +859,7 @@ class UIShop {
 		if (checkNullIteratee(_loc3_))
 			for (_tmp_ in _loc3_) {
 				_loc2_ = _tmp_;
-				if (ASCompat.toBool(_loc2_.isNew)) {
+				if (_loc2_.isNew) {
 					return true;
 				}
 			}
@@ -794,54 +867,54 @@ class UIShop {
 	}
 
 	function filterOffers() {
-		var __ax4_iter_134:Vector<GMOffer>;
+		var __ax4_iter_432:Array<ASAny>;
 		var _loc10_:String = null;
 		var _loc1_:Vector<GMOffer> = /*undefined*/ null;
 		var _loc2_:GMOffer = null;
-		var _loc8_ = 0;
-		var _loc9_ = 0;
-		var _loc11_ = 0;
-		var _loc7_ = 0;
+		var _loc8_ = (0 : UInt);
+		var _loc9_ = (0 : UInt);
+		var _loc11_ = (0 : UInt);
+		var _loc7_ = (0 : UInt);
 		var _loc4_:String = null;
-		var _loc3_ = 0;
+		var _loc3_ = (0 : UInt);
 		var _loc6_:GMHero = null;
 		var _loc5_ = ASCompat.coerce(mSelectedHero != null ? mDBFacade.dbAccountInfo.inventoryInfo.getAvatarInfoForHeroType(mSelectedHero.Id) : null,
 			account.AvatarInfo);
 		mFilteredGMOffers.clear();
-		final __ax4_iter_133 = CATEGORIES;
-		if (checkNullIteratee(__ax4_iter_133))
-			for (_tmp_ in __ax4_iter_133) {
+		final __ax4_iter_431 = CATEGORIES;
+		if (checkNullIteratee(__ax4_iter_431))
+			for (_tmp_ in __ax4_iter_431) {
 				_loc10_ = _tmp_;
 				_loc1_ = new Vector<GMOffer>();
 				mFilteredGMOffers.add(_loc10_, _loc1_);
-				__ax4_iter_134 = mCategorizedGMOffers.itemFor(_loc10_);
-				if (checkNullIteratee(__ax4_iter_134))
-					for (_tmp_ in __ax4_iter_134) {
-						_loc2_ = _tmp_;
-						if (!ASCompat.toBool(_loc2_.SaleTargetOffer)) {
-							if (!ASCompat.toBool(_loc2_.IsCoinAltOffer)) {
+				__ax4_iter_432 = mCategorizedGMOffers.itemFor(_loc10_);
+				if (checkNullIteratee(__ax4_iter_432))
+					for (_tmp_ in __ax4_iter_432) {
+						_loc2_ = ASCompat.coerce(_tmp_, gameMasterDictionary.GMOffer);
+						if (_loc2_.SaleTargetOffer == null) {
+							if (!_loc2_.IsCoinAltOffer) {
 								if (!(_loc10_ == "SPECIAL" && StoreServicesController.alreadyOwns(mDBFacade, _loc2_))) {
-									if (!(ASCompat.toBool(_loc2_.IsBundle) && StoreServicesController.alreadyOwns(mDBFacade, _loc2_))) {
+									if (!(_loc2_.IsBundle && StoreServicesController.alreadyOwns(mDBFacade, _loc2_))) {
 										if (mSelectedHero != null) {
-											_loc11_ = (StoreServicesController.requiredHeroForWeapon(mDBFacade, _loc2_) : Int);
-											if (_loc11_ != 0 && (_loc11_ : UInt) != mSelectedHero.Id) {
+											_loc11_ = StoreServicesController.requiredHeroForWeapon(mDBFacade, _loc2_);
+											if (_loc11_ != 0 && _loc11_ != mSelectedHero.Id) {
 												continue;
 											}
-											_loc7_ = (StoreServicesController.getOfferLevelReq(mDBFacade, _loc2_) : Int);
-											_loc3_ = ASCompat.toInt(_loc5_ != null ? _loc5_.level : 1);
-											_loc4_ = StoreServicesController.getWeaponMastertype(mDBFacade, _loc2_);
+											_loc7_ = StoreServicesController.getOfferLevelReq(mDBFacade, _loc2_);
+											_loc3_ = (ASCompat.toInt(_loc5_ != null ? _loc5_.levelForWeaponComparison : 1) : UInt);
+											_loc4_ = StoreServicesController.getWeaponMasterType(mDBFacade, _loc2_);
 											if (ASCompat.stringAsBool(_loc4_) && !mSelectedHero.AllowedWeapons.hasKey(_loc4_)) {
 												continue;
 											}
 										}
-										_loc8_ = (StoreServicesController.getHeroId(mDBFacade, _loc2_) : Int);
+										_loc8_ = StoreServicesController.getHeroId(mDBFacade, _loc2_);
 										_loc6_ = ASCompat.coerce(mDBFacade.gameMaster.heroById.itemFor(_loc8_), gameMasterDictionary.GMHero);
 										if (!(_loc6_ != null
 											&& _loc6_.Hidden
 											&& !mDBFacade.dbConfigManager.getConfigBoolean("want_hidden_heroes", false))) {
-											if (!(_loc8_ != 0 && mDBFacade.dbAccountInfo.inventoryInfo.ownsItem((_loc8_ : UInt)))) {
-												_loc9_ = (StoreServicesController.getSkinId(mDBFacade, _loc2_) : Int);
-												if (!(_loc9_ != 0 && mDBFacade.dbAccountInfo.inventoryInfo.ownsItem((_loc9_ : UInt)))) {
+											if (!(_loc8_ != 0 && mDBFacade.dbAccountInfo.inventoryInfo.ownsItem(_loc8_))) {
+												_loc9_ = StoreServicesController.getSkinId(mDBFacade, _loc2_);
+												if (!(_loc9_ != 0 && mDBFacade.dbAccountInfo.inventoryInfo.ownsItem(_loc9_))) {
 													_loc1_.push(_loc2_);
 												}
 											}
@@ -868,5 +941,176 @@ class UIShop {
 		if (mDBFacade.dbAccountInfo.activeAvatarInfo.gmHero.Id != _loc1_) {
 			mDBFacade.dbAccountInfo.changeActiveAvatarRPC(_loc1_);
 		}
+	}
+
+	function setupMenuNavigation() {
+		setupHeaderMenuNavigation();
+		setupShopCategoryNavigation();
+	}
+
+	function setupHeaderMenuNavigation() {
+		mTownHeader.setupButtonLinks();
+		mSpecialCategoryButton.upNavigation = mTownHeader.addCoinButton;
+		mHeroCategoryButton.upNavigation = mTownHeader.addCoinButton;
+		mSkinCategoryButton.upNavigation = mTownHeader.addCoinButton;
+		mTownHeader.addCoinButton.isAbove(mWeaponCategoryButton);
+		mChestCategoryButton.upNavigation = mTownHeader.addGemButton;
+		mTownHeader.addGemButton.isAbove(mPetCategoryButton);
+		mStuffCategoryButton.upNavigation = mTownHeader.addGemButton;
+		mTownHeader.closeButton.isAbove(mKeyCategoryButton);
+	}
+
+	function setupShopCategoryNavigation() {
+		mSpecialCategoryButton.isToTheLeftOf(mHeroCategoryButton);
+		mHeroCategoryButton.isToTheLeftOf(mSkinCategoryButton);
+		mSkinCategoryButton.isToTheLeftOf(mWeaponCategoryButton);
+		mWeaponCategoryButton.isToTheLeftOf(mChestCategoryButton);
+		mChestCategoryButton.isToTheLeftOf(mPetCategoryButton);
+		mPetCategoryButton.isToTheLeftOf(mStuffCategoryButton);
+		mStuffCategoryButton.isToTheLeftOf(mKeyCategoryButton);
+	}
+
+	public function setupUIShopOfferNavigationLinks() {
+		var _loc2_ = 0;
+		var _loc1_ = 0;
+		resetUIShopCategoriesNavigationLinks();
+		setShopFocusedObjectAfterRefreshing();
+		if (numOffersInCurrentCategory() <= 0) {
+			getNextTabButton(mCurrentTab).downNavigation = mHeroWithEquipPicker.getFirstHeroSlotUIObject();
+			mHeroWithEquipPicker.resetHeroWithEquipPickerMenuNavigation();
+			mHeroWithEquipPicker.setupHeroWithEquipPickerMenuNavigation(getNextTabButton(mCurrentTab));
+			return;
+		}
+		mHeroWithEquipPicker.resetHeroWithEquipPickerMenuNavigation();
+		mHeroWithEquipPicker.setupHeroWithEquipPickerMenuNavigation(mUIOffers[0]);
+		mSpecialCategoryButton.downNavigation = mUIOffers[0];
+		mHeroCategoryButton.downNavigation = mUIOffers[0];
+		mSkinCategoryButton.downNavigation = mUIOffers[0];
+		mWeaponCategoryButton.downNavigation = mUIOffers[0];
+		mChestCategoryButton.downNavigation = mUIOffers[0];
+		mPetCategoryButton.downNavigation = mUIOffers[0];
+		mStuffCategoryButton.downNavigation = mUIOffers[0];
+		mKeyCategoryButton.downNavigation = mUIOffers[0];
+		_loc2_ = 0;
+		while (_loc2_ < mUIOffers.length) {
+			if (mUIOffers[_loc2_].mBuyButton.visible) {
+				mUIOffers[_loc2_].isAbove(mUIOffers[_loc2_].mBuyButton);
+				if (_loc2_ > 0) {
+					mUIOffers[_loc2_].mBuyButton.leftNavigation = mUIOffers[_loc2_ - 1].mBuyButton;
+				}
+				if (_loc2_ + 1 < mUIOffers.length) {
+					mUIOffers[_loc2_].mBuyButton.rightNavigation = mUIOffers[_loc2_ + 1].mBuyButton;
+				}
+				if (_loc2_ + 3 < mUIOffers.length) {
+					mUIOffers[_loc2_].mBuyButton.downNavigation = mUIOffers[_loc2_ + 3].mBuyButton;
+				} else {
+					mUIOffers[_loc2_].mBuyButton.downNavigation = mHeroWithEquipPicker.getFirstHeroSlotUIObject();
+				}
+				if (_loc2_ + 1 == mUIOffers.length) {
+					mUIOffers[_loc2_].mBuyButton.downNavigation = mHeroWithEquipPicker.getFirstHeroSlotUIObject();
+					mHeroWithEquipPicker.resetHeroWithEquipPickerMenuNavigation();
+					mHeroWithEquipPicker.setupHeroWithEquipPickerMenuNavigation(mUIOffers[_loc2_]);
+				}
+			} else if (mUIOffers[_loc2_].mBuyButtonTimerBasedSale.visible) {
+				if (mCurrentTab == "WEAPON") {
+					mUIOffers[_loc2_].isAbove(mUIOffers[_loc2_].mBuyButtonTimerBasedSale);
+					if (_loc2_ > 0) {
+						mUIOffers[_loc2_].mBuyButtonTimerBasedSale.leftNavigation = mUIOffers[_loc2_ - 1].mBuyButtonTimerBasedSale;
+					}
+					if (_loc2_ + 1 < mUIOffers.length) {
+						mUIOffers[_loc2_].mBuyButtonTimerBasedSale.rightNavigation = mUIOffers[_loc2_ + 1].mBuyButtonTimerBasedSale;
+					}
+					if (_loc2_ == mUIOffers.length - 1) {
+						if (mCurrentPage == 0 && mPagination.numPages > 1) {
+							mUIOffers[_loc2_].mBuyButtonTimerBasedSale.downNavigation = mPagination.getPageButton((mPagination.numPages - 1:Int));
+						} else if (mPagination.numPages > 1) {
+							mUIOffers[_loc2_].mBuyButtonTimerBasedSale.downNavigation = mPagination.getPageButton((mCurrentPage - 1 : Int));
+						}
+					}
+				} else {
+					mUIOffers[_loc2_].isAbove(mUIOffers[_loc2_].mBuyButtonTimerBasedSale);
+					if (_loc2_ > 0) {
+						mUIOffers[_loc2_].mBuyButtonTimerBasedSale.leftNavigation = mUIOffers[_loc2_ - 1].mBuyButtonTimerBasedSale;
+					}
+					if (_loc2_ + 1 < mUIOffers.length) {
+						mUIOffers[_loc2_].mBuyButtonTimerBasedSale.rightNavigation = mUIOffers[_loc2_ + 1].mBuyButtonTimerBasedSale;
+					}
+				}
+			}
+			if (_loc2_ < 3) {
+				mUIOffers[_loc2_].upNavigation = getNextTabButton(mCurrentTab);
+			}
+			if (_loc2_ + 1 < mUIOffers.length) {
+				mUIOffers[_loc2_].isToTheLeftOf(mUIOffers[_loc2_ + 1]);
+			}
+			if (_loc2_ + 3 < mUIOffers.length) {
+				mUIOffers[_loc2_ + 3].upNavigation = mUIOffers[_loc2_];
+			}
+			_loc2_++;
+		}
+		if (mPagination.numPages > 1) {
+			_loc1_ = 0;
+			while ((_loc1_ : UInt) < numPagesInCurrentCategory()) {
+				if (_loc1_ > 0) {
+					mPagination.getPageButton(_loc1_ - 1).isToTheLeftOf(mPagination.getPageButton(_loc1_));
+				}
+				mPagination.getPageButton(_loc1_).upNavigation = mUIOffers[mUIOffers.length - 1];
+				mPagination.getPageButton(_loc1_).downNavigation = mHeroWithEquipPicker.getFirstHeroSlotUIObject();
+				_loc1_++;
+			}
+			mHeroWithEquipPicker.resetHeroWithEquipPickerMenuNavigation();
+			mHeroWithEquipPicker.setupHeroWithEquipPickerMenuNavigation(mPagination.getPageButton(0));
+		}
+	}
+
+	public function resetUIShopCategoriesNavigationLinks() {
+		mSpecialCategoryButton.clearDownNavigation();
+		mHeroCategoryButton.clearDownNavigation();
+		mSkinCategoryButton.clearDownNavigation();
+		mWeaponCategoryButton.clearDownNavigation();
+		mChestCategoryButton.clearDownNavigation();
+		mPetCategoryButton.clearDownNavigation();
+		mStuffCategoryButton.clearDownNavigation();
+		mKeyCategoryButton.clearDownNavigation();
+	}
+
+	function setShopFocusedObjectAfterRefreshing() {
+		mDBFacade.menuNavigationController.setFocusedUiObject(getNextTabButton(mCurrentTab));
+		if (mPagination.numPages > 1) {
+			if (mPagination.currentPage + 1 < mPagination.numPages) {
+				mDBFacade.menuNavigationController.setFocusedUiObject(mPagination.getPageButton((mPagination.currentPage + 1:Int)));
+			} else {
+				mDBFacade.menuNavigationController.setFocusedUiObject(mPagination.getPageButton(0));
+			}
+		}
+	}
+
+	function getNextTabButton(currentTab:String):UIRadioButton {
+		if (currentTab == "SPECIAL") {
+			return mHeroCategoryButton;
+		}
+		if (currentTab == "HERO") {
+			return mSkinCategoryButton;
+		}
+		if (currentTab == "SKIN") {
+			return mWeaponCategoryButton;
+		}
+		if (currentTab == "WEAPON") {
+			return mChestCategoryButton;
+		}
+		if (currentTab == "CHEST") {
+			return mPetCategoryButton;
+		}
+		if (currentTab == "PET") {
+			return mStuffCategoryButton;
+		}
+		if (currentTab == "STUFF") {
+			return mKeyCategoryButton;
+		}
+		if (currentTab == "KEY") {
+			return mSpecialCategoryButton;
+		}
+		Logger.warn("currentTab cannot be null");
+		return null;
 	}
 }

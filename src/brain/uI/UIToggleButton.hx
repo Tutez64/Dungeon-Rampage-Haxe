@@ -21,4 +21,12 @@ class UIToggleButton extends UIButton {
 		selectionChangeCallback(m_id, this.selected);
 		super.onRelease(event);
 	}
+
+	override public function onSelected(fromController:Bool = false) {
+		this.selected = !this.selected;
+		if (selectionChangeCallback != null) {
+			selectionChangeCallback(m_id, this.selected);
+		}
+		super.onSelected(fromController);
+	}
 }

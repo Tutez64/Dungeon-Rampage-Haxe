@@ -6,6 +6,7 @@ import brain.workLoop.LogicalWorkComponent;
 import combat.attack.AttackTimeline;
 import combat.attack.PotentialWeaponInputQueueStruct;
 import combat.attack.ScriptTimeline;
+import dBGlobals.DBGlobal;
 import distributedObjects.HeroGameObjectOwner;
 import events.FirstCooldownEvent;
 import facade.DBFacade;
@@ -38,9 +39,9 @@ class WeaponController {
 
 	var mTimeStartedAttack:Float = Math.NaN;
 
-	var mTimeStartedCurrentAttack:Int = 0;
-
 	var mQueueAttack:GMAttack;
+
+	var mAttackSerial:UInt = (0 : UInt);
 
 	public function new(dbFacade:DBFacade, controlledWeapon:WeaponGameObject, hero:HeroGameObjectOwner) {
 		mDBFacade = dbFacade;
@@ -84,6 +85,7 @@ class WeaponController {
 		var actorAttackSpeed:Float;
 		var buffMult:Float;
 		var baseAttackSpeed:Float;
+		var attackSerial:UInt;
 		var stopCallback:ASFunction;
 		var gmAttack = ASCompat.coerce(mDBFacade.gameMaster.attackById.itemFor(attackType), gameMasterDictionary.GMAttack);
 		var attackSpeedMultiplier:Float = 1;
@@ -105,13 +107,15 @@ class WeaponController {
 		}
 		stopCurrentTimeline();
 		mCurrentAttackTimeline = mWeapon.getAttackTimeline(attackType);
-		mTimeStartedCurrentAttack = mLogicalWorkComponent.gameClock.gameTime;
 		if (mCurrentAttackTimeline == null) {
 			Logger.error("AttackTimeline for attack: <" + attackType + "> was null. Ignoring onWeaponDown");
 			return false;
 		}
+		attackSerial = ++mAttackSerial;
 		stopCallback = function() {
-			mCurrentAttackTimeline = null;
+			if (attackSerial == mAttackSerial) {
+				mCurrentAttackTimeline = null;
+			}
 		};
 		mHero.attack(attackType, null, attackSpeedMultiplier, mCurrentAttackTimeline, function() {
 			finishedAttack(autoAim, (ASCompat.floatToInt(attackSpeedModifier) : UInt));
@@ -120,36 +124,35 @@ class WeaponController {
 		var attackStarted = (mCurrentAttackTimeline == null || mCurrentAttackTimeline.isPlaying);
 
 		if (attackStarted && autoStartCooldown && gmAttack.CooldownLength > 0) {
-			startCooldown();
+			startCooldown(gmAttack);
 		}
 
 		return attackStarted;
 	}
 
-	@:isVar public var currentAttackStartTime(get, never):Int;
-
-	public function get_currentAttackStartTime():Int {
-		return mTimeStartedCurrentAttack;
-	}
-
 	function finishedAttack(autoAim:Bool, attackSpeedModifier:UInt) {
+		var _loc3_:GMAttack = null;
 		if (mQueueAttack != null) {
-			attack(mQueueAttack.Id, autoAim, attackSpeedModifier);
+			_loc3_ = mQueueAttack;
 			mQueueAttack = null;
+			attack(_loc3_.Id, autoAim, attackSpeedModifier);
 		}
 	}
 
 	public function doQueue() {
+		var _loc1_:GMAttack = null;
 		if (mQueueAttack != null) {
-			attack(mQueueAttack.Id, false, 1);
+			_loc1_ = mQueueAttack;
 			mQueueAttack = null;
+			attack(_loc1_.Id, false, 1);
 		}
 	}
 
-	public function startCooldown() {
+	public function startCooldown(gmAttack:GMAttack = null) {
 		mIsInCooldown = true;
-		var _loc1_ = ASCompat.floatAsBool(currentTimeline.currentGMAttack.CooldownLength) ? currentTimeline.currentGMAttack.CooldownLength : currentTimeline.currentGMAttack.AIRechargeT;
-		mCoolDownTime = _loc1_ * 1000 * weapon.cooldownReduction() - _loc1_ * 1000 * mHero.attackCooldownMultiplier;
+		var _loc3_ = gmAttack ?? currentTimeline.currentGMAttack;
+		var _loc2_ = ASCompat.floatAsBool(_loc3_.CooldownLength) ? _loc3_.CooldownLength : _loc3_.AIRechargeT;
+		mCoolDownTime = _loc2_ * 1000 * weapon.cooldownReduction() - _loc2_ * 1000 * mHero.attackCooldownMultiplier;
 		mTimeStartedAttack = mLogicalWorkComponent.gameClock.gameTime;
 		updateHudCooldown(true);
 		mLogicalWorkComponent.doEveryFrame(updateCooldown);
@@ -175,14 +178,14 @@ class WeaponController {
 	}
 
 	function getNextAttackId():UInt {
-		var _loc2_ = 0;
+		var _loc2_ = (0 : UInt);
 		var _loc1_ = getAttackFromComboArray();
 		if (_loc1_ == null) {
-			_loc2_ = 0;
+			_loc2_ = (0 : UInt);
 		} else {
-			_loc2_ = (_loc1_.Id : Int);
+			_loc2_ = _loc1_.Id;
 		}
-		return (_loc2_ : UInt);
+		return _loc2_;
 	}
 
 	function buildAttackArray() {
@@ -203,7 +206,7 @@ class WeaponController {
 					mAttackArray.push(_loc3_);
 				}
 			}
-		if (mAttackArray.length == 0) {
+		if (mAttackArray.length == 0 && mWeapon.weaponData.Id != DBGlobal.CONSUMABLE_WEAPON_ID) {
 			Logger.warn("Did not find any attacks for weaponId: " + mWeapon.weaponData.Id);
 		}
 	}
@@ -249,16 +252,13 @@ class WeaponController {
 
 	public function canCombo():Bool {
 		if (mCurrentAttackTimeline != null) {
-			if (mCurrentAttackTimeline.isAttackWithinComboWindow()) {
-				return true;
-			}
-			return false;
+			return mCurrentAttackTimeline.isAttackWithinComboWindow();
 		}
 		return true;
 	}
 
 	public function berserkModeStart() {
-		if (mWeapon.weaponData.ClassType == "MELEE") {
+		if (mWeapon.weaponData.ClassType == DBGlobal.MELEE_ITEM_CATEGORY) {
 			overrideAttacksWithRampage();
 		}
 	}

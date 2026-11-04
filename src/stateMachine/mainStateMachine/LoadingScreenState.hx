@@ -5,14 +5,18 @@ import brain.assetRepository.AssetLoadingComponent;
 import brain.assetRepository.SwfAsset;
 import brain.clock.GameClock;
 import brain.event.EventComponent;
+import brain.event.EventListeners;
 import brain.logger.Logger;
 import brain.sceneGraph.SceneGraphComponent;
 import brain.stateMachine.State;
 import brain.uI.UIProgressBar;
 import brain.utils.MemoryTracker;
 import brain.utils.MemoryUtil;
+import brain.utils.TextUtil;
+import brain.workLoop.DoLater;
 import brain.workLoop.LogicalWorkComponent;
 import brain.workLoop.Task;
+import dBGlobals.DBGlobal;
 import distributedObjects.HeroGameObjectOwner;
 import events.CacheLoadRequestNpcEvent;
 import events.ClientExitCompleteEvent;
@@ -23,16 +27,16 @@ import facade.TrickleCacheLoader;
 import gameMasterDictionary.GMMapNode;
 import uI.popup.DBUIOneButtonPopup;
 import uI.UIHints;
-import com.greensock.TweenMax;
 import flash.display.MovieClip;
 import flash.events.Event;
 import flash.events.KeyboardEvent;
 import flash.events.MouseEvent;
 import flash.text.TextField;
+import brain.event.EventListeners;
 import brain.sceneGraph.SceneGraphComponent;
-import brain.uI.UIButton;
 import facade.DBFacade;
-import flash.display.MovieClip;
+import sound.DBSoundManager;
+import uI.CutsceneOverlay;
 import flash.display.Shape;
 import flash.events.KeyboardEvent;
 import flash.events.NetStatusEvent;
@@ -43,6 +47,8 @@ import flash.net.NetStream;
 
 class LoadingScreenState extends State {
 	public static inline final NAME = "LoadingScreenState";
+
+	public static inline final HERO_ENTRY_RELEASED = "LOADING_SCREEN_HERO_ENTRY_RELEASED";
 
 	public static inline final ERROR_NONE_PARSABLE_DEMOGRAPHICS = (102 : UInt);
 
@@ -64,6 +70,14 @@ class LoadingScreenState extends State {
 
 	static inline final LERP_RATE:Float = 0.04;
 
+	static inline final LEGACY_PROGRESS_WEIGHT:Float = 0.5;
+
+	static inline final FLOOR_PROGRESS_WEIGHT:Float = 0.1;
+
+	static inline final STARLING_PROGRESS_WEIGHT:Float = 0.4;
+
+	static inline final NETWORK_WAIT_EASE_RATE:Float = 0.005;
+
 	static inline final MINIMUM_LOADING_SECONDS:Float = 3;
 
 	static inline final LOADING_SCREEN_PATH = "Resources/Art2D/UI/db_UI_loading_screen.swf";
@@ -72,9 +86,13 @@ class LoadingScreenState extends State {
 
 	var mMinimumLoadingSeconds:Float = 3;
 
+	var mFloorDetails:FloorDetailsWait;
+
 	var mFinishLoadingCallback:ASFunction;
 
 	var mHasCalledFinishLoadingCallback:Bool = false;
+
+	var mHeroEntryHeld:Bool = false;
 
 	var mDBFacade:DBFacade;
 
@@ -101,6 +119,16 @@ class LoadingScreenState extends State {
 	var mScreenLoaded:Bool = false;
 
 	var mHeroOwnerReady:Bool = false;
+
+	var mStarlingAssetsPending:Bool = false;
+
+	var mLegacyAssetsReady:Bool = false;
+
+	var mFloorRequested:Bool = false;
+
+	var mFloorReady:Bool = false;
+
+	var mStarlingBundlesLoadedAtStart:UInt = 0;
 
 	var mMapNodeID:UInt = 0;
 
@@ -132,16 +160,39 @@ class LoadingScreenState extends State {
 		mScreenLoaded = false;
 		mHeroOwnerReady = false;
 		mFriendOnly = false;
+		mFloorDetails = new FloorDetailsWait(function(param1:Float, param2:ASFunction):ASObject {
+			return mDBFacade.realClockWorkManager.doLater(param1, param2, false, "LoadingScreenState");
+		}, function(param1:ASObject) {
+			mDBFacade.realClockWorkManager.removeDoLater(ASCompat.dynamicAs(param1, DoLater));
+		}, floorDetailsDone);
+	}
+
+	@:isVar public var holdsHeroEntry(get, never):Bool;
+
+	public function get_holdsHeroEntry():Bool {
+		return mHeroEntryHeld;
 	}
 
 	public function heroOwnerReady(e:Event) {
 		mDBFacade.metrics.log("DungeonLoadHeroReady", {});
 		mHeroOwnerReady = true;
+		mFloorDetails.heroReady();
 		checkIfReadyToMoveOn();
 	}
 
 	function floorInterestClosureEventCallback(e:Event) {
 		AssetLoader.stopTrackingLoads();
+		mFloorReady = true;
+		mFloorDetails.closureArrived();
+	}
+
+	function floorDetailsDone(timedOut:Bool) {
+		var _loc2_ = Math.NaN;
+		if (timedOut) {
+			_loc2_ = (mDBFacade.gameClock.realTime - (mLoadingStartTime : Float)) / 1000;
+			mDBFacade.metrics.log("DungeonLoadFloorDetailsTimeout", {"timeSpentSeconds": _loc2_});
+		}
+		checkIfReadyToMoveOn();
 	}
 
 	function ponderPlayMovie():Bool {
@@ -170,12 +221,27 @@ class LoadingScreenState extends State {
 		MemoryTracker.nextGeneration();
 		mLoadingStartTime = (mDBFacade.gameClock.realTime : UInt);
 		mHeroOwnerReady = false;
+		mFloorDetails.begin();
+		mStarlingAssetsPending = false;
+		mLegacyAssetsReady = false;
+		mFloorRequested = false;
+		mFloorReady = false;
+		mStarlingBundlesLoadedAtStart = mDBFacade.assetLoadingComponent.starlingBundlesLoaded;
+		mHeroEntryHeld = true;
+		mEventComponent.addListener("StarlingAssetsQueued", starlingAssetsQueued);
+		mEventComponent.addListener("StarlingAssetsReady", starlingAssetsReady);
 		mEventComponent.addListener("FLOOR_INTEREST_CLOSURE", floorInterestClosureEventCallback);
 		mEventComponent.addListener(HeroGameObjectOwner.HERO_OWNER_READY, heroOwnerReady);
 		mEventComponent.addListener("REQUEST_ENTRY_FAILED", failedRequestEntry);
 		mEventComponent.addListener("CLIENT_EXIT_COMPLETE", GraceFullClientExited);
 		mEventComponent.addListener("Busterncpccahche_event", TickleCacheWithEvent);
 		mAssetLoadingComponent.getSwfAsset(DBFacade.buildFullDownloadPath("Resources/Art2D/UI/db_UI_loading_screen.swf"), setUpLoadingScreen);
+		if (mDBFacade.assetLoadingComponent != null) {
+			mDBFacade.assetLoadingComponent.beginEntry();
+			TrickleCacheLoader.queueCommonStarlingAtlases(mDBFacade);
+			TrickleCacheLoader.queueHeroKitStarlingAtlases(mDBFacade);
+			mStarlingAssetsPending = mDBFacade.assetLoadingComponent.isStarlingLoadPending;
+		}
 		AssetLoader.startTrackingLoads(finishedLoading);
 		var _loc1_ = (0 : UInt);
 		if (mFriendOnly) {
@@ -193,10 +259,10 @@ class LoadingScreenState extends State {
 
 	function failedRequestEntry(event:RequestEntryFailedEvent) {
 		var _loc3_ = event.errorCode;
-		var _loc2_ = new DBUIOneButtonPopup(mDBFacade, Locale.getString("MATCHMAKER_REFUSES_TITLE"), Locale.getError((_loc3_ : Int)), Locale.getString("OK"),
-			failedRequestEntryDialogClose, true, failedRequestEntryDialogClose);
+		var _loc2_ = new DBUIOneButtonPopup(mDBFacade, "MATCHMAKER_REFUSED_POPUP", Locale.getString("MATCHMAKER_REFUSES_TITLE"),
+			Locale.getError((_loc3_ : Int)), Locale.getString("OK"), failedRequestEntryDialogClose, true, failedRequestEntryDialogClose);
 		MemoryTracker.track(_loc2_, "DBUIOneButtonPopup - created in LoadingScreenState.failedRequestEntry()");
-		var _loc4_ = (mDBFacade.gameClock.realTime - mLoadingStartTime) / 1000;
+		var _loc4_ = (mDBFacade.gameClock.realTime - (mLoadingStartTime : Float)) / 1000;
 		mDBFacade.metrics.log("DungeonLoadFailed", {
 			"errorCode": _loc3_,
 			"timeSpentSeconds": _loc4_
@@ -219,10 +285,10 @@ class LoadingScreenState extends State {
 	function setUpLoadingScreen(swfAsset:SwfAsset) {
 		var _loc2_:Dynamic = null;
 		var _loc3_:String = null;
-		if (nodeType == "DUNGEON" || nodeType == "") {
+		if (nodeType == GMMapNode.DUNGEON_NODE_TYPE || nodeType == "") {
 			_loc2_ = swfAsset.getClass("loading_gate_random");
 			_loc3_ = Locale.getString("LOADING_SCREEN_RANDOM_LABEL");
-		} else if (nodeType == "INFINITE") {
+		} else if (nodeType == GMMapNode.INFINITE_NODE_TYPE) {
 			_loc2_ = swfAsset.getClass("loading_gate_ultimate_random");
 			_loc3_ = Locale.getString("LOADING_SCREEN_RANDOM_LABEL");
 		} else {
@@ -231,10 +297,10 @@ class LoadingScreenState extends State {
 		}
 		mLoadingScreenRoot = ASCompat.coerce(ASCompat.createInstance(_loc2_, []), flash.display.MovieClip);
 		mLoadingScreenLabel = ASCompat.coerce((mLoadingScreenRoot : ASAny).loading_gate_text_hint.label, flash.text.TextField);
-		mLoadingScreenLabel.text = _loc3_;
+		TextUtil.setText(mLoadingScreenLabel, _loc3_);
 		mLoadingBarClip = ASCompat.coerce((mLoadingScreenRoot : ASAny).loading_gate_text_hint.UI_loadingBar, flash.display.MovieClip);
 		mLoadingBarClip.visible = true;
-		mLoadingBarClip.scaleX = mLoadingBarClip.scaleY = 1.8;
+		mLoadingBarClip.scaleX = mLoadingBarClip.scaleY = DBGlobal.UI_16_TO_9_PORT_OBJECT_SCALE;
 		mLoadingBarClip.x = 548.7;
 		mLoadingBarClip.y = 1000;
 		mHint = new UIHints(mDBFacade, ASCompat.coerce((mLoadingScreenRoot : ASAny).loading_gate_text_hint.hint, flash.display.MovieClip));
@@ -242,8 +308,8 @@ class LoadingScreenState extends State {
 		mProgressTarget = 0;
 		mLoadingBar.value = 0;
 		mScreenLoaded = true;
-		mDBFacade.stageRef.addEventListener("keyDown", keyCall);
-		mDBFacade.stageRef.addEventListener("mouseDown", handleMouseDown);
+		EventListeners.add(mDBFacade.stageRef, "keyDown", keyCall);
+		EventListeners.add(mDBFacade.stageRef, "mouseDown", handleMouseDown);
 		mMinimumLoadingSeconds = 3;
 		if (mScreenLoaded && mDBFacade.mainStateMachine.currentStateName == "LoadingScreenState") {
 			mSceneGraphComponent.addChild(mLoadingScreenRoot, (100 : UInt));
@@ -253,56 +319,117 @@ class LoadingScreenState extends State {
 
 	function updateProgress(clock:GameClock) {
 		var _loc2_ = Math.NaN;
+		var _loc3_ = Math.NaN;
 		if (!mScreenLoaded) {
 			return;
 		}
-		AssetLoader.updateTrackedLoads();
-		if (mLoadingBar != null && AssetLoader.pendingBytesTotal > 0) {
-			_loc2_ = AssetLoader.pendingBytesLoaded / AssetLoader.pendingBytesTotal;
-			mProgressTarget = Math.max(mLoadingBar.value, _loc2_);
-			var _loc3_ = 1 - Math.pow(1 - 0.04, clock.tickLength / GameClock.ANIMATION_FRAME_DURATION);
-			mLoadingBar.value += (mProgressTarget - mLoadingBar.value) * _loc3_;
+		if (!mFloorRequested) {
+			AssetLoader.updateTrackedLoads();
+		}
+		if (mLoadingBar != null) {
+			_loc2_ = 0.5 * legacyProgress(clock) + (mFloorReady ? 0.1 : 0) + 0.4 * starlingProgress();
+			mProgressTarget = Math.max(mProgressTarget, _loc2_);
+			if (waitingOnNetwork()) {
+				_loc3_ = nextMilestone(_loc2_);
+				if (mProgressTarget < _loc3_) {
+					mProgressTarget += (_loc3_ - mProgressTarget) * 0.005;
+				}
+			}
+			mLoadingBar.value += (mProgressTarget - mLoadingBar.value) * 0.04;
 		}
 	}
 
+	function waitingOnNetwork():Bool {
+		if (mStarlingAssetsPending) {
+			return false;
+		}
+		if (!mFloorRequested) {
+			return !mLegacyAssetsReady && AssetLoader.pendingBytesTotal == 0;
+		}
+		return !mHeroOwnerReady || mFloorDetails.pending;
+	}
+
+	function nextMilestone(earned:Float):Float {
+		if (!mFloorRequested) {
+			return 0.5;
+		}
+		if (!mFloorReady) {
+			return earned + 0.1;
+		}
+		var _loc2_ = mDBFacade.assetLoadingComponent.starlingBundlesLoaded - mStarlingBundlesLoadedAtStart;
+		return 0.5 + 0.1 + 0.4 * (_loc2_ + 1) / (_loc2_ + 2);
+	}
+
+	function legacyProgress(clock:GameClock):Float {
+		if (!mHeroEntryHeld) {
+			return 1;
+		}
+		var _loc2_ = mLegacyAssetsReady ? 1 : (AssetLoader.pendingBytesTotal > 0 ? AssetLoader.pendingBytesLoaded / AssetLoader.pendingBytesTotal : 0);
+		var _loc3_ = mMinimumLoadingSeconds > 0 ? (clock.realTime - (mLoadingStartTime : Float)) / (1000 * mMinimumLoadingSeconds) : 1;
+		return Math.min(_loc2_, _loc3_);
+	}
+
+	function starlingProgress():Float {
+		var _loc1_ = mDBFacade.assetLoadingComponent;
+		var _loc2_ = _loc1_.starlingBundlesLoaded - mStarlingBundlesLoadedAtStart;
+		var _loc4_ = _loc1_.activeStarlingBundleCount;
+		var _loc3_ = _loc2_ + _loc4_ + _loc1_.pendingStarlingBundleCount + (mHeroOwnerReady ? 0 : 1);
+		if (_loc3_ == 0) {
+			return 1;
+		}
+		return (_loc2_ + _loc1_.starlingLoadProgress) / _loc3_;
+	}
+
 	function TickleCacheWithEvent(event:CacheLoadRequestNpcEvent) {
-		var _loc2_ = 0;
+		var _loc2_ = (0 : UInt);
 		mDBFacade.metrics.log("DungeonLoadCacheStarted", {});
-		_loc2_ = 0;
-		while (_loc2_ < event.tilelibraryname.length) {
-			TrickleCacheLoader.tilelibrary(event.tilelibraryname[_loc2_], mDBFacade);
+		_loc2_ = (0 : UInt);
+		while (_loc2_ < (event.tileLibraryName.length:UInt)) {
+			TrickleCacheLoader.tileLibrary(event.tileLibraryName[(_loc2_ : Int)], mDBFacade);
 			_loc2_++;
 		}
 		TrickleCacheLoader.swfAsset(DBFacade.buildFullDownloadPath("Resources/Art2D/UI/db_UI_HUD.swf"), mDBFacade);
 		TrickleCacheLoader.swfAsset(DBFacade.buildFullDownloadPath("Resources/Art2D/FX/db_fx_library.swf"), mDBFacade);
 		TrickleCacheLoader.swfAsset(DBFacade.buildFullDownloadPath("Resources/Art2D/Doobers/db_items_doobers.swf"), mDBFacade);
-		TrickleCacheLoader.swfAsset(DBFacade.buildFullDownloadPath("Resources/Audio/soundEffects.swf"), mDBFacade);
+		TrickleCacheLoader.swfAsset(DBFacade.buildFullDownloadPath(DBGlobal.SFX_PATH), mDBFacade);
 		TrickleCacheLoader.swfAsset(DBFacade.buildFullDownloadPath("Resources/Art2D/UI/db_UI_nametag.swf"), mDBFacade);
 		TrickleCacheLoader.swfAsset(DBFacade.buildFullDownloadPath("Resources/Art2D/Icons/Weapons/db_icons_weapon_axes.swf"), mDBFacade);
 		TrickleCacheLoader.swfAsset(DBFacade.buildFullDownloadPath("Resources/Art2D/Icons/Weapons/db_icons_weapon_hammers.swf"), mDBFacade);
 		TrickleCacheLoader.swfAsset(DBFacade.buildFullDownloadPath("Resources/Art2D/Icons/Weapons/db_icons_weapon_throwingweapons.swf"), mDBFacade);
 		TrickleCacheLoader.swfAsset(DBFacade.buildFullDownloadPath("Resources/Art2D/Icons/Charge/db_icons_charge.swf"), mDBFacade);
 		TrickleCacheLoader.swfAsset(DBFacade.buildFullDownloadPath("Resources/Art2D/projectiles/db_projectiles_library.swf"), mDBFacade);
-		TrickleCacheLoader.loadHero(mDBFacade, mDBFacade.dbAccountInfo.activeAvatarInfo.skinId);
-		TrickleCacheLoader.npcVector(event.cacheNpc, mDBFacade);
 		TrickleCacheLoader.swfVector(event.cacheSwf, mDBFacade);
 		AssetLoader.stopTrackingLoads();
 	}
 
+	function starlingAssetsQueued(e:Event) {
+		mStarlingAssetsPending = true;
+	}
+
+	function starlingAssetsReady(e:Event) {
+		mStarlingAssetsPending = false;
+		checkIfReadyToMoveOn();
+	}
+
 	function checkIfReadyToMoveOn() {
 		var _loc1_ = Math.NaN;
-		if (mTask == null && mHeroOwnerReady) {
-			_loc1_ = (mDBFacade.gameClock.realTime - mLoadingStartTime) / 1000;
+		if (!mHeroEntryHeld && mHeroOwnerReady && !mFloorDetails.pending && !mStarlingAssetsPending) {
+			_loc1_ = (mDBFacade.gameClock.realTime - (mLoadingStartTime : Float)) / 1000;
 			mDBFacade.metrics.log("DungeonLoaded", {"timeSpentSeconds": _loc1_});
 			mFinishedCallback();
+			mEventComponent.dispatchEvent(new Event("FLOOR_REVEALED"));
 		}
 	}
 
 	function finishedLoading() {
 		var timeTakenToLoadSoFar:Float;
 		var timeLeftToLoad:Float;
+		mLegacyAssetsReady = true;
 		mDBFacade.metrics.log("DungeonLoadCacheFinished", {});
-		timeTakenToLoadSoFar = (mDBFacade.gameClock.realTime - mLoadingStartTime) / 1000;
+		mDBFacade.createHUD();
+		mFloorRequested = true;
+		mEventComponent.dispatchEvent(new Event("REQUEST_ENTRY_PLAYER_FLOOR"));
+		timeTakenToLoadSoFar = (mDBFacade.gameClock.realTime - (mLoadingStartTime : Float)) / 1000;
 		timeLeftToLoad = Math.max(0, mMinimumLoadingSeconds - timeTakenToLoadSoFar);
 		mHasCalledFinishLoadingCallback = false;
 		mFinishLoadingCallback = function() {
@@ -311,19 +438,17 @@ class LoadingScreenState extends State {
 			}
 			mHasCalledFinishLoadingCallback = true;
 			mFinishLoadingCallback = null;
-			mDBFacade.createHUD();
-			mEventComponent.dispatchEvent(new Event("REQUEST_ENTRY_PLAYER_FLOOR"));
-			mTask.destroy();
-			mTask = null;
+			mHeroEntryHeld = false;
+			mEventComponent.dispatchEvent(new Event("LOADING_SCREEN_HERO_ENTRY_RELEASED"));
 			checkIfReadyToMoveOn();
 		};
-		TweenMax.delayedCall(timeLeftToLoad, mFinishLoadingCallback);
+		mDBFacade.mTween.delayedCall(timeLeftToLoad, mFinishLoadingCallback);
 	}
 
 	function forceFinishLoading() {
 		mMinimumLoadingSeconds = 0;
 		if (mFinishLoadingCallback != null) {
-			TweenMax.killDelayedCallsTo(mFinishLoadingCallback);
+			mDBFacade.mTween.killDelayedCallsTo(mFinishLoadingCallback);
 			mFinishLoadingCallback();
 		}
 	}
@@ -344,15 +469,27 @@ class LoadingScreenState extends State {
 			mHint.destroy();
 		}
 		mHint = null;
+		if (mFinishLoadingCallback != null) {
+			mDBFacade.mTween.killDelayedCallsTo(mFinishLoadingCallback);
+			mFinishLoadingCallback = null;
+		}
 		AssetLoader.abortTrackingLoads();
 		mSceneGraphComponent.removeChild(mLoadingScreenRoot);
 		mSceneGraphComponent.removeChild(mLoadingBarClip);
 		mEventComponent.removeAllListeners();
-		mDBFacade.stageRef.removeEventListener("keyDown", keyCall);
-		mDBFacade.stageRef.removeEventListener("mouseDown", handleMouseDown);
+		EventListeners.remove(mDBFacade.stageRef, "keyDown", keyCall);
+		EventListeners.remove(mDBFacade.stageRef, "mouseDown", handleMouseDown);
 		if (mTask != null) {
 			mTask.destroy();
 			mTask = null;
+		}
+		mFloorDetails.stop();
+		if (mFinishLoadingCallback != null) {
+			mDBFacade.mTween.killDelayedCallsTo(mFinishLoadingCallback);
+			mFinishLoadingCallback = null;
+		}
+		if (mDBFacade.assetLoadingComponent != null) {
+			mDBFacade.assetLoadingComponent.endEntry();
 		}
 		super.exitState();
 	}
@@ -427,7 +564,7 @@ private class VideoPlayer {
 
 	var mCutVideoBackGround:Shape;
 
-	var mUIButton:UIButton;
+	var mOverlay:CutsceneOverlay;
 
 	var mSceneGraphComponent:SceneGraphComponent;
 
@@ -439,7 +576,7 @@ private class VideoPlayer {
 
 	var mNetStream:NetStream;
 
-	var skipButton:Dynamic = Db_UI_skip_button_swf;
+	var mIsCleanedUp:Bool = false;
 
 	public function new(dbFacade:DBFacade, sceneGraphComponent:SceneGraphComponent, callback:ASFunction) {
 		mcallback = callback;
@@ -452,23 +589,32 @@ private class VideoPlayer {
 	}
 
 	function cleanupAndTransition() {
+		if (mIsCleanedUp) {
+			return;
+		}
 		cleanup();
 		mcallback();
 	}
 
 	public function cleanup() {
+		if (mIsCleanedUp) {
+			return;
+		}
+		mIsCleanedUp = true;
 		mDBFacade.metrics.log("IntroVideoCleanup", {});
-		mNetStream.removeEventListener("netStatus", detectEnd);
-		mDBFacade.stageRef.removeEventListener("keyDown", KeyCall);
+		EventListeners.remove(mNetStream, "netStatus", detectEnd);
+		EventListeners.remove(mDBFacade.stageRef, "keyDown", KeyCall);
+		mDBFacade.menuNavigationController.popLayer("INTRO_CINEMATIC");
 		mSceneGraphComponent.removeChild(mCutVideoBackGround);
 		mSceneGraphComponent.removeChild(mCutVideo);
-		mSceneGraphComponent.removeChild(mUIButton.root);
-		mUIButton.destroy();
+		mSceneGraphComponent.removeChild(mOverlay.skipButton.root);
+		mSceneGraphComponent.removeChild(mOverlay.coliseumAdvert);
+		mOverlay.destroy();
 		mNetStream.close();
 		mNetStream = null;
 		mCutVideo = null;
 		mCutVideoBackGround = null;
-		mUIButton = null;
+		mOverlay = null;
 	}
 
 	public function KeyCall(event:KeyboardEvent) {
@@ -494,15 +640,16 @@ private class VideoPlayer {
 
 	public function process(clname:String) {
 		var customClient:ASObject;
-		var tempmovie:MovieClip;
+		var dbSoundManager:DBSoundManager;
 		var cuePointHandler = function(param1:ASObject) {};
 		var metaDataHandler = function(param1:ASObject) {
-			mCutVideo.y = (600 - ASCompat.toNumberField(param1, "height")) / 2;
+			mCutVideo.y = 0;
 			mCutVideo.x = 0;
 			mCutVideo.width = 1920;
 			mCutVideo.height = 1080;
 			mSceneGraphComponent.addChild(mCutVideo, (50 : UInt));
-			SceneGraphComponent.bringToFront(mUIButton.root);
+			SceneGraphComponent.bringToFront(mOverlay.skipButton.root);
+			SceneGraphComponent.bringToFront(mOverlay.coliseumAdvert);
 		};
 		mDBFacade.metrics.log("IntroVideoCreated", {});
 		mCutVideo = new Video(1, 1);
@@ -513,22 +660,21 @@ private class VideoPlayer {
 		ASCompat.setProperty(customClient, "onCuePoint", cuePointHandler);
 		ASCompat.setProperty(customClient, "onMetaData", metaDataHandler);
 		mNetStream.client = customClient;
-		mNetStream.addEventListener("netStatus", detectEnd);
+		EventListeners.add(mNetStream, "netStatus", detectEnd);
 		mCutVideoBackGround = new Shape();
 		mCutVideoBackGround.graphics.beginFill((0 : UInt));
 		mCutVideoBackGround.graphics.drawRect(0, 0, mDBFacade.viewWidth, mDBFacade.viewHeight);
 		mCutVideoBackGround.graphics.endFill();
 		mSceneGraphComponent.addChildAt(mCutVideoBackGround, (50 : UInt), (0 : UInt));
-		tempmovie = ASCompat.dynamicAs(ASCompat.createInstance(skipButton, []), MovieClip);
-		mUIButton = new UIButton(this.mDBFacade, tempmovie);
-		tempmovie = null;
-		mUIButton.root.x = 1850;
-		mUIButton.root.y = 20;
-		mUIButton.releaseCallback = cleanupAndTransition;
-		mSceneGraphComponent.addChild(mUIButton.root, (50 : UInt));
-		mDBFacade.stageRef.addEventListener("keyDown", KeyCall);
+		mOverlay = new CutsceneOverlay(mDBFacade, cleanupAndTransition);
+		mSceneGraphComponent.addChild(mOverlay.skipButton.root, (50 : UInt));
+		mSceneGraphComponent.addChild(mOverlay.coliseumAdvert, (50 : UInt));
+		mDBFacade.menuNavigationController.pushNewLayer("INTRO_CINEMATIC", cleanupAndTransition, mOverlay.skipButton);
+		EventListeners.add(mDBFacade.stageRef, "keyDown", KeyCall);
 		mCutVideo.attachNetStream(mNetStream);
 		mNetStream.play(DBFacade.buildFullDownloadPath(clname));
-		mNetStream.soundTransform = new SoundTransform(mDBFacade.soundManager.getDampenedVolumeScaleForCategory("sfx"));
+		dbSoundManager = ASCompat.reinterpretAs(mDBFacade.soundManager, DBSoundManager);
+		dbSoundManager.applyStoredVolumeSettings();
+		mNetStream.soundTransform = new SoundTransform(dbSoundManager.getDampenedVolumeScaleForCategory("music"));
 	}
 }

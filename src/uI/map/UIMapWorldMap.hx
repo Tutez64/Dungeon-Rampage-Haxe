@@ -7,6 +7,7 @@ import brain.assetRepository.AssetLoadingComponent;
 import brain.assetRepository.SwfAsset;
 import brain.clock.GameClock;
 import brain.event.EventComponent;
+import brain.event.EventListeners;
 import brain.logger.Logger;
 import brain.render.MovieClipRenderController;
 import brain.sceneGraph.SceneGraphComponent;
@@ -15,9 +16,12 @@ import brain.uI.UIObject;
 import brain.uI.UIProgressBar;
 import brain.utils.ColorMatrix;
 import brain.utils.MemoryTracker;
+import brain.utils.TextUtil;
+import brain.utils.Timers;
+import brain.workLoop.LayerWorkComponent;
 import brain.workLoop.LogicalWorkComponent;
 import brain.workLoop.Task;
-import brain.jsonRPC.JSONRPCService;
+import collections.Map;
 import dBGlobals.DBGlobal;
 import distributedObjects.MatchMaker;
 import facade.DBFacade;
@@ -31,43 +35,17 @@ import town.TownStateMachine;
 import uI.infiniteIsland.II_UIMapBattlePopup;
 import uI.popup.DBUIOneButtonPopup;
 import uI.popup.DBUIUltimateRampagePopup;
-import flash.display.DisplayObject;
 import flash.display.MovieClip;
 import flash.events.Event;
-import flash.events.KeyboardEvent;
 import flash.events.MouseEvent;
 import flash.events.TimerEvent;
 import flash.geom.Point;
 import flash.geom.Rectangle;
+import flash.text.TextField;
 import flash.utils.Timer;
-import org.as3commons.collections.Map;
-import org.as3commons.collections.Set;
-import gameMasterDictionary.GMMapNode;
 
 class UIMapWorldMap {
-	static inline final MAX_BOING_MAG:Float = 1.45;
-
-	static inline final BOING_DECAY:Float = 0.5;
-
-	static inline final BOING_RATE:Float = 2;
-
-	static inline final SQUASH_BALANCE:Float = 0.75;
-
-	static inline final SQUASH_RATE:Float = 0.25;
-
-	static inline final AVATAR_LERP_SPEED:Float = 12;
-
-	static inline final AVATAR_ARC_HEIGHT:Float = 30;
-
-	static inline final CUTSCENE_PATH = "Resources/Art2D/UI/animatic0104.swf";
-
 	static inline final CAMERA_LERP_SPEED:Float = 0.2916666666666667;
-
-	static inline final CAMERA_CENTER_TIMEOUT:Float = 144;
-
-	static inline final CAMERA_SPEED_SCALE:Float = 1;
-
-	static inline final LEADERBOARD_HEIGHT:Float = 90;
 
 	static inline final DRAG_MESSAGE_TIME:Float = 17;
 
@@ -80,6 +58,12 @@ class UIMapWorldMap {
 	static inline final GRINDER_LEAGUE = (3 : UInt);
 
 	static inline final INFINITE_ISLAND_LEAGUE = (4 : UInt);
+
+	static inline final MAX_NODE_NAVIGATION_STEPS = (150 : UInt);
+
+	static var LEAGUE_BOUNDARY_NODE_IDS:Array<ASAny>;
+
+	static final LEAGUE_DEFAULT_NODE_IDS:Vector<UInt> = Vector.ofArray(([(50002 : UInt), (50021 : UInt), (50052 : UInt), (50084 : UInt), (50156 : UInt)] : Array<UInt>));
 
 	static var OPEN_COLOR_MATRIX:ColorMatrix = new ColorMatrix();
 
@@ -94,11 +78,12 @@ class UIMapWorldMap {
 		null;
 	};
 
-	var mLastKeyboardUpdateFrame:UInt = (0 : UInt);
-
-	var KEYBOARD_FRAME_DELAY_UPDATE:UInt = (12 : UInt);
-
 	var mWorkComponent:LogicalWorkComponent;
+
+	// the camera and the drag move the map on every rendered frame rather than on the 24 Hz logic tick
+	var mRenderWorkComponent:LayerWorkComponent;
+
+	static inline final LOGIC_TICK_RATE:Float = 24;
 
 	var mEventComponent:EventComponent;
 
@@ -112,14 +97,6 @@ class UIMapWorldMap {
 
 	var mTownSwfAsset:SwfAsset;
 
-	var mMapAvatar:UIMapAvatar;
-
-	var mAvatarList:Array<ASAny>;
-
-	var mAvatarDropShadowList:Array<ASAny>;
-
-	var mSpentKeyMessage:MovieClip;
-
 	var mXPBar:UIProgressBar;
 
 	var mIIBattlePopup:UIMapBattlePopup;
@@ -130,13 +107,9 @@ class UIMapWorldMap {
 
 	var mInfiniteIslandUnlocked:Bool = false;
 
-	var mWantCinematics:Bool = false;
-
 	var mMouseTask:Task;
 
 	var mCameraLerpTask:Task;
-
-	var mFriendFadeTask:Task;
 
 	var mCameraTargetX:Float = Math.NaN;
 
@@ -156,19 +129,15 @@ class UIMapWorldMap {
 
 	var mCurrentNode:GMMapNode;
 
-	var mNodeQueue:Array<ASAny>;
-
-	var mNodePath:Array<ASAny>;
-
-	var mClosedNodeList:Set;
-
 	var mOpenNodeButtons:Map;
-
-	var mLockedNodeButtons:Map;
 
 	var mMapDragTask:Task;
 
 	var mMapNodeClass:Dynamic;
+
+	var mMapCursorKey:UInt = 0;
+
+	var mDragCursorKey:UInt = 0;
 
 	var mDragMessageRevealer:Revealer;
 
@@ -216,11 +185,20 @@ class UIMapWorldMap {
 		mAssetLoadingComponent = new AssetLoadingComponent(dbFacade);
 		mSceneGraphComponent = new SceneGraphComponent(mDBFacade, "UIMapWorldMap");
 		mEventComponent = new EventComponent(mDBFacade);
-		mWantCinematics = mDBFacade.dbConfigManager.getConfigBoolean("want_story", true);
 		mRootMovieClip = rootMovieClip;
 		mTownSwfAsset = townSwfAsset;
 		mShowedDragMessage = false;
 		mInfiniteIslandUnlocked = false;
+	}
+
+	static function setNodeTitle(field:TextField, text:String) {
+		TextUtil.setText(field, text, 1.73);
+		TextUtil.fitToField(field);
+	}
+
+	static function setNodeDescription(field:TextField, text:String) {
+		TextUtil.setText(field, text, 1.55);
+		TextUtil.fitToField(field);
 	}
 
 	public function initialize(tavernCallback:ASFunction, inventoryCallback:ASFunction, shopCallback:ASFunction, townCallback:ASFunction) {
@@ -228,11 +206,14 @@ class UIMapWorldMap {
 		var globalBottomRight:Point;
 		var setReturnNode:ASFunction;
 		mWorkComponent = new LogicalWorkComponent(mDBFacade, "UIMapWorldMap");
+		mRenderWorkComponent = new LayerWorkComponent(mDBFacade, "UIMapWorldMap.render");
+		mDBFacade.mouseCursorManager.popMouseCursor(mMapCursorKey);
+		mMapCursorKey = mDBFacade.mouseCursorManager.pushMouseCursor("HAND");
 		mWorkComponent.doEverySeconds(59, mDBFacade.playerActivityCount.fetchPublicDungeonActivityLevel);
 		finalLeagueBounds = ASCompat.coerce((mRootMovieClip : ASAny).worldmap.infinite_island_league.getRect((mRootMovieClip : ASAny)
 			.worldmap.infinite_island_league), flash.geom.Rectangle);
-		globalBottomRight = ASCompat.coerce((mRootMovieClip : ASAny).worldmap.infinite_island_league.localToGlobal(finalLeagueBounds.bottomRight),
-			flash.geom.Point);
+		globalBottomRight = mDBFacade.designLocalToGlobal(ASCompat.coerce((mRootMovieClip : ASAny).worldmap.infinite_island_league,
+			flash.display.DisplayObject), finalLeagueBounds.bottomRight);
 		mMapWidth = globalBottomRight.x - ASCompat.toNumberField((mRootMovieClip : ASAny).worldmap, "x") + 390;
 		mMapHeight = ASCompat.toNumberField((mRootMovieClip : ASAny).worldmap, "height");
 		mCurrentNode = null;
@@ -262,16 +243,20 @@ class UIMapWorldMap {
 		mCameraVelocityX = 0;
 		mCameraVelocityY = 0;
 		mCurrentLeague = (0 : UInt);
-		mMapNodeClass = ((cast((mRootMovieClip : ASAny).worldmap.rookie_league, flash.display.DisplayObjectContainer).getChildByName("TUTORIAL") : ASAny)
-			.constructor : Dynamic);
+		mMapNodeClass = (ASCompat.constructorOf(cast((mRootMovieClip : ASAny).worldmap.rookie_league, flash.display.DisplayObjectContainer)
+			.getChildByName("TUTORIAL")) : Dynamic);
 		mXPBar = new UIProgressBar(mDBFacade, ASCompat.coerce((mRootMovieClip : ASAny).ui_league.UI_XP.xp_bar, flash.display.MovieClip));
 		mXPBar.dontKillMyChildren = true;
-		setXP(mDBFacade.dbAccountInfo.activeAvatarInfo.experience, mDBFacade.dbAccountInfo.activeAvatarInfo.gmHero);
-		ASCompat.setProperty((mRootMovieClip : ASAny).ui_league.league_01.label, "text", Locale.getString("MAP_PAGE_ROOKIE_LEAGUE_LABEL"));
-		ASCompat.setProperty((mRootMovieClip : ASAny).ui_league.league_02.label, "text", Locale.getString("MAP_PAGE_GLADIATOR_LEAGUE_LABEL"));
-		ASCompat.setProperty((mRootMovieClip : ASAny).ui_league.league_04.label, "text", Locale.getString("MAP_PAGE_CHAMPION_LEAGUE_LABEL"));
-		ASCompat.setProperty((mRootMovieClip : ASAny).ui_league.league_03.label, "text", Locale.getString("MAP_PAGE_GRINDER_LEAGUE_LABEL"));
-		ASCompat.setProperty((mRootMovieClip : ASAny).ui_league.league_05.label, "text", Locale.getString("MAP_PAGE_INFINITE_LEAGUE_LABEL"));
+		if (ASCompat.toBool((mRootMovieClip : ASAny).ui_league.UI_XP.xp_bar_delta)) {
+			ASCompat.setProperty((mRootMovieClip : ASAny).ui_league.UI_XP.xp_bar_delta, "visible", false);
+		}
+		setXP(mDBFacade.dbAccountInfo.activeAvatarInfo.experience, mDBFacade.dbAccountInfo.activeAvatarInfo.mAscensionLevel,
+			mDBFacade.dbAccountInfo.activeAvatarInfo.gmHero);
+		Locale.setText(ASCompat.coerce((mRootMovieClip : ASAny).ui_league.league_01.label, flash.text.TextField), "MAP_PAGE_ROOKIE_LEAGUE_LABEL");
+		Locale.setText(ASCompat.coerce((mRootMovieClip : ASAny).ui_league.league_02.label, flash.text.TextField), "MAP_PAGE_GLADIATOR_LEAGUE_LABEL");
+		Locale.setText(ASCompat.coerce((mRootMovieClip : ASAny).ui_league.league_04.label, flash.text.TextField), "MAP_PAGE_CHAMPION_LEAGUE_LABEL");
+		Locale.setText(ASCompat.coerce((mRootMovieClip : ASAny).ui_league.league_03.label, flash.text.TextField), "MAP_PAGE_GRINDER_LEAGUE_LABEL");
+		Locale.setText(ASCompat.coerce((mRootMovieClip : ASAny).ui_league.league_05.label, flash.text.TextField), "MAP_PAGE_INFINITE_LEAGUE_LABEL");
 		mLeftLeagueButton = new UIButton(mDBFacade, ASCompat.coerce((mRootMovieClip : ASAny).ui_league.shift_left, flash.display.MovieClip));
 		mLeftLeagueButton.releaseCallback = function() {
 			var _loc1_ = mCurrentLeague;
@@ -288,29 +273,29 @@ class UIMapWorldMap {
 				updateCurrentLeague();
 			}
 		};
-			(mRootMovieClip : ASAny).worldmap.addEventListener("mouseDown", onMouseDown);
+		EventListeners.add(ASCompat.coerce((mRootMovieClip : ASAny).worldmap, flash.events.IEventDispatcher), "mouseDown", onMouseDown);
 		mDBFacade.dbAccountInfo.activeAvatarInfo.loadHeroIcon(function(param1:MovieClip) {
 			UIObject.scaleToFit(param1, 40);
 			(mRootMovieClip : ASAny).ui_league.ui_avatar.addChild(param1);
 		});
 		clearMouseEnabledOnWorldmap();
-		hideAllMapNodes();
 		setupMapNodeButtons();
 		setupMapNodeLinks();
 		if (mChooseDungeonMessage == null) {
 			mWorkComponent.doLater(1, showChooseDungeonMessage);
 		}
 		if (!mShowedDragMessage) {
-			mWorkComponent.doEverySeconds(17, function() {
+			mWorkComponent.doEverySeconds(17, function(param1:GameClock) {
 				var dragMessageClass:Dynamic;
 				var dragMessage:MovieClip;
-				if (!mDidDrag) {
+				var gameClock = param1;
+				if (!mDidDrag && !mDBFacade.steamInputManager.wantsControllerPrompts) {
 					mShowedDragMessage = true;
 					dragMessageClass = mTownSwfAsset.getClass("Branch_map_drag");
 					dragMessage = ASCompat.dynamicAs(ASCompat.createInstance(dragMessageClass, []), MovieClip);
 					mRootMovieClip.addChild(dragMessage);
-					dragMessage.x = dragMessage.stage.stageWidth / 2;
-					dragMessage.y = dragMessage.stage.stageHeight * 0.4;
+					dragMessage.x = mDBFacade.viewWidth / 2;
+					dragMessage.y = mDBFacade.viewHeight * 0.4;
 					dragMessage.mouseChildren = false;
 					dragMessage.mouseEnabled = false;
 					dragMessage.alpha = 0;
@@ -336,41 +321,40 @@ class UIMapWorldMap {
 		ASCompat.setProperty((mRootMovieClip : ASAny).worldmap, "y", mCameraTargetY);
 		updateCurrentLeague();
 		clampMap();
-		if (mDBFacade.dbConfigManager.getConfigBoolean("ALLOW_HACKS_TO_PLAY_MAP_NODE", false)) {
-			setUpHacksToPlayNode();
+		if (mInfiniteIslandUnlocked) {
+			mDBFacade.steamAchievementsHelper.unlockAchievement("UNLOCK_ULTIMATE_RAMPAGE");
 		}
-		mWorkComponent.doEveryFrame(keyboardCheck);
 	}
 
 	function setupMapNodeLinks() {
 		var _loc8_ = 0;
-		var _loc9_ = 0;
+		var _loc9_ = (0 : UInt);
 		var _loc4_:GMMapNode = null;
 		var _loc7_:UIButton = null;
-		var _loc5_ = 0;
+		var _loc5_ = (0 : UInt);
 		var _loc6_:UIButton = null;
-		var _loc2_ = 0;
+		var _loc2_ = (0 : UInt);
 		var _loc3_:UIButton = null;
 		var _loc1_ = mOpenNodeButtons.keysToArray();
 		ASCompat.ASArray.sortWithOptions(_loc1_, 16);
 		setupMapNodeNavigationUltimateRampage();
 		_loc8_ = 0;
 		while (_loc8_ < _loc1_.length) {
-			_loc9_ = ASCompat.toInt(_loc1_[_loc8_]);
+			_loc9_ = (ASCompat.toInt(_loc1_[_loc8_]) : UInt);
 			if (mDBFacade.dbAccountInfo.inventoryInfo.mapnodes1.hasKey(_loc9_)) {
 				_loc4_ = ASCompat.coerce(mDBFacade.gameMaster.mapNodeById.itemFor(_loc9_), gameMasterDictionary.GMMapNode);
 				if (_loc4_.IsInfiniteDungeon) {
 					break;
 				}
 				_loc7_ = ASCompat.coerce(mOpenNodeButtons.itemFor(_loc9_), brain.uI.UIButton);
-				_loc5_ = ASCompat.toInt(_loc8_ > 0 ? _loc1_[_loc8_ - 1] : 0);
+				_loc5_ = (ASCompat.toInt(_loc8_ > 0 ? _loc1_[_loc8_ - 1] : 0) : UInt);
 				if (_loc5_ > 0) {
 					_loc6_ = ASCompat.coerce(mOpenNodeButtons.itemFor(_loc5_), brain.uI.UIButton);
 					if (_loc6_ != null && mDBFacade.dbAccountInfo.inventoryInfo.mapnodes1.hasKey(_loc5_)) {
 						_loc7_.leftNavigation = _loc6_;
 					}
 				}
-				_loc2_ = ASCompat.toInt(_loc8_ < _loc1_.length - 1 ? _loc1_[_loc8_ + 1] : 0);
+				_loc2_ = (ASCompat.toInt(_loc8_ < _loc1_.length - 1 ? _loc1_[_loc8_ + 1] : 0) : UInt);
 				if (_loc2_ > 0) {
 					_loc3_ = ASCompat.coerce(mOpenNodeButtons.itemFor(_loc2_), brain.uI.UIButton);
 					if (_loc3_ != null && mDBFacade.dbAccountInfo.inventoryInfo.mapnodes1.hasKey(_loc2_) && _loc2_ != 50150) {
@@ -388,30 +372,41 @@ class UIMapWorldMap {
 	}
 
 	function setupMapNodeMenuNavigationLeagueChangeTriggers() {
-		ASCompat.setProperty(mOpenNodeButtons.itemFor(50020), "rightNavigationAdditionalInteraction", function() {
-			setCurrentLeague((1 : UInt));
-		});
-		ASCompat.setProperty(mOpenNodeButtons.itemFor(50021), "leftNavigationAdditionalInteraction", function() {
-			setCurrentLeague((0 : UInt));
-		});
-		ASCompat.setProperty(mOpenNodeButtons.itemFor(50051), "rightNavigationAdditionalInteraction", function() {
-			setCurrentLeague((2 : UInt));
-		});
-		ASCompat.setProperty(mOpenNodeButtons.itemFor(50052), "leftNavigationAdditionalInteraction", function() {
-			setCurrentLeague((1 : UInt));
-		});
-		ASCompat.setProperty(mOpenNodeButtons.itemFor(50083), "rightNavigationAdditionalInteraction", function() {
-			setCurrentLeague((3 : UInt));
-		});
-		ASCompat.setProperty(mOpenNodeButtons.itemFor(50084), "leftNavigationAdditionalInteraction", function() {
-			setCurrentLeague((2 : UInt));
-		});
-		ASCompat.setProperty(mOpenNodeButtons.itemFor(50099), "rightNavigationAdditionalInteraction", function() {
-			setCurrentLeague((4 : UInt));
-		});
-		ASCompat.setProperty(mOpenNodeButtons.itemFor(50156), "leftNavigationAdditionalInteraction", function() {
-			setCurrentLeague((3 : UInt));
-		});
+		var _loc2_:UIButton = null;
+		var _loc3_:UIButton = null;
+		var _loc1_:Array<ASAny>;
+		final __ax4_iter_513 = LEAGUE_BOUNDARY_NODE_IDS;
+		if (checkNullIteratee(__ax4_iter_513))
+			for (_tmp_ in __ax4_iter_513) {
+				_loc1_ = ASCompat.coerce(_tmp_, Array);
+				_loc2_ = ASCompat.coerce(mOpenNodeButtons.itemFor(_loc1_[0]), brain.uI.UIButton);
+				_loc3_ = ASCompat.coerce(mOpenNodeButtons.itemFor(_loc1_[1]), brain.uI.UIButton);
+				if (_loc2_ == null || _loc3_ == null) {
+					Logger.warn("Missing map node button for the league boundary between " + Std.string(_loc1_[0]) + " and " + Std.string(_loc1_[1]));
+				} else {
+					_loc2_.rightNavigationAdditionalInteraction = createLeagueChangeInteraction(_loc2_, true);
+					_loc3_.leftNavigationAdditionalInteraction = createLeagueChangeInteraction(_loc3_, false);
+				}
+			}
+	}
+
+	function createLeagueChangeInteraction(sourceNode:UIButton, movingRight:Bool):ASFunction {
+		return function() {
+			var _loc1_ = findNavigationDestination(sourceNode, movingRight);
+			if (_loc1_ != null) {
+				setCurrentLeague(getButtonLeagueView(_loc1_));
+			}
+		};
+	}
+
+	function findNavigationDestination(sourceNode:UIButton, movingRight:Bool):UIButton {
+		var _loc3_ = movingRight ? sourceNode.rightNavigation : sourceNode.leftNavigation;
+		var _loc4_ = (0 : UInt);
+		while (_loc3_ != null && !_loc3_.canBeFocused() && ++_loc4_ < 150) {
+			_loc3_ = movingRight ? _loc3_.rightNavigation : _loc3_.leftNavigation;
+		}
+		return ASCompat.coerce(_loc3_ != null
+			&& _loc3_.canBeFocused() ? ASCompat.reinterpretAs(_loc3_, UIButton) : null, brain.uI.UIButton);
 	}
 
 	function setupMapNodeNavigationGladiatorLeaguePrisonPath() {
@@ -628,22 +623,23 @@ class UIMapWorldMap {
 	}
 
 	public function getCurrentNodeButton():UIButton {
-		return ASCompat.coerce(mOpenNodeButtons.itemFor(mCurrentNode.Id), brain.uI.UIButton);
-	}
-
-	public function getCurrentNodeLeagueValue():UInt {
-		return getNodeLeagueValue(mCurrentNode);
+		var _loc1_ = ASCompat.coerce(mOpenNodeButtons.itemFor(mCurrentNode.Id), brain.uI.UIButton);
+		if (_loc1_ != null && _loc1_.canBeFocused()) {
+			return _loc1_;
+		}
+		var _loc2_ = findFirstNavigableNodeInLeague(getNodeLeagueValue(mCurrentNode));
+		return _loc2_ ?? _loc1_;
 	}
 
 	public function getButtonLeagueView(uiObject:UIObject):UInt {
 		var _loc5_ = 0;
-		var _loc6_ = 0;
+		var _loc6_ = (0 : UInt);
 		var _loc2_:UIButton = null;
 		var _loc3_:GMMapNode = null;
 		var _loc4_ = mOpenNodeButtons.keysToArray();
 		_loc5_ = 0;
 		while (_loc5_ < _loc4_.length) {
-			_loc6_ = ASCompat.toInt(_loc4_[_loc5_]);
+			_loc6_ = (ASCompat.toInt(_loc4_[_loc5_]) : UInt);
 			_loc2_ = ASCompat.coerce(mOpenNodeButtons.itemFor(_loc6_), brain.uI.UIButton);
 			if (_loc2_ == uiObject) {
 				_loc3_ = ASCompat.coerce(mDBFacade.gameMaster.mapNodeById.itemFor(_loc6_), gameMasterDictionary.GMMapNode);
@@ -688,10 +684,6 @@ class UIMapWorldMap {
 		return null;
 	}
 
-	public function getCurrentLeagueView():UInt {
-		return mCurrentLeague;
-	}
-
 	public function setCurrentLeague(newLeague:UInt, doNamePop:Bool = true) {
 		if (newLeague != mCurrentLeague) {
 			mCurrentLeague = newLeague;
@@ -711,7 +703,55 @@ class UIMapWorldMap {
 		return mCurrentLeague < 4 ? mCurrentLeague + 1 : (4 : UInt);
 	}
 
-	function keyboardCheck(gameClock:GameClock) {}
+	public function showPreviousLeague() {
+		var _loc1_ = (ASCompat.floatToInt(mCurrentLeague > 0 ? (mCurrentLeague : Float) - 1 : 0) : UInt);
+		showLeagueAndFocusFirstUnlockedNode(_loc1_);
+	}
+
+	public function showNextLeague() {
+		showLeagueAndFocusFirstUnlockedNode(determineNextLeague());
+	}
+
+	function showLeagueAndFocusFirstUnlockedNode(league:UInt) {
+		if (league == mCurrentLeague) {
+			return;
+		}
+		setCurrentLeague(league);
+		var _loc2_ = findFirstNavigableNodeInLeague(league);
+		if (_loc2_ != null) {
+			mDBFacade.menuNavigationController.setFocusedUiObject(_loc2_);
+		}
+	}
+
+	function findFirstNavigableNodeInLeague(league:UInt):UIButton {
+		var _loc5_ = 0;
+		var _loc7_:MovieClip = null;
+		var _loc3_:GMMapNode = null;
+		var _loc4_:UIButton = null;
+		var _loc2_ = ASCompat.coerce(mOpenNodeButtons.itemFor(LEAGUE_DEFAULT_NODE_IDS[(league : Int)]), brain.uI.UIButton);
+		if (_loc2_ != null && _loc2_.canBeFocused()) {
+			return _loc2_;
+		}
+		var _loc6_ = getLeagueClip(league);
+		if (_loc6_ == null) {
+			return null;
+		}
+		_loc5_ = 0;
+		while (_loc5_ < _loc6_.numChildren) {
+			_loc7_ = ASCompat.reinterpretAs(_loc6_.getChildAt(_loc5_), MovieClip);
+			if (_loc7_ != null) {
+				_loc3_ = ASCompat.coerce(mDBFacade.gameMaster.mapNodeByConstant.itemFor(_loc7_.name), gameMasterDictionary.GMMapNode);
+				if (_loc3_ != null) {
+					_loc4_ = ASCompat.coerce(mOpenNodeButtons.itemFor(_loc3_.Id), brain.uI.UIButton);
+					if (_loc4_ != null && _loc4_.canBeFocused()) {
+						return _loc4_;
+					}
+				}
+			}
+			_loc5_++;
+		}
+		return null;
+	}
 
 	function popLeagueName(clip:MovieClip) {
 		if (mLeagueNameRevealer != null) {
@@ -794,7 +834,7 @@ class UIMapWorldMap {
 				ASCompat.setProperty((mRootMovieClip : ASAny).ui_league.league_04, "visible", false);
 				ASCompat.setProperty((mRootMovieClip : ASAny).ui_league.league_05, "visible", true);
 				ASCompat.setProperty((mRootMovieClip : ASAny).ui_league.clock, "visible", true);
-				ASCompat.setProperty((mRootMovieClip : ASAny).ui_league.label_new_dungeon, "text", Locale.getString("INFINITE_TIMER_LABEL"));
+				Locale.setText(ASCompat.coerce((mRootMovieClip : ASAny).ui_league.label_new_dungeon, flash.text.TextField), "INFINITE_TIMER_LABEL");
 				ASCompat.setProperty((mRootMovieClip : ASAny).ui_league.label_new_dungeon, "visible", true);
 				ASCompat.setProperty((mRootMovieClip : ASAny).ui_league.label_timer, "visible", true);
 				ASCompat.setProperty((mRootMovieClip : ASAny).ui_league.label_timer, "text", "");
@@ -811,15 +851,15 @@ class UIMapWorldMap {
 	}
 
 	function startEpochCountdown() {
-		mEpochCountdownTimer = new Timer(1000);
-		mEpochCountdownTimer.addEventListener("timer", tickEpochCountdown);
+		mEpochCountdownTimer = Timers.create(1000, 0, "UIMapWorldMap.mEpochCountdownTimer");
+		EventListeners.add(mEpochCountdownTimer, "timer", tickEpochCountdown);
 		tickEpochCountdown(null);
 		mEpochCountdownTimer.start();
 	}
 
 	function endEpochCountdown() {
 		if (mEpochCountdownTimer != null) {
-			mEpochCountdownTimer.removeEventListener("timer", tickEpochCountdown);
+			EventListeners.remove(mEpochCountdownTimer, "timer", tickEpochCountdown);
 			mEpochCountdownTimer.stop();
 		}
 	}
@@ -840,7 +880,7 @@ class UIMapWorldMap {
 		if (ASCompat.toNumber(_loc2_[4]) == 0 && ASCompat.toNumber(_loc2_[3]) == 0) {
 			_loc3_ = ASCompat.toNumber(_loc2_[2]) + ":" + zeroPad(ASCompat.toInt(_loc2_[1]), 2) + ":" + zeroPad(ASCompat.toInt(_loc2_[0]), 2);
 		}
-		ASCompat.setProperty((mRootMovieClip : ASAny).ui_league.label_timer, "text", _loc3_);
+		TextUtil.setText(ASCompat.coerce((mRootMovieClip : ASAny).ui_league.label_timer, flash.text.TextField), _loc3_);
 	}
 
 	public function zeroPad(number:Int, width:Int):String {
@@ -851,20 +891,20 @@ class UIMapWorldMap {
 		return _loc3_;
 	}
 
-	function setXP(xp:UInt, gmHero:GMHero) {
+	function setXP(xp:UInt, ascensionLevel:UInt, gmHero:GMHero) {
 		mXPBar.value = xp;
-		var _loc5_ = gmHero.getLevelFromExp(xp);
-		ASCompat.setProperty((mRootMovieClip : ASAny).ui_league.UI_XP.xp_level, "text", Std.string(_loc5_));
-		var _loc4_ = xp;
-		var _loc3_ = (gmHero.getLevelIndex(xp) : UInt);
-		var _loc7_ = (ASCompat.toInt(_loc3_ > 0 ? gmHero.getExpFromIndex(_loc3_ - 1) : 0) : UInt);
-		var _loc6_ = gmHero.getExpFromIndex(_loc3_);
-		mXPBar.value = (_loc4_ - _loc7_) / (_loc6_ - _loc7_);
+		var _loc6_ = gmHero.getLevelFromExp(xp, ascensionLevel);
+		TextUtil.setText(ASCompat.coerce((mRootMovieClip : ASAny).ui_league.UI_XP.xp_level, flash.text.TextField), Std.string(_loc6_));
+		var _loc5_ = xp;
+		var _loc4_ = (gmHero.getLevelIndex(xp, (ascensionLevel : Int)) : UInt);
+		var _loc8_ = (ASCompat.toInt(_loc4_ > 0 ? gmHero.getExpFromIndex(_loc4_ - 1) : 0) : UInt);
+		var _loc7_ = gmHero.getExpFromIndex(_loc4_);
+		mXPBar.value = ((_loc5_ : Float) - (_loc8_ : Float)) / ((_loc7_ : Float) - (_loc8_ : Float));
 	}
 
 	public function deinit() {
 		var _loc1_:UIButton;
-		var __ax4_iter_169:Array<ASAny>;
+		var __ax4_iter_514:Array<ASAny>;
 		mTownStateMachine = null;
 		mDidDrag = false;
 		mShowedDragMessage = false;
@@ -898,17 +938,14 @@ class UIMapWorldMap {
 			mReturnToTownButton.destroy();
 			mReturnToTownButton = null;
 		}
-		(mRootMovieClip : ASAny).worldmap.removeEventListener("mouseUp", onMouseUp);
-		(mRootMovieClip : ASAny).worldmap.removeEventListener("mouseOut", onMouseOut);
-		(mRootMovieClip : ASAny).worldmap.removeEventListener("mouseLeave", onMouseOut);
-		(mRootMovieClip : ASAny).worldmap.removeEventListener("mouseMove", onDrag);
-		(mRootMovieClip : ASAny).worldmap.removeEventListener("mouseOver", onMouseOver);
-		mDBFacade.mouseCursorManager.popMouseCursor();
-		if (mClosedNodeList != null) {
-			mClosedNodeList.clear();
-		}
-		mNodePath = null;
-		mNodeQueue = null;
+		EventListeners.remove(ASCompat.coerce((mRootMovieClip : ASAny).worldmap, flash.events.IEventDispatcher), "mouseUp", onMouseUp);
+		EventListeners.remove(ASCompat.coerce((mRootMovieClip : ASAny).worldmap, flash.events.IEventDispatcher), "mouseOut", onMouseOut);
+		EventListeners.remove(ASCompat.coerce((mRootMovieClip : ASAny).worldmap, flash.events.IEventDispatcher), "mouseLeave", onMouseOut);
+		EventListeners.remove(ASCompat.coerce((mRootMovieClip : ASAny).worldmap, flash.events.IEventDispatcher), "mouseMove", onDrag);
+		EventListeners.remove(ASCompat.coerce((mRootMovieClip : ASAny).worldmap, flash.events.IEventDispatcher), "mouseOver", onMouseOver);
+		popDragCursor();
+		mDBFacade.mouseCursorManager.popMouseCursor(mMapCursorKey);
+		mMapCursorKey = (0 : UInt);
 		if (mIIBattlePopup != null) {
 			mIIBattlePopup.destroy();
 			mIIBattlePopup = null;
@@ -930,14 +967,10 @@ class UIMapWorldMap {
 			mMapDragTask.destroy();
 			mMapDragTask = null;
 		}
-		if (mMapAvatar != null) {
-			mMapAvatar.destroy(ASCompat.coerce((mRootMovieClip : ASAny).worldmap, flash.display.MovieClip));
-			mMapAvatar = null;
-		}
 		if (mOpenNodeButtons != null) {
-			__ax4_iter_169 = mOpenNodeButtons.toArray();
-			if (checkNullIteratee(__ax4_iter_169))
-				for (_tmp_ in __ax4_iter_169) {
+			__ax4_iter_514 = mOpenNodeButtons.toArray();
+			if (checkNullIteratee(__ax4_iter_514))
+				for (_tmp_ in __ax4_iter_514) {
 					_loc1_ = ASCompat.coerce(_tmp_, brain.uI.UIButton);
 					_loc1_.enabled = false;
 					_loc1_.destroy();
@@ -953,11 +986,12 @@ class UIMapWorldMap {
 			mWorkComponent.destroy();
 			mWorkComponent = null;
 		}
+		if (mRenderWorkComponent != null) {
+			mRenderWorkComponent.destroy();
+			mRenderWorkComponent = null;
+		}
 		if (mEventComponent != null) {
 			mEventComponent.removeAllListeners();
-		}
-		if (mDBFacade.dbConfigManager.getConfigBoolean("ALLOW_HACKS_TO_PLAY_MAP_NODE", false)) {
-			tearDownHacksToPlayNode();
 		}
 		clearTooltipLayer();
 	}
@@ -976,121 +1010,6 @@ class UIMapWorldMap {
 		}
 	}
 
-	function createPlayerAvatar() {
-		var node:DisplayObject;
-		var forceClassCompilation:UIMapAvatarDropMover;
-		var mapAvatarClass = mTownSwfAsset.getClass("Branch_map_avatar");
-		var avatar = ASCompat.dynamicAs(ASCompat.createInstance(mapAvatarClass, []), MovieClip);
-		var avatarDropShadowClass = mTownSwfAsset.getClass("Branch_map_avatar_shadow");
-		var avatarDropShadow = ASCompat.dynamicAs(ASCompat.createInstance(avatarDropShadowClass, []), MovieClip);
-		(mRootMovieClip : ASAny).worldmap.addChild(avatar);
-		(mRootMovieClip : ASAny).worldmap.addChild(avatarDropShadow);
-		node = ASCompat.coerce(cast((mRootMovieClip : ASAny).worldmap.rookie_league, flash.display.DisplayObjectContainer)
-			.getChildByName(mCurrentNode.Constant),
-			flash.display.DisplayObject);
-		if (node != null) {
-			node.visible = true;
-			ASCompat.setProperty((avatar : ASAny).join, "visible", false);
-			avatar.x = node.x;
-			avatar.y = node.y - avatar.height / 2;
-			avatarDropShadow.x = avatar.x;
-			avatarDropShadow.y = avatar.y;
-			mDBFacade.dbAccountInfo.activeAvatarInfo.loadHeroIcon(function(param1:MovieClip) {
-				(avatar : ASAny).pic.addChild(param1);
-			});
-			avatarDropShadow.mouseChildren = false;
-			avatarDropShadow.mouseEnabled = false;
-			avatar.mouseChildren = false;
-			avatar.mouseEnabled = false;
-			mMapAvatar = new UIMapAvatar(mDBFacade, avatar, avatarDropShadow, (Type.resolveClass("UI.Map.UIMapAvatarDropMover") : Dynamic));
-		}
-	}
-
-	function friendJoinCallback(friendId:UInt):ASFunction {
-		return function() {
-			if (mDBFacade.dbAccountInfo.inventoryInfo.getEquipedItemsOnAvatar(mDBFacade.dbAccountInfo.activeAvatarInfo.id).length == 0) {
-				mDBFacade.metrics.log("NoWeaponsEquippedWarning");
-				mDBFacade.errorPopup("Warning", "Cannot enter dungeon with no weapons equipped.", "NO_WEAPONS_DUNGEON_ERROR_POPUP");
-			} else {
-				mDBFacade.mouseCursorManager.popMouseCursor();
-				mDBFacade.mouseCursorManager.disable = true;
-				mDBFacade.metrics.log("JoinFriend", {"friendId": friendId});
-				mDBFacade.mainStateMachine.enterLoadingScreenState((0 : UInt), "", friendId, (0 : UInt), true, mBattlePopup.IsPrivate);
-			}
-		};
-	}
-
-	function clearAvatarList() {
-		var _loc2_:DisplayObject;
-		var __ax4_iter_170:Array<ASAny>;
-		var _loc1_:DisplayObject;
-		var __ax4_iter_171:Array<ASAny>;
-		if (mAvatarList != null) {
-			__ax4_iter_170 = mAvatarList;
-			if (checkNullIteratee(__ax4_iter_170))
-				for (_tmp_ in __ax4_iter_170) {
-					_loc2_ = ASCompat.coerce(_tmp_, flash.display.DisplayObject);
-					(mRootMovieClip : ASAny).worldmap.removeChild(_loc2_);
-				}
-		}
-		if (mAvatarDropShadowList != null) {
-			__ax4_iter_171 = mAvatarDropShadowList;
-			if (checkNullIteratee(__ax4_iter_171))
-				for (_tmp_ in __ax4_iter_171) {
-					_loc1_ = ASCompat.coerce(_tmp_, flash.display.DisplayObject);
-					(mRootMovieClip : ASAny).worldmap.removeChild(_loc1_);
-				}
-		}
-	}
-
-	function sortAvatarList() {
-		var i:UInt;
-		var avatar_clip:MovieClip;
-		var shadow_clip:MovieClip;
-		var ysort:ASFunction = function(param1:MovieClip, param2:MovieClip):Int {
-			if (param1.y < param2.y - 15) {
-				return -1;
-			}
-			if (param1.y > param2.y + 15) {
-				return 1;
-			}
-			return 0;
-		};
-		ASCompat.ASArray.sort(mAvatarList, ysort);
-		ASCompat.ASArray.sort(mAvatarDropShadowList, ysort);
-		i = (0 : UInt);
-		while (i < (mAvatarList.length:UInt)) {
-			avatar_clip = ASCompat.coerce(mAvatarList[(i : Int)], flash.display.MovieClip);
-			shadow_clip = ASCompat.coerce(mAvatarDropShadowList[(i : Int)], flash.display.MovieClip);
-			(mRootMovieClip : ASAny).worldmap.addChild(shadow_clip);
-			(mRootMovieClip : ASAny).worldmap.addChild(avatar_clip);
-			i = i + 1;
-		}
-	}
-
-	function updateFriends(event:Event = null) {}
-
-	function cutsceneSwfLoaded(className:String):ASFunction {
-		return function(param1:SwfAsset) {
-			mRootMovieClip.visible = false;
-			mBattlePopup.animatePopupOut();
-			mSceneGraphComponent.fadeIn(1);
-			var _loc2_ = new MovieClipRenderController(mDBFacade, param1.root);
-			mSceneGraphComponent.addChild(param1.root, (50 : UInt));
-			_loc2_.play((0 : UInt), false, cutsceneDone(param1.root, _loc2_));
-		};
-	}
-
-	function cutsceneDone(clip:MovieClip, movieClipRenderer:MovieClipRenderController):ASFunction {
-		return function() {
-			mSceneGraphComponent.removeChild(clip);
-			mDBFacade.mouseCursorManager.popMouseCursor();
-			mDBFacade.mouseCursorManager.disable = true;
-			mDBFacade.mainStateMachine.enterLoadingScreenState(mCurrentNode.Id, mCurrentNode.NodeType, (0 : UInt), (0 : UInt), true, mBattlePopup.IsPrivate);
-			movieClipRenderer.destroy();
-		};
-	}
-
 	function killCameraLerp() {
 		if (mCameraLerpTask != null) {
 			mCameraLerpTask.destroy();
@@ -1102,37 +1021,37 @@ class UIMapWorldMap {
 
 	function centerMapOnClip(clip:MovieClip, islandName:String = null) {
 		var _loc6_ = clip.getRect(clip);
-		var _loc3_ = clip.localToGlobal(new Point(_loc6_.left + clip.width * 0.5, 0));
-		var _loc4_ = ASCompat.coerce((mRootMovieClip : ASAny).worldmap.localToGlobal(new Point(0, 0)), flash.geom.Point);
+		var _loc3_ = mDBFacade.designLocalToGlobal(clip, new Point(_loc6_.left + clip.width * 0.5, 0));
+		var _loc4_ = mDBFacade.designLocalToGlobal(ASCompat.coerce((mRootMovieClip : ASAny).worldmap, flash.display.DisplayObject), new Point(0, 0));
 		var _loc5_ = _loc3_.x - _loc4_.x;
 		if (islandName == "ROOKIE") {
-			mCameraTargetX = mRootMovieClip.stage.stageWidth * 0.9 - _loc5_;
+			mCameraTargetX = 159;
 		} else if (islandName == "GLADIATOR") {
-			mCameraTargetX = -1900;
+			mCameraTargetX = -1950;
 		} else if (islandName == "CHAMPION") {
-			mCameraTargetX = -3850;
+			mCameraTargetX = -3900;
 		} else if (islandName == "GRINDHOUSE") {
-			mCameraTargetX = -5800;
+			mCameraTargetX = -5870;
 		}
 		if (islandName == "INFINITEISLAND") {
-			mCameraTargetX = -8100;
+			mCameraTargetX = -8200;
 		}
 		if (mCameraLerpTask != null) {
 			mCameraLerpTask.destroy();
 		}
 		mCameraVelocityX = 0;
 		mCameraVelocityY = 0;
-		mCameraLerpTask = mWorkComponent.doEveryFrame(centerCamera);
+		mCameraLerpTask = mRenderWorkComponent.doEveryFrame(centerCamera);
 	}
 
 	function centerCamera(clock:GameClock) {
 		var _loc3_ = mCameraTargetX - ASCompat.toNumberField((mRootMovieClip : ASAny).worldmap, "x");
 		var _loc4_ = mCameraTargetY - ASCompat.toNumberField((mRootMovieClip : ASAny).worldmap, "y");
 		var _loc2_ = _loc3_ * _loc3_ + _loc4_ * _loc4_;
-		var _loc5_ = 1 - Math.pow(1 - 0.2916666666666667, clock.tickLength / GameClock.ANIMATION_FRAME_DURATION);
-		mCameraVelocityX = _loc3_ * _loc5_;
-		var __tmpAssignObj9:ASAny = (mRootMovieClip : ASAny).worldmap;
-		ASCompat.setProperty(__tmpAssignObj9, "x", __tmpAssignObj9.x + mCameraVelocityX);
+		// the 24 Hz tick's lerp, over the time this frame took
+		mCameraVelocityX = _loc3_ * (1 - Math.pow(1 - CAMERA_LERP_SPEED, clock.tickLength * LOGIC_TICK_RATE));
+		var __tmpAssignObj78:ASAny = (mRootMovieClip : ASAny).worldmap;
+		ASCompat.setProperty(__tmpAssignObj78, "x", __tmpAssignObj78.x + mCameraVelocityX);
 		clampMap();
 		if (_loc2_ < 0.0001) {
 			mCameraVelocityX = 0;
@@ -1153,12 +1072,11 @@ class UIMapWorldMap {
 	function clampMap() {
 		ASCompat.setProperty((mRootMovieClip : ASAny).worldmap, "x", Math.min(ASCompat.toNumberField((mRootMovieClip : ASAny).worldmap, "x"), -13));
 		ASCompat.setProperty((mRootMovieClip : ASAny).worldmap, "x",
-			Math.max(ASCompat.toNumberField((mRootMovieClip : ASAny).worldmap, "x"),
-				ASCompat.toNumber(-mMapWidth + (mRootMovieClip : ASAny).worldmap.stage.stageWidth)));
+			Math.max(ASCompat.toNumberField((mRootMovieClip : ASAny).worldmap, "x"), -mMapWidth + mDBFacade.viewWidth));
 	}
 
 	function updateSlide(clock:GameClock) {
-		var _loc2_ = 0;
+		var _loc2_ = (0 : UInt);
 		var _loc7_:Point = null;
 		var _loc3_:Point = null;
 		var _loc5_:Point = null;
@@ -1169,60 +1087,66 @@ class UIMapWorldMap {
 		if (mMouseTask != null) {
 			mMouseTask.destroy();
 			mMouseTask = null;
-			_loc2_ = (mCurrentLeague : Int);
+			_loc2_ = mCurrentLeague;
 			if (_loc8_ > 10) {
 				if (mMouseVelocityX > 0) {
 					mCurrentLeague = determineNextLeague();
-					updateCurrentLeague((_loc2_ : UInt) != mCurrentLeague);
+					updateCurrentLeague(_loc2_ != mCurrentLeague);
 				} else {
 					mCurrentLeague = mCurrentLeague > 0 ? mCurrentLeague - 1 : (0 : UInt);
-					updateCurrentLeague((_loc2_ : UInt) != mCurrentLeague);
+					updateCurrentLeague(_loc2_ != mCurrentLeague);
 				}
 			} else {
-				_loc7_ = ASCompat.coerce((mRootMovieClip : ASAny).worldmap.gladiator_league.localToGlobal(new Point(0, 0)), flash.geom.Point);
-				_loc3_ = ASCompat.coerce((mRootMovieClip : ASAny).worldmap.rookie_league.localToGlobal(new Point(0, 0)), flash.geom.Point);
-				_loc5_ = ASCompat.coerce((mRootMovieClip : ASAny).worldmap.grinder_league.localToGlobal(new Point(0, 0)), flash.geom.Point);
-				_loc6_ = ASCompat.coerce((mRootMovieClip : ASAny).worldmap.heroic_league.localToGlobal(new Point(0, 0)), flash.geom.Point);
-				_loc4_ = ASCompat.coerce((mRootMovieClip : ASAny).worldmap.infinite_island_league.localToGlobal(new Point(0, 0)), flash.geom.Point);
+				_loc7_ = mDBFacade.designLocalToGlobal(ASCompat.coerce((mRootMovieClip : ASAny).worldmap.gladiator_league, flash.display.DisplayObject),
+					new Point(0, 0));
+				_loc3_ = mDBFacade.designLocalToGlobal(ASCompat.coerce((mRootMovieClip : ASAny).worldmap.rookie_league, flash.display.DisplayObject),
+					new Point(0, 0));
+				_loc5_ = mDBFacade.designLocalToGlobal(ASCompat.coerce((mRootMovieClip : ASAny).worldmap.grinder_league, flash.display.DisplayObject),
+					new Point(0, 0));
+				_loc6_ = mDBFacade.designLocalToGlobal(ASCompat.coerce((mRootMovieClip : ASAny).worldmap.heroic_league, flash.display.DisplayObject),
+					new Point(0, 0));
+				_loc4_ = mDBFacade.designLocalToGlobal(ASCompat.coerce((mRootMovieClip : ASAny).worldmap.infinite_island_league, flash.display.DisplayObject),
+					new Point(0, 0));
 				if (Math.abs(_loc7_.x) < Math.abs(_loc3_.x)
 					&& Math.abs(_loc7_.x) < Math.abs(_loc5_.x)
 					&& Math.abs(_loc7_.x) < Math.abs(_loc6_.x)
 					&& Math.abs(_loc7_.x) < Math.abs(_loc4_.x)) {
 					mCurrentLeague = (1 : UInt);
-					updateCurrentLeague((_loc2_ : UInt) != mCurrentLeague);
+					updateCurrentLeague(_loc2_ != mCurrentLeague);
 				} else if (Math.abs(_loc3_.x) < Math.abs(_loc7_.x)
 					&& Math.abs(_loc3_.x) < Math.abs(_loc5_.x)
 					&& Math.abs(_loc3_.x) < Math.abs(_loc6_.x)
 					&& Math.abs(_loc3_.x) < Math.abs(_loc4_.x)) {
 					mCurrentLeague = (0 : UInt);
-					updateCurrentLeague((_loc2_ : UInt) != mCurrentLeague);
+					updateCurrentLeague(_loc2_ != mCurrentLeague);
 				} else if (Math.abs(_loc5_.x) < Math.abs(_loc3_.x)
 					&& Math.abs(_loc5_.x) < Math.abs(_loc7_.x)
 					&& Math.abs(_loc5_.x) < Math.abs(_loc6_.x)
 					&& Math.abs(_loc5_.x) < Math.abs(_loc4_.x)) {
 					mCurrentLeague = (3 : UInt);
-					updateCurrentLeague((_loc2_ : UInt) != mCurrentLeague);
+					updateCurrentLeague(_loc2_ != mCurrentLeague);
 				} else if (Math.abs(_loc6_.x) < Math.abs(_loc3_.x)
 					&& Math.abs(_loc6_.x) < Math.abs(_loc7_.x)
 					&& Math.abs(_loc6_.x) < Math.abs(_loc5_.x)
 					&& Math.abs(_loc6_.x) < Math.abs(_loc4_.x)) {
 					mCurrentLeague = (2 : UInt);
-					updateCurrentLeague((_loc2_ : UInt) != mCurrentLeague);
+					updateCurrentLeague(_loc2_ != mCurrentLeague);
 				} else if (Math.abs(_loc4_.x) < Math.abs(_loc3_.x)
 					&& Math.abs(_loc4_.x) < Math.abs(_loc7_.x)
 					&& Math.abs(_loc4_.x) < Math.abs(_loc5_.x)
 					&& Math.abs(_loc4_.x) < Math.abs(_loc6_.x)) {
 					mCurrentLeague = (4 : UInt);
-					updateCurrentLeague((_loc2_ : UInt) != mCurrentLeague);
+					updateCurrentLeague(_loc2_ != mCurrentLeague);
 				}
 			}
 		}
 	}
 
 	function updateDrag(clock:GameClock) {
-		var _loc2_ = mMouseVelocityX * Math.min(0.9, clock.tickLength * 10);
-		var __tmpAssignObj10:ASAny = (mRootMovieClip : ASAny).worldmap;
-		ASCompat.setProperty(__tmpAssignObj10, "x", __tmpAssignObj10.x - _loc2_);
+		// the 24 Hz tick's share, over the time this frame (or the slide's tick) took
+		var _loc2_ = mMouseVelocityX * (1 - Math.pow(1 - Math.min(0.9, 10 / LOGIC_TICK_RATE), clock.tickLength * LOGIC_TICK_RATE));
+		var __tmpAssignObj79:ASAny = (mRootMovieClip : ASAny).worldmap;
+		ASCompat.setProperty(__tmpAssignObj79, "x", __tmpAssignObj79.x - _loc2_);
 		mMouseVelocityX -= _loc2_;
 		clampMap();
 	}
@@ -1242,35 +1166,41 @@ class UIMapWorldMap {
 			mMapDragTask.destroy();
 			mMapDragTask = null;
 		}
-		mDBFacade.mouseCursorManager.popMouseCursor();
+		popDragCursor();
 		ASCompat.setProperty((mRootMovieClip : ASAny).worldmap, "mouseChildren", true);
-		(mRootMovieClip : ASAny).worldmap.removeEventListener("mouseUp", onMouseUp);
-		(mRootMovieClip : ASAny).worldmap.removeEventListener("mouseOut", onMouseOut);
-		(mRootMovieClip : ASAny).worldmap.removeEventListener("mouseLeave", onMouseOut);
-		(mRootMovieClip : ASAny).worldmap.removeEventListener("mouseMove", onDrag);
+		EventListeners.remove(ASCompat.coerce((mRootMovieClip : ASAny).worldmap, flash.events.IEventDispatcher), "mouseUp", onMouseUp);
+		EventListeners.remove(ASCompat.coerce((mRootMovieClip : ASAny).worldmap, flash.events.IEventDispatcher), "mouseOut", onMouseOut);
+		EventListeners.remove(ASCompat.coerce((mRootMovieClip : ASAny).worldmap, flash.events.IEventDispatcher), "mouseLeave", onMouseOut);
+		EventListeners.remove(ASCompat.coerce((mRootMovieClip : ASAny).worldmap, flash.events.IEventDispatcher), "mouseMove", onDrag);
 		startSlide();
 	}
 
+	function popDragCursor() {
+		mDBFacade.mouseCursorManager.popMouseCursor(mDragCursorKey);
+		mDragCursorKey = (0 : UInt);
+	}
+
 	function onMouseOut(mouseEvent:MouseEvent) {
-		mDBFacade.mouseCursorManager.popMouseCursor();
+		popDragCursor();
 		ASCompat.setProperty((mRootMovieClip : ASAny).worldmap, "mouseChildren", true);
-		(mRootMovieClip : ASAny).worldmap.removeEventListener("mouseUp", onMouseUp);
-		(mRootMovieClip : ASAny).worldmap.removeEventListener("mouseOut", onMouseOut);
-		(mRootMovieClip : ASAny).worldmap.removeEventListener("mouseLeave", onMouseOut);
-		(mRootMovieClip : ASAny).worldmap.removeEventListener("mouseMove", onDrag);
-		(mRootMovieClip : ASAny).worldmap.addEventListener("mouseOver", onMouseOver);
+		EventListeners.remove(ASCompat.coerce((mRootMovieClip : ASAny).worldmap, flash.events.IEventDispatcher), "mouseUp", onMouseUp);
+		EventListeners.remove(ASCompat.coerce((mRootMovieClip : ASAny).worldmap, flash.events.IEventDispatcher), "mouseOut", onMouseOut);
+		EventListeners.remove(ASCompat.coerce((mRootMovieClip : ASAny).worldmap, flash.events.IEventDispatcher), "mouseLeave", onMouseOut);
+		EventListeners.remove(ASCompat.coerce((mRootMovieClip : ASAny).worldmap, flash.events.IEventDispatcher), "mouseMove", onDrag);
+		EventListeners.add(ASCompat.coerce((mRootMovieClip : ASAny).worldmap, flash.events.IEventDispatcher), "mouseOver", onMouseOver);
 		startSlide();
 	}
 
 	function onMouseOver(mouseEvent:MouseEvent) {
-		(mRootMovieClip : ASAny).worldmap.removeEventListener("mouseOver", onMouseOver);
+		EventListeners.remove(ASCompat.coerce((mRootMovieClip : ASAny).worldmap, flash.events.IEventDispatcher), "mouseOver", onMouseOver);
 		if (mouseEvent.buttonDown) {
 			onMouseDown(mouseEvent);
 		}
 	}
 
 	function onMouseDown(mouseEvent:MouseEvent) {
-		mDBFacade.mouseCursorManager.pushMouseCursor("DRAG");
+		popDragCursor();
+		mDragCursorKey = mDBFacade.mouseCursorManager.pushMouseCursor("DRAG");
 		if (mMouseTask != null) {
 			mMouseTask.destroy();
 			mMouseTask = null;
@@ -1280,23 +1210,19 @@ class UIMapWorldMap {
 		mMouseVelocityX = 0;
 		mMouseVelocityY = 0;
 		if (mMapDragTask == null) {
-			mMapDragTask = mWorkComponent.doEveryFrame(updateDrag);
+			mMapDragTask = mRenderWorkComponent.doEveryFrame(updateDrag);
 		}
 		ASCompat.setProperty((mRootMovieClip : ASAny).worldmap, "mouseChildren", false);
-		(mRootMovieClip : ASAny).worldmap.addEventListener("mouseMove", onDrag);
-		(mRootMovieClip : ASAny).worldmap.addEventListener("mouseUp", onMouseUp);
-		(mRootMovieClip : ASAny).worldmap.addEventListener("mouseOut", onMouseOut);
-		(mRootMovieClip : ASAny).worldmap.addEventListener("mouseLeave", onMouseOut);
-	}
-
-	function isMapNode(obj:ASObject):Bool {
-		return (obj : ASAny).constructor == mMapNodeClass;
+		EventListeners.add(ASCompat.coerce((mRootMovieClip : ASAny).worldmap, flash.events.IEventDispatcher), "mouseMove", onDrag);
+		EventListeners.add(ASCompat.coerce((mRootMovieClip : ASAny).worldmap, flash.events.IEventDispatcher), "mouseUp", onMouseUp);
+		EventListeners.add(ASCompat.coerce((mRootMovieClip : ASAny).worldmap, flash.events.IEventDispatcher), "mouseOut", onMouseOut);
+		EventListeners.add(ASCompat.coerce((mRootMovieClip : ASAny).worldmap, flash.events.IEventDispatcher), "mouseLeave", onMouseOut);
 	}
 
 	function clearMouseEnabledOnWorldmap() {
-		var _loc1_ = 0;
+		var _loc1_ = (0 : UInt);
 		var _loc2_:MovieClip = null;
-		_loc1_ = 0;
+		_loc1_ = (0 : UInt);
 		while (_loc1_ < ASCompat.toNumberField((mRootMovieClip : ASAny).worldmap, "numChildren")) {
 			_loc2_ = ASCompat.dynamicAs((mRootMovieClip : ASAny).worldmap.getChildAt(_loc1_), MovieClip);
 			if (_loc2_ != null
@@ -1313,8 +1239,6 @@ class UIMapWorldMap {
 		}
 	}
 
-	function hideAllMapNodes() {}
-
 	function revealCallback(childClip:MovieClip):ASFunction {
 		return function(param1:GameClock) {
 			var _loc2_:Revealer = null;
@@ -1325,19 +1249,15 @@ class UIMapWorldMap {
 		};
 	}
 
-	function getMapnodeFromCurrentNode1():MapnodeInfo {
-		return ASCompat.coerce(mDBFacade.dbAccountInfo.inventoryInfo.mapnodes1.itemFor(mCurrentNode.Id), account.MapnodeInfo);
-	}
-
 	function mapNodesOpen(mapNodes:Array<ASAny>, andDefeated:Bool = false):Bool {
-		var _loc4_ = 0;
+		var _loc4_ = (0 : UInt);
 		var _loc3_:GMMapNode = null;
 		if (mapNodes == null || mDBFacade.dbAccountInfo == null || mDBFacade.dbAccountInfo.inventoryInfo == null) {
 			return false;
 		}
-		_loc4_ = 0;
-		while (_loc4_ < mapNodes.length) {
-			_loc3_ = ASCompat.coerce(mapNodes[_loc4_], gameMasterDictionary.GMMapNode);
+		_loc4_ = (0 : UInt);
+		while (_loc4_ < (mapNodes.length:UInt)) {
+			_loc3_ = ASCompat.coerce(mapNodes[(_loc4_ : Int)], gameMasterDictionary.GMMapNode);
 			if (mapNodeOpen(_loc3_, andDefeated)) {
 				return true;
 			}
@@ -1376,9 +1296,9 @@ class UIMapWorldMap {
 
 	function hasLockedNextNode(node:GMMapNode):Bool {
 		var _loc2_:GMMapNode;
-		final __ax4_iter_172 = node.ChildNodes;
-		if (checkNullIteratee(__ax4_iter_172))
-			for (_tmp_ in __ax4_iter_172) {
+		final __ax4_iter_515 = node.ChildNodes;
+		if (checkNullIteratee(__ax4_iter_515))
+			for (_tmp_ in __ax4_iter_515) {
 				_loc2_ = ASCompat.coerce(_tmp_, gameMasterDictionary.GMMapNode);
 				if (_loc2_ != null) {
 					if (mapNodeLocked(_loc2_)) {
@@ -1392,28 +1312,15 @@ class UIMapWorldMap {
 	function hasUnlockedChild(node:GMMapNode):Bool {
 		var _loc2_:GMMapNode = null;
 		var _loc3_:String;
-		final __ax4_iter_173 = node.RevealNodes;
-		if (checkNullIteratee(__ax4_iter_173))
-			for (_tmp_ in __ax4_iter_173) {
+		final __ax4_iter_516 = node.RevealNodes;
+		if (checkNullIteratee(__ax4_iter_516))
+			for (_tmp_ in __ax4_iter_516) {
 				_loc3_ = _tmp_;
 				if (ASCompat.stringAsBool(_loc3_)) {
 					_loc2_ = ASCompat.coerce(mDBFacade.gameMaster.mapNodeByConstant.itemFor(_loc3_), gameMasterDictionary.GMMapNode);
 					if (_loc2_ != null && mapNodeOpen(_loc2_, true)) {
 						return true;
 					}
-				}
-			}
-		return false;
-	}
-
-	function isChildNode(node:GMMapNode, childConstant:String):Bool {
-		var _loc3_:GMMapNode;
-		final __ax4_iter_174 = node.ChildNodes;
-		if (checkNullIteratee(__ax4_iter_174))
-			for (_tmp_ in __ax4_iter_174) {
-				_loc3_ = ASCompat.coerce(_tmp_, gameMasterDictionary.GMMapNode);
-				if (_loc3_ != null && _loc3_.Constant == childConstant) {
-					return true;
 				}
 			}
 		return false;
@@ -1457,9 +1364,9 @@ class UIMapWorldMap {
 		var _loc7_:Float = 0.15;
 		var _loc4_ = hasUnlockedChild(node);
 		var _loc8_:String;
-		final __ax4_iter_175 = node.RevealNodes;
-		if (checkNullIteratee(__ax4_iter_175))
-			for (_tmp_ in __ax4_iter_175) {
+		final __ax4_iter_517 = node.RevealNodes;
+		if (checkNullIteratee(__ax4_iter_517))
+			for (_tmp_ in __ax4_iter_517) {
 				_loc8_ = _tmp_;
 				if (ASCompat.stringAsBool(_loc8_)) {
 					_loc3_ = ASCompat.coerce(mDBFacade.gameMaster.mapNodeByConstant.itemFor(_loc8_), gameMasterDictionary.GMMapNode);
@@ -1482,12 +1389,12 @@ class UIMapWorldMap {
 	}
 
 	function initializeLeagueMapNodes(league:MovieClip, isInfiniteLeague:Bool = false) {
-		var _loc5_ = 0;
+		var _loc5_ = (0 : UInt);
 		var _loc3_:MovieClip = null;
 		var _loc4_:GMMapNode = null;
-		_loc5_ = 0;
-		while (_loc5_ < league.numChildren) {
-			_loc3_ = ASCompat.reinterpretAs(league.getChildAt(_loc5_), MovieClip);
+		_loc5_ = (0 : UInt);
+		while (_loc5_ < (league.numChildren:UInt)) {
+			_loc3_ = ASCompat.reinterpretAs(league.getChildAt((_loc5_ : Int)), MovieClip);
 			if (_loc3_ != null) {
 				ASCompat.setProperty((_loc3_ : ASAny).arrow, "visible", false);
 				ASCompat.setProperty((_loc3_ : ASAny).arrow, "mouseEnabled", false);
@@ -1505,7 +1412,7 @@ class UIMapWorldMap {
 				}
 				if (ASCompat.toBool((_loc3_ : ASAny).text_popup) && ASCompat.toBool((_loc3_ : ASAny).text_popup.title_label)) {
 					ASCompat.setProperty((_loc3_ : ASAny).text_popup, "visible", false);
-					ASCompat.setProperty((_loc3_ : ASAny).text_popup.title_label, "text", Locale.getString("DUNGEON_LOCKED_TITLE"));
+					setNodeTitle(ASCompat.coerce((_loc3_ : ASAny).text_popup.title_label, flash.text.TextField), Locale.getString("DUNGEON_LOCKED_TITLE"));
 				}
 				if (ASCompat.toBool((_loc3_ : ASAny).label)) {
 					ASCompat.setProperty((_loc3_ : ASAny).label, "text", "");
@@ -1522,9 +1429,9 @@ class UIMapWorldMap {
 	}
 
 	function initializeAllMapNodes() {
-		var _loc2_ = 0;
+		var _loc2_ = (0 : UInt);
 		var _loc1_:MovieClip = null;
-		_loc2_ = 0;
+		_loc2_ = (0 : UInt);
 		while (_loc2_ < ASCompat.toNumberField((mRootMovieClip : ASAny).worldmap, "numChildren")) {
 			_loc1_ = ASCompat.dynamicAs((mRootMovieClip : ASAny).worldmap.getChildAt(_loc2_), MovieClip);
 			if (_loc1_ != null && _loc1_.name.indexOf("_unlocked") != -1) {
@@ -1596,18 +1503,20 @@ class UIMapWorldMap {
 						&& ASCompat.toBool((_loc2_ : ASAny).text_popup.title_label)
 						&& ASCompat.toBool((_loc2_ : ASAny).text_popup.description_label)) {
 						ASCompat.setProperty((_loc2_ : ASAny).text_popup, "visible", true);
-						ASCompat.setProperty((_loc2_ : ASAny).text_popup.title_label, "text",
+						setNodeTitle(ASCompat.coerce((_loc2_ : ASAny).text_popup.title_label, flash.text.TextField),
 							GameMasterLocale.getGameMasterSubString("DUNGEON_NAME", _loc5_.Constant).toUpperCase());
 						_loc11_ = ASCompat.coerce(mDBFacade.gameMaster.coliseumTierByConstant.itemFor(_loc5_.TierRank), gameMasterDictionary.GMColiseumTier);
-						if (_loc11_.TotalFloors > 0 && _loc5_.NodeType != "BOSS") {
+						if (_loc11_.TotalFloors > 0 && _loc5_.NodeType != GMMapNode.BOSS_NODE_TYPE) {
 							_loc9_ = _loc11_.TotalFloors > 1 ? Locale.getString("FLOORS") : Locale.getString("FLOOR");
 							if (_loc11_.TotalFloors >= 50) {
-								ASCompat.setProperty((_loc2_ : ASAny).text_popup.description_label, "text", Locale.getString("INFINITE_FLOORS_POPUP"));
+								setNodeDescription(ASCompat.coerce((_loc2_ : ASAny).text_popup.description_label, flash.text.TextField),
+									Locale.getString("INFINITE_FLOORS_POPUP"));
 							} else {
-								ASCompat.setProperty((_loc2_ : ASAny).text_popup.description_label, "text", Std.string(_loc11_.TotalFloors) + " " + _loc9_);
+								setNodeDescription(ASCompat.coerce((_loc2_ : ASAny).text_popup.description_label, flash.text.TextField),
+									Std.string(_loc11_.TotalFloors) + " " + _loc9_);
 							}
 						} else {
-							ASCompat.setProperty((_loc2_ : ASAny).text_popup.description_label, "text",
+							setNodeDescription(ASCompat.coerce((_loc2_ : ASAny).text_popup.description_label, flash.text.TextField),
 								GameMasterLocale.getGameMasterSubString("DUNGEON_DIFFICULTY_NAME", _loc5_.Constant));
 						}
 					}
@@ -1659,7 +1568,7 @@ class UIMapWorldMap {
 						}
 					}
 					if (ASCompat.toBool((_loc2_ : ASAny).label) && mCurrentLeague != 3) {
-						ASCompat.setProperty((_loc2_ : ASAny).label, "text",
+						TextUtil.setText(ASCompat.coerce((_loc2_ : ASAny).label, flash.text.TextField),
 							GameMasterLocale.getGameMasterSubString("DUNGEON_NAME", _loc5_.Constant).toUpperCase());
 					} else if (ASCompat.toBool((_loc2_ : ASAny).label) && mCurrentLeague == 3) {
 						ASCompat.setProperty((_loc2_ : ASAny).label, "visible", false);
@@ -1682,29 +1591,29 @@ class UIMapWorldMap {
 	}
 
 	function createNodeButtonsForLeague(league:MovieClip):Bool {
-		var _loc5_ = 0;
+		var _loc5_ = (0 : UInt);
 		var _loc10_:MovieClip = null;
 		var _loc13_ = false;
 		var _loc11_ = false;
 		var _loc3_:GMMapNode = null;
 		var _loc9_:MovieClip = null;
 		var _loc4_:MovieClipRenderController = null;
-		var _loc7_ = 0;
+		var _loc7_ = (0 : UInt);
 		var _loc6_:GMMapNode = null;
 		var _loc14_:MovieClip = null;
 		var _loc8_:UIButton = null;
 		var _loc12_:UIButton = null;
 		var _loc2_ = false;
-		_loc5_ = 0;
-		while (_loc5_ < league.numChildren) {
-			_loc10_ = ASCompat.reinterpretAs(league.getChildAt(_loc5_), MovieClip);
+		_loc5_ = (0 : UInt);
+		while (_loc5_ < (league.numChildren:UInt)) {
+			_loc10_ = ASCompat.reinterpretAs(league.getChildAt((_loc5_ : Int)), MovieClip);
 			if (_loc10_ != null) {
 				_loc13_ = false;
 				_loc11_ = false;
 				_loc3_ = ASCompat.coerce(mDBFacade.gameMaster.mapNodeByConstant.itemFor(_loc10_.name), gameMasterDictionary.GMMapNode);
 				if (_loc3_ != null) {
 					if (mapNodesOpen(_loc3_.ParentNodes, false)) {
-						if (_loc3_.LevelRequirement <= mDBFacade.dbAccountInfo.activeAvatarInfo.level) {
+						if (_loc3_.LevelRequirement <= mDBFacade.dbAccountInfo.activeAvatarInfo.ogLevel) {
 							if (ASCompat.toBool((_loc10_ : ASAny).level_req)) {
 								ASCompat.setProperty((_loc10_ : ASAny).level_req, "visible", false);
 							}
@@ -1712,10 +1621,11 @@ class UIMapWorldMap {
 							_loc13_ = true;
 							if (ASCompat.toBool((_loc10_ : ASAny).level_req)) {
 								ASCompat.setProperty((_loc10_ : ASAny).level_req, "visible", true);
-								ASCompat.setProperty((_loc10_ : ASAny).level_req.level_label, "text", Std.string(_loc3_.LevelRequirement));
+								TextUtil.setText(ASCompat.coerce((_loc10_ : ASAny).level_req.level_label, flash.text.TextField),
+									Std.string(_loc3_.LevelRequirement));
 							}
 							if (ASCompat.toBool((_loc10_ : ASAny).text_popup)) {
-								ASCompat.setProperty((_loc10_ : ASAny).text_popup.description_label, "text",
+								setNodeDescription(ASCompat.coerce((_loc10_ : ASAny).text_popup.description_label, flash.text.TextField),
 									"You are not high enough level to play this dungeon.");
 							}
 						}
@@ -1730,14 +1640,19 @@ class UIMapWorldMap {
 								ASCompat.setProperty((_loc10_ : ASAny).level_req, "visible", false);
 								ASCompat.setProperty((_loc10_ : ASAny).trophy_req, "visible", false);
 								ASCompat.setProperty((_loc10_ : ASAny).trophy_req_left, "visible", true);
-								ASCompat.setProperty((_loc10_ : ASAny).trophy_req_left.level_label, "text", Std.string(_loc3_.LevelRequirement));
-								ASCompat.setProperty((_loc10_ : ASAny).trophy_req_left.trophy_label, "text", Std.string(_loc3_.TrophyRequirement));
-								ASCompat.setProperty((_loc10_ : ASAny).text_popup.description_label, "text", "Not high enough level, and not enough trophies.");
+								TextUtil.setText(ASCompat.coerce((_loc10_ : ASAny).trophy_req_left.level_label, flash.text.TextField),
+									Std.string(_loc3_.LevelRequirement));
+								TextUtil.setText(ASCompat.coerce((_loc10_ : ASAny).trophy_req_left.trophy_label, flash.text.TextField),
+									Std.string(_loc3_.TrophyRequirement));
+								setNodeDescription(ASCompat.coerce((_loc10_ : ASAny).text_popup.description_label, flash.text.TextField),
+									"Not high enough level, and not enough trophies.");
 							} else {
 								ASCompat.setProperty((_loc10_ : ASAny).trophy_req_left, "visible", false);
 								ASCompat.setProperty((_loc10_ : ASAny).trophy_req, "visible", true);
-								ASCompat.setProperty((_loc10_ : ASAny).trophy_req.trophy_label, "text", Std.string(_loc3_.TrophyRequirement));
-								ASCompat.setProperty((_loc10_ : ASAny).text_popup.description_label, "text", "Not enough trophies to play this dungeon.");
+								TextUtil.setText(ASCompat.coerce((_loc10_ : ASAny).trophy_req.trophy_label, flash.text.TextField),
+									Std.string(_loc3_.TrophyRequirement));
+								setNodeDescription(ASCompat.coerce((_loc10_ : ASAny).text_popup.description_label, flash.text.TextField),
+									"Not enough trophies to play this dungeon.");
 							}
 						}
 						if (_loc13_) {
@@ -1768,9 +1683,9 @@ class UIMapWorldMap {
 					}
 					if (!_loc13_) {
 						_loc2_ = true;
-						_loc7_ = 0;
-						while (_loc7_ < _loc3_.ParentNodes.length) {
-							_loc6_ = ASCompat.coerce(_loc3_.ParentNodes[_loc7_], gameMasterDictionary.GMMapNode);
+						_loc7_ = (0 : UInt);
+						while (_loc7_ < (_loc3_.ParentNodes.length:UInt)) {
+							_loc6_ = ASCompat.coerce(_loc3_.ParentNodes[(_loc7_ : Int)], gameMasterDictionary.GMMapNode);
 							if (_loc6_ != null && mapNodeOpen(_loc6_, true)) {
 								_loc14_ = ASCompat.coerce(cast((mRootMovieClip : ASAny).worldmap, flash.display.DisplayObjectContainer)
 									.getChildByName(_loc6_.Constant
@@ -1788,7 +1703,7 @@ class UIMapWorldMap {
 							}
 							_loc7_++;
 						}
-						_loc8_ = new UIButton(mDBFacade, _loc9_);
+						_loc8_ = new UIMapNodeButton(mDBFacade, _loc9_, true);
 						_loc8_.rolloverFilter = DBGlobal.UI_ROLLOVER_FILTER;
 						_loc8_.releaseCallback = moveAvatarToNode(_loc3_);
 						_loc8_.rollOverCursor = "POINT";
@@ -1796,18 +1711,21 @@ class UIMapWorldMap {
 						ASCompat.setProperty((_loc10_ : ASAny).text_popup, "x", 0);
 						ASCompat.setProperty((_loc10_ : ASAny).text_popup, "y", 0);
 						_loc8_.tooltip = ASCompat.coerce((_loc10_ : ASAny).text_popup, flash.display.MovieClip);
+						_loc8_.lockTooltipToParent(ASCompat.coerce((mRootMovieClip : ASAny).worldmap, flash.display.DisplayObjectContainer));
 						mOpenNodeButtons.add(_loc3_.Id, _loc8_);
 					} else {
-						_loc12_ = new UIButton(mDBFacade, _loc9_);
+						_loc12_ = new UIMapNodeButton(mDBFacade, _loc9_, false);
 						if (ASCompat.toBool((_loc10_ : ASAny).text_popup)
 							&& ASCompat.toBool((_loc10_ : ASAny).text_popup.description_label)) {
 							if (!_loc11_) {
-								ASCompat.setProperty((_loc10_ : ASAny).text_popup.description_label, "text", Locale.getString("DUNGEON_LOCKED_DESCRIPTION"));
+								setNodeDescription(ASCompat.coerce((_loc10_ : ASAny).text_popup.description_label, flash.text.TextField),
+									Locale.getString("DUNGEON_LOCKED_DESCRIPTION"));
 							}
 							ASCompat.setProperty((_loc10_ : ASAny).text_popup, "x", 0);
 							ASCompat.setProperty((_loc10_ : ASAny).text_popup, "y", 0);
 							ASCompat.setProperty((_loc10_ : ASAny).text_popup, "visible", true);
 							_loc12_.tooltip = ASCompat.coerce((_loc10_ : ASAny).text_popup, flash.display.MovieClip);
+							_loc12_.lockTooltipToParent(ASCompat.coerce((mRootMovieClip : ASAny).worldmap, flash.display.DisplayObjectContainer));
 						}
 						_loc12_.rolloverFilter = DBGlobal.UI_DISABLED_FILTER;
 						_loc12_.releaseCallback = null;
@@ -1826,7 +1744,6 @@ class UIMapWorldMap {
 
 	function setupMapNodeButtons() {
 		mOpenNodeButtons = new Map();
-		mLockedNodeButtons = new Map();
 		initializeAllMapNodes();
 		initializeOpenMapNodes();
 		createNodeButtonsForLeague(ASCompat.coerce((mRootMovieClip : ASAny).worldmap.rookie_league, flash.display.MovieClip));
@@ -1836,138 +1753,6 @@ class UIMapWorldMap {
 		mInfiniteIslandUnlocked = createNodeButtonsForLeague(ASCompat.coerce((mRootMovieClip : ASAny).worldmap.infinite_island_league,
 			flash.display.MovieClip));
 		setCurrentNode(mCurrentNode);
-	}
-
-	function startFriendFader() {
-		if (mFriendFadeTask == null) {
-			mFriendFadeTask = mWorkComponent.doEveryFrame(hideFriendsOnHover);
-		}
-	}
-
-	function stopFriendFader() {
-		var _loc1_:DisplayObject;
-		var __ax4_iter_176:Array<ASAny>;
-		if (mFriendFadeTask != null) {
-			mFriendFadeTask.destroy();
-			mFriendFadeTask = null;
-			if (mAvatarList != null) {
-				__ax4_iter_176 = mAvatarList;
-				if (checkNullIteratee(__ax4_iter_176))
-					for (_tmp_ in __ax4_iter_176) {
-						_loc1_ = ASCompat.coerce(_tmp_, flash.display.DisplayObject);
-						_loc1_.alpha = 1;
-						ASCompat.setProperty((cast(_loc1_, MovieClip) : ASAny).join, "alpha", 1);
-					}
-			}
-		}
-	}
-
-	function hideFriendsOnHover(clock:GameClock) {
-		var _loc4_:DisplayObject;
-		var __ax4_iter_177:Array<ASAny>;
-		var _loc2_ = Math.NaN;
-		var _loc3_ = Math.NaN;
-		if (mAvatarList != null) {
-			__ax4_iter_177 = mAvatarList;
-			if (checkNullIteratee(__ax4_iter_177))
-				for (_tmp_ in __ax4_iter_177) {
-					_loc4_ = ASCompat.coerce(_tmp_, flash.display.DisplayObject);
-					_loc2_ = Math.abs(_loc4_.x - ASCompat.toNumberField((mRootMovieClip : ASAny).worldmap, "mouseX"));
-					_loc3_ = Math.abs(_loc4_.y - ASCompat.toNumberField((mRootMovieClip : ASAny).worldmap, "mouseY"));
-					if (_loc2_ < 60 && _loc3_ < 60) {
-						_loc2_ /= 60;
-						_loc3_ /= 60;
-						_loc4_.alpha = Math.sqrt(_loc2_ * _loc2_ + _loc3_ * _loc3_);
-					} else {
-						_loc4_.alpha = 1;
-					}
-					ASCompat.setProperty((cast(_loc4_, MovieClip) : ASAny).join, "alpha", 1 / Math.max(0.01, _loc4_.alpha));
-				}
-		}
-	}
-
-	function clipFromNodeId(nodeId:UInt):MovieClip {
-		var _loc2_ = ASCompat.coerce(mDBFacade.gameMaster.mapNodeById.itemFor(nodeId), gameMasterDictionary.GMMapNode);
-		if (_loc2_ != null) {
-			return getClipFromConstant(_loc2_.Constant);
-		}
-		return null;
-	}
-
-	function checkTransition() {
-		if (mUnlockResponseReceived && mDidKeySpentMessage) {
-			if (mUnlockSuccessful) {
-				mDBFacade.mouseCursorManager.popMouseCursor();
-				mDBFacade.mouseCursorManager.disable = true;
-				mDBFacade.mainStateMachine.enterLoadingScreenState(mCurrentNode.Id, mCurrentNode.NodeType, (0 : UInt), (0 : UInt), true,
-					mBattlePopup.IsPrivate);
-			} else {
-				mBattlePopup.battleButton.enabled = true;
-				mUnlockResponseReceived = false;
-				mUnlockSuccessful = false;
-				mDidKeySpentMessage = false;
-			}
-		}
-	}
-
-	function unlockMapNodeSuccessCallback(details:ASAny) {
-		mUnlockResponseReceived = true;
-		mUnlockSuccessful = true;
-		checkTransition();
-	}
-
-	function unlockMapNodeFailCallback(err:Error) {
-		mUnlockResponseReceived = true;
-		mUnlockSuccessful = false;
-		Logger.error(Std.string(err));
-		checkTransition();
-	}
-
-	function unlockMapNode() {
-		var node:MovieClip;
-		var popup:DBUIOneButtonPopup;
-		var spentKeyClass:Dynamic;
-		var keyCostClip:MovieClip;
-		var global_position:Point;
-		var floatingMessage:FloatingMessage;
-		var unlockMapNodeRPC:ASFunction;
-		if (mSpentKeyMessage != null) {
-			return;
-		}
-		node = getClipFromConstant(mCurrentNode.Constant);
-		if (node == null) {
-			Logger.error("Attempting to unlock invalid dungeon");
-			return;
-		}
-		if (mCurrentNode.TrophyRequirement > mDBFacade.dbAccountInfo.trophies) {
-			mDBFacade.metrics.log("NotEnoughTrophiesWarning");
-			popup = new DBUIOneButtonPopup(mDBFacade, "STOP IT!", "NO! NOT ENOUGH TROPHIES!", "OK", null);
-			MemoryTracker.track(popup, "DBUIOneButtonPopup - created in UIMapWorldMap.unlockMapNode()");
-			return;
-		}
-		spentKeyClass = mTownSwfAsset.getClass("Branch_map_spent_key");
-		mSpentKeyMessage = ASCompat.dynamicAs(ASCompat.createInstance(spentKeyClass, []), MovieClip);
-		keyCostClip = mBattlePopup.keyCostClip;
-		global_position = keyCostClip.localToGlobal(new Point(keyCostClip.x, keyCostClip.y));
-		mSpentKeyMessage.x = mBattlePopup.battleButton.root.x;
-		mSpentKeyMessage.y = mBattlePopup.battleButton.root.y - 40;
-		if (mCurrentNode.BasicKeys > mCurrentNode.PremiumKeys) {
-			ASCompat.setProperty((mSpentKeyMessage : ASAny).keyamount, "text", Std.string(mCurrentNode.BasicKeys));
-		} else {
-			ASCompat.setProperty((mSpentKeyMessage : ASAny).keyamount, "text", Std.string(mCurrentNode.PremiumKeys));
-		}
-		mBattlePopup.battleButton.enabled = false;
-		mWorkComponent.doLater(1, function(param1:GameClock) {
-			mBattlePopup.animatePopupOut(true);
-		});
-		mDBFacade.sceneGraphManager.addChild(mSpentKeyMessage, 105);
-		floatingMessage = new FloatingMessage(mSpentKeyMessage, mDBFacade, (12 : UInt), (64 : UInt), 10, 60, null, function() {
-			mDBFacade.sceneGraphManager.removeChild(mSpentKeyMessage);
-			mDidKeySpentMessage = true;
-			checkTransition();
-		});
-		unlockMapNodeRPC = JSONRPCService.getFunction("UnlockMapNode", mDBFacade.rpcRoot + "worldmap");
-		unlockMapNodeSuccessCallback(null);
 	}
 
 	function moveAvatarToNode(gmMapNode:GMMapNode, force:Bool = false, returningToNodeFromAnotherScreen:Bool = false):ASFunction {
@@ -1998,49 +1783,29 @@ class UIMapWorldMap {
 	public function battleButtonCallback() {
 		var _loc2_:DBUIOneButtonPopup = null;
 		var _loc1_:DBUIOneButtonPopup = null;
-		if (mCurrentNode.LevelRequirement <= mDBFacade.dbAccountInfo.activeAvatarInfo.level) {
+		if (mCurrentNode.LevelRequirement <= mDBFacade.dbAccountInfo.activeAvatarInfo.ogLevel) {
 			if (mCurrentNode.TrophyRequirement > mDBFacade.dbAccountInfo.trophies) {
 				mDBFacade.metrics.log("NotEnoughTrophiesWarning");
-				_loc2_ = new DBUIOneButtonPopup(mDBFacade, "STOP IT!", "NO! NOT ENOUGH TROPHIES!", "OK", null);
+				_loc2_ = new DBUIOneButtonPopup(mDBFacade, "MAP_DEBUG_POPUP", "STOP IT!", "NO! NOT ENOUGH TROPHIES!", "OK", null);
 				MemoryTracker.track(_loc2_, "DBUIOneButtonPopup - created in UIMapWorldMap.battleButtonCallback()");
 				return;
 			}
 			if (mapNodeOpen(mCurrentNode)) {
-				mDBFacade.mouseCursorManager.popMouseCursor();
-				mDBFacade.mouseCursorManager.disable = true;
 				mDBFacade.mainStateMachine.enterLoadingScreenState(mCurrentNode.Id, mCurrentNode.NodeType, (0 : UInt), (0 : UInt), true,
 					mBattlePopup.IsPrivate);
-			} else {
-				unlockMapNode();
 			}
 		} else {
-			_loc1_ = new DBUIOneButtonPopup(mDBFacade, "STOP IT!", "NO! NOT HIGH ENOUGH LEVEL!", "OK", null);
+			_loc1_ = new DBUIOneButtonPopup(mDBFacade, "MAP_DEBUG_POPUP", "STOP IT!", "NO! NOT HIGH ENOUGH LEVEL!", "OK", null);
 			MemoryTracker.track(_loc1_, "DBUIOneButtonPopup - created in UIMapWorldMap.battleButtonCallback()");
 		}
-	}
-
-	public function showFloatingMessage(xPos:Float, yPos:Float, message:String) {
-		var floatingMessage:FloatingMessage;
-		var messageClass = mTownSwfAsset.getClass("floating_text");
-		var messageClip = ASCompat.dynamicAs(ASCompat.createInstance(messageClass, []), MovieClip);
-		mRootMovieClip.addChild(messageClip);
-		messageClip.x = xPos;
-		messageClip.y = yPos;
-		messageClip.mouseChildren = false;
-		messageClip.mouseEnabled = false;
-		messageClip.alpha = 0;
-		ASCompat.setProperty((messageClip : ASAny).label, "text", message);
-		floatingMessage = new FloatingMessage(messageClip, mDBFacade, (25 : UInt), (100 : UInt), 20, 30, null, function() {
-			mRootMovieClip.removeChild(messageClip);
-		});
 	}
 
 	function showChooseDungeonMessage(clock:GameClock) {
 		var messageClass = mTownSwfAsset.getClass("Branch_choose_dungeon");
 		var messageClip = ASCompat.dynamicAs(ASCompat.createInstance(messageClass, []), MovieClip);
 		mRootMovieClip.addChild(messageClip);
-		messageClip.x = messageClip.stage.stageWidth / 2;
-		messageClip.y = messageClip.stage.stageHeight * 0.4;
+		messageClip.x = mDBFacade.viewWidth / 2;
+		messageClip.y = mDBFacade.viewHeight * 0.4;
 		messageClip.scaleX = messageClip.scaleY = 1.5;
 		messageClip.mouseChildren = false;
 		messageClip.mouseEnabled = false;
@@ -2053,93 +1818,7 @@ class UIMapWorldMap {
 		}, (1 : UInt));
 	}
 
-	@:isVar public var returnToMapNode(never, set):GMMapNode;
-
-	public function set_returnToMapNode(value:GMMapNode):GMMapNode {
-		return mReturnToMapNode = value;
-	}
-
-	function buildPathFromSearchNode(node:SearchNode) {
-		mNodePath = [];
-		mNodePath.push(node.Node);
-		while (node.Parent != null) {
-			node = node.Parent;
-			if (node.Parent != null) {
-				mNodePath.push(node.Node);
-			}
-		}
-	}
-
-	function findPathToNode(goal:GMMapNode) {
-		var _loc2_:SearchNode = null;
-		if (goal == null || mCurrentNode == null || goal == mCurrentNode) {
-			return;
-		}
-		mNodeQueue = [];
-		mClosedNodeList = new Set();
-		var _loc3_ = new SearchNode(mCurrentNode, null);
-		mNodeQueue.push(_loc3_);
-		while (mNodeQueue.length != 0) {
-			_loc2_ = ASCompat.coerce(mNodeQueue.shift(), SearchNode);
-			mClosedNodeList.add(_loc2_.Node);
-			if (_loc2_.Node == goal) {
-				buildPathFromSearchNode(_loc2_);
-				return;
-			}
-			addChildrenToQueue(_loc2_);
-		}
-		Logger.error("Can\'t find path to selected map node.");
-	}
-
-	function addChildrenToQueue(mapNode:SearchNode) {
-		var _loc2_ = 0;
-		var _loc3_:GMMapNode = null;
-		_loc2_ = 0;
-		while (_loc2_ < mapNode.Node.ChildNodes.length) {
-			_loc3_ = ASCompat.coerce(mapNode.Node.ChildNodes[_loc2_], gameMasterDictionary.GMMapNode);
-			if (_loc3_ != null && !mClosedNodeList.has(_loc3_)) {
-				mNodeQueue.push(new SearchNode(_loc3_, mapNode));
-			}
-			_loc2_++;
-		}
-	}
-
-	function setUpHacksToPlayNode() {
-		mDBFacade.stageRef.addEventListener("keyDown", hackToHandleKeyPressToPlayNode);
-	}
-
-	function tearDownHacksToPlayNode() {
-		mDBFacade.stageRef.removeEventListener("keyDown", hackToHandleKeyPressToPlayNode);
-	}
-
-	function hackToHandleKeyPressToPlayNode(e:KeyboardEvent) {
-		switch (e.keyCode - 69) {
-			case 0:
-				hackToPlayNode((50153 : UInt));
-
-			case 12:
-				hackToPlayNode((50150 : UInt));
-
-			case 13:
-				hackToPlayNode((50200 : UInt));
-
-			case 18:
-				hackToPlayNode((50151 : UInt));
-		}
-	}
-
-	function hackToPlayNode(nodeIdToPlay:UInt) {
-		mDBFacade.mainStateMachine.enterLoadingScreenState(nodeIdToPlay, "", (0 : UInt), (0 : UInt), true, false);
-	}
-}
-
-private class SearchNode {
-	public var Node:GMMapNode;
-
-	public var Parent:SearchNode;
-
-	public function new(node:GMMapNode, parent:SearchNode) {
-		Node = node;
-		Parent = parent;
+	static function __init__() {
+		LEAGUE_BOUNDARY_NODE_IDS = [[50020, 50021], [50051, 50052], [50083, 50084], [50099, 50156]];
 	}
 }

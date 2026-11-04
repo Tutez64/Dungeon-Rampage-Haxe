@@ -1,36 +1,38 @@
 package town;
 
+import account.AvatarInfo;
 import account.StoreServicesController;
 import brain.assetRepository.AssetLoadingComponent;
 import brain.clock.GameClock;
 import brain.event.EventComponent;
+import brain.event.EventListeners;
 import brain.logger.Logger;
 import brain.render.MovieClipRenderController;
 import brain.uI.UIButton;
 import brain.utils.MemoryTracker;
+import brain.utils.TextUtil;
 import brain.workLoop.LogicalWorkComponent;
 import brain.workLoop.Task;
 import brain.jsonRPC.JSONRPCService;
+import dBGlobals.DBGlobal;
 import events.XPBonusEvent;
 import facade.DBFacade;
 import facade.Locale;
 import facade.TrickleCacheLoader;
-import facebookAPI.DBFacebookLevelUpPostController;
 import gameMasterDictionary.GMOffer;
 import gameMasterDictionary.GMSkin;
+import settings.SettingsPopup;
+import steamInput.OnSteamInputButtonReleasedEvent;
 import uI.dailyRewards.UIDailyRewards;
 import uI.gifting.UIGift;
 import uI.leaderboard.UILeaderboard;
-import uI.options.OptionsPanel;
 import uI.popup.DBUIMoviePopup;
 import uI.popup.DBUIOneButtonPopup;
 import uI.popup.DBUIPopup;
 import uI.popup.UIDragonKnightUpsellPopup;
-import uI.popup.UIFBInvitePopup;
 import uI.popup.UIFlaggedPopup;
-import uI.popup.UIHeroUpsellPopup;
-import uI.popup.UILevelUpShopPopup;
 import uI.popup.UIWhatsNewPopup;
+import uI.UILevelUpPostController;
 import uI.UIPagingPanel;
 import flash.display.DisplayObject;
 import flash.display.MovieClip;
@@ -39,22 +41,15 @@ import flash.events.Event;
 import flash.events.KeyboardEvent;
 import flash.geom.Point;
 import flash.net.URLRequest;
-import org.as3commons.collections.Set;
 
 class HomeState extends TownSubState {
 	public static inline final NAME = "HomeState";
 
 	public static inline final ACTIVE_AVATAR_CHANGED_EVENT = "ACTIVE_AVATAR_CHANGED_EVENT";
 
-	static inline final MIN_FRIENDS_TO_AVOID_INVITE_POPUP = (4 : UInt);
-
-	static inline final MAX_INVITE_POPUPS = (2 : UInt);
-
-	static inline final MAX_HERO_UPSELL_POPUPS = (8 : UInt);
-
 	static inline final POPUP_DELAY_TIME:Float = 0.5;
 
-	static inline final DELAY_AMOUNT_FOR_FRIEND_LEADERBOARD_NAVIGATION_LOAD = (2 : UInt);
+	static inline final COLISEUM_UNLOCK_LEVEL = (100 : UInt);
 
 	public static var mHasPonderedMOD:Bool = false;
 
@@ -65,6 +60,8 @@ class HomeState extends TownSubState {
 	var mInventoryButton:UIButton;
 
 	var mSkillsButton:UIButton;
+
+	var mSkillsButtonLocked:UIButton;
 
 	var mTrainButton:UIButton;
 
@@ -80,7 +77,7 @@ class HomeState extends TownSubState {
 
 	var mOptionsButton:UIButton;
 
-	var mOptionsPanel:OptionsPanel;
+	var mSettingsPopup:SettingsPopup;
 
 	var mTavernAlertUp:MovieClip;
 
@@ -128,11 +125,9 @@ class HomeState extends TownSubState {
 
 	var mPopupDelayTask:Task;
 
+	var mOptionsKeyTask:Task;
+
 	var mUILeaderboard:UILeaderboard;
-
-	var mFriendLeaderboardDelayMenuNavigationLinkageTask:Task;
-
-	var mHeroTypesLazilyLoaded:Set;
 
 	var mNewsStories:Vector<MessageOfTheDay>;
 
@@ -149,14 +144,45 @@ class HomeState extends TownSubState {
 		mEventComponent = new EventComponent(mDBFacade);
 		mLogicalWorkComponent = new LogicalWorkComponent(mDBFacade, "HomeState");
 		mAssetLoadingComponent = new AssetLoadingComponent(mDBFacade);
-		mOptionsPanel = new OptionsPanel(mDBFacade);
-		MemoryTracker.track(mOptionsPanel, "OptionsPanel - created in HomeState.HomeState()");
-		mHeroTypesLazilyLoaded = new Set();
+		var _loc3_ = mDBFacade.settingsModel;
 		mNewsStories = new Vector<MessageOfTheDay>();
 	}
 
+	function toggleSettingsPopup() {
+		if (mSettingsPopup != null) {
+			mSettingsPopup.destroy();
+			mSettingsPopup = null;
+			return;
+		}
+		mSettingsPopup = new SettingsPopup(mDBFacade, onSettingsPopupClosed);
+		MemoryTracker.track(mSettingsPopup, "SettingsPopup - created in HomeState.toggleSettingsPopup()");
+	}
+
+	function onSettingsPopupClosed() {
+		mSettingsPopup = null;
+	}
+
+	function checkOptionsKey(gameClock:GameClock) {
+		if (mDBFacade.keyBindings.wasReleased("openOptionsMenu")) {
+			toggleSettingsFromShortcut();
+		}
+	}
+
+	function onSteamInputButtonReleased(event:OnSteamInputButtonReleasedEvent) {
+		if (event.actionName == "menu_options") {
+			toggleSettingsFromShortcut();
+		}
+	}
+
+	function toggleSettingsFromShortcut() {
+		var _loc1_ = mSettingsPopup != null ? SettingsPopup.isTopMenu(mDBFacade) : mDBFacade.menuNavigationController.getTopUILayer() == "TOWN_MENU";
+		if (_loc1_) {
+			toggleSettingsPopup();
+		}
+	}
+
 	override public function destroy() {
-		mDBFacade.stageRef.removeEventListener("keyDown", openDaily);
+		EventListeners.remove(mDBFacade.stageRef, "keyDown", openDaily);
 		if (mDailyRewardsPopup != null) {
 			mDailyRewardsPopup.destroy();
 			mDailyRewardsPopup = null;
@@ -165,10 +191,15 @@ class HomeState extends TownSubState {
 		mBattleButton.destroy();
 		mTavernButton.destroy();
 		mInventoryButton.destroy();
+		if (mSkillsButtonLocked != null) {
+			mSkillsButtonLocked.destroy();
+			mSkillsButtonLocked = null;
+		}
 		mTrainButton.destroy();
 		mShopButton.destroy();
 		mGiftButton.destroy();
 		mCreditsButton.destroy();
+		mOptionsButton.destroy();
 		if (mEventComponent != null) {
 			mEventComponent.destroy();
 		}
@@ -184,8 +215,10 @@ class HomeState extends TownSubState {
 			mAssetLoadingComponent.destroy();
 		}
 		mAssetLoadingComponent = null;
-		mOptionsPanel.destroy();
-		mOptionsPanel = null;
+		if (mSettingsPopup != null) {
+			mSettingsPopup.destroy();
+			mSettingsPopup = null;
+		}
 		mDBFacade.menuNavigationController.popLayer("TOWN_MENU");
 		super.destroy();
 	}
@@ -196,37 +229,47 @@ class HomeState extends TownSubState {
 		mBattleButton.releaseCallback = mTownStateMachine.enterMapState;
 		mInventoryButton = new UIButton(mDBFacade, ASCompat.coerce((mRootMovieClip : ASAny).townScreen_inventory_button_instance, flash.display.MovieClip));
 		mInventoryButton.releaseCallback = mTownStateMachine.enterInventoryState;
-		ASCompat.setProperty((mRootMovieClip : ASAny).townScreen_inventory_button_instance.up.label, "text", Locale.getString("INVENTORY_BUILDING"));
-		ASCompat.setProperty((mRootMovieClip : ASAny).townScreen_inventory_button_instance.over.label, "text", Locale.getString("INVENTORY_BUILDING"));
+		Locale.setText(ASCompat.coerce((mRootMovieClip : ASAny).townScreen_inventory_button_instance.up.label, flash.text.TextField), "INVENTORY_BUILDING");
+		Locale.setText(ASCompat.coerce((mRootMovieClip : ASAny).townScreen_inventory_button_instance.over.label, flash.text.TextField), "INVENTORY_BUILDING");
 		mInventoryAlertUp = ASCompat.coerce((mRootMovieClip : ASAny).townScreen_inventory_button_instance.up.alert_icon, flash.display.MovieClip);
 		mInventoryAlertOver = ASCompat.coerce((mRootMovieClip : ASAny).townScreen_inventory_button_instance.over.alert_icon, flash.display.MovieClip);
 		mInventoryAlertUp.visible = false;
 		mInventoryAlertOver.visible = false;
 		mTavernButton = new UIButton(mDBFacade, ASCompat.coerce((mRootMovieClip : ASAny).townScreen_tavern_button_instance, flash.display.MovieClip));
 		mTavernButton.releaseCallback = mTownStateMachine.enterTavernState;
-		ASCompat.setProperty((mRootMovieClip : ASAny).townScreen_tavern_button_instance.up.label, "text", Locale.getString("TAVERN_BUILDING"));
-		ASCompat.setProperty((mRootMovieClip : ASAny).townScreen_tavern_button_instance.over.label, "text", Locale.getString("TAVERN_BUILDING"));
+		Locale.setText(ASCompat.coerce((mRootMovieClip : ASAny).townScreen_tavern_button_instance.up.label, flash.text.TextField), "TAVERN_BUILDING");
+		Locale.setText(ASCompat.coerce((mRootMovieClip : ASAny).townScreen_tavern_button_instance.over.label, flash.text.TextField), "TAVERN_BUILDING");
 		mTavernAlertUp = ASCompat.coerce((mRootMovieClip : ASAny).townScreen_tavern_button_instance.up.alert_icon, flash.display.MovieClip);
 		mTavernAlertOver = ASCompat.coerce((mRootMovieClip : ASAny).townScreen_tavern_button_instance.over.alert_icon, flash.display.MovieClip);
 		mTavernAlertUp.visible = false;
 		mTavernAlertOver.visible = false;
 		mTrainButton = new UIButton(mDBFacade, ASCompat.coerce((mRootMovieClip : ASAny).townScreen_train_button_instance, flash.display.MovieClip));
 		mTrainButton.releaseCallback = mTownStateMachine.enterTrainState;
-		ASCompat.setProperty((mRootMovieClip : ASAny).townScreen_train_button_instance.up.label, "text", Locale.getString("TRAINING_BUILDING"));
-		ASCompat.setProperty((mRootMovieClip : ASAny).townScreen_train_button_instance.over.label, "text", Locale.getString("TRAINING_BUILDING"));
+		Locale.setText(ASCompat.coerce((mRootMovieClip : ASAny).townScreen_train_button_instance.up.label, flash.text.TextField), "TRAINING_BUILDING");
+		Locale.setText(ASCompat.coerce((mRootMovieClip : ASAny).townScreen_train_button_instance.over.label, flash.text.TextField), "TRAINING_BUILDING");
 		mTrainAlertUp = ASCompat.coerce((mRootMovieClip : ASAny).townScreen_train_button_instance.up.alert_icon, flash.display.MovieClip);
 		mTrainAlertOver = ASCompat.coerce((mRootMovieClip : ASAny).townScreen_train_button_instance.over.alert_icon, flash.display.MovieClip);
 		mTrainAlertUp.visible = false;
 		mTrainAlertOver.visible = false;
 		mCreditsButton = new UIButton(mDBFacade, ASCompat.coerce((mRootMovieClip : ASAny).news, flash.display.MovieClip));
 		mCreditsButton.releaseCallback = mTownStateMachine.enterCreditState;
-		ASCompat.setProperty((mRootMovieClip : ASAny).news.up.credit_mc.label, "text", Locale.getString("CREDITS_BUILDING"));
-		ASCompat.setProperty((mRootMovieClip : ASAny).news.over.credit_mc.label, "text", Locale.getString("CREDITS_BUILDING"));
+		Locale.setText(ASCompat.coerce((mRootMovieClip : ASAny).news.up.credit_mc.label, flash.text.TextField), "CREDITS_BUILDING");
+		Locale.setText(ASCompat.coerce((mRootMovieClip : ASAny).news.over.credit_mc.label, flash.text.TextField), "CREDITS_BUILDING");
+		mSkillsButton = new UIButton(mDBFacade, ASCompat.coerce((mRootMovieClip : ASAny).townScreen_skills_button_instance, flash.display.MovieClip));
+		mSkillsButton.releaseCallback = mTownStateMachine.enterSkillsState;
+		mSkillsAlertUp = ASCompat.coerce((mRootMovieClip : ASAny).townScreen_skills_button_instance.up.alert_icon, flash.display.MovieClip);
+		mSkillsAlertOver = ASCompat.coerce((mRootMovieClip : ASAny).townScreen_skills_button_instance.over.alert_icon, flash.display.MovieClip);
+		mSkillsAlertUp.visible = false;
+		mSkillsAlertOver.visible = false;
+		mSkillsButtonLocked = new UIButton(mDBFacade,
+			ASCompat.coerce((mRootMovieClip : ASAny).townScreen_coliseumClosed_button_instance, flash.display.MovieClip));
+		mSkillsButtonLocked.releaseCallback = showColiseumClosedPopup;
+		mSkillsButtonLocked.rolloverFilter = DBGlobal.UI_ROLLOVER_FILTER;
 		ASCompat.setProperty((mRootMovieClip : ASAny).townScreen_shop_button_sale_instance, "visible", false);
 		mShopButton = new UIButton(mDBFacade, ASCompat.coerce((mRootMovieClip : ASAny).townScreen_shop_button_instance, flash.display.MovieClip));
 		mShopButton.releaseCallback = mTownStateMachine.enterShopState;
-		ASCompat.setProperty((mRootMovieClip : ASAny).townScreen_shop_button_instance.up.label, "text", Locale.getString("SHOP_BUILDING"));
-		ASCompat.setProperty((mRootMovieClip : ASAny).townScreen_shop_button_instance.over.label, "text", Locale.getString("SHOP_BUILDING"));
+		Locale.setText(ASCompat.coerce((mRootMovieClip : ASAny).townScreen_shop_button_instance.up.label, flash.text.TextField), "SHOP_BUILDING");
+		Locale.setText(ASCompat.coerce((mRootMovieClip : ASAny).townScreen_shop_button_instance.over.label, flash.text.TextField), "SHOP_BUILDING");
 		mShopAlertUp = ASCompat.coerce((mRootMovieClip : ASAny).townScreen_shop_button_instance.up.alert_icon, flash.display.MovieClip);
 		mShopAlertOver = ASCompat.coerce((mRootMovieClip : ASAny).townScreen_shop_button_instance.over.alert_icon, flash.display.MovieClip);
 		mShopAlertUp.visible = false;
@@ -234,29 +277,24 @@ class HomeState extends TownSubState {
 		mShopNewUp = ASCompat.coerce((mRootMovieClip : ASAny).townScreen_shop_button_instance.up.new_icon, flash.display.MovieClip);
 		mShopNewOver = ASCompat.coerce((mRootMovieClip : ASAny).townScreen_shop_button_instance.over.new_icon, flash.display.MovieClip);
 		mGiftButton = new UIButton(mDBFacade, ASCompat.coerce((mRootMovieClip : ASAny).gift, flash.display.MovieClip));
-		if (mDBFacade.dbConfigManager.getConfigBoolean("FUFB", false)) {
-			mGiftButton.releaseCallback = function() {
-				mDBFacade.errorPopup("GIFTING CURRENTLY DISABLED", "Sorry for the inconvenience, we are looking into resolving the issue.");
-			};
-		} else {
-			mGiftButton.releaseCallback = function() {
-				mGiftPopup = new UIGift(mDBFacade, mRootMovieClip, giftPopupCloseCallback, giftCallbackToFriendManager);
-				mGiftButton.enabled = false;
-			};
-		}
-		mDBFacade.stageRef.addEventListener("keyDown", openDaily);
-		if (mDBFacade.mCheckedDailyReward == false) {
+		mGiftButton.releaseCallback = function() {
+			mGiftPopup = new UIGift(mDBFacade, mRootMovieClip, giftPopupCloseCallback, giftCallbackToFriendManager);
+			mGiftButton.enabled = false;
+		};
+		EventListeners.add(mDBFacade.stageRef, "keyDown", openDaily);
+		if (!mDBFacade.mCheckedDailyReward) {
 			mDBFacade.mCheckedDailyReward = true;
 			mDailyRewardsPopup = new UIDailyRewards(mDBFacade, rewardPopupCloseCallback, false);
 		}
-		ASCompat.setProperty((mRootMovieClip : ASAny).gift.up.label, "text", Locale.getString("GIFT_BUILDING"));
-		ASCompat.setProperty((mRootMovieClip : ASAny).gift.over.label, "text", Locale.getString("GIFT_BUILDING"));
+		Locale.setText(ASCompat.coerce((mRootMovieClip : ASAny).gift.up.label, flash.text.TextField), "GIFT_BUILDING");
+		Locale.setText(ASCompat.coerce((mRootMovieClip : ASAny).gift.over.label, flash.text.TextField), "GIFT_BUILDING");
 		mGiftAlertUp = ASCompat.coerce((mRootMovieClip : ASAny).gift.up.alert_icon, flash.display.MovieClip);
 		mGiftAlertOver = ASCompat.coerce((mRootMovieClip : ASAny).gift.over.alert_icon, flash.display.MovieClip);
 		mGiftAlertUp.visible = false;
 		mGiftAlertOver.visible = false;
 		mOptionsButton = new UIButton(mDBFacade, ASCompat.coerce((mRootMovieClip : ASAny).options_button, flash.display.MovieClip));
-		mOptionsButton.releaseCallback = mOptionsPanel.toggleVisible;
+		mOptionsButton.rolloverFilter = DBGlobal.UI_ROLLOVER_FILTER;
+		mOptionsButton.releaseCallback = toggleSettingsPopup;
 		mRenderer = new MovieClipRenderController(mDBFacade, mRootMovieClip);
 		loadActiveAvatarIcon(new Event("ACTIVE_AVATAR_CHANGED_EVENT"));
 		mEventComponent.addListener("ACTIVE_AVATAR_CHANGED_EVENT", loadActiveAvatarIcon);
@@ -266,16 +304,63 @@ class HomeState extends TownSubState {
 		mBattleButton.isToTheLeftOf(mInventoryButton);
 		mBattleButton.isAbove(mShopButton);
 		mInventoryButton.isAbove(mCreditsButton);
+		mInventoryButton.rightNavigation = mOptionsButton;
+		mOptionsButton.downNavigation = mCreditsButton;
+		mCreditsButton.rightNavigation = mOptionsButton;
 		mGiftButton.isToTheLeftOf(mTrainButton);
 		mTrainButton.isToTheLeftOf(mShopButton);
-		mShopButton.isToTheLeftOf(mCreditsButton);
+		mTavernButton.leftNavigation = mGiftButton;
+		mTrainButton.upNavigation = mTavernButton;
+		mSkillsButton.upNavigation = mInventoryButton;
+		mSkillsButtonLocked.upNavigation = mInventoryButton;
+		refreshColiseumLock();
 		setupHeaderLinks();
-		mDBFacade.menuNavigationController.pushNewLayer("TOWN_MENU", mTownStateMachine.townHeader.determineCallback, mBattleButton, mBattleButton);
+		mDBFacade.menuNavigationController.pushNewLayer("TOWN_MENU", mTownStateMachine.townHeader.determineCallback, mBattleButton, mBattleButton,
+			focusPreviousLeaderboardFriend, focusNextLeaderboardFriend);
+		mEventComponent.addListener("LEADERBOARD_INITIALIZED_EVENT", setupFriendLinks);
+		setupFriendLinks();
 	}
 
-	public function setupFriendLinks(gameClock:GameClock = null) {
-		mTrainButton.isAbove(mUILeaderboard.getManageFriendsButton);
-		mShopButton.isAbove(mUILeaderboard.getInviteFriendsButton);
+	public function setupFriendLinks(event:Event = null) {
+		if (mUILeaderboard == null) {
+			mUILeaderboard = mTownStateMachine.leaderboard;
+		}
+		if (mUILeaderboard == null) {
+			return;
+		}
+		if (!mUILeaderboard.initialized) {
+			return;
+		}
+		mEventComponent.removeListener("LEADERBOARD_INITIALIZED_EVENT");
+		mUILeaderboard.setupNavigationlinks();
+		linkTownButtonsToLeaderboard();
+		mGiftButton.clearDownNavigation();
+		mGiftButton.downNavigation = mUILeaderboard.getManageFriendsButton;
+	}
+
+	function linkTownButtonsToLeaderboard() {
+		if (mUILeaderboard == null || !mUILeaderboard.initialized) {
+			return;
+		}
+		mUILeaderboard.linkTownButtons([mTrainButton, mShopButton, coliseumButton]);
+	}
+
+	@:isVar var coliseumButton(get, never):UIButton;
+
+	function get_coliseumButton():UIButton {
+		return mSkillsButton.enabled ? mSkillsButton : mSkillsButtonLocked;
+	}
+
+	function focusPreviousLeaderboardFriend() {
+		if (mUILeaderboard != null) {
+			mUILeaderboard.focusPreviousFriendSlot();
+		}
+	}
+
+	function focusNextLeaderboardFriend() {
+		if (mUILeaderboard != null) {
+			mUILeaderboard.focusNextFriendSlot();
+		}
 	}
 
 	override function setupHeaderLinks() {
@@ -284,6 +369,7 @@ class HomeState extends TownSubState {
 		mTownStateMachine.townHeader.addCoinButton.isAbove(mTavernButton);
 		mTownStateMachine.townHeader.addGemButton.isAbove(mBattleButton);
 		mTownStateMachine.townHeader.closeButton.isAbove(mInventoryButton);
+		mTownStateMachine.townHeader.closeButton.isToTheLeftOf(mOptionsButton);
 	}
 
 	function refreshHeaderNavigationLinks() {
@@ -292,12 +378,13 @@ class HomeState extends TownSubState {
 		mTownStateMachine.townHeader.addCoinButton.downNavigation = mTavernButton;
 		mTownStateMachine.townHeader.addGemButton.downNavigation = mBattleButton;
 		mTownStateMachine.townHeader.closeButton.downNavigation = mInventoryButton;
+		mTownStateMachine.townHeader.closeButton.rightNavigation = mOptionsButton;
 	}
 
 	function openDaily(event:KeyboardEvent) {
 		if (event.keyCode == 36 && mDBFacade != null) {
 			mDailyRewardsPopup = new UIDailyRewards(mDBFacade, rewardPopupCloseCallback, true);
-			mDBFacade.stageRef.removeEventListener("keyDown", openDaily);
+			EventListeners.remove(mDBFacade.stageRef, "keyDown", openDaily);
 		}
 	}
 
@@ -312,17 +399,70 @@ class HomeState extends TownSubState {
 		}
 	}
 
+	function refreshColiseumLock() {
+		if (mSkillsButton == null || mSkillsButtonLocked == null) {
+			return;
+		}
+		var _loc1_ = tryUnlockColiseum();
+		mSkillsButton.visible = _loc1_;
+		mSkillsButton.enabled = _loc1_;
+		mSkillsButtonLocked.visible = !_loc1_;
+		mSkillsButtonLocked.enabled = !_loc1_;
+		mShopButton.clearRightNavigation();
+		mCreditsButton.clearLeftNavigation();
+		mCreditsButton.clearDownNavigation();
+		mShopButton.isToTheLeftOf(coliseumButton);
+		coliseumButton.isToTheLeftOf(mCreditsButton);
+		mCreditsButton.downNavigation = coliseumButton;
+		linkTownButtonsToLeaderboard();
+	}
+
+	function tryUnlockColiseum():Bool {
+		if (mDBFacade.dbAccountInfo.hasAttribute("hasReachedLevel100")) {
+			return true;
+		}
+		if (!hasHeroAtColiseumUnlockLevel()) {
+			return false;
+		}
+		mDBFacade.dbAccountInfo.alterAttribute("hasReachedLevel100", "1");
+		return true;
+	}
+
+	function hasHeroAtColiseumUnlockLevel():Bool {
+		var _loc2_:AvatarInfo = null;
+		var _loc4_ = mDBFacade.dbAccountInfo.inventoryInfo.avatars;
+		if (_loc4_ == null) {
+			return false;
+		}
+		var _loc1_ = _loc4_.keysToArray();
+		var _loc3_:ASAny;
+		if (checkNullIteratee(_loc1_))
+			for (_tmp_ in _loc1_) {
+				_loc3_ = _tmp_;
+				_loc2_ = ASCompat.dynamicAs(_loc4_.itemFor(_loc3_), AvatarInfo);
+				if (_loc2_ != null && _loc2_.cloutLevel >= 100) {
+					return true;
+				}
+			}
+		return false;
+	}
+
+	function showColiseumClosedPopup() {
+		var _loc1_ = new DBUIOneButtonPopup(mDBFacade, "COLISEUM_CLOSED_POPUP", Locale.getString("COLISEUM_CLOSED_TITLE"),
+			Locale.getString("COLISEUM_CLOSED_MESSAGE"), Locale.getString("OK"), null);
+		MemoryTracker.track(_loc1_, "DBUIOneButtonPopup - created in HomeState.showColiseumClosedPopup()");
+	}
+
 	function refreshAlerts() {
 		var _loc2_ = false;
 		var _loc1_ = false;
 		if (mRootMovieClip != null) {
 			mTavernAlertUp.visible = mTavernAlertOver.visible = this.tavernNeedsAttention;
 			mTrainAlertUp.visible = mTrainAlertOver.visible = this.trainingNeedsAttention;
+			mSkillsAlertUp.visible = mSkillsAlertOver.visible = this.skillsNeedsAttention;
 			mShopAlertUp.visible = mShopAlertOver.visible = this.shopNeedsAttention;
 			mInventoryAlertUp.visible = mInventoryAlertOver.visible = this.inventoryNeedsAttention;
-			if (!mDBFacade.isKongregatePlayer) {
-				checkGiftAlert();
-			}
+			checkGiftAlert();
 			_loc2_ = mDBFacade.gameMaster.storeHasSaleNow();
 			if (_loc2_) {
 				ASCompat.setProperty((mRootMovieClip : ASAny).townScreen_shop_button_sale_instance, "visible", true);
@@ -344,7 +484,7 @@ class HomeState extends TownSubState {
 			mAssetLoadingComponent.getSwfAsset(DBFacade.buildFullDownloadPath("Resources/Art2D/UI/db_UI_town.swf"),
 				function(param1:brain.assetRepository.SwfAsset) {
 					var swfAsset = param1;
-					var popup = new DBUIOneButtonPopup(mDBFacade, Locale.getString("BETA_REWARDS_POPUP_TITLE"),
+					var popup = new DBUIOneButtonPopup(mDBFacade, "BETA_REWARDS_POPUP", Locale.getString("BETA_REWARDS_POPUP_TITLE"),
 						Locale.getString("BETA_REWARDS_POPUP_MESSAGE"), Locale.getString("BETA_REWARDS_POPUP_BUTTON"), function() {}, true, null,
 						"popup_beta_thanks");
 					MemoryTracker.track(popup, "DBUIOneButtonPopup - created in HomeState.tryShowBetaRewardsPopup()");
@@ -353,58 +493,6 @@ class HomeState extends TownSubState {
 			return true;
 		}
 		return false;
-	}
-
-	function tryShowKeyMessagePopup():Bool {
-		if (mDBFacade.dbAccountInfo.dbAccountParams.hasKeyIntroParam()) {
-			return false;
-		}
-		mAssetLoadingComponent.getSwfAsset(DBFacade.buildFullDownloadPath("Resources/Art2D/UI/db_UI_town.swf"),
-			function(param1:brain.assetRepository.SwfAsset) {
-				var swfAsset = param1;
-				var popup = new DBUIOneButtonPopup(mDBFacade, Locale.getString("BETA_KEYS_POPUP_TITLE"), Locale.getString("BETA_KEYS_POPUP_MESSAGE"),
-					Locale.getString("BETA_KEYS_POPUP_BUTTON"), function() {}, true, null, "popup_beta_keys");
-				MemoryTracker.track(popup, "DBUIOneButtonPopup - created in HomeState.tryShowKeyMessagePopup()");
-			});
-		mDBFacade.dbAccountInfo.dbAccountParams.setKeyIntroParam();
-		return true;
-	}
-
-	function tryShowHeroUpsellPopup():Bool {
-		var _loc4_ = 0;
-		var _loc6_:GMOffer = null;
-		if (!mDBFacade.getSplitTestBoolean("HeroUpsellPopups", false)) {
-			return false;
-		}
-		var _loc1_ = (ASCompat.toInt(mDBFacade.dbAccountInfo.getAttribute("HERO_UPSELL_POPUP")) : UInt);
-		if (_loc1_ >= 8) {
-			return false;
-		}
-		if (mDBFacade.mainStateMachine.showedHeroUpsellPopup) {
-			return false;
-		}
-		var _loc3_ = new Vector<GMOffer>();
-		var _loc5_:UInt;
-		final __ax4_iter_142 = StoreServicesController.HERO_OFFERS;
-		if (checkNullIteratee(__ax4_iter_142))
-			for (_tmp_ in __ax4_iter_142) {
-				_loc5_ = _tmp_;
-				_loc6_ = ASCompat.coerce(mDBFacade.gameMaster.offerById.itemFor(_loc5_), gameMasterDictionary.GMOffer);
-				_loc4_ = (_loc6_.Details[0].HeroId : Int);
-				if (!mDBFacade.dbAccountInfo.inventoryInfo.ownsItem((_loc4_ : UInt))) {
-					_loc3_.push(_loc6_);
-				}
-			}
-		if (_loc3_.length == 0) {
-			return false;
-		}
-		var _loc7_ = _loc1_ % _loc3_.length;
-		var _loc8_ = _loc3_[(_loc7_ : Int)];
-		var _loc2_ = new UIHeroUpsellPopup(mTownStateMachine.townHeader, mDBFacade, _loc8_, null);
-		MemoryTracker.track(_loc2_, "UIHeroUpsellPopup - created in HomeState.tryShowHeroUpsellPopup()");
-		mDBFacade.mainStateMachine.showedHeroUpsellPopup = true;
-		mDBFacade.dbAccountInfo.alterAttribute("HERO_UPSELL_POPUP", Std.string(_loc1_ + 1));
-		return true;
 	}
 
 	function tryShowWhatsNewPopup(callback:ASFunction) {
@@ -516,7 +604,7 @@ class HomeState extends TownSubState {
 		var paginationEmptyMC:MovieClip;
 		var parentPos:Point;
 		var layoutClassName:String;
-		if (mNewsStories[(newsNum : Int)].type == 2) {
+		if (mNewsStories[(newsNum : Int)].imageType == 2) {
 			mNewsPopUp = new DBUIMoviePopup(mDBFacade, "whatsnew_popup_movie", mNewsStories[(newsNum : Int)].title, mNewsStories[(newsNum : Int)].message,
 				mNewsStories[(newsNum : Int)].imageURL + "?version=3&rel=0", mNewsStories[(newsNum : Int)].mainText, function() {
 					if (mNewsStories[(newsNum : Int)].mainCallback != null) {
@@ -533,7 +621,7 @@ class HomeState extends TownSubState {
 				paginationEmptyMC.addChild(mNewsPagination.root);
 			}
 		} else {
-			layoutClassName = mNewsStories[(newsNum : Int)].type == 0 ? "whatsnew_popup" : "whatsnew_popup_landscape";
+			layoutClassName = mNewsStories[(newsNum : Int)].imageType == 0 ? "whatsnew_popup" : "whatsnew_popup_landscape";
 			mNewsPopUp = new UIWhatsNewPopup(mDBFacade, layoutClassName, mNewsStories[(newsNum : Int)].title, mNewsStories[(newsNum : Int)].message,
 				mNewsStories[(newsNum : Int)].imageURL, mNewsStories[(newsNum : Int)].mainText, function() {
 					if (mNewsStories[(newsNum : Int)].mainCallback != null) {
@@ -554,7 +642,7 @@ class HomeState extends TownSubState {
 	}
 
 	function refreshPagination(page:UInt) {
-		mNewsPagination.currentPage = (ASCompat.floatToInt(mNewsTotalPages != 0 ? (ASCompat.floatToInt(Math.min(mNewsTotalPages - 1,
+		mNewsPagination.currentPage = (ASCompat.floatToInt(mNewsTotalPages != 0 ? (ASCompat.floatToInt(Math.min((mNewsTotalPages : Float) - 1,
 			page)) : UInt) : (0 : UInt)) : UInt);
 		mNewsPagination.numPages = mNewsTotalPages;
 		mNewsPagination.visible = true;
@@ -568,62 +656,6 @@ class HomeState extends TownSubState {
 			mNewsPopUp = null;
 		}
 		displayNews(page, true);
-	}
-
-	function tryShowLevelUpShopPopup():Bool {
-		var gmOffers:Vector<GMOffer>;
-		var popup:UILevelUpShopPopup;
-		var leveled = mDBFacade.mainStateMachine.markHasHeroLeveledUp();
-		if (!leveled) {
-			return false;
-		}
-		gmOffers = UILevelUpShopPopup.getLevelUpWeaponUnlocks(mDBFacade, mDBFacade.dbAccountInfo.activeAvatarInfo);
-		if (gmOffers.length == 0) {
-			return false;
-		}
-		popup = new UILevelUpShopPopup(mDBFacade, function() {
-			mTownStateMachine.enterShopState(false, "WEAPON");
-		}, mDBFacade.dbAccountInfo.activeAvatarInfo, gmOffers);
-		MemoryTracker.track(popup, "UILevelUpShopPopup - created in HomeState.tryShowLevelUpPopup()");
-		return true;
-	}
-
-	function shouldShowInvitePopup():Bool {
-		if (!mDBFacade.isFacebookPlayer) {
-			return false;
-		}
-		var _loc2_ = mDBFacade.getSplitTestNumber("MaxInvitePopups", 2);
-		if (_loc2_ == 0) {
-			return false;
-		}
-		var _loc1_ = (ASCompat.toInt(mDBFacade.dbAccountInfo.getAttribute("INVITE_POPUP")) : UInt);
-		if (mDBFacade.mainStateMachine.showedInvitePopup) {
-			return false;
-		}
-		if (_loc1_ == 0) {
-			return true;
-		}
-		if (_loc1_ >= _loc2_) {
-			return false;
-		}
-		if (mDBFacade.dbAccountInfo.friendInfos.size >= 4) {
-			return false;
-		}
-		return true;
-	}
-
-	function tryShowInvitePopup():Bool {
-		var _loc2_:UIFBInvitePopup = null;
-		var _loc1_ = 0;
-		if (this.shouldShowInvitePopup()) {
-			_loc2_ = new UIFBInvitePopup(mDBFacade, mDBFacade.facebookController.genericFriendRequests);
-			MemoryTracker.track(_loc2_, "UIFBInvitePopup - created in HomeState.tryShowInvitePopup()");
-			mDBFacade.mainStateMachine.showedInvitePopup = true;
-			_loc1_ = ASCompat.toInt(mDBFacade.dbAccountInfo.getAttribute("INVITE_POPUP"));
-			mDBFacade.dbAccountInfo.alterAttribute("INVITE_POPUP", Std.string(_loc1_ + 1));
-			return true;
-		}
-		return false;
 	}
 
 	function tryShowRewardPopup(rewardOfferId:UInt) {
@@ -641,14 +673,14 @@ class HomeState extends TownSubState {
 				var swfAsset = param1;
 				var rewardPopupClass = swfAsset.getClass("rewards_popup");
 				var rewardPopup = ASCompat.coerce(ASCompat.createInstance(rewardPopupClass, []), flash.display.MovieClip);
-				ASCompat.setProperty((rewardPopup : ASAny).title_label, "text", Locale.getString("REWARD_POPUP_TITLE"));
-				ASCompat.setProperty((rewardPopup : ASAny).header_label, "text", Locale.getString("REWARD_POPUP_HEADER"));
-				ASCompat.setProperty((rewardPopup : ASAny).description_label, "text", offer.getDisplayName(mDBFacade.gameMaster));
+				Locale.setText(ASCompat.coerce((rewardPopup : ASAny).title_label, flash.text.TextField), "REWARD_POPUP_TITLE");
+				Locale.setText(ASCompat.coerce((rewardPopup : ASAny).header_label, flash.text.TextField), "REWARD_POPUP_HEADER");
+				TextUtil.setText(ASCompat.coerce((rewardPopup : ASAny).description_label, flash.text.TextField), offer.getDisplayName(mDBFacade.gameMaster));
 				centerCloseButton = new UIButton(mDBFacade, ASCompat.coerce((rewardPopup : ASAny).close_button, flash.display.MovieClip));
 				topCloseButton = new UIButton(mDBFacade, ASCompat.coerce((rewardPopup : ASAny).close, flash.display.MovieClip));
-				centerCloseButton.label.text = Locale.getString("REWARD_POPUP_BUTTON");
+				Locale.setText(centerCloseButton.label, "REWARD_POPUP_BUTTON");
 				centerCloseButton.releaseCallback = topCloseButton.releaseCallback = function() {
-					DBFacebookLevelUpPostController.removeCurtain(curtain, mSceneGraphComponent);
+					UILevelUpPostController.removeCurtain(curtain, mSceneGraphComponent);
 					mSceneGraphComponent.removeChild(rewardPopup);
 					rewardPopup = null;
 				};
@@ -661,20 +693,14 @@ class HomeState extends TownSubState {
 							(rewardPopup : ASAny).icon.addChild(_loc2_);
 						});
 				}
-				curtain = DBFacebookLevelUpPostController.makeCurtain(mDBFacade, mSceneGraphComponent);
+				curtain = UILevelUpPostController.makeCurtain(mDBFacade, mSceneGraphComponent);
 				mSceneGraphComponent.addChild(rewardPopup, (105 : UInt));
 			});
 	}
 
 	function tryShowRewardErrorPopup(rewardErrorCode:String) {
-		var rewardErrorTitle:String;
-		var rewardErrorClose:String;
-		var rewardErrorHelp:String;
 		var rewardErrorDescription:String;
 		mDBFacade.mainStateMachine.showedRewardPopup = true;
-		rewardErrorTitle = Locale.getString("REWARD_ERROR_POPUP_TITLE_" + rewardErrorCode);
-		rewardErrorClose = Locale.getString("REWARD_ERROR_POPUP_CLOSE");
-		rewardErrorHelp = Locale.getString("REWARD_ERROR_POPUP_HELP");
 		rewardErrorDescription = Locale.getError(ASCompat.toInt(rewardErrorCode));
 		mAssetLoadingComponent.getSwfAsset(DBFacade.buildFullDownloadPath("Resources/Art2D/UI/db_UI_town.swf"),
 			function(param1:brain.assetRepository.SwfAsset) {
@@ -686,14 +712,14 @@ class HomeState extends TownSubState {
 				var swfAsset = param1;
 				var errorPopupClass = swfAsset.getClass("reward_errors_popup");
 				var errorPopup = ASCompat.coerce(ASCompat.createInstance(errorPopupClass, []), flash.display.MovieClip);
-				ASCompat.setProperty((errorPopup : ASAny).title_label, "text", rewardErrorTitle);
-				ASCompat.setProperty((errorPopup : ASAny).message_label, "text", rewardErrorDescription);
-				ASCompat.setProperty((errorPopup : ASAny).question_label, "text", rewardErrorHelp);
+				Locale.setText(ASCompat.coerce((errorPopup : ASAny).title_label, flash.text.TextField), "REWARD_ERROR_POPUP_TITLE_" + rewardErrorCode);
+				TextUtil.setText(ASCompat.coerce((errorPopup : ASAny).message_label, flash.text.TextField), rewardErrorDescription);
+				Locale.setText(ASCompat.coerce((errorPopup : ASAny).question_label, flash.text.TextField), "REWARD_ERROR_POPUP_HELP");
 				closeButton = new UIButton(mDBFacade, ASCompat.coerce((errorPopup : ASAny).button, flash.display.MovieClip));
 				closeButton2 = new UIButton(mDBFacade, ASCompat.coerce((errorPopup : ASAny).close, flash.display.MovieClip));
-				closeButton.label.text = rewardErrorClose;
+				Locale.setText(closeButton.label, "REWARD_ERROR_POPUP_CLOSE");
 				closeButton2.releaseCallback = closeButton.releaseCallback = function() {
-					DBFacebookLevelUpPostController.removeCurtain(curtain, mSceneGraphComponent);
+					UILevelUpPostController.removeCurtain(curtain, mSceneGraphComponent);
 					mSceneGraphComponent.removeChild(errorPopup);
 					errorPopup = null;
 				};
@@ -703,17 +729,17 @@ class HomeState extends TownSubState {
 					var _loc1_ = new URLRequest(helpURL);
 					flash.Lib.getURL(_loc1_, "_blank");
 				};
-				curtain = DBFacebookLevelUpPostController.makeCurtain(mDBFacade, mSceneGraphComponent);
+				curtain = UILevelUpPostController.makeCurtain(mDBFacade, mSceneGraphComponent);
 				mSceneGraphComponent.addChild(errorPopup, (105 : UInt));
 			});
 	}
 
 	function setUpHacksToRecalculateWeaponPowers() {
-		mDBFacade.stageRef.addEventListener("keyDown", hackToHandleKeyPressToRecalculateWeaponPowers);
+		EventListeners.add(mDBFacade.stageRef, "keyDown", hackToHandleKeyPressToRecalculateWeaponPowers);
 	}
 
 	function tearDownHacksToRecalculateWeaponPowers() {
-		mDBFacade.stageRef.removeEventListener("keyDown", hackToHandleKeyPressToRecalculateWeaponPowers);
+		EventListeners.remove(mDBFacade.stageRef, "keyDown", hackToHandleKeyPressToRecalculateWeaponPowers);
 	}
 
 	function hackToHandleKeyPressToRecalculateWeaponPowers(e:KeyboardEvent) {}
@@ -727,7 +753,7 @@ class HomeState extends TownSubState {
 		if (mDBFacade.dbConfigManager.getConfigBoolean("ALLOW_HACKS_TO_RECALCULATE_WEAPON_POWERS", false)) {
 			setUpHacksToRecalculateWeaponPowers();
 		}
-		lazyLoadActiveAvatar();
+		TrickleCacheLoader.queueCommonStarlingAtlases(mDBFacade);
 		mRenderer.play((0 : UInt), true);
 		mUILeaderboard = mTownStateMachine.leaderboard;
 		if (mUILeaderboard != null) {
@@ -735,10 +761,6 @@ class HomeState extends TownSubState {
 			mUILeaderboard.currentStateName = "HomeState";
 			mUILeaderboard.hidePopup();
 		}
-		if (mFriendLeaderboardDelayMenuNavigationLinkageTask != null) {
-			mFriendLeaderboardDelayMenuNavigationLinkageTask.destroy();
-		}
-		mFriendLeaderboardDelayMenuNavigationLinkageTask = mLogicalWorkComponent.doLater(2, setupFriendLinks);
 		mTownStateMachine.townHeader.title = Locale.getString("TOWN_HEADER");
 		mTownStateMachine.townHeader.inHomeState = true;
 		mTownStateMachine.townHeader.showCloseButton(true);
@@ -746,6 +768,7 @@ class HomeState extends TownSubState {
 			refreshAlerts();
 		});
 		this.refreshAlerts();
+		this.refreshColiseumLock();
 		mEventComponent.dispatchEvent(new XPBonusEvent("XP_BONUS_EVENT", false));
 		animateEntry();
 		if (mDBFacade != null && mDBFacade.hud != null && mDBFacade.hud.chatLog != null) {
@@ -756,6 +779,11 @@ class HomeState extends TownSubState {
 		}
 		mPopupDelayTask = mLogicalWorkComponent.doLater(0.5, showPopups);
 		refreshHeaderNavigationLinks();
+		if (mOptionsKeyTask != null) {
+			mOptionsKeyTask.destroy();
+		}
+		mOptionsKeyTask = mLogicalWorkComponent.doEveryFrame(checkOptionsKey);
+		mEventComponent.addListener("OnSteamInputButtonReleasedEvent", onSteamInputButtonReleased);
 	}
 
 	function showPopups(gameClock:GameClock = null) {
@@ -778,14 +806,8 @@ class HomeState extends TownSubState {
 			MemoryTracker.track(dkPopupClass, "UIDragonKnightUpsellPopup - created in HomeState.showPopups()");
 		} else {
 			this.tryShowWhatsNewPopup(function(param1:Bool) {
-				var _loc2_ = false;
 				if (!param1 && mDBFacade != null) {
-					_loc2_ = tryShowInvitePopup();
-					if (!_loc2_) {
-						if (!tryShowHeroUpsellPopup()) {
-							tryShowBetaRewardsPopup();
-						}
-					}
+					tryShowBetaRewardsPopup();
 				}
 			});
 		}
@@ -830,12 +852,13 @@ class HomeState extends TownSubState {
 			mPopupDelayTask.destroy();
 			mPopupDelayTask = null;
 		}
-		if (mFriendLeaderboardDelayMenuNavigationLinkageTask != null) {
-			mFriendLeaderboardDelayMenuNavigationLinkageTask.destroy();
-			mFriendLeaderboardDelayMenuNavigationLinkageTask = null;
+		if (mOptionsKeyTask != null) {
+			mOptionsKeyTask.destroy();
+			mOptionsKeyTask = null;
 		}
 		mRenderer.stop();
 		mEventComponent.removeListener("DB_ACCOUNT_INFO_RESPONSE");
+		mEventComponent.removeListener("OnSteamInputButtonReleasedEvent");
 		super.exitState();
 	}
 
@@ -856,6 +879,27 @@ class HomeState extends TownSubState {
 	function get_trainingNeedsAttention():Bool {
 		var _loc1_ = mDBFacade.dbAccountInfo.activeAvatarInfo;
 		return _loc1_ != null && _loc1_.skillPointsAvailable > 0;
+	}
+
+	@:isVar var skillsNeedsAttention(get, never):Bool;
+
+	function get_skillsNeedsAttention():Bool {
+		var _loc2_:AvatarInfo = null;
+		var _loc4_ = mDBFacade.dbAccountInfo.inventoryInfo.avatars;
+		if (_loc4_ == null) {
+			return false;
+		}
+		var _loc1_ = _loc4_.keysToArray();
+		var _loc3_:ASAny;
+		if (checkNullIteratee(_loc1_))
+			for (_tmp_ in _loc1_) {
+				_loc3_ = _tmp_;
+				_loc2_ = ASCompat.dynamicAs(_loc4_.itemFor(_loc3_), AvatarInfo);
+				if (_loc2_ != null && _loc2_.canAscend) {
+					return true;
+				}
+			}
+		return false;
 	}
 
 	@:isVar var inventoryNeedsAttention(get, never):Bool;
@@ -906,23 +950,15 @@ class HomeState extends TownSubState {
 		if (mRewardButton != null) {
 			mRewardButton.enabled = true;
 		}
-		mDBFacade.stageRef.addEventListener("keyDown", openDaily);
+		EventListeners.add(mDBFacade.stageRef, "keyDown", openDaily);
 		checkRewardAlert();
 		mDailyRewardsPopup = null;
 	}
 
 	function giftCallbackToFriendManager() {
-		mTownStateMachine.setFriendManagementTabCategory((1 : UInt));
-		mTownStateMachine.enterFriendManagementState();
 		mGiftPopup.destroy();
 		mGiftPopup = null;
-	}
-
-	function lazyLoadActiveAvatar() {
-		var _loc1_ = mDBFacade.dbAccountInfo.activeAvatarInfo.skinId;
-		if (!mHeroTypesLazilyLoaded.has(_loc1_)) {
-			TrickleCacheLoader.loadHero(mDBFacade, _loc1_);
-			mHeroTypesLazilyLoaded.add(_loc1_);
-		}
+		mTownStateMachine.setFriendManagementTabCategory((1 : UInt));
+		mTownStateMachine.enterFriendManagementState();
 	}
 }

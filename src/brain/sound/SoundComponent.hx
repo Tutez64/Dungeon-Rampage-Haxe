@@ -4,8 +4,8 @@ import brain.component.Component;
 import brain.facade.Facade;
 import brain.logger.Logger;
 import brain.utils.MemoryTracker;
-import org.as3commons.collections.Set;
-import org.as3commons.collections.framework.ISetIterator;
+import collections.ISetIterator;
+import collections.Set;
 
 class SoundComponent extends Component {
 	var mSoundHandles:Set;

@@ -1,5 +1,6 @@
 package uI.inventory;
 
+import brain.utils.TextUtil;
 import facade.DBFacade;
 import facade.GameMasterLocale;
 import gameMasterDictionary.GMWeaponItem;
@@ -19,6 +20,7 @@ class UIWeaponDescTooltip extends MovieClip {
 		mRoot = ASCompat.coerce(ASCompat.createInstance(templateClass, []), flash.display.MovieClip);
 		this.addChild(mRoot);
 		mDescription = ASCompat.coerce((mRoot : ASAny).description_label, flash.text.TextField);
+		mRoot.scaleX = mRoot.scaleY = UIWeaponTooltip.tooltipScale(mDescription, 1.55);
 	}
 
 	public function destroy() {
@@ -33,7 +35,7 @@ class UIWeaponDescTooltip extends MovieClip {
 	}
 
 	public function setWeaponItem(gmWeapon:GMWeaponItem, level:UInt, isLegendary:Bool = false) {
-		mDescription.text = GameMasterLocale.getGameMasterSubString("WEAPON_AESTHETIC_DESCRIPTION",
-			gmWeapon.getWeaponAesthetic(level, isLegendary).WeaponItemConstant);
+		TextUtil.setText(mDescription,
+			GameMasterLocale.getGameMasterSubString("WEAPON_AESTHETIC_DESCRIPTION", gmWeapon.getWeaponAesthetic(level, isLegendary).WeaponItemConstant));
 	}
 }

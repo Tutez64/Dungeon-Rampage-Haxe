@@ -6,13 +6,16 @@ import brain.assetRepository.AssetLoadingComponent;
 import brain.assetRepository.SwfAsset;
 import brain.event.EventComponent;
 import brain.uI.UIProgressBar;
+import brain.utils.TextUtil;
 import brain.workLoop.LogicalWorkComponent;
 import brain.workLoop.Task;
 import distributedObjects.HeroGameObject;
 import events.GameObjectEvent;
 import facade.DBFacade;
+import facade.Locale;
 import flash.display.MovieClip;
 import flash.filters.ColorMatrixFilter;
+import flash.text.TextField;
 
 class UIOffScreenClip {
 	public static inline final HPBAR_OFFSET:Float = 25;
@@ -25,7 +28,11 @@ class UIOffScreenClip {
 
 	public static inline final REVIVE_PIC_TOGGLE_TIME:Float = 0.25;
 
-	public static inline final MAX_FACEBOOK_PIC_SHOW_COUNT = (5 : UInt);
+	public static inline final MAX_STEAM_AVATAR_SHOW_COUNT = (5 : UInt);
+
+	static inline final DEATH_ICON_SWF_PATH = "Resources/Art2D/Icons/Avatars/db_icon_death.swf";
+
+	static inline final TEXT_GUTTER:Float = 4;
 
 	var mOffScreenPlayerClip:MovieClip;
 
@@ -57,9 +64,13 @@ class UIOffScreenClip {
 
 	var mFlashTask:Task;
 
-	var mFacebookPicShowCount:UInt = (0 : UInt);
+	var mSteamAvatarShowCount:UInt = (0 : UInt);
 
 	var mIsAHero:Bool = false;
+
+	var mNameX:Float = Math.NaN;
+
+	var mAlertX:Float = Math.NaN;
 
 	public function new(dbFacade:DBFacade, clip:MovieClip, player:ActorGameObject, nametagAsset:SwfAsset) {
 		var _loc6_:String = null;
@@ -68,6 +79,8 @@ class UIOffScreenClip {
 		mDBFacade = dbFacade;
 		mOffScreenPlayerClip = clip;
 		mPlayer = player;
+		mNameX = ASCompat.toNumberField((clip : ASAny).NametagText, "x");
+		mAlertX = ASCompat.toNumberField((clip : ASAny).AlertText, "x");
 		if (Std.isOfType(mPlayer, HeroGameObject)) {
 			mIsAHero = true;
 			_loc5_ = ASCompat.reinterpretAs(mPlayer, HeroGameObject);
@@ -80,6 +93,7 @@ class UIOffScreenClip {
 		mAssetLoadingComponent = new AssetLoadingComponent(mDBFacade);
 		mEventComponent = new EventComponent(mDBFacade);
 		mAssetLoadingComponent.getSwfAsset(DBFacade.buildFullDownloadPath(_loc6_), setupAvatarPic);
+		mAssetLoadingComponent.getSwfAsset(DBFacade.buildFullDownloadPath("Resources/Art2D/Icons/Avatars/db_icon_death.swf"), setupDeathPic);
 		setupUI();
 	}
 
@@ -103,7 +117,7 @@ class UIOffScreenClip {
 		mChatBalloon = new ChatBalloon();
 		mChatBalloon.visible = false;
 		balloon = ASCompat.coerce(ASCompat.createInstance(balloonClass, []), flash.display.MovieClip);
-		mChatBalloon.initializeChatBalloon(mNametagSwfAsset);
+		mChatBalloon.initializeChatBalloon(mNametagSwfAsset, null, 1.82);
 		mChatBalloon.y = -40;
 		mOffScreenPlayerClip.addChild(mChatBalloon);
 		if (mIsAHero) {
@@ -125,7 +139,7 @@ class UIOffScreenClip {
 					showPlayerIsTypingNotification(false);
 				}
 			});
-			showFacebookPicture();
+			showSteamAvatar();
 		}
 	}
 
@@ -144,23 +158,26 @@ class UIOffScreenClip {
 			return;
 		}
 		var _loc5_ = mAvatarSwfAsset.getClass(_loc3_);
-		var _loc6_ = mAvatarSwfAsset.getClass("death_icon");
 		mAvatarPic = ASCompat.coerce(ASCompat.createInstance(_loc5_, []), flash.display.MovieClip);
 		(mOffScreenPlayerClip : ASAny).UI_avatar.addChild(mAvatarPic);
-		if (_loc6_ != null) {
-			mDeathPic = ASCompat.coerce(ASCompat.createInstance(_loc6_, []), flash.display.MovieClip);
+	}
+
+	function setupDeathPic(iconsSwfAsset:SwfAsset) {
+		var _loc2_ = iconsSwfAsset.getClass("death_icon");
+		if (_loc2_ != null) {
+			mDeathPic = ASCompat.coerce(ASCompat.createInstance(_loc2_, []), flash.display.MovieClip);
 		}
 	}
 
-	public function showFacebookPicture() {
+	public function showSteamAvatar() {
 		var _loc1_:HeroGameObject = null;
 		if (mIsAHero) {
 			_loc1_ = ASCompat.reinterpretAs(mPlayer, HeroGameObject);
-			if (mFacebookPicShowCount >= 5 || _loc1_ == null || _loc1_.isDestroyed) {
+			if (mSteamAvatarShowCount >= 5 || _loc1_ == null || _loc1_.isDestroyed) {
 				return;
 			}
-			mFacebookPicShowCount = mFacebookPicShowCount + 1;
-			_loc1_.heroView.nametag.showFacebookPicture(_loc1_.playerID);
+			mSteamAvatarShowCount = mSteamAvatarShowCount + 1;
+			_loc1_.heroView.nametag.showSteamAvatar(_loc1_.playerID);
 		}
 	}
 
@@ -196,11 +213,58 @@ class UIOffScreenClip {
 		});
 	}
 
+	public function keepChatOnScreen(viewWidth:Float, viewHeight:Float) {
+		if (mChatBalloon == null || !mChatBalloon.visible || mOffScreenPlayerClip.parent == null) {
+			return;
+		}
+		mChatBalloon.x = 0;
+		mChatBalloon.y = -40;
+		var _loc5_ = mChatBalloon.getBounds(mOffScreenPlayerClip.parent);
+		var _loc3_:Float = 0;
+		var _loc4_:Float = 0;
+		if (_loc5_.left < 0) {
+			_loc3_ = -_loc5_.left;
+		} else if (_loc5_.right > viewWidth) {
+			_loc3_ = viewWidth - _loc5_.right;
+		}
+		if (_loc5_.top < 0) {
+			_loc4_ = -_loc5_.top;
+		} else if (_loc5_.bottom > viewHeight) {
+			_loc4_ = viewHeight - _loc5_.bottom;
+		}
+		mChatBalloon.x += _loc3_ / mOffScreenPlayerClip.scaleX;
+		mChatBalloon.y += _loc4_ / mOffScreenPlayerClip.scaleY;
+	}
+
+	public function keepTextOnScreen(viewWidth:Float) {
+		if (mOffScreenPlayerClip.parent == null) {
+			return;
+		}
+		keepFieldOnScreen(ASCompat.coerce((mOffScreenPlayerClip : ASAny).NametagText, flash.text.TextField), mNameX, viewWidth);
+		keepFieldOnScreen(ASCompat.coerce((mOffScreenPlayerClip : ASAny).AlertText, flash.text.TextField), mAlertX, viewWidth);
+	}
+
+	function keepFieldOnScreen(field:TextField, authoredX:Float, viewWidth:Float) {
+		field.x = authoredX;
+		var _loc7_ = field.getBounds(mOffScreenPlayerClip.parent);
+		var _loc4_ = Math.min(_loc7_.width, (field.textWidth + 4) * mOffScreenPlayerClip.scaleX) / 2;
+		var _loc6_ = _loc7_.x + _loc7_.width / 2 - _loc4_;
+		var _loc8_ = _loc6_ + _loc4_ * 2;
+		var _loc5_:Float = 0;
+		if (_loc6_ < 0) {
+			_loc5_ = -_loc6_;
+		} else if (_loc8_ > viewWidth) {
+			_loc5_ = viewWidth - _loc8_;
+		}
+		field.x += _loc5_ / mOffScreenPlayerClip.scaleX;
+	}
+
 	public function handlePicChange(picType:String) {
 		var cmf:ColorMatrixFilter;
 		if (picType == "REVIVE") {
-			ASCompat.setProperty((mOffScreenPlayerClip : ASAny).AlertText, "text", "Rescue!");
-			if (mDeathPic != null) {
+			Locale.setText(ASCompat.coerce((mOffScreenPlayerClip : ASAny).AlertText, flash.text.TextField), "NAMETAG_RESCUE", null, 1.36);
+			TextUtil.fitToField(ASCompat.coerce((mOffScreenPlayerClip : ASAny).AlertText, flash.text.TextField), 1.27);
+			if (mDeathPic != null && mAvatarPic != null) {
 				(mOffScreenPlayerClip : ASAny).UI_avatar.addChild(mDeathPic);
 				cmf = new ColorMatrixFilter(cast([2.5, 0, 0, 0, 0, 0, 0.25, 0, 0, 0, 0, 0, 0.25, 0, 0, 0, 0, 0, 1, 0]));
 				mAvatarPic.filters = cast([cmf]);

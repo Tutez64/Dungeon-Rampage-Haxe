@@ -55,17 +55,23 @@ class SteamConstants {
 
 	public static inline final RESPONSE_OnValidateAuthTicketResponse = 26;
 
-	public static inline final RESPONSE_OnGetAuthTicketForWebApiResponse = 27;
+	public static inline final RESPONSE_OnDLCInstalled = 27;
 
-	public static inline final RESPONSE_OnDLCInstalled = 28;
+	public static inline final RESPONSE_OnMicroTxnAuthorizationResponse = 28;
 
-	public static inline final RESPONSE_OnMicroTxnAuthorizationResponse = 29;
+	public static inline final RESPONSE_OnEncryptedAppTicketResponse = 29;
 
-	public static inline final RESPONSE_OnEncryptedAppTicketResponse = 30;
+	public static inline final RESPONSE_OnUserAchievementIconFetched = 30;
 
-	public static inline final RESPONSE_OnUserAchievementIconFetched = 31;
+	public static inline final RESPONSE_OnAvatarImageLoaded = 31;
 
-	public static inline final RESPONSE_OnAvatarImageLoaded = 32;
+	public static inline final RESPONSE_OnNewUrlLaunchParameters = 32;
+
+	public static inline final RESPONSE_OnGetAuthTicketForWebApiResponse = 33;
+
+	public static inline final RESPONSE_OnGamepadTextInputDismissed = 34;
+
+	public static inline final RESPONSE_OnFloatingGamepadTextInputDismissed = 35;
 
 	public function new() {}
 }

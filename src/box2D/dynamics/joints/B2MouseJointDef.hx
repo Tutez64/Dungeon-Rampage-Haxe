@@ -2,8 +2,8 @@ package box2D.dynamics.joints;
 
 import box2D.common.math.B2Vec2;
 
-/*use*/ /*namespace*/ /*b2internal*/ class B2MouseJointDef extends B2JointDef {
-	public var target:B2Vec2 = new B2Vec2();
+class B2MouseJointDef extends B2JointDef {
+	public var target:B2Vec2;
 
 	public var maxForce:Float = Math.NaN;
 
@@ -13,9 +13,10 @@ import box2D.common.math.B2Vec2;
 
 	public function new() {
 		super();
-		type = B2Joint.e_mouseJoint;
-		this.maxForce = 0;
-		this.frequencyHz = 5;
-		this.dampingRatio = 0.7;
+		target = new B2Vec2();
+		type = 5;
+		maxForce = 0;
+		frequencyHz = 5;
+		dampingRatio = 0.7;
 	}
 }

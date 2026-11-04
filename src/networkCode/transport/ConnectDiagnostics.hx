@@ -153,13 +153,13 @@ private class HttpsProbe {
 
 	function onResponseStatus(event:HTTPStatusEvent) {
 		var _loc3_:URLRequestHeader;
-		var __ax4_iter_82:Array<URLRequestHeader>;
+		var __ax4_iter_409:Array<URLRequestHeader>;
 		var _loc2_:String = null;
 		mStatus = event.status;
 		try {
-			__ax4_iter_82 = event.responseHeaders;
-			if (checkNullIteratee(__ax4_iter_82))
-				for (_tmp_ in __ax4_iter_82) {
+			__ax4_iter_409 = event.responseHeaders;
+			if (checkNullIteratee(__ax4_iter_409))
+				for (_tmp_ in __ax4_iter_409) {
 					_loc3_ = _tmp_;
 					_loc2_ = _loc3_.name.toLowerCase();
 					if (_loc2_ == "server" || _loc2_ == "via") {
@@ -226,9 +226,9 @@ private class DnsLookup {
 			resolver.addEventListener("lookup", function(param1:flash.events.DNSResolverEvent) {
 				var _loc2_:Array<ASAny> = [];
 				var _loc4_:ResourceRecord;
-				final __ax4_iter_83 = param1.resourceRecords;
-				if (checkNullIteratee(__ax4_iter_83))
-					for (_tmp_ in __ax4_iter_83) {
+				final __ax4_iter_410 = param1.resourceRecords;
+				if (checkNullIteratee(__ax4_iter_410))
+					for (_tmp_ in __ax4_iter_410) {
 						_loc4_ = ASCompat.coerce(_tmp_, flash.net.dns.ResourceRecord);
 						_loc2_.push((_loc4_ : ASAny).hasOwnProperty("address") ? (_loc4_ : ASAny)["address"] : _loc4_.name);
 					}

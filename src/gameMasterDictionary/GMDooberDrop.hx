@@ -1,7 +1,9 @@
 package gameMasterDictionary;
 
 class GMDooberDrop extends GMItem {
-	public var BRUTE:Bool = false;
+	public var WOLF_PET:Bool = false;
+
+	public var WARCOW_PET:Bool = false;
 
 	public var SKELETON_WARRIOR:Bool = false;
 
@@ -9,9 +11,7 @@ class GMDooberDrop extends GMItem {
 
 	public var KNIGHT:Bool = false;
 
-	public var CASTLE_BARREL:Bool = false;
-
-	public var CASTLE_BOX:Bool = false;
+	public var DEMON_PET:Bool = false;
 
 	public var CASTLE_SPIKES:Bool = false;
 
@@ -19,13 +19,13 @@ class GMDooberDrop extends GMItem {
 
 	public var CASTLE_FLAG:Bool = false;
 
-	public var WOLF_PET:Bool = false;
+	public var CASTLE_BOX:Bool = false;
 
-	public var WARCOW_PET:Bool = false;
+	public var CASTLE_BARREL:Bool = false;
 
-	public var DEMON_PET:Bool = false;
+	public var BRUTE:Bool = false;
 
-	public function new(jsonAsset:ASObject) {
+	public function new(jsonAsset:ASObject = /*undefined*/ null) {
 		super(jsonAsset);
 		BRUTE = ASCompat.toBool(jsonAsset.BRUTE);
 		SKELETON_WARRIOR = ASCompat.toBool(jsonAsset.SKELETON_WARRIOR);

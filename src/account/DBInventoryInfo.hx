@@ -5,6 +5,8 @@ import brain.clock.GameClock;
 import brain.event.EventComponent;
 import brain.logger.Logger;
 import brain.jsonRPC.JSONRPCService;
+import collections.IMapIterator;
+import collections.Map;
 import events.BoostersParsedEvent;
 import facade.DBFacade;
 import gameMasterDictionary.GMHero;
@@ -14,8 +16,6 @@ import gameMasterDictionary.GMOffer;
 import gameMasterDictionary.GMOfferDetail;
 import gameMasterDictionary.GMSkin;
 import gameMasterDictionary.GMStackable;
-import org.as3commons.collections.Map;
-import org.as3commons.collections.framework.IMapIterator;
 
 class DBInventoryInfo {
 	public static inline final II_FIRST_MAPNODE_ID = (50150 : UInt);
@@ -363,7 +363,7 @@ class DBInventoryInfo {
 		var _loc3_ = ASCompat.reinterpretAs(mAvatars.iterator(), IMapIterator);
 		while (_loc3_.hasNext()) {
 			_loc1_ = ASCompat.coerce(_loc3_.next(), account.AvatarInfo);
-			_loc2_ = (ASCompat.floatToInt(Math.max(_loc2_, _loc1_.level)) : UInt);
+			_loc2_ = (ASCompat.floatToInt(Math.max(_loc2_, _loc1_.cloutLevel)) : UInt);
 		}
 		return _loc2_;
 	}
@@ -407,45 +407,45 @@ class DBInventoryInfo {
 	@:isVar public var mapnodes1(get, never):Map;
 
 	public function get_mapnodes1():Map {
-		var _loc5_ = 0;
+		var _loc5_ = (0 : UInt);
 		var _loc1_:MapnodeInfo = null;
 		var _loc2_:GMMapNode = null;
-		var _loc12_ = 0;
+		var _loc12_ = (0 : UInt);
 		var _loc9_ = false;
-		var _loc10_ = 0;
-		var _loc11_ = 0;
+		var _loc10_ = (0 : UInt);
+		var _loc11_ = (0 : UInt);
 		var _loc4_ = new Map();
 		var _loc3_ = mDBFacade.dbAccountInfo.activeAvatarInfo;
-		var _loc7_ = _loc3_.level;
+		var _loc7_ = _loc3_.ogLevel;
 		var _loc6_ = mDBFacade.dbAccountInfo.trophies;
 		var _loc8_:ASObject = mDBFacade.dbAccountInfo.activeAvatarInfo.mapNodes;
-		_loc5_ = 0;
-		while (_loc5_ < _loc3_.mapNodes.length) {
+		_loc5_ = (0 : UInt);
+		while (_loc5_ < (_loc3_.mapNodes.length:UInt)) {
 			_loc1_ = new MapnodeInfo();
-			_loc12_ = (_loc3_.mapNodes[_loc5_].node_id : Int);
-			if (_loc3_.mapNodes[_loc5_].isCompleted) {
-				_loc1_.init((_loc12_ : UInt), (1 : UInt));
+			_loc12_ = _loc3_.mapNodes[(_loc5_ : Int)].node_id;
+			if (_loc3_.mapNodes[(_loc5_ : Int)].isCompleted) {
+				_loc1_.init(_loc12_, (1 : UInt));
 			} else {
-				_loc1_.init((_loc12_ : UInt), (3 : UInt));
+				_loc1_.init(_loc12_, (3 : UInt));
 			}
 			_loc4_.add(_loc12_, _loc1_);
 			_loc5_++;
 		}
-		_loc5_ = 0;
-		while (_loc5_ < mDBFacade.gameMaster.MapNodes.length) {
-			_loc2_ = mDBFacade.gameMaster.MapNodes[_loc5_];
-			if (ASCompat.mapItemForEqNull(_loc4_, _loc2_.Id) && _loc2_.LevelRequirement <= _loc7_ && _loc2_.TrophyRequirement <= _loc6_) {
+		_loc5_ = (0 : UInt);
+		while (_loc5_ < (mDBFacade.gameMaster.MapNodes.length:UInt)) {
+			_loc2_ = mDBFacade.gameMaster.MapNodes[(_loc5_ : Int)];
+			if (_loc4_.itemFor(_loc2_.Id) == null && _loc2_.LevelRequirement <= _loc7_ && _loc2_.TrophyRequirement <= _loc6_) {
 				if (_loc2_.ParentNodes.length == 0) {
 					_loc1_ = new MapnodeInfo();
 					_loc1_.init(_loc2_.Id, (2 : UInt));
 					_loc4_.add(_loc2_.Id, _loc1_);
 				} else {
 					_loc9_ = false;
-					_loc10_ = 0;
-					while (_loc10_ < _loc3_.mapNodes.length && !_loc9_) {
-						_loc11_ = 0;
-						while (_loc11_ < _loc2_.ParentNodes.length && !_loc9_) {
-							if (ASCompat.toNumberField(_loc2_.ParentNodes[_loc11_], "Id") == _loc3_.mapNodes[_loc10_].node_id) {
+					_loc10_ = (0 : UInt);
+					while (_loc10_ < (_loc3_.mapNodes.length:UInt) && !_loc9_) {
+						_loc11_ = (0 : UInt);
+						while (_loc11_ < (_loc2_.ParentNodes.length:UInt) && !_loc9_) {
+							if (ASCompat.toNumberField(_loc2_.ParentNodes[(_loc11_ : Int)], "Id") == _loc3_.mapNodes[(_loc10_ : Int)].node_id) {
 								_loc9_ = true;
 							}
 							_loc11_++;
@@ -511,12 +511,12 @@ class DBInventoryInfo {
 
 	function parseAvatars(avatarsJson:ASObject) {
 		var _loc2_:AvatarInfo = null;
-		var _loc4_ = 0;
+		var _loc4_ = (0 : UInt);
 		mAvatars.clear();
 		var _loc3_:Array<ASAny> = ASCompat.dynamicAs(avatarsJson, Array);
-		_loc4_ = 0;
-		while (_loc4_ < _loc3_.length) {
-			_loc2_ = new AvatarInfo(mDBFacade, _loc3_[_loc4_], mResponseCallback);
+		_loc4_ = (0 : UInt);
+		while (_loc4_ < (_loc3_.length:UInt)) {
+			_loc2_ = new AvatarInfo(mDBFacade, _loc3_[(_loc4_ : Int)], mResponseCallback);
 			mAvatars.add(_loc2_.id, _loc2_);
 			_loc4_++;
 		}
@@ -524,14 +524,14 @@ class DBInventoryInfo {
 
 	function parseItems(itemsJson:ASObject) {
 		var _loc4_:ItemInfo = null;
-		var _loc2_ = 0;
+		var _loc2_ = (0 : UInt);
 		var _loc3_ = mItems.keysToArray();
 		mItems.clear();
 		var _loc5_:Array<ASAny> = ASCompat.dynamicAs(itemsJson, Array);
-		_loc2_ = 0;
-		while (_loc2_ < _loc5_.length) {
-			_loc4_ = new ItemInfo(mDBFacade, _loc5_[_loc2_]);
-			if (!mFirstParse && _loc3_.indexOf(_loc5_[_loc2_].id) == -1) {
+		_loc2_ = (0 : UInt);
+		while (_loc2_ < (_loc5_.length:UInt)) {
+			_loc4_ = new ItemInfo(mDBFacade, _loc5_[(_loc2_ : Int)]);
+			if (!mFirstParse && _loc3_.indexOf(_loc5_[(_loc2_ : Int)].id) == -1) {
 				_loc4_.isNew = true;
 			}
 			mItems.add(_loc4_.databaseId, _loc4_);
@@ -542,19 +542,19 @@ class DBInventoryInfo {
 	function parseChests(chestsJson:ASObject) {
 		var _loc4_:ChestInfo;
 		var _loc6_:ChestInfo = null;
-		var _loc7_ = 0;
+		var _loc7_ = (0 : UInt);
 		var _loc5_ = false;
 		var _loc3_ = mChests.slice(0);
 		mChests.splice(0, (mChests.length : UInt));
 		var _loc2_:Array<ASAny> = ASCompat.dynamicAs(chestsJson, Array);
-		_loc7_ = 0;
-		while (_loc7_ < _loc2_.length) {
+		_loc7_ = (0 : UInt);
+		while (_loc7_ < (_loc2_.length:UInt)) {
 			_loc5_ = false;
 			if (!mFirstParse) {
 				if (checkNullIteratee(_loc3_))
 					for (_tmp_ in _loc3_) {
 						_loc4_ = _tmp_;
-						if (_loc4_.databaseId == ASCompat.toNumberField(_loc2_[_loc7_], "id")) {
+						if (_loc4_.databaseId == ASCompat.toNumberField(_loc2_[(_loc7_ : Int)], "id")) {
 							_loc5_ = true;
 							break;
 						}
@@ -562,7 +562,7 @@ class DBInventoryInfo {
 			} else {
 				_loc5_ = true;
 			}
-			_loc6_ = new ChestInfo(mDBFacade, _loc2_[_loc7_]);
+			_loc6_ = new ChestInfo(mDBFacade, _loc2_[(_loc7_ : Int)]);
 			if (!_loc5_) {
 				_loc6_.isNew = true;
 			}
@@ -573,30 +573,30 @@ class DBInventoryInfo {
 
 	function parseKeys(accountsJson:ASObject) {
 		var _loc6_:KeyInfo = null;
-		var _loc4_ = 0;
-		var _loc5_ = 0;
-		var _loc2_ = 0;
+		var _loc4_ = (0 : UInt);
+		var _loc5_ = (0 : UInt);
+		var _loc2_ = (0 : UInt);
 		mKeys.splice(0, (mKeys.length : UInt));
 		var _loc3_ = mDBFacade.gameMaster.Keys;
-		_loc4_ = 0;
-		while (_loc4_ < _loc3_.length) {
-			_loc5_ = (_loc3_[_loc4_].OfferId : Int);
-			_loc2_ = 0;
+		_loc4_ = (0 : UInt);
+		while (_loc4_ < (_loc3_.length:UInt)) {
+			_loc5_ = _loc3_[(_loc4_ : Int)].OfferId;
+			_loc2_ = (0 : UInt);
 			switch (_loc4_) {
 				case 0:
-					_loc2_ = ASCompat.toInt(accountsJson.basic_keys);
+					_loc2_ = (ASCompat.toInt(accountsJson.basic_keys) : UInt);
 
 				case 1:
-					_loc2_ = ASCompat.toInt(accountsJson.uncommon_keys);
+					_loc2_ = (ASCompat.toInt(accountsJson.uncommon_keys) : UInt);
 
 				case 2:
-					_loc2_ = ASCompat.toInt(accountsJson.rare_keys);
+					_loc2_ = (ASCompat.toInt(accountsJson.rare_keys) : UInt);
 
 				case 3:
-					_loc2_ = ASCompat.toInt(accountsJson.legendary_keys);
+					_loc2_ = (ASCompat.toInt(accountsJson.legendary_keys) : UInt);
 			}
 			_loc6_ = new KeyInfo(ASCompat.coerce(mDBFacade.gameMaster.keysByOfferId.itemFor(_loc5_), gameMasterDictionary.GMKey),
-				ASCompat.coerce(mDBFacade.gameMaster.offerById.itemFor(_loc5_), gameMasterDictionary.GMOffer), (_loc2_ : UInt));
+				ASCompat.coerce(mDBFacade.gameMaster.offerById.itemFor(_loc5_), gameMasterDictionary.GMOffer), _loc2_);
 			mKeys.push(_loc6_);
 			_loc4_++;
 		}
@@ -604,15 +604,15 @@ class DBInventoryInfo {
 
 	function parseStackables(stackablesJson:ASObject) {
 		var _loc5_:StackableInfo = null;
-		var _loc4_ = 0;
+		var _loc4_ = (0 : UInt);
 		var _loc2_ = mStackablesByDatabaseId.keysToArray();
 		mStackablesByDatabaseId.clear();
 		mStackablesByStackableId.clear();
 		var _loc3_:Array<ASAny> = ASCompat.dynamicAs(stackablesJson, Array);
-		_loc4_ = 0;
-		while (_loc4_ < _loc3_.length) {
-			_loc5_ = new StackableInfo(mDBFacade, _loc3_[_loc4_]);
-			if (!mFirstParse && _loc2_.indexOf(_loc3_[_loc4_].id) == -1) {
+		_loc4_ = (0 : UInt);
+		while (_loc4_ < (_loc3_.length:UInt)) {
+			_loc5_ = new StackableInfo(mDBFacade, _loc3_[(_loc4_ : Int)]);
+			if (!mFirstParse && _loc2_.indexOf(_loc3_[(_loc4_ : Int)].id) == -1) {
 				_loc5_.isNew = true;
 			}
 			mStackablesByDatabaseId.add(_loc5_.databaseId, _loc5_);
@@ -623,15 +623,15 @@ class DBInventoryInfo {
 
 	function parseBoosters(boostersJson:ASObject) {
 		var _loc2_:BoosterInfo = null;
-		var _loc3_ = 0;
+		var _loc3_ = (0 : UInt);
 		var _loc5_ = mBoostersByDatabaseId.keysToArray();
 		mBoostersByDatabaseId.clear();
 		mBoostersByStackableId.clear();
 		var _loc4_:Array<ASAny> = ASCompat.dynamicAs(boostersJson, Array);
-		_loc3_ = 0;
-		while (_loc3_ < _loc4_.length) {
-			_loc2_ = new BoosterInfo(mDBFacade, _loc4_[_loc3_]);
-			if (!mFirstParse && _loc5_.indexOf(_loc4_[_loc3_].id) == -1) {
+		_loc3_ = (0 : UInt);
+		while (_loc3_ < (_loc4_.length:UInt)) {
+			_loc2_ = new BoosterInfo(mDBFacade, _loc4_[(_loc3_ : Int)]);
+			if (!mFirstParse && _loc5_.indexOf(_loc4_[(_loc3_ : Int)].id) == -1) {
 				_loc2_.isNew = true;
 			}
 			mBoostersByDatabaseId.add(_loc2_.databaseId, _loc2_);
@@ -643,14 +643,14 @@ class DBInventoryInfo {
 
 	function parsePetInfo(petsJson:ASObject) {
 		var _loc3_:PetInfo = null;
-		var _loc4_ = 0;
+		var _loc4_ = (0 : UInt);
 		var _loc5_ = mPets.keysToArray();
 		mPets.clear();
 		var _loc2_:Array<ASAny> = ASCompat.dynamicAs(petsJson, Array);
-		_loc4_ = 0;
-		while (_loc4_ < _loc2_.length) {
-			_loc3_ = new PetInfo(mDBFacade, _loc2_[_loc4_]);
-			if (!mFirstParse && _loc5_.indexOf(_loc2_[_loc4_].id) == -1) {
+		_loc4_ = (0 : UInt);
+		while (_loc4_ < (_loc2_.length:UInt)) {
+			_loc3_ = new PetInfo(mDBFacade, _loc2_[(_loc4_ : Int)]);
+			if (!mFirstParse && _loc5_.indexOf(_loc2_[(_loc4_ : Int)].id) == -1) {
 				_loc3_.isNew = true;
 			}
 			mPets.add(_loc3_.databaseId, _loc3_);
@@ -660,12 +660,12 @@ class DBInventoryInfo {
 
 	function parseSkinInfo(skinsJson:ASObject) {
 		var _loc3_:SkinInfo = null;
-		var _loc4_ = 0;
+		var _loc4_ = (0 : UInt);
 		mSkins.clear();
 		var _loc2_:Array<ASAny> = ASCompat.dynamicAs(skinsJson, Array);
-		_loc4_ = 0;
-		while (_loc4_ < _loc2_.length) {
-			_loc3_ = new SkinInfo(mDBFacade, _loc2_[_loc4_]);
+		_loc4_ = (0 : UInt);
+		while (_loc4_ < (_loc2_.length:UInt)) {
+			_loc3_ = new SkinInfo(mDBFacade, _loc2_[(_loc4_ : Int)]);
 			mSkins.add(_loc3_.skinType, _loc3_);
 			_loc4_++;
 		}
@@ -715,7 +715,7 @@ class DBInventoryInfo {
 		if (!canAvatarEquipThisMasterType(avatarInfo, itemInfo.gmWeaponItem.MasterType)) {
 			return false;
 		}
-		if (avatarInfo.level < itemInfo.requiredLevel) {
+		if (avatarInfo.levelForWeaponComparison < itemInfo.requiredLevel) {
 			return false;
 		}
 		return true;
@@ -917,9 +917,9 @@ class DBInventoryInfo {
 			}
 		}
 		var _loc2_:ChestInfo;
-		final __ax4_iter_10 = mChests;
-		if (checkNullIteratee(__ax4_iter_10))
-			for (_tmp_ in __ax4_iter_10) {
+		final __ax4_iter_343 = mChests;
+		if (checkNullIteratee(__ax4_iter_343))
+			for (_tmp_ in __ax4_iter_343) {
 				_loc2_ = _tmp_;
 				if (_loc2_.isNew) {
 					return true;
@@ -949,9 +949,9 @@ class DBInventoryInfo {
 			_loc1_.isNew = false;
 		}
 		var _loc2_:ChestInfo;
-		final __ax4_iter_11 = mChests;
-		if (checkNullIteratee(__ax4_iter_11))
-			for (_tmp_ in __ax4_iter_11) {
+		final __ax4_iter_344 = mChests;
+		if (checkNullIteratee(__ax4_iter_344))
+			for (_tmp_ in __ax4_iter_344) {
 				_loc2_ = _tmp_;
 				_loc2_.isNew = false;
 			}
@@ -961,9 +961,9 @@ class DBInventoryInfo {
 		var skin:GMSkin;
 		var offer:GMOffer;
 		var result = new Vector<GMSkin>();
-		final __ax4_iter_12 = mDBFacade.gameMaster.Skins;
-		if (checkNullIteratee(__ax4_iter_12))
-			for (_tmp_ in __ax4_iter_12) {
+		final __ax4_iter_345 = mDBFacade.gameMaster.Skins;
+		if (checkNullIteratee(__ax4_iter_345))
+			for (_tmp_ in __ax4_iter_345) {
 				skin = _tmp_;
 				if (skin.ForHero == gmHero.Constant) {
 					offer = ASCompat.coerce(offerBySkinId.itemFor(skin.Id), gameMasterDictionary.GMOffer);

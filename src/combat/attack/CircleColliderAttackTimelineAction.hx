@@ -32,8 +32,8 @@ class CircleColliderAttackTimelineAction extends ColliderTimelineAction {
 		var _loc9_ = Math.NaN;
 		var _loc8_ = Math.NaN;
 		var _loc13_:Vector3D = null;
-		var _loc15_ = 0;
-		var _loc17_ = 0;
+		var _loc15_ = (0 : UInt);
+		var _loc17_ = (0 : UInt);
 		if (actorGameObject.isOwner) {
 			_loc14_ = weapon != null ? weapon.collisionScale() : 1;
 			_loc16_ = ASCompat.toNumberField(actionObj, "radius") * _loc14_;
@@ -55,16 +55,16 @@ class CircleColliderAttackTimelineAction extends ColliderTimelineAction {
 				_loc8_ = ASCompat.toNumberField(actionObj, "yGlobalOffset") * _loc14_;
 			}
 			_loc13_ = new Vector3D(_loc9_, _loc8_);
-			_loc15_ = 1;
+			_loc15_ = (1 : UInt);
 			if (actionObj.lifeTime != null) {
-				_loc15_ = ASCompat.toInt(actionObj.lifeTime);
+				_loc15_ = (ASCompat.toInt(actionObj.lifeTime) : UInt);
 			}
-			_loc17_ = 0;
+			_loc17_ = (0 : UInt);
 			if (actionObj.hitDelayPerObject != null) {
-				_loc17_ = ASCompat.toInt(actionObj.hitDelayPerObject);
+				_loc17_ = (ASCompat.toInt(actionObj.hitDelayPerObject) : UInt);
 			}
 			return new CircleColliderAttackTimelineAction(weapon, actorGameObject, actorView, dbFacade, distributedDungeonFloor, combatResultCallback,
-				_loc16_, _loc10_, _loc13_, (_loc15_ : UInt), (_loc17_ : UInt));
+				_loc16_, _loc10_, _loc13_, _loc15_, _loc17_);
 		}
 		return null;
 	}

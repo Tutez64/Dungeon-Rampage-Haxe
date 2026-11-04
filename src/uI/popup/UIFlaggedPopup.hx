@@ -38,7 +38,7 @@ class UIFlaggedPopup extends DBUITwoButtonPopup {
 			_loc10_ = Locale.getString("FLAGGED_READ_RULES");
 			_loc6_ = readGameRules;
 		}
-		super(dbFacade, _loc7_, _loc9_, _loc5_, _loc8_, _loc10_, _loc6_, true, null);
+		super(dbFacade, "ACCOUNT_FLAGGED_POPUP", _loc7_, _loc9_, _loc5_, _loc8_, _loc10_, _loc6_);
 	}
 
 	function readGameRules() {

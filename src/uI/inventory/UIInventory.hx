@@ -13,15 +13,19 @@ import brain.event.EventComponent;
 import brain.logger.Logger;
 import brain.sceneGraph.SceneGraphComponent;
 import brain.uI.UIButton;
+import brain.uI.UIObject;
 import brain.uI.UIRadioButton;
 import brain.utils.MemoryTracker;
 import brain.workLoop.LogicalWorkComponent;
+import collections.IMapIterator;
+import collections.Map;
 import dBGlobals.DBGlobal;
 import distributedObjects.DistributedDungeonSummary;
 import facade.DBFacade;
 import facade.Locale;
 import gameMasterDictionary.GMChest;
 import gameMasterDictionary.GMHero;
+import gameMasterDictionary.GMInventoryBase;
 import gameMasterDictionary.GMNpc;
 import gameMasterDictionary.GMOffer;
 import gameMasterDictionary.GMOfferDetail;
@@ -35,18 +39,13 @@ import uI.equipPicker.StuffWithEquipPicker;
 import uI.hud.UIHud;
 import uI.inventory.chests.ChestInfoCard;
 import uI.popup.DBUIOneButtonPopup;
-import uI.popup.DBUITwoButtonPopup;
 import uI.UIPagingPanel;
 import uI.UITownTweens;
 import flash.display.MovieClip;
 import flash.display.Sprite;
 import flash.events.Event;
-import org.as3commons.collections.Map;
-import org.as3commons.collections.framework.IMapIterator;
 
 class UIInventory {
-	static inline final BUY_KEY_POPUP_SWF_PATH = "Resources/Art2D/UI/db_UI_score_report.swf";
-
 	static inline final SELECTED_TAB_SCALE:Float = 1.15;
 
 	static inline final NUM_GRID_ELEMENTS = (15 : UInt);
@@ -63,7 +62,12 @@ class UIInventory {
 
 	public static inline final EQUIPPABLE_NEVER = (3 : UInt);
 
-	static final CATEGORY_ARRAY:Array<ASAny> = ["WEAPON", "POWERUP", "PET", "STUFF"];
+	static final CATEGORY_ARRAY:Array<ASAny> = [
+		GMInventoryBase.WEAPON_CATEGORY,
+		GMInventoryBase.POWERUP_CATEGORY,
+		GMInventoryBase.PET_CATEGORY,
+		GMInventoryBase.STUFF_CATEGORY
+	];
 
 	var mDBFacade:DBFacade;
 
@@ -89,6 +93,8 @@ class UIInventory {
 
 	var mCurrentTab:String;
 
+	var mNextTab:String;
+
 	var mWantPets:Bool = false;
 
 	var mItems:Vector<UIInventoryItem>;
@@ -102,6 +108,8 @@ class UIInventory {
 	var mInfoCard:ItemInfoCard;
 
 	var mDungeonSummary:DistributedDungeonSummary;
+
+	var mDungeonSummaryInitialFocusSet:Bool = false;
 
 	var mNewItemIds:Array<ASAny>;
 
@@ -121,13 +129,17 @@ class UIInventory {
 
 	var mSelectedItemInfo:InventoryBaseInfo;
 
+	var mSelectedItemNavigationSource:UIObject;
+
+	var mBoosterNavigationItem:UIInventoryItem;
+
 	var mSelectedAvatar:UInt = 0;
 
 	var mSceneGraphComponent:SceneGraphComponent;
 
 	var mChestCard:ChestInfoCard;
 
-	var mAbandonChestPopUp:DBUITwoButtonPopup;
+	var mAbandonChestPopUp:UIAbandonChestPopup;
 
 	var mChestOpenFullPopUp:DBUIOneButtonPopup;
 
@@ -143,10 +155,21 @@ class UIInventory {
 
 	var mBoosterCard:BoosterInfoCard;
 
-	public function new(dbFacade:DBFacade, townHeader:TownHeader = null, dungeonSummary:DistributedDungeonSummary = null) {
+	var mWeaponTabButton:UIRadioButton;
+
+	var mPotionsTabButton:UIRadioButton;
+
+	var mPetsTabButton:UIRadioButton;
+
+	var mStuffTabButton:UIRadioButton;
+
+	var mIsActiveCallback:ASFunction;
+
+	public function new(dbFacade:DBFacade, townHeader:TownHeader = null, dungeonSummary:DistributedDungeonSummary = null, isActiveCallback:ASFunction = null) {
 		mDBFacade = dbFacade;
 		mTownHeader = townHeader;
 		mDungeonSummary = dungeonSummary;
+		mIsActiveCallback = isActiveCallback;
 		mRevealedItemType = (0 : UInt);
 		mRevealedItemOfferId = (0 : UInt);
 		mRoot = new Sprite();
@@ -198,20 +221,20 @@ class UIInventory {
 		ASCompat.setProperty((mInventoryRoot : ASAny).potion_picker, "visible", false);
 		ASCompat.setProperty((mInventoryRoot : ASAny).stuff_picker, "visible", false);
 		mHeroWithEquipPicker = new HeroWithEquipPicker(mDBFacade, ASCompat.coerce((mInventoryRoot : ASAny).weapon_picker, flash.display.MovieClip), _loc3_,
-			_loc4_, heroSelected, itemSelected, getSelectedAvatar, setSelectedAvatar, refresh, true);
+			_loc4_, heroSelected, itemSelected, getSelectedAvatar, setSelectedAvatar, refresh, true, true, mIsActiveCallback);
 		mStacksWithEquipPicker = new StacksWithEquipPicker(mDBFacade, ASCompat.coerce((mInventoryRoot : ASAny).potion_picker, flash.display.MovieClip),
-			_loc3_, _loc4_, itemSelected, refresh, true, getSelectedAvatar, setSelectedAvatar);
+			_loc3_, _loc4_, itemSelected, refresh, true, getSelectedAvatar, setSelectedAvatar, mIsActiveCallback);
 		if (mWantPets) {
 			mPetsWithEquipPicker = new PetsWithEquipPicker(mDBFacade, ASCompat.coerce((mInventoryRoot : ASAny).pet_picker, flash.display.MovieClip), _loc3_,
-				_loc4_, itemSelected, getSelectedAvatar, setSelectedAvatar, refresh, true);
+				_loc4_, itemSelected, getSelectedAvatar, setSelectedAvatar, refresh, true, mIsActiveCallback);
 		}
 		mStuffWithEquipPicker = new StuffWithEquipPicker(mDBFacade, ASCompat.coerce((mInventoryRoot : ASAny).stuff_picker, flash.display.MovieClip), _loc4_,
-			getSelectedAvatar, setSelectedAvatar);
+			getSelectedAvatar, setSelectedAvatar, mIsActiveCallback);
 		ASCompat.setProperty((mInventoryRoot : ASAny).close, "visible", false);
 		var _loc5_ = ASCompat.coerce((mInventoryRoot : ASAny).treasure, flash.display.MovieClip);
 		if (mDungeonSummary != null) {
 			mDungeonRewardPanel = new DungeonRewardPanel(mDBFacade, _loc5_, mDungeonSummary, itemSelected);
-			ASCompat.setProperty((_loc5_ : ASAny).label, "text", Locale.getString("LOOT"));
+			Locale.setText(ASCompat.coerce((_loc5_ : ASAny).label, flash.text.TextField), "LOOT");
 		} else {
 			_loc5_.visible = false;
 		}
@@ -221,7 +244,9 @@ class UIInventory {
 	}
 
 	function accountInfoUpdated(evt:Event) {
-		refresh(false);
+		if (mIsActiveCallback == null || ASCompat.toBool(mIsActiveCallback())) {
+			refresh(false);
+		}
 	}
 
 	public function hide() {
@@ -258,24 +283,24 @@ class UIInventory {
 	function determineEquippableItems(gmHero:GMHero) {
 		var _loc7_:InventoryBaseInfo = null;
 		var _loc6_:ItemInfo = null;
-		var _loc3_ = 0;
-		var _loc4_ = 0;
+		var _loc3_ = (0 : UInt);
+		var _loc4_ = (0 : UInt);
 		var _loc5_ = mDBFacade.dbAccountInfo.inventoryInfo;
 		var _loc2_ = _loc5_.getAvatarInfoForHeroType(gmHero.Id);
-		_loc4_ = 0;
-		while (_loc4_ < mItems.length) {
-			_loc7_ = mItems[_loc4_].info;
+		_loc4_ = (0 : UInt);
+		while (_loc4_ < (mItems.length:UInt)) {
+			_loc7_ = mItems[(_loc4_ : Int)].info;
 			_loc6_ = ASCompat.reinterpretAs(_loc7_, ItemInfo);
 			if (_loc7_ != null && _loc6_ != null && _loc6_.gmWeaponItem != null) {
-				_loc3_ = 1;
+				_loc3_ = (1 : UInt);
 				if (_loc2_ == null) {
-					_loc3_ = 3;
+					_loc3_ = (3 : UInt);
 				} else if (!_loc5_.canAvatarEquipThisMasterType(_loc2_, _loc6_.gmWeaponItem.MasterType)) {
-					_loc3_ = 3;
-				} else if (_loc2_.level < _loc6_.requiredLevel) {
-					_loc3_ = 2;
+					_loc3_ = (3 : UInt);
+				} else if (_loc2_.levelForWeaponComparison < _loc6_.requiredLevel) {
+					_loc3_ = (2 : UInt);
 				}
-				mItems[_loc4_].equippable = (_loc3_ : UInt);
+				mItems[(_loc4_ : Int)].equippable = _loc3_;
 			}
 			_loc4_++;
 		}
@@ -302,11 +327,8 @@ class UIInventory {
 							mNewPetIds.splice(_loc1_, (1 : UInt));
 						}
 					}
-					if (mDBFacade.steamAchievementsManager != null) {
-						mDBFacade.steamAchievementsManager.setAchievement("SELL_AN_ITEM");
-						mDBFacade.steamAchievementsManager.addToStatInt("SELL_ITEM_STAT", 1);
-					}
 					refresh();
+					focusFirstInventoryItem();
 				});
 			}
 			mSelectedItemInfo = null;
@@ -345,36 +367,38 @@ class UIInventory {
 			mChestCard = null;
 		}
 		mChestCard = new ChestInfoCard(mDBFacade, mSceneGraphComponent, ASCompat.coerce((root : ASAny).inv_chests, flash.display.MovieClip), abandonChest,
-			openChest, abandonChestDS, openChestDS, keepChestDS);
+			openChest, abandonChestDS, openChestDS, keepChestDS, mIsActiveCallback);
 		if (mConsumableChestCard != null) {
 			mConsumableChestCard.destroy();
 			mConsumableChestCard = null;
 		}
 		mConsumableChestCard = new ChestInfoCard(mDBFacade, mSceneGraphComponent, ASCompat.coerce((root : ASAny).inv_consumable, flash.display.MovieClip),
-			abandonChest, openChest, abandonChestDS, openChestDS, keepChestDS);
+			abandonChest, openChest, abandonChestDS, openChestDS, keepChestDS, mIsActiveCallback);
 		if (mBoosterCard != null) {
 			mBoosterCard.destroy();
 			mBoosterCard = null;
 		}
-		mBoosterCard = new BoosterInfoCard(mDBFacade, mSceneGraphComponent, ASCompat.coerce((root : ASAny).booster_card, flash.display.MovieClip));
+		mBoosterCard = new BoosterInfoCard(mDBFacade, mSceneGraphComponent, ASCompat.coerce((root : ASAny).booster_card, flash.display.MovieClip),
+			focusAfterBoosterActivation);
 		group = "UIInventoryTabGroup";
-		mTabButtons.add("WEAPON",
-			new UIRadioButton(mDBFacade, ASCompat.coerce((mInventoryRoot : ASAny).grid_widget.tab_weapons, flash.display.MovieClip), group));
-		ASCompat.setProperty((mInventoryRoot : ASAny).grid_widget.tab_weapons.label, "text", Locale.getString("TAB_LOOT"));
-		mTabButtons.add("POWERUP",
-			new UIRadioButton(mDBFacade, ASCompat.coerce((mInventoryRoot : ASAny).grid_widget.tab_potions, flash.display.MovieClip), group));
-		ASCompat.setProperty((mInventoryRoot : ASAny).grid_widget.tab_potions.label, "text", Locale.getString("TAB_POWERUPS"));
+		mWeaponTabButton = new UIRadioButton(mDBFacade, ASCompat.coerce((mInventoryRoot : ASAny).grid_widget.tab_weapons, flash.display.MovieClip), group);
+		mPotionsTabButton = new UIRadioButton(mDBFacade, ASCompat.coerce((mInventoryRoot : ASAny).grid_widget.tab_potions, flash.display.MovieClip), group);
+		mPetsTabButton = new UIRadioButton(mDBFacade, ASCompat.coerce((mInventoryRoot : ASAny).grid_widget.tab_pets, flash.display.MovieClip), group);
+		mStuffTabButton = new UIRadioButton(mDBFacade, ASCompat.coerce((mInventoryRoot : ASAny).grid_widget.tab_stuff, flash.display.MovieClip), group);
+		mTabButtons.add(GMInventoryBase.WEAPON_CATEGORY, mWeaponTabButton);
+		Locale.setText(ASCompat.coerce((mInventoryRoot : ASAny).grid_widget.tab_weapons.label, flash.text.TextField), "TAB_LOOT");
+		mTabButtons.add(GMInventoryBase.POWERUP_CATEGORY, mPotionsTabButton);
+		Locale.setText(ASCompat.coerce((mInventoryRoot : ASAny).grid_widget.tab_potions.label, flash.text.TextField), "TAB_POWERUPS");
 		if (mWantPets) {
-			mTabButtons.add("PET",
-				new UIRadioButton(mDBFacade, ASCompat.coerce((mInventoryRoot : ASAny).grid_widget.tab_pets, flash.display.MovieClip), group));
-			ASCompat.setProperty((mInventoryRoot : ASAny).grid_widget.tab_pets.label, "text", Locale.getString("TAB_PETS"));
+			mTabButtons.add(GMInventoryBase.PET_CATEGORY, mPetsTabButton);
+			Locale.setText(ASCompat.coerce((mInventoryRoot : ASAny).grid_widget.tab_pets.label, flash.text.TextField), "TAB_PETS");
 		}
-		mTabButtons.add("STUFF", new UIRadioButton(mDBFacade, ASCompat.coerce((mInventoryRoot : ASAny).grid_widget.tab_stuff, flash.display.MovieClip), group));
-		ASCompat.setProperty((mInventoryRoot : ASAny).grid_widget.tab_stuff.label, "text", Locale.getString("TAB_STUFF"));
+		mTabButtons.add(GMInventoryBase.STUFF_CATEGORY, mStuffTabButton);
+		Locale.setText(ASCompat.coerce((mInventoryRoot : ASAny).grid_widget.tab_stuff.label, flash.text.TextField), "TAB_STUFF");
 		iter = ASCompat.reinterpretAs(mTabButtons.iterator(), IMapIterator);
 		while (iter.hasNext()) {
 			tabButton = ASCompat.coerce(iter.next(), brain.uI.UIRadioButton);
-			ASCompat.setProperty((tabButton.root : ASAny).new_label, "text", Locale.getString("INV_NEW"));
+			Locale.setText(ASCompat.coerce((tabButton.root : ASAny).new_label, flash.text.TextField), "INV_NEW");
 			ASCompat.setProperty((tabButton.root : ASAny).new_label, "visible", this.categoryHasAnyNewItems(iter.key));
 			ASCompat.setProperty(tabButton.root, "category", iter.key);
 			tabButton.releaseCallbackThis = function(param1:UIButton) {
@@ -415,7 +439,7 @@ class UIInventory {
 		}
 		mAddStorageButton = new UIButton(mDBFacade, ASCompat.coerce((mInventoryRoot : ASAny).grid_widget.add_storage_button, flash.display.MovieClip));
 		mAddStorageButton.rolloverFilter = DBGlobal.UI_ROLLOVER_FILTER;
-		mAddStorageButton.label.text = Locale.getString("INV_ADD_STORAGE");
+		Locale.setText(mAddStorageButton.label, "INV_ADD_STORAGE");
 		mAddStorageButton.releaseCallback = function() {
 			StoreServicesController.showStoragePage(mDBFacade);
 		};
@@ -426,17 +450,16 @@ class UIInventory {
 
 	function abandonChest(chestInfo:ChestInfo) {
 		var index:Int;
-		mAbandonChestPopUp = new DBUITwoButtonPopup(mDBFacade, Locale.getString("ABANDON_CHEST_POPUP_TITLE"), Locale.getString("ABANDON_CHEST_POPUP_DESC"),
-			Locale.getString("ABANDON_CHEST_POPUP_CANCEL"), closeAbandonChestPopUp, Locale.getString("ABANDON_CHEST_POPUP_CONFIRM"), function() {
-				mDBFacade.metrics.log("ChestAbandoned", {
-					"chestId": chestInfo.gmChestInfo.Id,
-					"rarity": chestInfo.rarity,
-					"category": "storage"
-				});
-				mDBFacade.dbAccountInfo.inventoryInfo.dropChest(chestInfo.databaseId, dropChestSuccessfullCallback, abandonChestFailedPopUp);
-				closeAbandonChestPopUp();
-		}, false, null);
-		MemoryTracker.track(mAbandonChestPopUp, "DBUITwoButtonPopup - created in UIInventory.abandonChest()");
+		mAbandonChestPopUp = new UIAbandonChestPopup(mDBFacade, closeAbandonChestPopUp, function() {
+			mDBFacade.metrics.log("ChestAbandoned", {
+				"chestId": chestInfo.gmChestInfo.Id,
+				"rarity": chestInfo.rarity,
+				"category": "storage"
+			});
+			mDBFacade.dbAccountInfo.inventoryInfo.dropChest(chestInfo.databaseId, dropChestSuccessfullCallback, abandonChestFailedPopUp);
+			closeAbandonChestPopUp();
+		});
+		MemoryTracker.track(mAbandonChestPopUp, "UIAbandonChestPopup - created in UIInventory.abandonChest()");
 		index = mNewChestIds.indexOf(chestInfo.databaseId);
 		if (index != -1) {
 			mNewChestIds.splice(index, (1 : UInt));
@@ -450,19 +473,20 @@ class UIInventory {
 	function dropChestSuccessfullCallback(chestInstanceId:UInt, details:ASAny) {
 		removeChestFromInventory(chestInstanceId);
 		refresh(true);
+		focusFirstInventoryItem();
 	}
 
 	function returnFromOpenFullPopUp() {
 		if (mChestOpenFullPopUp != null) {
-			mSceneGraphComponent.removeChild(mChestOpenFullPopUp.root);
+			mChestOpenFullPopUp.destroy();
 			mChestOpenFullPopUp = null;
 		}
 	}
 
 	function openChest(chestInfo:ChestInfo) {
-		var _loc4_ = 0;
-		var _loc6_ = 0;
-		var _loc2_ = 0;
+		var _loc4_ = (0 : UInt);
+		var _loc6_ = (0 : UInt);
+		var _loc2_ = (0 : UInt);
 		var _loc3_ = mChestCard;
 		if (UIHud.isThisAConsumbleChestId((chestInfo.gmChestInfo.Id : Int))) {
 			_loc3_ = mConsumableChestCard;
@@ -472,13 +496,13 @@ class UIInventory {
 				mDungeonSummary.openChestFromInventory(chestInfo.gmChestInfo, true);
 			} else {
 				_loc3_.createRevealPopUp(closeRevealPopUp, goToStorage);
-				_loc4_ = (mHeroWithEquipPicker.currentlySelectedHero.Id : Int);
-				_loc6_ = (mDBFacade.dbAccountInfo.inventoryInfo.getAvatarInfoForHeroType((_loc4_ : UInt)).id : Int);
-				_loc2_ = (mDBFacade.dbAccountInfo.inventoryInfo.getAvatarInfoForHeroType((_loc4_ : UInt)).skinId : Int);
-				mDBFacade.dbAccountInfo.inventoryInfo.openChest(chestInfo.databaseId, (_loc6_ : UInt), (_loc2_ : UInt), updateRevealLoot, openChestFailedPopUp);
+				_loc4_ = mHeroWithEquipPicker.currentlySelectedHero.Id;
+				_loc6_ = mDBFacade.dbAccountInfo.inventoryInfo.getAvatarInfoForHeroType(_loc4_).id;
+				_loc2_ = mDBFacade.dbAccountInfo.inventoryInfo.getAvatarInfoForHeroType(_loc4_).skinId;
+				mDBFacade.dbAccountInfo.inventoryInfo.openChest(chestInfo.databaseId, _loc6_, _loc2_, updateRevealLoot, openChestFailedPopUp);
 			}
 		} else {
-			mAssetLoadingComponent.getSwfAsset(DBFacade.buildFullDownloadPath("Resources/Art2D/UI/db_UI_score_report.swf"), _loc3_.showBuyKeysPopUp);
+			_loc3_.showBuyKeysPopUp();
 		}
 		var _loc5_ = mNewChestIds.indexOf(chestInfo.databaseId);
 		if (_loc5_ != -1) {
@@ -495,12 +519,36 @@ class UIInventory {
 		refresh();
 	}
 
-	function closeRevealPopUp(itemType:UInt, itemOfferId:UInt, updateInventory:Bool) {
+	function closeRevealPopUp(itemType:UInt, itemOfferId:UInt, keptItem:Bool) {
 		mRevealedItemType = itemType;
 		mRevealedItemOfferId = itemOfferId;
 		mConsumableChestCard.closeChestRevealPopUp();
 		mChestCard.closeChestRevealPopUp();
 		refresh();
+		focusAfterChestReveal(itemType, keptItem);
+	}
+
+	function focusAfterChestReveal(itemType:UInt, keptItem:Bool) {
+		var _loc3_:UIInventoryItem;
+		var __ax4_iter_350:Vector<UIInventoryItem>;
+		var _loc4_:UIObject = null;
+		if (keptItem && itemType == 1) {
+			__ax4_iter_350 = mItems;
+			if (checkNullIteratee(__ax4_iter_350))
+				for (_tmp_ in __ax4_iter_350) {
+					_loc3_ = _tmp_;
+					if (_loc3_.info == mSelectedItemInfo && _loc3_.canBeFocused()) {
+						_loc4_ = _loc3_;
+						break;
+					}
+				}
+		}
+		if (_loc4_ == null) {
+			_loc4_ = getFirstFocusableInventoryItem();
+		}
+		if (_loc4_ != null) {
+			mDBFacade.menuNavigationController.setFocusedUiObject(_loc4_);
+		}
 	}
 
 	function updateRevealLoot(chestInstanceId:UInt, details:ASAny) {
@@ -510,24 +558,24 @@ class UIInventory {
 	}
 
 	function abandonChestDS(chestInfo:ChestInfo) {
-		mAbandonChestPopUp = new DBUITwoButtonPopup(mDBFacade, Locale.getString("ABANDON_CHEST_POPUP_TITLE"), Locale.getString("ABANDON_CHEST_POPUP_DESC"),
-			Locale.getString("ABANDON_CHEST_POPUP_CANCEL"), closeAbandonChestPopUp, Locale.getString("ABANDON_CHEST_POPUP_CONFIRM"), function() {
-				mDBFacade.metrics.log("ChestAbandoned", {
-					"chestId": chestInfo.gmChestInfo.Id,
-					"rarity": chestInfo.rarity,
-					"category": "storageFromDungeonSummary"
-				});
-				var _loc1_ = mDungeonSummary.findSlotForChest(chestInfo.gmChestInfo);
-				mDungeonSummary.abandonChestFromInventory(_loc1_);
-				closeAbandonChestPopUp();
-		}, false, null);
-		MemoryTracker.track(mAbandonChestPopUp, "DBUITwoButtonPopup - created in UIInventory.abandonChestDS()");
+		mAbandonChestPopUp = new UIAbandonChestPopup(mDBFacade, closeAbandonChestPopUp, function() {
+			mDBFacade.metrics.log("ChestAbandoned", {
+				"chestId": chestInfo.gmChestInfo.Id,
+				"rarity": chestInfo.rarity,
+				"category": "storageFromDungeonSummary"
+			});
+			var _loc1_ = mDungeonSummary.findSlotForChest(chestInfo.gmChestInfo);
+			mDungeonSummary.abandonChestFromInventory(_loc1_);
+			focusFirstInventoryItem();
+			closeAbandonChestPopUp();
+		});
+		MemoryTracker.track(mAbandonChestPopUp, "UIAbandonChestPopup - created in UIInventory.abandonChestDS()");
 	}
 
 	function openChestDS(chestInfo:ChestInfo) {
 		if (mDungeonSummary != null && !mDBFacade.dbAccountInfo.inventoryInfo.isThereEmptySpaceInWeaponStorage()) {
-			mChestOpenFullPopUp = new DBUIOneButtonPopup(mDBFacade, Locale.getString("STORAGE_FULL"), Locale.getString("CLEAR_INVENTORY"),
-				Locale.getString("RETURN"), returnFromOpenFullPopUp, true, returnFromOpenFullPopUp);
+			mChestOpenFullPopUp = new DBUIOneButtonPopup(mDBFacade, "POPUP_STORAGE_FULL", Locale.getString("STORAGE_FULL"),
+				Locale.getString("CLEAR_INVENTORY"), Locale.getString("RETURN"), returnFromOpenFullPopUp, true, returnFromOpenFullPopUp);
 			MemoryTracker.track(mChestOpenFullPopUp, "DBUIOneButtonPopup - created in UIInventory.openChestDS()");
 			mSceneGraphComponent.addChild(mChestOpenFullPopUp.root, (105 : UInt));
 			return;
@@ -537,8 +585,8 @@ class UIInventory {
 
 	function keepChestDS(chestInfo:ChestInfo) {
 		if (mDungeonSummary != null && !mDBFacade.dbAccountInfo.inventoryInfo.isThereEmptySpaceInWeaponStorage()) {
-			mChestOpenFullPopUp = new DBUIOneButtonPopup(mDBFacade, Locale.getString("STORAGE_FULL"), Locale.getString("CLEAR_INVENTORY"),
-				Locale.getString("RETURN"), returnFromOpenFullPopUp, true, returnFromOpenFullPopUp);
+			mChestOpenFullPopUp = new DBUIOneButtonPopup(mDBFacade, "POPUP_STORAGE_FULL", Locale.getString("STORAGE_FULL"),
+				Locale.getString("CLEAR_INVENTORY"), Locale.getString("RETURN"), returnFromOpenFullPopUp, true, returnFromOpenFullPopUp);
 			MemoryTracker.track(mChestOpenFullPopUp, "DBUIOneButtonPopup - created in UIInventory.keepChestDS()");
 			mSceneGraphComponent.addChild(mChestOpenFullPopUp.root, (105 : UInt));
 			return;
@@ -559,11 +607,11 @@ class UIInventory {
 	}
 
 	function removeChestFromInventory(chestInstanceId:UInt) {
-		var _loc2_ = 0;
-		_loc2_ = 0;
-		while (_loc2_ < mDBFacade.dbAccountInfo.inventoryInfo.chests.length) {
-			if (mDBFacade.dbAccountInfo.inventoryInfo.chests[_loc2_].gmId == chestInstanceId) {
-				mDBFacade.dbAccountInfo.inventoryInfo.chests.splice(_loc2_, (1 : UInt));
+		var _loc2_ = (0 : UInt);
+		_loc2_ = (0 : UInt);
+		while (_loc2_ < (mDBFacade.dbAccountInfo.inventoryInfo.chests.length:UInt)) {
+			if (mDBFacade.dbAccountInfo.inventoryInfo.chests[(_loc2_ : Int)].gmId == chestInstanceId) {
+				mDBFacade.dbAccountInfo.inventoryInfo.chests.splice((_loc2_ : Int), (1 : UInt));
 				break;
 			}
 			_loc2_++;
@@ -599,7 +647,7 @@ class UIInventory {
 			mLogicalWorkComponent.doLater(0.16666666666666666, function(param1:brain.clock.GameClock) {
 				UITownTweens.rightPanelTweenSequence(ASCompat.coerce((mInventoryRoot : ASAny).grid_widget, flash.display.MovieClip), mDBFacade);
 			});
-			if (mCurrentTab != "WEAPON") {
+			if (mCurrentTab != GMInventoryBase.WEAPON_CATEGORY) {
 				return;
 			}
 			mHeroWithEquipPicker.root.visible = false;
@@ -615,9 +663,9 @@ class UIInventory {
 		var _loc10_:InventoryBaseInfo = null;
 		var _loc5_:IMapIterator = null;
 		mCategorizedItems = new Map();
-		final __ax4_iter_15 = CATEGORY_ARRAY;
-		if (checkNullIteratee(__ax4_iter_15))
-			for (_tmp_ in __ax4_iter_15) {
+		final __ax4_iter_351 = CATEGORY_ARRAY;
+		if (checkNullIteratee(__ax4_iter_351))
+			for (_tmp_ in __ax4_iter_351) {
 				_loc7_ = _tmp_;
 				mCategorizedItems.add(_loc7_, new Vector<InventoryBaseInfo>());
 			}
@@ -626,10 +674,10 @@ class UIInventory {
 		var _loc3_ = mDBFacade.dbAccountInfo.inventoryInfo.stackables;
 		var _loc1_ = mDBFacade.dbAccountInfo.inventoryInfo.pets;
 		var _loc4_:Map;
-		final __ax4_iter_16:Array<ASAny> = [_loc8_, _loc3_, _loc1_];
-		if (checkNullIteratee(__ax4_iter_16))
-			for (_tmp_ in __ax4_iter_16) {
-				_loc4_ = ASCompat.coerce(_tmp_, org.as3commons.collections.Map);
+		final __ax4_iter_352:Array<ASAny> = [_loc8_, _loc3_, _loc1_];
+		if (checkNullIteratee(__ax4_iter_352))
+			for (_tmp_ in __ax4_iter_352) {
+				_loc4_ = ASCompat.coerce(_tmp_, collections.Map);
 				_loc5_ = ASCompat.reinterpretAs(_loc4_.iterator(), IMapIterator);
 				while (_loc5_.hasNext()) {
 					_loc10_ = ASCompat.coerce(_loc5_.next(), account.InventoryBaseInfo);
@@ -638,7 +686,7 @@ class UIInventory {
 					} else {
 						_loc7_ = "PET";
 					}
-					_loc9_ = mCategorizedItems.itemFor(_loc7_);
+					_loc9_ = (mCategorizedItems.itemFor(_loc7_) : Vector<InventoryBaseInfo>);
 					if (_loc9_ == null) {
 						Logger.error("No inventory category exists for weapon class type: " + _loc7_);
 					} else {
@@ -651,8 +699,8 @@ class UIInventory {
 			for (_tmp_ in _loc6_) {
 				_loc2_ = _tmp_;
 				if (_loc2_.gmChestInfo != null) {
-					_loc7_ = "WEAPON";
-					_loc9_ = mCategorizedItems.itemFor(_loc7_);
+					_loc7_ = GMInventoryBase.WEAPON_CATEGORY;
+					_loc9_ = (mCategorizedItems.itemFor(_loc7_) : Vector<InventoryBaseInfo>);
 					if (_loc9_ == null) {
 						Logger.error("No inventory category exists for weapon class type: " + _loc7_);
 					} else {
@@ -727,10 +775,10 @@ class UIInventory {
 		var _loc3_:Vector<InventoryBaseInfo> = /*undefined*/ null;
 		var _loc1_ = ASCompat.reinterpretAs(mCategorizedItems.iterator(), IMapIterator);
 		while (_loc1_.hasNext()) {
-			_loc3_ = _loc1_.next();
+			_loc3_ = (_loc1_.next() : Vector<InventoryBaseInfo>);
 			_loc2_ = _loc1_.key;
 			_loc4_ = _loc2_;
-			if ("WEAPON" != _loc4_) {
+			if (GMInventoryBase.WEAPON_CATEGORY != _loc4_) {
 				ASCompat.ASVector.sort(_loc3_, basicSortComparator);
 			} else {
 				ASCompat.ASVector.sort(_loc3_, weaponSortComparator);
@@ -750,7 +798,6 @@ class UIInventory {
 		}
 		if (mTownHeader != null) {
 			mTownHeader.title = Locale.getString("INVENTORY_HEADER");
-			mTownHeader.refreshKeyPanel();
 		}
 		mHeroWithEquipPicker.refresh(resync);
 		mStacksWithEquipPicker.refresh(resync);
@@ -769,7 +816,7 @@ class UIInventory {
 			return false;
 		}));
 		if (!currentTabIsValidCategory) {
-			mCurrentTab = "WEAPON";
+			mCurrentTab = GMInventoryBase.WEAPON_CATEGORY;
 		}
 		if (!dontRefreshChestSelection) {
 			mSelectedItemInfo = checkIfRevealedWeaponExists();
@@ -805,8 +852,8 @@ class UIInventory {
 	}
 
 	public function jumpToWeaponOffer(info:InventoryBaseInfo) {
-		var _loc4_ = "WEAPON";
-		var _loc5_ = (mCategorizedItems.itemFor("WEAPON") : Vector<InventoryBaseInfo>);
+		var _loc4_ = GMInventoryBase.WEAPON_CATEGORY;
+		var _loc5_ = (mCategorizedItems.itemFor(GMInventoryBase.WEAPON_CATEGORY) : Vector<InventoryBaseInfo>);
 		var _loc2_ = _loc5_.indexOf(info);
 		if (_loc2_ == -1) {
 			Logger.warn("Index not found for item in Storage");
@@ -816,30 +863,30 @@ class UIInventory {
 	}
 
 	function checkIfRevealedWeaponExists():InventoryBaseInfo {
-		var __ax4_iter_17:Vector<InventoryBaseInfo>;
+		var __ax4_iter_353:Array<ASAny>;
 		var _loc10_:Int;
 		var _loc9_:Vector<GMOfferDetail>;
 		var _loc2_:GMOfferDetail;
-		var __ax4_iter_18:Vector<InventoryBaseInfo>;
+		var __ax4_iter_354:Array<ASAny>;
 		var _loc6_:InventoryBaseInfo = null;
 		var _loc1_:GMWeaponItem = null;
-		var _loc4_ = 0;
+		var _loc4_ = (0 : UInt);
 		var _loc5_:GMOffer = null;
 		var _loc3_:GMStackable = null;
 		if (mRevealedItemType == 0) {
 			return null;
 		}
 		if (mRevealedItemType == 1) {
-			mCurrentTab = "WEAPON";
+			mCurrentTab = GMInventoryBase.WEAPON_CATEGORY;
 			mRevealedItemOfferId %= (100000 : UInt);
 			_loc1_ = ASCompat.coerce(mDBFacade.gameMaster.weaponItemById.itemFor(mRevealedItemOfferId), gameMasterDictionary.GMWeaponItem);
-			__ax4_iter_17 = mCategorizedItems.itemFor(mCurrentTab);
-			if (checkNullIteratee(__ax4_iter_17))
-				for (_tmp_ in __ax4_iter_17) {
-					_loc6_ = _tmp_;
+			__ax4_iter_353 = mCategorizedItems.itemFor(mCurrentTab);
+			if (checkNullIteratee(__ax4_iter_353))
+				for (_tmp_ in __ax4_iter_353) {
+					_loc6_ = ASCompat.coerce(_tmp_, account.InventoryBaseInfo);
 					if (Std.isOfType(_loc6_, ItemInfo)) {
-						_loc4_ = (ASCompat.reinterpretAs(_loc6_, ItemInfo).gmWeaponItem.Id : Int);
-						if ((_loc4_ : UInt) == _loc1_.Id && ASCompat.toBool(_loc6_.isNew)) {
+						_loc4_ = ASCompat.reinterpretAs(_loc6_, ItemInfo).gmWeaponItem.Id;
+						if (_loc4_ == _loc1_.Id && _loc6_.isNew) {
 							mRevealedItemType = mRevealedItemOfferId = (0 : UInt);
 							return _loc6_;
 						}
@@ -855,12 +902,12 @@ class UIInventory {
 					_loc3_ = ASCompat.coerce(mDBFacade.gameMaster.stackableById.itemFor(_loc2_.StackableId), gameMasterDictionary.GMStackable);
 				}
 			if (_loc3_ != null) {
-				mCurrentTab = "POWERUP";
-				__ax4_iter_18 = mCategorizedItems.itemFor(mCurrentTab);
-				if (checkNullIteratee(__ax4_iter_18))
-					for (_tmp_ in __ax4_iter_18) {
-						_loc6_ = _tmp_;
-						if (ASCompat.toNumberField(_loc6_, "gmId") == _loc3_.Id) {
+				mCurrentTab = GMInventoryBase.POWERUP_CATEGORY;
+				__ax4_iter_354 = mCategorizedItems.itemFor(mCurrentTab);
+				if (checkNullIteratee(__ax4_iter_354))
+					for (_tmp_ in __ax4_iter_354) {
+						_loc6_ = ASCompat.coerce(_tmp_, account.InventoryBaseInfo);
+						if (_loc6_.gmId == _loc3_.Id) {
 							mRevealedItemType = mRevealedItemOfferId = (0 : UInt);
 							return _loc6_;
 						}
@@ -917,10 +964,10 @@ class UIInventory {
 	function numElementsInCurrentCategory():UInt {
 		var _loc1_ = (0 : UInt);
 		switch (mCurrentTab) {
-			case "WEAPON":
+			case(_ == GMInventoryBase.WEAPON_CATEGORY => true):
 				_loc1_ = mDBFacade.dbAccountInfo.inventoryLimitWeapons;
 
-			case "POWERUP":
+			case(_ == GMInventoryBase.POWERUP_CATEGORY => true):
 				_loc1_ = mDBFacade.dbAccountInfo.stackableCount;
 				if (_loc1_ % 15 != 0) {
 					_loc1_ += 15 - _loc1_ % 15;
@@ -942,11 +989,12 @@ class UIInventory {
 		var _loc7_ = 0;
 		var _loc4_ = 0;
 		var _loc9_ = 0;
+		resetItemGridMenuNavigation();
 		var _loc10_ = (mCategorizedItems.itemFor(mCurrentTab) : Vector<InventoryBaseInfo>);
 		if (mDungeonRewardPanel != null) {
 			mDungeonRewardPanel.hide();
 		}
-		if (mCurrentTab == "WEAPON") {
+		if (mCurrentTab == GMInventoryBase.WEAPON_CATEGORY) {
 			mStacksWithEquipPicker.hide();
 			if (mWantPets) {
 				mPetsWithEquipPicker.hide();
@@ -958,7 +1006,7 @@ class UIInventory {
 			if (mDungeonRewardPanel != null) {
 				mDungeonRewardPanel.show();
 			}
-		} else if (mCurrentTab == "POWERUP") {
+		} else if (mCurrentTab == GMInventoryBase.POWERUP_CATEGORY) {
 			mHeroWithEquipPicker.hide();
 			if (mWantPets) {
 				mPetsWithEquipPicker.hide();
@@ -967,14 +1015,14 @@ class UIInventory {
 			mAddStorageButton.visible = false;
 			mStacksWithEquipPicker.refresh(false);
 			mStacksWithEquipPicker.show();
-		} else if (mWantPets && mCurrentTab == "PET") {
+		} else if (mWantPets && mCurrentTab == GMInventoryBase.PET_CATEGORY) {
 			mHeroWithEquipPicker.hide();
 			mStacksWithEquipPicker.hide();
 			mStuffWithEquipPicker.hide();
 			mAddStorageButton.visible = false;
 			mPetsWithEquipPicker.refresh(false);
 			mPetsWithEquipPicker.show();
-		} else if (mWantPets && mCurrentTab == "STUFF") {
+		} else if (mWantPets && mCurrentTab == GMInventoryBase.STUFF_CATEGORY) {
 			mHeroWithEquipPicker.hide();
 			mStacksWithEquipPicker.hide();
 			if (mWantPets) {
@@ -1044,10 +1092,12 @@ class UIInventory {
 			_loc5_++;
 		}
 		determineEquippableItems(mHeroWithEquipPicker.currentlySelectedHero);
+		setupNavigationLinks();
 	}
 
 	function showTab(category:String, page:UInt = (0 : UInt)) {
 		var _loc4_:UIRadioButton = null;
+		setNextTab(category);
 		mCurrentTab = category;
 		var _loc5_ = ASCompat.reinterpretAs(mTabButtons.iterator(), IMapIterator);
 		while (_loc5_.hasNext()) {
@@ -1059,9 +1109,9 @@ class UIInventory {
 		_loc4_.enabled = false;
 		_loc4_.label.visible = true;
 		var _loc3_ = this.numPagesInCurrentCategory();
-		page = (ASCompat.floatToInt(Math.min(_loc3_, page)) : UInt);
-		mPagination.currentPage = mCurrentPage = page;
+		page = (ASCompat.floatToInt(_loc3_ == 0 ? (0 : UInt) : (ASCompat.floatToInt(Math.min((_loc3_ : Float) - 1, page)) : UInt)) : UInt);
 		mPagination.numPages = _loc3_;
+		mPagination.currentPage = mCurrentPage = page;
 		mPagination.visible = _loc3_ > 1;
 		displayCategoryPage();
 	}
@@ -1069,6 +1119,14 @@ class UIInventory {
 	function setCurrentPage(value:UInt) {
 		mCurrentPage = value;
 		displayCategoryPage();
+		focusNextPageButton();
+	}
+
+	function focusNextPageButton() {
+		var _loc1_ = mPagination.getNextPageButton();
+		if (_loc1_ != null) {
+			mDBFacade.menuNavigationController.setFocusedUiObject(_loc1_);
+		}
 	}
 
 	@:isVar public var infoCard(get, never):ItemInfoCard;
@@ -1089,18 +1147,20 @@ class UIInventory {
 		return mCurrentTab = category;
 	}
 
-	function itemSelected(info:InventoryBaseInfo) {
-		var _loc2_:StackableInfo = null;
+	function itemSelected(info:InventoryBaseInfo, navigationSource:UIObject = null) {
+		var _loc3_:StackableInfo = null;
+		restoreBoosterItemNavigation();
 		mSelectedItemInfo = info;
-		var _loc3_ = false;
+		mSelectedItemNavigationSource = navigationSource;
+		var _loc4_ = false;
 		if (Std.isOfType(info, StackableInfo)) {
-			_loc2_ = ASCompat.reinterpretAs(info, StackableInfo);
-			if (_loc2_.gmStackable.AccountBooster) {
+			_loc3_ = ASCompat.reinterpretAs(info, StackableInfo);
+			if (_loc3_.gmStackable.AccountBooster) {
 				populateDetailBoosterCard();
-				_loc3_ = true;
+				_loc4_ = true;
 			}
 		}
-		if (!_loc3_) {
+		if (!_loc4_) {
 			mBoosterCard.hide();
 			if (mSelectedItemInfo.gmChestInfo != null) {
 				populateDetailChestCard();
@@ -1125,23 +1185,23 @@ class UIInventory {
 
 	function highLightSelectedChestItem() {
 		var _loc2_:UIInventoryItem = null;
-		var _loc3_ = 0;
+		var _loc3_ = (0 : UInt);
 		if (mDungeonRewardPanel != null) {
 			mDungeonRewardPanel.clearHighlights();
 		}
 		var _loc1_ = ASCompat.reinterpretAs(mSelectedItemInfo, ChestInfo);
 		if (_loc1_.isFromDungeonSummary()) {
-			_loc3_ = 0;
+			_loc3_ = (0 : UInt);
 			while (_loc3_ < 15) {
-				mItems[_loc3_].deSelect();
+				mItems[(_loc3_ : Int)].deSelect();
 				_loc3_++;
 			}
 			mDungeonRewardPanel.highlightChest(_loc1_);
 			return;
 		}
-		_loc3_ = 0;
+		_loc3_ = (0 : UInt);
 		while (_loc3_ < 15) {
-			_loc2_ = mItems[_loc3_];
+			_loc2_ = mItems[(_loc3_ : Int)];
 			if (mSelectedItemInfo != null && _loc2_.info == mSelectedItemInfo) {
 				_loc2_.select();
 			} else {
@@ -1153,9 +1213,9 @@ class UIInventory {
 
 	function highLightSelectedAvatarItem() {
 		var _loc2_:GMWeaponItem = null;
-		var _loc4_ = 0;
+		var _loc4_ = (0 : UInt);
 		var _loc1_:UIInventoryItem = null;
-		var _loc3_ = 0;
+		var _loc3_ = (0 : UInt);
 		if (mDungeonRewardPanel != null) {
 			mDungeonRewardPanel.clearHighlights();
 		}
@@ -1166,16 +1226,16 @@ class UIInventory {
 			false;
 		}) {
 			_loc2_ = _loc5_.gmWeaponItem;
-			_loc4_ = (_loc5_.power : Int);
+			_loc4_ = _loc5_.power;
 		} else {
-			_loc3_ = 0;
+			_loc3_ = (0 : UInt);
 			while (_loc3_ < 15) {
-				_loc1_ = mItems[_loc3_];
+				_loc1_ = mItems[(_loc3_ : Int)];
 				if (mSelectedItemInfo != null && _loc1_.info == mSelectedItemInfo) {
 					_loc1_.select();
 					if (_loc5_ != null) {
 						_loc2_ = _loc5_.gmWeaponItem;
-						_loc4_ = (_loc5_.power : Int);
+						_loc4_ = _loc5_.power;
 					}
 				} else {
 					_loc1_.deSelect();
@@ -1184,7 +1244,7 @@ class UIInventory {
 			}
 		}
 		if (_loc2_ != null) {
-			mHeroWithEquipPicker.showWeaponComparison(_loc2_, (_loc4_ : UInt));
+			mHeroWithEquipPicker.showWeaponComparison(_loc2_, _loc4_);
 		}
 	}
 
@@ -1192,7 +1252,7 @@ class UIInventory {
 		var _loc4_:GMStackable = null;
 		var _loc5_ = 0;
 		var _loc2_:UIInventoryItem = null;
-		var _loc3_ = 0;
+		var _loc3_ = (0 : UInt);
 		var _loc1_ = ASCompat.reinterpretAs(mSelectedItemInfo, StackableInfo);
 		mStacksWithEquipPicker.deselectEquipment();
 		if ({
@@ -1201,9 +1261,9 @@ class UIInventory {
 		}) {
 			_loc4_ = _loc1_.gmStackable;
 		} else {
-			_loc3_ = 0;
+			_loc3_ = (0 : UInt);
 			while (_loc3_ < 15) {
-				_loc2_ = mItems[_loc3_];
+				_loc2_ = mItems[(_loc3_ : Int)];
 				if (mSelectedItemInfo != null && _loc2_.info == mSelectedItemInfo) {
 					_loc2_.select();
 					if (_loc1_ != null) {
@@ -1221,7 +1281,7 @@ class UIInventory {
 	function highLightSelectedPet() {
 		var _loc1_:GMNpc = null;
 		var _loc3_:UIInventoryItem = null;
-		var _loc4_ = 0;
+		var _loc4_ = (0 : UInt);
 		var _loc2_ = ASCompat.reinterpretAs(mSelectedItemInfo, PetInfo);
 		mPetsWithEquipPicker.deselectEquipment();
 		if ({
@@ -1230,9 +1290,9 @@ class UIInventory {
 		}) {
 			_loc1_ = _loc2_.gmNpc;
 		} else {
-			_loc4_ = 0;
+			_loc4_ = (0 : UInt);
 			while (_loc4_ < 15) {
-				_loc3_ = mItems[_loc4_];
+				_loc3_ = mItems[(_loc4_ : Int)];
 				if (mSelectedItemInfo != null && _loc3_.info == mSelectedItemInfo) {
 					_loc3_.select();
 					if (_loc2_ != null) {
@@ -1251,40 +1311,118 @@ class UIInventory {
 		mChestCard.hide();
 		mInfoCard.visible = false;
 		mBoosterCard.info = ASCompat.reinterpretAs(mSelectedItemInfo, StackableInfo);
+		setupBoosterCardMenuNavigation();
+	}
+
+	function setupBoosterCardMenuNavigation() {
+		restoreBoosterItemNavigation();
+		var _loc2_ = mBoosterCard.visibleActivationButton;
+		if (_loc2_ == null) {
+			return;
+		}
+		_loc2_.clearNavigationAndInteractions();
+		if (mSelectedItemNavigationSource != null && mSelectedItemNavigationSource.canBeFocused()) {
+			mSelectedItemNavigationSource.clearUpNavigation();
+			mSelectedItemNavigationSource.upNavigation = _loc2_;
+			_loc2_.downNavigation = mSelectedItemNavigationSource;
+			return;
+		}
+		var _loc1_ = ASCompat.reinterpretAs(getFirstFocusableInventoryItem(), UIInventoryItem);
+		if (_loc1_ == null) {
+			return;
+		}
+		mBoosterNavigationItem = _loc1_;
+		_loc2_.rightNavigation = _loc1_;
+		_loc1_.clearLeftNavigation();
+		_loc1_.leftNavigation = _loc2_;
+	}
+
+	function focusAfterBoosterActivation() {
+		if (mLogicalWorkComponent == null) {
+			return;
+		}
+		mLogicalWorkComponent.doLater(0, function(param1:brain.clock.GameClock) {
+			completeBoosterActivationFocus();
+		});
+	}
+
+	function completeBoosterActivationFocus() {
+		var _loc1_:UIButton = null;
+		if (mBoosterCard != null && mBoosterCard.isShowing()) {
+			setupBoosterCardMenuNavigation();
+			_loc1_ = mBoosterCard.visibleActivationButton;
+			if (_loc1_ != null && _loc1_.canBeFocused()) {
+				mDBFacade.menuNavigationController.setFocusedUiObject(_loc1_);
+				return;
+			}
+		}
+		focusFirstInventoryItem();
+	}
+
+	function restoreBoosterItemNavigation() {
+		if (mBoosterNavigationItem == null) {
+			return;
+		}
+		var _loc1_ = mItems.indexOf(mBoosterNavigationItem);
+		mBoosterNavigationItem.clearLeftNavigation();
+		if (_loc1_ > 0 && _loc1_ % 5 != 0) {
+			mBoosterNavigationItem.leftNavigation = mItems[_loc1_ - 1];
+		}
+		mBoosterNavigationItem = null;
 	}
 
 	function populateDetailInfoCard() {
 		mConsumableChestCard.hide();
 		mChestCard.hide();
 		mInfoCard.info = mSelectedItemInfo;
+		if (mSelectedItemInfo != null) {
+			setupInfoCardMenuNavigation();
+		}
 	}
 
 	function populateDetailChestCard() {
-		mInfoCard.info = null;
-		if (mSelectedItemInfo == null) {
+		var _loc1_ = ASCompat.reinterpretAs(mSelectedItemInfo, ChestInfo);
+		if (_loc1_ == null) {
 			mConsumableChestCard.hide();
 			mChestCard.hide();
 			mChestCard.selectedHeroId = mSelectedAvatar;
 			return;
 		}
-		if (UIHud.isThisAConsumbleChestId((mSelectedItemInfo.gmId : Int))) {
-			mConsumableChestCard.info = mSelectedItemInfo;
+		mInfoCard.info = null;
+		if (UIHud.isThisAConsumbleChestId((_loc1_.gmId : Int))) {
+			mConsumableChestCard.info = _loc1_;
 			mChestCard.hide();
 			mBoosterCard.hide();
+			setupChestInfoCardMenuNavigation(mConsumableChestCard);
 		} else {
 			mChestCard.selectedHeroId = mSelectedAvatar;
-			mChestCard.info = mSelectedItemInfo;
+			mChestCard.info = _loc1_;
 			mConsumableChestCard.hide();
 			mBoosterCard.hide();
+			setupChestInfoCardMenuNavigation(mChestCard);
 		}
+	}
+
+	function getSelectedItemPosition():Int {
+		var _loc1_:UIInventoryItem = null;
+		var _loc2_ = 0;
+		_loc2_ = 0;
+		while (_loc2_ < 15) {
+			_loc1_ = mItems[_loc2_];
+			if (mSelectedItemInfo != null && _loc1_.info == mSelectedItemInfo) {
+				return _loc2_;
+			}
+			_loc2_++;
+		}
+		return -1;
 	}
 
 	public function destroy() {
 		var _loc4_:UIRadioButton = null;
 		var _loc1_:UIInventoryItem = null;
-		var _loc5_ = 0;
+		var _loc5_ = (0 : UInt);
 		var _loc2_:MovieClip = null;
-		var _loc6_ = 0;
+		var _loc6_ = (0 : UInt);
 		mDBFacade = null;
 		if (mLogicalWorkComponent != null) {
 			mLogicalWorkComponent.destroy();
@@ -1297,6 +1435,7 @@ class UIInventory {
 		mRoot = null;
 		mInventoryRoot = null;
 		mSwfAsset = null;
+		resetMenuNavigation();
 		mTownHeader = null;
 		if (mDungeonRewardPanel != null) {
 			mDungeonRewardPanel.destroy();
@@ -1313,17 +1452,17 @@ class UIInventory {
 			mPagination.destroy();
 		}
 		mPagination = null;
-		_loc5_ = 0;
-		while (_loc5_ < mItems.length) {
-			_loc1_ = mItems[_loc5_];
+		_loc5_ = (0 : UInt);
+		while (_loc5_ < (mItems.length:UInt)) {
+			_loc1_ = mItems[(_loc5_ : Int)];
 			_loc1_.destroy();
 			_loc5_++;
 		}
 		mItems = null;
 		if (mInventoryGridElements != null) {
-			_loc6_ = 0;
-			while (_loc5_ < mInventoryGridElements.length) {
-				_loc2_ = mInventoryGridElements[_loc6_];
+			_loc6_ = (0 : UInt);
+			while (_loc5_ < (mInventoryGridElements.length:UInt)) {
+				_loc2_ = mInventoryGridElements[(_loc6_ : Int)];
 				_loc2_ = null;
 				_loc5_++;
 			}
@@ -1407,6 +1546,280 @@ class UIInventory {
 		var _loc1_ = mHeroWithEquipPicker.currentlySelectedHero.Id;
 		if (mDBFacade.dbAccountInfo.activeAvatarInfo.gmHero.Id != _loc1_) {
 			mDBFacade.dbAccountInfo.changeActiveAvatarRPC(_loc1_);
+		}
+	}
+
+	function setNextTab(category:String) {
+		if (category == GMInventoryBase.WEAPON_CATEGORY) {
+			mNextTab = GMInventoryBase.POWERUP_CATEGORY;
+		} else if (category == GMInventoryBase.POWERUP_CATEGORY) {
+			mNextTab = mWantPets ? GMInventoryBase.PET_CATEGORY : GMInventoryBase.STUFF_CATEGORY;
+		} else if (category == GMInventoryBase.PET_CATEGORY) {
+			mNextTab = GMInventoryBase.STUFF_CATEGORY;
+		} else if (category == GMInventoryBase.STUFF_CATEGORY) {
+			mNextTab = GMInventoryBase.WEAPON_CATEGORY;
+		}
+	}
+
+	public function setupCategoryNavigation(ownerLayer:String) {
+		mDBFacade.menuNavigationController.setLayerCategoryCallbacks(selectPreviousHero, selectNextHero, ownerLayer);
+		mWeaponTabButton.clearNavigationAndInteractions();
+		mPotionsTabButton.clearNavigationAndInteractions();
+		mPetsTabButton.clearNavigationAndInteractions();
+		mStuffTabButton.clearNavigationAndInteractions();
+		if (mTownHeader != null) {
+			mTownHeader.addCoinButton.clearDownNavigation();
+			mTownHeader.addGemButton.clearDownNavigation();
+			mTownHeader.closeButton.clearDownNavigation();
+			mTownHeader.addCoinButton.downNavigation = ASCompat.coerce(mTabButtons.itemFor(mNextTab), brain.uI.UIObject);
+			mTownHeader.addGemButton.downNavigation = ASCompat.coerce(mTabButtons.itemFor(mNextTab), brain.uI.UIObject);
+			mTownHeader.closeButton.downNavigation = ASCompat.coerce(mTabButtons.itemFor(mNextTab), brain.uI.UIObject);
+			mWeaponTabButton.upNavigation = mTownHeader.addCoinButton;
+			mPotionsTabButton.upNavigation = mTownHeader.addCoinButton;
+			mStuffTabButton.upNavigation = mTownHeader.addCoinButton;
+			if (mWantPets) {
+				mPetsTabButton.upNavigation = mTownHeader.addCoinButton;
+			}
+		}
+		mWeaponTabButton.isToTheLeftOf(mPotionsTabButton);
+		if (mWantPets) {
+			mPotionsTabButton.isToTheLeftOf(mPetsTabButton);
+			mPetsTabButton.isToTheLeftOf(mStuffTabButton);
+			mPetsTabButton.downNavigation = mItems[0];
+		} else {
+			mPotionsTabButton.isToTheLeftOf(mStuffTabButton);
+		}
+		mStuffTabButton.isToTheLeftOf(mWeaponTabButton);
+		mWeaponTabButton.downNavigation = mItems[0];
+		mPotionsTabButton.downNavigation = mItems[0];
+		mStuffTabButton.downNavigation = mItems[0];
+	}
+
+	function selectPreviousHero() {
+		selectAdjacentHero(-1);
+	}
+
+	function selectNextHero() {
+		selectAdjacentHero(1);
+	}
+
+	function selectAdjacentHero(direction:Int) {
+		var _loc3_ = mDBFacade.gameMaster.Heroes;
+		if (_loc3_.length == 0) {
+			return;
+		}
+		var _loc2_ = ASCompat.toInt(mSelectedAvatar < (_loc3_.length:UInt) ? mSelectedAvatar : 0);
+		var _loc4_ = _loc2_;
+		do {
+			_loc4_ = (_loc4_ + direction + _loc3_.length) % _loc3_.length;
+		} while (_loc3_[_loc4_].Hidden
+			&& !mDBFacade.dbConfigManager.getConfigBoolean("want_hidden_heroes", false)
+			&& _loc4_ != _loc2_);
+		if ((_loc4_ : UInt) == mSelectedAvatar) {
+			return;
+		}
+		mSelectedAvatar = (_loc4_ : UInt);
+		heroSelected(_loc3_[_loc4_], mDBFacade.dbAccountInfo.inventoryInfo.ownsItem(_loc3_[_loc4_].Id));
+	}
+
+	function resetMenuNavigation() {
+		if (mTownHeader == null) {
+			return;
+		}
+		mTownHeader.addCoinButton.clearDownNavigation();
+		mTownHeader.addGemButton.clearDownNavigation();
+		mTownHeader.closeButton.clearDownNavigation();
+	}
+
+	function resetItemGridMenuNavigation() {
+		var _loc1_ = 0;
+		_loc1_ = 0;
+		while (_loc1_ < 15) {
+			mItems[_loc1_].clearNavigationAndInteractions();
+			_loc1_++;
+		}
+	}
+
+	function setupNavigationLinks() {
+		var _loc4_ = 0;
+		var _loc1_ = 0;
+		var _loc2_ = mPagination.getNextPageButton();
+		var _loc3_ = getFirstFocusableInventoryItem();
+		mAddStorageButton.clearUpNavigation();
+		mAddStorageButton.clearDownNavigation();
+		mItems[0].clearUpNavigation();
+		mItems[1].clearUpNavigation();
+		mItems[2].clearUpNavigation();
+		mItems[3].clearUpNavigation();
+		mItems[4].clearUpNavigation();
+		mItems[0].upNavigation = ASCompat.coerce(mTabButtons.itemFor(mNextTab), brain.uI.UIObject);
+		mItems[1].upNavigation = ASCompat.coerce(mTabButtons.itemFor(mNextTab), brain.uI.UIObject);
+		mItems[2].upNavigation = ASCompat.coerce(mTabButtons.itemFor(mNextTab), brain.uI.UIObject);
+		mItems[3].upNavigation = ASCompat.coerce(mTabButtons.itemFor(mNextTab), brain.uI.UIObject);
+		mItems[4].upNavigation = ASCompat.coerce(mTabButtons.itemFor(mNextTab), brain.uI.UIObject);
+		resetEquipPickerMenuNavigation();
+		setupCurrentEquipPickerMenuNavigation();
+		_loc4_ = 0;
+		while (_loc4_ < 15) {
+			if (_loc4_ % 5 < 4 && _loc4_ + 1 < 15) {
+				mItems[_loc4_].isToTheLeftOf(mItems[_loc4_ + 1]);
+			}
+			if (_loc4_ + 5 < 15) {
+				mItems[_loc4_].isAbove(mItems[_loc4_ + 5]);
+			}
+			if (_loc4_ >= 10) {
+				mItems[_loc4_].downNavigation = _loc2_ ?? mAddStorageButton;
+				if (_loc2_ != null) {
+					mItems[_loc4_].downNavigationAdditionalInteraction = createPaginationReturnCallback(mItems[_loc4_]);
+				}
+			}
+			_loc4_++;
+		}
+		if (mPagination.numPages > 1) {
+			_loc1_ = 0;
+			while ((_loc1_ : UInt) < mPagination.numPageButtons) {
+				if (_loc1_ > 0) {
+					mPagination.getPageButton(_loc1_ - 1).isToTheLeftOf(mPagination.getPageButton(_loc1_));
+				}
+				if (_loc3_ != null) {
+					mPagination.getPageButton(_loc1_).upNavigation = _loc3_;
+				}
+				mPagination.getPageButton(_loc1_).downNavigation = mAddStorageButton;
+				_loc1_++;
+			}
+			mAddStorageButton.upNavigation = _loc2_;
+		} else {
+			mAddStorageButton.upNavigation = mItems[15 - 1];
+		}
+	}
+
+	function getFirstFocusableInventoryItem():UIObject {
+		var _loc1_:UIInventoryItem;
+		final __ax4_iter_355 = mItems;
+		if (checkNullIteratee(__ax4_iter_355))
+			for (_tmp_ in __ax4_iter_355) {
+				_loc1_ = _tmp_;
+				if (_loc1_.canBeFocused()) {
+					return _loc1_;
+				}
+			}
+		return null;
+	}
+
+	function focusFirstInventoryItem() {
+		var _loc1_ = getFirstFocusableInventoryItem();
+		if (_loc1_ == null && mTownHeader != null) {
+			_loc1_ = mTownHeader.closeButton;
+		}
+		if (_loc1_ != null && _loc1_.canBeFocused()) {
+			mDBFacade.menuNavigationController.setFocusedUiObject(_loc1_);
+		}
+	}
+
+	function resetEquipPickerMenuNavigation() {
+		mHeroWithEquipPicker.resetHeroWithEquipPickerMenuNavigation();
+		mStacksWithEquipPicker.resetMenuNavigation();
+		if (mWantPets) {
+			mPetsWithEquipPicker.resetMenuNavigation();
+		}
+		mStuffWithEquipPicker.resetMenuNavigation();
+	}
+
+	function setupCurrentEquipPickerMenuNavigation() {
+		var _loc1_:UIObject = null;
+		if (mCurrentTab == GMInventoryBase.POWERUP_CATEGORY) {
+			mStacksWithEquipPicker.setupMenuNavigation(mAddStorageButton);
+			_loc1_ = mStacksWithEquipPicker.getFirstUIObject();
+		} else if (mWantPets && mCurrentTab == GMInventoryBase.PET_CATEGORY) {
+			mPetsWithEquipPicker.setupMenuNavigation(mAddStorageButton);
+			_loc1_ = mPetsWithEquipPicker.getFirstUIObject();
+		} else if (mCurrentTab == GMInventoryBase.STUFF_CATEGORY) {
+			mStuffWithEquipPicker.setupMenuNavigation(mAddStorageButton);
+			_loc1_ = mStuffWithEquipPicker.getFirstUIObject();
+		} else {
+			mHeroWithEquipPicker.setupHeroWithEquipPickerMenuNavigation(mAddStorageButton);
+			_loc1_ = mHeroWithEquipPicker.getFirstHeroSlotUIObject();
+		}
+		mAddStorageButton.downNavigation = _loc1_;
+	}
+
+	function createPaginationReturnCallback(returnObject:UIObject):ASFunction {
+		return function() {
+			setPaginationReturnObject(returnObject);
+		};
+	}
+
+	function setPaginationReturnObject(returnObject:UIObject) {
+		var _loc3_ = (0 : UInt);
+		var _loc2_:UIButton = null;
+		_loc3_ = (0 : UInt);
+		while (_loc3_ < mPagination.numPageButtons) {
+			_loc2_ = mPagination.getPageButton((_loc3_ : Int));
+			_loc2_.clearUpNavigation();
+			_loc2_.upNavigation = returnObject;
+			_loc3_++;
+		}
+	}
+
+	function setupInfoCardMenuNavigation() {
+		mItems[0].clearLeftNavigation();
+		mItems[5].clearLeftNavigation();
+		mItems[10].clearLeftNavigation();
+		mInfoCard.mEquipButton.clearRightNavigation();
+		mInfoCard.setupMenuNavigation();
+		if (mSelectedItemNavigationSource != null && mSelectedItemNavigationSource.canBeFocused()) {
+			mSelectedItemNavigationSource.clearUpNavigation();
+			mSelectedItemNavigationSource.upNavigation = mInfoCard.mEquipButton;
+			mInfoCard.mEquipButton.downNavigation = mSelectedItemNavigationSource;
+			return;
+		}
+		var _loc1_ = getSelectedItemPosition();
+		if (_loc1_ != -1) {
+			mInfoCard.mEquipButton.rightNavigation = mItems[_loc1_];
+		}
+		mItems[0].leftNavigation = mInfoCard.mEquipButton;
+		mItems[5].leftNavigation = mInfoCard.mEquipButton;
+		mItems[10].leftNavigation = mInfoCard.mEquipButton;
+	}
+
+	function setupChestInfoCardMenuNavigation(chestCard:ChestInfoCard) {
+		var _loc3_:UIObject = null;
+		var _loc4_ = 0;
+		var _loc2_:UIObject = null;
+		mItems[0].clearLeftNavigation();
+		mItems[5].clearLeftNavigation();
+		mItems[10].clearLeftNavigation();
+		var _loc5_ = ASCompat.reinterpretAs(mSelectedItemInfo, ChestInfo);
+		if (_loc5_.isFromDungeonSummary() && mDungeonRewardPanel != null) {
+			_loc3_ = mDungeonRewardPanel.getNavigationEntry(_loc5_);
+		} else {
+			_loc4_ = getSelectedItemPosition();
+			if (_loc4_ != -1) {
+				_loc3_ = mItems[_loc4_];
+			}
+		}
+		chestCard.setupMenuNavigation(_loc3_);
+		if (_loc5_.isFromDungeonSummary()) {
+			_loc2_ = getFirstFocusableInventoryItem();
+			mDungeonRewardPanel.setupChestCardNavigation(chestCard.dungeonSummaryAbandonButton, chestCard.dungeonSummaryKeepButton, _loc5_);
+			if (_loc2_ != null) {
+				chestCard.dungeonSummaryUnlockButton.rightNavigation = _loc2_;
+				_loc2_.clearLeftNavigation();
+				_loc2_.leftNavigation = chestCard.dungeonSummaryUnlockButton;
+			}
+			mItems[5].leftNavigation = chestCard.dungeonSummaryUnlockButton;
+			mItems[10].leftNavigation = chestCard.dungeonSummaryUnlockButton;
+			if (!mDungeonSummaryInitialFocusSet && chestCard.dungeonSummaryUnlockButton.canBeFocused()) {
+				mDungeonSummaryInitialFocusSet = true;
+				mDBFacade.menuNavigationController.setFocusedUiObject(chestCard.dungeonSummaryUnlockButton);
+			}
+		} else {
+			mItems[0].leftNavigation = chestCard.menuEntryButton;
+			mItems[5].leftNavigation = chestCard.menuEntryButton;
+			mItems[10].leftNavigation = chestCard.menuEntryButton;
+			if (mDungeonSummary != null && mDungeonRewardPanel != null) {
+				mDungeonRewardPanel.setupInventoryChestNavigation(chestCard.inventoryAbandonButton);
+			}
 		}
 	}
 }

@@ -9,12 +9,12 @@ class CacheLoadRequestNpcEvent extends Event {
 
 	public var cacheSwf:Vector<String>;
 
-	public var tilelibraryname:Vector<String>;
+	public var tileLibraryName:Vector<String>;
 
-	public function new(cachenpc:Vector<UInt>, cacheswf:Vector<String>, tilelibrary:Vector<String>, bubbles:Bool = false, cancelable:Bool = false) {
-		cacheSwf = cacheswf;
-		cacheNpc = cachenpc;
-		tilelibraryname = tilelibrary;
+	public function new(inCacheNpc:Vector<UInt>, inCacheSwf:Vector<String>, inTileLibraryName:Vector<String>, bubbles:Bool = false, cancelable:Bool = false) {
+		cacheSwf = inCacheSwf;
+		cacheNpc = inCacheNpc;
+		tileLibraryName = inTileLibraryName;
 		super("Busterncpccahche_event", bubbles, cancelable);
 	}
 }

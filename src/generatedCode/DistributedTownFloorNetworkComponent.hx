@@ -8,9 +8,9 @@ import networkCode.DcNetworkPacket;
 class DistributedTownFloorNetworkComponent extends DcNetworkClass implements DcNetworkInterface {
 	var the_instance:DistributedTownFloor;
 
-	public static inline final FLID_tileLibrary = (205 : UInt);
+	public static inline final FLID_tileLibrary = (213 : UInt);
 
-	public static inline final FLID_tiles = (206 : UInt);
+	public static inline final FLID_tiles = (214 : UInt);
 
 	public function new(Inst:DistributedTownFloor, gs:GeneratedDcSocket, id:UInt) {
 		super(Inst, gs, id);
@@ -27,7 +27,7 @@ class DistributedTownFloorNetworkComponent extends DcNetworkClass implements DcN
 	}
 
 	override public function recvById(packet:DcNetworkPacket, fieldid:UInt) {
-		switch (fieldid - 205) {
+		switch (fieldid - 213) {
 			case 0:
 				recv_tileLibrary(packet);
 

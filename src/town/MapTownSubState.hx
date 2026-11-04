@@ -8,6 +8,7 @@ import brain.uI.UIObject;
 import brain.workLoop.LogicalWorkComponent;
 import facade.DBFacade;
 import facade.Locale;
+import gameMasterDictionary.GMInventoryBase;
 import uI.leaderboard.UILeaderboard;
 import uI.map.UIMapWorldMap;
 import flash.display.MovieClip;
@@ -41,18 +42,6 @@ class MapTownSubState extends TownSubState {
 		mWorkComponent = new LogicalWorkComponent(mDBFacade, "MapTownSubState");
 		mEventComponent = new EventComponent(mDBFacade);
 		mWorldMap = new UIMapWorldMap(mDBFacade, mRootMovieClip, mTownStateMachine.townSwf, mTownStateMachine);
-		var _loc8_ = mTownStateMachine.townSwf.getClass("cursor_pointer");
-		var _loc6_ = ASCompat.dynamicAs(ASCompat.createInstance(_loc8_, []), MovieClip);
-		mDBFacade.mouseCursorManager.registerMouseCursor(_loc6_, "auto", true);
-		var _loc2_ = mTownStateMachine.townSwf.getClass("cursor_open");
-		var _loc3_ = ASCompat.dynamicAs(ASCompat.createInstance(_loc2_, []), MovieClip);
-		mDBFacade.mouseCursorManager.registerMouseCursor(_loc3_, "HAND");
-		var _loc1_ = mTownStateMachine.townSwf.getClass("cursor_fist");
-		var _loc4_ = ASCompat.dynamicAs(ASCompat.createInstance(_loc1_, []), MovieClip);
-		mDBFacade.mouseCursorManager.registerMouseCursor(_loc4_, "DRAG");
-		var _loc5_ = mTownStateMachine.townSwf.getClass("cursor_point");
-		var _loc7_ = ASCompat.dynamicAs(ASCompat.createInstance(_loc5_, []), MovieClip);
-		mDBFacade.mouseCursorManager.registerMouseCursor(_loc7_, "POINT");
 	}
 
 	public function animateEntry() {
@@ -73,13 +62,12 @@ class MapTownSubState extends TownSubState {
 			mTownStateMachine.enterTavernState(true);
 		};
 		var inventoryCallback:ASFunction = function() {
-			mTownStateMachine.enterInventoryState(true, "POWERUP");
+			mTownStateMachine.enterInventoryState(true, GMInventoryBase.POWERUP_CATEGORY);
 		};
 		var shopCallback:ASFunction = function() {
 			mTownStateMachine.enterShopState(true, "STUFF");
 		};
 		mWorldMap.initialize(tavernCallback, inventoryCallback, shopCallback, mTownStateMachine.enterHomeState);
-		mDBFacade.mouseCursorManager.pushMouseCursor("HAND");
 		mUILeaderboard = mDBFacade.mainStateMachine.leaderboard;
 		mUILeaderboard.setRootMovieClip(mRootMovieClip);
 		mUILeaderboard.currentStateName = "MapTownSubState";
@@ -108,7 +96,7 @@ class MapTownSubState extends TownSubState {
 		super.resetHeaderLinks();
 		super.setupHeaderLinks();
 		mDBFacade.menuNavigationController.pushNewLayer("MAP_MENU", mTownStateMachine.townHeader.determineCallback, mWorldMap.getCurrentNodeButton(),
-			mWorldMap.getCurrentNodeButton());
+			mWorldMap.getCurrentNodeButton(), mWorldMap.showPreviousLeague, mWorldMap.showNextLeague);
 	}
 
 	override public function exitState() {

@@ -23,7 +23,7 @@ class PlayerGameObjectOwnerNetworkComponent extends PlayerGameObjectNetworkCompo
 	}
 
 	override public function recvById(packet:DcNetworkPacket, fieldid:UInt) {
-		switch (fieldid - 181) {
+		switch (fieldid - 189) {
 			case 0:
 				recv_basicCurrency(packet);
 
@@ -34,6 +34,7 @@ class PlayerGameObjectOwnerNetworkComponent extends PlayerGameObjectNetworkCompo
 
 	override public function generate(packet:DcNetworkPacket) {
 		recv_screenName(packet);
+		recv_heroPreloadLook(packet);
 		recv_basicCurrency(packet);
 		recvByIdLoop(packet);
 	}
@@ -45,33 +46,33 @@ class PlayerGameObjectOwnerNetworkComponent extends PlayerGameObjectNetworkCompo
 
 	public function send_Chat(text:String) {
 		var _loc2_ = new DcNetworkPacket();
-		Prepare_FieldUpdate(_loc2_, (182 : UInt));
+		Prepare_FieldUpdate(_loc2_, (190 : UInt));
 		_loc2_.writeUTF(text);
 		Send_packet(_loc2_);
 	}
 
 	public function send_ShowPlayerIsTyping(value:UInt) {
 		var _loc2_ = new DcNetworkPacket();
-		Prepare_FieldUpdate(_loc2_, (183 : UInt));
+		Prepare_FieldUpdate(_loc2_, (191 : UInt));
 		_loc2_.writeByte((value : Int));
 		Send_packet(_loc2_);
 	}
 
 	public function send_requesthero() {
 		var _loc1_ = new DcNetworkPacket();
-		Prepare_FieldUpdate(_loc1_, (184 : UInt));
+		Prepare_FieldUpdate(_loc1_, (192 : UInt));
 		Send_packet(_loc1_);
 	}
 
 	public function send_requestentry() {
 		var _loc1_ = new DcNetworkPacket();
-		Prepare_FieldUpdate(_loc1_, (185 : UInt));
+		Prepare_FieldUpdate(_loc1_, (193 : UInt));
 		Send_packet(_loc1_);
 	}
 
 	public function send_requestpartymemberinvite() {
 		var _loc1_ = new DcNetworkPacket();
-		Prepare_FieldUpdate(_loc1_, (186 : UInt));
+		Prepare_FieldUpdate(_loc1_, (194 : UInt));
 		Send_packet(_loc1_);
 	}
 }

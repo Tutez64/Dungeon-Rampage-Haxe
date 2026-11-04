@@ -2,10 +2,10 @@ package brain.render;
 
 import brain.clock.GameClock;
 import brain.utils.MemoryTracker;
+import collections.SortedMap;
+import collections.SortedMapIterator;
 import flash.display.Sprite;
-import org.as3commons.collections.SortedMap;
-import org.as3commons.collections.framework.core.SortedMapIterator;
-import org.as3commons.collections.framework.IComparator;
+import collections.IComparator;
 
 class LayerGroup extends Sprite {
 	var mTransformNode:Sprite;

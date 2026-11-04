@@ -4,13 +4,16 @@ import account.iI.II_AccountTopScoreInfo;
 import brain.assetRepository.AssetLoadingComponent;
 import brain.clock.GameClock;
 import brain.event.EventComponent;
+import brain.event.EventListeners;
 import brain.logger.Logger;
 import brain.utils.HttpStatusEventUtils;
 import brain.utils.MemoryTracker;
 import brain.utils.Utf8BitArray;
+import brain.workLoop.DoLater;
 import brain.workLoop.LogicalWorkComponent;
-import brain.workLoop.Task;
 import brain.jsonRPC.JSONRPCService;
+import collections.IMapIterator;
+import collections.Map;
 import events.DBAccountLoadedEvent;
 import events.DBAccountResponseEvent;
 import events.FriendStatusEvent;
@@ -25,17 +28,9 @@ import flash.net.URLLoader;
 import flash.net.URLRequest;
 import flash.net.URLRequestHeader;
 import flash.system.System;
-import org.as3commons.collections.Map;
-import org.as3commons.collections.framework.IMapIterator;
 
 class DBAccountInfo {
-	public static inline final SFX_ATTRIBUTE_KEY = "optionsSFXVolume";
-
-	public static inline final MUSIC_ATTRIBUTE_KEY = "optionsMusicVolume";
-
-	public static inline final GRAPHICS_QUALITY_ATTRIBUTE_KEY = "optionsGraphicsQuality";
-
-	public static inline final HUD_STYLE_ATTRIBUTE_KEY = "optionsHudStyle";
+	public static inline final REACHED_LEVEL_100_ATTRIBUTE_KEY = "hasReachedLevel100";
 
 	static inline final DB_ACCOUNT_INFO_SERVICE = "dbAccountInfo/accountdetails";
 
@@ -91,7 +86,7 @@ class DBAccountInfo {
 
 	var mEventComponent:EventComponent;
 
-	var mOnlinePresenceTask:Task;
+	var mOnlinePresenceTask:DoLater;
 
 	public var SocketPingMilsecs:Int = 0;
 
@@ -167,18 +162,6 @@ class DBAccountInfo {
 		return mName;
 	}
 
-	@:isVar public var facebookId(get, never):String;
-
-	public function get_facebookId():String {
-		return mDBFacade.facebookPlayerId;
-	}
-
-	@:isVar public var kongregateId(get, never):String;
-
-	public function get_kongregateId():String {
-		return mDBFacade.kongregatePlayerId;
-	}
-
 	@:isVar public var inventoryInfo(get, never):DBInventoryInfo;
 
 	public function get_inventoryInfo():DBInventoryInfo {
@@ -191,27 +174,6 @@ class DBAccountInfo {
 		return mId;
 	}
 
-	@:isVar public var currentFacebookFriendsHash(get, never):String;
-
-	public function get_currentFacebookFriendsHash():String {
-		return mCurrentFriendsHash;
-	}
-
-	@:isVar public var currentKongregateFriendsHash(get, never):String;
-
-	public function get_currentKongregateFriendsHash():String {
-		return mCurrentFriendsHash;
-	}
-
-	public function checkFriendsHash() {
-		if (mDBFacade.facebookController != null) {
-			mDBFacade.facebookController.getFacebookFriendsHash();
-		}
-		if (mDBFacade.isKongregatePlayer) {
-			mDBFacade.facebookController.getKongregateFriendsHash();
-		}
-	}
-
 	public function getUsersFullAccountInfo() {
 		var onAccountInfoLoaded:Event->Void = null;
 		var onAccountInfoError:Event->Void = null;
@@ -220,15 +182,15 @@ class DBAccountInfo {
 		var getUrl:String;
 		var req:URLRequest;
 		var loader:URLLoader = null;
-		var traceInfo:String;
-		var responseStatusCode:Int;
+		var traceInfo:String = null;
+		var responseStatusCode = 0;
 		var _this:DBAccountInfo = null;
 		var removeAllListeners = function() {
-			loader.removeEventListener("httpResponseStatus", onAccountInfoLoaded);
-			loader.removeEventListener("complete", onAccountInfoLoaded);
-			loader.removeEventListener("securityError", onAccountInfoError);
-			loader.removeEventListener("certificateError", onAccountInfoError);
-			loader.removeEventListener("ioError", onAccountInfoError);
+			EventListeners.remove(loader, "httpResponseStatus", onAccountInfoLoaded);
+			EventListeners.remove(loader, "complete", onAccountInfoLoaded);
+			EventListeners.remove(loader, "securityError", onAccountInfoError);
+			EventListeners.remove(loader, "certificateError", onAccountInfoError);
+			EventListeners.remove(loader, "ioError", onAccountInfoError);
 		};
 		var onResponseStatus = function(param1:flash.events.HTTPStatusEvent) {
 			responseStatusCode = param1.status;
@@ -255,9 +217,9 @@ class DBAccountInfo {
 			}
 		};
 		onAccountInfoError = function(param1:Event) {
+			var _loc2_:String = null;
 			removeAllListeners();
 			var _loc3_ = "[" + responseStatusCode + "] Account info loading failed";
-			var _loc2_ = "";
 			if (Std.isOfType(param1, IOErrorEvent)) {
 				_loc2_ = "IOError: " + ASCompat.reinterpretAs(param1, IOErrorEvent).text;
 			} else if (Std.isOfType(param1, SecurityErrorEvent)) {
@@ -269,7 +231,7 @@ class DBAccountInfo {
 				_loc2_ += "; Response: " + Std.string(param1.target.data);
 			}
 			Logger.warn(_loc3_ + (ASCompat.stringAsBool(_loc2_) ? "; " + _loc2_ : "") + (ASCompat.stringAsBool(traceInfo) ? "; " + traceInfo : ""));
-			mDBFacade.errorPopup(Locale.getString("ERROR"), Locale.getError(100) + "\n[" + responseStatusCode + "]");
+			mDBFacade.errorPopup(Locale.getString("ERROR"), Locale.getError(100) + "\n[" + responseStatusCode + "]", "ACCOUNT_ERROR_POPUP");
 		};
 		Logger.debug("DBAccountInfo.getUsersFullAccountInfo");
 		accountId = mDBFacade.accountId;
@@ -285,11 +247,11 @@ class DBAccountInfo {
 		}
 		loader = new URLLoader();
 		responseStatusCode = 0;
-		loader.addEventListener("httpResponseStatus", onResponseStatus);
-		loader.addEventListener("complete", onAccountInfoLoaded);
-		loader.addEventListener("securityError", onAccountInfoError);
-		loader.addEventListener("certificateError", onAccountInfoError);
-		loader.addEventListener("ioError", onAccountInfoError);
+		EventListeners.add(loader, "httpResponseStatus", onResponseStatus);
+		EventListeners.add(loader, "complete", onAccountInfoLoaded);
+		EventListeners.add(loader, "securityError", onAccountInfoError);
+		EventListeners.add(loader, "certificateError", onAccountInfoError);
+		EventListeners.add(loader, "ioError", onAccountInfoError);
 		_this = this;
 		loader.load(req);
 	}
@@ -389,17 +351,10 @@ class DBAccountInfo {
 			if (successCallback != null) {
 				successCallback();
 			}
-			if (mDBFacade.steamAchievementsManager != null) {
-				mDBFacade.steamAchievementsManager.setAchievement("SEND_A_GIFT");
-			}
+			mDBFacade.steamAchievementsHelper.unlockAchievement("SEND_A_GIFT");
 		};
 		rpcFunc(mDBFacade.dbAccountInfo.id, offerId, mDBFacade.dbConfigManager.networkId, requestIds, toIds, mDBFacade.validationToken, rpcSuccessCallback,
 			parseError);
-	}
-
-	public function sendFacebookRequestData(requestIds:Array<ASAny>, toIds:Array<ASAny>, successCallback:ASFunction = null) {
-		var _loc4_ = JSONRPCService.getFunction("AppRequests", mDBFacade.rpcRoot + "facebookrequests");
-		_loc4_(mDBFacade.dbAccountInfo.id, requestIds, toIds, mDBFacade.validationToken);
 	}
 
 	public function getGiftData(successCallback:ASFunction = null) {
@@ -416,7 +371,7 @@ class DBAccountInfo {
 	function parseGiftData(gifts:ASAny) {
 		var _loc3_:Array<ASAny> = null;
 		var _loc2_:GiftInfo = null;
-		var _loc4_ = 0;
+		var _loc4_ = (0 : UInt);
 		if (ASCompat.toBool(gifts)) {
 			if (ASCompat.toBool(gifts.excludeIds)) {
 				mGiftExcludeIds = ASCompat.dynamicAs(gifts.excludeIds, Array);
@@ -425,9 +380,9 @@ class DBAccountInfo {
 				return;
 			}
 			_loc3_ = ASCompat.dynamicAs(gifts.gifts, Array);
-			_loc4_ = 0;
-			while (_loc4_ < _loc3_.length) {
-				_loc2_ = new GiftInfo(mDBFacade, _loc3_[_loc4_]);
+			_loc4_ = (0 : UInt);
+			while (_loc4_ < (_loc3_.length:UInt)) {
+				_loc2_ = new GiftInfo(mDBFacade, _loc3_[(_loc4_ : Int)]);
 				if (!mGiftsInfo.has(_loc2_.requestId)) {
 					mGiftsInfo.add(_loc2_.requestId, _loc2_);
 				}
@@ -439,19 +394,19 @@ class DBAccountInfo {
 	public function addFriendCallback(friends:ASAny) {
 		var _loc2_:Array<ASAny> = null;
 		var _loc5_:FriendInfo = null;
-		var _loc4_ = 0;
-		var _loc3_ = 0;
+		var _loc4_ = (0 : UInt);
+		var _loc3_ = (0 : UInt);
 		if (ASCompat.toBool(friends)) {
 			_loc2_ = ASCompat.dynamicAs(friends, Array);
-			_loc4_ = 0;
-			while (_loc4_ < _loc2_.length) {
-				_loc3_ = (ASCompat.asUint(_loc2_[_loc4_].account_id) : Int);
+			_loc4_ = (0 : UInt);
+			while (_loc4_ < (_loc2_.length:UInt)) {
+				_loc3_ = ASCompat.asUint(_loc2_[(_loc4_ : Int)].account_id);
 				if (!mFriendsInfo.hasKey(_loc3_)) {
-					_loc5_ = new FriendInfo(mDBFacade, _loc2_[_loc4_]);
+					_loc5_ = new FriendInfo(mDBFacade, _loc2_[(_loc4_ : Int)]);
 					mFriendsInfo.add(_loc5_.id, _loc5_);
 				} else {
 					_loc5_ = ASCompat.coerce(mFriendsInfo.itemFor(_loc3_), account.FriendInfo);
-					_loc5_.parseFriendJson(_loc2_[_loc4_]);
+					_loc5_.parseFriendJson(_loc2_[(_loc4_ : Int)]);
 				}
 				_loc4_++;
 			}
@@ -462,13 +417,13 @@ class DBAccountInfo {
 	public function removeFriendCallback(friends:ASAny) {
 		var _loc2_:Array<ASAny> = null;
 		var _loc5_:ASAny = null;
-		var _loc4_ = 0;
-		var _loc3_ = 0;
+		var _loc4_ = (0 : UInt);
+		var _loc3_ = (0 : UInt);
 		if (ASCompat.toBool(friends)) {
 			_loc2_ = ASCompat.dynamicAs(friends, Array);
-			_loc4_ = 0;
-			while (_loc4_ < _loc2_.length) {
-				_loc3_ = (ASCompat.asUint(_loc2_[_loc4_].account_id) : Int);
+			_loc4_ = (0 : UInt);
+			while (_loc4_ < (_loc2_.length:UInt)) {
+				_loc3_ = ASCompat.asUint(_loc2_[(_loc4_ : Int)].account_id);
 				if (mFriendsInfo.hasKey(_loc3_)) {
 					mFriendsInfo.removeKey(_loc3_);
 				}
@@ -519,19 +474,19 @@ class DBAccountInfo {
 	function parseIgnoredFriendData(ignoredFriends:ASAny) {
 		var _loc2_:Array<ASAny> = null;
 		var _loc5_:FriendInfo = null;
-		var _loc4_ = 0;
-		var _loc3_ = 0;
+		var _loc4_ = (0 : UInt);
+		var _loc3_ = (0 : UInt);
 		if (ASCompat.toBool(ignoredFriends)) {
 			_loc2_ = ASCompat.dynamicAs(ignoredFriends, Array);
-			_loc4_ = 0;
-			while (_loc4_ < _loc2_.length) {
-				_loc3_ = (ASCompat.asUint(_loc2_[_loc4_].account_id) : Int);
+			_loc4_ = (0 : UInt);
+			while (_loc4_ < (_loc2_.length:UInt)) {
+				_loc3_ = ASCompat.asUint(_loc2_[(_loc4_ : Int)].account_id);
 				if (!mFriendsInfo.hasKey(_loc3_)) {
-					_loc5_ = new FriendInfo(mDBFacade, _loc2_[_loc4_]);
+					_loc5_ = new FriendInfo(mDBFacade, _loc2_[(_loc4_ : Int)]);
 					mIgnoredFriendsInfo.push(_loc5_);
 				} else {
-					_loc5_ = mIgnoredFriendsInfo[_loc4_];
-					_loc5_.parseFriendJson(_loc2_[_loc4_]);
+					_loc5_ = mIgnoredFriendsInfo[(_loc4_ : Int)];
+					_loc5_.parseFriendJson(_loc2_[(_loc4_ : Int)]);
 				}
 				_loc4_++;
 			}
@@ -540,7 +495,7 @@ class DBAccountInfo {
 
 	function friendlistUpdate(event:FriendStatusEvent) {
 		var successCallback:ASFunction;
-		if (event.status == false || mFriendsInfo.hasKey(event.friendId)) {
+		if (!event.status || mFriendsInfo.hasKey(event.friendId)) {
 			return;
 		}
 		successCallback = function() {
@@ -559,8 +514,7 @@ class DBAccountInfo {
 			"account_id": this.mId,
 			"name": this.mName,
 			"trophies": this.trophies,
-			"facebook_id": mDBFacade.facebookPlayerId,
-			"kongregate_id": mDBFacade.kongregatePlayerId,
+			"steam_avatar_url": mDBFacade.mSteamAvatarUrl,
 			"status_online": true,
 			"in_dungeon": false
 		};
@@ -568,6 +522,7 @@ class DBAccountInfo {
 			mFriendsInfo.clear();
 		}
 		if (!mFriendsInfo.hasKey(this.mId)) {
+			ASCompat.setProperty(myObject, "steam_avatar_url", mDBFacade.mSteamAvatarUrl);
 			myself = new FriendInfo(mDBFacade, myObject);
 			mFriendsInfo.add(myself.id, myself);
 		} else {
@@ -580,9 +535,6 @@ class DBAccountInfo {
 		});
 		mLocalFriendInfo = myself;
 		mEventComponent.addListener("FRIEND_STATUS_EVENT", friendlistUpdate);
-		if (mDBFacade.facebookController != null && activeAvatarInfo.level >= 5) {
-			mDBFacade.facebookController.updateGuestAchievement((2 : UInt));
-		}
 		if (ASCompat.toBool(friends)) {
 			friendsArray = ASCompat.dynamicAs(friends, Array);
 			i = (0 : UInt);
@@ -600,19 +552,10 @@ class DBAccountInfo {
 		}
 	}
 
-	public function addAchievement(achievementId:String, achievementURL:String, achievementCallback:ASFunction) {
-		var rpcFunc = JSONRPCService.getFunction("AddAchievement", mDBFacade.rpcRoot + "achievement");
-		var successCallback:ASFunction = function(param1:ASAny) {
-			achievementCallback(achievementId);
-			Logger.info("achievement success");
-		};
-		var failCallback:ASFunction = function(param1:ASAny) {};
-		rpcFunc(mDBFacade.accountId, mDBFacade.validationToken, mDBFacade.facebookPlayerId, achievementURL, successCallback, failCallback);
-	}
-
 	public function setPresenceTask(location:String) {
 		if (mOnlinePresenceTask != null) {
-			mOnlinePresenceTask.destroy();
+			mDBFacade.realClockWorkManager.removeDoLater(mOnlinePresenceTask);
+			mOnlinePresenceTask = null;
 		}
 		SocketPingMilsecs = -1;
 		mLastFPSTime = (mDBFacade.gameClock.realTime : UInt);
@@ -625,8 +568,8 @@ class DBAccountInfo {
 	function setOnlinePresence(gameClock:GameClock) {
 		var _loc6_ = (gameClock.realTime : UInt);
 		var _loc4_ = gameClock.frame;
-		var _loc2_ = (_loc6_ - mLastFPSTime) / 1000;
-		var _loc5_ = ASCompat.floatToInt(_loc2_ > 0 ? Math.round((_loc4_ - mLastFPSFrame) / _loc2_) : -1);
+		var _loc2_ = ((_loc6_ : Float) - (mLastFPSTime : Float)) / 1000;
+		var _loc5_ = ASCompat.floatToInt(_loc2_ > 0 ? Math.round(((_loc4_ : Float) - (mLastFPSFrame : Float)) / _loc2_) : -1);
 		mLastFPSTime = _loc6_;
 		mLastFPSFrame = _loc4_;
 		var _loc3_:ASObject = {};
@@ -641,12 +584,12 @@ class DBAccountInfo {
 		mDBFacade.metrics.log("Presence", _loc3_);
 	}
 
-	public function getFacebookIdRPC(remoteId:UInt, successCallback:ASFunction) {
-		var rpcFunc = JSONRPCService.getFunction("GetFacebookId", mDBFacade.rpcRoot + "account");
+	public function getSteamAvatarUrlRPC(remoteId:UInt, successCallback:ASFunction) {
+		var rpcFunc = JSONRPCService.getFunction("GetSteamAvatarPictureUrl", mDBFacade.rpcRoot + "account");
 		var rpcSuccessCallback:ASFunction = function(param1:String) {
 			successCallback(param1);
 		};
-		rpcFunc(remoteId, id, mDBFacade.validationToken, rpcSuccessCallback, parseError);
+		rpcFunc(remoteId, rpcSuccessCallback, parseError);
 	}
 
 	@:isVar public var basicCurrency(get, never):UInt;
@@ -668,10 +611,7 @@ class DBAccountInfo {
 	}
 
 	public function hasAllTrophies():Bool {
-		if (mTrophyCount >= 106) {
-			return true;
-		}
-		return false;
+		return mTrophyCount >= 106;
 	}
 
 	@:isVar public var activeAvatarInfo(get, never):AvatarInfo;
@@ -753,7 +693,10 @@ class DBAccountInfo {
 		var avatarInfo = mInventory.getAvatarInfoForHeroType(heroType);
 		if (avatarInfo != null) {
 			mActiveAvatar = avatarInfo;
-			mUpdateMessagePopup = new DBUIPopup(mDBFacade, Locale.getString("SHOP_UPDATING"), null, false);
+			if (mLocalFriendInfo != null) {
+				mLocalFriendInfo.refreshOwnPortrait();
+			}
+			mUpdateMessagePopup = new DBUIPopup(mDBFacade, "", Locale.getString("SHOP_UPDATING"), null, false);
 			MemoryTracker.track(mUpdateMessagePopup, "DBUIPopup - created in DBAccountInfo.changeActiveAvatarRPC()");
 			rpcFunc(mDBFacade.validationToken, mDBFacade.dbAccountInfo.id, avatarInfo.id, avatarInfo.skinId, function(param1:ASAny) {
 				mUpdateMessagePopup.destroy();
@@ -780,33 +723,6 @@ class DBAccountInfo {
 		}, parseError);
 	}
 
-	public function updateFacebookFriendsRPC(friends:Array<ASAny>, newFriendsHash:String, cascade:Bool) {
-		var rpcFunc = JSONRPCService.getFunction("updateFBFriends", mDBFacade.rpcRoot + "leaderboard");
-		var callback:ASFunction = function(param1:ASAny) {
-			mCurrentFriendsHash = newFriendsHash;
-			parseFriendData(param1);
-			mEventComponent.dispatchEvent(new Event("REFRESH_FRIENDS_EVENT"));
-		};
-		rpcFunc(mDBFacade.dbAccountInfo.id, mDBFacade.validationToken, friends, newFriendsHash, cascade, callback);
-	}
-
-	public function updateDRFriendsRPC(friends:Array<ASAny>, newFriendsHash:String) {
-		var _loc3_ = JSONRPCService.getFunction("inviteNewDRFriends", mDBFacade.rpcRoot + "leaderboard");
-		mCurrentFriendsHash = newFriendsHash;
-		_loc3_(mDBFacade.dbAccountInfo.id, mDBFacade.validationToken, friends, newFriendsHash, mDBFacade.dbAccountInfo.name, mDBFacade.dbAccountInfo.trophies,
-			mDBFacade.dbAccountInfo.activeAvatarSkinId, mDBFacade.dbAccountInfo.facebookId);
-	}
-
-	public function updateKongregateFriendsRPC(friends:Array<ASAny>, newFriendsHash:String, cascade:Bool) {
-		var rpcFunc = JSONRPCService.getFunction("updateKongregateFriends", mDBFacade.rpcRoot + "leaderboard");
-		var callback:ASFunction = function(param1:ASAny) {
-			mCurrentFriendsHash = newFriendsHash;
-			parseFriendData(param1);
-			mEventComponent.dispatchEvent(new Event("REFRESH_FRIENDS_EVENT"));
-		};
-		rpcFunc(mDBFacade.dbAccountInfo.id, mDBFacade.validationToken, friends, newFriendsHash, cascade, callback);
-	}
-
 	public function parseFriendResponse(details:ASAny, callRefreshOnceDone:Bool = true) {
 		if (ASCompat.toBool(details.friends_hash)) {
 			mCurrentFriendsHash = ASCompat.asString(details.friends_hash);
@@ -822,7 +738,7 @@ class DBAccountInfo {
 		var _loc3_ = ASCompat.reinterpretAs(friendInfos.iterator(), IMapIterator);
 		while (_loc3_.hasNext()) {
 			_loc3_.next();
-			_loc3_.current.parseChampionsboardData(_loc4_.accountIdToTopScoreMapnodeInfo.itemFor(_loc3_.current.id));
+			_loc3_.current.parseChampionsboardData(_loc4_.accountIdToTopScoreMapNodeInfo.itemFor(_loc3_.current.id));
 			if (ASCompat.toNumberField(_loc3_.current, "id") == mDBFacade.accountId) {
 				_loc3_.current.parseIIAvatarScoresData(details.avatar_scores);
 			}
@@ -839,6 +755,9 @@ class DBAccountInfo {
 		var _loc3_ = ASCompat.toInt(details.active_avatar);
 		mInventory.parseJson(details);
 		mActiveAvatar = mInventory.getAvatarInfoForAvatarInstanceId((_loc3_ : UInt));
+		if (mLocalFriendInfo != null) {
+			mLocalFriendInfo.refreshOwnPortrait();
+		}
 		mEventComponent.dispatchEvent(new Event("ACTIVE_AVATAR_CHANGED_EVENT"));
 		parseCurrency(details);
 		if (ASCompat.toBool(details.account_attributes)) {
@@ -864,7 +783,7 @@ class DBAccountInfo {
 		if (mErrorPopUp != null) {
 			return;
 		}
-		mErrorPopUp = new DBUIPopup(mDBFacade, "Error getting account info.");
+		mErrorPopUp = new DBUIPopup(mDBFacade, "", "Error getting account info.");
 		MemoryTracker.track(mErrorPopUp, "DBUIPopup - created in DBAccountInfo.parseError()");
 		mLogicalWorkComponent.doLater(1.5, killErrorPopUp);
 	}

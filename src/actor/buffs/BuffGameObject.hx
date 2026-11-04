@@ -2,12 +2,12 @@ package actor.buffs;
 
 import actor.ActorGameObject;
 import actor.ActorView;
+import brain.render.tweens.TweenHandle;
 import brain.utils.MemoryTracker;
 import facade.DBFacade;
 import dr_floor.FloorObject;
 import gameMasterDictionary.GMBuff;
 import gameMasterDictionary.StatVector;
-import com.greensock.TimelineMax;
 
 class BuffGameObject extends FloorObject {
 	var mData:GMBuff;
@@ -30,7 +30,7 @@ class BuffGameObject extends FloorObject {
 
 	public var mSortLayer:String;
 
-	public var mCameraTweenMax:TimelineMax;
+	public var mCameraTweenMax:TweenHandle;
 
 	public function new(facade:DBFacade, actorGameObject:ActorGameObject, actorView:ActorView, id:UInt, remoteId:UInt = (0 : UInt),
 			attackerId:UInt = (0 : UInt)) {
@@ -52,7 +52,7 @@ class BuffGameObject extends FloorObject {
 	override public function destroy() {
 		if (mActorGameObject.isOwner && mData.ShakeLocalCamera) {
 			this.mDBFacade.camera.removeShakes();
-			mCameraTweenMax.kill();
+			mDBFacade.mTween.killTween(mCameraTweenMax);
 		}
 		mData = null;
 		mParentView = null;
@@ -126,6 +126,12 @@ class BuffGameObject extends FloorObject {
 
 	public function get_buffView():BuffView {
 		return mBuffView;
+	}
+
+	@:isVar public var actorGameObject(get, never):ActorGameObject;
+
+	public function get_actorGameObject():ActorGameObject {
+		return mActorGameObject;
 	}
 
 	@:isVar public var buffData(get, never):GMBuff;

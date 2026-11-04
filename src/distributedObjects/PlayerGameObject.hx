@@ -7,24 +7,30 @@ import events.FriendStatusEvent;
 import events.PlayerExitEvent;
 import events.PlayerIsTypingEvent;
 import facade.DBFacade;
+import facade.LoadingPrewarm;
+import facade.TrickleCacheLoader;
+import generatedCode.HeroPreloadLook;
 import generatedCode.IPlayerGameObject;
 import generatedCode.PlayerGameObjectNetworkComponent;
+import stateMachine.mainStateMachine.LoadingScreenState;
 import uI.UIChatLog;
 import account.FriendInfo;
-import events.FacebookIdReceivedEvent;
+import events.SteamAvatarUrlReceivedEvent;
 import facade.DBFacade;
 
 class PlayerGameObject extends GameObject implements IPlayerGameObject {
 	var mName:String;
 
-	var mFacebookHelper:FacebookHelper;
+	var mHeroPreloadLook:HeroPreloadLook;
+
+	var mSteamHelper:SteamHelper;
 
 	var mDBFacade:DBFacade;
 
 	public function new(dbFacade:DBFacade, remoteId:UInt = (0 : UInt)) {
 		super(dbFacade, remoteId);
 		mDBFacade = dbFacade;
-		mFacebookHelper = new FacebookHelper(dbFacade, remoteId);
+		mSteamHelper = new SteamHelper(dbFacade, remoteId);
 		mFacade.eventManager.dispatchEvent(new FriendStatusEvent("FRIEND_DUNGEON_STATUS_EVENT", this.id, true));
 	}
 
@@ -42,11 +48,26 @@ class PlayerGameObject extends GameObject implements IPlayerGameObject {
 		return mName;
 	}
 
-	@:isVar public var facebookId(get, never):String;
+	@:isVar public var heroPreloadLook(get, set):HeroPreloadLook;
 
-	public function get_facebookId():String {
-		if (mFacebookHelper != null) {
-			return mFacebookHelper.facebookId;
+	public function set_heroPreloadLook(val:HeroPreloadLook):HeroPreloadLook {
+		mHeroPreloadLook = val;
+		if (val != null && id != mDBFacade.dbAccountInfo.id) {
+			TrickleCacheLoader.queueHeroLookAtlases(mDBFacade, val, !Std.isOfType(mDBFacade.mainStateMachine.currentState, LoadingScreenState));
+			LoadingPrewarm.heroJoined(mDBFacade, val);
+		}
+		return val;
+	}
+
+	function get_heroPreloadLook():HeroPreloadLook {
+		return mHeroPreloadLook;
+	}
+
+	@:isVar public var steamAvatarUrl(get, never):String;
+
+	public function get_steamAvatarUrl():String {
+		if (mSteamHelper != null) {
+			return mSteamHelper.steamAvatarUrl;
 		}
 		return "";
 	}
@@ -54,7 +75,7 @@ class PlayerGameObject extends GameObject implements IPlayerGameObject {
 	@:isVar public var isFriend(get, never):Bool;
 
 	public function get_isFriend():Bool {
-		return mFacebookHelper.isFriend;
+		return mSteamHelper.isFriend;
 	}
 
 	public function Chat(text:String) {
@@ -73,10 +94,10 @@ class PlayerGameObject extends GameObject implements IPlayerGameObject {
 	override public function destroy() {
 		mFacade.eventManager.dispatchEvent(new FriendStatusEvent("FRIEND_DUNGEON_STATUS_EVENT", this.id, false));
 		mFacade.eventManager.dispatchEvent(new PlayerExitEvent(id));
-		if (mFacebookHelper != null) {
-			mFacebookHelper.destroy();
+		if (mSteamHelper != null) {
+			mSteamHelper.destroy();
 		}
-		mFacebookHelper = null;
+		mSteamHelper = null;
 		mDBFacade = null;
 		super.destroy();
 	}
@@ -92,8 +113,8 @@ class PlayerGameObject extends GameObject implements IPlayerGameObject {
 	}
 }
 
-private class FacebookHelper {
-	var mFacebookId:String;
+private class SteamHelper {
+	var mSteamAvatarUrl:String;
 
 	var mIsFriend:Bool = false;
 
@@ -104,33 +125,33 @@ private class FacebookHelper {
 	public function new(dbFacade:DBFacade, id:UInt) {
 		mDBFacade = dbFacade;
 		mPlayerId = id;
-		getFacebookId();
+		getSteamAvatar();
 	}
 
-	function getFacebookId() {
+	function getSteamAvatar() {
 		var friend:FriendInfo;
 		if (mDBFacade.dbAccountInfo.id == mPlayerId) {
-			mFacebookId = mDBFacade.facebookPlayerId;
+			mSteamAvatarUrl = mDBFacade.mSteamAvatarUrl;
 		} else if (mDBFacade.dbAccountInfo.friendInfos.hasKey(mPlayerId)) {
 			mIsFriend = true;
 			friend = ASCompat.coerce(mDBFacade.dbAccountInfo.friendInfos.itemFor(mPlayerId), account.FriendInfo);
 			if (friend != null) {
-				mFacebookId = friend.facebookId;
+				mSteamAvatarUrl = friend.steamAvatarUrl;
 			}
 		} else {
-			mDBFacade.dbAccountInfo.getFacebookIdRPC(mPlayerId, function(param1:String) {
-				if (param1 != "") {
-					mDBFacade.eventManager.dispatchEvent(new FacebookIdReceivedEvent("FACEBOOK_ID_RECEIVED_EVENT", mPlayerId, param1));
+			mDBFacade.dbAccountInfo.getSteamAvatarUrlRPC(mPlayerId, function(param1:String) {
+				if (param1 != "" && mDBFacade != null) {
+					mDBFacade.eventManager.dispatchEvent(new SteamAvatarUrlReceivedEvent("STEAM_AVATAR_URL_RECEIVED_EVENT", mPlayerId, param1));
 				}
-				mFacebookId = param1;
+				mSteamAvatarUrl = param1;
 			});
 		}
 	}
 
-	@:isVar public var facebookId(get, never):String;
+	@:isVar public var steamAvatarUrl(get, never):String;
 
-	public function get_facebookId():String {
-		return mFacebookId;
+	public function get_steamAvatarUrl():String {
+		return mSteamAvatarUrl;
 	}
 
 	@:isVar public var isFriend(get, never):Bool;

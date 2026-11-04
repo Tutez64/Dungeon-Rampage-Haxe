@@ -1,51 +1,51 @@
 package box2D.common;
 
 class B2Settings {
-	public static inline final VERSION = "2.1alpha";
+	public static var VERSION:String = "2.1alpha";
 
-	public static inline final USHRT_MAX_cpp /*cpp macro conflict*/ = 65535;
+	public static var USHRT_MAX_cpp /*cpp macro conflict*/:Int = 65535;
 
-	public static final b2_pi:Float = Math.PI;
+	public static var b2_maxManifoldPoints:Int = 2;
 
-	public static inline final b2_maxManifoldPoints = 2;
+	public static var b2_aabbExtension:Float = 0.1;
 
-	public static inline final b2_aabbExtension:Float = 0.1;
+	public static var b2_aabbMultiplier:Float = 2;
 
-	public static inline final b2_aabbMultiplier:Float = 2;
+	public static var b2_polygonRadius:Float = 0.01;
 
-	public static final b2_polygonRadius:Float = 2 * b2_linearSlop;
+	public static var b2_linearSlop:Float = 0.005;
 
-	public static inline final b2_linearSlop:Float = 0.005;
+	public static var b2_toiSlop:Float = 0.04;
 
-	public static final b2_angularSlop:Float = 2 / 180 * b2_pi;
+	public static var b2_maxTOIContactsPerIsland:Int = 32;
 
-	public static final b2_toiSlop:Float = 8 * b2_linearSlop;
+	public static var b2_maxTOIJointsPerIsland:Int = 32;
 
-	public static inline final b2_maxTOIContactsPerIsland = 32;
+	public static var b2_velocityThreshold:Float = 1;
 
-	public static inline final b2_maxTOIJointsPerIsland = 32;
+	public static var b2_maxLinearCorrection:Float = 0.2;
 
-	public static inline final b2_velocityThreshold:Float = 1;
+	public static var b2_maxTranslation:Float = 2;
 
-	public static inline final b2_maxLinearCorrection:Float = 0.2;
+	public static var b2_maxTranslationSquared:Float = 4;
 
-	public static final b2_maxAngularCorrection:Float = 8 / 180 * b2_pi;
+	public static var b2_contactBaumgarte:Float = 0.2;
 
-	public static inline final b2_maxTranslation:Float = 2;
+	public static var b2_timeToSleep:Float = 0.5;
 
-	public static final b2_maxTranslationSquared:Float = b2_maxTranslation * b2_maxTranslation;
+	public static var b2_linearSleepTolerance:Float = 0.01;
 
-	public static final b2_maxRotation:Float = 0.5 * b2_pi;
+	public static var b2_pi:Float = Math.PI;
 
-	public static final b2_maxRotationSquared:Float = b2_maxRotation * b2_maxRotation;
+	public static var b2_angularSlop:Float = 0.011111111111111112 * Math.PI;
 
-	public static inline final b2_contactBaumgarte:Float = 0.2;
+	public static var b2_maxAngularCorrection:Float = 0.044444444444444446 * Math.PI;
 
-	public static inline final b2_timeToSleep:Float = 0.5;
+	public static var b2_maxRotation:Float = 0.5 * Math.PI;
 
-	public static inline final b2_linearSleepTolerance:Float = 0.01;
+	public static var b2_maxRotationSquared:Float = 0.5 * Math.PI * (0.5 * Math.PI);
 
-	public static final b2_angularSleepTolerance:Float = 2 / 180 * B2Settings.b2_pi;
+	public static var b2_angularSleepTolerance:Float = 0.011111111111111112 * Math.PI;
 
 	public function new() {}
 
@@ -54,12 +54,27 @@ class B2Settings {
 	}
 
 	public static function b2MixRestitution(restitution1:Float, restitution2:Float):Float {
-		return restitution1 > restitution2 ? restitution1 : restitution2;
+		if (restitution1 > restitution2) {
+			return restitution1;
+		}
+		return restitution2;
 	}
 
 	public static function b2Assert(a:Bool) {
 		if (!a) {
-			throw "Assertion Failed";
+			throw ASCompat.haxeThrown("Assertion Failed");
 		}
+	}
+
+	public static function B2MixFriction(friction1:Float, friction2:Float):Float {
+		return B2Settings.b2MixFriction(friction1, friction2);
+	}
+
+	public static function B2MixRestitution(restitution1:Float, restitution2:Float):Float {
+		return B2Settings.b2MixRestitution(restitution1, restitution2);
+	}
+
+	public static function B2Assert(a:Bool) {
+		B2Settings.b2Assert(a);
 	}
 }

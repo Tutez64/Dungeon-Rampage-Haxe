@@ -20,130 +20,168 @@ import flash.text.TextFormatAlign;
 import flash.ui.Mouse;
 
 class Ruler extends Sprite {
-	var _master:Console;
+	public var background:Sprite;
 
-	var _config:ConsoleConfig;
+	public var _zoom:Bitmap;
 
-	var _area:Rectangle;
+	public var _posTxt:TextField;
 
-	var _pointer:Shape;
+	public var _points:Array<ASAny>;
 
-	var _posTxt:TextField;
+	public var _pointerTop:Shape;
 
-	var _zoom:Bitmap;
+	public var _pointerRight:Shape;
 
-	var _points:Array<ASAny>;
+	public var _pointerLeft:Shape;
 
-	public function new(console:Console) {
+	public var _pointerBottom:Shape;
+
+	public var _pointer:Shape;
+
+	public var _master:Console;
+
+	public var _config:ConsoleConfig;
+
+	public var _area:Rectangle;
+
+	public function new(console:Console = /*undefined*/ null) {
 		super();
-		this._master = console;
-		this._config = console.config;
+		_master = console;
+		_config = console.get_config();
 		buttonMode = true;
-		this._points = new Array<ASAny>();
-		this._pointer = new Shape();
-		addChild(this._pointer);
+		_points = [];
+		_pointer = new Shape();
+		addChild(_pointer);
 		var _loc2_ = new Point();
 		_loc2_ = globalToLocal(_loc2_);
-		this._area = new Rectangle(-console.stage.stageWidth * 1.5 + _loc2_.x, -console.stage.stageHeight * 1.5 + _loc2_.y, console.stage.stageWidth * 3,
+		_area = new Rectangle(-console.stage.stageWidth * 1.5 + _loc2_.x, -console.stage.stageHeight * 1.5 + _loc2_.y, console.stage.stageWidth * 3,
 			console.stage.stageHeight * 3);
-		graphics.beginFill(this._config.style.backgroundColor, 0.2);
-		graphics.drawRect(this._area.x, this._area.y, this._area.width, this._area.height);
+		graphics.beginFill(_config.get_style().backgroundColor, 0.2);
+		graphics.drawRect(_area.x, _area.y, _area.width, _area.height);
 		graphics.endFill();
-		this._posTxt = this._master.panels.mainPanel.makeTF("positionText", true);
-		this._posTxt.autoSize = TextFieldAutoSize.LEFT;
-		addChild(this._posTxt);
-		this._zoom = new Bitmap();
-		this._zoom.scaleY = this._zoom.scaleX = 2;
-		addChild(this._zoom);
-		addEventListener(MouseEvent.CLICK, this.onMouseClick, false, 0, true);
-		addEventListener(MouseEvent.MOUSE_MOVE, this.onMouseMove, false, 0, true);
-		this.onMouseMove();
-		if (this._config.rulerHidesMouse) {
+		_posTxt = _master.get_panels().get_mainPanel().makeTF("positionText", true);
+		_posTxt.autoSize = TextFieldAutoSize.LEFT;
+		addChild(_posTxt);
+		_zoom = new Bitmap();
+		_zoom.scaleY = _zoom.scaleX = 2;
+		addChild(_zoom);
+		addEventListener(MouseEvent.CLICK, onMouseClick, false, 0, true);
+		addEventListener(MouseEvent.MOUSE_MOVE, onMouseMove, false, 0, true);
+		onMouseMove();
+		if (_config.rulerHidesMouse) {
 			Mouse.hide();
 		}
-		this._master.report("<b>Ruler started. Click on two locations to measure.</b>", -1);
+		_master.report("<b>Ruler started. Click on two locations to measure.</b>", -1);
 	}
 
-	function onMouseMove(e:MouseEvent = null) {
-		var bmd:BitmapData;
-		var d:Int;
-		var m:Matrix = null;
-		this._pointer.graphics.clear();
-		this._pointer.graphics.lineStyle(1, (11193344 : UInt), 1);
-		this._pointer.graphics.moveTo(this._area.x, mouseY);
-		this._pointer.graphics.lineTo(this._area.x + this._area.width, mouseY);
-		this._pointer.graphics.moveTo(mouseX, this._area.y);
-		this._pointer.graphics.lineTo(mouseX, this._area.y + this._area.height);
-		this._pointer.blendMode = BlendMode.INVERT;
-		this._posTxt.text = "<low>" + mouseX + "," + mouseY + "</low>";
-		bmd = new BitmapData(30, 30);
+	public function updateSize() {
+		var _loc1_ = new Point();
+		_loc1_ = globalToLocal(_loc1_);
+		_area = new Rectangle(-_loc1_.x, -_loc1_.y, _master.stage.stageWidth, _master.stage.stageHeight);
+		var _loc2_ = Math.floor(_master.stage.stageHeight);
+		var _loc3_ = Math.floor(_master.stage.stageWidth);
+		_pointerRight.graphics.clear();
+		_pointerRight.graphics.lineStyle(1, (11193344 : UInt), 1);
+		_pointerRight.graphics.moveTo(_loc1_.x, 0);
+		_pointerRight.graphics.lineTo(_loc1_.x - _loc3_, 0);
+		_pointerLeft.graphics.clear();
+		_pointerLeft.graphics.lineStyle(1, (11193344 : UInt), 1);
+		_pointerLeft.graphics.moveTo(_loc3_ - _loc1_.x, 0);
+		_pointerLeft.graphics.lineTo(_loc1_.x, 0);
+		_pointerTop.graphics.clear();
+		_pointerTop.graphics.lineStyle(1, (11193344 : UInt), 1);
+		_pointerTop.graphics.moveTo(0, _loc1_.y - _loc2_);
+		_pointerTop.graphics.lineTo(0, _loc1_.y);
+		_pointerBottom.graphics.clear();
+		_pointerBottom.graphics.lineStyle(1, (11193344 : UInt), 1);
+		_pointerBottom.graphics.moveTo(0, _loc1_.y);
+		_pointerBottom.graphics.lineTo(0, _loc2_ - _loc1_.y);
+	}
+
+	public function round(n:Float, d:UInt = (10 : UInt)):Float {
+		return ASCompat.floatToInt(Math.fround(d * n)) / d;
+	}
+
+	public function onMouseMove(e:MouseEvent = /*undefined*/ null) {
+		var _loc4_ = ASCompat.dynamicAs(null, Matrix);
+		var _loc5_ = ASCompat.dynamicAs(null, Error);
+		_pointer.graphics.clear();
+		_pointer.graphics.lineStyle(1, (11193344 : UInt), 1);
+		_pointer.graphics.moveTo(_area.x, mouseY);
+		_pointer.graphics.lineTo(_area.x + _area.width, mouseY);
+		_pointer.graphics.moveTo(mouseX, _area.y);
+		_pointer.graphics.lineTo(mouseX, _area.y + _area.height);
+		_pointer.blendMode = BlendMode.INVERT;
+		_posTxt.text = "<low>" + mouseX + "," + mouseY + "</low>";
+		var _loc3_ = new BitmapData(30, 30);
 		try {
-			m = new Matrix();
-			m.tx = -stage.mouseX + 15;
-			m.ty = -stage.mouseY + 15;
-			bmd.draw(stage, m);
-		} catch (err:Dynamic) {
-			bmd = null;
+			_loc4_ = new Matrix();
+			ASCompat.setProperty(_loc4_, "tx", -_master.stage.mouseX + 15);
+			ASCompat.setProperty(_loc4_, "ty", -_master.stage.mouseY + 15);
+			_loc3_.draw(_master.stage, _loc4_);
+		} catch (_loc_e_:Dynamic) {
+			_loc5_ = _loc_e_;
+			_loc3_ = null;
 		}
-		this._zoom.bitmapData = bmd;
-		d = 10;
-		this._posTxt.x = mouseX - this._posTxt.width - d;
-		this._posTxt.y = mouseY - this._posTxt.height - d;
-		this._zoom.x = this._posTxt.x + this._posTxt.width - this._zoom.width;
-		this._zoom.y = this._posTxt.y - this._zoom.height;
-		if (this._posTxt.x < 16) {
-			this._posTxt.x = mouseX + d;
-			this._zoom.x = this._posTxt.x;
+		_zoom.bitmapData = _loc3_;
+		var _loc6_ = 10;
+		_posTxt.x = mouseX - _posTxt.width - _loc6_;
+		_posTxt.y = mouseY - _posTxt.height - _loc6_;
+		_zoom.x = _posTxt.x + _posTxt.width - _zoom.width;
+		_zoom.y = _posTxt.y - _zoom.height;
+		if (_posTxt.x < 16) {
+			_posTxt.x = mouseX + _loc6_;
+			_zoom.x = _posTxt.x;
 		}
-		if (this._posTxt.y < 38) {
-			this._posTxt.y = mouseY + d;
-			this._zoom.y = this._posTxt.y + this._posTxt.height;
+		if (_posTxt.y < 38) {
+			_posTxt.y = mouseY + _loc6_;
+			_zoom.y = _posTxt.y + _posTxt.height;
 		}
 	}
 
-	function onMouseClick(e:MouseEvent) {
-		var _loc2_:Point = null;
-		var _loc4_:Point = null;
-		var _loc5_:Point = null;
-		var _loc6_:Point = null;
-		var _loc7_:Point = null;
-		var _loc8_:Point = null;
-		var _loc9_:Point = null;
+	public function onMouseClick(e:MouseEvent) {
+		var _loc2_:ASAny = ASCompat.dynamicAs(null, Point);
+		var _loc4_ = ASCompat.dynamicAs(null, Point);
+		var _loc5_ = ASCompat.dynamicAs(null, Point);
+		var _loc6_:ASAny = ASCompat.dynamicAs(null, Point);
+		var _loc7_:ASAny = ASCompat.dynamicAs(null, Point);
+		var _loc8_:ASAny = ASCompat.dynamicAs(null, Point);
+		var _loc9_:ASAny = ASCompat.dynamicAs(null, Point);
 		var _loc10_ = Math.NaN;
 		var _loc11_ = Math.NaN;
 		var _loc12_ = Math.NaN;
-		var _loc13_:TextField = null;
+		var _loc13_ = ASCompat.dynamicAs(null, TextField);
 		var _loc14_ = Math.NaN;
 		var _loc15_ = Math.NaN;
 		e.stopPropagation();
-		var _loc3_ = this._config.style;
-		if (this._points.length == 0) {
+		var _loc3_ = _config.get_style();
+		if (_points.length == 0) {
 			_loc2_ = new Point(e.localX, e.localY);
 			graphics.lineStyle(1, (16711680 : UInt));
-			graphics.drawCircle(_loc2_.x, _loc2_.y, 3);
-			this._points.push(_loc2_);
-		} else if (this._points.length == 1) {
-			this._zoom.bitmapData = null;
-			if (this._config.rulerHidesMouse) {
+			graphics.drawCircle(ASCompat.toNumberField(_loc2_, "x"), ASCompat.toNumberField(_loc2_, "y"), 3);
+			_points.push(_loc2_);
+		} else if (_points.length == 1) {
+			_zoom.bitmapData = null;
+			if (_config.rulerHidesMouse) {
 				Mouse.show();
 			}
-			removeChild(this._pointer);
-			removeChild(this._posTxt);
-			removeEventListener(MouseEvent.MOUSE_MOVE, this.onMouseMove);
-			_loc2_ = ASCompat.coerce(this._points[0], flash.geom.Point);
+			removeChild(_pointer);
+			removeChild(_posTxt);
+			removeEventListener(MouseEvent.MOUSE_MOVE, onMouseMove);
+			_loc2_ = _points[0];
 			_loc4_ = new Point(e.localX, e.localY);
-			this._points.push(_loc4_);
+			_points.push(_loc4_);
 			graphics.clear();
 			graphics.beginFill(_loc3_.backgroundColor, 0.4);
-			graphics.drawRect(this._area.x, this._area.y, this._area.width, this._area.height);
+			graphics.drawRect(_area.x, _area.y, _area.width, _area.height);
 			graphics.endFill();
 			graphics.lineStyle(1.5, (16711680 : UInt));
-			graphics.drawCircle(_loc2_.x, _loc2_.y, 4);
+			graphics.drawCircle(ASCompat.toNumberField(_loc2_, "x"), ASCompat.toNumberField(_loc2_, "y"), 4);
 			graphics.lineStyle(1.5, (16750848 : UInt));
-			graphics.drawCircle(_loc4_.x, _loc4_.y, 4);
-			_loc5_ = Point.interpolate(_loc2_, _loc4_, 0.5);
+			graphics.drawCircle(ASCompat.toNumberField(_loc4_, "x"), ASCompat.toNumberField(_loc4_, "y"), 4);
+			_loc5_ = Point.interpolate(ASCompat.coerce(_loc2_, flash.geom.Point), _loc4_, 0.5);
 			graphics.lineStyle(1, (11184810 : UInt));
-			graphics.drawCircle(_loc5_.x, _loc5_.y, 4);
+			graphics.drawCircle(ASCompat.toNumberField(_loc5_, "x"), ASCompat.toNumberField(_loc5_, "y"), 4);
 			_loc6_ = _loc2_;
 			_loc7_ = _loc4_;
 			if (_loc2_.x > _loc4_.x) {
@@ -156,63 +194,59 @@ class Ruler extends Sprite {
 				_loc8_ = _loc4_;
 				_loc9_ = _loc2_;
 			}
-			_loc10_ = _loc7_.x - _loc6_.x;
-			_loc11_ = _loc9_.y - _loc8_.y;
-			_loc12_ = Point.distance(_loc2_, _loc4_);
-			_loc13_ = this.makeTxtField(_loc3_.highColor);
-			_loc13_.text = this.round(_loc2_.x) + "," + this.round(_loc2_.y);
-			_loc13_.x = _loc2_.x;
-			_loc13_.y = _loc2_.y - (_loc8_ == _loc2_ ? 14 : 0);
+			_loc10_ = ASCompat.toNumberField(_loc7_, "x") - ASCompat.toNumberField(_loc6_, "x");
+			_loc11_ = ASCompat.toNumberField(_loc9_, "y") - ASCompat.toNumberField(_loc8_, "y");
+			_loc12_ = Point.distance(ASCompat.coerce(_loc2_, flash.geom.Point), _loc4_);
+			_loc13_ = makeTxtField((_loc3_.highColor : Int));
+			ASCompat.setProperty(_loc13_, "text", round(ASCompat.toNumberField(_loc2_, "x")) + "," + round(ASCompat.toNumberField(_loc2_, "y")));
+			ASCompat.setProperty(_loc13_, "x", _loc2_.x);
+			ASCompat.setProperty(_loc13_, "y", ASCompat.toNumberField(_loc2_, "y") - (_loc8_ == _loc2_ ? 14 : 0));
 			addChild(_loc13_);
-			_loc13_ = this.makeTxtField(_loc3_.highColor);
-			_loc13_.text = this.round(_loc4_.x) + "," + this.round(_loc4_.y);
-			_loc13_.x = _loc4_.x;
-			_loc13_.y = _loc4_.y - (_loc8_ == _loc4_ ? 14 : 0);
+			_loc13_ = makeTxtField((_loc3_.highColor : Int));
+			ASCompat.setProperty(_loc13_, "text", round(ASCompat.toNumberField(_loc4_, "x")) + "," + round(ASCompat.toNumberField(_loc4_, "y")));
+			ASCompat.setProperty(_loc13_, "x", _loc4_.x);
+			ASCompat.setProperty(_loc13_, "y", ASCompat.toNumberField(_loc4_, "y") - (_loc8_ == _loc4_ ? 14 : 0));
 			addChild(_loc13_);
 			if (_loc10_ > 40 || _loc11_ > 25) {
-				_loc13_ = this.makeTxtField(_loc3_.lowColor);
-				_loc13_.text = this.round(_loc5_.x) + "," + this.round(_loc5_.y);
-				_loc13_.x = _loc5_.x;
-				_loc13_.y = _loc5_.y;
+				_loc13_ = makeTxtField((_loc3_.lowColor : Int));
+				ASCompat.setProperty(_loc13_, "text", round(ASCompat.toNumberField(_loc5_, "x")) + "," + round(ASCompat.toNumberField(_loc5_, "y")));
+				ASCompat.setProperty(_loc13_, "x", _loc5_.x);
+				ASCompat.setProperty(_loc13_, "y", _loc5_.y);
 				addChild(_loc13_);
 			}
 			graphics.lineStyle(1, (11193344 : UInt), 0.5);
-			graphics.moveTo(this._area.x, _loc8_.y);
-			graphics.lineTo(this._area.x + this._area.width, _loc8_.y);
-			graphics.moveTo(this._area.x, _loc9_.y);
-			graphics.lineTo(this._area.x + this._area.width, _loc9_.y);
-			graphics.moveTo(_loc6_.x, this._area.y);
-			graphics.lineTo(_loc6_.x, this._area.y + this._area.height);
-			graphics.moveTo(_loc7_.x, this._area.y);
-			graphics.lineTo(_loc7_.x, this._area.y + this._area.height);
-			_loc14_ = this.round(this.angle(_loc2_, _loc4_), (100 : UInt));
-			_loc15_ = this.round(this.angle(_loc4_, _loc2_), (100 : UInt));
+			graphics.moveTo(_area.x, ASCompat.toNumberField(_loc8_, "y"));
+			graphics.lineTo(_area.x + _area.width, ASCompat.toNumberField(_loc8_, "y"));
+			graphics.moveTo(_area.x, ASCompat.toNumberField(_loc9_, "y"));
+			graphics.lineTo(_area.x + _area.width, ASCompat.toNumberField(_loc9_, "y"));
+			graphics.moveTo(ASCompat.toNumberField(_loc6_, "x"), _area.y);
+			graphics.lineTo(ASCompat.toNumberField(_loc6_, "x"), _area.y + _area.height);
+			graphics.moveTo(ASCompat.toNumberField(_loc7_, "x"), _area.y);
+			graphics.lineTo(ASCompat.toNumberField(_loc7_, "x"), _area.y + _area.height);
+			_loc14_ = round(angle(ASCompat.coerce(_loc2_, flash.geom.Point), _loc4_), (100 : UInt));
+			_loc15_ = round(angle(_loc4_, ASCompat.coerce(_loc2_, flash.geom.Point)), (100 : UInt));
 			graphics.lineStyle(1, (11141120 : UInt), 0.8);
-			this.drawCircleSegment(graphics, 10, _loc2_, _loc14_, -90);
+			drawCircleSegment(graphics, 10, ASCompat.coerce(_loc2_, flash.geom.Point), _loc14_, -90);
 			graphics.lineStyle(1, (13404160 : UInt), 0.8);
-			this.drawCircleSegment(graphics, 10, _loc4_, _loc15_, -90);
+			drawCircleSegment(graphics, 10, _loc4_, _loc15_, -90);
 			graphics.lineStyle(2, (65280 : UInt), 0.7);
-			graphics.moveTo(_loc2_.x, _loc2_.y);
-			graphics.lineTo(_loc4_.x, _loc4_.y);
-			this._master.report("Ruler results: (red) <b>[" + _loc2_.x + "," + _loc2_.y + "]</b> to (orange) <b>[" + _loc4_.x + "," + _loc4_.y + "]</b>", -2);
-			this._master.report("Distance: <b>" + this.round(_loc12_, (100 : UInt)) + "</b>", -2);
-			this._master.report("Mid point: <b>[" + _loc5_.x + "," + _loc5_.y + "]</b>", -2);
-			this._master.report("Width:<b>" + _loc10_ + "</b>, Height: <b>" + _loc11_ + "</b>", -2);
-			this._master.report("Angle from first point (red): <b>" + _loc14_ + "°</b>", -2);
-			this._master.report("Angle from second point (orange): <b>" + _loc15_ + "°</b>", -2);
+			graphics.moveTo(ASCompat.toNumberField(_loc2_, "x"), ASCompat.toNumberField(_loc2_, "y"));
+			graphics.lineTo(ASCompat.toNumberField(_loc4_, "x"), ASCompat.toNumberField(_loc4_, "y"));
+			_master.report("Ruler results: (red) <b>[" + Std.string(_loc2_.x) + "," + Std.string(_loc2_.y) + "]</b> to (orange) <b>[" + Std.string(_loc4_.x)
+				+ "," + Std.string(_loc4_.y) + "]</b>",
+				-2);
+			_master.report("Distance: <b>" + round(_loc12_, (100 : UInt)) + "</b>", -2);
+			_master.report("Mid point: <b>[" + Std.string(_loc5_.x) + "," + Std.string(_loc5_.y) + "]</b>", -2);
+			_master.report("Width:<b>" + _loc10_ + "</b>, Height: <b>" + _loc11_ + "</b>", -2);
+			_master.report("Angle from first point (red): <b>" + _loc14_ + "°</b>", -2);
+			_master.report("Angle from second point (orange): <b>" + _loc15_ + "°</b>", -2);
 		} else {
-			this.exit();
+			exit();
 		}
 	}
 
-	public function exit() {
-		this._master = null;
-		dispatchEvent(new Event(Event.COMPLETE));
-	}
-
-	function makeTxtField(col:Float, b:Bool = true):TextField {
-		var _loc3_ = new TextFormat(this._config.style.menuFont, this._config.style.menuFontSize, ASCompat.toInt(col), b, true, null, null,
-			TextFormatAlign.RIGHT);
+	public function makeTxtField(col:Int, b:Bool = true):TextField {
+		var _loc3_ = new TextFormat(_config.get_style().menuFont, _config.get_style().menuFontSize, col, b, true, null, null, null, TextFormatAlign.RIGHT);
 		var _loc4_ = new TextField();
 		_loc4_.autoSize = TextFieldAutoSize.RIGHT;
 		_loc4_.selectable = false;
@@ -220,24 +254,20 @@ class Ruler extends Sprite {
 		return _loc4_;
 	}
 
-	function round(n:Float, d:UInt = (10 : UInt)):Float {
-		return Math.fround(n * d) / d;
+	public function getPointOnCircle(radius:Float, rad:Float):Point {
+		return new Point(radius * Math.cos(rad), radius * Math.sin(rad));
 	}
 
-	function angle(srcP:Point, point:Point):Float {
-		var _loc3_ = Math.atan2(point.y - srcP.y, point.x - srcP.x) / Math.PI * 180;
-		_loc3_ += 90;
-		if (_loc3_ > 180) {
-			_loc3_ -= 360;
-		}
-		return _loc3_;
+	public function exit() {
+		_master = null;
+		dispatchEvent(new Event(Event.COMPLETE));
 	}
 
-	function drawCircleSegment(g:Graphics, radius:Float, pos:Point, deg:Float = 180, startDeg:Float = 0):Point {
+	public function drawCircleSegment(g:Graphics, radius:Float, pos:Point, deg:Float = 180, startDeg:Float = 0):Point {
 		var _loc12_ = Math.NaN;
 		var _loc13_ = Math.NaN;
 		var _loc14_ = Math.NaN;
-		var _loc15_:Point = null;
+		var _loc15_ = ASCompat.dynamicAs(null, Point);
 		var _loc6_ = false;
 		if (deg < 0) {
 			_loc6_ = true;
@@ -245,7 +275,7 @@ class Ruler extends Sprite {
 		}
 		var _loc7_ = deg * Math.PI / 180;
 		var _loc8_ = startDeg * Math.PI / 180;
-		var _loc9_ = this.getPointOnCircle(radius, _loc8_);
+		var _loc9_ = getPointOnCircle(radius, _loc8_);
 		_loc9_.offset(pos.x, pos.y);
 		g.moveTo(_loc9_.x, _loc9_.y);
 		var _loc10_:Float = 0;
@@ -254,18 +284,23 @@ class Ruler extends Sprite {
 			_loc12_ = _loc11_ <= _loc7_ ? _loc11_ : _loc7_;
 			_loc13_ = _loc12_ - _loc10_;
 			_loc14_ = 1 + 0.12 * _loc13_ * _loc13_;
-			_loc15_ = this.getPointOnCircle(radius * _loc14_, (_loc12_ - _loc13_ / 2) * (_loc6_ ? -1 : 1) + _loc8_);
+			_loc15_ = getPointOnCircle(radius * _loc14_, (_loc12_ - _loc13_ / 2) * (_loc6_ ? -1 : 1) + _loc8_);
 			_loc15_.offset(pos.x, pos.y);
-			_loc9_ = this.getPointOnCircle(radius, _loc12_ * (_loc6_ ? -1 : 1) + _loc8_);
+			_loc9_ = getPointOnCircle(radius, _loc12_ * (_loc6_ ? -1 : 1) + _loc8_);
 			_loc9_.offset(pos.x, pos.y);
-			g.curveTo(_loc15_.x, _loc15_.y, _loc9_.x, _loc9_.y);
+			g.curveTo(ASCompat.toNumberField(_loc15_, "x"), ASCompat.toNumberField(_loc15_, "y"), _loc9_.x, _loc9_.y);
 			_loc10_ = _loc12_;
 			_loc11_++;
 		}
 		return _loc9_;
 	}
 
-	function getPointOnCircle(radius:Float, rad:Float):Point {
-		return new Point(radius * Math.cos(rad), radius * Math.sin(rad));
+	public function angle(srcP:Point, point:Point):Float {
+		var _loc3_ = Math.atan2(point.y - srcP.y, point.x - srcP.x) / Math.PI * 180;
+		_loc3_ += 90;
+		if (_loc3_ > 180) {
+			_loc3_ -= 360;
+		}
+		return _loc3_;
 	}
 }

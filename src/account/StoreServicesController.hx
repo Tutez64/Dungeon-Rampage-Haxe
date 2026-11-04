@@ -2,6 +2,7 @@ package account;
 
 import brain.logger.Logger;
 import brain.utils.MemoryTracker;
+import collections.Map;
 import facade.DBFacade;
 import facade.Locale;
 import gameMasterDictionary.GMOffer;
@@ -18,7 +19,6 @@ import uI.popup.UICoinPage;
 import uI.popup.UIGiftPage;
 import uI.popup.UIOfferPopup;
 import uI.popup.UIStorageFullPopup;
-import org.as3commons.collections.Map;
 
 class StoreServicesController {
 	public static inline final MAX_INVENTORY_SLOTS = (120 : UInt);
@@ -38,8 +38,6 @@ class StoreServicesController {
 	public static final STORAGE_OFFERS:Vector<UInt> = Vector.ofArray(([(51401 : UInt), (51402 : UInt), (51403 : UInt)] : Array<UInt>));
 
 	public static final GIFT_OFFERS:Vector<UInt> = Vector.ofArray(([(51301 : UInt), (51399 : UInt), (51398 : UInt)] : Array<UInt>));
-
-	public static final HERO_OFFERS:Vector<UInt> = Vector.ofArray(([(51012 : UInt), (51013 : UInt), (51014 : UInt), (51015 : UInt)] : Array<UInt>));
 
 	public function new() {}
 
@@ -75,13 +73,13 @@ class StoreServicesController {
 			StoreServicesController.notHighEnoughLevelPopup(dbFacade, gmOffer);
 		} else if (weaponRestrictedAndHeroNotOwned(dbFacade, gmOffer)) {
 			StoreServicesController.doesntOwnHeroPopup(dbFacade, gmOffer);
-		} else if (gmOffer.CurrencyType == "PREMIUM" && dbFacade.dbAccountInfo.premiumCurrency < gmOffer.Price) {
+		} else if (gmOffer.CurrencyType == GMOffer.PREMIUM_CURRENCY && dbFacade.dbAccountInfo.premiumCurrency < gmOffer.Price) {
 			StoreServicesController.showCashPage(dbFacade, "tryBuyOffer", gmOffer, buySuccessCallback, null, forHeroId);
-		} else if (gmOffer.CurrencyType == "BASIC" && dbFacade.dbAccountInfo.basicCurrency < gmOffer.Price) {
+		} else if (gmOffer.CurrencyType == GMOffer.BASIC_CURRENCY && dbFacade.dbAccountInfo.basicCurrency < gmOffer.Price) {
 			StoreServicesController.notEnoughCoinsPopup(dbFacade, gmOffer);
-		} else if (false && gmOffer.CurrencyType == "PREMIUM") {
+		} else if (false && gmOffer.CurrencyType == GMOffer.PREMIUM_CURRENCY) {
 			StoreServicesController.confirmPurchasePopup(dbFacade, gmOffer, buySuccessCallback, forHeroId);
-		} else if (false && gmOffer.CurrencyType == "BASIC") {
+		} else if (false && gmOffer.CurrencyType == GMOffer.BASIC_CURRENCY) {
 			StoreServicesController.confirmPurchasePopup(dbFacade, gmOffer, buySuccessCallback, forHeroId);
 		} else {
 			StoreServicesController.buyOffer(dbFacade, gmOffer, buySuccessCallback, forHeroId);
@@ -108,7 +106,7 @@ class StoreServicesController {
 		return (0 : UInt);
 	}
 
-	public static function getWeaponMastertype(dbFacade:DBFacade, gmOffer:GMOffer):String {
+	public static function getWeaponMasterType(dbFacade:DBFacade, gmOffer:GMOffer):String {
 		var _loc3_:GMWeaponItem = null;
 		if (gmOffer.IsBundle) {
 			return null;
@@ -140,9 +138,9 @@ class StoreServicesController {
 	public static function alreadyOwns(dbFacade:DBFacade, gmOffer:GMOffer):Bool {
 		var _loc3_ = dbFacade.dbAccountInfo.inventoryInfo;
 		var _loc4_:GMOfferDetail;
-		final __ax4_iter_3 = gmOffer.Details;
-		if (checkNullIteratee(__ax4_iter_3))
-			for (_tmp_ in __ax4_iter_3) {
+		final __ax4_iter_336 = gmOffer.Details;
+		if (checkNullIteratee(__ax4_iter_336))
+			for (_tmp_ in __ax4_iter_336) {
 				_loc4_ = _tmp_;
 				if (_loc4_.HeroId != 0 && _loc3_.ownsItem(_loc4_.HeroId)) {
 					return true;
@@ -171,9 +169,9 @@ class StoreServicesController {
 	public static function weaponInventoryWouldOverflow(dbFacade:DBFacade, gmOffer:GMOffer):Bool {
 		var _loc4_ = (0 : UInt);
 		var _loc5_:GMOfferDetail;
-		final __ax4_iter_4 = gmOffer.Details;
-		if (checkNullIteratee(__ax4_iter_4))
-			for (_tmp_ in __ax4_iter_4) {
+		final __ax4_iter_337 = gmOffer.Details;
+		if (checkNullIteratee(__ax4_iter_337))
+			for (_tmp_ in __ax4_iter_337) {
 				_loc5_ = _tmp_;
 				if (_loc5_.WeaponId != 0) {
 					_loc4_++;
@@ -186,36 +184,36 @@ class StoreServicesController {
 
 	public static function stackableLimitWouldOverflow(dbFacade:DBFacade, gmOffer:GMOffer):Bool {
 		var _loc8_:GMOfferDetail = null;
-		var _loc4_:ASAny = 0;
-		var _loc9_ = 0;
-		var _loc5_ = 0;
-		var _loc3_ = 0;
+		var _loc4_ = (0 : UInt);
+		var _loc9_ = (0 : UInt);
+		var _loc5_ = (0 : UInt);
+		var _loc3_ = (0 : UInt);
 		var _loc6_:GMStackable = null;
 		var _loc7_ = new Map();
-		final __ax4_iter_5 = gmOffer.Details;
-		if (checkNullIteratee(__ax4_iter_5))
-			for (_tmp_ in __ax4_iter_5) {
+		final __ax4_iter_338 = gmOffer.Details;
+		if (checkNullIteratee(__ax4_iter_338))
+			for (_tmp_ in __ax4_iter_338) {
 				_loc8_ = _tmp_;
 				_loc4_ = _loc8_.StackableId;
-				if (ASCompat.toBool(_loc4_)) {
+				if (_loc4_ != 0) {
 					if (_loc7_.hasKey(_loc4_)) {
-						_loc9_ = ASCompat.toInt(_loc7_.itemFor(_loc4_));
+						_loc9_ = (ASCompat.toInt(_loc7_.itemFor(_loc4_)) : UInt);
 						_loc7_.replaceFor(_loc4_, _loc9_ + _loc8_.StackableCount);
 					} else {
 						_loc7_.add(_loc4_, _loc8_.StackableCount);
 					}
 				}
 			}
-		final __ax4_iter_6 = gmOffer.Details;
-		if (checkNullIteratee(__ax4_iter_6))
-			for (_tmp_ in __ax4_iter_6) {
+		final __ax4_iter_339 = gmOffer.Details;
+		if (checkNullIteratee(__ax4_iter_339))
+			for (_tmp_ in __ax4_iter_339) {
 				_loc8_ = _tmp_;
 				_loc4_ = _loc8_.StackableId;
-				if (ASCompat.toBool(_loc4_)) {
-					_loc5_ = (dbFacade.dbAccountInfo.inventoryInfo.getStackCount((ASCompat.toInt(_loc4_) : UInt)) : Int);
-					_loc3_ = ASCompat.toInt(_loc7_.itemFor(_loc4_));
+				if (_loc4_ != 0) {
+					_loc5_ = dbFacade.dbAccountInfo.inventoryInfo.getStackCount(_loc4_);
+					_loc3_ = (ASCompat.toInt(_loc7_.itemFor(_loc4_)) : UInt);
 					_loc6_ = ASCompat.coerce(dbFacade.gameMaster.stackableById.itemFor(_loc4_), gameMasterDictionary.GMStackable);
-					if ((_loc5_ + _loc3_ : UInt) > _loc6_.StackLimit) {
+					if (_loc5_ + _loc3_ > _loc6_.StackLimit) {
 						return true;
 					}
 				}
@@ -226,9 +224,9 @@ class StoreServicesController {
 	public static function weaponStorageWouldOverflow(dbFacade:DBFacade, gmOffer:GMOffer):Bool {
 		var _loc5_ = (0 : UInt);
 		var _loc4_:GMOfferDetail;
-		final __ax4_iter_7 = gmOffer.Details;
-		if (checkNullIteratee(__ax4_iter_7))
-			for (_tmp_ in __ax4_iter_7) {
+		final __ax4_iter_340 = gmOffer.Details;
+		if (checkNullIteratee(__ax4_iter_340))
+			for (_tmp_ in __ax4_iter_340) {
 				_loc4_ = _tmp_;
 				_loc5_ += _loc4_.WeaponSlots;
 			}
@@ -265,8 +263,8 @@ class StoreServicesController {
 	public static function notEnoughCashPopup(dbFacade:DBFacade, gmOffer:GMOffer) {
 		var popup:DBUITwoButtonPopup;
 		dbFacade.metrics.log("ShopPurchaseNotEnoughCash", getOfferMetrics(dbFacade, gmOffer));
-		popup = new DBUITwoButtonPopup(dbFacade, Locale.getString("SHOP_NOT_ENOUGH_CASH_TITLE"), Locale.getString("SHOP_NOT_ENOUGH_CASH_MESSAGE"),
-			Locale.getString("SHOP_GET_CASH"), function() {
+		popup = new DBUITwoButtonPopup(dbFacade, "SHOP_NOT_ENOUGH_GEMS_POPUP", Locale.getString("SHOP_NOT_ENOUGH_CASH_TITLE"),
+			Locale.getString("SHOP_NOT_ENOUGH_CASH_MESSAGE"), Locale.getString("SHOP_GET_CASH"), function() {
 				showCashPage(dbFacade, "notEnoughGemsPopup");
 		}, Locale.getString("CANCEL"), null);
 		MemoryTracker.track(popup, "DBUITwoButtonPopup - created in StoreServicesController.notEnoughCashPopup()");
@@ -275,8 +273,8 @@ class StoreServicesController {
 	public static function notEnoughCoinsPopup(dbFacade:DBFacade, gmOffer:GMOffer) {
 		var popup:DBUITwoButtonPopup;
 		dbFacade.metrics.log("ShopPurchaseNotEnoughCoins", getOfferMetrics(dbFacade, gmOffer));
-		popup = new DBUITwoButtonPopup(dbFacade, Locale.getString("SHOP_NOT_ENOUGH_COINS_TITLE"), Locale.getString("SHOP_NOT_ENOUGH_COINS_MESSAGE"),
-			Locale.getString("SHOP_GET_COINS"), function() {
+		popup = new DBUITwoButtonPopup(dbFacade, "SHOP_NOT_ENOUGH_COINS_POPUP", Locale.getString("SHOP_NOT_ENOUGH_COINS_TITLE"),
+			Locale.getString("SHOP_NOT_ENOUGH_COINS_MESSAGE"), Locale.getString("SHOP_GET_COINS"), function() {
 				showCoinPage(dbFacade);
 		}, Locale.getString("CANCEL"), null);
 		MemoryTracker.track(popup, "DBUITwoButtonPopup - created in StoreServicesController.notEnoughCoinsPopup()");
@@ -285,8 +283,8 @@ class StoreServicesController {
 	public static function notHighEnoughLevelPopup(dbFacade:DBFacade, gmOffer:GMOffer) {
 		var popup:DBUITwoButtonPopup;
 		dbFacade.metrics.log("ShopPurchaseNotHighLevel", getOfferMetrics(dbFacade, gmOffer));
-		popup = new DBUITwoButtonPopup(dbFacade, Locale.getString("SHOP_NOT_HIGH_LEVEL_TITLE"), Locale.getString("SHOP_NOT_HIGH_LEVEL_MESSAGE"),
-			Locale.getString("SHOP_BUY_ANYWAYS"), function() {
+		popup = new DBUITwoButtonPopup(dbFacade, "SHOP_LEVEL_TOO_LOW_POPUP", Locale.getString("SHOP_NOT_HIGH_LEVEL_TITLE"),
+			Locale.getString("SHOP_NOT_HIGH_LEVEL_MESSAGE"), Locale.getString("SHOP_BUY_ANYWAYS"), function() {
 				buyOffer(dbFacade, gmOffer, null);
 		}, Locale.getString("CANCEL"), null);
 		MemoryTracker.track(popup, "DBUITwoButtonPopup - created in StoreServicesController.notHighEnoughLevelPopup()");
@@ -295,8 +293,8 @@ class StoreServicesController {
 	public static function weaponInventoryFullPopup(dbFacade:DBFacade, gmOffer:GMOffer) {
 		var popup:DBUITwoButtonPopup;
 		dbFacade.metrics.log("ShopPurchaseWeaponInventoryFull", getOfferMetrics(dbFacade, gmOffer));
-		popup = new UIStorageFullPopup(dbFacade, Locale.getString("SHOP_WEAPON_INVENTORY_FULL_TITLE"), Locale.getString("SHOP_WEAPON_INVENTORY_FULL_MESSAGE"),
-			Locale.getString("SHOP_GET_STORAGE"), function() {
+		popup = new UIStorageFullPopup(dbFacade, "SHOP_STORAGE_FULL_POPUP", Locale.getString("SHOP_WEAPON_INVENTORY_FULL_TITLE"),
+			Locale.getString("SHOP_WEAPON_INVENTORY_FULL_MESSAGE"), Locale.getString("SHOP_GET_STORAGE"), function() {
 				showStoragePage(dbFacade);
 		}, Locale.getString("CANCEL"), null);
 		MemoryTracker.track(popup, "UIStorageFullPopup - created in StoreServicesController.weaponInventoryFullPopup()");
@@ -304,14 +302,14 @@ class StoreServicesController {
 
 	public static function stackableLimitPopup(dbFacade:DBFacade, gmOffer:GMOffer) {
 		dbFacade.metrics.log("ShopPurchaseStackLimit", getOfferMetrics(dbFacade, gmOffer));
-		var _loc3_ = new DBUIOneButtonPopup(dbFacade, Locale.getString("SHOP_STACK_LIMIT_TITLE"), Locale.getString("SHOP_STACK_LIMIT_MESSAGE"),
-			Locale.getString("CANCEL"), null);
+		var _loc3_ = new DBUIOneButtonPopup(dbFacade, "SHOP_STACK_LIMIT_POPUP", Locale.getString("SHOP_STACK_LIMIT_TITLE"),
+			Locale.getString("SHOP_STACK_LIMIT_MESSAGE"), Locale.getString("CANCEL"), null);
 		MemoryTracker.track(_loc3_, "DBUIOneButtonPopup - created in StoreServicesController.stackableLimitPopup()");
 	}
 
 	public static function weaponStorageLimitPopup(dbFacade:DBFacade, gmOffer:GMOffer) {
 		dbFacade.metrics.log("ShopPurchaseWeaponStorageLimit", getOfferMetrics(dbFacade, gmOffer));
-		var _loc3_ = new DBUIOneButtonPopup(dbFacade, Locale.getString("SHOP_WEAPON_STORAGE_LIMIT_TITLE"),
+		var _loc3_ = new DBUIOneButtonPopup(dbFacade, "SHOP_WEAPON_STORAGE_LIMIT_POPUP", Locale.getString("SHOP_WEAPON_STORAGE_LIMIT_TITLE"),
 			Locale.getString("SHOP_WEAPON_STORAGE_LIMIT_MESSAGE"), Locale.getString("CANCEL"), null);
 		MemoryTracker.track(_loc3_, "DBUIOneButtonPopup - created in StoreServicesController.weaponStorageLimitPopup()");
 	}
@@ -319,8 +317,9 @@ class StoreServicesController {
 	public static function doesntOwnHeroPopup(dbFacade:DBFacade, gmOffer:GMOffer) {
 		var popup:DBUITwoButtonPopup;
 		dbFacade.metrics.log("ShopPurchaseDoesntOwnHero", getOfferMetrics(dbFacade, gmOffer));
-		popup = new DBUITwoButtonPopup(dbFacade, Locale.getString("SHOP_HERO_NOT_OWNED"), null, Locale.getString("SHOP_BUY_ANYWAYS"), function() {
-			buyOffer(dbFacade, gmOffer, null);
+		popup = new DBUITwoButtonPopup(dbFacade, "SHOP_HERO_NOT_OWNED_POPUP", Locale.getString("SHOP_HERO_NOT_OWNED"), null,
+			Locale.getString("SHOP_BUY_ANYWAYS"), function() {
+				buyOffer(dbFacade, gmOffer, null);
 		}, Locale.getString("CANCEL"), null);
 		MemoryTracker.track(popup, "DBUITwoButtonPopup - created in StoreServicesController.doesntOwnHeroPopup()");
 	}
@@ -328,8 +327,9 @@ class StoreServicesController {
 	public static function confirmPurchasePopup(dbFacade:DBFacade, gmOffer:GMOffer, buySuccessCallback:ASFunction, forHeroId:UInt = (0 : UInt)) {
 		var popup:UIPurchaseOfferPopup;
 		dbFacade.metrics.log("ShopPurchaseConfirm", getOfferMetrics(dbFacade, gmOffer));
-		popup = new UIPurchaseOfferPopup(dbFacade, "purchase_popup", Locale.getString("SHOP_CONFIRM_BUY"), gmOffer, Locale.getString("SHOP_BUY"), function() {
-			buyOffer(dbFacade, gmOffer, buySuccessCallback, forHeroId);
+		popup = new UIPurchaseOfferPopup(dbFacade, "SHOP_CONFIRM_PURCHASE_POPUP", "purchase_popup", Locale.getString("SHOP_CONFIRM_BUY"), gmOffer,
+			Locale.getString("SHOP_BUY"), function() {
+				buyOffer(dbFacade, gmOffer, buySuccessCallback, forHeroId);
 		}, Locale.getString("CANCEL"), null);
 		MemoryTracker.track(popup, "UIPurchaseOfferPopup - created in StoreServicesController.confirmPurchasePopup()");
 	}
@@ -337,21 +337,21 @@ class StoreServicesController {
 	public static function confirmAlreadyOwnsPopup(dbFacade:DBFacade, gmOffer:GMOffer, buySuccessCallback:ASFunction, forHeroId:UInt = (0 : UInt)) {
 		var popup:UIPurchaseOfferPopup;
 		dbFacade.metrics.log("ShopPurchaseConfirmAlreadyOwns", getOfferMetrics(dbFacade, gmOffer));
-		popup = new UIPurchaseOfferPopup(dbFacade, "purchase_popup", Locale.getString("SHOP_CONFIRM_DUPLICATE_BUY"), gmOffer,
-			Locale.getString("SHOP_BUY_ANOTHER"), function() {
+		popup = new UIPurchaseOfferPopup(dbFacade, "SHOP_CONFIRM_DUPLICATE_PURCHASE_POPUP", "purchase_popup", Locale.getString("SHOP_CONFIRM_DUPLICATE_BUY"),
+			gmOffer, Locale.getString("SHOP_BUY_ANOTHER"), function() {
 				buyOffer(dbFacade, gmOffer, buySuccessCallback, forHeroId);
 		}, Locale.getString("CANCEL"), null);
 		MemoryTracker.track(popup, "UIPurchaseOfferPopup - created in StoreServicesController.confirmAlreadyOwnsPopup()");
 	}
 
 	public static function waitForPurchaseServicePopup(dbFacade:DBFacade):DBUIPopup {
-		var _loc2_ = new DBUIPopup(dbFacade, Locale.getString("SHOP_PURCHASING"), null, false);
+		var _loc2_ = new DBUIPopup(dbFacade, "", Locale.getString("SHOP_PURCHASING"), null, false);
 		MemoryTracker.track(_loc2_, "DBUIPopup - created in StoreServicesController.waitForPurchaseServicePopup()");
 		return _loc2_;
 	}
 
 	public static function waitForSellServicePopup(dbFacade:DBFacade):DBUIPopup {
-		var _loc2_ = new DBUIPopup(dbFacade, Locale.getString("SHOP_SELLING"), null, false);
+		var _loc2_ = new DBUIPopup(dbFacade, "", Locale.getString("SHOP_SELLING"), null, false);
 		MemoryTracker.track(_loc2_, "DBUIPopup - created in StoreServicesController.waitForSellServicePopup()");
 		return _loc2_;
 	}
@@ -365,21 +365,15 @@ class StoreServicesController {
 		StoreServices.purchaseOffer(dbFacade, gmOffer.Id, function(param1:ASAny) {
 			var _loc2_ = 0;
 			popup.destroy();
-			if (dbFacade.steamAchievementsManager != null) {
-				if (gmOffer.CurrencyType == "BASIC") {
-					dbFacade.steamAchievementsManager.addToStatInt("SPEND_COINS_INT", ASCompat.floatToInt(gmOffer.Price));
-				}
-				if (gmOffer.Tab == "WEAPON") {
-					dbFacade.steamAchievementsManager.setAchievement("PURCHASE_WEAPON_FIRST_TIME");
-				}
+			if (gmOffer.Tab == "WEAPON") {
+				dbFacade.steamAchievementsHelper.unlockAchievement("PURCHASE_WEAPON_FIRST_TIME");
 			}
 			StoreServices.getLimitedOfferUsage(dbFacade, param1, null, null);
 			if (buySuccessCallback != null) {
 				buySuccessCallback(param1);
 				_loc2_ = dbFacade.dbAccountInfo.inventoryInfo.storageLimitWeapon;
-				if (previousBucketsWeapon < _loc2_ && dbFacade.steamAchievementsManager != null) {
-					dbFacade.steamAchievementsManager.setAchievement("STORAGE_EXPAND_FIRST_TIME");
-					dbFacade.steamAchievementsManager.setMaxStorageStat(previousBucketsWeapon, _loc2_);
+				if (previousBucketsWeapon < _loc2_) {
+					dbFacade.steamAchievementsHelper.checkStorageAchievements(_loc2_);
 				}
 			}
 		}, function(param1:Error) {
@@ -428,7 +422,7 @@ class StoreServicesController {
 
 	public static function showErrorPopup(dbFacade:DBFacade, error:Error) {
 		dbFacade.metrics.log("ShopError", {"error": error.errorID});
-		dbFacade.errorPopup(Locale.getString("SHOP_ERROR") + ": " + error.errorID, error.message);
+		dbFacade.errorPopup(Locale.getString("SHOP_ERROR") + ": " + error.errorID, error.message, "SHOP_SERVICE_ERROR_POPUP");
 	}
 
 	public static function showCashPage(dbFacade:DBFacade, openedFrom:String, attemptedOffer:GMOffer = null, successCallback:ASFunction = null,

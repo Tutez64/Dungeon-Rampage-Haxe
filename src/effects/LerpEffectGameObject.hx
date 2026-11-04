@@ -1,24 +1,24 @@
 package effects;
 
 import actor.ActorGameObject;
-import brain.clock.GameClock;
 import brain.event.EventComponent;
+import brain.render.tweens.Circ;
+import brain.render.tweens.Sine;
+import brain.render.tweens.TweenHandle;
 import facade.DBFacade;
-import com.greensock.TimelineMax;
-import com.greensock.TweenMax;
-import com.greensock.easing.Circ;
-import com.greensock.easing.Sine;
 import flash.events.Event;
 import flash.geom.Vector3D;
 
 class LerpEffectGameObject extends EffectGameObject {
+	static final sNextPos:Vector3D = new Vector3D();
+
 	var mLerpTargetActor:ActorGameObject;
 
 	var mLerpSpeed:Float = Math.NaN;
 
 	public var mLerpTempSpeed:Float = Math.NaN;
 
-	var mLerpTimeline:TimelineMax;
+	var mLerpTimeline:TweenHandle;
 
 	var mLerpTargetPositionVector:Vector3D;
 
@@ -36,33 +36,43 @@ class LerpEffectGameObject extends EffectGameObject {
 		mEventComponent = new EventComponent(facade);
 		mEventComponent.addListener("enterFrame", update);
 		mLerpTempSpeed = 0;
-		mLerpTimeline = new TimelineMax();
-		mLerpTimeline.append(new TweenMax(this, 0.1, {
+		mLerpTimeline = mDBFacade.mTween.createTimeline();
+		mDBFacade.mTween.appendTween(mLerpTimeline, mDBFacade.mTween.tweenMaxTo(this, 0.1, {
 			"mLerpTempSpeed": -mLerpSpeed,
 			"onComplete": function() {
 				mLerpTempSpeed = 0;
 			}
 		}));
-		mLerpTimeline.append(new TweenMax(this, 0.65, {
+		mDBFacade.mTween.appendTween(mLerpTimeline, mDBFacade.mTween.tweenMaxTo(this, 0.65, {
 			"mLerpTempSpeed": mLerpSpeed,
 			"ease": Circ.easeIn
 		}));
-		mLerpTimeline.play();
+		mDBFacade.mTween.playTween(mLerpTimeline);
 	}
 
 	function update(evt:Event) {
-		var _loc3_:Vector3D = null;
-		var _loc4_:Vector3D = null;
 		var _loc2_ = Math.NaN;
-		if (mLerpTargetActor != null && mLerpTargetActor.position != null) {
-			_loc3_ = mLerpTargetActor.position.add(mLerpTargetPositionVector);
-			_loc4_ = _loc3_.subtract(mEffectView.position);
-			_loc2_ = _loc4_.length;
-			_loc4_.normalize();
-			_loc4_.scaleBy(mLerpTempSpeed * mDBFacade.realClock.tickLength * GameClock.LEGACY_STAGE_FRAME_RATE);
-			mEffectView.position = mEffectView.position.add(_loc4_);
-			if (_loc2_ < 15) {
-				TweenMax.to(mLerpTargetActor.actorView.body, 0.05, {
+		var _loc3_ = Math.NaN;
+		var _loc5_ = Math.NaN;
+		var _loc7_ = Math.NaN;
+		var _loc6_ = Math.NaN;
+		var _loc4_ = Math.NaN;
+		if (mLerpTargetActor != null && mLerpTargetActor.hasPosition) {
+			_loc2_ = mEffectView.positionX;
+			_loc3_ = mEffectView.positionY;
+			_loc5_ = mLerpTargetActor.positionX + mLerpTargetPositionVector.x - _loc2_;
+			_loc7_ = mLerpTargetActor.positionY + mLerpTargetPositionVector.y - _loc3_;
+			_loc6_ = mLerpTargetActor.positionZ + mLerpTargetPositionVector.z;
+			_loc4_ = Math.sqrt(_loc5_ * _loc5_ + _loc7_ * _loc7_ + _loc6_ * _loc6_);
+			if (_loc4_ != 0) {
+				_loc5_ = _loc5_ / _loc4_ * mLerpTempSpeed;
+				_loc7_ = _loc7_ / _loc4_ * mLerpTempSpeed;
+			}
+			sNextPos.x = _loc2_ + _loc5_;
+			sNextPos.y = _loc3_ + _loc7_;
+			mEffectView.position = sNextPos;
+			if (_loc4_ < 15) {
+				mDBFacade.mTween.tweenMaxTo(mLerpTargetActor.actorView.body, 0.05, {
 					"glowFilter": {
 						"color": mLerpGlowColor,
 						"alpha": 1,

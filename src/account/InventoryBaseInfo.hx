@@ -1,9 +1,10 @@
 package account;
 
+import collections.Map;
+import dBGlobals.DBGlobal;
 import facade.DBFacade;
 import gameMasterDictionary.GMChest;
 import gameMasterDictionary.GMInventoryBase;
-import org.as3commons.collections.Map;
 
 class InventoryBaseInfo {
 	var mDBFacade:DBFacade;
@@ -42,7 +43,7 @@ class InventoryBaseInfo {
 	@:isVar public var iconScale(get, never):Float;
 
 	public function get_iconScale():Float {
-		return 100;
+		return DBGlobal.DEFAULT_ICON_NATIVE_SIZE;
 	}
 
 	@:isVar public var iconName(get, never):String;

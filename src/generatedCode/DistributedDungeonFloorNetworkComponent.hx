@@ -8,31 +8,31 @@ import networkCode.DcNetworkPacket;
 class DistributedDungeonFloorNetworkComponent extends DcNetworkClass implements DcNetworkInterface {
 	var the_instance:DistributedDungeonFloor;
 
-	public static inline final FLID_mapNodeId = (192 : UInt);
+	public static inline final FLID_mapNodeId = (200 : UInt);
 
-	public static inline final FLID_coliseumTierConstant = (193 : UInt);
+	public static inline final FLID_coliseumTierConstant = (201 : UInt);
 
-	public static inline final FLID_tileLibrary = (194 : UInt);
+	public static inline final FLID_tileLibrary = (202 : UInt);
 
-	public static inline final FLID_tiles = (195 : UInt);
+	public static inline final FLID_tiles = (203 : UInt);
 
-	public static inline final FLID_baseLining = (196 : UInt);
+	public static inline final FLID_baseLining = (204 : UInt);
 
-	public static inline final FLID_introMovieSwfFilePath = (197 : UInt);
+	public static inline final FLID_introMovieSwfFilePath = (205 : UInt);
 
-	public static inline final FLID_introMovieAssetClassName = (198 : UInt);
+	public static inline final FLID_introMovieAssetClassName = (206 : UInt);
 
-	public static inline final FLID_currentFloorNum = (199 : UInt);
+	public static inline final FLID_currentFloorNum = (207 : UInt);
 
-	public static inline final FLID_activeDungeonModifiers = (200 : UInt);
+	public static inline final FLID_activeDungeonModifiers = (208 : UInt);
 
-	public static inline final FLID_show_text = (201 : UInt);
+	public static inline final FLID_show_text = (209 : UInt);
 
-	public static inline final FLID_play_sound = (202 : UInt);
+	public static inline final FLID_play_sound = (210 : UInt);
 
-	public static inline final FLID_trigger_camera_zoom = (203 : UInt);
+	public static inline final FLID_trigger_camera_zoom = (211 : UInt);
 
-	public static inline final FLID_trigger_camera_shake = (204 : UInt);
+	public static inline final FLID_trigger_camera_shake = (212 : UInt);
 
 	public function new(Inst:DistributedDungeonFloor, gs:GeneratedDcSocket, id:UInt) {
 		super(Inst, gs, id);
@@ -49,7 +49,7 @@ class DistributedDungeonFloorNetworkComponent extends DcNetworkClass implements 
 	}
 
 	override public function recvById(packet:DcNetworkPacket, fieldid:UInt) {
-		switch (fieldid - 192) {
+		switch (fieldid - 200) {
 			case 0:
 				recv_mapNodeId(packet);
 

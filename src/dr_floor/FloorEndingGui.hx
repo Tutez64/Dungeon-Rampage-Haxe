@@ -6,8 +6,10 @@ import brain.clock.GameClock;
 import brain.event.EventComponent;
 import brain.logger.Logger;
 import brain.render.MovieClipRenderController;
+import brain.render.tweens.TweenHandle;
 import brain.sceneGraph.SceneGraphComponent;
 import brain.utils.MemoryTracker;
+import brain.utils.TextUtil;
 import brain.workLoop.LogicalWorkComponent;
 import brain.workLoop.Task;
 import distributedObjects.Floor;
@@ -18,7 +20,6 @@ import facade.Locale;
 import gameMasterDictionary.GMDungeonModifier;
 import gameMasterDictionary.GMMapNode;
 import uI.infiniteIsland.II_UIRewardReportPopup;
-import com.greensock.TweenMax;
 import flash.display.MovieClip;
 import flash.display.Sprite;
 import flash.events.Event;
@@ -39,7 +40,7 @@ class FloorEndingGui {
 
 	var mScreensRoot:MovieClip;
 
-	var mKillswitchIconsSwfAsset:SwfAsset;
+	var mKillSwitchIconsSwfAsset:SwfAsset;
 
 	var mCountdownTimerLabel:TextField;
 
@@ -57,7 +58,7 @@ class FloorEndingGui {
 
 	var mUpdateCountdownTask:Task;
 
-	var mDefeatCountdownTween:TweenMax;
+	var mDefeatCountdownTween:TweenHandle;
 
 	var mVictoryRenderer:MovieClipRenderController;
 
@@ -75,13 +76,17 @@ class FloorEndingGui {
 
 	var mDefeatCountdownRenderer:MovieClipRenderController;
 
+	var mDefeatCountdownBounceRenderer:MovieClipRenderController;
+
 	var mDefeatCountdownTextField:TextField;
 
-	var mKillswitchRenderer:MovieClipRenderController;
+	var mKillSwitchRenderer:MovieClipRenderController;
 
 	var mFloor:Floor;
 
 	var mFloorGUIStarted:Bool = false;
+
+	var mStartRequested:Bool = false;
 
 	var mShowStartSplash:Bool = false;
 
@@ -102,16 +107,16 @@ class FloorEndingGui {
 		mShowStartSplash = mDBFacade.mainStateMachine.currentStateName == "LoadingScreenState";
 		mSceneGraphComponent.addChild(mRoot, (50 : UInt));
 		switch (mNodeType) {
-			case "DUNGEON":
+			case(_ == GMMapNode.DUNGEON_NODE_TYPE => true):
 				mRootInstanceName = "scrn_dungeon_regular";
 
-			case "BOSS":
+			case(_ == GMMapNode.BOSS_NODE_TYPE => true):
 				mRootInstanceName = "scrn_dungeon_boss";
 
-			case "INFINITE":
+			case(_ == GMMapNode.INFINITE_NODE_TYPE => true):
 				mRootInstanceName = "scrn_dungeon_ultimate";
 
-			case "TAVERN":
+			case(_ == GMMapNode.TAVERN_NODE_TYPE => true):
 				mRootInstanceName = "scrn_dungeon_regular";
 
 			default:
@@ -119,7 +124,7 @@ class FloorEndingGui {
 		}
 		mAssetLoadingComponent.getSwfAsset(DBFacade.buildFullDownloadPath("Resources/Art2D/UI/db_UI_screens.swf"), dungeonFinishedSwfLoaded);
 		mAssetLoadingComponent.getSwfAsset(DBFacade.buildFullDownloadPath("Resources/Art2D/Icons/Modifier/db_icons_modifier.swf"), function(param1:SwfAsset) {
-			mKillswitchIconsSwfAsset = param1;
+			mKillSwitchIconsSwfAsset = param1;
 		});
 	}
 
@@ -127,7 +132,7 @@ class FloorEndingGui {
 		var _loc2_ = swfAsset.getClass(mRootInstanceName);
 		mScreensRoot = ASCompat.coerce(ASCompat.createInstance(_loc2_, []), flash.display.MovieClip);
 		mScreensRoot.mouseEnabled = false;
-		if (mNodeType != "INFINITE") {
+		if (mNodeType != GMMapNode.INFINITE_NODE_TYPE) {
 			mVictoryRenderer = new MovieClipRenderController(mDBFacade, ASCompat.coerce((mScreensRoot : ASAny).scrn_victory_instance, flash.display.MovieClip));
 			mCountdownRenderer = new MovieClipRenderController(mDBFacade,
 				ASCompat.coerce((mScreensRoot : ASAny).scrn_countdown_instance, flash.display.MovieClip));
@@ -138,10 +143,12 @@ class FloorEndingGui {
 		mCurrentFloorRenderer = new MovieClipRenderController(mDBFacade, ASCompat.coerce((mScreensRoot : ASAny).scrn_floor, flash.display.MovieClip));
 		mDefeatCountdownRenderer = new MovieClipRenderController(mDBFacade,
 			ASCompat.coerce((mScreensRoot : ASAny).scrn_defeat_countdown, flash.display.MovieClip));
+		mDefeatCountdownBounceRenderer = new MovieClipRenderController(mDBFacade,
+			ASCompat.coerce((mDefeatCountdownRenderer.clip : ASAny).countdown_bounce, flash.display.MovieClip));
 		mDefeatCountdownStartClip = ASCompat.coerce((mScreensRoot : ASAny).scrn_defeat_start_text, flash.display.MovieClip);
 		mDefeatCountdownTextField = ASCompat.dynamicAs((mDefeatCountdownRenderer.clip : ASAny).countdown_bounce.countdown.countdown_text, TextField);
 		hideAll();
-		if (!mFloorGUIStarted) {
+		if (mStartRequested && !mFloorGUIStarted) {
 			floorStart();
 		}
 	}
@@ -174,15 +181,16 @@ class FloorEndingGui {
 	public function floorStart() {
 		var _loc1_:GMMapNode = null;
 		var _loc2_:String = null;
+		mStartRequested = true;
 		if (mScreensRoot != null && mFloor.gmMapNode != null) {
 			mDBFacade.refreshHUD();
 			mFloorGUIStarted = true;
 			_loc1_ = mFloor.gmMapNode;
 			_loc2_ = _loc1_.NodeType;
-			if (_loc2_ == "INFINITE") {
-				mKillswitchRenderer = new MovieClipRenderController(mDBFacade,
+			if (_loc2_ == GMMapNode.INFINITE_NODE_TYPE) {
+				mKillSwitchRenderer = new MovieClipRenderController(mDBFacade,
 					ASCompat.coerce((mScreensRoot : ASAny).scrn_killSwitchEngage, flash.display.MovieClip));
-				mKillswitchRenderer.clip.visible = false;
+				mKillSwitchRenderer.clip.visible = false;
 			}
 			displayStart();
 		}
@@ -236,6 +244,9 @@ class FloorEndingGui {
 				mDefeatCountdownRenderer.stop();
 				mDefeatCountdownRenderer.clip.visible = false;
 			}
+			if (mDefeatCountdownBounceRenderer != null) {
+				mDefeatCountdownBounceRenderer.stop();
+			}
 		}
 	}
 
@@ -244,52 +255,52 @@ class FloorEndingGui {
 		checkToRemoveRoot();
 	}
 
-	function displayNewKillswitches() {
-		var _loc2_ = 0;
+	function displayNewKillSwitches() {
+		var _loc2_ = (0 : UInt);
 		var _loc1_ = new Vector<GMDungeonModifier>();
-		_loc2_ = 0;
-		while (_loc2_ < mFloor.activeGMDungeonModifiers.length) {
-			if (mFloor.activeGMDungeonModifiers[_loc2_].NewThisFloor) {
-				_loc1_.push(mFloor.activeGMDungeonModifiers[_loc2_].GMDungeonMod);
+		_loc2_ = (0 : UInt);
+		while (_loc2_ < (mFloor.activeGMDungeonModifiers.length:UInt)) {
+			if (mFloor.activeGMDungeonModifiers[(_loc2_ : Int)].NewThisFloor) {
+				_loc1_.push(mFloor.activeGMDungeonModifiers[(_loc2_ : Int)].GMDungeonMod);
 			}
 			_loc2_++;
 		}
-		playKillswitchIntros(_loc1_, (0 : UInt));
+		playKillSwitchIntros(_loc1_, (0 : UInt));
 		checkToRemoveRoot();
 	}
 
-	function playKillswitchIntros(killswitches:Vector<GMDungeonModifier>, index:UInt) {
+	function playKillSwitchIntros(killSwitches:Vector<GMDungeonModifier>, index:UInt) {
 		var _loc4_:Dynamic = null;
 		var _loc3_:ASFunction = null;
-		if (mKillswitchRenderer == null) {
-			Logger.debug("Trying to play killswitch intros without a kill switch renderer.");
+		if (mKillSwitchRenderer == null) {
+			Logger.debug("Trying to play killSwitch intros without a kill switch renderer.");
 			return;
 		}
-		if ((killswitches.length : UInt) > index) {
-			if (mKillswitchIconsSwfAsset != null) {
-				_loc4_ = mKillswitchIconsSwfAsset.getClass(killswitches[(index : Int)].IconName);
-				while (ASCompat.toNumberField((mKillswitchRenderer.clip : ASAny).modifier.modifier, "numChildren") > 0) {
-					(mKillswitchRenderer.clip : ASAny).modifier.modifier.removeChildAt(0);
+		if ((killSwitches.length : UInt) > index) {
+			if (mKillSwitchIconsSwfAsset != null) {
+				_loc4_ = mKillSwitchIconsSwfAsset.getClass(killSwitches[(index : Int)].IconName);
+				while (ASCompat.toNumberField((mKillSwitchRenderer.clip : ASAny).modifier.modifier, "numChildren") > 0) {
+					(mKillSwitchRenderer.clip : ASAny).modifier.modifier.removeChildAt(0);
 				}
 				if (_loc4_ == null) {
-					Logger.warn("Unable to find iconClass for iconName: " + killswitches[(index : Int)].IconName);
+					Logger.warn("Unable to find iconClass for iconName: " + killSwitches[(index : Int)].IconName);
 				} else {
-					(mKillswitchRenderer.clip : ASAny).modifier.modifier.addChild(ASCompat.createInstance(_loc4_, []));
+					(mKillSwitchRenderer.clip : ASAny).modifier.modifier.addChild(ASCompat.createInstance(_loc4_, []));
 				}
 			}
-			_loc3_ = becauseFlashSucksAtScopingVariables(killswitches, index + 1);
-			mKillswitchRenderer.play((0 : UInt), false, _loc3_);
-			ASCompat.setProperty((mKillswitchRenderer.clip : ASAny).banner_modifier.label_modifier, "text",
-				GameMasterLocale.getGameMasterSubString("DUNGEON_MODIFIER_NAME", killswitches[(index : Int)].Constant));
-			mKillswitchRenderer.clip.visible = true;
+			_loc3_ = becauseFlashSucksAtScopingVariables(killSwitches, index + 1);
+			mKillSwitchRenderer.play((0 : UInt), false, _loc3_);
+			TextUtil.setText(ASCompat.coerce((mKillSwitchRenderer.clip : ASAny).banner_modifier.label_modifier, flash.text.TextField),
+				GameMasterLocale.getGameMasterSubString("DUNGEON_MODIFIER_NAME", killSwitches[(index : Int)].Constant));
+			mKillSwitchRenderer.clip.visible = true;
 			return;
 		}
-		screenFinished(mKillswitchRenderer);
+		screenFinished(mKillSwitchRenderer);
 	}
 
-	function becauseFlashSucksAtScopingVariables(killswitches:Vector<GMDungeonModifier>, index:UInt):ASFunction {
+	function becauseFlashSucksAtScopingVariables(killSwitches:Vector<GMDungeonModifier>, index:UInt):ASFunction {
 		return function() {
-			playKillswitchIntros(killswitches, index);
+			playKillSwitchIntros(killSwitches, index);
 		};
 	}
 
@@ -318,11 +329,11 @@ class FloorEndingGui {
 			mStartRenderer.play((0 : UInt), false, function() {
 				if (mStartRenderer != null) {
 					mStartRenderer.clip.visible = false;
-					displayNewKillswitches();
+					displayNewKillSwitches();
 				}
 			});
 		} else {
-			displayNewKillswitches();
+			displayNewKillSwitches();
 		}
 	}
 
@@ -330,10 +341,10 @@ class FloorEndingGui {
 		checkToAddRootToScene();
 		mCurrentFloorRenderer.clip.visible = true;
 		if (mFloor.getMaxFloorNum() >= 50) {
-			ASCompat.setProperty((mCurrentFloorRenderer.clip : ASAny).scrn_floor.textField, "text",
+			TextUtil.setText(ASCompat.coerce((mCurrentFloorRenderer.clip : ASAny).scrn_floor.textField, flash.text.TextField),
 				Locale.getString("FLOOR").toUpperCase() + " " + Std.string(mFloor.getCurrentFloorNum()));
 		} else {
-			ASCompat.setProperty((mCurrentFloorRenderer.clip : ASAny).scrn_floor.textField, "text",
+			TextUtil.setText(ASCompat.coerce((mCurrentFloorRenderer.clip : ASAny).scrn_floor.textField, flash.text.TextField),
 				Locale.getString("FLOOR").toUpperCase()
 				+ " "
 				+ Std.string(mFloor.getCurrentFloorNum())
@@ -351,7 +362,7 @@ class FloorEndingGui {
 			&& (mStartRenderer == null || !mStartRenderer.isPlaying)
 			&& !(mVictoryRenderer != null && !mVictoryRenderer.isPlaying)
 			&& !mDefeatRenderer.isPlaying
-			&& !(mKillswitchRenderer != null && !mKillswitchRenderer.isPlaying)
+			&& !(mKillSwitchRenderer != null && !mKillSwitchRenderer.isPlaying)
 			&& mUpdateCountdownTask == null) {
 			mSceneGraphComponent.removeChild(mRoot);
 			hideAll();
@@ -372,7 +383,7 @@ class FloorEndingGui {
 			return;
 		}
 		mSecondsUntilTransition = (timeUntilTransition : Int);
-		mCountdownTextField.text = Std.string(mSecondsUntilTransition);
+		TextUtil.setText(mCountdownTextField, Std.string(mSecondsUntilTransition));
 		mCountdownRenderer.play((0 : UInt), false);
 		mCountdownRenderer.clip.visible = true;
 		mUpdateCountdownTask = mLogicalWorkComponent.doEverySeconds(1, updateFloorEndingCountdown);
@@ -383,21 +394,22 @@ class FloorEndingGui {
 			return;
 		}
 		mSecondsUntilTransition = (timeUntilTransition : Int);
-		mCountdownTextField.text = Std.string(mSecondsUntilTransition);
+		TextUtil.setText(mCountdownTextField, Std.string(mSecondsUntilTransition));
 		mCountdownRenderer.play((0 : UInt), false);
 		mCountdownRenderer.clip.visible = true;
 		ASCompat.setProperty((mScreensRoot : ASAny).Scrn_nextfloor_infinite.basic, "visible", false);
 		ASCompat.setProperty((mScreensRoot : ASAny).Scrn_nextfloor_infinite.uncommon, "visible", false);
 		ASCompat.setProperty((mScreensRoot : ASAny).Scrn_nextfloor_infinite.rare, "visible", false);
 		ASCompat.setProperty((mScreensRoot : ASAny).Scrn_nextfloor_infinite.legendary, "visible", false);
-		ASCompat.setProperty((mScreensRoot : ASAny).Scrn_nextfloor_infinite.coin_count, "text", "3000");
+		TextUtil.setText(ASCompat.coerce((mScreensRoot : ASAny).Scrn_nextfloor_infinite.coin_count, flash.text.TextField), "3000");
 		initInfiniteDungeonTotalReward(5000, (2 : UInt));
 		mUpdateCountdownTask = mLogicalWorkComponent.doEverySeconds(1, updateFloorEndingCountdown);
 	}
 
 	function initInfiniteDungeonTotalReward(coinVal:Int, totalRewardsEarned:UInt) {
 		var _loc4_ = 0;
-		ASCompat.setProperty((mScreensRoot : ASAny).Scrn_nextfloor_infinite.current_reward.label_currentReward, "text", Locale.getString("TOTAL_REWARD"));
+		Locale.setText(ASCompat.coerce((mScreensRoot : ASAny).Scrn_nextfloor_infinite.current_reward.label_currentReward, flash.text.TextField),
+			"TOTAL_REWARD");
 		var _loc3_ = new Vector<MovieClip>();
 		_loc3_.push(ASCompat.coerce((mScreensRoot : ASAny).Scrn_nextfloor_infinite.current_reward.basic, flash.display.MovieClip));
 		_loc3_.push(ASCompat.coerce((mScreensRoot : ASAny).Scrn_nextfloor_infinite.current_reward.uncommon, flash.display.MovieClip));
@@ -408,7 +420,7 @@ class FloorEndingGui {
 			_loc3_[_loc4_].stop();
 			_loc4_++;
 		}
-		ASCompat.setProperty((mScreensRoot : ASAny).Scrn_nextfloor_infinite.current_reward.coin_count, "text", Std.string(coinVal));
+		TextUtil.setText(ASCompat.coerce((mScreensRoot : ASAny).Scrn_nextfloor_infinite.current_reward.coin_count, flash.text.TextField), Std.string(coinVal));
 		_loc4_ = totalRewardsEarned;
 		while (_loc4_ < _loc3_.length) {
 			_loc3_[_loc4_].nextFrame();
@@ -418,9 +430,17 @@ class FloorEndingGui {
 	}
 
 	function setUpFloorFailingCountdownGui(timeUntilTransition:UInt) {
+		if (mDefeatCountdownTween != null) {
+			mDBFacade.mTween.killTween(mDefeatCountdownTween);
+			mDefeatCountdownTween = null;
+		}
+		if (mUpdateCountdownTask != null) {
+			mUpdateCountdownTask.destroy();
+			mUpdateCountdownTask = null;
+		}
 		mDefeatCountdownStartClip.visible = true;
 		mSecondsUntilTransition = (timeUntilTransition : Int);
-		mDefeatCountdownTween = TweenMax.to(mDefeatCountdownStartClip, 2, {
+		mDefeatCountdownTween = mDBFacade.mTween.tweenMaxTo(mDefeatCountdownStartClip, 2, {
 			"visible": false,
 			"onComplete": defeatCountdownTweenFinished
 		});
@@ -431,12 +451,16 @@ class FloorEndingGui {
 			mDefeatCountdownStartClip.visible = false;
 		}
 		if (mDefeatCountdownTextField != null) {
-			mDefeatCountdownTextField.text = Std.string(mSecondsUntilTransition);
+			TextUtil.setText(mDefeatCountdownTextField, Std.string(mSecondsUntilTransition));
+		}
+		if (mDefeatCountdownBounceRenderer != null) {
+			mDefeatCountdownBounceRenderer.stop();
 		}
 		if (mDefeatCountdownRenderer != null) {
 			mDefeatCountdownRenderer.play((0 : UInt), false);
 			mDefeatCountdownRenderer.clip.visible = true;
 		}
+		mDefeatCountdownTween = null;
 		mUpdateCountdownTask = mLogicalWorkComponent.doEverySeconds(1, updateFloorFailingCountdown);
 	}
 
@@ -454,7 +478,7 @@ class FloorEndingGui {
 
 	function updateFloorEndingCountdown(gameClock:GameClock) {
 		if (!isCountdownComplete()) {
-			mCountdownTextField.text = Std.string(mSecondsUntilTransition);
+			TextUtil.setText(mCountdownTextField, Std.string(mSecondsUntilTransition));
 			mCountdownRenderer.play((0 : UInt), false);
 		} else {
 			mSceneGraphComponent.fadeOut(1);
@@ -463,8 +487,8 @@ class FloorEndingGui {
 
 	function updateFloorFailingCountdown(gameClock:GameClock) {
 		if (!isCountdownComplete()) {
-			mDefeatCountdownTextField.text = Std.string(mSecondsUntilTransition);
-			mDefeatCountdownRenderer.play((0 : UInt), false);
+			TextUtil.setText(mDefeatCountdownTextField, Std.string(mSecondsUntilTransition));
+			mDefeatCountdownBounceRenderer.play((0 : UInt), false);
 		} else {
 			mEventComponent.dispatchEvent(new Event("CLIENT_COUNTDOWN_FINISHED_EVENT"));
 			screenFinished(mDefeatCountdownRenderer);
@@ -476,19 +500,18 @@ class FloorEndingGui {
 			if (mDefeatCountdownStartClip != null) {
 				mDefeatCountdownStartClip.visible = false;
 			}
-			if (mDefeatCountdownTextField != null) {
-				mDefeatCountdownTextField.text = Std.string(mSecondsUntilTransition);
-			}
-			if (mDefeatCountdownRenderer != null) {
-				mDefeatCountdownRenderer.play((0 : UInt), false);
-				mDefeatCountdownRenderer.clip.visible = true;
-			}
-			mDefeatCountdownTween.kill();
+			mDBFacade.mTween.killTween(mDefeatCountdownTween);
 			mDefeatCountdownTween = null;
 		}
 		if (mUpdateCountdownTask != null) {
 			mUpdateCountdownTask.destroy();
 			mUpdateCountdownTask = null;
+		}
+		if (mDefeatCountdownRenderer != null) {
+			mDefeatCountdownRenderer.stop();
+		}
+		if (mDefeatCountdownBounceRenderer != null) {
+			mDefeatCountdownBounceRenderer.stop();
 		}
 		mSecondsUntilTransition = 0;
 		screenFinished(mDefeatCountdownRenderer);
@@ -503,17 +526,7 @@ class FloorEndingGui {
 		}
 		mUpdateCountdownTask = null;
 		if (mDefeatCountdownTween != null) {
-			if (mDefeatCountdownStartClip != null) {
-				mDefeatCountdownStartClip.visible = false;
-			}
-			if (mDefeatCountdownTextField != null) {
-				mDefeatCountdownTextField.text = Std.string(mSecondsUntilTransition);
-			}
-			if (mDefeatCountdownRenderer != null) {
-				mDefeatCountdownRenderer.play((0 : UInt), false);
-				mDefeatCountdownRenderer.clip.visible = true;
-			}
-			mDefeatCountdownTween.kill();
+			mDBFacade.mTween.killTween(mDefeatCountdownTween);
 			mDefeatCountdownTween = null;
 		}
 		if (mSceneGraphComponent != null) {
@@ -536,7 +549,7 @@ class FloorEndingGui {
 		mRoot = null;
 		mCountdownTextField = null;
 		mCountdownTimerLabel = null;
-		TweenMax.killTweensOf(mDefeatCountdownStartClip);
+		mDBFacade.mTween.killTweensOf(mDefeatCountdownStartClip);
 		mDefeatCountdownStartClip = null;
 		mDefeatCountdownTextField = null;
 		if (mVictoryRenderer != null) {
@@ -566,9 +579,13 @@ class FloorEndingGui {
 			mDefeatCountdownRenderer.destroy();
 		}
 		mDefeatCountdownRenderer = null;
-		if (mKillswitchRenderer != null) {
-			mKillswitchRenderer.destroy();
-			mKillswitchRenderer = null;
+		if (mDefeatCountdownBounceRenderer != null) {
+			mDefeatCountdownBounceRenderer.destroy();
+		}
+		mDefeatCountdownBounceRenderer = null;
+		if (mKillSwitchRenderer != null) {
+			mKillSwitchRenderer.destroy();
+			mKillSwitchRenderer = null;
 		}
 		mDBFacade = null;
 	}

@@ -37,7 +37,7 @@ class UITavernSkinButton extends UIRadioButton {
 		this.releaseCallback = clicked;
 		mHeroRequired = ASCompat.coerce((mRoot : ASAny).hero_required, flash.display.MovieClip);
 		mHeroRequired.visible = false;
-		ASCompat.setProperty((mHeroRequired : ASAny).required_text, "text", Locale.getString("TAVERN_SKIN_BUTTON_HERO_REQUIRED"));
+		Locale.setText(ASCompat.coerce((mHeroRequired : ASAny).required_text, flash.text.TextField), "TAVERN_SKIN_BUTTON_HERO_REQUIRED");
 		mShowSkinInTavernCallback = showSkinInTavernCallback;
 		mAssetLoadingComponent = new AssetLoadingComponent(mDBFacade);
 		mAvatarIconSlot = ASCompat.coerce((mRoot : ASAny).slot, flash.display.MovieClip);
@@ -46,7 +46,7 @@ class UITavernSkinButton extends UIRadioButton {
 		mChosenClip = ASCompat.coerce((mRoot : ASAny).chosen, flash.display.MovieClip);
 		mChosenClip.visible = false;
 		mClassicLabel = ASCompat.coerce((mRoot : ASAny).classic_text, flash.text.TextField);
-		mClassicLabel.text = Locale.getString("TAVERN_SKIN_SLOT_HERO_LABEL");
+		Locale.setText(mClassicLabel, "TAVERN_SKIN_SLOT_HERO_LABEL");
 	}
 
 	@:isVar public var chosen(never, set):Bool;

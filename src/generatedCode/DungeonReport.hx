@@ -113,6 +113,8 @@ class DungeonReport {
 
 	public var consumable2_count:UInt = 0;
 
+	public var ascension_level:UInt = 0;
+
 	public function new() {}
 
 	public static function readFromPacket(packet:DcNetworkPacket):DungeonReport {
@@ -172,6 +174,7 @@ class DungeonReport {
 		_loc2_.consumable1_count = packet.readUnsignedInt();
 		_loc2_.consumable2_id = packet.readUnsignedInt();
 		_loc2_.consumable2_count = packet.readUnsignedInt();
+		_loc2_.ascension_level = packet.readUnsignedInt();
 		return _loc2_;
 	}
 
@@ -231,5 +234,6 @@ class DungeonReport {
 		outpacket.writeUnsignedInt(consumable1_count);
 		outpacket.writeUnsignedInt(consumable2_id);
 		outpacket.writeUnsignedInt(consumable2_count);
+		outpacket.writeUnsignedInt(ascension_level);
 	}
 }

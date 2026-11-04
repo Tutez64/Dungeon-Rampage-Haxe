@@ -5,6 +5,8 @@ import flash.display.DisplayObject;
 interface IRenderer {
 	@:isVar var rendererType(get, never):String;
 
+	@:isVar var backendType(get, never):String;
+
 	function play(startingFrame:UInt = (0 : UInt), loop:Bool = true, finishedCallback:ASFunction = null):Void;
 
 	function stop():Void;

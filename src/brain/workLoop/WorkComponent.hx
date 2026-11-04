@@ -14,12 +14,15 @@ class WorkComponent extends Component {
 
 	var mTasksLabel:String;
 
-	public function new(dbFacade:Facade, workLoopManager:WorkLoopManager, ownerName:String = null) {
+	var mCategory:String;
+
+	public function new(dbFacade:Facade, workLoopManager:WorkLoopManager, ownerName:String = null, category:String = "brain") {
 		super(dbFacade);
 		mOwnerName = ownerName;
 		mTasksLabel = "Dictionary - tasks in " + (if (ASCompat.stringAsBool(ownerName)) ownerName else "WorkComponent") + "()";
+		mCategory = category;
 		mTasks = new ASDictionary<ASAny, ASAny>(true);
-		MemoryTracker.track(mTasks, mTasksLabel, "brain");
+		MemoryTracker.track(mTasks, mTasksLabel, mCategory);
 		mWorkLoopManager = workLoopManager;
 	}
 
@@ -49,23 +52,31 @@ class WorkComponent extends Component {
 
 	public function clear() {
 		var _loc1_:ASObject;
-		final __ax4_iter_232 = mTasks;
-		if (checkNullIteratee(__ax4_iter_232))
-			for (_tmp_ in __ax4_iter_232.keys()) {
+		final __ax4_iter_324 = mTasks;
+		if (checkNullIteratee(__ax4_iter_324))
+			for (_tmp_ in __ax4_iter_324.keys()) {
 				_loc1_ = _tmp_;
-				cast(_loc1_, Task).destroy();
+				if (Std.isOfType(_loc1_, DoLater)) {
+					mWorkLoopManager.removeDoLater(cast(_loc1_, DoLater));
+				} else {
+					cast(_loc1_, Task).destroy();
+				}
 			}
 		mTasks = new ASDictionary<ASAny, ASAny>(true);
-		MemoryTracker.track(mTasks, mTasksLabel, "brain");
+		MemoryTracker.track(mTasks, mTasksLabel, mCategory);
 	}
 
 	override public function destroy() {
 		var _loc1_:ASObject;
-		final __ax4_iter_233 = mTasks;
-		if (checkNullIteratee(__ax4_iter_233))
-			for (_tmp_ in __ax4_iter_233.keys()) {
+		final __ax4_iter_325 = mTasks;
+		if (checkNullIteratee(__ax4_iter_325))
+			for (_tmp_ in __ax4_iter_325.keys()) {
 				_loc1_ = _tmp_;
-				cast(_loc1_, Task).destroy();
+				if (Std.isOfType(_loc1_, DoLater)) {
+					mWorkLoopManager.removeDoLater(cast(_loc1_, DoLater));
+				} else {
+					cast(_loc1_, Task).destroy();
+				}
 			}
 		mTasks = null;
 		mWorkLoopManager = null;

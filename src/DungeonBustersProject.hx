@@ -1,12 +1,16 @@
+import account.SteamAccountInfo;
+import brain.assetRepository.TestResourceLocator;
+import brain.event.EventListeners;
 import brain.GameEntry;
 import brain.logger.Logger;
-import brain.mouseScrollPlugin.*;
+import brain.render.tweens.TweeningProxy;
 import dBGlobals.DBGlobal;
 import facade.DBFacade;
+import util.GameLogOutput;
+import util.LaunchWindowOptions;
 #if cpp
 import modding.Host;
 #end
-import com.amanitadesign.steam.SteamEvent;
 import flash.desktop.NativeApplication;
 import flash.events.ErrorEvent;
 import flash.events.Event;
@@ -14,23 +18,9 @@ import flash.events.InvokeEvent;
 
 @:meta(SWF(width = "1920", height = "1080", backgroundColor = "#1e0808", frameRate = "60"))
 class DungeonBustersProject extends GameEntry {
-	#if cpp
-	static inline final FRAME_RATE_ARGUMENT:String = "--fps";
-
-	static inline final MIN_FRAME_RATE:Float = 1;
-
-	// Lime clamps its application frame rate to this value.
-	static inline final MAX_FRAME_RATE:Float = 10000;
-
-	static inline final AUTO_FRAME_RATE_FALLBACK:Float = 120;
-	static inline final AUTO_FRAME_RATE_STEP:Float = 24;
-	static inline final AUTO_FRAME_RATE_MAXIMUM:Float = 240;
-
-	var mAutoFrameRateMessage:String;
-	var mAutoFrameRateDetectionFailed:Bool = false;
-	#end
-
 	var mDBFacade:DBFacade;
+
+	var mSteamStarted:Bool = false;
 
 	var mSteamDisposed:Bool = false;
 
@@ -38,15 +28,13 @@ class DungeonBustersProject extends GameEntry {
 		super();
 		// uncaughtError does not see a synchronous throw in this constructor; mod
 		// init is wrapped on its own. exiting is registered before Steam's listener.
-		this.loaderInfo.uncaughtErrorEvents.addEventListener("uncaughtError", onUncaughtError);
-		NativeApplication.nativeApplication.addEventListener("exiting", onModsExiting);
-		var _loc1_:String = null;
+		EventListeners.add(this.loaderInfo.uncaughtErrorEvents, "uncaughtError", onUncaughtError);
+		EventListeners.add(NativeApplication.nativeApplication, "exiting", onModsExiting);
 		#if cpp
-		var args = Sys.args();
-		_loc1_ = applyFrameRateFromArguments(args);
-		Host.boot(stage, args);
+		Host.boot(stage, Sys.args());
 		#end
-		stage.scaleMode = "showAll";
+		stage.scaleMode = "noScale";
+		stage.align = "TL";
 		stage.quality = "high";
 		mDBFacade = new DBFacade();
 		mDBFacade.init(this.stage);
@@ -54,21 +42,7 @@ class DungeonBustersProject extends GameEntry {
 		Host.attachOverlay(mDBFacade);
 		Host.flush();
 		#end
-		if (_loc1_ != null) {
-			Logger.warn(_loc1_);
-		}
-		#if cpp
-		if (mAutoFrameRateMessage != null) {
-			if (mAutoFrameRateDetectionFailed) {
-				Logger.warn(mAutoFrameRateMessage);
-			} else {
-				Logger.info(mAutoFrameRateMessage);
-			}
-		}
-		#end
-		Logger.info("Frame rate: " + stage.frameRate);
-		NativeApplication.nativeApplication.addEventListener("invoke", onInvoke);
-		MouseWheelEnabler.init(this.stage);
+		EventListeners.add(NativeApplication.nativeApplication, "invoke", onInvoke);
 	}
 
 	function onModsExiting(_:Event):Void {
@@ -105,97 +79,14 @@ class DungeonBustersProject extends GameEntry {
 		}
 	}
 
-	#if cpp
-	function applyFrameRateFromArguments(args:Array<String>):String {
-		var _loc1_:String = null;
-		var _loc2_:String = null;
-		var _loc3_ = 0;
-		while (_loc3_ < args.length) {
-			_loc1_ = args[_loc3_];
-			if (_loc1_ == FRAME_RATE_ARGUMENT) {
-				if (_loc3_ + 1 < args.length) {
-					_loc2_ = args[_loc3_ + 1];
-				}
-				break;
-			}
-			if (StringTools.startsWith(_loc1_, FRAME_RATE_ARGUMENT + "=")) {
-				_loc2_ = _loc1_.substr(FRAME_RATE_ARGUMENT.length + 1);
-				break;
-			}
-			_loc3_++;
+	public function onInvoke(e:InvokeEvent) {
+		EventListeners.add(NativeApplication.nativeApplication, "exiting", onExit);
+		if (!mSteamStarted) {
+			mSteamStarted = true;
+			SteamAccountInfo.startSteam(mDBFacade);
 		}
-		if (_loc2_ == null) {
-			return _loc1_ == FRAME_RATE_ARGUMENT ? "Ignoring " + FRAME_RATE_ARGUMENT + " without a value." : null;
-		}
-		if (_loc2_.toLowerCase() == "auto") {
-			stage.frameRate = resolveAutoFrameRate();
-			return null;
-		}
-		if (!~/^[0-9]+(?:\.[0-9]+)?$/.match(_loc2_)) {
-			return "Ignoring invalid " + FRAME_RATE_ARGUMENT + " value: " + _loc2_;
-		}
-		var _loc4_ = Std.parseFloat(_loc2_);
-		if (_loc4_ < MIN_FRAME_RATE || _loc4_ > MAX_FRAME_RATE) {
-			return "Ignoring "
-				+ FRAME_RATE_ARGUMENT
-				+ " outside the supported range of "
-				+ MIN_FRAME_RATE
-				+ " to "
-				+ MAX_FRAME_RATE
-				+ ": "
-				+ _loc2_;
-		}
-		stage.frameRate = _loc4_;
-		return null;
-	}
-
-	function resolveAutoFrameRate():Float {
-		// The window manager may not have placed the window yet during initialization.
-		var _loc1_ = lime.system.System.getDisplay(0);
-		if (_loc1_ != null && _loc1_.currentMode != null) {
-			var _loc2_ = _loc1_.currentMode.refreshRate;
-			if (_loc2_ > 0) {
-				var _loc3_ = Math.min(Math.ceil(_loc2_ / AUTO_FRAME_RATE_STEP) * AUTO_FRAME_RATE_STEP, AUTO_FRAME_RATE_MAXIMUM);
-				mAutoFrameRateMessage = "Auto frame rate detection succeeded: primary display reports " + _loc2_ + " Hz; selected " + _loc3_ + " FPS.";
-				return _loc3_;
-			}
-		}
-		mAutoFrameRateDetectionFailed = true;
-		mAutoFrameRateMessage = "Auto frame rate detection failed; using the " + AUTO_FRAME_RATE_FALLBACK + " FPS fallback.";
-		return AUTO_FRAME_RATE_FALLBACK;
-	}
-	#end
-
-	public function onInvoke(e:InvokeEvent = null) {
-		NativeApplication.nativeApplication.addEventListener("exiting", onExit);
-		try {
-			if (!mDBFacade.mSteamworks.init()) {
-				Logger.warn("STEAMWORKS API is NOT available");
-			} else {
-				Logger.info("STEAMWORKS API is available\n");
-				mDBFacade.mSteamworks.addEventListener(SteamEvent.STEAM_RESPONSE, onSteamResponse);
-				mDBFacade.mSteamUserId = mDBFacade.mSteamworks.getUserID();
-				Logger.info("STEAMWORKS User ID: " + mDBFacade.mSteamUserId);
-				mDBFacade.mSteamAppId = mDBFacade.mSteamworks.getAppID();
-				Logger.info("STEAMWORKS App ID: " + mDBFacade.mSteamAppId);
-				mDBFacade.mSteamPersonaName = mDBFacade.mSteamworks.getPersonaName();
-				Logger.info("STEAMWORKS Persona name: " + mDBFacade.mSteamPersonaName);
-				mDBFacade.mSteamworks.getAuthTicketForWebApi();
-			}
-		} catch (e:Dynamic) {
-			Logger.warn("*** STEAMWORKS ERROR ***");
-			Logger.error(e.message, e);
-		}
+		GameLogOutput.configure(e.arguments);
 		processArguments(e.arguments);
-	}
-
-	function onSteamResponse(e:SteamEvent) {
-		switch (e.req_type - 27) {
-			case 0:
-				Logger.info("[Steam] RESPONSE_OnGetAuthTicketForWebApiResponse: " + e.response);
-				mDBFacade.mSteamWebApiAuthTicket = mDBFacade.mSteamworks.getAuthTicketForWebApiResultHexString();
-				mDBFacade.mSteamAuthTicketHandle = mDBFacade.mSteamworks.getAuthTicketForWebApiResultHandle();
-		}
 	}
 
 	function onExit(e:Event) {
@@ -205,21 +96,29 @@ class DungeonBustersProject extends GameEntry {
 		mSteamDisposed = true;
 		Logger.info("Exiting application, cleaning up Steam");
 		mDBFacade.mSteamworks.dispose();
+		TweeningProxy.shutdown();
+		GameLogOutput.close();
 	}
 
 	function processArguments(arguments:Array<ASAny>) {
 		var _loc3_ = 0;
 		var _loc2_:String = null;
+		TestResourceLocator.apply(arguments);
 		mDBFacade.featureFlags.loadFeatureFlagValuesFromCli(arguments);
+		LaunchWindowOptions.apply(stage, mDBFacade.featureFlags, arguments);
 		var _loc4_ = 0;
 		_loc3_ = 0;
 		while (_loc3_ < arguments.length) {
 			_loc2_ = arguments[_loc3_];
-			if (DBGlobal.endsWith(_loc2_, ".json")) {
-				if (++_loc4_ > 2) {
-					Logger.warn("GBS: Too many JSON files passed in! Only supports two json files, ignoring: " + _loc2_);
-				} else {
-					mDBFacade.mAdditionalConfigFilesToLoad.push("DBConfiguration/" + _loc2_);
+			if (!(_loc2_ == "--log" || _loc2_.indexOf("--log=") == 0)) {
+				if (!(_loc2_ == "--windowed" || _loc2_.indexOf("--windowed=") == 0)) {
+					if (DBGlobal.endsWith(_loc2_, ".json")) {
+						if (++_loc4_ > 3) {
+							Logger.warn("GBS: Too many JSON files passed in! Only supports three json files, ignoring: " + _loc2_);
+						} else {
+							mDBFacade.mAdditionalConfigFilesToLoad.push("DBConfiguration/" + _loc2_);
+						}
+					}
 				}
 			}
 			_loc3_++;

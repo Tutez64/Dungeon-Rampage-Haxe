@@ -2,7 +2,7 @@ import brain.assetRepository.SwfAsset;
 import flash.display.MovieClip;
 
 @:bind
-@:native("symbol41")
+@:native("symbol89")
 class Db_UI_skip_button_swf extends MovieClip {
 	public var over:ASAny;
 

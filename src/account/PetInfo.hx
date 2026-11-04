@@ -1,5 +1,6 @@
 package account;
 
+import dBGlobals.DBGlobal;
 import facade.DBFacade;
 import gameMasterDictionary.GMNpc;
 
@@ -21,7 +22,7 @@ class PetInfo extends InventoryBaseInfo {
 	}
 
 	override public function get_iconScale():Float {
-		return 68;
+		return DBGlobal.PET_ICON_NATIVE_SIZE;
 	}
 
 	@:isVar public var attackRating(get, never):UInt;

@@ -1,10 +1,11 @@
 package uI.popup;
 
+import brain.event.EventListeners;
 import brain.uI.UIButton;
 import brain.utils.MemoryTracker;
+import brain.utils.TextUtil;
 import dBGlobals.DBGlobal;
 import facade.DBFacade;
-import uI.*;
 import flash.display.Loader;
 import flash.display.MovieClip;
 import flash.events.Event;
@@ -36,14 +37,16 @@ class DBUIMoviePopup extends DBUIOneButtonPopup {
 		mWidth = width;
 		mHeight = height;
 		mUseCurtain = !showPagination;
-		super(dbFacade, titleText, mContainerMC, centerText, centerCallback);
-		mMessage.text = contentText;
-		mLoadingPopUp = new DBUIPopup(mDBFacade, "LOADING", null, true, false);
-		MemoryTracker.track(mLoadingPopUp, "DBUIPopup - created in DBUIMoviePopup.DBUIMoviePopup()");
-		mLoader = new Loader();
-		mLoader.contentLoaderInfo.addEventListener("init", onLoaderInit);
-		mLoader.contentLoaderInfo.addEventListener("ioError", loaderIOErrorHandler);
-		mLoader.load(new URLRequest(moviePath));
+		super(dbFacade, "NEWS_MOVIE_POPUP", titleText, mContainerMC, centerText, centerCallback);
+		TextUtil.setText(mMessage, contentText);
+		if (moviePath != null && moviePath.length > 0) {
+			mLoadingPopUp = new DBUIPopup(mDBFacade, "", "LOADING", null, true, false);
+			MemoryTracker.track(mLoadingPopUp, "DBUIPopup - created in DBUIMoviePopup.DBUIMoviePopup()");
+			mLoader = new Loader();
+			EventListeners.add(mLoader.contentLoaderInfo, "init", onLoaderInit);
+			EventListeners.add(mLoader.contentLoaderInfo, "ioError", loaderIOErrorHandler);
+			mLoader.load(new URLRequest(moviePath));
+		}
 		if (!showPagination) {
 			ASCompat.setProperty((mPopup : ASAny).center_button_news, "visible", false);
 			ASCompat.setProperty((mPopup : ASAny).pagination, "visible", false);
@@ -51,7 +54,7 @@ class DBUIMoviePopup extends DBUIOneButtonPopup {
 			ASCompat.setProperty((mPopup : ASAny).center_button, "visible", false);
 			mCenterButton = new UIButton(mDBFacade, ASCompat.coerce((mPopup : ASAny).center_button_news, flash.display.MovieClip));
 			mCenterButton.rolloverFilter = DBGlobal.UI_ROLLOVER_FILTER;
-			mCenterButton.label.text = mCenterText;
+			TextUtil.setText(mCenterButton.label, mCenterText);
 			mCenterButton.releaseCallback = function() {
 				close(mCenterCallback);
 			};
@@ -84,10 +87,10 @@ class DBUIMoviePopup extends DBUIOneButtonPopup {
 		mContainerMC.addChild(mLoader);
 		mLoader.x = -mWidth / 2;
 		mLoader.y = -mHeight / 2;
-		mLoader.content.addEventListener("onReady", onPlayerReady);
-		mLoader.content.addEventListener("onError", onPlayerError);
-		mLoader.content.addEventListener("onStateChange", onPlayerStateChange);
-		mLoader.content.addEventListener("onPlaybackQualityChange", onVideoPlaybackQualityChange);
+		EventListeners.add(mLoader.content, "onReady", onPlayerReady);
+		EventListeners.add(mLoader.content, "onError", onPlayerError);
+		EventListeners.add(mLoader.content, "onStateChange", onPlayerStateChange);
+		EventListeners.add(mLoader.content, "onPlaybackQualityChange", onVideoPlaybackQualityChange);
 	}
 
 	function onPlayerReady(event:Event) {
@@ -109,14 +112,16 @@ class DBUIMoviePopup extends DBUIOneButtonPopup {
 	override public function destroy() {
 		super.destroy();
 		mContainerMC = null;
-		mLoader.contentLoaderInfo.removeEventListener("init", onLoaderInit);
-		if (mLoader.content != null) {
-			mLoader.content.removeEventListener("onReady", onPlayerReady);
-			mLoader.content.removeEventListener("onError", onPlayerError);
-			mLoader.content.removeEventListener("onStateChange", onPlayerStateChange);
-			mLoader.content.removeEventListener("onPlaybackQualityChange", onVideoPlaybackQualityChange);
-			mLoader.unloadAndStop();
+		if (mLoader != null) {
+			EventListeners.remove(mLoader.contentLoaderInfo, "init", onLoaderInit);
+			if (mLoader.content != null) {
+				EventListeners.remove(mLoader.content, "onReady", onPlayerReady);
+				EventListeners.remove(mLoader.content, "onError", onPlayerError);
+				EventListeners.remove(mLoader.content, "onStateChange", onPlayerStateChange);
+				EventListeners.remove(mLoader.content, "onPlaybackQualityChange", onVideoPlaybackQualityChange);
+				mLoader.unloadAndStop();
+			}
+			mLoader = null;
 		}
-		mLoader = null;
 	}
 }

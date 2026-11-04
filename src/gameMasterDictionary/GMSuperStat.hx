@@ -1,13 +1,7 @@
 package gameMasterDictionary;
 
 class GMSuperStat extends GMItem {
-	public var BaseValues:StatVector;
-
-	public var Ability1:String;
-
-	public var Ability2:String;
-
-	public var Ability3:String;
+	public var TrapPower:Float = Math.NaN;
 
 	public var IconName:String;
 
@@ -15,7 +9,25 @@ class GMSuperStat extends GMItem {
 
 	public var CooldownReduction:Float = Math.NaN;
 
-	public function new(jsonAsset:ASObject) {
+	public var CookingRarityMinPerPoint:Float = Math.NaN;
+
+	public var CookingRarityMaxPerPoint:Float = Math.NaN;
+
+	public var CookingRarityMaxBase:Float = Math.NaN;
+
+	public var CookingFoodOnHitPerPoint:Float = Math.NaN;
+
+	public var CookingBuffDurationPerPoint:Float = Math.NaN;
+
+	public var BaseValues:StatVector;
+
+	public var Ability3:String;
+
+	public var Ability2:String;
+
+	public var Ability1:String;
+
+	public function new(jsonAsset:ASObject = /*undefined*/ null) {
 		super(jsonAsset);
 		BaseValues = new StatVector();
 		BaseValues.SetFromJSON(jsonAsset);
@@ -24,6 +36,12 @@ class GMSuperStat extends GMItem {
 		Ability3 = jsonAsset.Ability3;
 		IconName = jsonAsset.IconName;
 		Description = jsonAsset.Description;
-		CooldownReduction = ASCompat.toNumberField(jsonAsset, "CooldownReduction");
+		CooldownReduction = ASCompat.toNumber(jsonAsset.CooldownReduction);
+		CookingRarityMinPerPoint = ASCompat.toNumber(jsonAsset.CookingRarityMinPerPoint);
+		CookingRarityMaxPerPoint = ASCompat.toNumber(jsonAsset.CookingRarityMaxPerPoint);
+		CookingRarityMaxBase = ASCompat.toNumber(jsonAsset.CookingRarityMaxBase);
+		CookingBuffDurationPerPoint = ASCompat.toNumber(jsonAsset.CookingBuffDurationPerPoint);
+		CookingFoodOnHitPerPoint = ASCompat.toNumber(jsonAsset.CookingFoodOnHitPerPoint);
+		TrapPower = ASCompat.toNumber(jsonAsset.TrapPower);
 	}
 }

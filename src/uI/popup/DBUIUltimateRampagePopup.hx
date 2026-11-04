@@ -1,5 +1,6 @@
 package uI.popup;
 
+import brain.utils.TextUtil;
 import facade.DBFacade;
 import facade.Locale;
 
@@ -11,11 +12,12 @@ class DBUIUltimateRampagePopup extends DBUIPopup {
 	public function new(dbFacade:DBFacade) {
 		var _loc3_ = Locale.getString("INFINITE_MAP_POPUP_TITLE");
 		var _loc2_ = Locale.getString("INFINITE_MAP_POPUP_MESSAGE");
-		super(dbFacade, _loc3_, _loc2_);
-		ASCompat.setProperty((mPopup : ASAny).message_label1, "text", Locale.getString("INFINITE_MAP_POPUP_MESSAGE_LABEL_1"));
-		ASCompat.setProperty((mPopup : ASAny).message_label2, "text", Locale.getString("INFINITE_MAP_POPUP_MESSAGE_LABEL_2"));
-		ASCompat.setProperty((mPopup : ASAny).message_label3, "text", Locale.getString("INFINITE_MAP_POPUP_MESSAGE_LABEL_3"));
-		ASCompat.setProperty((mPopup : ASAny).message_label4, "text", Locale.getString("INFINITE_MAP_POPUP_MESSAGE_LABEL_4"));
+		super(dbFacade, "ULTIMATE_RAMPAGE_POPUP", _loc3_, _loc2_);
+		Locale.setText(ASCompat.coerce((mPopup : ASAny).message_label1, flash.text.TextField), "INFINITE_MAP_POPUP_MESSAGE_LABEL_1");
+		Locale.setText(ASCompat.coerce((mPopup : ASAny).message_label2, flash.text.TextField), "INFINITE_MAP_POPUP_MESSAGE_LABEL_2");
+		Locale.setText(ASCompat.coerce((mPopup : ASAny).message_label3, flash.text.TextField), "INFINITE_MAP_POPUP_MESSAGE_LABEL_3");
+		Locale.setText(ASCompat.coerce((mPopup : ASAny).message_label4, flash.text.TextField), "INFINITE_MAP_POPUP_MESSAGE_LABEL_4", null, 1.55);
+		TextUtil.fitToField(ASCompat.coerce((mPopup : ASAny).message_label4, flash.text.TextField));
 	}
 
 	override function getClassName():String {

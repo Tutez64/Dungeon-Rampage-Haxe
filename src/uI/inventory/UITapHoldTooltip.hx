@@ -1,5 +1,6 @@
 package uI.inventory;
 
+import brain.utils.TextUtil;
 import facade.DBFacade;
 import flash.display.MovieClip;
 import flash.text.TextField;
@@ -20,6 +21,7 @@ class UITapHoldTooltip extends MovieClip {
 		this.addChild(mRoot);
 		mTitle = ASCompat.coerce((mRoot : ASAny).title_label, flash.text.TextField);
 		mDescription = ASCompat.coerce((mRoot : ASAny).charge_description_label, flash.text.TextField);
+		mRoot.scaleX = mRoot.scaleY = UIWeaponTooltip.tooltipScale(mDescription, 1.55);
 	}
 
 	public function destroy() {
@@ -29,7 +31,7 @@ class UITapHoldTooltip extends MovieClip {
 	}
 
 	public function setValues(name:String, desc:String) {
-		mTitle.text = name.toUpperCase();
-		mDescription.text = desc;
+		TextUtil.setText(mTitle, name.toUpperCase());
+		TextUtil.setText(mDescription, desc);
 	}
 }

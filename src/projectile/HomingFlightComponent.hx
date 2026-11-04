@@ -3,6 +3,7 @@ package projectile;
 import actor.ActorGameObject;
 import box2D.collision.B2AABB;
 import box2D.dynamics.B2Fixture;
+import dBGlobals.DBGlobal;
 import distributedObjects.DistributedDungeonFloor;
 import dungeon.NavCollider;
 import facade.DBFacade;
@@ -66,10 +67,12 @@ class HomingFlightComponent extends FlightComponent {
 		if (newTarget.hitPoints == 0) {
 			return false;
 		}
-		if (_loc2_.team == 1 && newTarget.team != 1) {
+		if ((_loc2_.team : UInt) == DBGlobal.TEAM_ENVIRONMENT && (newTarget.team : UInt) != DBGlobal.TEAM_ENVIRONMENT) {
 			return true;
 		}
-		if (_loc2_.team != 1 && newTarget.team != 1 || _loc2_.team == 1 && newTarget.team == 1) {
+		if ((_loc2_.team : UInt) != DBGlobal.TEAM_ENVIRONMENT
+			&& (newTarget.team : UInt) != DBGlobal.TEAM_ENVIRONMENT
+				|| (_loc2_.team : UInt) == DBGlobal.TEAM_ENVIRONMENT && (newTarget.team : UInt) == DBGlobal.TEAM_ENVIRONMENT) {
 			_loc3_ = calculateTargetScore(newTarget, _loc4_);
 			if (_loc3_ > mBestScore) {
 				return true;

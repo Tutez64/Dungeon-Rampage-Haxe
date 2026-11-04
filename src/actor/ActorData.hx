@@ -21,6 +21,14 @@ class ActorData {
 		}
 	}
 
+	public static function offMovieClipClassName(assetClassName:String):String {
+		return ASCompat.stringAsBool(assetClassName) ? assetClassName + "_off" : "";
+	}
+
+	public static function deathMovieClipClassName(assetClassName:String):String {
+		return ASCompat.stringAsBool(assetClassName) ? assetClassName + "_death" : "";
+	}
+
 	public function destroy() {
 		mFacade = null;
 		mActorGameObject = null;
@@ -50,7 +58,11 @@ class ActorData {
 	}
 
 	public function getOffMovieClipClassName():String {
-		return ASCompat.stringAsBool(mData.AssetClassName) ? mData.AssetClassName + "_off" : "";
+		return offMovieClipClassName(mData.AssetClassName);
+	}
+
+	public function getDeathMovieClipClassName():String {
+		return deathMovieClipClassName(mData.AssetClassName);
 	}
 
 	@:isVar public var constant(get, never):String;
@@ -165,11 +177,5 @@ class ActorData {
 
 	public function get_deathVolume():Float {
 		return mData.DeathVolume;
-	}
-
-	@:isVar public var scale3DModel(get, never):Float;
-
-	public function get_scale3DModel():Float {
-		return mData.Scale3DModel;
 	}
 }

@@ -7,9 +7,9 @@ class ManaEvent extends GameObjectEvent {
 
 	public var maxMana:UInt = 0;
 
-	public function new(type:String, id:UInt, mana:UInt, maxMana:UInt, bubbles:Bool = false, cancelable:Bool = false) {
+	public function new(inType:String, id:UInt, mana:UInt, maxMana:UInt, bubbles:Bool = false, cancelable:Bool = false) {
 		this.mana = mana;
 		this.maxMana = maxMana;
-		super(type, id, bubbles, cancelable);
+		super(inType, id, bubbles, cancelable);
 	}
 }

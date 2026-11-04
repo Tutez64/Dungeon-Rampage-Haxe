@@ -13,11 +13,18 @@ class EffectGameObject extends FloorObject implements IPoolable {
 
 	public var className:String;
 
+	public var iconInsert:EffectIconInsert;
+
+	public var fallbackCategory:String;
+
 	var mAssetLoadedCallback:ASFunction;
 
-	public function new(facade:DBFacade, swfPath:String, className:String, playRate:Float, remoteId:UInt = (0 : UInt), assetLoadedCallback:ASFunction = null) {
+	public function new(facade:DBFacade, swfPath:String, className:String, playRate:Float, remoteId:UInt = (0 : UInt), assetLoadedCallback:ASFunction = null,
+			iconInsert:EffectIconInsert = null, fallbackCategory:String = null) {
 		this.swfPath = swfPath;
 		this.className = className;
+		this.iconInsert = iconInsert;
+		this.fallbackCategory = fallbackCategory;
 		mAssetLoadedCallback = assetLoadedCallback;
 		super(facade, remoteId);
 		this.layer = 20;
@@ -29,14 +36,23 @@ class EffectGameObject extends FloorObject implements IPoolable {
 		mAssetLoadedCallback = callback;
 	}
 
+	public function setIconInsert(iconInsert:EffectIconInsert) {
+		this.iconInsert = iconInsert;
+		if (mEffectView != null) {
+			mEffectView.setIconInsert(iconInsert);
+		}
+	}
+
 	public function postCheckout(isNewObject:Bool) {
-		if (!isNewObject && mAssetLoadedCallback != null) {
+		if (!isNewObject && mAssetLoadedCallback != null && view.movieClipRenderer != null) {
 			view.movieClipRenderer.clip.gotoAndStop(0);
 			mAssetLoadedCallback(view.movieClipRenderer.clip);
 		}
 	}
 
 	public function postCheckin() {
+		mAssetLoadedCallback = null;
+		setIconInsert(null);
 		mEffectView.stop();
 	}
 
@@ -46,7 +62,8 @@ class EffectGameObject extends FloorObject implements IPoolable {
 
 	override public function set_position(pos:Vector3D):Vector3D {
 		super.position = pos;
-		return mEffectView.position = pos;
+		mEffectView.snapPosition(pos);
+		return pos;
 	}
 
 	override function buildView() {
@@ -66,6 +83,7 @@ class EffectGameObject extends FloorObject implements IPoolable {
 	}
 
 	override public function destroy() {
+		mAssetLoadedCallback = null;
 		mEffectView = null;
 		super.destroy();
 	}

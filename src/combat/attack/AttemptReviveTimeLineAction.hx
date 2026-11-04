@@ -9,8 +9,6 @@ import facade.DBFacade;
 class AttemptReviveTimeLineAction extends AttackTimelineAction {
 	public static inline final TYPE = "attemptRevive";
 
-	static inline final REVIVE_KEYCODE = 32;
-
 	var mKeyboardCheckTask:Task;
 
 	var mDeltaPerFrame:Float = Math.NaN;
@@ -32,7 +30,7 @@ class AttemptReviveTimeLineAction extends AttackTimelineAction {
 	}
 
 	function isReviveActionDown():Bool {
-		return mDBFacade.inputManager.check(32) || mDBFacade.steamInputManager.heldAction("revive_ally");
+		return mDBFacade.keyBindings.isDown("reviveAlly") || mDBFacade.steamInputManager.heldAction("revive_ally");
 	}
 
 	override public function execute(timeline:ScriptTimeline) {

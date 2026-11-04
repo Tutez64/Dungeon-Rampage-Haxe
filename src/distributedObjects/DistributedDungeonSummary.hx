@@ -5,7 +5,6 @@ import account.BoosterInfo;
 import account.ChestInfo;
 import account.CurrencyUpdatedAccountEvent;
 import account.DBInventoryInfo;
-import account.KeyInfo;
 import account.PlayerSpecialStatus;
 import account.StoreServices;
 import account.StoreServicesController;
@@ -14,6 +13,7 @@ import brain.assetRepository.AssetLoadingComponent;
 import brain.assetRepository.SwfAsset;
 import brain.clock.GameClock;
 import brain.event.EventComponent;
+import brain.event.EventListeners;
 import brain.gameObject.GameObject;
 import brain.logger.Logger;
 import brain.render.MovieClipRenderController;
@@ -24,19 +24,20 @@ import brain.uI.UIButton;
 import brain.uI.UIObject;
 import brain.uI.UIProgressBar;
 import brain.utils.MemoryTracker;
+import brain.utils.TextUtil;
 import brain.workLoop.LogicalWorkComponent;
 import brain.workLoop.Task;
 import brain.jsonRPC.JSONRPCService;
+import collections.Map;
 import dBGlobals.DBGlobal;
 import events.ChatEvent;
-import events.FacebookLevelUpPostEvent;
 import events.FriendSummaryNewsFeedEvent;
 import events.GameObjectEvent;
+import events.LevelUpPostEvent;
 import events.PlayerExitEvent;
 import facade.DBFacade;
 import facade.GameMasterLocale;
 import facade.Locale;
-import facebookAPI.DBFacebookBragFeedPost;
 import gameMasterDictionary.GMChest;
 import gameMasterDictionary.GMDoober;
 import gameMasterDictionary.GMHero;
@@ -48,13 +49,10 @@ import gameMasterDictionary.GMWeaponItem;
 import generatedCode.DistributedDungeonSummaryNetworkComponent;
 import generatedCode.DungeonReport;
 import generatedCode.IDistributedDungeonSummary;
-import metrics.LifestreetTracker;
-import metrics.PixelTracker;
 import sound.DBSoundComponent;
 import town.TownHeader;
 import uI.CountdownTextTimer;
 import uI.friendManager.UIFriendManager;
-import uI.hud.UIHud;
 import uI.inventory.chests.ChestBuyKeysPopUp;
 import uI.inventory.chests.ChestKeySlot;
 import uI.inventory.chests.ChestRevealPopUp;
@@ -62,11 +60,11 @@ import uI.inventory.UIInventory;
 import uI.inventory.UIWeaponTooltip;
 import uI.popup.DBUIPopup;
 import uI.popup.DBUITwoButtonPopup;
+import uI.popup.UIDistributedDungeonNextFloorSection;
 import uI.popup.UIReportPopup;
+import uI.popup.UITreasureFoundPopup;
 import uI.popup.UIVictoryBoosterPopup;
 import uI.UIChatLog;
-import com.greensock.TweenMax;
-import com.maccherone.json.JSONParseError;
 import flash.display.DisplayObject;
 import flash.display.Loader;
 import flash.display.MovieClip;
@@ -74,13 +72,11 @@ import flash.events.Event;
 import flash.filters.ColorMatrixFilter;
 import flash.filters.GlowFilter;
 import flash.geom.Point;
-import flash.geom.Rectangle;
 import flash.geom.Vector3D;
 import flash.net.URLRequest;
 import flash.system.LoaderContext;
 import flash.text.TextField;
 import flash.text.TextFormat;
-import org.as3commons.collections.Map;
 import flash.display.DisplayObject;
 import flash.display.MovieClip;
 
@@ -95,6 +91,10 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 
 	static inline final TAKE_ALL_ID = (1000 : UInt);
 
+	static inline final CHAT_LOG_HEIGHT_SCALE:Float = 1.5;
+
+	static inline final CHAT_BUTTON_HEIGHT_SCALE:Float = 1.25;
+
 	static inline final DUNGEONS_COMPLETED = "DUNGEONS_COMPLETED";
 
 	static inline final REVEAL_STATE_BEGIN = (1 : UInt);
@@ -102,8 +102,6 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 	static inline final REVEAL_TROPHY_AWARD_STATE = (20 : UInt);
 
 	static inline final HIDE_TROPHY_AWARD_STATE = (25 : UInt);
-
-	static inline final MAP_NODE_DEFEATED_FEED_POST = (30 : UInt);
 
 	static inline final REVEAL_STATE_BONUS_XP = (2 : UInt);
 
@@ -151,6 +149,8 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 
 	var mTownRoot:MovieClip;
 
+	var mNextFloorSection:UIDistributedDungeonNextFloorSection;
+
 	var mUIInventory:UIInventory;
 
 	var mTownHeader:TownHeader;
@@ -187,6 +187,10 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 
 	var mItemButtons:Array<ASAny>;
 
+	var mAvatarButtons:Array<ASAny>;
+
+	var mPlayerBoosterUIs:Array<ASAny>;
+
 	var mAddFriendButtons:Array<ASAny>;
 
 	var mBlockFriendButtons:Array<ASAny>;
@@ -196,6 +200,8 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 	var mSelectedItemSlot:UInt = 0;
 
 	var mSelectedGMChest:GMChest;
+
+	var mLeaving:Bool = false;
 
 	var mTookLastItem:Bool = false;
 
@@ -235,9 +241,9 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 
 	var mTransactionSuccessCallback:ASFunction;
 
-	var mFacebookPicHolder:MovieClip;
+	var mSteamAvatarHolder:MovieClip;
 
-	var mFacebookPicMap:Map;
+	var mSteamAvatarMap:Map;
 
 	var mDungeonSuccess:Bool = false;
 
@@ -249,23 +255,13 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 
 	var mBgRenderer:MovieClipRenderController;
 
-	var mOpenKeyChestMC:MovieClip;
-
-	var mAbandonButton:UIButton;
-
-	var mKeepButton:UIButton;
-
-	var mOpenButton:UIButton;
+	var mTreasureFoundPopup:UITreasureFoundPopup;
 
 	var mChestRevealPopUp:ChestRevealPopUp;
 
 	var mChestRenderers:Vector<MovieClipRenderer>;
 
 	var mChestKeySlots:Vector<ChestKeySlot>;
-
-	var mOpenKeyChestRenderer:MovieClipRenderer;
-
-	var mKeyThatCanOpenChest:KeyInfo;
 
 	var mChestBuyKeysPopUp:ChestBuyKeysPopUp;
 
@@ -334,12 +330,11 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 	var mDRReportPlayerPopup:UIReportPopup;
 
 	public function new(dbFacade:DBFacade, doid:UInt) {
-		var dungeonsCompletedCount:UInt;
 		var k:Int;
 		var i:Int;
 		var j:Int;
 		mXpBar = [];
-		Logger.warn("Start construction of DDS");
+		Logger.info("Start construction of DDS");
 		super(dbFacade, doid);
 		try {
 			mDBFacade = dbFacade;
@@ -357,16 +352,9 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 			mBlockFriendButtons = [];
 			mReportPlayerButtons = [];
 			mBoosterInfos = [];
+			mAvatarButtons = ASCompat.allocArray(4);
+			mPlayerBoosterUIs = [[], [], [], []];
 			mDBFacade.dbAccountInfo.incrementCompletedDungeons();
-			dungeonsCompletedCount = mDBFacade.dbAccountInfo.getDungeonsCompleted();
-			if (dungeonsCompletedCount == 1) {
-				PixelTracker.tutorialComplete(mDBFacade);
-			}
-			if (mDBFacade.facebookController != null
-				&& dungeonsCompletedCount >= 1
-				&& !mDBFacade.dbConfigManager.getConfigBoolean("FUFB", false)) {
-				mDBFacade.facebookController.updateGuestAchievement((1 : UInt));
-			}
 			mAssetLoadingComponent = new AssetLoadingComponent(mDBFacade);
 			mSceneGraphComponent = new SceneGraphComponent(mDBFacade, "DistributedDungeonSummary");
 			mSoundComponent = new DBSoundComponent(mDBFacade);
@@ -375,7 +363,7 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 			mChatBalloon = new Vector<ChatBalloon>((4 : UInt));
 			mChatCloseTask = new Vector<Task>((4 : UInt));
 			mChatEventComponent = new EventComponent(dbFacade);
-			mFacebookPicMap = new Map();
+			mSteamAvatarMap = new Map();
 			isSingleChestList = new Vector<Bool>();
 			isSingleChestList = new Vector<Bool>();
 			k = 0;
@@ -396,25 +384,24 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 				i = i + 1;
 			}
 			mAssetLoadingComponent.getSwfAsset(DBFacade.buildFullDownloadPath("Resources/Art2D/UI/db_UI_nametag.swf"), nametagSwfLoaded);
-			mAssetLoadingComponent.getSoundAsset(DBFacade.buildFullDownloadPath("Resources/Audio/soundEffects.swf"), "HealthBomb1",
-				function(param1:SoundAsset) {
-					mSmashSfx = param1;
-				});
-			mAssetLoadingComponent.getSoundAsset(DBFacade.buildFullDownloadPath("Resources/Audio/soundEffects.swf"), "LevelUp2", function(param1:SoundAsset) {
+			mAssetLoadingComponent.getSoundAsset(DBFacade.buildFullDownloadPath(DBGlobal.SFX_PATH), "HealthBomb1", function(param1:SoundAsset) {
+				mSmashSfx = param1;
+			});
+			mAssetLoadingComponent.getSoundAsset(DBFacade.buildFullDownloadPath(DBGlobal.SFX_PATH), "LevelUp2", function(param1:SoundAsset) {
 				mLevelSfx = param1;
 			});
 			mTeamBonusUI = new Map();
 		} catch (e:Dynamic) {
 			Logger.error("An error occurred while attempting to construct distributed dungeon summary.  Error: " + Std.string(e.message));
 		}
-		Logger.warn("Finished construction of DDS");
+		Logger.info("Finished construction of DDS");
 	}
 
 	function nametagSwfLoaded(swfAsset:SwfAsset) {
 		var _loc2_ = swfAsset.getClass("fb_avatar_holder");
-		mFacebookPicHolder = ASCompat.coerce(ASCompat.createInstance(_loc2_, []), flash.display.MovieClip);
-		mSceneGraphComponent.addChild(mFacebookPicHolder, (105 : UInt));
-		mFacebookPicHolder.visible = false;
+		mSteamAvatarHolder = ASCompat.coerce(ASCompat.createInstance(_loc2_, []), flash.display.MovieClip);
+		mSceneGraphComponent.addChild(mSteamAvatarHolder, (105 : UInt));
+		mSteamAvatarHolder.visible = false;
 	}
 
 	public function setNetworkComponentDistributedDungeonSummary(iface:DistributedDungeonSummaryNetworkComponent) {
@@ -422,37 +409,35 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 	}
 
 	public function postGenerate() {
+		mDBFacade.uiHideToggle.reveal();
 		mCurrentMapNode = ASCompat.coerce(mDBFacade.gameMaster.mapNodeById.itemFor(mMapNodeId), gameMasterDictionary.GMMapNode);
 		if (mCurrentMapNode == null) {
 			Logger.error("Couldn\'t find GMMapNode for node id : " + mMapNodeId);
 			return;
 		}
-		if (LifestreetTracker.IS_FUNCTIONAL
-			&& mCurrentMapNode.Id == LifestreetTracker.LIFESTREET_NODE_ID
-			&& !mDBFacade.dbAccountInfo.dbAccountParams.hasLifestreetParam()) {
-			PixelTracker.nodeCompleted(mDBFacade);
-		}
-		PixelTracker.nodeIndexCompleted(mDBFacade, mCurrentMapNode.BitIndex);
 		mDungeonName = GameMasterLocale.getGameMasterSubString("DUNGEON_NAME", mCurrentMapNode.Constant).toUpperCase();
 		if (this.dungeonSuccess != 0) {
 			mAssetLoadingComponent.getSwfAsset(DBFacade.buildFullDownloadPath("Resources/Art2D/UI/db_UI_score_report.swf"), successScoreReportSwfLoaded);
 		} else {
 			mAssetLoadingComponent.getSwfAsset(DBFacade.buildFullDownloadPath("Resources/Art2D/UI/db_UI_score_report.swf"), failureScoreReportSwfLoaded);
 		}
+		if (this.dungeonSuccess != 0 && mMapNodeId == DBGlobal.TUTORIAL_MAP_NODE_ID) {
+			mDBFacade.dbAccountInfo.dbAccountParams.setMovementTutorialParam();
+		}
 		mDBFacade.dbAccountInfo.dbAccountParams.flushParams();
 	}
 
 	function setRevealState(reveal_state:UInt, delay:Float) {
 		mRevealState = reveal_state;
-		mWorkComponent.doLater(Math.max(delay, GameClock.ANIMATION_FRAME_DURATION), updateRevealState);
+		mWorkComponent.doLater(delay, updateRevealState);
 	}
 
 	function setUILootSlotsTwoTreasuresVisible(isVisible:Bool) {
 		var _loc3_ = 0;
 		var _loc2_:Array<ASAny>;
-		final __ax4_iter_223 = mUILootSlotsTwoTreasures;
-		if (checkNullIteratee(__ax4_iter_223))
-			for (_tmp_ in __ax4_iter_223) {
+		final __ax4_iter_308 = mUILootSlotsTwoTreasures;
+		if (checkNullIteratee(__ax4_iter_308))
+			for (_tmp_ in __ax4_iter_308) {
 				_loc2_ = ASCompat.coerce(_tmp_, Array);
 				_loc3_ = 0;
 				while (_loc3_ < _loc2_.length) {
@@ -465,9 +450,9 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 	function setUILootSlotsFourTreasuresVisible(isVisible:Bool) {
 		var _loc3_ = 0;
 		var _loc2_:Array<ASAny>;
-		final __ax4_iter_224 = mUILootSlotsFourTreasures;
-		if (checkNullIteratee(__ax4_iter_224))
-			for (_tmp_ in __ax4_iter_224) {
+		final __ax4_iter_309 = mUILootSlotsFourTreasures;
+		if (checkNullIteratee(__ax4_iter_309))
+			for (_tmp_ in __ax4_iter_309) {
 				_loc2_ = ASCompat.coerce(_tmp_, Array);
 				_loc3_ = 0;
 				while (_loc3_ < _loc2_.length) {
@@ -475,6 +460,22 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 					_loc3_++;
 				}
 			}
+	}
+
+	function noCoinsCollectedByParty():Bool {
+		if (!mDungeonSuccess || mCurrentMapNode.InfiniteDungeon != null) {
+			return false;
+		}
+		var _loc1_:DungeonReport;
+		final __ax4_iter_310 = mDungeonReport;
+		if (checkNullIteratee(__ax4_iter_310))
+			for (_tmp_ in __ax4_iter_310) {
+				_loc1_ = _tmp_;
+				if (_loc1_.valid != 0 && _loc1_.gold_earned != 0) {
+					return false;
+				}
+			}
+		return true;
 	}
 
 	function updateRevealState(clock:GameClock) {
@@ -485,9 +486,9 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 		var i:UInt = 0;
 		var allFinished:Bool;
 		var loot:Array<ASAny>;
+		var popupType:String;
 		var trophies:Int;
 		var trophyGetClipLength:UInt;
-		var bossFeedPosts:Bool;
 		var maxBonus:UInt;
 		var xp_bars:Array<ASAny>;
 		var speed:Float;
@@ -520,7 +521,7 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 		var weapon_clip:MovieClip;
 		var global_position:Point;
 		var position:Vector3D;
-		var totalXP:Int;
+		var totalXP:UInt;
 		var local_i:UInt;
 		var tickingFilter:Array<ASAny>;
 		var headerTitle:String;
@@ -549,6 +550,13 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 							ASCompat.setProperty(stats[(i : Int)].stats.kills.enemies_killed, "visible", false);
 							ASCompat.setProperty(stats[(i : Int)].stats.kills.enemies_killed_reveal, "visible", false);
 							ASCompat.setProperty(stats[(i : Int)].stats.treasure, "visible", false);
+							if (mDungeonReport[(i : Int)].id == mDBFacade.accountId) {
+								if (noCoinsCollectedByParty()) {
+									mDBFacade.steamAchievementsHelper.unlockAchievement("CHALLENGE_COLLECT_NO_COINS_IN_DUNGEON");
+								}
+								mDBFacade.steamAchievementsHelper.addValueToStatInt(mDungeonReport[(i : Int)].kills, "ENEMIES_KILLED");
+								mDBFacade.steamAchievementsHelper.addValueToStatInt(mDungeonReport[(i : Int)].receivedTrophy, "TROPHIES_EARNED");
+							}
 						}
 						i = i + 1;
 					}
@@ -556,8 +564,17 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 						mXPBonusStarEffect.visible = true;
 						mXPBonusBarEffect.visible = true;
 						mXPBonusTextFlash.visible = true;
-						mXPBonusText.text = mDBFacade.accountBonus.xpBonusText;
+						TextUtil.setText(mXPBonusText, mDBFacade.accountBonus.xpBonusText);
 					}
+					if (mCurrentMapNode.InfiniteDungeon != null) {
+						popupType = "ULTIMATE_RAMPAGE";
+					} else if (this.dungeonSuccess != 0) {
+						popupType = "VICTORY";
+					} else {
+						popupType = "DEFEAT";
+					}
+					mNextFloorSection = new UIDistributedDungeonNextFloorSection(mDBFacade,
+						ASCompat.coerce((mScoreReportRoot : ASAny).dungeon_popup, flash.display.MovieClip), mCurrentMapNode, popupType, returnToSplashScreen);
 					setRevealState((20 : UInt), 0.45);
 
 				case 20:
@@ -568,7 +585,8 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 						ASCompat.setProperty((mScoreReportRoot : ASAny).stats_a.stats.trophies, "filters", [new GlowFilter((16633879 : UInt), 1, 8, 8, 10)]);
 						trophies = ASCompat.toInt((mScoreReportRoot : ASAny).stats_a.stats.trophies.trophies.text);
 						trophies = trophies + 1;
-						ASCompat.setProperty((mScoreReportRoot : ASAny).stats_a.stats.trophies.trophies, "text", Std.string(trophies));
+						TextUtil.setText(ASCompat.coerce((mScoreReportRoot : ASAny).stats_a.stats.trophies.trophies, flash.text.TextField),
+							Std.string(trophies));
 						trophyGetClipLength = (4 : UInt);
 						mDungeonAchievementPanelMovieClipRenderer.play();
 						if (mSmashSfx != null) {
@@ -586,13 +604,6 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 					if (mDungeonAchievementPanelMovieClipRenderer != null && mDungeonAchievementPanelMovieClipRenderer.clip != null) {
 						mDungeonAchievementPanelMovieClipRenderer.stop();
 						mDungeonAchievementPanelMovieClipRenderer.clip.visible = false;
-					}
-					setRevealState((30 : UInt), 0.45);
-
-				case 30:
-					bossFeedPosts = mDBFacade.dbConfigManager.getConfigBoolean("boss_feed_posts", true);
-					if (bossFeedPosts && mDungeonReport[0].receivedTrophy != 0 && mCurrentMapNode.Constant != "TUTORIAL") {
-						DBFacebookBragFeedPost.defeatMapNodeBrag(mDBFacade, mCurrentMapNode, mAssetLoadingComponent);
 					}
 					setRevealState((2 : UInt), 0.45);
 
@@ -629,25 +640,28 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 							ASCompat.setProperty(stats[(i : Int)].stats.xp_bar.bonus_xp_reveal, "visible", false);
 							ASCompat.setProperty(stats[(i : Int)].stats.xp_bar.bonus_xp, "visible", true);
 							maxBonus = (ASCompat.floatToInt(Math.max(maxBonus, mDungeonReport[(i : Int)].xp_bonus)) : UInt);
-							speed = (maxBonus - mBonusXPTick[(i : Int)]) / 10;
+							speed = ((maxBonus : Float) - (mBonusXPTick[(i : Int)] : Float)) / 10;
 							if (speed < 1 && maxBonus > mBonusXPTick[(i : Int)]) {
 								speed = 1;
 							}
 							if (mBonusXPTick[(i : Int)] < mDungeonReport[(i : Int)].xp_bonus) {
 								gmHero = ASCompat.coerce(mDBFacade.gameMaster.heroById.itemFor(mDungeonReport[(i : Int)].type), gameMasterDictionary.GMHero);
-								oldLevel = gmHero.getLevelFromExp(mDungeonReport[(i : Int)].xp + mBonusXPTick[(i : Int)]);
+								oldLevel = gmHero.getLevelFromExp(mDungeonReport[(i : Int)].xp + mBonusXPTick[(i : Int)],
+									mDungeonReport[(i : Int)].ascension_level);
 								allFinished = false;
 								mBonusXPTick[(i : Int)] += (ASCompat.floatToInt(speed) : UInt);
 								currentExp = mDungeonReport[(i : Int)].xp + mBonusXPTick[(i : Int)];
-								level = gmHero.getLevelFromExp(currentExp);
-								levelIndex = (gmHero.getLevelIndex(currentExp) : UInt);
+								level = gmHero.getLevelFromExp(currentExp, mDungeonReport[(i : Int)].ascension_level);
+								levelIndex = (gmHero.getLevelIndex(currentExp, (mDungeonReport[(i : Int)].ascension_level : Int)) : UInt);
 								lastLevelExp = (ASCompat.toInt(levelIndex > 0 ? gmHero.getExpFromIndex(levelIndex - 1) : 0) : UInt);
 								max = gmHero.getExpFromIndex(levelIndex);
-								ASCompat.setProperty(mXpBar[(i : Int)], "value", (currentExp - lastLevelExp) / (max - lastLevelExp));
-								ASCompat.setProperty(xp_bars[(i : Int)].xp_level, "text", Std.string(level));
-								ASCompat.setProperty(stats[(i : Int)].stats.xp_bar.bonus_xp.xp, "text", Std.string(mBonusXPTick[(i : Int)]));
-								ASCompat.setProperty(stats[(i : Int)].stats.xp_bar.UI_XP.xp_points, "text", Std.string(currentExp));
-								ASCompat.setProperty(stats[(i : Int)].stats.xp_bar.UI_XP.xp_level, "text", Std.string(level));
+								ASCompat.setProperty(mXpBar[(i : Int)], "value",
+									((currentExp : Float) - (lastLevelExp : Float)) / ((max : Float) - (lastLevelExp : Float)));
+								TextUtil.setText(ASCompat.coerce(xp_bars[(i : Int)].xp_level, flash.text.TextField), Std.string(level));
+								TextUtil.setText(ASCompat.coerce(stats[(i : Int)].stats.xp_bar.bonus_xp.xp, flash.text.TextField),
+									Std.string(mBonusXPTick[(i : Int)]));
+								TextUtil.setText(ASCompat.coerce(stats[(i : Int)].stats.xp_bar.UI_XP.xp_points, flash.text.TextField), Std.string(currentExp));
+								TextUtil.setText(ASCompat.coerce(stats[(i : Int)].stats.xp_bar.UI_XP.xp_level, flash.text.TextField), Std.string(level));
 								if (oldLevel != level) {
 									ASCompat.setProperty(stats[(i : Int)].stats.fx_level_up_text, "visible", true);
 									ASCompat.setProperty(stats[(i : Int)].stats.fx_level_up_anim, "visible", true);
@@ -665,7 +679,7 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 										mSoundComponent.playSfxOneShot(mLevelSfx);
 									}
 									if (i == 0) {
-										mEventComponent.dispatchEvent(new FacebookLevelUpPostEvent("FacebookLevelUpPostEvent", level));
+										mEventComponent.dispatchEvent(new LevelUpPostEvent("LevelUpPostEvent", level));
 									}
 								}
 							}
@@ -708,27 +722,31 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 					while (i < (stats.length:UInt)) {
 						if (mDungeonReport[(i : Int)].valid != 0) {
 							maxBonusTeam = (ASCompat.floatToInt(Math.max(maxBonusTeam, mDungeonReport[(i : Int)].team_xp_bonus)) : UInt);
-							speedTeam = (maxBonusTeam - mTeamBonusXPTick[(i : Int)]) / 10;
+							speedTeam = ((maxBonusTeam : Float) - (mTeamBonusXPTick[(i : Int)] : Float)) / 10;
 							if (speedTeam < 1 && maxBonusTeam > mTeamBonusXPTick[(i : Int)]) {
 								speedTeam = 1;
 							}
 							if (mTeamBonusXPTick[(i : Int)] < mDungeonReport[(i : Int)].team_xp_bonus) {
 								gmHeroTeam = ASCompat.coerce(mDBFacade.gameMaster.heroById.itemFor(mDungeonReport[(i : Int)].type),
 									gameMasterDictionary.GMHero);
-								oldLevelTeam = gmHeroTeam.getLevelFromExp(mDungeonReport[(i : Int)].xp + mBonusXPTick[(i : Int)]);
+								oldLevelTeam = gmHeroTeam.getLevelFromExp(mDungeonReport[(i : Int)].xp + mBonusXPTick[(i : Int)],
+									mDungeonReport[(i : Int)].ascension_level);
 								allFinished = false;
 								mTeamBonusXPTick[(i : Int)] += (ASCompat.floatToInt(speedTeam) : UInt);
 								currentExpTeam = mDungeonReport[(i : Int)].xp + mBonusXPTick[(i : Int)] + mTeamBonusXPTick[(i : Int)];
-								levelTeam = gmHeroTeam.getLevelFromExp(currentExpTeam);
-								levelIndexTeam = (gmHeroTeam.getLevelIndex(currentExpTeam) : UInt);
+								levelTeam = gmHeroTeam.getLevelFromExp(currentExpTeam, mDungeonReport[(i : Int)].ascension_level);
+								levelIndexTeam = (gmHeroTeam.getLevelIndex(currentExpTeam, (mDungeonReport[(i : Int)].ascension_level : Int)) : UInt);
 								lastLevelExpTeam = (ASCompat.toInt(levelIndexTeam > 0 ? gmHeroTeam.getExpFromIndex(levelIndexTeam - 1) : 0) : UInt);
 								maxTeam = gmHeroTeam.getExpFromIndex(levelIndexTeam);
-								ASCompat.setProperty(mXpBar[(i : Int)], "value", (currentExpTeam - lastLevelExpTeam) / (maxTeam - lastLevelExpTeam));
-								ASCompat.setProperty(xp_barsTeam[(i : Int)].xp_level, "text", Std.string(levelTeam));
+								ASCompat.setProperty(mXpBar[(i : Int)], "value",
+									((currentExpTeam : Float) - (lastLevelExpTeam : Float)) / ((maxTeam : Float) - (lastLevelExpTeam : Float)));
+								TextUtil.setText(ASCompat.coerce(xp_barsTeam[(i : Int)].xp_level, flash.text.TextField), Std.string(levelTeam));
 								teamBonusUITeam = ASCompat.coerce(mTeamBonusUI.itemFor(i), brain.uI.UIObject);
-								ASCompat.setProperty((teamBonusUITeam.root : ASAny).xp, "text", Std.string(mTeamBonusXPTick[(i : Int)]));
-								ASCompat.setProperty(stats[(i : Int)].stats.xp_bar.UI_XP.xp_points, "text", Std.string(currentExpTeam));
-								ASCompat.setProperty(stats[(i : Int)].stats.xp_bar.UI_XP.xp_level, "text", Std.string(levelTeam));
+								TextUtil.setText(ASCompat.coerce((teamBonusUITeam.root : ASAny).xp, flash.text.TextField),
+									Std.string(mTeamBonusXPTick[(i : Int)]));
+								TextUtil.setText(ASCompat.coerce(stats[(i : Int)].stats.xp_bar.UI_XP.xp_points, flash.text.TextField),
+									Std.string(currentExpTeam));
+								TextUtil.setText(ASCompat.coerce(stats[(i : Int)].stats.xp_bar.UI_XP.xp_level, flash.text.TextField), Std.string(levelTeam));
 								if (oldLevelTeam != levelTeam) {
 									ASCompat.setProperty(stats[(i : Int)].stats.fx_level_up_text, "visible", true);
 									ASCompat.setProperty(stats[(i : Int)].stats.fx_level_up_anim, "visible", true);
@@ -746,7 +764,7 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 										mSoundComponent.playSfxOneShot(mLevelSfx);
 									}
 									if (i == 0) {
-										mEventComponent.dispatchEvent(new FacebookLevelUpPostEvent("FacebookLevelUpPostEvent", levelTeam));
+										mEventComponent.dispatchEvent(new LevelUpPostEvent("LevelUpPostEvent", levelTeam));
 									}
 								}
 							}
@@ -784,7 +802,8 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 								__tmpIncObj1 = mKillsTick;
 								__tmpIncIdx2 = (i : Int);
 								__tmpIncObj1[__tmpIncIdx2] = (__tmpIncObj1[__tmpIncIdx2] + 1 : UInt);
-								ASCompat.setProperty(stats[(i : Int)].stats.kills.enemies_killed.kills, "text", mKillsTick[(i : Int)]);
+								TextUtil.setText(ASCompat.coerce(stats[(i : Int)].stats.kills.enemies_killed.kills, flash.text.TextField),
+									Std.string(mKillsTick[(i : Int)]));
 							}
 						}
 						i = i + 1;
@@ -824,7 +843,7 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 								weapon_clip = ASCompat.coerce(loot[(slot : Int)].getChildAt(2), flash.display.MovieClip);
 								if (weapon_clip != null) {
 									weapon_clip.visible = true;
-									global_position = weapon_clip.localToGlobal(new Point(0, 0));
+									global_position = mFacade.designLocalToGlobal(weapon_clip, new Point(0, 0));
 									position = new Vector3D(global_position.x, global_position.y + 16);
 								}
 							}
@@ -851,7 +870,7 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 					if (mBoosterPopup.expStack != null) {
 						maxBonus = (ASCompat.floatToInt(Math.max(mDungeonReport[0].xp_bonus + mDungeonReport[0].team_xp_bonus,
 							mDungeonReport[0].xp_earned)) : UInt);
-						totalXP = (mDungeonReport[0].xp_bonus + mDungeonReport[0].team_xp_bonus + mDungeonReport[0].xp_earned:Int);
+						totalXP = mDungeonReport[0].xp_bonus + mDungeonReport[0].team_xp_bonus + mDungeonReport[0].xp_earned;
 						mBoosterExpTick = (ASCompat.floatToInt(totalXP * mBoosterPopup.expStack.ExpMult - totalXP) : UInt);
 						if (mBoosterPopup != null) {
 							mBoosterPopup.setExp((mBoosterExpTick : Int));
@@ -888,21 +907,24 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 						mDungeonReport[(local_i : Int)].xp_bonus + mDungeonReport[(local_i : Int)].team_xp_bonus)) : UInt);
 					if (mBonusXPTick[(local_i : Int)] < mDungeonReport[(local_i : Int)].xp_bonus + mDungeonReport[(local_i : Int)].team_xp_bonus) {
 						gmHero = ASCompat.coerce(mDBFacade.gameMaster.heroById.itemFor(mDungeonReport[(local_i : Int)].type), gameMasterDictionary.GMHero);
-						oldLevel = gmHero.getLevelFromExp(mDungeonReport[(local_i : Int)].xp + mBonusXPTick[(local_i : Int)]);
+						oldLevel = gmHero.getLevelFromExp(mDungeonReport[(local_i : Int)].xp + mBonusXPTick[(local_i : Int)],
+							mDungeonReport[(local_i : Int)].ascension_level);
 						allFinished = false;
 						__tmpIncObj3 = mBonusXPTick;
 						__tmpIncIdx4 = (local_i : Int);
 						__tmpIncObj3[__tmpIncIdx4] = (__tmpIncObj3[__tmpIncIdx4] + 1 : UInt);
 						currentExp = mDungeonReport[(local_i : Int)].xp + mBonusXPTick[(local_i : Int)];
-						level = gmHero.getLevelFromExp(currentExp);
-						levelIndex = (gmHero.getLevelIndex(currentExp) : UInt);
+						level = gmHero.getLevelFromExp(currentExp, mDungeonReport[(local_i : Int)].ascension_level);
+						levelIndex = (gmHero.getLevelIndex(currentExp, (mDungeonReport[(local_i : Int)].ascension_level : Int)) : UInt);
 						lastLevelExp = (ASCompat.toInt(levelIndex > 0 ? gmHero.getExpFromIndex(levelIndex - 1) : 0) : UInt);
 						max = gmHero.getExpFromIndex(levelIndex);
-						ASCompat.setProperty(mXpBar[(local_i : Int)], "value", (currentExp - lastLevelExp) / (max - lastLevelExp));
-						ASCompat.setProperty(xp_bars[(local_i : Int)].xp_level, "text", Std.string(level));
-						ASCompat.setProperty(stats[(local_i : Int)].stats.xp_bar.bonus_xp.xp, "text", Std.string(mBonusXPTick[(local_i : Int)]));
-						ASCompat.setProperty(stats[(local_i : Int)].stats.xp_bar.UI_XP.xp_points, "text", Std.string(currentExp));
-						ASCompat.setProperty(stats[(local_i : Int)].stats.xp_bar.UI_XP.xp_level, "text", Std.string(level));
+						ASCompat.setProperty(mXpBar[(local_i : Int)], "value",
+							((currentExp : Float) - (lastLevelExp : Float)) / ((max : Float) - (lastLevelExp : Float)));
+						TextUtil.setText(ASCompat.coerce(xp_bars[(local_i : Int)].xp_level, flash.text.TextField), Std.string(level));
+						TextUtil.setText(ASCompat.coerce(stats[(local_i : Int)].stats.xp_bar.bonus_xp.xp, flash.text.TextField),
+							Std.string(mBonusXPTick[(local_i : Int)]));
+						TextUtil.setText(ASCompat.coerce(stats[(local_i : Int)].stats.xp_bar.UI_XP.xp_points, flash.text.TextField), Std.string(currentExp));
+						TextUtil.setText(ASCompat.coerce(stats[(local_i : Int)].stats.xp_bar.UI_XP.xp_level, flash.text.TextField), Std.string(level));
 						if (oldLevel != level) {
 							ASCompat.setProperty(stats[(local_i : Int)].stats.fx_level_up_text, "visible", true);
 							ASCompat.setProperty(stats[(local_i : Int)].stats.fx_level_up_anim, "visible", true);
@@ -917,7 +939,7 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 								textMcr.destroy();
 							});
 							if (i == 0) {
-								mEventComponent.dispatchEvent(new FacebookLevelUpPostEvent("FacebookLevelUpPostEvent", level));
+								mEventComponent.dispatchEvent(new LevelUpPostEvent("LevelUpPostEvent", level));
 							}
 						}
 					}
@@ -935,6 +957,9 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 
 				case 12:
 					fadeAwayTitle();
+					if (mTownHeader != null) {
+						mTownHeader.destroy();
+					}
 					mTownHeader = new TownHeader(mDBFacade, closeHeader);
 					mTownHeader.animateHeader();
 					if (mCurrentMapNode.InfiniteDungeon != null) {
@@ -945,8 +970,11 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 					mTownHeader.title = headerTitle;
 					mTownHeader.showCloseButton(true);
 					mUIChatLog.enabledChatEnterEvent = false;
-					mDBFacade.menuNavigationController.pushNewLayer("DISTRIBUTED_DUNGEON_SUMMARY", closeHeader, mTownHeader.closeButton);
+					mNextFloorSection.setButtonEnabled();
+					mDBFacade.menuNavigationController.pushNewLayer("DISTRIBUTED_DUNGEON_SUMMARY", closeHeader, mTownHeader.closeButton,
+						mNextFloorSection.battleButton, focusPreviousPlayerAvatar, focusNextPlayerAvatar);
 					mTownHeader.setupButtonLinks();
+					setupMenuNavigation();
 					mEventComponent.dispatchEvent(new Event("TIME_TO_SHARE_LEVEL_UP_EVENT"));
 					go = mFacade.gameObjectManager.getReferenceFromId(mDungeonReport[0].id);
 					player = ASCompat.reinterpretAs(go, PlayerGameObject);
@@ -1014,12 +1042,16 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 
 	function setupPortraits() {
 		var _loc2_:GMSkin = null;
-		var _loc3_ = 0;
+		var _loc3_ = (0 : UInt);
 		var _loc1_:TextField = null;
-		ASCompat.setProperty((mScoreReportRoot : ASAny).stats_a.stats.player_name, "text", mDungeonReport[0].name);
-		ASCompat.setProperty((mScoreReportRoot : ASAny).stats_b.stats.player_name, "text", mDungeonReport[1].name);
-		ASCompat.setProperty((mScoreReportRoot : ASAny).stats_c.stats.player_name, "text", mDungeonReport[2].name);
-		ASCompat.setProperty((mScoreReportRoot : ASAny).stats_d.stats.player_name, "text", mDungeonReport[3].name);
+		TextUtil.setText(ASCompat.coerce((mScoreReportRoot : ASAny).stats_a.stats.player_name, flash.text.TextField), mDungeonReport[0].name,
+			Locale.summaryNameSizeModifier);
+		TextUtil.setText(ASCompat.coerce((mScoreReportRoot : ASAny).stats_b.stats.player_name, flash.text.TextField), mDungeonReport[1].name,
+			Locale.summaryNameSizeModifier);
+		TextUtil.setText(ASCompat.coerce((mScoreReportRoot : ASAny).stats_c.stats.player_name, flash.text.TextField), mDungeonReport[2].name,
+			Locale.summaryNameSizeModifier);
+		TextUtil.setText(ASCompat.coerce((mScoreReportRoot : ASAny).stats_d.stats.player_name, flash.text.TextField), mDungeonReport[3].name,
+			Locale.summaryNameSizeModifier);
 		ASCompat.setProperty((mScoreReportRoot : ASAny).stats_a.stats.player_name, "textColor",
 			PlayerSpecialStatus.getSpecialTextColor(mDungeonReport[0].name,
 				(ASCompat.toInt((mScoreReportRoot : ASAny).stats_a.stats.player_name.textColor) : UInt)));
@@ -1052,102 +1084,104 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 			(mScoreReportRoot : ASAny)
 			.stats_d
 		];
-		_loc3_ = 0;
+		_loc3_ = (0 : UInt);
 		while (_loc3_ < 4) {
-			if (mDungeonReport[_loc3_].valid == ASCompat.toNumber(true)) {
-				_loc1_ = ASCompat.coerce(_loc4_[_loc3_].stats.trophies.trophies, flash.text.TextField);
-				_loc1_.text = Std.string(mDungeonReport[_loc3_].trophyCount);
-				_loc2_ = mDBFacade.gameMaster.getSkinByType(mDungeonReport[_loc3_].skin_type);
+			if (mDungeonReport[(_loc3_ : Int)].valid == ASCompat.toNumber(true)) {
+				_loc1_ = ASCompat.coerce(_loc4_[(_loc3_ : Int)].stats.trophies.trophies, flash.text.TextField);
+				TextUtil.setText(_loc1_, Std.string(mDungeonReport[(_loc3_ : Int)].trophyCount));
+				_loc2_ = mDBFacade.gameMaster.getSkinByType(mDungeonReport[(_loc3_ : Int)].skin_type);
 				if (_loc2_ == null) {
-					Logger.error("Could not find skin for skin_type: " + mDungeonReport[_loc3_].skin_type);
+					Logger.error("Could not find skin for skin_type: " + mDungeonReport[(_loc3_ : Int)].skin_type);
 				} else {
-					loadPortraitForReport(mDungeonReport[_loc3_], _loc2_, ASCompat.coerce(_loc5_[_loc3_], flash.display.MovieClip));
+					loadPortraitForReport(mDungeonReport[(_loc3_ : Int)], _loc2_, ASCompat.coerce(_loc5_[(_loc3_ : Int)], flash.display.MovieClip), _loc3_);
 				}
 			} else {
-				ASCompat.setProperty(_loc5_[_loc3_], "visible", false);
+				ASCompat.setProperty(_loc5_[(_loc3_ : Int)], "visible", false);
 			}
 			_loc3_++;
 		}
 	}
 
-	function loadPortraitForReport(dungeonReport:DungeonReport, skin:GMSkin, iconContainer:MovieClip) {
+	function loadPortraitForReport(dungeonReport:DungeonReport, skin:GMSkin, iconContainer:MovieClip, playerIndex:UInt) {
 		mAssetLoadingComponent.getSwfAsset(DBFacade.buildFullDownloadPath(skin.UISwfFilepath), function(param1:SwfAsset) {
 			var _loc3_ = param1.getClass(skin.IconName);
 			var _loc2_ = ASCompat.coerce(ASCompat.createInstance(_loc3_, []), flash.display.MovieClip);
 			UIObject.scaleToFit(_loc2_, 65);
 			iconContainer.addChild(_loc2_);
-			saveFacebookPicAndAchievement(dungeonReport.id, iconContainer);
+			var _loc4_ = new UIButton(mDBFacade, iconContainer);
+			_loc4_.rolloverFilter = DBGlobal.UI_ROLLOVER_FILTER;
+			mAvatarButtons[(playerIndex : Int)] = _loc4_;
+			loadSteamAvatar(dungeonReport.id, iconContainer);
+			if (mTownHeader != null) {
+				setupMenuNavigation();
+			}
 		});
 	}
 
-	function showFacebookPic(playerId:UInt) {
-		if (mFacebookPicHolder == null) {
+	function showSteamAvatar(playerId:UInt) {
+		if (mSteamAvatarHolder == null) {
 			return;
 		}
-		var _loc2_ = ASCompat.coerce(mFacebookPicMap.itemFor(playerId), FacebookPicHelper);
+		var _loc2_ = ASCompat.coerce(mSteamAvatarMap.itemFor(playerId), SteamAvatarHelper);
 		if (_loc2_ == null) {
 			return;
 		}
-		mFacebookPicHolder.addChild(_loc2_.pic);
-		mFacebookPicHolder.visible = true;
-		var _loc3_ = _loc2_.root.localToGlobal(new Point(0, 0));
-		mFacebookPicHolder.x = _loc3_.x;
-		mFacebookPicHolder.y = _loc3_.y - _loc2_.root.height / 2 - mFacebookPicHolder.height / 2;
+		mSteamAvatarHolder.addChild(_loc2_.pic);
+		mSteamAvatarHolder.visible = true;
+		var _loc3_ = mDBFacade.designLocalToGlobal(_loc2_.root, new Point(0, 0));
+		mSteamAvatarHolder.x = _loc3_.x;
+		mSteamAvatarHolder.y = _loc3_.y - _loc2_.root.height / 2 - mSteamAvatarHolder.height / 2;
 	}
 
-	function hideFacebookPic(playerId:UInt) {
-		if (mFacebookPicHolder == null) {
+	function hideSteamAvatar(playerId:UInt) {
+		if (mSteamAvatarHolder == null) {
 			return;
 		}
-		mFacebookPicHolder.visible = false;
-		var _loc2_ = ASCompat.coerce(mFacebookPicMap.itemFor(playerId), FacebookPicHelper);
+		mSteamAvatarHolder.visible = false;
+		var _loc2_ = ASCompat.coerce(mSteamAvatarMap.itemFor(playerId), SteamAvatarHelper);
 		if (_loc2_ == null) {
 			return;
 		}
-		if (mFacebookPicHolder.contains(_loc2_.pic)) {
-			mFacebookPicHolder.removeChild(_loc2_.pic);
+		if (mSteamAvatarHolder.contains(_loc2_.pic)) {
+			mSteamAvatarHolder.removeChild(_loc2_.pic);
 		}
 	}
 
-	function saveFacebookPicAndAchievement(playerId:UInt, root:MovieClip) {
-		var facebookId:String;
+	function loadSteamAvatar(playerId:UInt, root:MovieClip) {
 		var loader:Loader;
 		var picUrl:String;
 		var url:URLRequest;
 		var lc:LoaderContext;
 		var go = mFacade.gameObjectManager.getReferenceFromId(playerId);
 		var player = ASCompat.reinterpretAs(go, PlayerGameObject);
-		if (player == null || !ASCompat.stringAsBool(player.facebookId) || player.facebookId == "" || mDBFacade.isDRPlayer) {
+		if (player == null || !ASCompat.stringAsBool(player.steamAvatarUrl) || player.steamAvatarUrl == "") {
 			return;
 		}
-		if (mDBFacade.facebookController != null && player.isFriend && playerId != mDBFacade.accountId) {
-			mDBFacade.facebookController.updateGuestAchievement((4 : UInt));
-		}
-		facebookId = player.facebookId;
 		loader = new Loader();
-		picUrl = "https://graph.facebook.com/" + facebookId + "/picture";
+		picUrl = player.steamAvatarUrl;
 		url = new URLRequest(picUrl);
-		loader.contentLoaderInfo.addEventListener("ioError", (cast function() {}));
-		loader.contentLoaderInfo.addEventListener("securityError", (cast function() {}));
-		loader.contentLoaderInfo.addEventListener("complete", function(param1:Event) {
-			var facebookPic:DisplayObject;
-			var helper:FacebookPicHelper;
+		EventListeners.add(loader.contentLoaderInfo, "ioError", function() {});
+		EventListeners.add(loader.contentLoaderInfo, "securityError", function() {});
+		EventListeners.add(loader.contentLoaderInfo, "complete", function(param1:Event) {
+			var steamAvatarPic:DisplayObject;
+			var helper:SteamAvatarHelper;
 			var e = param1;
-			if (root == null) {
+			if (root == null || mDBFacade == null || mSteamAvatarMap == null) {
 				return;
 			}
-			facebookPic = loader;
-			facebookPic.x -= 25;
-			facebookPic.y -= 25;
-			helper = new FacebookPicHelper();
-			helper.pic = facebookPic;
+			steamAvatarPic = loader;
+			steamAvatarPic.x -= 25;
+			steamAvatarPic.y -= 25;
+			steamAvatarPic.width = steamAvatarPic.height = 50;
+			helper = new SteamAvatarHelper();
+			helper.pic = steamAvatarPic;
 			helper.root = root;
-			mFacebookPicMap.add(playerId, helper);
-			root.addEventListener("rollOver", function(param1:flash.events.MouseEvent) {
-				showFacebookPic(playerId);
+			mSteamAvatarMap.add(playerId, helper);
+			EventListeners.add(root, "rollOver", function(param1:flash.events.MouseEvent) {
+				showSteamAvatar(playerId);
 			});
-			root.addEventListener("rollOut", function(param1:flash.events.MouseEvent) {
-				hideFacebookPic(playerId);
+			EventListeners.add(root, "rollOut", function(param1:flash.events.MouseEvent) {
+				hideSteamAvatar(playerId);
 			});
 		});
 		lc = new LoaderContext(true);
@@ -1156,13 +1190,13 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 	}
 
 	function setupXPBars() {
-		var _loc7_ = 0;
+		var _loc7_ = (0 : UInt);
 		var _loc4_:GMHero = null;
-		var _loc5_ = 0;
-		var _loc2_ = 0;
-		var _loc1_ = 0;
-		var _loc8_ = 0;
-		var _loc6_ = 0;
+		var _loc5_ = (0 : UInt);
+		var _loc2_ = (0 : UInt);
+		var _loc1_ = (0 : UInt);
+		var _loc8_ = (0 : UInt);
+		var _loc6_ = (0 : UInt);
 		ASCompat.setProperty((mScoreReportRoot : ASAny).stats_a.stats.fx_level_up_text, "visible", false);
 		ASCompat.setProperty((mScoreReportRoot : ASAny).stats_b.stats.fx_level_up_text, "visible", false);
 		ASCompat.setProperty((mScoreReportRoot : ASAny).stats_c.stats.fx_level_up_text, "visible", false);
@@ -1181,22 +1215,25 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 			(mScoreReportRoot : ASAny)
 			.stats_d.stats.xp_bar.UI_XP
 		];
-		_loc7_ = 0;
+		_loc7_ = (0 : UInt);
 		while (_loc7_ < 4) {
-			if (mDungeonReport[_loc7_].valid != 0) {
-				_loc4_ = ASCompat.coerce(mDBFacade.gameMaster.heroById.itemFor(mDungeonReport[_loc7_].type), gameMasterDictionary.GMHero);
-				_loc5_ = (_loc4_.getLevelFromExp(mDungeonReport[_loc7_].xp) : Int);
-				_loc2_ = (mDungeonReport[_loc7_].xp : Int);
-				_loc1_ = _loc4_.getLevelIndex(_loc2_);
-				_loc8_ = ASCompat.toInt(_loc1_ > 0 ? _loc4_.getExpFromIndex((_loc1_ - 1 : UInt)) : 0);
-				_loc6_ = (_loc4_.getExpFromIndex((_loc1_ : UInt)) : Int);
-				mXpBar[_loc7_] = new UIProgressBar(mFacade, ASCompat.coerce(_loc3_[_loc7_].xp_bar, flash.display.MovieClip));
-				ASCompat.setProperty(mXpBar[_loc7_], "value", (_loc2_ - _loc8_) / (_loc6_ - _loc8_));
-				ASCompat.setProperty(_loc3_[_loc7_].xp_level, "text", Std.string(_loc5_));
-				ASCompat.setProperty(_loc3_[_loc7_].xp_points, "visible", true);
-				ASCompat.setProperty(_loc3_[_loc7_].xp_points, "text", Std.string(mDungeonReport[_loc7_].xp));
+			if (mDungeonReport[(_loc7_ : Int)].valid != 0) {
+				_loc4_ = ASCompat.coerce(mDBFacade.gameMaster.heroById.itemFor(mDungeonReport[(_loc7_ : Int)].type), gameMasterDictionary.GMHero);
+				_loc5_ = _loc4_.getLevelFromExp(mDungeonReport[(_loc7_ : Int)].xp, mDungeonReport[(_loc7_ : Int)].ascension_level);
+				_loc2_ = mDungeonReport[(_loc7_ : Int)].xp;
+				_loc1_ = (_loc4_.getLevelIndex(_loc2_, (mDungeonReport[(_loc7_ : Int)].ascension_level : Int)) : UInt);
+				_loc8_ = (ASCompat.toInt(_loc1_ > 0 ? _loc4_.getExpFromIndex(_loc1_ - 1) : 0) : UInt);
+				_loc6_ = _loc4_.getExpFromIndex(_loc1_);
+				mXpBar[(_loc7_ : Int)] = new UIProgressBar(mFacade, ASCompat.coerce(_loc3_[(_loc7_ : Int)].xp_bar, flash.display.MovieClip));
+				if (ASCompat.toBool(_loc3_[(_loc7_ : Int)].xp_bar_delta)) {
+					ASCompat.setProperty(_loc3_[(_loc7_ : Int)].xp_bar_delta, "visible", false);
+				}
+				ASCompat.setProperty(mXpBar[(_loc7_ : Int)], "value", ((_loc2_ : Float) - (_loc8_ : Float)) / ((_loc6_ : Float) - (_loc8_ : Float)));
+				TextUtil.setText(ASCompat.coerce(_loc3_[(_loc7_ : Int)].xp_level, flash.text.TextField), Std.string(_loc5_));
+				ASCompat.setProperty(_loc3_[(_loc7_ : Int)].xp_points, "visible", true);
+				TextUtil.setText(ASCompat.coerce(_loc3_[(_loc7_ : Int)].xp_points, flash.text.TextField), Std.string(mDungeonReport[(_loc7_ : Int)].xp));
 			} else {
-				ASCompat.setProperty(_loc3_[_loc7_], "visible", false);
+				ASCompat.setProperty(_loc3_[(_loc7_ : Int)], "visible", false);
 			}
 			_loc7_++;
 		}
@@ -1221,7 +1258,7 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 			ASCompat.setProperty(details.NewWeaponDetails, "id", weapon_id);
 			if (!mTookLastItem) {
 				callbackHelper = function(param1:ASAny):ASFunction {
-					var details:ASObject = param1;
+					var details:ASAny = param1;
 					return function() {
 						mChestRevealPopUp.updateRevealLoot(details);
 					};
@@ -1237,18 +1274,15 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 			if (mTookLastItem) {
 				removeItemFromSlot(mSelectedItemSlot);
 				if (!mFromInventory) {
-					if (mOpenKeyChestMC != null) {
+					if (mTreasureFoundPopup != null) {
 						closeKeyChestPopup();
 					}
 					loadNextChestPopUp();
 				}
 			}
 		} else {
-			if (mInfoPopup != null) {
-				mInfoPopup.destroy();
-				mInfoPopup = null;
-			}
-			mChestTransactionFailedPopup = new DBUIPopup(mDBFacade, Locale.getString("TRANSACTION_FAILED"));
+			closeInfoPopup();
+			mChestTransactionFailedPopup = new DBUIPopup(mDBFacade, "", Locale.getString("TRANSACTION_FAILED"));
 			MemoryTracker.track(mChestTransactionFailedPopup, "DBUIPopup - created in DistributedDungeonSummary.TransactionResponse()");
 			mLogicalWorkComponent.doLater(1.5, function() {
 				if (mChestTransactionFailedPopup != null) {
@@ -1257,7 +1291,7 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 				}
 			});
 			if (!mTookLastItem) {
-				if (mOpenKeyChestMC != null) {
+				if (mTreasureFoundPopup != null) {
 					closeKeyChestPopup();
 				}
 				mChestRevealPopUp.destroy();
@@ -1267,10 +1301,7 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 		}
 		mEventComponent.addListener("DB_ACCOUNT_INFO_LOADED", function(param1:Event) {
 			mEventComponent.removeListener("DB_ACCOUNT_INFO_LOADED");
-			if (mInfoPopup != null) {
-				mInfoPopup.destroy();
-				mInfoPopup = null;
-			}
+			closeInfoPopup();
 			updateRevealPopupCallback();
 			if (mTransactionSuccessCallback != null) {
 				mTransactionSuccessCallback();
@@ -1306,7 +1337,7 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 	}
 
 	function getPlayerSlotItemCount(playerSlot:Int):Int {
-		var _loc3_ = 0;
+		var _loc3_ = (0 : UInt);
 		var _loc5_ = 0;
 		var _loc4_ = mDungeonReport[playerSlot];
 		var _loc2_:Array<ASAny> = [
@@ -1316,9 +1347,9 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 			_loc4_.chest_type_4
 		];
 		if (_loc4_.valid == ASCompat.toNumber(true)) {
-			_loc3_ = 0;
-			while (_loc3_ < _loc2_.length) {
-				if (ASCompat.toNumber(_loc2_[_loc3_]) != 0) {
+			_loc3_ = (0 : UInt);
+			while (_loc3_ < (_loc2_.length:UInt)) {
+				if (ASCompat.toNumber(_loc2_[(_loc3_ : Int)]) != 0) {
 					_loc5_++;
 				}
 				_loc3_++;
@@ -1328,10 +1359,10 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 	}
 
 	function setupItemButtons() {
-		var _loc2_ = 0;
+		var _loc2_ = (0 : UInt);
 		var _loc7_:DungeonReport = null;
 		var _loc1_:Array<ASAny> = null;
-		var _loc6_ = 0;
+		var _loc6_ = (0 : UInt);
 		var _loc4_:GMChest = null;
 		var _loc5_:Array<ASAny> = [
 			(mScoreReportRoot : ASAny)
@@ -1350,46 +1381,47 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 		if (mUILootSlots == mUILootSlotsTwoTreasures) {
 			setUILootSlotsFourTreasuresVisible(false);
 		}
-		_loc2_ = 0;
+		_loc2_ = (0 : UInt);
 		while (_loc2_ < 4) {
-			_loc7_ = mDungeonReport[_loc2_];
+			_loc7_ = mDungeonReport[(_loc2_ : Int)];
 			_loc1_ = [_loc7_.loot_type_1, _loc7_.loot_type_2, _loc7_.loot_type_3, _loc7_.loot_type_4];
 			if (_loc7_.valid == ASCompat.toNumber(true)) {
-				_loc6_ = 0;
-				while (_loc6_ < _loc1_.length) {
-					if (ASCompat.toNumber(_loc1_[_loc6_]) != 0) {
-						_loc4_ = ASCompat.coerce(mDBFacade.gameMaster.chestsById.itemFor(_loc1_[_loc6_]), gameMasterDictionary.GMChest);
+				_loc6_ = (0 : UInt);
+				while (_loc6_ < (_loc1_.length:UInt)) {
+					if (ASCompat.toNumber(_loc1_[(_loc6_ : Int)]) != 0) {
+						_loc4_ = ASCompat.coerce(mDBFacade.gameMaster.chestsById.itemFor(_loc1_[(_loc6_ : Int)]), gameMasterDictionary.GMChest);
 						if (_loc4_ != null && ASCompat.stringAsBool(_loc4_.IconName)) {
-							if (isSingleChestList[_loc2_]) {
-								if (_loc3_[_loc2_] == null || ASCompat.dynGetIndex(_loc3_[_loc2_], 2) == null) {
+							if (isSingleChestList[(_loc2_ : Int)]) {
+								if (_loc3_[(_loc2_ : Int)] == null || ASCompat.dynGetIndex(_loc3_[(_loc2_ : Int)], 2) == null) {
 									Logger.warn("Could not load loot for singleChestList player slot: " + _loc2_);
 									_loc6_++;
 									continue;
 								}
-								ASCompat.setProperty(ASCompat.dynGetIndex(_loc3_[_loc2_], 2), "visible", false);
+								ASCompat.setProperty(ASCompat.dynGetIndex(_loc3_[(_loc2_ : Int)], 2), "visible", false);
 								mAssetLoadingComponent.getSwfAsset(DBFacade.buildFullDownloadPath(_loc4_.IconSwf),
-									loadChestIconCallback(_loc4_, ASCompat.coerce(ASCompat.dynGetIndex(mChestMovieClips[_loc2_], 2), flash.display.MovieClip),
-										(ASCompat.toInt(_loc1_[_loc6_]) : UInt), (_loc2_ : UInt), (_loc6_ : UInt), this));
+									loadChestIconCallback(_loc4_,
+										ASCompat.coerce(ASCompat.dynGetIndex(mChestMovieClips[(_loc2_ : Int)], 2), flash.display.MovieClip),
+										(ASCompat.toInt(_loc1_[(_loc6_ : Int)]) : UInt), _loc2_, _loc6_, this));
 							} else {
-								if (_loc3_[_loc2_] == null || ASCompat.dynGetIndex(_loc3_[_loc2_], _loc6_) == null) {
+								if (_loc3_[(_loc2_ : Int)] == null || ASCompat.dynGetIndex(_loc3_[(_loc2_ : Int)], _loc6_) == null) {
 									Logger.warn("Could not load loot for player slot: " + _loc2_ + " chest slot: " + _loc6_);
 									_loc6_++;
 									continue;
 								}
-								ASCompat.setProperty(ASCompat.dynGetIndex(_loc3_[_loc2_], _loc6_), "visible", false);
+								ASCompat.setProperty(ASCompat.dynGetIndex(_loc3_[(_loc2_ : Int)], _loc6_), "visible", false);
 								mAssetLoadingComponent.getSwfAsset(DBFacade.buildFullDownloadPath(_loc4_.IconSwf),
 									loadChestIconCallback(_loc4_,
-										ASCompat.coerce(ASCompat.dynGetIndex(mChestMovieClips[_loc2_], _loc6_), flash.display.MovieClip),
-										(ASCompat.toInt(_loc1_[_loc6_]) : UInt), (_loc2_ : UInt), (_loc6_ : UInt), this));
+										ASCompat.coerce(ASCompat.dynGetIndex(mChestMovieClips[(_loc2_ : Int)], _loc6_), flash.display.MovieClip),
+										(ASCompat.toInt(_loc1_[(_loc6_ : Int)]) : UInt), _loc2_, _loc6_, this));
 							}
 						} else {
-							Logger.error("Could not find GMChestItem for loot item: " + Std.string(_loc1_[_loc6_]));
+							Logger.error("Could not find GMChestItem for loot item: " + Std.string(_loc1_[(_loc6_ : Int)]));
 						}
 					}
 					_loc6_++;
 				}
 			} else {
-				ASCompat.setProperty(_loc5_[_loc2_], "visible", false);
+				ASCompat.setProperty(_loc5_[(_loc2_ : Int)], "visible", false);
 			}
 			_loc2_++;
 		}
@@ -1399,9 +1431,9 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 		var mcr:MovieClipRenderer;
 		var loot:Array<ASAny>;
 		var yScale:Float;
-		final __ax4_iter_225 = mChestRenderers;
-		if (checkNullIteratee(__ax4_iter_225))
-			for (_tmp_ in __ax4_iter_225) {
+		final __ax4_iter_311 = mChestRenderers;
+		if (checkNullIteratee(__ax4_iter_311))
+			for (_tmp_ in __ax4_iter_311) {
 				mcr = _tmp_;
 				mcr.destroy();
 			}
@@ -1419,11 +1451,11 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 			mUILootSlots = mUILootSlotsTwoTreasures;
 		}
 		mAssetLoadingComponent.getSwfAsset(DBFacade.buildFullDownloadPath("Resources/Art2D/Doobers/db_items_doobers.swf"), function(param1:SwfAsset) {
-			var _loc9_ = 0;
+			var _loc9_ = (0 : UInt);
 			var _loc2_:Array<ASAny> = null;
 			var _loc12_ = 0;
-			var _loc5_ = 0;
-			var _loc10_ = 0;
+			var _loc5_ = (0 : UInt);
+			var _loc10_ = (0 : UInt);
 			var _loc7_:GMDoober = null;
 			var _loc8_:GMChest = null;
 			var _loc6_:String = null;
@@ -1431,18 +1463,18 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 			var _loc11_:Point = null;
 			var _loc3_:Array<ASAny> = null;
 			loot = mUILootSlots;
-			_loc9_ = 0;
+			_loc9_ = (0 : UInt);
 			while (_loc9_ < 4) {
 				_loc2_ = [
-					mDungeonReport[_loc9_].chest_type_1,
-					mDungeonReport[_loc9_].chest_type_2,
-					mDungeonReport[_loc9_].chest_type_3,
-					mDungeonReport[_loc9_].chest_type_4
+					mDungeonReport[(_loc9_ : Int)].chest_type_1,
+					mDungeonReport[(_loc9_ : Int)].chest_type_2,
+					mDungeonReport[(_loc9_ : Int)].chest_type_3,
+					mDungeonReport[(_loc9_ : Int)].chest_type_4
 				];
 				_loc12_ = 0;
-				_loc5_ = 0;
-				while (_loc5_ < _loc2_.length) {
-					if (ASCompat.toBool(_loc2_[_loc5_])) {
+				_loc5_ = (0 : UInt);
+				while (_loc5_ < (_loc2_.length:UInt)) {
+					if (ASCompat.toBool(_loc2_[(_loc5_ : Int)])) {
 						_loc12_++;
 					}
 					_loc5_++;
@@ -1452,28 +1484,29 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 				} else {
 					ASCompat.ASArray.sort(_loc2_, compareChestTypes);
 				}
-				if (mDungeonReport[_loc9_].valid == ASCompat.toNumber(true)) {
-					_loc10_ = 0;
+				if (mDungeonReport[(_loc9_ : Int)].valid == ASCompat.toNumber(true)) {
+					_loc10_ = (0 : UInt);
 					while (_loc10_ < 4) {
-						if (!(ASCompat.toNumber(_loc2_[_loc10_]) == 0 || ASCompat.dynGetIndex(loot[_loc9_], _loc10_) == null)) {
-							_loc7_ = ASCompat.coerce(mDBFacade.gameMaster.dooberById.itemFor(_loc2_[_loc10_]), gameMasterDictionary.GMDoober);
+						if (!(ASCompat.toNumber(_loc2_[(_loc10_ : Int)]) == 0
+							|| ASCompat.dynGetIndex(loot[(_loc9_ : Int)], _loc10_) == null)) {
+							_loc7_ = ASCompat.coerce(mDBFacade.gameMaster.dooberById.itemFor(_loc2_[(_loc10_ : Int)]), gameMasterDictionary.GMDoober);
 							if (_loc7_ != null) {
 								_loc8_ = ASCompat.coerce(mDBFacade.gameMaster.chestsById.itemFor(_loc7_.ChestId), gameMasterDictionary.GMChest);
 								_loc6_ = _loc8_.IconSwf;
 								_loc4_ = _loc8_.IconName;
-								if (isSingleChestList[_loc9_]) {
-									_loc10_ = 2;
+								if (isSingleChestList[(_loc9_ : Int)]) {
+									_loc10_ = (2 : UInt);
 								}
-								_loc11_ = new Point(ASCompat.toNumberField(ASCompat.dynGetIndex(loot[_loc9_], _loc10_), "x"),
-									ASCompat.toNumberField(ASCompat.dynGetIndex(loot[_loc9_], _loc10_), "y"));
+								_loc11_ = new Point(ASCompat.toNumberField(ASCompat.dynGetIndex(loot[(_loc9_ : Int)], _loc10_), "x"),
+									ASCompat.toNumberField(ASCompat.dynGetIndex(loot[(_loc9_ : Int)], _loc10_), "y"));
 								_loc3_ = mChestMovieClips;
 								ChestInfo.loadItemIcon(_loc6_, _loc4_,
-									ASCompat.coerce(ASCompat.dynGetIndex(mChestMovieClips[_loc9_], _loc10_), flash.display.DisplayObjectContainer), mDBFacade,
-									(150 : UInt), (150 : UInt), mAssetLoadingComponent);
-								ASCompat.setProperty(ASCompat.dynGetIndex(mChestMovieClips[_loc9_], _loc10_), "scaleX",
-									ASCompat.setProperty(ASCompat.dynGetIndex(mChestMovieClips[_loc9_], _loc10_), "scaleY", yScale));
-								ASCompat.setProperty(ASCompat.dynGetIndex(mChestMovieClips[_loc9_], _loc10_), "x", _loc11_.x);
-								ASCompat.setProperty(ASCompat.dynGetIndex(mChestMovieClips[_loc9_], _loc10_), "y", _loc11_.y);
+									ASCompat.coerce(ASCompat.dynGetIndex(mChestMovieClips[(_loc9_ : Int)], _loc10_), flash.display.DisplayObjectContainer),
+									mDBFacade, (150 : UInt), (150 : UInt), mAssetLoadingComponent);
+								ASCompat.setProperty(ASCompat.dynGetIndex(mChestMovieClips[(_loc9_ : Int)], _loc10_), "scaleX",
+									ASCompat.setProperty(ASCompat.dynGetIndex(mChestMovieClips[(_loc9_ : Int)], _loc10_), "scaleY", yScale));
+								ASCompat.setProperty(ASCompat.dynGetIndex(mChestMovieClips[(_loc9_ : Int)], _loc10_), "x", _loc11_.x);
+								ASCompat.setProperty(ASCompat.dynGetIndex(mChestMovieClips[(_loc9_ : Int)], _loc10_), "y", _loc11_.y);
 							}
 						}
 						_loc10_++;
@@ -1519,21 +1552,20 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 	}
 
 	function setupWeapons() {
-		mWeapons = [];
-		mWeaponTooltips = [];
+		mWeapons = [[], [], [], []];
+		mWeaponTooltips = [[], [], [], []];
 		mAssetLoadingComponent.getSwfAsset(DBFacade.buildFullDownloadPath("Resources/Art2D/UI/db_UI_town.swf"), function(param1:SwfAsset) {
-			var _loc2_ = 0;
-			var _loc3_ = 0;
-			_loc2_ = 0;
+			var _loc2_ = (0 : UInt);
+			var _loc3_ = (0 : UInt);
+			_loc2_ = (0 : UInt);
 			while (_loc2_ < 4) {
-				if (mDungeonReport[_loc2_].valid == ASCompat.toNumber(true)) {
-					mWeaponTooltips.push([]);
-					_loc3_ = 0;
+				if (mDungeonReport[(_loc2_ : Int)].valid == ASCompat.toNumber(true)) {
+					_loc3_ = (0 : UInt);
 					while (_loc3_ < 3) {
-						if (!(_loc3_ == 0 && mDungeonReport[_loc2_].weapon_type_1 == 0)) {
-							if (!(_loc3_ == 1 && mDungeonReport[_loc2_].weapon_type_2 == 0)) {
-								if (!(_loc3_ == 2 && mDungeonReport[_loc2_].weapon_type_3 == 0)) {
-									setupWeaponUIForStat(param1, (_loc2_ : UInt), (_loc3_ : UInt));
+						if (!(_loc3_ == 0 && mDungeonReport[(_loc2_ : Int)].weapon_type_1 == 0)) {
+							if (!(_loc3_ == 1 && mDungeonReport[(_loc2_ : Int)].weapon_type_2 == 0)) {
+								if (!(_loc3_ == 2 && mDungeonReport[(_loc2_ : Int)].weapon_type_3 == 0)) {
+									setupWeaponUIForStat(param1, _loc2_, _loc3_);
 								}
 							}
 						}
@@ -1541,6 +1573,9 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 					}
 				}
 				_loc2_++;
+			}
+			if (mTownHeader != null) {
+				setupMenuNavigation();
 			}
 		});
 	}
@@ -1585,7 +1620,7 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 			]
 		];
 		var weapon = new UIObject(mDBFacade, ASCompat.coerce(ASCompat.dynGetIndex(weaponButtons[(statNum : Int)], weaponSlotNum), flash.display.MovieClip));
-		mWeapons.push(weapon);
+		mWeapons[(statNum : Int)][weaponSlotNum] = weapon;
 		tooltipClass = swfAsset.getClass("DR_weapon_tooltip");
 		weaponTooltip = new UIWeaponTooltip(mDBFacade, tooltipClass);
 		ASCompat.dynPush(mWeaponTooltips[(statNum : Int)], weaponTooltip);
@@ -1709,7 +1744,8 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 	function chestOpenPopUp(gmChest:GMChest, slot:UInt) {
 		mSelectedItemSlot = slot;
 		mSelectedGMChest = gmChest;
-		mAssetLoadingComponent.getSwfAsset(DBFacade.buildFullDownloadPath("Resources/Art2D/UI/db_UI_score_report.swf"), setupOpenKeyChest);
+		mTreasureFoundPopup = new UITreasureFoundPopup(mDBFacade, mSelectedGMChest, abandonChestCallback, keepChestCallback, openChestCallback,
+			refreshHeroInfoUI);
 	}
 
 	@:isVar public var dungeonSuccess(get, set):UInt;
@@ -1735,79 +1771,10 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 		};
 	}
 
-	function setupOpenKeyChest(swfAsset:SwfAsset) {
-		var openKeyChestClass:Dynamic;
-		var bounds:Rectangle;
-		var swfPath:String;
-		var iconName:String;
-		var rarity:GMRarity;
-		var bgColoredExists:Bool;
-		var bgSwfPath:String;
-		var bgIconName:String;
-		var keys:Vector<KeyInfo>;
-		var i:Int;
-		mSceneGraphComponent.showPopupCurtain();
-		openKeyChestClass = UIHud.isThisAConsumbleChestId((mSelectedGMChest.Id : Int)) ? swfAsset.getClass("popup_itemBox") : swfAsset.getClass("popup_chest");
-		mOpenKeyChestMC = ASCompat.coerce(ASCompat.createInstance(openKeyChestClass, []), flash.display.MovieClip);
-		mOpenKeyChestMC.scaleX = mOpenKeyChestMC.scaleY = 1.8;
-		bounds = mOpenKeyChestMC.getBounds(mDBFacade.stageRef);
-		mOpenKeyChestMC.x = mDBFacade.stageRef.stageWidth / 2 - bounds.width / 2 - bounds.x;
-		mOpenKeyChestMC.y = mDBFacade.stageRef.stageHeight / 2 - bounds.height / 2 - bounds.y;
-		ASCompat.setProperty((mOpenKeyChestMC : ASAny).title_label, "text", Locale.getString("TREASURE_FOUND"));
-		swfPath = mSelectedGMChest.IconSwf;
-		iconName = mSelectedGMChest.IconName;
-		ChestInfo.loadItemIcon(swfPath, iconName, ASCompat.coerce((mOpenKeyChestMC : ASAny).content, flash.display.DisplayObjectContainer), mDBFacade,
-			(150 : UInt), (150 : UInt), mAssetLoadingComponent);
-		rarity = ASCompat.coerce(mDBFacade.gameMaster.rarityByConstant.itemFor(mSelectedGMChest.Rarity), gameMasterDictionary.GMRarity);
-		bgColoredExists = rarity.HasColoredBackground;
-		bgSwfPath = rarity.BackgroundSwf;
-		bgIconName = rarity.BackgroundIcon;
-		if (bgColoredExists) {
-			mAssetLoadingComponent.getSwfAsset(DBFacade.buildFullDownloadPath(bgSwfPath), function(param1:SwfAsset) {
-				var _loc3_:MovieClip = null;
-				var _loc2_ = param1.getClass(bgIconName);
-				if (_loc2_ != null) {
-					_loc3_ = ASCompat.dynamicAs(ASCompat.createInstance(_loc2_, []), MovieClip);
-					(mOpenKeyChestMC : ASAny).content.addChildAt(_loc3_, 0);
-					_loc3_.scaleX = _loc3_.scaleY = 1.5;
-				}
-			});
-		}
-		mOpenKeyChestRenderer = new MovieClipRenderer(mDBFacade, ASCompat.coerce((mOpenKeyChestMC : ASAny).content, flash.display.MovieClip));
-		mOpenKeyChestRenderer.play((0 : UInt), true);
-		mAbandonButton = new UIButton(mDBFacade, ASCompat.coerce((mOpenKeyChestMC : ASAny).abandon_button, flash.display.MovieClip));
-		mAbandonButton.releaseCallback = abandonChestCallback;
-		mAbandonButton.label.text = Locale.getString("ABANDON");
-		mKeepButton = new UIButton(mDBFacade, ASCompat.coerce((mOpenKeyChestMC : ASAny).keep_button, flash.display.MovieClip));
-		mKeepButton.releaseCallback = keepChestCallback;
-		mKeepButton.label.text = Locale.getString("KEEP");
-		mOpenButton = new UIButton(mDBFacade, ASCompat.coerce((mOpenKeyChestMC : ASAny).open_button, flash.display.MovieClip));
-		mOpenButton.releaseCallback = openChestCallback;
-		mOpenButton.label.text = Locale.getString("UNLOCK");
-		ASCompat.setProperty((mOpenKeyChestMC : ASAny).close, "visible", false);
-		keys = mDBFacade.dbAccountInfo.inventoryInfo.keys;
-		i = 0;
-		while (i < keys.length) {
-			if (mSelectedGMChest.Id == keys[i].gmKey.ChestId) {
-				mKeyThatCanOpenChest = keys[i];
-			}
-			i = i + 1;
-		}
-		if (!UIHud.isThisAConsumbleChestId((mSelectedGMChest.Id : Int))) {
-			mAssetLoadingComponent.getSwfAsset(DBFacade.buildFullDownloadPath(mKeyThatCanOpenChest.gmKeyOffer.BundleSwfFilepath), loadKeyIconOnButton);
-			refreshHeroInfoUI(mOpenKeyChestMC);
-		}
-		mSceneGraphComponent.addChild(mOpenKeyChestMC, (105 : UInt));
-		mDBFacade.menuNavigationController.pushNewLayer("POPUP_CHEST_LAYER", closeKeyChestPopup, mOpenButton);
-		mOpenButton.isAbove(mKeepButton);
-		mAbandonButton.isToTheLeftOf(mKeepButton);
-		mAbandonButton.upNavigation = mOpenButton;
-	}
-
 	public function refreshHeroInfoUI(chestMC:MovieClip) {
 		var mHeroInfo:AvatarInfo;
 		var gmSkin:GMSkin;
-		ASCompat.setProperty((chestMC : ASAny).hero_label, "text", Locale.getString("OPENING_WITH"));
+		Locale.setText(ASCompat.coerce((chestMC : ASAny).hero_label, flash.text.TextField), "OPENING_WITH");
 		mHeroInfo = mDBFacade.dbAccountInfo.activeAvatarInfo;
 		gmSkin = mDBFacade.gameMaster.getSkinByType(mHeroInfo.skinId);
 		if (gmSkin == null) {
@@ -1830,19 +1797,9 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 		}
 	}
 
-	function loadKeyIconOnButton(swfAsset:SwfAsset) {
-		var _loc3_ = swfAsset.getClass(mKeyThatCanOpenChest.gmKeyOffer.BundleIcon);
-		var _loc2_ = ASCompat.dynamicAs(ASCompat.createInstance(_loc3_, []), MovieClip);
-		_loc2_.scaleX = _loc2_.scaleY = 0.5;
-		if (ASCompat.toNumberField((mOpenButton.root : ASAny).pick, "numChildren") > 1) {
-			(mOpenButton.root : ASAny).pick.removeChildAt(1);
-		}
-		(mOpenButton.root : ASAny).pick.addChild(_loc2_);
-	}
-
-	function setupOpenKeylessChest(swfAsset:SwfAsset) {
-		mChestBuyKeysPopUp = new ChestBuyKeysPopUp(mDBFacade, mAssetLoadingComponent, mSceneGraphComponent, swfAsset, mSelectedGMChest, chestBuyCoinCallback,
-			chestBuyGemCallback, closeKeylessChestPopup, refreshHeroInfoUI, true);
+	function setupOpenKeylessChest() {
+		mChestBuyKeysPopUp = new ChestBuyKeysPopUp(mDBFacade, mSelectedGMChest, chestBuyCoinCallback, chestBuyGemCallback, closeKeylessChestPopup,
+			refreshHeroInfoUI, true);
 	}
 
 	function createKeySlots(mc:MovieClip) {
@@ -1865,7 +1822,7 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 	function chestBuyCoinCallback(val:Float):ASFunction {
 		return function() {
 			var _loc1_ = 0;
-			var _loc2_ = 0;
+			var _loc2_ = (0 : UInt);
 			mDBFacade.metrics.log("ChestUnlockCoinTry", {
 				"chestId": mSelectedGMChest.Id,
 				"rarity": mSelectedGMChest.Rarity,
@@ -1879,14 +1836,15 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 				});
 				closeKeylessChestPopup();
 				closeKeyChestPopup();
-				mInfoPopup = new DBUIPopup(mDBFacade, Locale.getString("PURCHASING..."));
+				closeInfoPopup();
+				mInfoPopup = new DBUIPopup(mDBFacade, "", Locale.getString("PURCHASING..."));
 				MemoryTracker.track(mInfoPopup, "DBUIPopup - created in DistributedDungeonSummary.chestBuyCoinCallback()");
 				mSceneGraphComponent.addChild(mInfoPopup.root, (105 : UInt));
 				_loc1_ = 0;
 				while (_loc1_ < 6) {
 					if (mDBFacade.dbAccountInfo.inventoryInfo.keys[_loc1_].gmKey.ChestId == mSelectedGMChest.Id) {
-						_loc2_ = (mDBFacade.dbAccountInfo.inventoryInfo.keys[_loc1_].gmKeyOffer.Id : Int);
-						StoreServices.purchaseOffer(mDBFacade, (_loc2_ : UInt), boughtKey, boughtKeyError, (0 : UInt), false);
+						_loc2_ = mDBFacade.dbAccountInfo.inventoryInfo.keys[_loc1_].gmKeyOffer.Id;
+						StoreServices.purchaseOffer(mDBFacade, _loc2_, boughtKey, boughtKeyError, (0 : UInt), false);
 						break;
 					}
 					_loc1_++;
@@ -1900,7 +1858,7 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 	function chestBuyGemCallback(val:Float):ASFunction {
 		return function() {
 			var _loc1_ = 0;
-			var _loc2_ = 0;
+			var _loc2_ = (0 : UInt);
 			mDBFacade.metrics.log("ChestUnlockGemTry", {
 				"chestId": mSelectedGMChest.Id,
 				"rarity": mSelectedGMChest.Rarity,
@@ -1914,14 +1872,15 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 				});
 				closeKeylessChestPopup();
 				closeKeyChestPopup();
-				mInfoPopup = new DBUIPopup(mDBFacade, Locale.getString("PURCHASING..."));
+				closeInfoPopup();
+				mInfoPopup = new DBUIPopup(mDBFacade, "", Locale.getString("PURCHASING..."));
 				MemoryTracker.track(mInfoPopup, "DBUIPopup - created in DistributedDungeonSummary.chestBuyGemCallback()");
 				mSceneGraphComponent.addChild(mInfoPopup.root, (105 : UInt));
 				_loc1_ = 0;
 				while (_loc1_ < 6) {
 					if (mDBFacade.dbAccountInfo.inventoryInfo.keys[_loc1_].gmKey.ChestId == mSelectedGMChest.Id) {
-						_loc2_ = (mDBFacade.dbAccountInfo.inventoryInfo.keys[_loc1_].gmKeyOffer.Id : Int);
-						StoreServices.purchaseOffer(mDBFacade, (_loc2_ : UInt), boughtKey, boughtKeyError, (0 : UInt), false);
+						_loc2_ = mDBFacade.dbAccountInfo.inventoryInfo.keys[_loc1_].gmKeyOffer.Id;
+						StoreServices.purchaseOffer(mDBFacade, _loc2_, boughtKey, boughtKeyError, (0 : UInt), false);
 						break;
 					}
 					_loc1_++;
@@ -1933,8 +1892,9 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 	}
 
 	function abandonChestCallback(category:String = "dungeonSummaryChestPopUp") {
-		mAbandonChestPopUp = new DBUITwoButtonPopup(mDBFacade, Locale.getString("ABANDON_CHEST_POPUP_TITLE"), Locale.getString("ABANDON_CHEST_POPUP_DESC"),
-			Locale.getString("ABANDON_CHEST_POPUP_CANCEL"), closeAbandonChestPopUp, Locale.getString("ABANDON_CHEST_POPUP_CONFIRM"), function() {
+		mAbandonChestPopUp = new DBUITwoButtonPopup(mDBFacade, "ABANDON_CHEST_CONFIRMATION", Locale.getString("ABANDON_CHEST_POPUP_TITLE"),
+			Locale.getString("ABANDON_CHEST_POPUP_DESC"), Locale.getString("ABANDON_CHEST_POPUP_CANCEL"), closeAbandonChestPopUp,
+			Locale.getString("ABANDON_CHEST_POPUP_CONFIRM"), function() {
 				mNetworkComponent.send_DropChest(mDBFacade.dbAccountInfo.id, mSelectedItemSlot);
 				mDBFacade.metrics.log("ChestAbandoned", {
 					"chestId": mSelectedGMChest.Id,
@@ -1945,7 +1905,7 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 				closeAbandonChestPopUp();
 				closeKeyChestPopup();
 				loadNextChestPopUp();
-		}, false, null, true, true, "ABANDON_CHESTS");
+		}, false);
 		MemoryTracker.track(mAbandonChestPopUp, "DBUITwoButtonPopup - created in DistributedDungeonSummary.abandonChestCallback()");
 		mAbandonChestPopUp.root.y += 180;
 	}
@@ -1958,7 +1918,7 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 	}
 
 	public function abandonChestFromInventory(slot:UInt) {
-		mNetworkComponent.send_DropChest(mDBFacade.dbAccountInfo.id, mSelectedItemSlot);
+		mNetworkComponent.send_DropChest(mDBFacade.dbAccountInfo.id, slot);
 		removeItemFromSlot(slot);
 		mUIInventory.refresh(true);
 	}
@@ -1968,13 +1928,15 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 			closeKeyChestPopup();
 			keepChestFromInventory(mSelectedItemSlot, false);
 		} else {
-			mStorageFullPopUp = new DBUITwoButtonPopup(mDBFacade, Locale.getString("GO_TO_INVENTORY_TITLE"), Locale.getString("GO_TO_INVENTORY_BODY"),
-				Locale.getString("INVENTORY"), function() {
+			mStorageFullPopUp = new DBUITwoButtonPopup(mDBFacade, "DUNGEON_SUMMARY_STORAGE_FULL_ON_KEEP", Locale.getString("GO_TO_INVENTORY_TITLE"),
+				Locale.getString("GO_TO_INVENTORY_BODY"), Locale.getString("INVENTORY"), function() {
+					closeStorageFullPopUp();
 					closeKeyChestPopup();
 					openInventory();
 			}, Locale.getString("ABANDON"), function() {
+					closeStorageFullPopUp();
 					abandonChestCallback("dungeonSummaryInventoryFullOnKeep");
-			}, true, null);
+			}, true, closeStorageFullPopUp);
 			MemoryTracker.track(mStorageFullPopUp, "DBUITwoButtonPopup - created in DistributedDungeonSummary.keepChestCallback()");
 			mStorageFullPopUp.root.y += 180;
 		}
@@ -1998,7 +1960,8 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 		mFromInventory = fromInventory;
 		mTookLastItem = true;
 		mNetworkComponent.send_TakeChest(mDBFacade.dbAccountInfo.id, mSelectedItemSlot);
-		mInfoPopup = new DBUIPopup(mDBFacade, Locale.getString("TAKING_ITEM"));
+		closeInfoPopup();
+		mInfoPopup = new DBUIPopup(mDBFacade, "", Locale.getString("TAKING_ITEM"));
 		MemoryTracker.track(mInfoPopup, "DBUIPopup - created in DistributedDungeonSummary.keepChestFromInventory()");
 	}
 
@@ -2018,38 +1981,46 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 			if (doesKeyExist) {
 				boughtKey(null);
 			} else {
-				mOpenKeyChestMC.visible = false;
-				mAssetLoadingComponent.getSwfAsset(DBFacade.buildFullDownloadPath("Resources/Art2D/UI/db_UI_score_report.swf"), setupOpenKeylessChest);
+				mTreasureFoundPopup.visible = false;
+				setupOpenKeylessChest();
 			}
 		} else {
-			mStorageFullPopUp = new DBUITwoButtonPopup(mDBFacade, Locale.getString("GO_TO_INVENTORY_TITLE"), Locale.getString("GO_TO_INVENTORY_BODY_OPEN"),
-				Locale.getString("INVENTORY"), function() {
+			mStorageFullPopUp = new DBUITwoButtonPopup(mDBFacade, "DUNGEON_SUMMARY_STORAGE_FULL_ON_UNLOCK", Locale.getString("GO_TO_INVENTORY_TITLE"),
+				Locale.getString("GO_TO_INVENTORY_BODY_OPEN"), Locale.getString("INVENTORY"), function() {
+					closeStorageFullPopUp();
 					closeKeyChestPopup();
 					openInventory();
 			}, Locale.getString("ABANDON"), function() {
+					closeStorageFullPopUp();
 					abandonChestCallback("abandonFromUnlockOnChestWithFullInventory");
-			}, true, null);
+			}, true, closeStorageFullPopUp);
 			MemoryTracker.track(mStorageFullPopUp, "DBUITwoButtonPopup - created in DistributedDungeonSummary.openChestCallback()");
 			mStorageFullPopUp.root.y += 180;
 		}
 	}
 
+	function closeStorageFullPopUp() {
+		if (mStorageFullPopUp != null) {
+			mStorageFullPopUp.destroy();
+			mStorageFullPopUp = null;
+		}
+	}
+
 	function boughtKey(details:ASAny) {
+		if (mLeaving || mWorkComponent == null || mSelectedGMChest == null) {
+			return;
+		}
 		mDBFacade.metrics.log("ChestUnlockKey", {
 			"chestId": mSelectedGMChest.Id,
 			"rarity": mSelectedGMChest.Rarity,
 			"category": "dungeonSummary"
 		});
-		if (mInfoPopup != null) {
-			mSceneGraphComponent.removeChild(mInfoPopup.root);
-			mInfoPopup.destroy();
-			mInfoPopup = null;
-		}
+		closeInfoPopup();
 		openChestFromInventory(mSelectedGMChest, false);
 	}
 
 	public function findSlotForChest(gmChest:GMChest):UInt {
-		var _loc4_ = 0;
+		var _loc4_ = (0 : UInt);
 		var _loc3_:GMDoober = null;
 		var _loc2_:Array<ASAny> = [
 			mDungeonReport[0].chest_type_1,
@@ -2058,12 +2029,12 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 			mDungeonReport[0].chest_type_4
 		];
 		if (mDungeonReport[0].valid == ASCompat.toNumber(true)) {
-			_loc4_ = 0;
+			_loc4_ = (0 : UInt);
 			while (_loc4_ < 4) {
-				if (ASCompat.toNumber(_loc2_[_loc4_]) != 0) {
-					_loc3_ = ASCompat.coerce(mDBFacade.gameMaster.dooberById.itemFor(_loc2_[_loc4_]), gameMasterDictionary.GMDoober);
+				if (ASCompat.toNumber(_loc2_[(_loc4_ : Int)]) != 0) {
+					_loc3_ = ASCompat.coerce(mDBFacade.gameMaster.dooberById.itemFor(_loc2_[(_loc4_ : Int)]), gameMasterDictionary.GMDoober);
 					if (_loc3_.ChestId == gmChest.Id) {
-						return (_loc4_ : UInt);
+						return _loc4_;
 					}
 				}
 				_loc4_++;
@@ -2084,7 +2055,7 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 			mChestRevealPopUp = new ChestRevealPopUp(mDBFacade, gmChest, closeChestRevealPopUp, goToStorageChestRevealPopUp);
 		}
 		removeItemFromSlot(_loc3_);
-		if (mOpenKeyChestMC != null) {
+		if (mTreasureFoundPopup != null) {
 			closeKeyChestPopup();
 		}
 	}
@@ -2094,9 +2065,6 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 		if (mChestRevealPopUp != null) {
 			mChestRevealPopUp.destroy();
 			mChestRevealPopUp = null;
-		}
-		if (mTownHeader != null) {
-			mTownHeader.refreshKeyPanel();
 		}
 		mUIInventory.setRevealedState(itemType, itemOfferId, callEquip);
 		mUIInventory.refresh();
@@ -2111,13 +2079,10 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 			mChestRevealPopUp.destroy();
 			mChestRevealPopUp = null;
 		}
-		if (mTownHeader != null) {
-			mTownHeader.refreshKeyPanel();
-		}
 		openInventory();
 	}
 
-	function boughtKeyError(err:JSONParseError) {
+	function boughtKeyError(err:ASAny) {
 		Logger.warn("Error buying keys from Reward Screen");
 	}
 
@@ -2135,25 +2100,23 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 			mUIInventory.setRevealedState(mRevealedItemType, mRevealedItemOfferId);
 			mUIInventory.refresh();
 		}
-		if (mTownHeader != null) {
-			mTownHeader.refreshKeyPanel();
+	}
+
+	function closeInfoPopup() {
+		if (mInfoPopup == null) {
+			return;
 		}
+		if (mSceneGraphComponent != null) {
+			mSceneGraphComponent.removeChild(mInfoPopup.root);
+		}
+		mInfoPopup.destroy();
+		mInfoPopup = null;
 	}
 
 	function closeKeyChestPopup() {
-		if (mOpenKeyChestMC != null) {
-			mAbandonButton.destroy();
-			mAbandonButton = null;
-			mKeepButton.destroy();
-			mKeepButton = null;
-			mOpenButton.destroy();
-			mOpenButton = null;
-			mOpenKeyChestRenderer.destroy();
-			mOpenKeyChestRenderer = null;
-			mSceneGraphComponent.removeChild(mOpenKeyChestMC);
-			mOpenKeyChestMC = null;
-			mSceneGraphComponent.removePopupCurtain();
-			mDBFacade.menuNavigationController.popLayer("POPUP_CHEST_LAYER");
+		if (mTreasureFoundPopup != null) {
+			mTreasureFoundPopup.destroy();
+			mTreasureFoundPopup = null;
 		}
 	}
 
@@ -2162,7 +2125,9 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 			mChestBuyKeysPopUp.destroy();
 			mChestBuyKeysPopUp = null;
 		}
-		mOpenKeyChestMC.visible = true;
+		if (mTreasureFoundPopup != null) {
+			mTreasureFoundPopup.visible = true;
+		}
 	}
 
 	function chatCallback(playerIndex:UInt):ASFunction {
@@ -2190,6 +2155,8 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 	}
 
 	function setupChat() {
+		var button:MovieClip;
+		var c:Int;
 		var i = (0 : UInt);
 		while (i < 4) {
 			if (mDungeonReport[(i : Int)].valid != 0) {
@@ -2200,11 +2167,36 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 			}
 			i = i + 1;
 		}
+		UIChatLog.growLogUp(ASCompat.coerce((mScoreReportRoot : ASAny).chatLogContainer, flash.display.MovieClip), 1.5);
+		final __ax4_iter_312:Array<ASAny> = [
+			(mScoreReportRoot : ASAny)
+			.UI_chat.chat_btn,
+			(mScoreReportRoot : ASAny)
+			.UI_chat.log_btn
+		];
+		if (checkNullIteratee(__ax4_iter_312))
+			for (_tmp_ in __ax4_iter_312) {
+				button = ASCompat.coerce(_tmp_, flash.display.MovieClip);
+				c = 0;
+				while (c < button.numChildren) {
+					if (!Std.isOfType(button.getChildAt(c), TextField)) {
+						button.getChildAt(c).scaleY = button.getChildAt(c).scaleY * 1.25;
+					}
+					c = c + 1;
+				}
+			}
 		mUIChatLog = new UIChatLog(mDBFacade, ASCompat.coerce((mScoreReportRoot : ASAny).chatLogContainer, flash.display.MovieClip),
 			ASCompat.coerce((mScoreReportRoot : ASAny).UI_chat, flash.display.MovieClip),
 			ASCompat.coerce((mScoreReportRoot : ASAny).UI_chat.log_btn, flash.display.MovieClip),
 			ASCompat.coerce((mScoreReportRoot : ASAny).UI_chat.chat_btn, flash.display.MovieClip));
+		mUIChatLog.textSizeModifier = 1.55;
 		mUIChatLog.hideChatLog();
+		mUIChatLog.setChatPromptVisible(!mDBFacade.steamInputManager.wantsControllerPrompts);
+		mChatEventComponent.addListener("ControllerConnectionChangedEvent", function(param1:Event) {
+			if (mUIChatLog != null) {
+				mUIChatLog.setChatPromptVisible(!mDBFacade.steamInputManager.wantsControllerPrompts);
+			}
+		});
 		mAssetLoadingComponent.getSwfAsset(DBFacade.buildFullDownloadPath("Resources/Art2D/UI/db_UI_nametag.swf"), function(param1:SwfAsset) {
 			var _loc3_:Dynamic = null;
 			var _loc2_:MovieClip = null;
@@ -2229,10 +2221,11 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 					_loc6_ = param1.getClass("UI_speechbubble_typing");
 					mPlayerIsTypingNotification = ASCompat.coerce(ASCompat.createInstance(_loc6_, []), flash.display.MovieClip);
 					mPlayerIsTypingNotification.visible = false;
-					mChatBalloon[(i : Int)].initializeChatBalloon(param1, mPlayerIsTypingNotification);
+					mChatBalloon[(i : Int)].initializeChatBalloon(param1, mPlayerIsTypingNotification, 1.47);
+					mChatBalloon[(i : Int)].growsDown = true;
 					mSceneGraphComponent.addChild(mChatBalloon[(i : Int)], (50 : UInt));
 					mChatBalloon[(i : Int)].text = "";
-					_loc5_ = ASCompat.coerce(_loc4_[(i : Int)].stats.player_name.localToGlobal(new Point(0, 0)), flash.geom.Point);
+					_loc5_ = mDBFacade.designLocalToGlobal(ASCompat.coerce(_loc4_[(i : Int)].stats.player_name, flash.display.DisplayObject), new Point(0, 0));
 					mChatBalloon[(i : Int)].scaleY = mChatBalloon[(i : Int)].scaleX = 1.8;
 					mChatBalloon[(i : Int)].x = _loc5_.x + 69 + 55;
 					mChatBalloon[(i : Int)].y = _loc5_.y + 32 - 32;
@@ -2259,12 +2252,12 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 	}
 
 	function removeItemFromSlot(slot:UInt) {
-		var _loc3_ = 0;
+		var _loc3_ = (0 : UInt);
 		var _loc5_ = slot;
-		_loc3_ = 0;
-		while (_loc3_ < mSortedLootData.length) {
-			if (ASCompat.toNumber(ASCompat.dynGetIndex(mSortedLootData[_loc3_], 0)) == slot) {
-				_loc5_ = (_loc3_ : UInt);
+		_loc3_ = (0 : UInt);
+		while (_loc3_ < (mSortedLootData.length:UInt)) {
+			if (ASCompat.toNumber(ASCompat.dynGetIndex(mSortedLootData[(_loc3_ : Int)], 0)) == slot) {
+				_loc5_ = _loc3_;
 			}
 			_loc3_++;
 		}
@@ -2326,7 +2319,7 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 
 	function updateBannerAlpha(clock:GameClock) {
 		var _loc2_ = 1 - ASCompat.toNumberField((mScoreReportRoot : ASAny).stats_a, "alpha");
-		_loc2_ = 1 - Math.pow(_loc2_, Math.pow(2, clock.tickLength / GameClock.ANIMATION_FRAME_DURATION));
+		_loc2_ = 1 - _loc2_ * _loc2_;
 		ASCompat.setProperty((mScoreReportRoot : ASAny).stats_a, "alpha", _loc2_);
 		ASCompat.setProperty((mScoreReportRoot : ASAny).stats_b, "alpha", _loc2_);
 		ASCompat.setProperty((mScoreReportRoot : ASAny).stats_c, "alpha", _loc2_);
@@ -2384,7 +2377,7 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 	}
 
 	function onPlayerExit(event:PlayerExitEvent) {
-		var _loc6_ = 0;
+		var _loc6_ = (0 : UInt);
 		var _loc3_ = Math.NaN;
 		var _loc5_ = Math.NaN;
 		var _loc4_ = Math.NaN;
@@ -2409,9 +2402,9 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 			(mScoreReportRoot : ASAny)
 			.empty_banner_d
 		];
-		_loc6_ = 0;
+		_loc6_ = (0 : UInt);
 		while (_loc6_ < 4) {
-			if (mDungeonReport[_loc6_].valid != 0 && mDungeonReport[_loc6_].id == event.id) {
+			if (mDungeonReport[(_loc6_ : Int)].valid != 0 && mDungeonReport[(_loc6_ : Int)].id == event.id) {
 				_loc3_ = 0.212671;
 				_loc5_ = 0.71516;
 				_loc4_ = 0.072169;
@@ -2420,7 +2413,7 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 				_loc8_ = _loc8_.concat([_loc3_, _loc5_, _loc4_, 0, 0]);
 				_loc8_ = _loc8_.concat([_loc3_, _loc5_, _loc4_, 0, 0]);
 				_loc8_ = _loc8_.concat([0, 0, 0, 1, 0]);
-				ASCompat.setProperty(_loc7_[_loc6_], "filters", [new ColorMatrixFilter(cast(_loc8_))]);
+				ASCompat.setProperty(_loc7_[(_loc6_ : Int)], "filters", [new ColorMatrixFilter(cast(_loc8_))]);
 			}
 			_loc6_++;
 		}
@@ -2598,27 +2591,23 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 
 	function addFriendCallback(button:UIButton, idx:UInt):ASFunction {
 		return function() {
-			if (mDBFacade.dbConfigManager.getConfigBoolean("FUFB", false)) {
-				mDBFacade.errorPopup("INVITE CURRENTLY DISABLED", "Sorry for the inconvenience, we are looking into resolving the issue.");
-				return;
-			}
-			findCorrectIcon(mDungeonReport[(idx : Int)], addFriend, button);
+			findCorrectIcon(mDungeonReport[(idx : Int)], addFriend, button, idx);
 		};
 	}
 
 	function blockFriendCallback(button:UIButton, idx:UInt):ASFunction {
 		return function() {
-			findCorrectIcon(mDungeonReport[(idx : Int)], blockFriend, button);
+			findCorrectIcon(mDungeonReport[(idx : Int)], blockFriend, button, idx);
 		};
 	}
 
 	function reportPlayerCallback(button:UIButton, idx:UInt):ASFunction {
 		return function() {
-			findCorrectIcon(mDungeonReport[(idx : Int)], createReportPlayerPopup, button);
+			findCorrectIcon(mDungeonReport[(idx : Int)], createReportPlayerPopup, button, idx);
 		};
 	}
 
-	function findCorrectIcon(DR:DungeonReport, callBackFunc:ASFunction, button:UIButton) {
+	function findCorrectIcon(DR:DungeonReport, callBackFunc:ASFunction, button:UIButton, playerIndex:UInt) {
 		var iconContainer = new MovieClip();
 		var skin = mDBFacade.gameMaster.getSkinByType(DR.skin_type);
 		mAssetLoadingComponent.getSwfAsset(DBFacade.buildFullDownloadPath(skin.UISwfFilepath), function(param1:SwfAsset) {
@@ -2626,19 +2615,22 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 			var _loc2_ = ASCompat.coerce(ASCompat.createInstance(_loc3_, []), flash.display.MovieClip);
 			UIObject.scaleToFit(_loc2_, 65);
 			iconContainer.addChild(_loc2_);
-			saveFacebookPicAndAchievement(DR.id, iconContainer);
-			callBackFunc(DR.name, iconContainer, DR.id, button);
+			loadSteamAvatar(DR.id, iconContainer);
+			callBackFunc(DR.name, iconContainer, DR.id, button, playerIndex);
 		});
 	}
 
 	function fadeAwayTitle() {
-		TweenMax.to(mBgRenderer.clip, 1, {
+		mDBFacade.mTween.tweenMaxTo(mBgRenderer.clip, 1, {
 			"alpha": 0,
 			"onComplete": killFadeAwayTitle
 		});
 	}
 
 	function killFadeAwayTitle() {
+		if (mScoreReportRoot == null || mBgRenderer == null) {
+			return;
+		}
 		ASCompat.setProperty((mScoreReportRoot : ASAny).bg, "visible", false);
 		mBgRenderer.destroy();
 		mBgRenderer = null;
@@ -2651,6 +2643,8 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 		var invInfo:DBInventoryInfo;
 		var i:UInt;
 		var teamBonusUI:UIObject;
+		var xpBoosterUI:UIObject;
+		var goldBoosterUI:UIObject;
 		var titleText:String;
 		if (mDBFacade.hud != null) {
 			mDBFacade.hud.hideStacks();
@@ -2695,16 +2689,19 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 				ASCompat.setProperty(stats_panels[(i : Int)].stats.treasure.loot_slot_A2, "visible", true);
 				ASCompat.setProperty(stats_panels[(i : Int)].stats.treasure.loot_slot_A3, "visible", false);
 			}
-			ASCompat.setProperty(stats_panels[(i : Int)].stats.xp_bar.bonus_xp_reveal.Bonus_XP, "text", Locale.getString("SUMMARY_BONUS_XP"));
-			ASCompat.setProperty(stats_panels[(i : Int)].stats.kills.enemies_killed_reveal.Enemies_Killed, "text", Locale.getString("SUMMARY_ENEMIES_KILLED"));
-			ASCompat.setProperty(stats_panels[(i : Int)].stats.treasure.treasure_text, "text", Locale.getString("SUMMARY_TREASURE"));
+			Locale.setText(ASCompat.coerce(stats_panels[(i : Int)].stats.xp_bar.bonus_xp_reveal.Bonus_XP, flash.text.TextField), "SUMMARY_BONUS_XP");
+			Locale.setText(ASCompat.coerce(stats_panels[(i : Int)].stats.kills.enemies_killed_reveal.Enemies_Killed, flash.text.TextField),
+				"SUMMARY_ENEMIES_KILLED");
+			Locale.setText(ASCompat.coerce(stats_panels[(i : Int)].stats.treasure.treasure_text, flash.text.TextField), "SUMMARY_TREASURE");
 			if (i == 0) {
-				ASCompat.setProperty(stats_panels[(i : Int)].stats.text_booster, "text", Locale.getString("ACTIVE_BOOSTERS"));
+				Locale.setText(ASCompat.coerce(stats_panels[(i : Int)].stats.text_booster, flash.text.TextField), "ACTIVE_BOOSTERS");
 				ASCompat.setProperty(stats_panels[(i : Int)].stats.text_booster, "visible", false);
 				if (mBoosterXP != null) {
 					mXPBoosterUI = new UIObject(mDBFacade, ASCompat.coerce(stats_panels[(i : Int)].stats.boosterXP, flash.display.MovieClip));
-					ASCompat.setProperty(stats_panels[(i : Int)].stats.boosterXP.label, "text", mBoosterXP.BuffInfo.Exp + "X");
-					ASCompat.setProperty(stats_panels[(i : Int)].stats.boosterXP.tooltip.title_label, "text", mBoosterXP.StackInfo.Name);
+					ASCompat.dynPush(mPlayerBoosterUIs[(i : Int)], mXPBoosterUI);
+					TextUtil.setText(ASCompat.coerce(stats_panels[(i : Int)].stats.boosterXP.label, flash.text.TextField), mBoosterXP.BuffInfo.Exp + "X");
+					TextUtil.setText(ASCompat.coerce(stats_panels[(i : Int)].stats.boosterXP.tooltip.title_label, flash.text.TextField),
+						mBoosterXP.StackInfo.Name);
 					ASCompat.setProperty(stats_panels[(i : Int)].stats.boosterXP, "visible", true);
 					mCountDownTextXP = new CountdownTextTimer(ASCompat.coerce((mXPBoosterUI.tooltip : ASAny).time_label, flash.text.TextField),
 						mBoosterXP.getEndDate(), GameClock.getWebServerDate, null, Locale.getString("BOOSTER_REMAINING"), "", Locale.getString("EXPIRED"));
@@ -2715,8 +2712,10 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 				}
 				if (mBoosterGold != null) {
 					mCoinBoosterUI = new UIObject(mDBFacade, ASCompat.coerce(stats_panels[(i : Int)].stats.boosterCoin, flash.display.MovieClip));
-					ASCompat.setProperty(stats_panels[(i : Int)].stats.boosterCoin.label, "text", mBoosterGold.BuffInfo.Gold + "X");
-					ASCompat.setProperty(stats_panels[(i : Int)].stats.boosterCoin.tooltip.title_label, "text", mBoosterGold.StackInfo.Name);
+					ASCompat.dynPush(mPlayerBoosterUIs[(i : Int)], mCoinBoosterUI);
+					TextUtil.setText(ASCompat.coerce(stats_panels[(i : Int)].stats.boosterCoin.label, flash.text.TextField), mBoosterGold.BuffInfo.Gold + "X");
+					TextUtil.setText(ASCompat.coerce(stats_panels[(i : Int)].stats.boosterCoin.tooltip.title_label, flash.text.TextField),
+						mBoosterGold.StackInfo.Name);
 					ASCompat.setProperty(stats_panels[(i : Int)].stats.boosterCoin, "visible", true);
 					mCountDownTextGold = new CountdownTextTimer(ASCompat.coerce((mCoinBoosterUI.tooltip : ASAny).time_label, flash.text.TextField),
 						mBoosterGold.getEndDate(), GameClock.getWebServerDate, null, Locale.getString("BOOSTER_REMAINING"), "", Locale.getString("EXPIRED"));
@@ -2728,12 +2727,13 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 			}
 			mTeamBonusUI.add(i, new UIObject(mDBFacade, ASCompat.coerce(stats_panels[(i : Int)].stats.crewbonus, flash.display.MovieClip)));
 			teamBonusUI = ASCompat.coerce(mTeamBonusUI.itemFor(i), brain.uI.UIObject);
-			ASCompat.setProperty((teamBonusUI.root : ASAny).header_crew_bonus_txt1, "text", Locale.getString("TEAM_BONUS_TITLE_CREW"));
-			ASCompat.setProperty((teamBonusUI.root : ASAny).header_crew_bonus_txt2, "text", Locale.getString("TEAM_BONUS_TITLE_BONUS"));
-			ASCompat.setProperty((teamBonusUI.tooltip : ASAny).title_label, "text", Locale.getString("TEAM_BONUS_TOOLTIP_TITLE"));
-			ASCompat.setProperty((teamBonusUI.tooltip : ASAny).description_label, "text", Locale.getString("TEAM_BONUS_TOOLTIP_DESCRIPTION"));
-			ASCompat.setProperty((teamBonusUI.root : ASAny).header_crew_bonus_number, "text", mDungeonReport[(i : Int)].totalAvatarsOwned - 1);
-			ASCompat.setProperty((teamBonusUI.root : ASAny).xp, "text", "0");
+			Locale.setText(ASCompat.coerce((teamBonusUI.root : ASAny).header_crew_bonus_txt1, flash.text.TextField), "TEAM_BONUS_TITLE_CREW", null, 0.82);
+			Locale.setText(ASCompat.coerce((teamBonusUI.root : ASAny).header_crew_bonus_txt2, flash.text.TextField), "TEAM_BONUS_TITLE_BONUS", null, 0.82);
+			Locale.setText(ASCompat.coerce((teamBonusUI.tooltip : ASAny).title_label, flash.text.TextField), "TEAM_BONUS_TOOLTIP_TITLE");
+			Locale.setText(ASCompat.coerce((teamBonusUI.tooltip : ASAny).description_label, flash.text.TextField), "TEAM_BONUS_TOOLTIP_DESCRIPTION");
+			TextUtil.setText(ASCompat.coerce((teamBonusUI.root : ASAny).header_crew_bonus_number, flash.text.TextField),
+				Std.string((mDungeonReport[(i : Int)].totalAvatarsOwned : Float) - 1), 0.73);
+			TextUtil.setText(ASCompat.coerce((teamBonusUI.root : ASAny).xp, flash.text.TextField), "0");
 			teamBonusUI.visible = false;
 			ASCompat.setProperty(stats_panels[(i : Int)].stats.doublexp_effect, "visible", false);
 			ASCompat.setProperty(stats_panels[(i : Int)].stats.doublexp_effect_star, "visible", false);
@@ -2746,19 +2746,27 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 				ASCompat.setProperty(stats_panels[(i : Int)].stats.boosterXP, "visible", false);
 				ASCompat.setProperty(stats_panels[(i : Int)].stats.boosterCoin, "visible", false);
 				if (mDungeonReport[(i : Int)].boost_xp > 1) {
-					mBoosterInfos.push(new UIObject(mDBFacade, ASCompat.coerce(stats_panels[(i : Int)].stats.boosterXP, flash.display.MovieClip)));
+					xpBoosterUI = new UIObject(mDBFacade, ASCompat.coerce(stats_panels[(i : Int)].stats.boosterXP, flash.display.MovieClip));
+					mBoosterInfos.push(xpBoosterUI);
+					ASCompat.dynPush(mPlayerBoosterUIs[(i : Int)], xpBoosterUI);
 					ASCompat.setProperty(stats_panels[(i : Int)].stats.boosterXP, "visible", true);
-					ASCompat.setProperty(stats_panels[(i : Int)].stats.boosterXP.label, "text", mDungeonReport[(i : Int)].boost_xp + "X");
-					ASCompat.setProperty(stats_panels[(i : Int)].stats.boosterXP.tooltip.title_label, "text", Locale.getString("BOOST_XP_SUMMARY_TITLE"));
-					ASCompat.setProperty(stats_panels[(i : Int)].stats.boosterXP.tooltip.time_label, "text",
+					TextUtil.setText(ASCompat.coerce(stats_panels[(i : Int)].stats.boosterXP.label, flash.text.TextField),
+						mDungeonReport[(i : Int)].boost_xp + "X");
+					Locale.setText(ASCompat.coerce(stats_panels[(i : Int)].stats.boosterXP.tooltip.title_label, flash.text.TextField),
+						"BOOST_XP_SUMMARY_TITLE");
+					TextUtil.setText(ASCompat.coerce(stats_panels[(i : Int)].stats.boosterXP.tooltip.time_label, flash.text.TextField),
 						Locale.getString("BOOST_XP_SUMMARY_DESCRIPTION") + mDungeonReport[(i : Int)].boost_xp + "X");
 				}
 				if (mDungeonReport[(i : Int)].boost_gold > 1) {
-					mBoosterInfos.push(new UIObject(mDBFacade, ASCompat.coerce(stats_panels[(i : Int)].stats.boosterCoin, flash.display.MovieClip)));
+					goldBoosterUI = new UIObject(mDBFacade, ASCompat.coerce(stats_panels[(i : Int)].stats.boosterCoin, flash.display.MovieClip));
+					mBoosterInfos.push(goldBoosterUI);
+					ASCompat.dynPush(mPlayerBoosterUIs[(i : Int)], goldBoosterUI);
 					ASCompat.setProperty(stats_panels[(i : Int)].stats.boosterCoin, "visible", true);
-					ASCompat.setProperty(stats_panels[(i : Int)].stats.boosterCoin.label, "text", mDungeonReport[(i : Int)].boost_gold + "X");
-					ASCompat.setProperty(stats_panels[(i : Int)].stats.boosterCoin.tooltip.title_label, "text", Locale.getString("BOOST_GOLD_SUMMARY_TITLE"));
-					ASCompat.setProperty(stats_panels[(i : Int)].stats.boosterCoin.tooltip.time_label, "text",
+					TextUtil.setText(ASCompat.coerce(stats_panels[(i : Int)].stats.boosterCoin.label, flash.text.TextField),
+						mDungeonReport[(i : Int)].boost_gold + "X");
+					Locale.setText(ASCompat.coerce(stats_panels[(i : Int)].stats.boosterCoin.tooltip.title_label, flash.text.TextField),
+						"BOOST_GOLD_SUMMARY_TITLE");
+					TextUtil.setText(ASCompat.coerce(stats_panels[(i : Int)].stats.boosterCoin.tooltip.time_label, flash.text.TextField),
 						Locale.getString("BOOST_GOLD_SUMMARY_DESCRIPTION") + mDungeonReport[(i : Int)].boost_gold + "X");
 				}
 			}
@@ -2767,7 +2775,8 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 				if (mDBFacade.dbAccountInfo.isFriend(mDungeonReport[(i : Int)].id)) {
 					ASCompat.setProperty(stats_panels[(i : Int)].stats.friend_indicator_icon, "visible", true);
 					ASCompat.setProperty(stats_panels[(i : Int)].stats.friend_name, "visible", true);
-					ASCompat.setProperty(stats_panels[(i : Int)].stats.friend_name, "text", mDungeonReport[(i : Int)].name);
+					TextUtil.setText(ASCompat.coerce(stats_panels[(i : Int)].stats.friend_name, flash.text.TextField), mDungeonReport[(i : Int)].name,
+						Locale.summaryNameSizeModifier);
 					ASCompat.setProperty(stats_panels[(i : Int)].stats.player_name, "visible", false);
 				} else {
 					ASCompat.setProperty(stats_panels[(i : Int)].stats.friend_indicator_icon, "visible", false);
@@ -2776,20 +2785,22 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 				}
 				if (!ASCompat.toBool(stats_panels[(i : Int)].stats.friend_indicator_icon.visible)) {
 					ASCompat.setProperty(stats_panels[(i : Int)].stats.add_button, "visible", true);
-					ASCompat.setProperty(stats_panels[(i : Int)].stats.add_button.label, "text", Locale.getString("ADD_FRIEND"));
-					mAddFriendButtons.push(new UIButton(mDBFacade, ASCompat.coerce(stats_panels[(i : Int)].stats.add_button, flash.display.MovieClip)));
-					ASCompat.setProperty(mAddFriendButtons[mAddFriendButtons.length - 1], "releaseCallback",
-						addFriendCallback(ASCompat.coerce(mAddFriendButtons[mAddFriendButtons.length - 1], brain.uI.UIButton), i));
+					Locale.setText(ASCompat.coerce(stats_panels[(i : Int)].stats.add_button.label, flash.text.TextField), "ADD_FRIEND");
+					mAddFriendButtons[(i : Int)] = new UIButton(mDBFacade, ASCompat.coerce(stats_panels[(i : Int)].stats.add_button, flash.display.MovieClip));
+					ASCompat.setProperty(mAddFriendButtons[(i : Int)], "releaseCallback",
+						addFriendCallback(ASCompat.coerce(mAddFriendButtons[(i : Int)], brain.uI.UIButton), i));
 					ASCompat.setProperty(stats_panels[(i : Int)].stats.block_button, "visible", true);
-					ASCompat.setProperty(stats_panels[(i : Int)].stats.block_button.label, "text", Locale.getString("BLOCK"));
-					mBlockFriendButtons.push(new UIButton(mDBFacade, ASCompat.coerce(stats_panels[(i : Int)].stats.block_button, flash.display.MovieClip)));
-					ASCompat.setProperty(mBlockFriendButtons[mBlockFriendButtons.length - 1], "releaseCallback",
-						blockFriendCallback(ASCompat.coerce(mBlockFriendButtons[mBlockFriendButtons.length - 1], brain.uI.UIButton), i));
+					Locale.setText(ASCompat.coerce(stats_panels[(i : Int)].stats.block_button.label, flash.text.TextField), "BLOCK");
+					mBlockFriendButtons[(i : Int)] = new UIButton(mDBFacade,
+						ASCompat.coerce(stats_panels[(i : Int)].stats.block_button, flash.display.MovieClip));
+					ASCompat.setProperty(mBlockFriendButtons[(i : Int)], "releaseCallback",
+						blockFriendCallback(ASCompat.coerce(mBlockFriendButtons[(i : Int)], brain.uI.UIButton), i));
 					ASCompat.setProperty(stats_panels[(i : Int)].stats.report_button, "visible", true);
-					ASCompat.setProperty(stats_panels[(i : Int)].stats.report_button.label, "text", Locale.getString("REPORT"));
-					mReportPlayerButtons.push(new UIButton(mDBFacade, ASCompat.coerce(stats_panels[(i : Int)].stats.report_button, flash.display.MovieClip)));
-					ASCompat.setProperty(mReportPlayerButtons[mReportPlayerButtons.length - 1], "releaseCallback",
-						reportPlayerCallback(ASCompat.coerce(mReportPlayerButtons[mReportPlayerButtons.length - 1], brain.uI.UIButton), i));
+					Locale.setText(ASCompat.coerce(stats_panels[(i : Int)].stats.report_button.label, flash.text.TextField), "REPORT");
+					mReportPlayerButtons[(i : Int)] = new UIButton(mDBFacade,
+						ASCompat.coerce(stats_panels[(i : Int)].stats.report_button, flash.display.MovieClip));
+					ASCompat.setProperty(mReportPlayerButtons[(i : Int)], "releaseCallback",
+						reportPlayerCallback(ASCompat.coerce(mReportPlayerButtons[(i : Int)], brain.uI.UIButton), i));
 				}
 			}
 			if (i == 0) {
@@ -2799,19 +2810,20 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 				mXPBonusText = ASCompat.coerce((mXPBonusTextFlash : ASAny).doublexp_text, flash.text.TextField);
 			}
 			ASCompat.setProperty(stats_panels[(i : Int)], "visible", mDungeonReport[(i : Int)].valid);
-			ASCompat.setProperty(stats_panels[(i : Int)].stats.kills.enemies_killed.kills, "text", Std.string(mDungeonReport[(i : Int)].kills));
-			ASCompat.setProperty(stats_panels[(i : Int)].stats.xp_bar.bonus_xp.xp, "text", "0");
+			TextUtil.setText(ASCompat.coerce(stats_panels[(i : Int)].stats.kills.enemies_killed.kills, flash.text.TextField),
+				Std.string(mDungeonReport[(i : Int)].kills));
+			TextUtil.setText(ASCompat.coerce(stats_panels[(i : Int)].stats.xp_bar.bonus_xp.xp, flash.text.TextField), "0");
 			ASCompat.setProperty(stats_panels[(i : Int)].stats.xp_bar.tooltip, "visible", false);
 			mItemButtons[(i : Int)] = [];
 			i = i + 1;
 		}
-		ASCompat.setProperty((mScoreReportRoot : ASAny).bg.banner_text.dungeon_title, "text",
+		TextUtil.setText(ASCompat.coerce((mScoreReportRoot : ASAny).bg.banner_text.dungeon_title, flash.text.TextField),
 			mDungeonName != null ? mDungeonName.toUpperCase() : "DUNGEON NAME");
 		titleText = this.dungeonSuccess != 0 ? Locale.getString("VICTORY") : Locale.getString("DUNGEON_FAILED");
 		if (mCurrentMapNode.InfiniteDungeon != null) {
 			titleText = Locale.getString("CASHED_OUT");
 		}
-		ASCompat.setProperty((mScoreReportRoot : ASAny).bg.banner_text.title, "text", titleText);
+		TextUtil.setText(ASCompat.coerce((mScoreReportRoot : ASAny).bg.banner_text.title, flash.text.TextField), titleText);
 		setupXPBars();
 		setupLoot();
 		setupChat();
@@ -2825,12 +2837,13 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 		mDungeonAchievementPanelMovieClipRenderer = new MovieClipRenderer(mDBFacade,
 			ASCompat.coerce((mScoreReportRoot : ASAny).achievement, flash.display.MovieClip), destroyAchievementBossPanel);
 		mDungeonAchievementPanelMovieClipRenderer.clip.visible = false;
-		ASCompat.setProperty((mScoreReportRoot : ASAny).achievement.label.label, "text", Locale.getString("DUNGEON_SUMMARY_REWARD_PANEL_LABEL"));
+		Locale.setText(ASCompat.coerce((mScoreReportRoot : ASAny).achievement.label.label, flash.text.TextField), "DUNGEON_SUMMARY_REWARD_PANEL_LABEL");
 		if (mCurrentMapNode.InfiniteDungeon != null) {
-			ASCompat.setProperty((mScoreReportRoot : ASAny).achievement.label_boss.label, "text",
-				Locale.getString("DUNGEON_SUMMARY_REWARD_PANEL_LABEL_INFINITE"));
+			Locale.setText(ASCompat.coerce((mScoreReportRoot : ASAny).achievement.label_boss.label, flash.text.TextField),
+				"DUNGEON_SUMMARY_REWARD_PANEL_LABEL_INFINITE");
 		} else {
-			ASCompat.setProperty((mScoreReportRoot : ASAny).achievement.label_boss.label, "text", Locale.getString("DUNGEON_SUMMARY_REWARD_PANEL_LABEL_BOSS"));
+			Locale.setText(ASCompat.coerce((mScoreReportRoot : ASAny).achievement.label_boss.label, flash.text.TextField),
+				"DUNGEON_SUMMARY_REWARD_PANEL_LABEL_BOSS");
 		}
 		if (mDungeonReport[0].receivedTrophy != 0) {
 			mAssetLoadingComponent.getSwfAsset(DBFacade.buildFullDownloadPath("Resources/Art2D/Doobers/db_items_doobers.swf"), function(param1:SwfAsset) {
@@ -2866,7 +2879,7 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 			_loc2_ = ASCompat.coerce(details[0], Array);
 			_loc4_ = details[1];
 			_loc3_ = new Vector<UInt>();
-			_loc3_.push(_loc4_.account_id);
+			_loc3_.push((ASCompat.toInt(_loc4_.account_id) : UInt));
 			PresenceManager.instance().addFriends(_loc3_);
 			mDBFacade.dbAccountInfo.addFriendCallback(_loc2_);
 		} else {
@@ -2877,7 +2890,7 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 		return _loc4_;
 	}
 
-	function addFriend(personName:String, iconMC:MovieClip, personId:UInt, button:UIButton) {
+	function addFriend(personName:String, iconMC:MovieClip, personId:UInt, button:UIButton, playerIndex:UInt) {
 		var rpcFunc = JSONRPCService.getFunction("DRFriendRequest", mDBFacade.rpcRoot + "friendrequests");
 		var rpcSuccessCallback:ASFunction = function(param1:ASAny) {
 			var _loc2_:ASObject = null;
@@ -2889,15 +2902,20 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 				mEventComponent.dispatchEvent(new FriendSummaryNewsFeedEvent("FRIEND_SUMMARY_NEWS_FEED_MESSAGE_EVENT",
 					Locale.getString("Friend_Request_Sent_to_"), iconMC, personName));
 				mDBFacade.metrics.log("DRFriendRequest", {"friendId": _loc2_.to_account_id});
+				mDBFacade.steamAchievementsHelper.unlockAchievement("ADD_FRIEND");
 			}
 			button.enabled = false;
+			if (mDBFacade.menuNavigationController.getTopUILayer() == "DISTRIBUTED_DUNGEON_SUMMARY") {
+				restoreFocusAfterSocialAction(playerIndex, button);
+			}
 		};
-		rpcFunc(mDBFacade.dbAccountInfo.name, mDBFacade.dbAccountInfo.trophies, mDBFacade.dbAccountInfo.activeAvatarSkinId,
-			mDBFacade.dbAccountInfo.facebookId, mDBFacade.dbAccountInfo.id, personId, mDBFacade.demographics, mDBFacade.validationToken, rpcSuccessCallback,
+		var deadFacebookIdParameter = "";
+		rpcFunc(mDBFacade.dbAccountInfo.name, mDBFacade.dbAccountInfo.trophies, mDBFacade.dbAccountInfo.activeAvatarSkinId, deadFacebookIdParameter,
+			mDBFacade.dbAccountInfo.id, personId, mDBFacade.demographics, mDBFacade.validationToken, rpcSuccessCallback,
 			UIFriendManager.createFriendRPCErrorCallback(mDBFacade, "addFriend"));
 	}
 
-	function blockFriend(personName:String, iconMC:MovieClip, personId:UInt, button:UIButton) {
+	function blockFriend(personName:String, iconMC:MovieClip, personId:UInt, button:UIButton, playerIndex:UInt) {
 		var tf:TextFormat;
 		var rpcSuccessCallback:ASFunction = function(param1:ASAny) {
 			var _loc2_:String = null;
@@ -2911,7 +2929,7 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 				mDBFacade.metrics.log("DRFriendIgnore", {"friendId": _loc2_.substr(1, _loc2_.length - 2)});
 			}
 		};
-		mDRFriendBlockPopup = new DBUITwoButtonPopup(mDBFacade, Locale.getString("BLOCK")
+		mDRFriendBlockPopup = new DBUITwoButtonPopup(mDBFacade, "DUNGEON_SUMMARY_BLOCK_PLAYER", Locale.getString("BLOCK")
 			+ " "
 			+ personName
 			+ "?",
@@ -2920,11 +2938,20 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 				var _loc1_ = JSONRPCService.getFunction("IgnoreFriend", mDBFacade.rpcRoot + "friendrequests");
 				_loc1_(mDBFacade.dbAccountInfo.id, personId, mDBFacade.validationToken, rpcSuccessCallback);
 				button.enabled = false;
-		}, Locale.getString("CANCEL"), null);
+				closeDRFriendBlockPopup();
+				restoreFocusAfterSocialAction(playerIndex, button);
+		}, Locale.getString("CANCEL"), null, true, closeDRFriendBlockPopup);
 		MemoryTracker.track(mDRFriendBlockPopup, "DBUITwoButtonPopup - created in DistributedDungeonSummary.blockFriend()");
 		tf = new TextFormat();
 		tf.color = FriendSummaryNewsFeedEvent.FRIEND_NAME_HIGHLIGHT_COLOR;
 		mDRFriendBlockPopup.colorizeMessage(tf, 0, personName.length);
+	}
+
+	function closeDRFriendBlockPopup() {
+		if (mDRFriendBlockPopup != null) {
+			mDRFriendBlockPopup.destroy();
+			mDRFriendBlockPopup = null;
+		}
 	}
 
 	function buildMatchPlayers():Array<ASAny> {
@@ -2944,7 +2971,7 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 		return _loc2_;
 	}
 
-	function createReportPlayerPopup(personName:String, iconMC:MovieClip, personId:UInt, button:UIButton) {
+	function createReportPlayerPopup(personName:String, iconMC:MovieClip, personId:UInt, button:UIButton, playerIndex:UInt) {
 		var matchPlayers = buildMatchPlayers();
 		mDRReportPlayerPopup = new UIReportPopup(mDBFacade, personName, personId, matchPlayers, function() {
 			if (button != null) {
@@ -2955,28 +2982,57 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 				mEventComponent.dispatchEvent(new FriendSummaryNewsFeedEvent("FRIEND_SUMMARY_NEWS_FEED_MESSAGE_EVENT", Locale.getString("_has_been_reported"),
 					iconMC, personName, true));
 			}
+		}, function() {
+			mDRReportPlayerPopup = null;
+			restoreFocusAfterSocialAction(playerIndex, button);
 		});
 		MemoryTracker.track(mDRReportPlayerPopup, "UIReportPopup - created in DistributedDungeonSummary.createReportPlayerPopup()");
 	}
 
+	function closeDRReportPlayerPopup() {
+		if (mDRReportPlayerPopup != null) {
+			mDRReportPlayerPopup.destroy();
+			mDRReportPlayerPopup = null;
+		}
+	}
+
+	function restoreFocusAfterSocialAction(playerIndex:UInt, usedButton:UIButton) {
+		if (mAvatarButtons == null || mAddFriendButtons == null || mBlockFriendButtons == null || mReportPlayerButtons == null) {
+			return;
+		}
+		if (usedButton == null || usedButton.canBeFocused()) {
+			return;
+		}
+		setupMenuNavigation();
+		var _loc3_ = getPlayerSocialButtons((playerIndex : Int));
+		var _loc4_ = firstUIObject(_loc3_);
+		if (_loc4_ == null) {
+			_loc4_ = ASCompat.coerce(mAvatarButtons[(playerIndex : Int)], brain.uI.UIObject);
+		}
+		if (_loc4_ != null) {
+			mDBFacade.menuNavigationController.setFocusedUiObject(_loc4_);
+		}
+	}
+
 	override public function destroy() {
-		var _loc5_ = 0;
+		var _loc2_:UIObject;
 		var _loc6_ = 0;
-		var _loc2_:FacebookPicHelper = null;
-		var _loc4_ = 0;
 		var _loc7_ = 0;
+		var _loc3_:SteamAvatarHelper = null;
+		var _loc5_ = (0 : UInt);
+		var _loc8_ = (0 : UInt);
 		if (mCountDownTextXP != null) {
 			mCountDownTextXP.destroy();
 		}
 		if (mCountDownTextGold != null) {
 			mCountDownTextGold.destroy();
 		}
-		var _loc3_:UIObject;
-		final __ax4_iter_226 = mTeamBonusUI;
-		if (checkNullIteratee(__ax4_iter_226))
-			for (_tmp_ in __ax4_iter_226.iterator()) {
-				_loc3_ = ASCompat.coerce(_tmp_, brain.uI.UIObject);
-				_loc3_.destroy();
+		var _loc4_:UIObject;
+		final __ax4_iter_313 = mTeamBonusUI;
+		if (checkNullIteratee(__ax4_iter_313))
+			for (_tmp_ in __ax4_iter_313.iterator()) {
+				_loc4_ = ASCompat.coerce(_tmp_, brain.uI.UIObject);
+				_loc4_.destroy();
 			}
 		mTeamBonusUI = null;
 		mSmashSfx = null;
@@ -2986,10 +3042,10 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 			mChestRevealPopUp = null;
 		}
 		if (mChestKeySlots != null) {
-			_loc5_ = 0;
-			while (_loc5_ < mChestKeySlots.length) {
-				mChestKeySlots[_loc5_].destroy();
-				_loc5_++;
+			_loc6_ = 0;
+			while (_loc6_ < mChestKeySlots.length) {
+				mChestKeySlots[_loc6_].destroy();
+				_loc6_++;
 			}
 		}
 		mChestKeySlots = null;
@@ -3005,34 +3061,45 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 			mUIInventory.destroy();
 			mUIInventory = null;
 		}
-		_loc4_ = 0;
-		while (_loc4_ < 4) {
-			_loc6_ = 0;
-			while (_loc6_ < 2) {
-				mSceneGraphComponent.removeChild(ASCompat.coerce(ASCompat.dynGetIndex(mChestMovieClips[_loc4_], _loc6_), flash.display.DisplayObject));
-				_loc6_++;
+		_loc5_ = (0 : UInt);
+		while (_loc5_ < 4) {
+			_loc7_ = 0;
+			while (_loc7_ < 2) {
+				mSceneGraphComponent.removeChild(ASCompat.coerce(ASCompat.dynGetIndex(mChestMovieClips[(_loc5_ : Int)], _loc7_), flash.display.DisplayObject));
+				_loc7_++;
 			}
-			_loc4_++;
+			_loc5_++;
 		}
 		mChestMovieClips = null;
 		mDBFacade.regainFocus();
-		if (mSceneGraphComponent.contains(mFacebookPicHolder, (105 : UInt))) {
-			mSceneGraphComponent.removeChild(mFacebookPicHolder);
+		if (mSceneGraphComponent.contains(mSteamAvatarHolder, (105 : UInt))) {
+			mSceneGraphComponent.removeChild(mSteamAvatarHolder);
 		}
-		mFacebookPicHolder = null;
-		var _loc1_ = mFacebookPicMap.keysToArray();
-		var _loc8_:UInt;
+		mSteamAvatarHolder = null;
+		var _loc1_ = mSteamAvatarMap.keysToArray();
+		var _loc10_:UInt;
 		if (checkNullIteratee(_loc1_))
 			for (_tmp_ in _loc1_) {
-				_loc8_ = (ASCompat.toInt(_tmp_) : UInt);
-				_loc2_ = ASCompat.coerce(mFacebookPicMap.itemFor(_loc8_), FacebookPicHelper);
-				if (_loc2_ != null) {
-					_loc2_.destroy();
+				_loc10_ = (ASCompat.toInt(_tmp_) : UInt);
+				_loc3_ = ASCompat.coerce(mSteamAvatarMap.itemFor(_loc10_), SteamAvatarHelper);
+				if (_loc3_ != null) {
+					_loc3_.destroy();
 				}
-				_loc2_ = null;
+				_loc3_ = null;
 			}
-		mFacebookPicMap.clear();
+		mSteamAvatarMap.clear();
 		closeBoosterPopup();
+		closeDRFriendBlockPopup();
+		closeDRReportPlayerPopup();
+		closeAbandonChestPopUp();
+		closeKeylessChestPopup();
+		closeKeyChestPopup();
+		closeInfoPopup();
+		if (mChestTransactionFailedPopup != null) {
+			mChestTransactionFailedPopup.destroy();
+			mChestTransactionFailedPopup = null;
+		}
+		mDBFacade.menuNavigationController.removeLayer("DISTRIBUTED_DUNGEON_SUMMARY");
 		mEventComponent.destroy();
 		mWorkComponent.destroy();
 		mChatEventComponent.destroy();
@@ -3045,41 +3112,64 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 		mXPBonusBarEffect = null;
 		mXPBonusTextFlash = null;
 		mXPBonusText = null;
-		_loc4_ = 0;
-		while (_loc4_ < mAddFriendButtons.length) {
-			mAddFriendButtons[_loc4_].destroy();
-			_loc4_++;
+		_loc5_ = (0 : UInt);
+		while (_loc5_ < (mAddFriendButtons.length:UInt)) {
+			if (ASCompat.toBool(mAddFriendButtons[(_loc5_ : Int)])) {
+				mAddFriendButtons[(_loc5_ : Int)].destroy();
+			}
+			_loc5_++;
 		}
 		mAddFriendButtons = null;
-		_loc4_ = 0;
-		while (_loc4_ < mBlockFriendButtons.length) {
-			mBlockFriendButtons[_loc4_].destroy();
-			_loc4_++;
+		_loc5_ = (0 : UInt);
+		while (_loc5_ < (mBlockFriendButtons.length:UInt)) {
+			if (ASCompat.toBool(mBlockFriendButtons[(_loc5_ : Int)])) {
+				mBlockFriendButtons[(_loc5_ : Int)].destroy();
+			}
+			_loc5_++;
 		}
 		mBlockFriendButtons = null;
-		_loc4_ = 0;
-		while (_loc4_ < mReportPlayerButtons.length) {
-			mReportPlayerButtons[_loc4_].destroy();
-			_loc4_++;
+		_loc5_ = (0 : UInt);
+		while (_loc5_ < (mReportPlayerButtons.length:UInt)) {
+			if (ASCompat.toBool(mReportPlayerButtons[(_loc5_ : Int)])) {
+				mReportPlayerButtons[(_loc5_ : Int)].destroy();
+			}
+			_loc5_++;
 		}
 		mReportPlayerButtons = null;
-		_loc4_ = 0;
-		while (_loc4_ < mBoosterInfos.length) {
-			mBoosterInfos[_loc4_].destroy();
-			_loc4_++;
+		_loc5_ = (0 : UInt);
+		while (_loc5_ < (mBoosterInfos.length:UInt)) {
+			mBoosterInfos[(_loc5_ : Int)].destroy();
+			_loc5_++;
 		}
 		mBoosterInfos = null;
-		_loc4_ = 0;
-		while (_loc4_ < 4) {
-			_loc7_ = 0;
-			while (_loc7_ < 2) {
-				if (ASCompat.toBool(ASCompat.dynGetIndex(mItemButtons[_loc4_], _loc7_))) {
-					ASCompat.dynGetIndex(mItemButtons[_loc4_], _loc7_).destroy();
-					mItemButtons[_loc4_][_loc7_] = null;
-				}
-				_loc7_++;
+		_loc5_ = (0 : UInt);
+		while (_loc5_ < (mAvatarButtons.length:UInt)) {
+			if (ASCompat.toBool(mAvatarButtons[(_loc5_ : Int)])) {
+				mAvatarButtons[(_loc5_ : Int)].destroy();
 			}
-			_loc4_++;
+			_loc5_++;
+		}
+		mAvatarButtons = null;
+		if (mXPBoosterUI != null) {
+			mXPBoosterUI.destroy();
+		}
+		mXPBoosterUI = null;
+		if (mCoinBoosterUI != null) {
+			mCoinBoosterUI.destroy();
+		}
+		mCoinBoosterUI = null;
+		mPlayerBoosterUIs = null;
+		_loc5_ = (0 : UInt);
+		while (_loc5_ < 4) {
+			_loc8_ = (0 : UInt);
+			while (_loc8_ < 2) {
+				if (ASCompat.toBool(ASCompat.dynGetIndex(mItemButtons[(_loc5_ : Int)], _loc8_))) {
+					ASCompat.dynGetIndex(mItemButtons[(_loc5_ : Int)], _loc8_).destroy();
+					mItemButtons[(_loc5_ : Int)][_loc8_] = null;
+				}
+				_loc8_++;
+			}
+			_loc5_++;
 		}
 		mItemButtons = null;
 		if (mTownHeader != null) {
@@ -3089,6 +3179,15 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 		if (mAssetLoadingComponent != null) {
 			mAssetLoadingComponent.destroy();
 			mAssetLoadingComponent = null;
+		}
+		if (mBgRenderer != null) {
+			mDBFacade.mTween.killTweensOf(mBgRenderer.clip);
+			mBgRenderer.destroy();
+			mBgRenderer = null;
+		}
+		if (mNextFloorSection != null) {
+			mNextFloorSection.destroy();
+			mNextFloorSection = null;
 		}
 		if (mScoreReportRoot != null) {
 			mSceneGraphComponent.removeChild(mScoreReportRoot);
@@ -3100,10 +3199,10 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 		}
 		mUIChatLog.enabledChatEnterEvent = true;
 		mUIChatLog.destroy();
-		_loc4_ = 0;
-		while (_loc4_ < mChestRenderers.length) {
-			mChestRenderers[_loc4_].destroy();
-			_loc4_++;
+		_loc5_ = (0 : UInt);
+		while (_loc5_ < (mChestRenderers.length:UInt)) {
+			mChestRenderers[(_loc5_ : Int)].destroy();
+			_loc5_++;
 		}
 		mChestRenderers = null;
 		isSingleChestList.length = 0;
@@ -3117,8 +3216,8 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 		mDungeonReport.length = 0;
 		mDungeonReport = null;
 		mEventComponent = null;
-		mFacebookPicMap.clear();
-		mFacebookPicMap = null;
+		mSteamAvatarMap.clear();
+		mSteamAvatarMap = null;
 		mNetworkComponent = null;
 		mPlayerIsTypingNotification = null;
 		mRarityMap.clear();
@@ -3132,6 +3231,19 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 		mUILootSlotsFourTreasures = null;
 		mUILootSlotsTwoTreasures.resize(0);
 		mUILootSlotsTwoTreasures = null;
+		var _loc9_:Array<ASAny>;
+		final __ax4_iter_314 = mWeapons;
+		if (checkNullIteratee(__ax4_iter_314))
+			for (_tmp_ in __ax4_iter_314) {
+				_loc9_ = ASCompat.coerce(_tmp_, Array);
+				if (checkNullIteratee(_loc9_))
+					for (_tmp_ in _loc9_) {
+						_loc2_ = ASCompat.coerce(_tmp_, brain.uI.UIObject);
+						if (_loc2_ != null) {
+							_loc2_.destroy();
+						}
+					}
+			}
 		mWeapons.resize(0);
 		mWeapons = null;
 		mWeaponTooltips.resize(0);
@@ -3139,6 +3251,7 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 		mXpBar.resize(0);
 		mXpBar = null;
 		mDBFacade = null;
+		super.destroy();
 	}
 
 	@:isVar public var dungeon_name(never, set):String;
@@ -3150,16 +3263,16 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 	@:isVar public var report(get, set):Vector<DungeonReport>;
 
 	public function set_report(val:Vector<DungeonReport>):Vector<DungeonReport> {
-		var _loc4_ = 0;
+		var _loc4_ = (0 : UInt);
 		var _loc2_:DungeonReport = null;
 		var _loc3_ = 0;
 		var _loc6_:Array<ASAny> = null;
 		mDungeonReport = val;
-		_loc4_ = 0;
+		_loc4_ = (0 : UInt);
 		while (_loc4_ < 4) {
-			if (mDungeonReport[_loc4_].id == mDBFacade.accountId) {
-				_loc2_ = mDungeonReport[_loc4_];
-				mDungeonReport[_loc4_] = mDungeonReport[0];
+			if (mDungeonReport[(_loc4_ : Int)].id == mDBFacade.accountId) {
+				_loc2_ = mDungeonReport[(_loc4_ : Int)];
+				mDungeonReport[(_loc4_ : Int)] = mDungeonReport[0];
 				mDungeonReport[0] = _loc2_;
 				break;
 			}
@@ -3223,8 +3336,8 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 		var alreadyCompleted = mDBFacade.dbAccountInfo.getAttribute(surveyName) == "1";
 		if (ASCompat.stringAsBool(surveyURL) && !alreadyCompleted) {
 			surveyURL += "?c=" + mDBFacade.accountId;
-			popup = new DBUITwoButtonPopup(mDBFacade, Locale.getString("SURVEY_POPUP_TITLE"), Locale.getString("SURVEY_POPUP_MESSAGE"),
-				Locale.getString("SURVEY_CANCEL"), function() {
+			popup = new DBUITwoButtonPopup(mDBFacade, "SUMMARY_SURVEY_POPUP", Locale.getString("SURVEY_POPUP_TITLE"),
+				Locale.getString("SURVEY_POPUP_MESSAGE"), Locale.getString("SURVEY_CANCEL"), function() {
 					Logger.info("trySurveyLink cancel: " + surveyURL);
 					returnToSplashScreen();
 			}, Locale.getString("SURVEY_GO"), function() {
@@ -3242,9 +3355,8 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 	function tryReturnToSplashScreen() {
 		var _loc1_:DBUITwoButtonPopup = null;
 		if (mItemCount > 0) {
-			_loc1_ = new DBUITwoButtonPopup(mDBFacade, Locale.getString("ABANDON_ITEMS_TITLE"), Locale.getString("ABANDON_ITEMS_MESSAGE"),
-				Locale.getString("ABANDON_YES"), trySurveyLink, Locale.getString("CANCEL"), null, true, null, true, true,
-				"ARE_YOU_SURE_YOU_WANT_TO_ABANDON_CHESTS");
+			_loc1_ = new DBUITwoButtonPopup(mDBFacade, "ARE_YOU_SURE_YOU_WANT_TO_ABANDON_CHESTS", Locale.getString("ABANDON_ITEMS_TITLE"),
+				Locale.getString("ABANDON_ITEMS_MESSAGE"), Locale.getString("ABANDON_YES"), trySurveyLink, Locale.getString("CANCEL"), null);
 			MemoryTracker.track(_loc1_, "DBUITwoButtonPopup - created in DistributedDungeonSummary.tryReturnToSplashScreen()");
 		} else {
 			trySurveyLink();
@@ -3252,19 +3364,21 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 	}
 
 	function openInventory() {
-		var _loc1_ = 0;
+		var _loc1_ = (0 : UInt);
 		var _loc2_ = 0;
 		mUIInventory = new UIInventory(mDBFacade, mTownHeader, this);
 		mUIInventory.setRevealedState(mRevealedItemType, mRevealedItemOfferId, mRevealedItemCallEquip);
 		mUIInventory.show(mSelectedGMChest);
 		mTownHeader.showCloseButton(true);
 		mScoreReportRoot.addChild(mUIInventory.root);
-		_loc1_ = 0;
+		mUIInventory.setupCategoryNavigation("DISTRIBUTED_DUNGEON_SUMMARY");
+		mTownHeader.closeButton.clearRightNavigation();
+		_loc1_ = (0 : UInt);
 		while (_loc1_ < 4) {
 			_loc2_ = 0;
 			while (_loc2_ < 2) {
-				if (ASCompat.dynGetIndex(mChestMovieClips[_loc1_], _loc2_) != null) {
-					ASCompat.setProperty(ASCompat.dynGetIndex(mChestMovieClips[_loc1_], _loc2_), "visible", false);
+				if (ASCompat.dynGetIndex(mChestMovieClips[(_loc1_ : Int)], _loc2_) != null) {
+					ASCompat.setProperty(ASCompat.dynGetIndex(mChestMovieClips[(_loc1_ : Int)], _loc2_), "visible", false);
 				}
 				_loc2_++;
 			}
@@ -3282,9 +3396,11 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 
 	function closeInventory() {
 		var _loc2_ = 0;
+		mDBFacade.menuNavigationController.setLayerCategoryCallbacks(null, null, "DISTRIBUTED_DUNGEON_SUMMARY");
 		mScoreReportRoot.removeChild(mUIInventory.root);
 		mUIInventory.destroy();
 		mUIInventory = null;
+		setupMenuNavigation();
 		mTownHeader.showCloseButton(true);
 		mTownHeader.title = this.dungeonSuccess != 0 ? Locale.getString("VICTORY") : Locale.getString("DUNGEON_FAILED");
 		var _loc1_:Array<ASAny> = [
@@ -3307,14 +3423,314 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 	}
 
 	function returnToSplashScreen() {
-		mDBFacade.menuNavigationController.popLayer("DISTRIBUTED_DUNGEON_SUMMARY");
+		mLeaving = true;
+		closeDRFriendBlockPopup();
+		closeDRReportPlayerPopup();
+		mDBFacade.menuNavigationController.removeLayer("DISTRIBUTED_DUNGEON_SUMMARY");
 		mDBFacade.mDistributedObjectManager.mMatchMaker.RequestExit();
 	}
 
-	function setupMenuNavigation() {}
+	function setupMenuNavigation() {
+		var __ax4_iter_315:Array<ASAny>;
+		var __ax4_iter_316:Array<ASAny>;
+		var _loc12_ = 0;
+		var _loc13_:UIObject = null;
+		var _loc16_ = 0;
+		var _loc9_:UIObject = null;
+		var _loc19_:Array<ASAny> = null;
+		var _loc14_:Array<ASAny> = null;
+		var _loc22_:Array<ASAny> = null;
+		var _loc17_:UIObject = null;
+		var _loc11_:UIObject = null;
+		var _loc7_:UIObject = null;
+		var _loc6_:UIObject = null;
+		var _loc18_:UIObject = null;
+		var _loc2_:UIObject = null;
+		var _loc4_ = 0;
+		var _loc21_:UIObject = null;
+		var _loc15_:UIObject = null;
+		var _loc24_:UIObject = null;
+		var _loc3_:UIObject = null;
+		var _loc5_:Array<ASAny> = null;
+		var _loc20_:Array<ASAny> = null;
+		if (mTownHeader == null || mNextFloorSection == null || mUIChatLog == null || mWeapons == null) {
+			return;
+		}
+		var _loc23_:Array<ASAny> = [
+			mNextFloorSection.battleButton,
+			mUIChatLog.chatSendButton,
+			mUIChatLog.chatLogButton
+		];
+		_loc12_ = 0;
+		while (_loc12_ < 4) {
+			if (ASCompat.toBool(mAvatarButtons[_loc12_])) {
+				_loc23_.push(mAvatarButtons[_loc12_]);
+			}
+			__ax4_iter_315 = mPlayerBoosterUIs[_loc12_];
+			if (checkNullIteratee(__ax4_iter_315))
+				for (_tmp_ in __ax4_iter_315) {
+					_loc13_ = ASCompat.coerce(_tmp_, brain.uI.UIObject);
+					_loc23_.push(_loc13_);
+				}
+			if (ASCompat.toBool(mAddFriendButtons[_loc12_])) {
+				_loc23_.push(mAddFriendButtons[_loc12_]);
+			}
+			if (ASCompat.toBool(mBlockFriendButtons[_loc12_])) {
+				_loc23_.push(mBlockFriendButtons[_loc12_]);
+			}
+			if (ASCompat.toBool(mReportPlayerButtons[_loc12_])) {
+				_loc23_.push(mReportPlayerButtons[_loc12_]);
+			}
+			__ax4_iter_316 = mWeapons[_loc12_];
+			if (checkNullIteratee(__ax4_iter_316))
+				for (_tmp_ in __ax4_iter_316) {
+					_loc13_ = ASCompat.coerce(_tmp_, brain.uI.UIObject);
+					_loc23_.push(_loc13_);
+				}
+			_loc12_++;
+		}
+		if (checkNullIteratee(_loc23_))
+			for (_tmp_ in _loc23_) {
+				_loc13_ = ASCompat.coerce(_tmp_, brain.uI.UIObject);
+				_loc13_.clearNavigationAndInteractions();
+			}
+		var _loc10_ = getValidSummaryPlayerIndices();
+		linkHeaderToSummary(ASCompat.coerce(_loc10_.length > 0 ? ASCompat.coerce(mAvatarButtons[ASCompat.toInt(_loc10_[0])], brain.uI.UIObject) : null,
+			brain.uI.UIObject));
+		if (_loc10_.length == 0) {
+			return;
+		}
+		_loc16_ = 0;
+		while (_loc16_ < _loc10_.length) {
+			_loc12_ = ASCompat.toInt(_loc10_[_loc16_]);
+			_loc9_ = ASCompat.coerce(mAvatarButtons[_loc12_], brain.uI.UIObject);
+			_loc9_.upNavigation = mTownHeader.addCoinButton;
+			if (_loc16_ > 0) {
+				mAvatarButtons[ASCompat.toInt(_loc10_[_loc16_ - 1])].isToTheLeftOf(_loc9_);
+			}
+			_loc19_ = getAvailableUIObjects(ASCompat.coerce(mPlayerBoosterUIs[_loc12_], Array));
+			_loc14_ = getPlayerSocialButtons(_loc12_);
+			_loc22_ = getAvailableUIObjects(ASCompat.coerce(mWeapons[_loc12_], Array));
+			_loc17_ = firstUIObject(_loc19_);
+			if (_loc17_ == null) {
+				_loc17_ = firstUIObject(_loc14_);
+			}
+			if (_loc17_ == null) {
+				_loc17_ = firstUIObject(_loc22_);
+			}
+			if (_loc17_ == null) {
+				_loc17_ = mUIChatLog.chatSendButton;
+			}
+			_loc9_.downNavigation = _loc17_;
+			linkHorizontalRow(_loc19_);
+			_loc11_ = firstUIObject(_loc14_);
+			if (_loc11_ == null) {
+				_loc11_ = firstUIObject(_loc22_);
+			}
+			if (_loc11_ == null) {
+				_loc11_ = mUIChatLog.chatSendButton;
+			}
+			if (checkNullIteratee(_loc19_))
+				for (_tmp_ in _loc19_) {
+					_loc13_ = ASCompat.coerce(_tmp_, brain.uI.UIObject);
+					_loc13_.upNavigation = _loc9_;
+					_loc13_.downNavigation = _loc11_;
+				}
+			linkHorizontalRow(_loc14_);
+			_loc7_ = firstUIObject(_loc22_);
+			_loc6_ = ASCompat.coerce(_loc7_ != null ? _loc7_ : mUIChatLog.chatSendButton, brain.uI.UIObject);
+			_loc18_ = ASCompat.coerce(_loc19_.length > 0 ? ASCompat.coerce(_loc19_[_loc19_.length - 1], brain.uI.UIObject) : _loc9_, brain.uI.UIObject);
+			if (checkNullIteratee(_loc14_))
+				for (_tmp_ in _loc14_) {
+					_loc13_ = ASCompat.coerce(_tmp_, brain.uI.UIObject);
+					_loc13_.upNavigation = _loc18_;
+					_loc13_.downNavigation = _loc6_;
+				}
+			linkHorizontalRow(_loc22_);
+			_loc2_ = ASCompat.coerce(_loc14_.length > 0 ? ASCompat.coerce(_loc14_[0],
+				brain.uI.UIObject) : ASCompat.coerce(_loc19_.length > 0 ? ASCompat.coerce(_loc19_[_loc19_.length - 1], brain.uI.UIObject) : _loc9_,
+					brain.uI.UIObject),
+				brain.uI.UIObject);
+			if (checkNullIteratee(_loc22_))
+				for (_tmp_ in _loc22_) {
+					_loc13_ = ASCompat.coerce(_tmp_, brain.uI.UIObject);
+					_loc13_.upNavigation = _loc2_;
+					_loc13_.downNavigation = mUIChatLog.chatSendButton;
+				}
+			_loc4_ = ASCompat.toInt(_loc16_ + 1 < _loc10_.length ? _loc10_[_loc16_ + 1] : -1);
+			_loc21_ = ASCompat.coerce(_loc4_ >= 0 ? firstUIObject(getPlayerSocialButtons(_loc4_)) : null, brain.uI.UIObject);
+			_loc15_ = ASCompat.coerce(_loc4_ >= 0 ? firstUIObject(getAvailableUIObjects(ASCompat.coerce(mWeapons[_loc4_], Array))) : null, brain.uI.UIObject);
+			_loc24_ = mNextFloorSection.battleButton;
+			if (_loc14_.length > 0) {
+				cast(_loc14_[_loc14_.length - 1], UIObject).rightNavigation = _loc21_ != null ? _loc21_ : (_loc15_ != null ? _loc15_ : _loc24_);
+				if (_loc21_ != null) {
+					_loc21_.leftNavigation = ASCompat.coerce(_loc14_[_loc14_.length - 1], brain.uI.UIObject);
+				}
+			}
+			if (_loc22_.length > 0) {
+				cast(_loc22_[_loc22_.length - 1], UIObject).rightNavigation = _loc15_ != null ? _loc15_ : (_loc21_ != null ? _loc21_ : _loc24_);
+				if (_loc15_ != null) {
+					_loc15_.leftNavigation = ASCompat.coerce(_loc22_[_loc22_.length - 1], brain.uI.UIObject);
+				}
+			}
+			_loc16_++;
+		}
+		var _loc1_ = ASCompat.toInt(_loc10_[_loc10_.length - 1]);
+		ASCompat.setProperty(mAvatarButtons[_loc1_], "rightNavigation", mNextFloorSection.battleButton);
+		var _loc8_ = getAvailableUIObjects(ASCompat.coerce(mWeapons[_loc1_], Array));
+		if (_loc8_.length > 0) {
+			_loc3_ = ASCompat.coerce(_loc8_[_loc8_.length - 1], brain.uI.UIObject);
+		} else {
+			_loc5_ = getPlayerSocialButtons(_loc1_);
+			_loc20_ = getAvailableUIObjects(ASCompat.coerce(mPlayerBoosterUIs[_loc1_], Array));
+			_loc3_ = ASCompat.coerce(_loc5_.length > 0 ? ASCompat.coerce(_loc5_[0],
+				brain.uI.UIObject) : ASCompat.coerce(_loc20_.length > 0 ? ASCompat.coerce(_loc20_[_loc20_.length - 1],
+					brain.uI.UIObject) : ASCompat.coerce(mAvatarButtons[_loc1_], brain.uI.UIObject),
+					brain.uI.UIObject),
+				brain.uI.UIObject);
+		}
+		mUIChatLog.chatSendButton.upNavigation = _loc3_;
+		mUIChatLog.chatSendButton.isToTheLeftOf(mUIChatLog.chatLogButton);
+		mUIChatLog.chatLogButton.rightNavigation = mNextFloorSection.battleButton;
+		mUIChatLog.chatSendButton.isToTheLeftOf(mUIChatLog.chatLogButton);
+		mUIChatLog.chatLogButton.rightNavigation = mNextFloorSection.battleButton;
+		if (_loc8_.length > 0) {
+			mNextFloorSection.battleButton.leftNavigation = ASCompat.coerce(_loc8_[_loc8_.length - 1], brain.uI.UIObject);
+		}
+	}
+
+	function linkHeaderToSummary(firstAvatar:UIObject) {
+		var _loc3_:UIObject = mNextFloorSection.battleButton;
+		var _loc2_:UIObject = mTownHeader.closeButton;
+		_loc3_.upNavigation = _loc2_;
+		if (mUIInventory != null) {
+			return;
+		}
+		_loc2_.clearRightNavigation();
+		_loc2_.clearDownNavigation();
+		_loc2_.rightNavigation = _loc3_;
+		_loc2_.downNavigation = _loc3_;
+		mTownHeader.addCoinButton.clearDownNavigation();
+		mTownHeader.addGemButton.clearDownNavigation();
+		if (firstAvatar != null) {
+			mTownHeader.addCoinButton.downNavigation = firstAvatar;
+			mTownHeader.addGemButton.downNavigation = firstAvatar;
+		}
+	}
+
+	function getValidSummaryPlayerIndices():Array<ASAny> {
+		var _loc2_ = 0;
+		var _loc1_:Array<ASAny> = [];
+		_loc2_ = 0;
+		while (_loc2_ < 4) {
+			if (mDungeonReport[_loc2_].valid != 0
+				&& ASCompat.toBool(mAvatarButtons[_loc2_])
+				&& ASCompat.toBool(mAvatarButtons[_loc2_].canBeFocused())
+				&& isEffectivelyVisible(ASCompat.coerce(mAvatarButtons[_loc2_].root, flash.display.DisplayObject))) {
+				_loc1_.push(_loc2_);
+			}
+			_loc2_++;
+		}
+		return _loc1_;
+	}
+
+	function getAvailableUIObjects(objects:Array<ASAny>):Array<ASAny> {
+		var _loc2_:Array<ASAny> = [];
+		if (objects == null) {
+			return _loc2_;
+		}
+		var _loc3_:UIObject;
+		if (checkNullIteratee(objects))
+			for (_tmp_ in objects) {
+				_loc3_ = ASCompat.coerce(_tmp_, brain.uI.UIObject);
+				if (_loc3_ != null && _loc3_.canBeFocused() && isEffectivelyVisible(_loc3_.root)) {
+					_loc2_.push(_loc3_);
+				}
+			}
+		return _loc2_;
+	}
+
+	function isEffectivelyVisible(displayObject:DisplayObject):Bool {
+		var _loc2_:DisplayObject = null;
+		_loc2_ = displayObject;
+		while (_loc2_ != null) {
+			if (!_loc2_.visible) {
+				return false;
+			}
+			_loc2_ = _loc2_.parent;
+		}
+		return true;
+	}
+
+	function getPlayerSocialButtons(playerIndex:Int):Array<ASAny> {
+		return getAvailableUIObjects([
+			mAddFriendButtons[playerIndex],
+			mBlockFriendButtons[playerIndex],
+			mReportPlayerButtons[playerIndex]
+		]);
+	}
+
+	function firstUIObject(objects:Array<ASAny>):UIObject {
+		return ASCompat.coerce(objects != null && objects.length > 0 ? ASCompat.dynamicAs(objects[0], UIObject) : null, brain.uI.UIObject);
+	}
+
+	function linkHorizontalRow(objects:Array<ASAny>) {
+		var _loc2_ = 0;
+		_loc2_ = 1;
+		while (_loc2_ < objects.length) {
+			cast(objects[_loc2_ - 1], UIObject).isToTheLeftOf(cast(objects[_loc2_], UIObject));
+			_loc2_++;
+		}
+	}
+
+	function focusPreviousPlayerAvatar() {
+		focusAdjacentPlayerAvatar(-1);
+	}
+
+	function focusNextPlayerAvatar() {
+		focusAdjacentPlayerAvatar(1);
+	}
+
+	function focusAdjacentPlayerAvatar(direction:Int) {
+		var _loc4_ = 0;
+		var _loc5_ = getValidSummaryPlayerIndices();
+		if (_loc5_.length == 0) {
+			return;
+		}
+		var _loc2_ = -1;
+		_loc4_ = 0;
+		while (_loc4_ < _loc5_.length) {
+			if (isSummaryPlayerObjectFocused(ASCompat.toInt(_loc5_[_loc4_]))) {
+				_loc2_ = _loc4_;
+				break;
+			}
+			_loc4_++;
+		}
+		var _loc3_ = _loc2_ < 0 ? (direction < 0 ? _loc5_.length - 1 : 0) : (_loc2_ + direction + _loc5_.length) % _loc5_.length;
+		mDBFacade.menuNavigationController.setFocusedUiObject(ASCompat.coerce(mAvatarButtons[ASCompat.toInt(_loc5_[_loc3_])], brain.uI.UIObject));
+	}
+
+	function isSummaryPlayerObjectFocused(playerIndex:Int):Bool {
+		var _loc2_:Array<ASAny> = [
+			mAvatarButtons[playerIndex],
+			mAddFriendButtons[playerIndex],
+			mBlockFriendButtons[playerIndex],
+			mReportPlayerButtons[playerIndex]
+		];
+		_loc2_ = ASCompat.ASArray.concat(_loc2_, [mPlayerBoosterUIs[playerIndex], mWeapons[playerIndex]]);
+		var _loc3_:UIObject;
+		if (checkNullIteratee(_loc2_))
+			for (_tmp_ in _loc2_) {
+				_loc3_ = ASCompat.coerce(_tmp_, brain.uI.UIObject);
+				if (_loc3_ != null && _loc3_.isFocused()) {
+					return true;
+				}
+			}
+		return false;
+	}
 }
 
-private class FacebookPicHelper {
+private class SteamAvatarHelper {
 	public var pic:DisplayObject;
 
 	public var root:MovieClip;

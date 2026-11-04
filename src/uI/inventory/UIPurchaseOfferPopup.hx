@@ -2,6 +2,8 @@ package uI.inventory;
 
 import brain.assetRepository.SwfAsset;
 import brain.logger.Logger;
+import brain.utils.TextUtil;
+import dBGlobals.DBGlobal;
 import facade.DBFacade;
 import facade.GameMasterLocale;
 import facade.Locale;
@@ -20,11 +22,11 @@ class UIPurchaseOfferPopup extends DBUITwoButtonPopup {
 
 	var mGMOffer:GMOffer;
 
-	public function new(dbFacade:DBFacade, popupClassName:String, titleText:String, offer:GMOffer, leftText:String, leftCallback:ASFunction, rightText:String,
-			rightCallback:ASFunction, allowClose:Bool = true, closeCallback:ASFunction = null) {
+	public function new(dbFacade:DBFacade, uiLayerName:String, popupClassName:String, titleText:String, offer:GMOffer, leftText:String,
+			leftCallback:ASFunction, rightText:String, rightCallback:ASFunction, allowClose:Bool = true, closeCallback:ASFunction = null) {
 		mGMOffer = offer;
 		mPopupClassName = popupClassName;
-		super(dbFacade, titleText, null, leftText, leftCallback, rightText, rightCallback, allowClose, closeCallback);
+		super(dbFacade, uiLayerName, titleText, null, leftText, leftCallback, rightText, rightCallback, allowClose, closeCallback);
 	}
 
 	override public function destroy() {
@@ -62,8 +64,8 @@ class UIPurchaseOfferPopup extends DBUITwoButtonPopup {
 				swfPath = weaponAesthetic.IconSwf;
 				iconName = weaponAesthetic.IconName;
 				ASCompat.setProperty((mPopup : ASAny).power, "visible", true);
-				ASCompat.setProperty((mPopup : ASAny).power.label, "text", offerDetail.WeaponPower);
-				ASCompat.setProperty((mPopup : ASAny).power.attack_label, "text", Locale.getString("POWER"));
+				TextUtil.setText(ASCompat.coerce((mPopup : ASAny).power.label, flash.text.TextField), Std.string(offerDetail.WeaponPower));
+				Locale.setText(ASCompat.coerce((mPopup : ASAny).power.attack_label, flash.text.TextField), "POWER");
 			} else if (offerDetail.HeroId != 0) {
 				hero = ASCompat.coerce(mDBFacade.gameMaster.heroById.itemFor(offerDetail.HeroId), gameMasterDictionary.GMHero);
 				defaultSkin = mDBFacade.gameMaster.getSkinByConstant(hero.DefaultSkin);
@@ -92,15 +94,16 @@ class UIPurchaseOfferPopup extends DBUITwoButtonPopup {
 					return;
 				}
 				var _loc2_ = ASCompat.coerce(ASCompat.createInstance(_loc3_, []), flash.display.MovieClip);
-				_loc2_.scaleX = _loc2_.scaleY = 70 / 100;
+				_loc2_.scaleX = _loc2_.scaleY = 70 / DBGlobal.WEAPON_ICON_NATIVE_SIZE;
 				(mPopup : ASAny).item_icon.addChild(_loc2_);
 			});
 		}
 		if ((mPopup : ASAny).message_label != null) {
-			ASCompat.setProperty((mPopup : ASAny).message_label, "text", offerName);
+			TextUtil.setText(ASCompat.coerce((mPopup : ASAny).message_label, flash.text.TextField), offerName);
 		}
-		ASCompat.setProperty((mPopup : ASAny).cash, "visible", mGMOffer.Price > 0 && mGMOffer.CurrencyType == "PREMIUM");
-		ASCompat.setProperty((mPopup : ASAny).coin, "visible", mGMOffer.Price > 0 && mGMOffer.CurrencyType == "BASIC");
-		ASCompat.setProperty((mPopup : ASAny).price, "text", mGMOffer.Price > 0 ? Std.string(mGMOffer.Price) : Locale.getString("SHOP_FREE"));
+		ASCompat.setProperty((mPopup : ASAny).cash, "visible", mGMOffer.Price > 0 && mGMOffer.CurrencyType == GMOffer.PREMIUM_CURRENCY);
+		ASCompat.setProperty((mPopup : ASAny).coin, "visible", mGMOffer.Price > 0 && mGMOffer.CurrencyType == GMOffer.BASIC_CURRENCY);
+		TextUtil.setText(ASCompat.coerce((mPopup : ASAny).price, flash.text.TextField),
+			mGMOffer.Price > 0 ? Std.string(mGMOffer.Price) : Locale.getString("SHOP_FREE"));
 	}
 }

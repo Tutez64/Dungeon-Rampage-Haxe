@@ -6,8 +6,11 @@ import brain.assetRepository.AssetLoadingComponent;
 import brain.assetRepository.SwfAsset;
 import brain.clock.GameClock;
 import brain.event.EventComponent;
+import brain.utils.TextUtil;
 import brain.workLoop.LogicalWorkComponent;
 import brain.workLoop.Task;
+import collections.IMapIterator;
+import collections.Map;
 import distributedObjects.HeroGameObject;
 import distributedObjects.HeroGameObjectOwner;
 import events.ActorLifetimeEvent;
@@ -15,8 +18,6 @@ import facade.DBFacade;
 import flash.display.MovieClip;
 import flash.geom.Rectangle;
 import flash.geom.Vector3D;
-import org.as3commons.collections.Map;
-import org.as3commons.collections.framework.IMapIterator;
 
 class UIOffScreenPlayerManager {
 	static inline final EFFECT_RECT_X_OFFSET:Float = 50;
@@ -187,7 +188,9 @@ class UIOffScreenPlayerManager {
 			_loc3_.x = calculateEffectXPosition(_loc12_);
 			_loc3_.y = calculateEffectYPosition(_loc12_, _loc10_.y, _loc11_.y);
 			mUIRoot.addChild(_loc3_);
-			ASCompat.setProperty((_loc3_ : ASAny).NametagText, "text", player.screenName);
+			TextUtil.setText(ASCompat.coerce((_loc3_ : ASAny).NametagText, flash.text.TextField), player.screenName, 1.82);
+			TextUtil.fitToField(ASCompat.coerce((_loc3_ : ASAny).NametagText, flash.text.TextField), 1.27);
+			ASCompat.setProperty((_loc3_ : ASAny).NametagText, "mouseEnabled", false);
 			ASCompat.setProperty((_loc3_ : ASAny).NametagText, "textColor",
 				PlayerSpecialStatus.getSpecialTextColor(player.screenName, (ASCompat.toInt((_loc3_ : ASAny).NametagText.textColor) : UInt)));
 			ASCompat.setProperty((_loc3_ : ASAny).AlertText, "text", "");
@@ -200,7 +203,7 @@ class UIOffScreenPlayerManager {
 			_loc7_ = ASCompat.coerce(mOffScreenPlayerMap.itemFor(player.id), uI.hud.UIOffScreenClip);
 			if (_loc7_ != null && _loc7_.clip != null) {
 				if (!_loc2_.contains(_loc11_.x, _loc11_.y)) {
-					if (_loc7_.clip.visible == false) {
+					if (!_loc7_.clip.visible) {
 						_loc7_.clip.visible = true;
 					}
 					_loc8_ = normalize(_loc8_);
@@ -213,9 +216,11 @@ class UIOffScreenPlayerManager {
 					}
 					_loc7_.clip.x = calculateEffectXPosition(_loc14_);
 					_loc7_.clip.y = calculateEffectYPosition(_loc14_, _loc10_.y, _loc11_.y);
-				} else if (_loc7_.clip.visible == true) {
+					_loc7_.keepTextOnScreen(mDBFacade.viewWidth);
+					_loc7_.keepChatOnScreen(mDBFacade.viewWidth, mDBFacade.viewHeight);
+				} else if (_loc7_.clip.visible) {
 					_loc7_.clip.visible = false;
-					_loc7_.showFacebookPicture();
+					_loc7_.showSteamAvatar();
 				}
 			}
 		}

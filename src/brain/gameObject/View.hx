@@ -13,6 +13,8 @@ import flash.display.Sprite;
 import flash.geom.Vector3D;
 
 class View {
+	static var sAllViews:Vector<View> = new Vector();
+
 	var mFacade:Facade;
 
 	var mRoot:Sprite;
@@ -27,14 +29,23 @@ class View {
 
 	var mFading:Bool = false;
 
-	public function new(facade:Facade) {
+	var mTickPosX:Float = Math.NaN;
+
+	var mTickPosY:Float = Math.NaN;
+
+	var mPrevPosX:Float = Math.NaN;
+
+	var mPrevPosY:Float = Math.NaN;
+
+	public function new(facade:Facade, category:String = "brain") {
 		mFacade = facade;
-		var _loc2_ = "View";
-		mSceneGraphComponent = new SceneGraphComponent(mFacade, _loc2_);
-		mWorkComponent = new LogicalWorkComponent(mFacade, _loc2_);
+		var _loc3_ = "View";
+		mSceneGraphComponent = new SceneGraphComponent(mFacade, _loc3_, category);
+		mWorkComponent = new LogicalWorkComponent(mFacade, _loc3_, category);
 		mRoot = new Sprite();
 		mFading = false;
-		MemoryTracker.track(this, _loc2_ + " - created in View()", "brain");
+		sAllViews.push(this);
+		MemoryTracker.track(this, _loc3_ + " - created in View()", category);
 	}
 
 	static function recursiveFindChildrenOfClass(foundArray:Array<ASAny>, node:DisplayObject, classNames:Array<ASAny>) {
@@ -59,6 +70,26 @@ class View {
 		return _loc3_;
 	}
 
+	public static function beginTickAll() {
+		var _loc1_:View;
+		final __ax4_iter_528 = sAllViews;
+		if (checkNullIteratee(__ax4_iter_528))
+			for (_tmp_ in __ax4_iter_528) {
+				_loc1_ = _tmp_;
+				_loc1_.beginTick();
+			}
+	}
+
+	public static function renderInterpolatedAll(alpha:Float) {
+		var _loc2_:View;
+		final __ax4_iter_529 = sAllViews;
+		if (checkNullIteratee(__ax4_iter_529))
+			for (_tmp_ in __ax4_iter_529) {
+				_loc2_ = _tmp_;
+				_loc2_.renderInterpolated(alpha);
+			}
+	}
+
 	public function init() {}
 
 	public function unFade() {
@@ -70,16 +101,15 @@ class View {
 
 	public function updateFade(gameClock:GameClock) {
 		var _loc2_ = Math.NaN;
-		var _loc3_ = gameClock.tickLength / GameClock.ANIMATION_FRAME_DURATION;
 		if (mFading) {
-			mRoot.alpha *= Math.pow(0.85, _loc3_);
+			mRoot.alpha *= 0.85;
 			if (mRoot.alpha <= 0.3) {
 				mFading = false;
 				mRoot.alpha = 0.3;
 			}
 		} else {
 			_loc2_ = 1 - mRoot.alpha;
-			mRoot.alpha = 1 - Math.pow(_loc2_, Math.pow(2, _loc3_));
+			mRoot.alpha = 1 - _loc2_ * _loc2_;
 			if (mRoot.alpha > 0.975) {
 				unFade();
 			}
@@ -102,13 +132,43 @@ class View {
 	@:isVar public var position(get, set):Vector3D;
 
 	public function get_position():Vector3D {
-		return new Vector3D(mRoot.x, mRoot.y);
+		if (Math.isNaN(mTickPosX)) {
+			return new Vector3D(mRoot.x, mRoot.y);
+		}
+		return new Vector3D(mTickPosX, mTickPosY);
+	}
+
+	@:isVar public var positionX(get, never):Float;
+
+	public function get_positionX():Float {
+		return Math.isNaN(mTickPosX) ? mRoot.x : mTickPosX;
+	}
+
+	@:isVar public var positionY(get, never):Float;
+
+	public function get_positionY():Float {
+		return Math.isNaN(mTickPosX) ? mRoot.y : mTickPosY;
 	}
 
 	function set_position(pos:Vector3D):Vector3D {
+		if (Math.isNaN(mPrevPosX)) {
+			mPrevPosX = pos.x;
+			mPrevPosY = pos.y;
+		}
+		mTickPosX = pos.x;
+		mTickPosY = pos.y;
 		mRoot.x = pos.x;
 		mRoot.y = pos.y;
 		return pos;
+	}
+
+	public function snapPosition(pos:Vector3D) {
+		mPrevPosX = pos.x;
+		mPrevPosY = pos.y;
+		mTickPosX = pos.x;
+		mTickPosY = pos.y;
+		mRoot.x = pos.x;
+		mRoot.y = pos.y;
 	}
 
 	@:isVar public var rotation(get, set):Float;
@@ -157,7 +217,42 @@ class View {
 		return mRoot;
 	}
 
+	public function isViewObjectTweenDriven():Bool {
+		return false;
+	}
+
+	public function beginTick() {
+		mPrevPosX = mTickPosX;
+		mPrevPosY = mTickPosY;
+		if (!Math.isNaN(mTickPosX) && (mPrevPosX != mTickPosX || mPrevPosY != mTickPosY)) {
+			mRoot.x = mTickPosX;
+			mRoot.y = mTickPosY;
+		}
+		mPrevPosX = mTickPosX;
+		mPrevPosY = mTickPosY;
+	}
+
+	public function renderInterpolated(alpha:Float) {
+		if (Math.isNaN(mTickPosX)) {
+			return;
+		}
+		if (isViewObjectTweenDriven()) {
+			return;
+		}
+		if (mPrevPosX == mTickPosX && mPrevPosY == mTickPosY) {
+			mRoot.x = mTickPosX;
+			mRoot.y = mTickPosY;
+			return;
+		}
+		mRoot.x = mPrevPosX + (mTickPosX - mPrevPosX) * alpha;
+		mRoot.y = mPrevPosY + (mTickPosY - mPrevPosY) * alpha;
+	}
+
 	public function destroy() {
+		var _loc1_ = sAllViews.indexOf(this);
+		if (_loc1_ >= 0) {
+			sAllViews.splice(_loc1_, (1 : UInt));
+		}
 		if (mSceneGraphComponent != null) {
 			mSceneGraphComponent.destroy();
 			mSceneGraphComponent = null;

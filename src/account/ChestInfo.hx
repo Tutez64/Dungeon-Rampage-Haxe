@@ -2,6 +2,7 @@ package account;
 
 import brain.assetRepository.AssetLoadingComponent;
 import brain.logger.Logger;
+import dBGlobals.DBGlobal;
 import facade.DBFacade;
 import gameMasterDictionary.GMChest;
 import gameMasterDictionary.GMRarity;
@@ -59,7 +60,7 @@ class ChestInfo extends InventoryBaseInfo {
 	}
 
 	override public function get_iconScale():Float {
-		return 120;
+		return DBGlobal.CHEST_ICON_NATIVE_SIZE;
 	}
 
 	override function parseJson(json:ASObject) {

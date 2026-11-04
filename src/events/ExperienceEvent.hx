@@ -5,8 +5,8 @@ class ExperienceEvent extends GameObjectEvent {
 
 	public var experience:UInt = 0;
 
-	public function new(type:String, id:UInt, experience:UInt, bubbles:Bool = false, cancelable:Bool = false) {
+	public function new(experienceEventType:String, id:UInt, experience:UInt, bubbles:Bool = false, cancelable:Bool = false) {
 		this.experience = experience;
-		super(type, id, bubbles, cancelable);
+		super(experienceEventType, id, bubbles, cancelable);
 	}
 }
