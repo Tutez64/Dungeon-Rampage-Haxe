@@ -374,6 +374,7 @@ class SwfAsset extends Asset {
 		if (target == null || libraryName == null) {
 			return;
 		}
+		registerPreferredExportedFonts();
 		if (className == null || className.length == 0) {
 			className = Type.getClassName(Type.getClass(target));
 		}
@@ -576,12 +577,66 @@ class SwfAsset extends Asset {
 		return null;
 	}
 
+	static var sPreferredFontsRegistered:Bool = false;
+
+	/**
+		Several SWFs embed subsets of the same font, and OpenFL resolves a font name (an htmlText face,
+		a format restored from htmlText) to the first font registered with it, which can lack glyphs the
+		text needs. The most complete exported file of each name is registered first.
+	**/
+	@:access(openfl.text.Font)
+	static function registerPreferredExportedFonts():Void {
+		var root:String = null;
+		var directory:String = null;
+		var path:String = null;
+		var name:String = null;
+		var size:Int = 0;
+		var font:flash.text.Font = null;
+		var paths = new StringMap<String>();
+		var sizes = new StringMap<Int>();
+		if (sPreferredFontsRegistered) {
+			return;
+		}
+		sPreferredFontsRegistered = true;
+		root = Path.directory(getExportedFontDirectory("_"));
+		if (!FileSystem.exists(root) || !FileSystem.isDirectory(root)) {
+			return;
+		}
+		for (library in FileSystem.readDirectory(root)) {
+			directory = Path.join([root, library]);
+			if (!FileSystem.isDirectory(directory)) {
+				continue;
+			}
+			for (entry in FileSystem.readDirectory(directory)) {
+				name = entry.toLowerCase();
+				if (!StringTools.endsWith(name, ".ttf") && !StringTools.endsWith(name, ".otf")) {
+					continue;
+				}
+				name = normalizeFontLookupName(Path.withoutExtension(~/^[0-9]+_(symbol[0-9]+_)?/.replace(entry, "")));
+				path = Path.normalize(Path.join([directory, entry]));
+				size = FileSystem.stat(path).size;
+				if (!sizes.exists(name) || size > sizes.get(name)) {
+					sizes.set(name, size);
+					paths.set(name, path);
+				}
+			}
+		}
+		for (path in paths) {
+			font = flash.text.Font.fromFile(path);
+			if (font != null) {
+				flash.text.Font.__registeredFonts.unshift(font);
+				flash.text.Font.__fontByName[font.fontName] = font;
+			}
+		}
+	}
+
 	static function getExportedFontMap(libraryName:String):StringMap<String> {
 		var fontMap:StringMap<String> = null;
 		var directory:String = null;
 		var entry:String = null;
 		var lookup:String = null;
 		var separator:Int = 0;
+		registerPreferredExportedFonts();
 		if (sFontMaps.exists(libraryName)) {
 			return sFontMaps.get(libraryName);
 		}
