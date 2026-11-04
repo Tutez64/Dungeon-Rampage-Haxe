@@ -18,6 +18,7 @@ import brain.utils.ColorMatrix;
 import brain.utils.MemoryTracker;
 import brain.utils.TextUtil;
 import brain.utils.Timers;
+import brain.workLoop.LayerWorkComponent;
 import brain.workLoop.LogicalWorkComponent;
 import brain.workLoop.Task;
 import collections.Map;
@@ -78,6 +79,11 @@ class UIMapWorldMap {
 	};
 
 	var mWorkComponent:LogicalWorkComponent;
+
+	// the camera and the drag move the map on every rendered frame rather than on the 24 Hz logic tick
+	var mRenderWorkComponent:LayerWorkComponent;
+
+	static inline final LOGIC_TICK_RATE:Float = 24;
 
 	var mEventComponent:EventComponent;
 
@@ -200,6 +206,7 @@ class UIMapWorldMap {
 		var globalBottomRight:Point;
 		var setReturnNode:ASFunction;
 		mWorkComponent = new LogicalWorkComponent(mDBFacade, "UIMapWorldMap");
+		mRenderWorkComponent = new LayerWorkComponent(mDBFacade, "UIMapWorldMap.render");
 		mDBFacade.mouseCursorManager.popMouseCursor(mMapCursorKey);
 		mMapCursorKey = mDBFacade.mouseCursorManager.pushMouseCursor("HAND");
 		mWorkComponent.doEverySeconds(59, mDBFacade.playerActivityCount.fetchPublicDungeonActivityLevel);
@@ -978,6 +985,10 @@ class UIMapWorldMap {
 			mWorkComponent.destroy();
 			mWorkComponent = null;
 		}
+		if (mRenderWorkComponent != null) {
+			mRenderWorkComponent.destroy();
+			mRenderWorkComponent = null;
+		}
 		if (mEventComponent != null) {
 			mEventComponent.removeAllListeners();
 		}
@@ -1029,14 +1040,15 @@ class UIMapWorldMap {
 		}
 		mCameraVelocityX = 0;
 		mCameraVelocityY = 0;
-		mCameraLerpTask = mWorkComponent.doEveryFrame(centerCamera);
+		mCameraLerpTask = mRenderWorkComponent.doEveryFrame(centerCamera);
 	}
 
 	function centerCamera(clock:GameClock) {
 		var _loc3_ = mCameraTargetX - ASCompat.toNumberField((mRootMovieClip : ASAny).worldmap, "x");
 		var _loc4_ = mCameraTargetY - ASCompat.toNumberField((mRootMovieClip : ASAny).worldmap, "y");
 		var _loc2_ = _loc3_ * _loc3_ + _loc4_ * _loc4_;
-		mCameraVelocityX = _loc3_ * 0.2916666666666667;
+		// the 24 Hz tick's lerp, over the time this frame took
+		mCameraVelocityX = _loc3_ * (1 - Math.pow(1 - CAMERA_LERP_SPEED, clock.tickLength * LOGIC_TICK_RATE));
 		var __tmpAssignObj78:ASAny = (mRootMovieClip : ASAny).worldmap;
 		ASCompat.setProperty(__tmpAssignObj78, "x", __tmpAssignObj78.x + mCameraVelocityX);
 		clampMap();
@@ -1130,7 +1142,8 @@ class UIMapWorldMap {
 	}
 
 	function updateDrag(clock:GameClock) {
-		var _loc2_ = mMouseVelocityX * Math.min(0.9, clock.tickLength * 10);
+		// the 24 Hz tick's share, over the time this frame (or the slide's tick) took
+		var _loc2_ = mMouseVelocityX * (1 - Math.pow(1 - Math.min(0.9, 10 / LOGIC_TICK_RATE), clock.tickLength * LOGIC_TICK_RATE));
 		var __tmpAssignObj79:ASAny = (mRootMovieClip : ASAny).worldmap;
 		ASCompat.setProperty(__tmpAssignObj79, "x", __tmpAssignObj79.x - _loc2_);
 		mMouseVelocityX -= _loc2_;
@@ -1196,7 +1209,7 @@ class UIMapWorldMap {
 		mMouseVelocityX = 0;
 		mMouseVelocityY = 0;
 		if (mMapDragTask == null) {
-			mMapDragTask = mWorkComponent.doEveryFrame(updateDrag);
+			mMapDragTask = mRenderWorkComponent.doEveryFrame(updateDrag);
 		}
 		ASCompat.setProperty((mRootMovieClip : ASAny).worldmap, "mouseChildren", false);
 		EventListeners.add(ASCompat.coerce((mRootMovieClip : ASAny).worldmap, flash.events.IEventDispatcher), "mouseMove", onDrag);
