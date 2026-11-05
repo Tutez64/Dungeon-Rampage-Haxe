@@ -277,7 +277,7 @@ class TweenHandle extends EventDispatcher implements IAnimatable {
 
 	public function get_delayedCallback():ASFunction {
 		var _loc1_ = ASCompat.reinterpretAs(mPrimary, DelayedCall);
-		return ASCompat.coerceFunction(_loc1_ != null ? _loc1_.callback : null);
+		return _loc1_ != null ? _loc1_.callback : null;
 	}
 
 	@:isVar var isInnerComplete(get, never):Bool;

@@ -242,8 +242,7 @@ class StarlingChatPrompt {
 	}
 
 	@:allow(uI.hud.starlingConverted) function node(path:String):DisplayObject {
-		return ASCompat.coerce(path.length == 0 ? mBar : ASCompat.coerce(mView != null ? mView.node(path) : null, starling.display.DisplayObject),
-			starling.display.DisplayObject);
+		return ASCompat.coerce(path.length == 0 ? mBar : (mView != null ? mView.node(path) : null), starling.display.DisplayObject);
 	}
 
 	function bake():Bool {
@@ -295,7 +294,7 @@ class StarlingChatPrompt {
 		var _loc2_ = HudArt.content(_loc14_);
 		if (_loc2_ == null) {
 			_loc12_ = ASCompat.dynamicAs(ASCompat.createInstance(mModel, []), MovieClip);
-			_loc6_ = ASCompat.coerce(_loc12_ != null ? ASCompat.reinterpretAs(_loc12_.getChildByName("UI_chat"), MovieClip) : null, flash.display.MovieClip);
+			_loc6_ = _loc12_ != null ? ASCompat.reinterpretAs(_loc12_.getChildByName("UI_chat"), MovieClip) : null;
 			if (_loc6_ == null || _loc6_.getChildByName("textField") == null) {
 				HudArt.fatal("Missing Starling chat bar art: " + mBarKey);
 			}

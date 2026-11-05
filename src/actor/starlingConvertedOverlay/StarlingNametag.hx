@@ -117,8 +117,7 @@ class StarlingNametag {
 		mAfkPart = new TagPart(afk);
 		mUnderPart = new TagPart(hp, Vector.ofArray([fill]).concat(after), true);
 		mFillPart = new TagPart(fill, null, true);
-		mOverPart = ASCompat.coerce(after.length > 0 ? new TagPart(hp, Vector.ofArray([fill]).concat(before), true) : null,
-			actor.starlingConvertedOverlay.TagPart);
+		mOverPart = after.length > 0 ? new TagPart(hp, Vector.ofArray([fill]).concat(before), true) : null;
 		mParts = Vector.ofArray([mNamePart, mAfkPart, mUnderPart, mFillPart]);
 		if (mOverPart != null) {
 			mParts.push(mOverPart);
@@ -134,7 +133,7 @@ class StarlingNametag {
 
 	static function apply(image:BakedImage, part:TagPart) {
 		var _loc3_ = part.drawn;
-		image.cell = ASCompat.coerce(_loc3_ ? part.cell : null, brain.starling.swfConverter.BakedCell);
+		image.cell = _loc3_ ? part.cell : null;
 		image.visible = _loc3_;
 	}
 
@@ -228,8 +227,8 @@ class StarlingNametag {
 	}
 
 	@:allow(actor.starlingConvertedOverlay) function compareInFlash(other:StarlingNametag):Int {
-		var _loc3_ = ASCompat.coerce(mNametag != null ? mNametag.parent : null, flash.display.DisplayObject);
-		var _loc2_ = ASCompat.coerce(other.mNametag != null ? other.mNametag.parent : null, flash.display.DisplayObject);
+		var _loc3_:DisplayObject = mNametag != null ? mNametag.parent : null;
+		var _loc2_:DisplayObject = other.mNametag != null ? other.mNametag.parent : null;
 		if (_loc3_ == _loc2_) {
 			return 0;
 		}
@@ -482,12 +481,8 @@ class StarlingNametag {
 	}
 
 	@:allow(actor.starlingConvertedOverlay) function snapToScreen(pixelSize:Float) {
-		var _loc2_ = ASCompat.coerce(mView.name.visible
-			&& mNamePart.current ? mView.name : ASCompat.coerce(mView.afk.visible && mAfkPart.current ? mView.afk : null,
-				brain.starling.swfConverter.BakedImage),
-			brain.starling.swfConverter.BakedImage);
-		mView.snapToScreen(ASCompat.coerce(mOverlays.snapPixelsPerUnit > 0 ? _loc2_ : null, brain.starling.swfConverter.BakedImage), pixelSize, mArtX, mArtY,
-			mOverlays.cameraOffsetX, mOverlays.cameraOffsetY);
+		var _loc2_ = mView.name.visible && mNamePart.current ? mView.name : (mView.afk.visible && mAfkPart.current ? mView.afk : null);
+		mView.snapToScreen(mOverlays.snapPixelsPerUnit > 0 ? _loc2_ : null, pixelSize, mArtX, mArtY, mOverlays.cameraOffsetX, mOverlays.cameraOffsetY);
 	}
 
 	function layoutSlow(view:TagView) {

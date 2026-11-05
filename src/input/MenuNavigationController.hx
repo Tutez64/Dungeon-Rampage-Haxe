@@ -182,7 +182,7 @@ class MenuNavigationController {
 	@:isVar public var focusedUiObject(get, never):UIObject;
 
 	public function get_focusedUiObject():UIObject {
-		return ASCompat.coerce(mTopLayer == 0 ? null : mFocusedUiObject, brain.uI.UIObject);
+		return mTopLayer == 0 ? null : mFocusedUiObject;
 	}
 
 	public function setFocusedUiObject(uiObject:UIObject, fromControllerNavigation:Bool = false) {

@@ -161,12 +161,12 @@ class MultiTextureAtlas extends TextureAtlas {
 
 	override public function getRegion(name:String):Rectangle {
 		var _loc2_ = ASCompat.coerce(_regions[name], starling.textures.SubTexture);
-		return ASCompat.coerce(_loc2_ != null ? _loc2_.region : null, flash.geom.Rectangle);
+		return _loc2_ != null ? _loc2_.region : null;
 	}
 
 	override public function getFrame(name:String):Rectangle {
 		var _loc2_ = ASCompat.coerce(_regions[name], starling.textures.SubTexture);
-		return ASCompat.coerce(_loc2_ != null ? _loc2_.frame : null, flash.geom.Rectangle);
+		return _loc2_ != null ? _loc2_.frame : null;
 	}
 
 	override public function getRotation(name:String):Bool {

@@ -65,8 +65,7 @@ class TimelineMasks {
 		}
 		var _loc3_ = ASCompat.asVector(cast(linked.parser, TimelineMasks).mSprites[linked.id], (_ : Array<ASAny>));
 		var _loc4_ = ASCompat.reinterpretAs(source, MovieClip);
-		return ASCompat.coerce(_loc3_ != null
-			&& _loc3_.length > 0 ? _loc3_[(_loc4_ != null ? _loc4_.currentFrame - 1 : 0) % _loc3_.length] : null, Array);
+		return _loc3_ != null && _loc3_.length > 0 ? _loc3_[(_loc4_ != null ? _loc4_.currentFrame - 1 : 0) % _loc3_.length] : null;
 	}
 
 	@:allow(uI.hud.starlingConverted) static function isMask(parent:DisplayObjectContainer, child:DisplayObject):Bool {

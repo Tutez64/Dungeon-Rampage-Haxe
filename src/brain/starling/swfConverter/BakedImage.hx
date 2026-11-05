@@ -7,7 +7,7 @@ class BakedImage extends Image {
 	var mCell:BakedCell;
 
 	public function new(cell:BakedCell = null) {
-		super(ASCompat.coerce(cell != null ? cell.texture : null, starling.textures.Texture));
+		super(cell != null ? cell.texture : null);
 		touchable = false;
 		this.cell = cell;
 	}

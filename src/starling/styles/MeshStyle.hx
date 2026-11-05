@@ -261,7 +261,7 @@ import starling.textures.Texture;
 				setRequiresRedraw();
 			}
 			_texture = value;
-			_textureRoot = ASCompat.coerce(value != null ? value.root : null, starling.textures.ConcreteTexture);
+			_textureRoot = value != null ? value.root : null;
 		}
 		return value;
 	}

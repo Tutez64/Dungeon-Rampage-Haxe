@@ -9,7 +9,6 @@ import dBGlobals.DBGlobal;
 import facade.DBFacade;
 import facade.Locale;
 import settings.model.SettingsModel;
-import settings.view.rows.SettingRow;
 import settings.view.SettingsCategoryTabs;
 import settings.view.SettingsList;
 import uI.popup.DBUIPopup;
@@ -71,8 +70,7 @@ class SettingsPopup extends DBUIPopup {
 
 	override function initializeMenuNavigationLayer() {
 		mDBFacade.menuNavigationController.pushNewLayer(mUILayerName, getNavigationExitCallback(), getDefaultNavigationObject(),
-			getInitialFocusedNavigationObject(), ASCompat.coerceFunction(mTabs != null ? mTabs.selectPrevious : null),
-			ASCompat.coerceFunction(mTabs != null ? mTabs.selectNext : null));
+			getInitialFocusedNavigationObject(), mTabs != null ? mTabs.selectPrevious : null, mTabs != null ? mTabs.selectNext : null);
 	}
 
 	override function getInitialFocusedNavigationObject():UIObject {
@@ -182,8 +180,8 @@ class SettingsPopup extends DBUIPopup {
 			return;
 		}
 		var _loc3_ = mTabs.buttons;
-		var _loc1_ = ASCompat.coerce(mList != null ? mList.firstRow : null, settings.view.rows.SettingRow);
-		var _loc2_ = ASCompat.coerce(mList != null ? mList.lastRow : null, settings.view.rows.SettingRow);
+		var _loc1_ = mList != null ? mList.firstRow : null;
+		var _loc2_ = mList != null ? mList.lastRow : null;
 		_loc4_ = 0;
 		while (_loc4_ < _loc3_.length) {
 			_loc3_[_loc4_].clearNavigationAndInteractions();

@@ -807,9 +807,8 @@ class DBFacade extends Facade {
 	}
 
 	public function setLoadingBarText(message:String) {
-		var _loc2_ = ASCompat.coerce(mInitialLoadingClip != null ? ASCompat.dynamicAs((mInitialLoadingClip : ASAny).loadingBar, MovieClip) : null,
-			flash.display.MovieClip);
-		var _loc4_ = ASCompat.coerce(_loc2_ != null ? ASCompat.dynamicAs((_loc2_ : ASAny).loading_text, TextField) : null, flash.text.TextField);
+		var _loc2_ = mInitialLoadingClip != null ? ASCompat.dynamicAs((mInitialLoadingClip : ASAny).loadingBar, MovieClip) : null;
+		var _loc4_ = _loc2_ != null ? ASCompat.dynamicAs((_loc2_ : ASAny).loading_text, TextField) : null;
 		if (_loc4_ == null || _loc4_.text == message) {
 			return;
 		}

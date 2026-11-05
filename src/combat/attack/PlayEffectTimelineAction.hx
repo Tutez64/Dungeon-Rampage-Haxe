@@ -225,11 +225,9 @@ class PlayEffectTimelineAction extends AttackTimelineAction {
 			_loc2_ = mActorGameObject;
 		}
 		var _loc3_ = calculatePositionBasedOnOffsets(timeline.targetActor);
-		var _loc4_ = ASCompat.coerce(mDoIconInsert ? new EffectIconInsert(mInsertIconPath, mInsertIconName, mInsertParentName) : null,
-			effects.EffectIconInsert);
+		var _loc4_ = mDoIconInsert ? new EffectIconInsert(mInsertIconPath, mInsertIconName, mInsertParentName) : null;
 		var _loc5_ = mActorGameObject.distributedDungeonFloor.effectManager.playEffect(DBFacade.buildFullDownloadPath(mEffectPath), mEffectName, _loc3_,
-			_loc2_, mBehindAvatar, mScale, 0, 0, 0, 0, false, mLayer, mManaged, mPlayRate,
-			ASCompat.coerceFunction(mDoIconInsert ? assetLoadedCallback(this) : null), _loc4_);
+			_loc2_, mBehindAvatar, mScale, 0, 0, 0, 0, false, mLayer, mManaged, mPlayRate, mDoIconInsert ? assetLoadedCallback(this) : null, _loc4_);
 		if (mManaged) {
 			timeline.mManagedEffects.add(_loc5_);
 		}

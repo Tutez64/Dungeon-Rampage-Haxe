@@ -29,7 +29,7 @@ class WeaponRenderer extends ActorRenderer {
 	}
 
 	override function testCulled(drawX:Float, drawY:Float, scale:Float):Bool {
-		var _loc4_ = ASCompat.coerce(mActorGameObject.actorView != null ? mActorGameObject.actorView.bodyAnimRenderer : null, actor.ActorRenderer);
+		var _loc4_ = mActorGameObject.actorView != null ? mActorGameObject.actorView.bodyAnimRenderer : null;
 		return _loc4_ != null && _loc4_.hasStarlingArt ? _loc4_.isCulled : super.testCulled(drawX, drawY, scale);
 	}
 

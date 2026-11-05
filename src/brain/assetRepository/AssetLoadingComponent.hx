@@ -1234,7 +1234,7 @@ class AssetLoadingComponent extends Component {
 		var _loc4_ = ASCompat.coerce(ASCompat.toBool(mLoadedBiomeKeys[bundleKey]) ? ASCompat.coerce(mBundleManagers[bundleKey],
 			starling.extensions.animate.AnimAssetManager) : null,
 			starling.extensions.animate.AnimAssetManager);
-		var _loc3_ = ASCompat.coerce(_loc4_ != null ? _loc4_.getTexture(textureName) : null, starling.textures.Texture);
+		var _loc3_ = _loc4_ != null ? _loc4_.getTexture(textureName) : null;
 		if (_loc3_ != null) {
 			markStarlingKeyUsed(bundleKey);
 		}
@@ -1303,7 +1303,7 @@ class AssetLoadingComponent extends Component {
 		var _loc3_ = ASCompat.coerce(ASCompat.toBool(mLoadedBiomeKeys[bundleKey]) ? ASCompat.coerce(mPropManifests[bundleKey],
 			brain.assetRepository.StarlingPropManifest) : null,
 			brain.assetRepository.StarlingPropManifest);
-		return ASCompat.coerce(_loc3_ != null ? _loc3_.getParts(assetClassName) : null, Array);
+		return _loc3_ != null ? _loc3_.getParts(assetClassName) : null;
 	}
 
 	public function createAnimationFromAssetManager(animationName:String, libraryKey:String = null):Animation {
@@ -1374,8 +1374,7 @@ class AssetLoadingComponent extends Component {
 
 	public function createAnimationFromAtlas(atlasName:String, animationName:String):Animation {
 		var _loc3_ = findAtlasOwner(atlasName);
-		var _loc4_ = ASCompat.coerce(_loc3_ != null ? cast(mBundleManagers[_loc3_], AnimAssetManager).createAnimationInAtlas(atlasName, animationName) : null,
-			starling.extensions.animate.Animation);
+		var _loc4_ = _loc3_ != null ? cast(mBundleManagers[_loc3_], AnimAssetManager).createAnimationInAtlas(atlasName, animationName) : null;
 		if (_loc4_ != null) {
 			markStarlingKeyUsed(_loc3_);
 			MemoryTracker.track(_loc4_, "AssetLoadingComponent - Animation: " + animationName + " @ " + atlasName, "starling");

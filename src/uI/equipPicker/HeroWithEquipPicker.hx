@@ -287,14 +287,14 @@ class HeroWithEquipPicker extends UIObject {
 	public function get_currentlySelectedHero():GMHero {
 		var _loc2_ = mDBFacade.gameMaster.Heroes;
 		var _loc1_ = selectedHeroIndex;
-		return ASCompat.coerce(_loc1_ >= 0 && _loc1_ < _loc2_.length ? _loc2_[_loc1_] : null, gameMasterDictionary.GMHero);
+		return _loc1_ >= 0 && _loc1_ < _loc2_.length ? _loc2_[_loc1_] : null;
 	}
 
 	@:isVar public var currentlySelectedAvatarInfo(get, never):AvatarInfo;
 
 	public function get_currentlySelectedAvatarInfo():AvatarInfo {
 		var _loc1_ = this.currentlySelectedHero;
-		return ASCompat.coerce(_loc1_ != null ? mDBFacade.dbAccountInfo.inventoryInfo.getAvatarInfoForHeroType(_loc1_.Id) : null, account.AvatarInfo);
+		return _loc1_ != null ? mDBFacade.dbAccountInfo.inventoryInfo.getAvatarInfoForHeroType(_loc1_.Id) : null;
 	}
 
 	public function selectPreviousHero() {

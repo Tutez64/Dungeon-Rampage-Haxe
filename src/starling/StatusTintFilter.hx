@@ -12,7 +12,7 @@ class StatusTintFilter {
 	@:isVar public var matrix(get, never):Vector<Float>;
 
 	public function get_matrix():Vector<Float> {
-		return (mActive ? mMatrix : null : Vector<Float>);
+		return mActive ? mMatrix : null;
 	}
 
 	@:isVar public var active(get, never):Bool;

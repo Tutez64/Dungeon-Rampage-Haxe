@@ -126,7 +126,7 @@ class HudArt {
 			return _loc7_;
 		}
 		var _loc6_ = StarlingRaster.bake(source, scale);
-		_loc7_ = ASCompat.coerce(_loc6_ != null ? pages.add(key, _loc6_, true) : null, brain.starling.swfConverter.BakedCell);
+		_loc7_ = _loc6_ != null ? pages.add(key, _loc6_, true) : null;
 		if (_loc7_ == null && required) {
 			throw new Error("HUD content rasterisation refused");
 		}
@@ -409,7 +409,7 @@ class HudArt {
 	}
 
 	static function contextReady() {
-		var _loc1_ = ASCompat.coerce(sFacade.starlingLayerManager != null ? sFacade.starlingLayerManager.starlingInstance : null, starling.core.Starling);
+		var _loc1_ = sFacade.starlingLayerManager != null ? sFacade.starlingLayerManager.starlingInstance : null;
 		if (sLoading != 0 || _loc1_ == null || !_loc1_.contextValid || !sFacade.starlingLayerManager.isReady()) {
 			return;
 		}
@@ -605,7 +605,7 @@ class HudArt {
 
 	@:allow(uI.hud.starlingConverted) static function content(key:String, pages:BakedPages = null):ArtNode {
 		var _loc4_:ASObject = pages != null && pages == sPendingPages ? sPendingArt : sArt;
-		var _loc3_ = ASCompat.coerce(_loc4_ != null ? ASCompat.dynamicAs(_loc4_["content|" + key], ArtNode) : null, uI.hud.starlingConverted.ArtNode);
+		var _loc3_ = _loc4_ != null ? ASCompat.dynamicAs(_loc4_["content|" + key], ArtNode) : null;
 		if (_loc3_ != null) {
 			touchContent(_loc3_);
 		}

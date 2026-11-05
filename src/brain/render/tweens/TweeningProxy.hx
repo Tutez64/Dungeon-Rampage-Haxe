@@ -391,7 +391,7 @@ class TweeningProxy {
 	}
 
 	function requireTimeline(handle:TweenHandle, operation:String):TweenTimeline {
-		var _loc3_ = ASCompat.coerce(handle != null ? handle.timeline : null, brain.render.tweens.TweenTimeline);
+		var _loc3_ = handle != null ? handle.timeline : null;
 		if (_loc3_ == null) {
 			Logger.warn("TweeningProxy." + operation + ": handle is not a timeline");
 		}

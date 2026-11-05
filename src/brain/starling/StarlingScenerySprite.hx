@@ -104,7 +104,7 @@ class StarlingScenerySprite extends Sprite {
 		if (_loc1_ == null || _loc1_.filter != null || _loc1_.mask != null || MaskRole.isMask(_loc1_) || _loc1_.pixelSnapping) {
 			return null;
 		}
-		return ASCompat.coerce(_loc1_.numVertices == 4 && _loc1_.numIndices == 6 ? _loc1_ : null, starling.display.Image);
+		return _loc1_.numVertices == 4 && _loc1_.numIndices == 6 ? _loc1_ : null;
 	}
 
 	@:allow(brain.starling) @:isVar var hasMaskRole(get, never):Bool;

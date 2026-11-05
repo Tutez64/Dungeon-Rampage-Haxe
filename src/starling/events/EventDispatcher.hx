@@ -80,7 +80,7 @@ import starling.display.DisplayObject;
 		var _loc6_ = 0;
 		var _loc5_:ASFunction = null;
 		var _loc2_ = 0;
-		var _loc3_:Array<ASAny> = ASCompat.coerce(_eventListeners != null ? ASCompat.dynamicAs(_eventListeners[event.type], Array) : null, Array);
+		var _loc3_ = _eventListeners != null ? ASCompat.dynamicAs(_eventListeners[event.type], Array) : null;
 		var _loc4_ = ASCompat.toInt(_loc3_?.length);
 		if (_loc4_ != 0) {
 			event.setCurrentTarget(this);
@@ -149,7 +149,7 @@ import starling.display.DisplayObject;
 	}
 
 	public function hasEventListener(type:String, listener:ASFunction = null):Bool {
-		var _loc3_:Array<ASAny> = ASCompat.coerce(_eventListeners != null ? ASCompat.dynamicAs(_eventListeners[type], Array) : null, Array);
+		var _loc3_ = _eventListeners != null ? ASCompat.dynamicAs(_eventListeners[type], Array) : null;
 		if (_loc3_ == null) {
 			return false;
 		}

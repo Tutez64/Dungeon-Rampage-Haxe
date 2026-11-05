@@ -96,7 +96,7 @@ class GameClock {
 			_loc21_ = (cast _loc14_.split(":"));
 			_loc18_ = ASCompat.toNumber(_loc21_.shift());
 			_loc13_ = ASCompat.toNumber(_loc21_.shift());
-			_loc16_ = ASCompat.coerce(_loc21_.length > 0 ? (cast ASCompat.toString(_loc21_.shift()).split(".")) : null, Array);
+			_loc16_ = (cast _loc21_.length > 0 ? (cast ASCompat.toString(_loc21_.shift()).split(".")) : null);
 			_loc15_ = _loc16_ != null && _loc16_.length > 0 ? ASCompat.toNumber(_loc16_.shift()) : 0;
 			_loc5_ = _loc16_ != null && _loc16_.length > 0 ? 1000 * Std.parseFloat("0." + Std.string(_loc16_.shift())) : 0;
 			_loc11_ = ASCompat.ASDate.UTC(_loc10_, _loc17_ - 1, _loc3_, _loc18_, _loc13_, _loc15_, _loc5_);

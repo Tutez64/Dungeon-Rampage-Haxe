@@ -64,13 +64,13 @@ class SettingsList {
 	@:isVar public var firstRow(get, never):SettingRow;
 
 	public function get_firstRow():SettingRow {
-		return ASCompat.coerce(mRows.length > 0 ? mRows[0] : null, settings.view.rows.SettingRow);
+		return mRows.length > 0 ? mRows[0] : null;
 	}
 
 	@:isVar public var lastRow(get, never):SettingRow;
 
 	public function get_lastRow():SettingRow {
-		return ASCompat.coerce(mRows.length > 0 ? mRows[mRows.length - 1] : null, settings.view.rows.SettingRow);
+		return mRows.length > 0 ? mRows[mRows.length - 1] : null;
 	}
 
 	public function showCategory(category:String) {

@@ -27,7 +27,7 @@ class StatesView extends ArtDisplay {
 			_loc2_++;
 		}
 		if (mImage != null) {
-			showCells(ASCompat.coerce(_loc4_ != null ? _loc4_.cell : null, brain.starling.swfConverter.BakedCell));
+			showCells(_loc4_ != null ? _loc4_.cell : null);
 		}
 		if (_loc4_ == null) {
 			return;

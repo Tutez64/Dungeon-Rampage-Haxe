@@ -3566,8 +3566,8 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 					_loc13_.downNavigation = mUIChatLog.chatSendButton;
 				}
 			_loc4_ = ASCompat.toInt(_loc16_ + 1 < _loc10_.length ? _loc10_[_loc16_ + 1] : -1);
-			_loc21_ = ASCompat.coerce(_loc4_ >= 0 ? firstUIObject(getPlayerSocialButtons(_loc4_)) : null, brain.uI.UIObject);
-			_loc15_ = ASCompat.coerce(_loc4_ >= 0 ? firstUIObject(getAvailableUIObjects(ASCompat.coerce(mWeapons[_loc4_], Array))) : null, brain.uI.UIObject);
+			_loc21_ = _loc4_ >= 0 ? firstUIObject(getPlayerSocialButtons(_loc4_)) : null;
+			_loc15_ = _loc4_ >= 0 ? firstUIObject(getAvailableUIObjects(ASCompat.coerce(mWeapons[_loc4_], Array))) : null;
 			_loc24_ = mNextFloorSection.battleButton;
 			if (_loc14_.length > 0) {
 				cast(_loc14_[_loc14_.length - 1], UIObject).rightNavigation = _loc21_ != null ? _loc21_ : (_loc15_ != null ? _loc15_ : _loc24_);
@@ -3679,7 +3679,7 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 	}
 
 	function firstUIObject(objects:Array<ASAny>):UIObject {
-		return ASCompat.coerce(objects != null && objects.length > 0 ? ASCompat.dynamicAs(objects[0], UIObject) : null, brain.uI.UIObject);
+		return objects != null && objects.length > 0 ? ASCompat.dynamicAs(objects[0], UIObject) : null;
 	}
 
 	function linkHorizontalRow(objects:Array<ASAny>) {

@@ -141,7 +141,7 @@ class StarlingAssetMapper {
 		var _loc4_ = libraryKey + "/" + assetClassName;
 		if (!mPropAtlasFolders.hasOwnProperty(_loc4_)) {
 			_loc6_ = libraryKey == "shared" ? "Resources/Art2D/Environments/shared/props/db_prop_shared_library/" : mPropMap[libraryKey];
-			_loc3_ = ASCompat.coerce(_loc6_ != null ? AssetLoader.resolveFile(_loc6_ + assetClassName) : null, flash.filesystem.File);
+			_loc3_ = _loc6_ != null ? AssetLoader.resolveFile(_loc6_ + assetClassName) : null;
 			_loc5_ = _loc3_ != null && _loc3_.exists && _loc3_.isDirectory && _loc3_.resolvePath("Animation.json").exists;
 			mPropAtlasFolders[_loc4_] = _loc5_ ? (_loc3_ : ASAny) : (false : ASAny);
 		}

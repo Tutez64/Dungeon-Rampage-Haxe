@@ -72,8 +72,7 @@ class StarlingPetPortrait {
 		mPetButton.rollOverCallback = mTooltip.rollOver;
 		mPetButton.rollOutCallback = mTooltip.hide;
 		input.add(mPetButton, false, true);
-		var _loc9_ = ASCompat.coerce((model : ASAny).hasOwnProperty("pet_none") ? ASCompat.dynamicAs((model : ASAny).pet_none, MovieClip) : null,
-			flash.display.MovieClip);
+		var _loc9_ = (model : ASAny).hasOwnProperty("pet_none") ? ASCompat.dynamicAs((model : ASAny).pet_none, MovieClip) : null;
 		if (_loc9_ != null && view.node("pet_none") != null) {
 			HudArtConverter.stopTree(_loc9_);
 			mNoneButton = new StarlingButton(view, "pet_none", space);

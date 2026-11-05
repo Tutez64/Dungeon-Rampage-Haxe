@@ -491,14 +491,14 @@ class ProjectileGameObject extends FloorObject implements IContactResolver {
 	@:isVar public var belongsToRemotePlayer(get, never):Bool;
 
 	public function get_belongsToRemotePlayer():Bool {
-		var _loc1_ = ASCompat.coerce(mDistributedDungeonFloor != null ? mDistributedDungeonFloor.getActor(mParentActorId) : null, actor.ActorGameObject);
+		var _loc1_ = mDistributedDungeonFloor != null ? mDistributedDungeonFloor.getActor(mParentActorId) : null;
 		return _loc1_ != null && _loc1_.belongsToRemotePlayer;
 	}
 
 	@:isVar public var backgroundLoadTier(get, never):Int;
 
 	public function get_backgroundLoadTier():Int {
-		var _loc1_ = ASCompat.coerce(mDistributedDungeonFloor != null ? mDistributedDungeonFloor.getActor(mParentActorId) : null, actor.ActorGameObject);
+		var _loc1_ = mDistributedDungeonFloor != null ? mDistributedDungeonFloor.getActor(mParentActorId) : null;
 		return Std.isOfType(_loc1_, NPCGameObject) ? 4 : 2;
 	}
 

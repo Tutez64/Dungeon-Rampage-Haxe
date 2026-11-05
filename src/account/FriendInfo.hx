@@ -6,7 +6,6 @@ import account.iI.II_FriendChampionsboardInfo;
 import brain.event.EventComponent;
 import facade.DBFacade;
 import facade.GameMasterLocale;
-import gameMasterDictionary.GMMapNode;
 import flash.events.Event;
 import flash.events.EventDispatcher;
 
@@ -148,7 +147,7 @@ class FriendInfo extends EventDispatcher {
 	@:isVar public var dungeonName(get, never):String;
 
 	public function get_dungeonName():String {
-		var _loc1_ = ASCompat.coerce(mDBFacade.gameMaster != null ? mDBFacade.gameMaster.getMapNode(lastMapNode) : null, gameMasterDictionary.GMMapNode);
+		var _loc1_ = mDBFacade.gameMaster != null ? mDBFacade.gameMaster.getMapNode(lastMapNode) : null;
 		if (_loc1_ == null) {
 			return null;
 		}

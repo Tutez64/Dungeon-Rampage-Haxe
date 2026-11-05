@@ -687,7 +687,7 @@ class StarlingSweepArt {
 				_loc11_++;
 			}
 		}
-		return (_loc5_ == 0 ? _loc6_ : null : Vector<Int>);
+		return _loc5_ == 0 ? _loc6_ : null;
 	}
 
 	public function bakeDisc(clip:MovieClip, pixelScale:Float, onSeek:ASFunction = null):BakedPicture {

@@ -40,7 +40,6 @@ import gameMasterDictionary.GMAttack;
 import gameMasterDictionary.GMSkin;
 import gameMasterDictionary.GMWeaponAesthetic;
 import gameMasterDictionary.GMWeaponItem;
-import input.keyBindings.KeyBindings;
 import settings.model.SettingsModel;
 import settings.SettingsPopup;
 import steamInput.OnSteamInputButtonReleasedEvent;
@@ -511,7 +510,7 @@ class UIHud implements IGameHud {
 		if (mUIRoot != null && mRoot.contains(mUIRoot)) {
 			mRoot.removeChild(mUIRoot);
 		}
-		mPetCarriedAcrossRebuild = ASCompat.coerce(mPetPortrait != null ? mPetPortrait.petNPCGameObject : null, distributedObjects.NPCGameObject);
+		mPetCarriedAcrossRebuild = mPetPortrait != null ? mPetPortrait.petNPCGameObject : null;
 		if (mHpBar != null) {
 			mHpBar.destroy();
 		}
@@ -822,12 +821,12 @@ class UIHud implements IGameHud {
 		initControllerIconOn("use_consumable_one", mConsumable1Button, CONTROLLER_ICON_POSITION_FOR_WEAPON_BUTTONS, CONTROLLER_GLYPH_SCALE_WEAPON_BUTTONS);
 		initControllerIconOn("use_consumable_two", mConsumable2Button, CONTROLLER_ICON_POSITION_FOR_WEAPON_BUTTONS, CONTROLLER_GLYPH_SCALE_WEAPON_BUTTONS);
 		initControllerIconOn("use_dungeon_buster", mDungeonBusterButton, CONTROLLER_ICON_POSITION_FOR_DUNGEON_BUSTER, CONTROLLER_GLYPH_SCALE_DUNGEON_BUSTER);
-		initTopRightControllerIcon("toggle_menu", ASCompat.coerce(mCloseButton != null ? mCloseButton.root : null, flash.display.MovieClip), false);
-		initControllerIconOn("toggle_chat_log", ASCompat.coerce(mUIChatLog != null ? mUIChatLog.chatLogButton : null, brain.uI.UIButton),
-			CONTROLLER_ICON_POSITION_FOR_CHAT_LOG_BUTTON, CONTROLLER_GLYPH_SCALE_CHAT_BUTTONS);
+		initTopRightControllerIcon("toggle_menu", mCloseButton != null ? mCloseButton.root : null, false);
+		initControllerIconOn("toggle_chat_log", mUIChatLog != null ? mUIChatLog.chatLogButton : null, CONTROLLER_ICON_POSITION_FOR_CHAT_LOG_BUTTON,
+			CONTROLLER_GLYPH_SCALE_CHAT_BUTTONS);
 		if (mDBFacade.steamInputManager.usesSteamOnScreenKeyboard) {
-			initControllerIconOn("open_chat_keyboard", ASCompat.coerce(mUIChatLog != null ? mUIChatLog.chatSendButton : null, brain.uI.UIButton),
-				CONTROLLER_ICON_POSITION_FOR_CHAT_SEND_BUTTON, CONTROLLER_GLYPH_SCALE_CHAT_BUTTONS);
+			initControllerIconOn("open_chat_keyboard", mUIChatLog != null ? mUIChatLog.chatSendButton : null, CONTROLLER_ICON_POSITION_FOR_CHAT_SEND_BUTTON,
+				CONTROLLER_GLYPH_SCALE_CHAT_BUTTONS);
 		}
 	}
 
@@ -845,7 +844,7 @@ class UIHud implements IGameHud {
 	}
 
 	function refreshKeyboardLabels() {
-		var _loc2_ = ASCompat.coerce(mDBFacade != null ? mDBFacade.keyBindings : null, input.keyBindings.KeyBindings);
+		var _loc2_ = mDBFacade != null ? mDBFacade.keyBindings : null;
 		if (_loc2_ == null || mUIRoot == null) {
 			return;
 		}
@@ -1406,16 +1405,14 @@ class UIHud implements IGameHud {
 			equippedWeapons = new Vector<WeaponGameObject>();
 			i = 0;
 			while (i < mHeroOwner.weaponControllers.length) {
-				equippedWeapons.push(ASCompat.coerce(mHeroOwner.weaponControllers[i] != null ? mHeroOwner.weaponControllers[i].weapon : null,
-					combat.weapon.WeaponGameObject));
+				equippedWeapons.push(mHeroOwner.weaponControllers[i] != null ? mHeroOwner.weaponControllers[i].weapon : null);
 				i = i + 1;
 			}
 			this.setupWeaponUI(equippedWeapons);
 			equippedConsumableWeapons = new Vector<ConsumableWeaponGameObject>();
 			j = 0;
 			while (j < 2) {
-				equippedConsumableWeapons.push(ASCompat.coerce(mHeroOwner.consumables[j] != null ? mHeroOwner.consumables[j] : null,
-					combat.weapon.ConsumableWeaponGameObject));
+				equippedConsumableWeapons.push(mHeroOwner.consumables[j] != null ? mHeroOwner.consumables[j] : null);
 				j = j + 1;
 			}
 			this.setupConsumableWeaponUI(equippedConsumableWeapons);

@@ -213,7 +213,7 @@ class HudIconBake {
 		sDone = done;
 		sIndex = 0;
 		var _loc9_ = ASCompat.dynamicAs(sArt[layout], ArtNode);
-		var _loc10_ = ASCompat.coerce(_loc9_ != null ? _loc9_.find("floor_modifier01") : null, uI.hud.starlingConverted.ArtNode);
+		var _loc10_ = _loc9_ != null ? _loc9_.find("floor_modifier01") : null;
 		sModifierWidth = 0;
 		if (_loc10_ != null) {
 			_loc8_ = ArtView.build(_loc10_);

@@ -368,14 +368,14 @@ class StacksWithEquipPicker extends UIObject {
 	function get_selectedGMHero():GMHero {
 		var _loc2_ = mDBFacade.gameMaster.Heroes;
 		var _loc1_ = selectedHeroIndex;
-		return ASCompat.coerce(_loc1_ >= 0 && _loc1_ < _loc2_.length ? _loc2_[_loc1_] : null, gameMasterDictionary.GMHero);
+		return _loc1_ >= 0 && _loc1_ < _loc2_.length ? _loc2_[_loc1_] : null;
 	}
 
 	@:isVar var selectedAvatarInfo(get, never):AvatarInfo;
 
 	function get_selectedAvatarInfo():AvatarInfo {
 		var _loc1_ = selectedGMHero;
-		return ASCompat.coerce(_loc1_ != null ? mDBFacade.dbAccountInfo.inventoryInfo.getAvatarInfoForHeroType(_loc1_.Id) : null, account.AvatarInfo);
+		return _loc1_ != null ? mDBFacade.dbAccountInfo.inventoryInfo.getAvatarInfoForHeroType(_loc1_.Id) : null;
 	}
 
 	function heroClicked(heroElement:HeroElement, owned:Bool) {
@@ -539,7 +539,7 @@ class StacksWithEquipPicker extends UIObject {
 		}
 		mHeroSlots[0].leftNavigationAdditionalInteraction = rotateRosterLeft;
 		mHeroSlots[mHeroSlots.length - 1].rightNavigationAdditionalInteraction = rotateRosterRight;
-		mFirstSlotLeftNavigation = ASCompat.coerce(mEquipElements.length > 0 ? mEquipElements[mEquipElements.length - 1] : null, brain.uI.UIObject);
+		mFirstSlotLeftNavigation = mEquipElements.length > 0 ? mEquipElements[mEquipElements.length - 1] : null;
 		updateFirstSlotLeftNavigation();
 	}
 

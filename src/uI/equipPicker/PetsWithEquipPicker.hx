@@ -221,9 +221,8 @@ class PetsWithEquipPicker extends UIObject {
 	function get_selectedAvatarInfo():AvatarInfo {
 		var _loc2_ = mDBFacade.gameMaster.Heroes;
 		var _loc1_ = selectedHeroIndex;
-		return ASCompat.coerce(_loc1_ >= 0
-			&& _loc1_ < _loc2_.length ? mDBFacade.dbAccountInfo.inventoryInfo.getAvatarInfoForHeroType(_loc2_[_loc1_].Id) : null,
-			account.AvatarInfo);
+		return _loc1_ >= 0
+			&& _loc1_ < _loc2_.length ? mDBFacade.dbAccountInfo.inventoryInfo.getAvatarInfoForHeroType(_loc2_[_loc1_].Id) : null;
 	}
 
 	function setCurrentIndexToShowSelectedHero() {
@@ -373,7 +372,7 @@ class PetsWithEquipPicker extends UIObject {
 		}
 		mHeroSlots[0].leftNavigationAdditionalInteraction = rotateRosterLeft;
 		mHeroSlots[mHeroSlots.length - 1].rightNavigationAdditionalInteraction = rotateRosterRight;
-		mFirstSlotLeftNavigation = ASCompat.coerce(mEquipElements.length > 0 ? mEquipElements[mEquipElements.length - 1] : null, brain.uI.UIObject);
+		mFirstSlotLeftNavigation = mEquipElements.length > 0 ? mEquipElements[mEquipElements.length - 1] : null;
 		updateFirstSlotLeftNavigation();
 	}
 

@@ -92,7 +92,7 @@ import flash.errors.ArgumentError;
 		if (!visible || !touchable || !hitTestMask(localPoint)) {
 			return null;
 		}
-		return ASCompat.coerce(MeshUtil.containsPoint(_vertexData, _indexData, localPoint) ? this : null, starling.display.DisplayObject);
+		return MeshUtil.containsPoint(_vertexData, _indexData, localPoint) ? this : null;
 	}
 
 	override public function getBounds(targetSpace:DisplayObject, out:Rectangle = null):Rectangle {

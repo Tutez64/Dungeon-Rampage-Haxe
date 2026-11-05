@@ -497,9 +497,7 @@ class HeroGameObjectOwner extends HeroGameObject implements IHeroGameObjectOwner
 		if (mCurrentAttemptedRevivee != null && mCurrentAttemptedRevivee.isInReviveState()) {
 			if (mHeroGameObjectOwnerNetworkComponent != null) {
 				mHeroGameObjectOwnerNetworkComponent.send_ProposeRevive(mCurrentAttemptedRevivee.id);
-				_loc1_ = ASCompat.coerce(mDistributedDungeonFloor != null ? ASCompat.reinterpretAs(mDistributedDungeonFloor.parentArea,
-					DistributedDungionArea) : null,
-					distributedObjects.DistributedDungionArea);
+				_loc1_ = mDistributedDungeonFloor != null ? ASCompat.reinterpretAs(mDistributedDungeonFloor.parentArea, DistributedDungionArea) : null;
 				if (_loc1_ != null) {
 					mDBFacade.steamAchievementsHelper.setHighestStatValueAchieved(_loc1_.countTeammateRevive(), "MOST_REVIVES_IN_DUNGEON");
 				}

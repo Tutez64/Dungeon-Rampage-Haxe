@@ -33,7 +33,7 @@ class AnimationAtlasFactory extends JsonFactory {
 			stdName = SPRITEMAP_SUFFIX_REGEX.replace(stdName, "");
 		}
 		var _loc4_ = stdName == "Animation";
-		var _loc6_:Array<ASAny> = ASCompat.coerce(_loc4_ ? null : (cast SPRITEMAP_REGEX.match(stdName)), Array);
+		var _loc6_:Array<ASAny> = (cast _loc4_ ? null : (cast SPRITEMAP_REGEX.match(stdName)));
 		if ((_loc4_ || _loc6_ != null) && url.indexOf(_loc8_) != -1) {
 			_loc5_ = (cast url.split(_loc8_));
 			_loc7_ = _loc5_[_loc5_.length - 2];

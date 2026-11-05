@@ -405,8 +405,7 @@ class UIMapWorldMap {
 		while (_loc3_ != null && !_loc3_.canBeFocused() && ++_loc4_ < 150) {
 			_loc3_ = movingRight ? _loc3_.rightNavigation : _loc3_.leftNavigation;
 		}
-		return ASCompat.coerce(_loc3_ != null
-			&& _loc3_.canBeFocused() ? ASCompat.reinterpretAs(_loc3_, UIButton) : null, brain.uI.UIButton);
+		return _loc3_ != null && _loc3_.canBeFocused() ? ASCompat.reinterpretAs(_loc3_, UIButton) : null;
 	}
 
 	function setupMapNodeNavigationGladiatorLeaguePrisonPath() {

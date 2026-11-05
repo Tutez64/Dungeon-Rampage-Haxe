@@ -1,6 +1,5 @@
 package uI.shop;
 
-import account.AvatarInfo;
 import account.StoreServices;
 import account.StoreServicesController;
 import brain.assetRepository.AssetLoadingComponent;
@@ -794,8 +793,7 @@ class UIShop {
 		var _loc8_:GMOffer = null;
 		var _loc2_:GMWeaponItem = null;
 		var _loc7_ = (0 : UInt);
-		var _loc4_ = ASCompat.coerce(mSelectedHero != null ? mDBFacade.dbAccountInfo.inventoryInfo.getAvatarInfoForHeroType(mSelectedHero.Id) : null,
-			account.AvatarInfo);
+		var _loc4_ = mSelectedHero != null ? mDBFacade.dbAccountInfo.inventoryInfo.getAvatarInfoForHeroType(mSelectedHero.Id) : null;
 		if (_loc4_ != null) {
 			_loc1_ = _loc4_.levelForWeaponComparison;
 			_loc5_ = (mFilteredGMOffers.itemFor(mCurrentTab) : Vector<GMOffer>);
@@ -878,8 +876,7 @@ class UIShop {
 		var _loc4_:String = null;
 		var _loc3_ = (0 : UInt);
 		var _loc6_:GMHero = null;
-		var _loc5_ = ASCompat.coerce(mSelectedHero != null ? mDBFacade.dbAccountInfo.inventoryInfo.getAvatarInfoForHeroType(mSelectedHero.Id) : null,
-			account.AvatarInfo);
+		var _loc5_ = mSelectedHero != null ? mDBFacade.dbAccountInfo.inventoryInfo.getAvatarInfoForHeroType(mSelectedHero.Id) : null;
 		mFilteredGMOffers.clear();
 		final __ax4_iter_441 = CATEGORIES;
 		if (checkNullIteratee(__ax4_iter_441))

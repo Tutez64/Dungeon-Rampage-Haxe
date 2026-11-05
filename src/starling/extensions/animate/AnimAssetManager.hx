@@ -96,7 +96,7 @@ class AnimAssetManager extends AssetManager {
 			return _loc3_.createAnimation(name);
 		}
 		var _loc4_ = _loc3_.getLabelSymbolName(name);
-		return ASCompat.coerce(_loc4_ != null ? _loc3_.createAnimation(_loc4_) : null, starling.extensions.animate.Animation);
+		return _loc4_ != null ? _loc3_.createAnimation(_loc4_) : null;
 	}
 
 	public function isPackedAtlas(atlasName:String):Bool {

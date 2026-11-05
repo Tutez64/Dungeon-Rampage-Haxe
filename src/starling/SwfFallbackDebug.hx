@@ -1,6 +1,5 @@
 package starling;
 
-import brain.assetRepository.AssetLoadingComponent;
 import brain.assetRepository.StarlingAssetMapper;
 import brain.logger.Logger;
 import facade.DBFacade;
@@ -121,24 +120,16 @@ class SwfFallbackDebug {
 	}
 
 	static function describeContext(facade:DBFacade, swfPath:String):String {
-		var _loc3_ = ASCompat.coerce(facade != null ? facade.assetLoadingComponent : null, brain.assetRepository.AssetLoadingComponent);
+		var _loc3_ = facade != null ? facade.assetLoadingComponent : null;
 		var _loc4_:String = null;
 		try {
 			_loc4_ = swfPath != null ? StarlingAssetMapper.getBiomeKeyFromPath(swfPath) : null;
 		} catch (e:Dynamic) {
 			_loc4_ = "<unmapped>";
 		}
-		return " [context: starlingReady="
-			+ (_loc3_ != null && _loc3_.isStarlingReady)
-			+ " loadPending="
-			+ (_loc3_ != null && _loc3_.isStarlingLoadPending)
-			+ " floorBiome="
-			+ Std.string((_loc3_ != null ? _loc3_.currentFloorBiome : null))
-			+ " purgeCount="
-			+ (_loc3_ != null ? _loc3_.starlingPurgeCount : -1)
-			+ " pathBiome="
-			+ _loc4_
-			+ "]";
+		return " [context: starlingReady=" + (_loc3_ != null && _loc3_.isStarlingReady) + " loadPending=" + (_loc3_ != null && _loc3_.isStarlingLoadPending)
+			+ " floorBiome=" + (_loc3_ != null ? _loc3_.currentFloorBiome : null) + " purgeCount=" + (_loc3_ != null ? _loc3_.starlingPurgeCount : -1)
+			+ " pathBiome=" + _loc4_ + "]";
 	}
 
 	static function __init__() {

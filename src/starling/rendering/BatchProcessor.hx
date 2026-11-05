@@ -70,7 +70,7 @@ class BatchProcessor {
 				_cacheToken.setTo(_batches.length);
 				_batches[_batches.length] = _currentBatch;
 			}
-			_loc6_ = ASCompat.coerce(state != null ? state._modelviewMatrix : null, flash.geom.Matrix);
+			_loc6_ = state != null ? state._modelviewMatrix : null;
 			_loc5_ = state != null ? state._alpha : 1;
 			_currentBatch.addMeshAt(mesh, -1, -1, _loc6_, _loc5_, subset, ignoreTransformations);
 			_cacheToken.vertexID += subset.numVertices;

@@ -37,7 +37,7 @@ class ColorMatrixFilterAdapter {
 		mToProps = if (ASCompat.toBool(toProps)) toProps else {};
 		mRemove = mToProps.remove == true;
 		var _loc4_ = findExisting();
-		mOriginalFilter = ASCompat.coerce(_loc4_ != null ? ASCompat.reinterpretAs(_loc4_.clone(), ColorMatrixFilter) : null, flash.filters.ColorMatrixFilter);
+		mOriginalFilter = _loc4_ != null ? ASCompat.reinterpretAs(_loc4_.clone(), ColorMatrixFilter) : null;
 	}
 
 	static function buildMatrix(base:Array<ASAny>, props:ASObject):Array<ASAny> {

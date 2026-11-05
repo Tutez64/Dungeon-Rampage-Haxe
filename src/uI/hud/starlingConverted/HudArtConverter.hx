@@ -592,7 +592,7 @@ class HudArtConverter {
 			sAnonymous = new ASDictionary<ASAny, ASAny>(true);
 		}
 		mPages = pages;
-		mFramePages = ASCompat.coerce(options != null ? ASCompat.dynamicAs(options.framePages, BakedPages) : null, brain.starling.swfConverter.BakedPages);
+		mFramePages = options != null ? ASCompat.dynamicAs(options.framePages, BakedPages) : null;
 		mScale = scale;
 		mHudScale = options != null
 			&& ASCompat.toNumberField(options, "hudScale") > 0 ? ASCompat.toNumber(options.hudScale) : HudArt.pixelScale;

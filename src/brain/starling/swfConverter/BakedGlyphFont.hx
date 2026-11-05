@@ -4,7 +4,6 @@ import flash.display.BitmapData;
 import flash.geom.Point;
 import flash.geom.Rectangle;
 import flash.text.TextField;
-import flash.text.TextFormat;
 import starling.textures.Texture;
 import brain.starling.swfConverter.BakedCell;
 import starling.textures.Texture;
@@ -49,7 +48,7 @@ class BakedGlyphFont {
 		var _loc13_ = model.width;
 		var _loc17_ = model.height;
 		var _loc10_ = model.defaultTextFormat;
-		var _loc12_ = ASCompat.coerce(model.length > 0 ? model.getTextFormat(0, model.length) : null, flash.text.TextFormat);
+		var _loc12_ = model.length > 0 ? model.getTextFormat(0, model.length) : null;
 		{
 			var __finallyReturn0:BakedGlyphFont;
 			try {
@@ -330,7 +329,7 @@ class BakedGlyphFont {
 	@:isVar public var cell(get, never):BakedCell;
 
 	public function get_cell():BakedCell {
-		return ASCompat.coerce(mTable != null ? mTable.cell : null, brain.starling.swfConverter.BakedCell);
+		return mTable != null ? mTable.cell : null;
 	}
 
 	public function hasGlyph(charCode:Int):Bool {
@@ -367,7 +366,7 @@ class BakedGlyphFont {
 	}
 
 	@:allow(brain.starling.swfConverter) function glyphTexture(charCode:Int):Texture {
-		return ASCompat.coerce(hasGlyph(charCode) ? mTable.textures[charCode] : null, starling.textures.Texture);
+		return hasGlyph(charCode) ? mTable.textures[charCode] : null;
 	}
 
 	@:allow(brain.starling.swfConverter) function glyphOffsetX(charCode:Int):Float {

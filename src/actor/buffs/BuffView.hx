@@ -8,7 +8,6 @@ import brain.logger.Logger;
 import brain.render.MovieClipRenderController;
 import brain.render.tweens.TweenHandle;
 import brain.workLoop.LogicalWorkComponent;
-import distributedObjects.DistributedDungeonFloor;
 import effects.EffectManager;
 import effects.EffectView;
 import facade.DBFacade;
@@ -86,8 +85,8 @@ class BuffView extends FloorView {
 
 	function startManagedBuffEffect():Bool {
 		var _loc2_ = mParentGameObject.actorGameObject;
-		var _loc3_ = ASCompat.coerce(_loc2_ != null ? _loc2_.distributedDungeonFloor : null, distributedObjects.DistributedDungeonFloor);
-		var _loc1_ = ASCompat.coerce(_loc3_ != null ? _loc3_.effectManager : null, effects.EffectManager);
+		var _loc3_ = _loc2_ != null ? _loc2_.distributedDungeonFloor : null;
+		var _loc1_ = _loc3_ != null ? _loc3_.effectManager : null;
 		if (_loc1_ == null) {
 			return false;
 		}
@@ -260,7 +259,7 @@ class BuffView extends FloorView {
 		if (mBuff != null) {
 			return mBuff;
 		}
-		return ASCompat.coerce(mEffectView != null ? mEffectView.root : null, flash.display.DisplayObject);
+		return mEffectView != null ? mEffectView.root : null;
 	}
 
 	public function hide(transitionTime:Float) {

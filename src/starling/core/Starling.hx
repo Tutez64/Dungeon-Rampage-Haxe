@@ -169,19 +169,19 @@ class Starling extends EventDispatcher {
 	@:isVar public static var context(get, never):Context3D;
 
 	static public function get_context():Context3D {
-		return ASCompat.coerce(sCurrent != null ? sCurrent._context : null, flash.display3D.Context3D);
+		return sCurrent != null ? sCurrent._context : null;
 	}
 
 	@:isVar public static var juggler(get, never):Juggler;
 
 	static public function get_juggler():Juggler {
-		return ASCompat.coerce(sCurrent != null ? sCurrent._juggler : null, starling.animation.Juggler);
+		return sCurrent != null ? sCurrent._juggler : null;
 	}
 
 	@:isVar public static var painter(get, never):Painter;
 
 	static public function get_painter():Painter {
-		return ASCompat.coerce(sCurrent != null ? sCurrent._painter : null, starling.rendering.Painter);
+		return sCurrent != null ? sCurrent._painter : null;
 	}
 
 	@:isVar public static var contentScaleFactor(get, never):Float;
@@ -734,7 +734,7 @@ class Starling extends EventDispatcher {
 
 	function set_nativeOverlayBlocksTouches(value:Bool):Bool {
 		if (value != this.nativeOverlayBlocksTouches) {
-			_touchProcessor.occlusionTest = ASCompat.coerceFunction(value ? hitTestNativeOverlay : null);
+			_touchProcessor.occlusionTest = value ? hitTestNativeOverlay : null;
 		}
 		return value;
 	}

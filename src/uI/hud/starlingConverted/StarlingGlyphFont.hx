@@ -42,7 +42,7 @@ class StarlingGlyphFont {
 
 	@:allow(uI.hud.starlingConverted) static function acquire(pages:BakedPages, key:String):StarlingGlyphFont {
 		var _loc3_:ASObject = sTables[pages];
-		var _loc4_ = ASCompat.coerce(_loc3_ != null ? ASCompat.dynamicAs(_loc3_[key], HudGlyphTable) : null, HudGlyphTable);
+		var _loc4_ = _loc3_ != null ? ASCompat.dynamicAs(_loc3_[key], HudGlyphTable) : null;
 		if (_loc4_ == null || !_loc4_.mCell.alive || pages.acquire(key) != _loc4_.mCell) {
 			return null;
 		}
@@ -495,7 +495,7 @@ class StarlingGlyphFont {
 	@:isVar public var cell(get, never):BakedCell;
 
 	public function get_cell():BakedCell {
-		return ASCompat.coerce(mTable != null ? mTable.mCell : null, brain.starling.swfConverter.BakedCell);
+		return mTable != null ? mTable.mCell : null;
 	}
 
 	public function hasGlyph(charCode:Int):Bool {
@@ -532,7 +532,7 @@ class StarlingGlyphFont {
 	}
 
 	@:allow(uI.hud.starlingConverted) function glyphTexture(charCode:Int):Texture {
-		return ASCompat.coerce(hasGlyph(charCode) ? mTable.mTextures[charCode] : null, starling.textures.Texture);
+		return hasGlyph(charCode) ? mTable.mTextures[charCode] : null;
 	}
 
 	@:allow(uI.hud.starlingConverted) function glyphOffsetX(charCode:Int):Float {

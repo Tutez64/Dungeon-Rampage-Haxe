@@ -133,8 +133,8 @@ class StarlingText extends ArtDisplay {
 		mFontSize = mArt.textFontSize;
 		if (_loc4_ != null && _loc4_[0] != null) {
 			_loc14_ = StarlingGlyphFont.acquire(mPages, _loc4_[0]);
-			_loc6_ = ASCompat.coerce(_loc4_[1] != null ? StarlingGlyphFont.acquire(mPages, _loc4_[1]) : null, uI.hud.starlingConverted.StarlingGlyphFont);
-			_loc11_ = ASCompat.coerce(_loc4_[2] != null ? StarlingGlyphFont.acquire(mPages, _loc4_[2]) : null, uI.hud.starlingConverted.StarlingGlyphFont);
+			_loc6_ = _loc4_[1] != null ? StarlingGlyphFont.acquire(mPages, _loc4_[1]) : null;
+			_loc11_ = _loc4_[2] != null ? StarlingGlyphFont.acquire(mPages, _loc4_[2]) : null;
 			if (_loc14_ != null && (_loc4_[1] == null || _loc6_ != null) && (_loc4_[2] == null || _loc11_ != null)) {
 				return useFonts(_loc14_, _loc6_, _loc11_);
 			}
@@ -192,8 +192,7 @@ class StarlingText extends ArtDisplay {
 		}
 		{
 			try {
-				_loc6_ = ASCompat.coerce(_loc10_ ? HudArt.buildFont(mPages, "hudStarling", _loc13_, mScale, chars, 1) : null,
-					uI.hud.starlingConverted.StarlingGlyphFont);
+				_loc6_ = _loc10_ ? HudArt.buildFont(mPages, "hudStarling", _loc13_, mScale, chars, 1) : null;
 			} catch (__finallyError1:Dynamic) {
 				{
 					_loc13_.defaultTextFormat = _loc3_;
@@ -737,7 +736,7 @@ class StarlingText extends ArtDisplay {
 			_loc16_ += "|ancestorFilters|" + mBakingVariant;
 		}
 		var _loc12_ = HudArt.content(_loc16_, mPages);
-		var _loc13_ = ASCompat.coerce(_loc12_ != null ? _loc12_.cell : null, brain.starling.swfConverter.BakedCell);
+		var _loc13_ = _loc12_ != null ? _loc12_.cell : null;
 		var _loc17_ = _loc13_ != null && _loc13_.alive;
 		if (_loc13_ == null || !_loc13_.alive) {
 			_loc8_ = _loc14_.htmlText;
@@ -763,7 +762,7 @@ class StarlingText extends ArtDisplay {
 					try {
 						if (mBakingVariant >= 0) {
 							_loc10_ = TextFilterBake.bake(_loc14_, mFilterAncestors, mBakingVariant, mScale, _loc15_);
-							_loc13_ = ASCompat.coerce(_loc10_ != null ? mPages.add(_loc16_, _loc10_, true) : null, brain.starling.swfConverter.BakedCell);
+							_loc13_ = _loc10_ != null ? mPages.add(_loc16_, _loc10_, true) : null;
 						} else {
 							_loc13_ = HudArt.bakeOn(mPages, _loc16_, _loc14_, mScale, false);
 						}
@@ -796,7 +795,7 @@ class StarlingText extends ArtDisplay {
 				HudArt.storeContent(_loc16_, _loc12_, mPages);
 			}
 		}
-		mCell = ASCompat.coerce(_loc13_ != null ? mPages.acquire(_loc16_) : null, brain.starling.swfConverter.BakedCell);
+		mCell = _loc13_ != null ? mPages.acquire(_loc16_) : null;
 		mImage.cell = mCell;
 		mImage.visible = mCell != null;
 		mNeedsBake = mCell == null;

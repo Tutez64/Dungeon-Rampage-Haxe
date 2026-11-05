@@ -1,6 +1,5 @@
 package facade;
 
-import account.AvatarInfo;
 import account.Consumable;
 import account.ItemInfo;
 import account.PetInfo;
@@ -355,7 +354,7 @@ class LoadingPrewarm {
 		var _loc7_:GMSkin = null;
 		var _loc10_ = mDBFacade.gameMaster;
 		var _loc2_ = mDBFacade.dbAccountInfo;
-		var _loc8_ = ASCompat.coerce(_loc2_ != null ? _loc2_.activeAvatarInfo : null, account.AvatarInfo);
+		var _loc8_ = _loc2_ != null ? _loc2_.activeAvatarInfo : null;
 		var _loc13_ = DBFacade.buildFullDownloadPath("Resources/Art2D/FX/db_fx_library.swf");
 		if (_loc8_ != null && _loc2_.inventoryInfo != null) {
 			_loc14_ = [];
@@ -384,7 +383,7 @@ class LoadingPrewarm {
 					_loc4_.push(_loc15_.gmNpc);
 				}
 			_loc7_ = _loc10_.getSkinByType(_loc8_.skinId);
-			addHero(ASCompat.coerce(_loc7_ != null ? _loc10_.getHeroByConstant(_loc7_.ForHero) : null, gameMasterDictionary.GMHero), _loc14_, _loc6_, _loc4_);
+			addHero(_loc7_ != null ? _loc10_.getHeroByConstant(_loc7_.ForHero) : null, _loc14_, _loc6_, _loc4_);
 		}
 		var _loc9_:String;
 		final __ax4_iter_52 = COMMON_EFFECTS;

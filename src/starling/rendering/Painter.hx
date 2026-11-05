@@ -327,7 +327,7 @@ import starling.utils.SystemUtil;
 		}
 		_loc2_--;
 		Pool.putRectangle(_loc1_.pop());
-		_state.clipRect = ASCompat.coerce(_loc2_ != 0 ? _loc1_[(_loc2_ - 1 : Int)] : null, flash.geom.Rectangle);
+		_state.clipRect = _loc2_ != 0 ? _loc1_[(_loc2_ - 1 : Int)] : null;
 	}
 
 	function isRectangularMask(mask:DisplayObject, maskee:DisplayObject, out:Matrix):Bool {

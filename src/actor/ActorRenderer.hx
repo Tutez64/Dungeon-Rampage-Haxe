@@ -13,7 +13,6 @@ import collections.IMapIterator;
 import collections.Map;
 import combat.weapon.WeaponRenderer;
 import distributedObjects.NPCGameObject;
-import dungeon.Tile;
 import facade.DBFacade;
 import gameMasterDictionary.GMActor;
 import starling.SwfFallbackDebug;
@@ -375,7 +374,7 @@ class ActorRenderer extends Sprite {
 			if (mAnims == null) {
 				return;
 			}
-			var _loc1_:String = mActorGameObject.isProp ? null : starlingAtlasName;
+			var _loc1_ = mActorGameObject.isProp ? null : starlingAtlasName;
 			var _loc2_ = _loc1_ != null && _loc1_ != "" ? _loc1_ : className;
 			if (_loc2_ != className && mDBFacade.assetLoadingComponent.isPackedAtlasInAssetManager(_loc2_)) {
 				_loc2_ = className;
@@ -392,7 +391,7 @@ class ActorRenderer extends Sprite {
 				loadMovieClipSwfAssets(swfPath, className);
 			}
 		};
-		actorAtlasFile = ASCompat.coerce(!mActorGameObject.isProp ? StarlingAssetMapper.getActorAtlasFile(swfPath, true) : null, flash.filesystem.File);
+		actorAtlasFile = !mActorGameObject.isProp ? StarlingAssetMapper.getActorAtlasFile(swfPath, true) : null;
 		isBackground = mActorGameObject.belongsToRemotePlayer;
 		if (actorAtlasFile != null) {
 			queueActorAtlas(actorAtlasFile, className, onStarlingAssets, isBackground);
@@ -857,7 +856,7 @@ class ActorRenderer extends Sprite {
 		}
 		if (mUnculledSinceLastFrame) {
 			mUnculledSinceLastFrame = false;
-			_loc2_ = ASCompat.coerce(mActorGameObject != null ? mActorGameObject.actorView : null, actor.ActorView);
+			_loc2_ = mActorGameObject != null ? mActorGameObject.actorView : null;
 			if (_loc2_ != null && _loc2_.bodyAnimRenderer == this) {
 				mActorGameObject.refreshRunIdleAnim();
 			}
@@ -1018,7 +1017,7 @@ class ActorRenderer extends Sprite {
 	}
 
 	function stretchTileToStarlingArt() {
-		var _loc1_ = ASCompat.coerce(mActorGameObject != null ? mActorGameObject.tile : null, dungeon.Tile);
+		var _loc1_ = mActorGameObject != null ? mActorGameObject.tile : null;
 		if (_loc1_ == null || mStarlingRenderer == null || Math.isNaN(mSyncedWorldX)) {
 			return;
 		}
@@ -1048,8 +1047,8 @@ class ActorRenderer extends Sprite {
 
 	function stretchTileToFlashArt(idleClip:MovieClip):Bool {
 		var _loc2_:DisplayObject = null;
-		var _loc4_ = ASCompat.coerce(mActorGameObject != null ? mActorGameObject.tile : null, dungeon.Tile);
-		var _loc3_ = ASCompat.coerce(mActorGameObject != null ? mActorGameObject.actorView : null, actor.ActorView);
+		var _loc4_ = mActorGameObject != null ? mActorGameObject.tile : null;
+		var _loc3_ = mActorGameObject != null ? mActorGameObject.actorView : null;
 		if (_loc4_ == null || _loc3_ == null || _loc3_.root == null) {
 			return false;
 		}
@@ -1138,8 +1137,8 @@ class ActorRenderer extends Sprite {
 	function reportSwfFallback(reason:String, asError:Bool = true) {
 		var _loc6_ = mActorGameObject != null && mActorGameObject.actorData != null;
 		var _loc4_ = _loc6_ ? mActorGameObject.actorData.constant : "?";
-		var _loc5_:String = _loc6_ ? movieClipClassName : null;
-		var _loc3_:String = _loc6_ ? this.swfFilePath : null;
+		var _loc5_ = _loc6_ ? movieClipClassName : null;
+		var _loc3_ = _loc6_ ? this.swfFilePath : null;
 		SwfFallbackDebug.report(mDBFacade, fallbackCategory, _loc4_ + " (" + _loc5_ + ")", _loc3_, reason, asError);
 	}
 

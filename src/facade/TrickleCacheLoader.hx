@@ -66,7 +66,7 @@ class TrickleCacheLoader {
 		var _loc11_ = _loc17_.getSkinByType(look.skinType);
 		if (_loc11_ == null) {
 			_loc8_ = ASCompat.coerce(_loc17_.heroById.itemFor(look.heroType), gameMasterDictionary.GMHero);
-			_loc11_ = ASCompat.coerce(_loc8_ != null ? _loc17_.getSkinByConstant(_loc8_.DefaultSkin) : null, gameMasterDictionary.GMSkin);
+			_loc11_ = _loc8_ != null ? _loc17_.getSkinByConstant(_loc8_.DefaultSkin) : null;
 		}
 		var _loc21_ = new Vector<GMWeaponItem>();
 		var _loc16_ = new Vector<String>();
@@ -110,7 +110,7 @@ class TrickleCacheLoader {
 					_loc5_.push(_loc23_);
 				}
 			}
-		var _loc12_ = ASCompat.coerceFunction(dbFacade.timelineFactory != null ? dbFacade.timelineFactory.getTimelineJson : null);
+		var _loc12_:ASFunction = dbFacade.timelineFactory != null ? dbFacade.timelineFactory.getTimelineJson : null;
 		var _loc18_ = collectStarlingAtlasPaths(_loc17_, _loc12_, _loc11_, _loc21_, _loc16_, _loc9_, _loc5_, null);
 		var _loc7_:ASObject = isBackground ? heroLookAtlasTiers(_loc17_, _loc12_, _loc11_, _loc21_, _loc16_, _loc9_, _loc5_) : {};
 		var _loc15_:String;
@@ -175,7 +175,7 @@ class TrickleCacheLoader {
 		if (checkNullIteratee(__ax4_iter_71))
 			for (_tmp_ in __ax4_iter_71) {
 				_loc5_ = _tmp_;
-				_loc8_ = ASCompat.coerce(_loc5_.gmWeaponItem != null ? _loc5_.gmWeaponAesthetic : null, gameMasterDictionary.GMWeaponAesthetic);
+				_loc8_ = _loc5_.gmWeaponItem != null ? _loc5_.gmWeaponAesthetic : null;
 				if (_loc8_ != null) {
 					_loc15_.push(_loc5_.gmWeaponItem);
 					_loc11_.push(_loc8_.ModelName);
@@ -203,13 +203,13 @@ class TrickleCacheLoader {
 				_loc14_.push(_loc16_.gmNpc);
 			}
 		var _loc7_ = _loc12_.getSkinByType(_loc10_.skinId);
-		var _loc9_ = ASCompat.coerceFunction(dbFacade.timelineFactory != null ? dbFacade.timelineFactory.getTimelineJson : null);
+		var _loc9_:ASFunction = dbFacade.timelineFactory != null ? dbFacade.timelineFactory.getTimelineJson : null;
 		return collectStarlingAtlasPaths(_loc12_, _loc9_, _loc7_, _loc15_, _loc11_, _loc6_, heroKitPets(_loc12_, _loc7_, _loc14_), cacheNpc);
 	}
 
 	public static function heroKitPets(gameMaster:GameMaster, gmSkin:GMSkin, equippedPets:Vector<GMNpc>):Vector<GMNpc> {
 		var _loc4_ = new Vector<GMNpc>();
-		var _loc5_ = ASCompat.coerce(gmSkin != null ? gameMaster.getHeroByConstant(gmSkin.ForHero) : null, gameMasterDictionary.GMHero);
+		var _loc5_ = gmSkin != null ? gameMaster.getHeroByConstant(gmSkin.ForHero) : null;
 		var _loc6_ = ASCompat.coerce(_loc5_ != null
 			&& ASCompat.stringAsBool(_loc5_.Pet) ? ASCompat.coerce(gameMaster.npcByConstant.itemFor(_loc5_.Pet), gameMasterDictionary.GMNpc) : null,
 			gameMasterDictionary.GMNpc);

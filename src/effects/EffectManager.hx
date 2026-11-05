@@ -126,7 +126,7 @@ class EffectManager {
 	public function managedEffectView(effectID:UInt):EffectView {
 		var _loc2_ = ASCompat.coerce(mManagedEffects != null ? ASCompat.coerce(mManagedEffects.itemFor(effectID), effects.EffectGameObject) : null,
 			effects.EffectGameObject);
-		return ASCompat.coerce(_loc2_ != null ? ASCompat.reinterpretAs(_loc2_.view, EffectView) : null, effects.EffectView);
+		return _loc2_ != null ? ASCompat.reinterpretAs(_loc2_.view, EffectView) : null;
 	}
 
 	public function playNotEnoughManaEffects() {

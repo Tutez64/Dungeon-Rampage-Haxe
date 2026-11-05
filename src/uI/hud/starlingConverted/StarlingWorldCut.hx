@@ -94,7 +94,7 @@ class StarlingWorldCut {
 	}
 
 	function useMask(on:Bool) {
-		var _loc2_ = ASCompat.coerce(on ? mMask : null, flash.display.Shape);
+		var _loc2_ = on ? mMask : null;
 		if (mWorld.mask == _loc2_) {
 			return;
 		}

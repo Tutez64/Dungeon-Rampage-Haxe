@@ -595,13 +595,13 @@ class DistributedDungeonFloor extends Floor implements IDistributedDungeonFloor 
 		mEntryGeneration = _loc2_.floorGeneration;
 		var _loc1_ = ASCompat.reinterpretAs(parentArea, DistributedDungionArea);
 		var _loc3_:String;
-		final __ax4_iter_325 = TrickleCacheLoader.starlingAtlasPaths(mDBFacade, (_loc1_ != null ? _loc1_.mCacheNpc : null : Vector<UInt>));
+		final __ax4_iter_325 = TrickleCacheLoader.starlingAtlasPaths(mDBFacade, _loc1_ != null ? _loc1_.mCacheNpc : null);
 		if (checkNullIteratee(__ax4_iter_325))
 			for (_tmp_ in __ax4_iter_325) {
 				_loc3_ = _tmp_;
 				_loc2_.queueStarlingAssetsForPath(_loc3_);
 			}
-		TrickleCacheLoader.queueBossAtlases(mDBFacade, (_loc1_ != null ? _loc1_.mCacheNpc : null : Vector<UInt>));
+		TrickleCacheLoader.queueBossAtlases(mDBFacade, _loc1_ != null ? _loc1_.mCacheNpc : null);
 		queueEntryPropAtlases();
 	}
 
@@ -612,8 +612,8 @@ class DistributedDungeonFloor extends Floor implements IDistributedDungeonFloor 
 		}
 		mEntryPropAtlasesQueued = true;
 		var _loc1_ = ASCompat.reinterpretAs(parentArea, DistributedDungionArea);
-		var _loc4_:String = _loc3_.isEntryFloorPending ? null : _loc3_.requestedFloorBiome;
-		var _loc2_:ASObject = TrickleCacheLoader.starlingPropAtlasClassNames(mDBFacade, (_loc1_ != null ? _loc1_.mCacheNpc : null : Vector<UInt>), _loc4_);
+		var _loc4_ = _loc3_.isEntryFloorPending ? null : _loc3_.requestedFloorBiome;
+		var _loc2_:ASObject = TrickleCacheLoader.starlingPropAtlasClassNames(mDBFacade, _loc1_ != null ? _loc1_.mCacheNpc : null, _loc4_);
 		var _loc5_:String;
 		if (checkNullIteratee(_loc2_))
 			for (_tmp_ in _loc2_.___keys()) {
@@ -640,7 +640,7 @@ class DistributedDungeonFloor extends Floor implements IDistributedDungeonFloor 
 		stopEntryReleaseEvents();
 		if (Std.isOfType(mDBFacade.mainStateMachine.currentState, LoadingScreenState)) {
 			_loc1_ = ASCompat.reinterpretAs(parentArea, DistributedDungionArea);
-			mPrewarm = LoadingPrewarm.startLoadingAndRelease(mDBFacade, (_loc1_ != null ? _loc1_.mCacheNpc : null : Vector<UInt>), mEntryGeneration);
+			mPrewarm = LoadingPrewarm.startLoadingAndRelease(mDBFacade, _loc1_ != null ? _loc1_.mCacheNpc : null, mEntryGeneration);
 		}
 	}
 

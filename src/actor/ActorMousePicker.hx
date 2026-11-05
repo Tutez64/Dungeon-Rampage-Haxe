@@ -215,7 +215,7 @@ class ActorMousePicker {
 	}
 
 	public function pickAt(stageX:Float, stageY:Float) {
-		setHovered(ASCompat.coerce(sWorldUnderPointer ? pick(stageX, stageY) : null, actor.MouseEventHandler));
+		setHovered(sWorldUnderPointer ? pick(stageX, stageY) : null);
 	}
 
 	public function pick(stageX:Float, stageY:Float):MouseEventHandler {
@@ -312,7 +312,7 @@ class ActorMousePicker {
 			_loc21_++;
 		}
 		var _loc7_ = ActorMousePick.nearest(0, 0, mRects, _loc20_, _loc27_);
-		var _loc13_ = ASCompat.coerce(_loc7_ >= 0 ? mCandidates[_loc7_] : null, actor.MouseEventHandler);
+		var _loc13_ = _loc7_ >= 0 ? mCandidates[_loc7_] : null;
 		_loc21_ = 0;
 		while (_loc21_ < _loc20_) {
 			mCandidates[_loc21_] = null;

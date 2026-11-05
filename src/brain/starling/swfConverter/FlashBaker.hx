@@ -9,7 +9,6 @@ import flash.geom.Matrix;
 import flash.geom.Point;
 import flash.geom.Rectangle;
 import flash.text.TextField;
-import flash.text.TextFormat;
 
 class FlashBaker {
 	public static inline final MAX_SIDE = 2048;
@@ -133,7 +132,7 @@ class FlashBaker {
 
 	static function drawOnto(canvas:BitmapData, source:DisplayObject, scale:Float, ownFilters:Bool, left:Int, top:Int):BakedPicture {
 		sMatrix.setTo(scale, 0, 0, scale, -left, -top);
-		var _loc7_:Array<ASAny> = ASCompat.coerce(ownFilters ? null : source.filters, Array);
+		var _loc7_ = ownFilters ? null : source.filters;
 		if (_loc7_ != null && _loc7_.length > 0) {
 			source.filters = cast([]);
 		}
@@ -253,7 +252,7 @@ class FlashBaker {
 
 	public static function textCopy(field:TextField, text:String = null):TextField {
 		var _loc4_ = new TextField();
-		var _loc3_ = ASCompat.coerce(field.length > 0 ? field.getTextFormat(0, field.length) : null, flash.text.TextFormat);
+		var _loc3_ = field.length > 0 ? field.getTextFormat(0, field.length) : null;
 		_loc4_.defaultTextFormat = _loc3_ != null && _loc3_.size != null ? _loc3_ : field.defaultTextFormat;
 		_loc4_.embedFonts = field.embedFonts;
 		_loc4_.antiAliasType = field.antiAliasType;

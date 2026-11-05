@@ -135,8 +135,7 @@ class SettingsCategoryTabs {
 
 	public function get_selectedButton():UIRadioButton {
 		var _loc1_ = mCategories.indexOf(mSelectedCategory);
-		return ASCompat.coerce(_loc1_ != -1 ? mButtons[_loc1_] : ASCompat.coerce(mButtons.length > 0 ? mButtons[0] : null, brain.uI.UIRadioButton),
-			brain.uI.UIRadioButton);
+		return _loc1_ != -1 ? mButtons[_loc1_] : (mButtons.length > 0 ? mButtons[0] : null);
 	}
 
 	public function select(category:String) {

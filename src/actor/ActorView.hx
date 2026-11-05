@@ -216,7 +216,7 @@ class ActorView extends FloorView {
 		if (mMouseHitRect != null) {
 			return mMouseHitRect;
 		}
-		return ASCompat.coerce(mBody != null && mBody.width > 0 ? mBody.getBounds(mRoot) : null, flash.geom.Rectangle);
+		return mBody != null && mBody.width > 0 ? mBody.getBounds(mRoot) : null;
 	}
 
 	@:isVar public var fixedMouseHitRect(get, never):Rectangle;

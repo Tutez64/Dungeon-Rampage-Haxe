@@ -95,11 +95,9 @@ class PlayEffectAttackTimelineAction extends PlayEffectTimelineAction {
 			_loc10_ = 180;
 		}
 		_loc11_ = mDBFacade.customSkinVisualsOverrideHandler.customSkinBusterVisualOverrider(_loc11_, mActorGameObject);
-		var _loc9_ = ASCompat.coerce(mDoIconInsert ? new EffectIconInsert(mInsertIconPath, mInsertIconName, mInsertParentName) : null,
-			effects.EffectIconInsert);
+		var _loc9_ = mDoIconInsert ? new EffectIconInsert(mInsertIconPath, mInsertIconName, mInsertParentName) : null;
 		_loc8_ = mActorGameObject.distributedDungeonFloor.effectManager.playEffect(DBFacade.buildFullDownloadPath(mEffectPath), _loc11_, _loc4_, _loc3_,
-			mBehindAvatar, mScale, 0, 0, _loc10_, _loc2_, mLoop, mLayer, mManaged, mPlayRate,
-			ASCompat.coerceFunction(mDoIconInsert ? assetLoadedCallback(this) : null), _loc9_);
+			mBehindAvatar, mScale, 0, 0, _loc10_, _loc2_, mLoop, mLayer, mManaged, mPlayRate, mDoIconInsert ? assetLoadedCallback(this) : null, _loc9_);
 		if (mManaged) {
 			timeline.mManagedEffects.add(_loc8_);
 		}

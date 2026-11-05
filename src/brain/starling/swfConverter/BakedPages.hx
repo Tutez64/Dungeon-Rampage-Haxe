@@ -183,7 +183,7 @@ class BakedPages {
 			return _loc6_;
 		}
 		var _loc5_ = FlashBaker.bake(source, pixelScale, hide);
-		return ASCompat.coerce(_loc5_ != null ? add(key, _loc5_) : null, brain.starling.swfConverter.BakedCell);
+		return _loc5_ != null ? add(key, _loc5_) : null;
 	}
 
 	public function add(key:String, bake:BakedPicture, force:Bool = false):BakedCell {

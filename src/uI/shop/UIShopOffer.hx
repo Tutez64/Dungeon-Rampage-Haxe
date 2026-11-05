@@ -572,7 +572,7 @@ class UIShopOffer extends UIObject {
 		mGMOffer = value;
 		mSaleOffer = mGMOffer.isOnSaleNow;
 		mCoinOffer = mGMOffer.CoinOffer;
-		mCoinSaleOffer = ASCompat.coerce(mCoinOffer != null ? mCoinOffer.isOnSaleNow : null, gameMasterDictionary.GMOffer);
+		mCoinSaleOffer = mCoinOffer != null ? mCoinOffer.isOnSaleNow : null;
 		return value;
 	}
 

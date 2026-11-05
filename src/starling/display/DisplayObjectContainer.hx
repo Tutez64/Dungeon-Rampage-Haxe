@@ -356,8 +356,8 @@ import flash.errors.ArgumentError;
 					painter.fillToken(_loc12_._popToken);
 					_loc12_._pushToken.copyFrom(sCacheToken);
 				} else {
-					_loc6_ = ASCompat.coerce(_loc8_ ? _loc12_._pushToken : null, starling.rendering.BatchToken);
-					_loc2_ = ASCompat.coerce(_loc8_ ? _loc12_._popToken : null, starling.rendering.BatchToken);
+					_loc6_ = _loc8_ ? _loc12_._pushToken : null;
+					_loc2_ = _loc8_ ? _loc12_._popToken : null;
 					_loc7_ = _loc12_._filter;
 					_loc13_ = _loc12_._mask;
 					painter.fillToken(_loc6_);
@@ -375,7 +375,7 @@ import flash.errors.ArgumentError;
 						_loc12_.render(painter);
 					}
 					if (_loc13_ != null) {
-						_loc9_ = ASCompat.coerce(_loc5_ >= _loc10_ - 1 ? null : _children[_loc5_ + 1], starling.display.DisplayObject);
+						_loc9_ = _loc5_ >= _loc10_ - 1 ? null : _children[_loc5_ + 1];
 						if (_loc9_ != null
 							&& _loc9_._mask == _loc13_
 							&& _loc9_.maskInverted == _loc12_.maskInverted

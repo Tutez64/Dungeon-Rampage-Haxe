@@ -102,14 +102,14 @@ class MovieBehavior extends EventDispatcher implements IAnimatable {
 		if (index < 0 || index >= _numFrames) {
 			throw new ArgumentError("Invalid frame index");
 		}
-		return ASCompat.coerce(index < _frames.length ? _frames[index] : null, MovieFrame);
+		return index < _frames.length ? _frames[index] : null;
 	}
 
 	function actionFrameAt(index:Int):MovieFrame {
 		if (index < 0 || index >= _numFrames) {
 			throw new RangeError("Error #1125: The index " + index + " is out of range " + _numFrames + ".", 1125);
 		}
-		return ASCompat.coerce(index < _frames.length ? _frames[index] : null, MovieFrame);
+		return index < _frames.length ? _frames[index] : null;
 	}
 
 	public function advanceTime(passedTime:Float) {

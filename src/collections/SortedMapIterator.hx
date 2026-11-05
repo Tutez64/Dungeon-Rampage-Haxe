@@ -23,7 +23,7 @@ class SortedMapIterator implements IMapIterator {
 		_current = _next;
 		var _loc1_ = _map.indexOfNode(_current, _nextIndex);
 		_nextIndex = _loc1_ + 1;
-		_next = ASCompat.coerce(_loc1_ == -1 ? null : _map.nodeAt(_nextIndex), collections.SortedMapNode);
+		_next = _loc1_ == -1 ? null : _map.nodeAt(_nextIndex);
 		return _current.item;
 	}
 

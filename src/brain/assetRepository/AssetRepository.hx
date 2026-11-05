@@ -58,27 +58,27 @@ class AssetRepository {
 
 	public function getJsonAsset(assetLoaderInfo:AssetLoaderInfo, loadedCallback:ASFunction, errorCallback:ASFunction = null):AssetLoaderInfo {
 		var _loc4_ = getAsset(assetLoaderInfo, loadedCallback, errorCallback, JsonAssetLoader);
-		return ASCompat.coerce(_loc4_ ? null : assetLoaderInfo, brain.assetRepository.AssetLoaderInfo);
+		return _loc4_ ? null : assetLoaderInfo;
 	}
 
 	public function getXMLAsset(assetLoaderInfo:AssetLoaderInfo, loadedCallback:ASFunction, errorCallback:ASFunction = null):AssetLoaderInfo {
 		var _loc4_ = getAsset(assetLoaderInfo, loadedCallback, errorCallback, XMLAssetLoader);
-		return ASCompat.coerce(_loc4_ ? null : assetLoaderInfo, brain.assetRepository.AssetLoaderInfo);
+		return _loc4_ ? null : assetLoaderInfo;
 	}
 
 	public function getByteArrayAsset(assetLoaderInfo:AssetLoaderInfo, loadedCallback:ASFunction, errorCallback:ASFunction = null):AssetLoaderInfo {
 		var _loc4_ = getAsset(assetLoaderInfo, loadedCallback, errorCallback, ByteArrayAssetLoader);
-		return ASCompat.coerce(_loc4_ ? null : assetLoaderInfo, brain.assetRepository.AssetLoaderInfo);
+		return _loc4_ ? null : assetLoaderInfo;
 	}
 
 	public function getSwfAsset(assetLoaderInfo:AssetLoaderInfo, loadedCallback:ASFunction, errorCallback:ASFunction = null):AssetLoaderInfo {
 		var _loc4_ = getAsset(assetLoaderInfo, loadedCallback, errorCallback, SwfAssetLoader);
-		return ASCompat.coerce(_loc4_ ? null : assetLoaderInfo, brain.assetRepository.AssetLoaderInfo);
+		return _loc4_ ? null : assetLoaderInfo;
 	}
 
 	public function getImageAsset(assetLoaderInfo:AssetLoaderInfo, loadedCallback:ASFunction, errorCallback:ASFunction = null):AssetLoaderInfo {
 		var _loc4_ = getAsset(assetLoaderInfo, loadedCallback, errorCallback, ImageAssetLoader);
-		return ASCompat.coerce(_loc4_ ? null : assetLoaderInfo, brain.assetRepository.AssetLoaderInfo);
+		return _loc4_ ? null : assetLoaderInfo;
 	}
 
 	public function getSpriteSheetAsset(facade:Facade, sheetLoaderInfo:SpriteSheetAssetLoaderInfo, bitmapDataName:String, loadedCallback:ASFunction,
@@ -190,7 +190,7 @@ class AssetRepository {
 
 	public function getURLSoundAsset(assetLoaderInfo:SoundAssetLoaderInfo, loadedCallback:ASFunction, errorCallback:ASFunction = null):AssetLoaderInfo {
 		var _loc4_ = getAsset(assetLoaderInfo, loadedCallback, errorCallback, URLSoundAssetLoader);
-		return ASCompat.coerce(_loc4_ ? null : assetLoaderInfo, brain.assetRepository.AssetLoaderInfo);
+		return _loc4_ ? null : assetLoaderInfo;
 	}
 
 	public function removeCallbackFromPendingDownload(assetKey:String, loadedCallback:ASFunction):Bool {

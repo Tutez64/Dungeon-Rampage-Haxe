@@ -68,13 +68,13 @@ class HudCutFade {
 	}
 
 	public function designMoved(mask:flash.display.DisplayObject):Bool {
-		var _loc2_ = ASCompat.coerce(mask != null ? mask.parent : null, flash.display.DisplayObject);
+		var _loc2_:flash.display.DisplayObject = mask != null ? mask.parent : null;
 		return _loc2_ != null
 			&& (_loc2_.x != mDesignX || _loc2_.y != mDesignY || _loc2_.scaleX != mDesignScaleX || _loc2_.scaleY != mDesignScaleY);
 	}
 
 	public function remember(mask:flash.display.DisplayObject) {
-		var _loc2_ = ASCompat.coerce(mask != null ? mask.parent : null, flash.display.DisplayObject);
+		var _loc2_:flash.display.DisplayObject = mask != null ? mask.parent : null;
 		if (_loc2_ == null) {
 			return;
 		}

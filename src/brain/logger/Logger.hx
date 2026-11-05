@@ -191,7 +191,7 @@ class Logger {
 
 	public static function error(logString:String, originalError:Error = null) {
 		var _loc5_ = originalError != null ? originalError : new Error(logString);
-		var _loc4_:String = (_loc5_ : ASAny).hasOwnProperty("getStackTrace") ? _loc5_.getStackTrace() : null;
+		var _loc4_ = (_loc5_ : ASAny).hasOwnProperty("getStackTrace") ? _loc5_.getStackTrace() : null;
 		var _loc3_ = ASCompat.stringAsBool(_loc4_) ? logString + "\n" + _loc4_ : logString;
 		tryErrorCallback(_loc3_);
 		logString = "[ERROR] " + getDateString() + _loc3_;
@@ -217,7 +217,7 @@ class Logger {
 
 	public static function fatal(logString:String, originalError:Error = null) {
 		var _loc5_ = originalError != null ? originalError : new Error(logString);
-		var _loc4_:String = (_loc5_ : ASAny).hasOwnProperty("getStackTrace") ? _loc5_.getStackTrace() : null;
+		var _loc4_ = (_loc5_ : ASAny).hasOwnProperty("getStackTrace") ? _loc5_.getStackTrace() : null;
 		logString = "[FATAL] " + getDateString() + logString;
 		var _loc3_ = logString + "\n" + _loc4_;
 		trace(_loc3_);

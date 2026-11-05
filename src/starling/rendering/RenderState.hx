@@ -64,8 +64,8 @@ class RenderState {
 		var _loc3_ = false;
 		var _loc2_ = false;
 		if (_onDrawRequired != null) {
-			_loc4_ = ASCompat.coerce(_renderTarget != null ? _renderTarget.base : null, flash.display3D.textures.TextureBase);
-			_loc5_ = ASCompat.coerce(renderState._renderTarget != null ? renderState._renderTarget.base : null, flash.display3D.textures.TextureBase);
+			_loc4_ = _renderTarget != null ? _renderTarget.base : null;
+			_loc5_ = renderState._renderTarget != null ? renderState._renderTarget.base : null;
 			_loc6_ = ((_miscOptions : Int) & 0x0F00) != ((renderState._miscOptions : Int) & 0x0F00);
 			_loc7_ = ((_miscOptions : Int) & 0xF000) != ((renderState._miscOptions : Int) & 0xF000);
 			_loc3_ = ((_miscOptions : Int) & 0x0F0000) != ((renderState._miscOptions : Int) & 0x0F0000);
@@ -199,8 +199,8 @@ class RenderState {
 	}
 
 	public function setRenderTarget(target:Texture, enableDepthAndStencil:Bool = true, antiAlias:Int = 0) {
-		var _loc5_ = ASCompat.coerce(_renderTarget != null ? _renderTarget.base : null, flash.display3D.textures.TextureBase);
-		var _loc6_ = ASCompat.coerce(target != null ? target.base : null, flash.display3D.textures.TextureBase);
+		var _loc5_ = _renderTarget != null ? _renderTarget.base : null;
+		var _loc6_ = target != null ? target.base : null;
 		var _loc7_ = (ASCompat.floatToInt(MathUtil.min(antiAlias, 15)) | ASCompat.toInt(enableDepthAndStencil) << 4:UInt);
 		var _loc4_ = _loc7_ != (((_miscOptions : Int) & 0xFF) : UInt);
 		if (_loc5_ != _loc6_ || _loc4_) {
@@ -252,7 +252,7 @@ class RenderState {
 	@:allow(starling.rendering) @:isVar var renderTargetBase(get, never):TextureBase;
 
 	function get_renderTargetBase():TextureBase {
-		return ASCompat.coerce(_renderTarget != null ? _renderTarget.base : null, flash.display3D.textures.TextureBase);
+		return _renderTarget != null ? _renderTarget.base : null;
 	}
 
 	@:allow(starling.rendering) @:isVar var renderTargetOptions(get, never):UInt;

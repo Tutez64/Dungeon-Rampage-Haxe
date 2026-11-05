@@ -155,12 +155,12 @@ class TextureAtlas {
 
 	public function getRegion(name:String):Rectangle {
 		var _loc2_ = ASCompat.coerce(_subTextures[name], starling.textures.SubTexture);
-		return ASCompat.coerce(_loc2_ != null ? _loc2_.region : null, flash.geom.Rectangle);
+		return _loc2_ != null ? _loc2_.region : null;
 	}
 
 	public function getFrame(name:String):Rectangle {
 		var _loc2_ = ASCompat.coerce(_subTextures[name], starling.textures.SubTexture);
-		return ASCompat.coerce(_loc2_ != null ? _loc2_.frame : null, flash.geom.Rectangle);
+		return _loc2_ != null ? _loc2_.frame : null;
 	}
 
 	public function getRotation(name:String):Bool {

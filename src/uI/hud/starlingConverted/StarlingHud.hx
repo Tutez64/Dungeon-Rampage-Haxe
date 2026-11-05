@@ -403,7 +403,7 @@ class StarlingHud implements IGameHud {
 		mRoot.addChild(mView.root);
 		mFacade.starlingLayerManager.hudLayer.addChild(mRoot);
 		mRoot.visible = mShown && !mUiHidden;
-		mTicker.attachStage(ASCompat.coerce(mRoot.visible ? mFacade.stageRef : null, flash.display.Stage));
+		mTicker.attachStage(mRoot.visible ? mFacade.stageRef : null);
 		mProfile = node("UI_profile");
 		mXpRoot = node("UI_XP");
 		mCenterMessage = ASCompat.reinterpretAs(node("UI_center_message"), ArtDisplay);
@@ -679,7 +679,7 @@ class StarlingHud implements IGameHud {
 	}
 
 	function node(path:String):DisplayObject {
-		return ASCompat.coerce(mView != null ? mView.node(path) : null, starling.display.DisplayObject);
+		return mView != null ? mView.node(path) : null;
 	}
 
 	function visible(path:String, value:Bool) {
@@ -1378,7 +1378,7 @@ class StarlingHud implements IGameHud {
 				return;
 			}
 			mRoot.visible = !mUiHidden;
-			mTicker.attachStage(ASCompat.coerce(mUiHidden ? null : mFacade.stageRef, flash.display.Stage));
+			mTicker.attachStage(mUiHidden ? null : mFacade.stageRef);
 			if (mChatHolder != null) {
 				mFacade.sceneGraphManager.addChild(mChatHolder, 50);
 				mChatHolder.visible = !mUiHidden;
@@ -1682,7 +1682,7 @@ class StarlingHud implements IGameHud {
 					mInput.attach();
 				}
 			}
-			mTicker.attachStage(ASCompat.coerce(mUiHidden ? null : mFacade.stageRef, flash.display.Stage));
+			mTicker.attachStage(mUiHidden ? null : mFacade.stageRef);
 			if (!mUiHidden) {
 				restoreSlotCooldowns();
 			}
@@ -2137,7 +2137,7 @@ class StarlingHud implements IGameHud {
 	public function get_floaterTextClass():Dynamic {
 		var _loc3_:ASAny;
 		try {
-			return (HudArt.ready || HudArt.fatalFailure ? HudArt.swfClass("floater_text") : null:Dynamic);
+			return HudArt.ready || HudArt.fatalFailure ? HudArt.swfClass("floater_text") : null;
 		} catch (error:Dynamic) {
 			failed(error);
 			_loc3_ = null;
@@ -2281,10 +2281,8 @@ class StarlingHud implements IGameHud {
 				if (_loc1_ >= _loc2_) {
 					mCooldownDurations[_loc3_] = 0;
 				} else {
-					_loc4_ = ASCompat.coerce(_loc3_ < 3 ? ASCompat.coerce(_loc3_ < mWeapons.length ? mWeapons[_loc3_] : null,
-						uI.hud.starlingConverted.StarlingHudSlot) : ASCompat.coerce(_loc3_ - 3 < mConsumables.length ? mConsumables[_loc3_ - 3] : null,
-							uI.hud.starlingConverted.StarlingHudSlot),
-						uI.hud.starlingConverted.StarlingHudSlot);
+					_loc4_ = _loc3_ < 3 ? (_loc3_ < mWeapons.length ? mWeapons[_loc3_] : null) : (_loc3_
+						- 3 < mConsumables.length ? mConsumables[_loc3_ - 3] : null);
 					if (_loc4_ != null) {
 						_loc4_.startCooldown(_loc2_, _loc1_);
 					}
@@ -2677,10 +2675,7 @@ class StarlingHud implements IGameHud {
 		}
 		_loc1_ = 0;
 		while (_loc1_ < mWeapons.length) {
-			mWeapons[_loc1_].equipWeapon(mHeroOwner,
-				ASCompat.coerce(_loc1_ < mHeroOwner.weaponControllers.length
-					&& mHeroOwner.weaponControllers[_loc1_] != null ? mHeroOwner.weaponControllers[_loc1_].weapon : null,
-					combat.weapon.WeaponGameObject));
+			mWeapons[_loc1_].equipWeapon(mHeroOwner, _loc1_ < mHeroOwner.weaponControllers.length && mHeroOwner.weaponControllers[_loc1_] != null ? mHeroOwner.weaponControllers[_loc1_].weapon : null);
 			_loc1_++;
 		}
 	}
@@ -2692,8 +2687,7 @@ class StarlingHud implements IGameHud {
 		}
 		_loc1_ = 0;
 		while (_loc1_ < mConsumables.length) {
-			mConsumables[_loc1_].equipConsumable(mHeroOwner,
-				ASCompat.coerce(_loc1_ < mHeroOwner.consumables.length ? mHeroOwner.consumables[_loc1_] : null, combat.weapon.ConsumableWeaponGameObject));
+			mConsumables[_loc1_].equipConsumable(mHeroOwner, _loc1_ < mHeroOwner.consumables.length ? mHeroOwner.consumables[_loc1_] : null);
 			_loc1_++;
 		}
 		restoreGlyph("use_consumable_one");
@@ -2724,10 +2718,9 @@ class StarlingHud implements IGameHud {
 		if (mOffScreen != null) {
 			mOffScreen.dispose();
 		}
-		mOffScreen = ASCompat.coerce(mView != null
+		mOffScreen = mView != null
 			&& mHeroOwner != null ? new StarlingOffScreenManager(mFacade, mTicker, ASCompat.reinterpretAs(mView.root, DisplayObjectContainer), mHeroOwner,
-				invalidateArrowBounds, mCut) : null,
-			uI.hud.starlingConverted.StarlingOffScreenManager);
+				invalidateArrowBounds, mCut) : null;
 		if (mOffScreen != null) {
 			bindBounds(mRoot);
 		}
@@ -2877,7 +2870,7 @@ class StarlingHud implements IGameHud {
 		var _loc4_:ASAny;
 		var _loc1_:NPCGameObject = null;
 		try {
-			_loc1_ = ASCompat.coerce(mPetPortrait != null ? mPetPortrait.petNPCGameObject : null, distributedObjects.NPCGameObject);
+			_loc1_ = mPetPortrait != null ? mPetPortrait.petNPCGameObject : null;
 			return {
 				"present": mPetPortrait != null,
 				"hasPet": _loc1_ != null,

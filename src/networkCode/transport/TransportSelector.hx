@@ -86,7 +86,7 @@ class TransportSelector {
 		if (_loc4_ == null || !_loc4_.supportsSessions) {
 			return _loc4_;
 		}
-		var _loc3_ = ASCompat.coerceFunction(mExperimentalWebSocketReconnects && TransportSettings.sessionsEnabled ? factory : null);
+		var _loc3_ = mExperimentalWebSocketReconnects && TransportSettings.sessionsEnabled ? factory : null;
 		return new SessionTransport(url, _loc3_, _loc4_, mCredentialSource);
 	}
 

@@ -768,7 +768,7 @@ class UITavern {
 		offer = ASCompat.coerce(mHeroOffers.itemFor(gmHero.Id), gameMasterDictionary.GMOffer);
 		saleOffer = offer.isOnSaleNow;
 		coinOffer = offer.CoinOffer;
-		coinSaleOffer = ASCompat.coerce(coinOffer != null ? coinOffer.isOnSaleNow : null, gameMasterDictionary.GMOffer);
+		coinSaleOffer = coinOffer != null ? coinOffer.isOnSaleNow : null;
 		currentOffer = saleOffer != null ? saleOffer : offer;
 		currentCoinOffer = coinSaleOffer != null ? coinSaleOffer : coinOffer;
 		mHeroRequiredForSkinPurchase.visible = false;

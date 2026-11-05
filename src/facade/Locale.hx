@@ -4,7 +4,6 @@ import brain.assetRepository.AssetLoaderInfo;
 import brain.event.EventListeners;
 import brain.logger.Logger;
 import brain.utils.TextUtil;
-import flash.display.Stage;
 import flash.events.Event;
 import flash.text.TextField;
 
@@ -132,7 +131,7 @@ class Locale {
 	@:isVar public static var isLowRes(get, never):Bool;
 
 	static public function get_isLowRes():Bool {
-		var _loc1_ = ASCompat.coerce(dbFacade != null ? dbFacade.stageRef : null, flash.display.Stage);
+		var _loc1_ = dbFacade != null ? dbFacade.stageRef : null;
 		if (_loc1_ == null) {
 			return true;
 		}

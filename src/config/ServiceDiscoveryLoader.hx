@@ -27,7 +27,7 @@ class ServiceDiscoveryLoader {
 	}
 
 	public static function maintenanceMessage(result:ASObject):String {
-		var _loc2_:String = ASCompat.toBool(result) ? ASCompat.asString(result.maintenanceMessage) : null;
+		var _loc2_ = ASCompat.toBool(result) ? ASCompat.asString(result.maintenanceMessage) : null;
 		return ASCompat.stringAsBool(_loc2_) && new compat.RegExp("\\S").test(_loc2_) ? _loc2_ : null;
 	}
 
@@ -37,7 +37,7 @@ class ServiceDiscoveryLoader {
 
 	function onCompleted(event:Event) {
 		var _loc3_:ASObject = null;
-		var _loc2_:String = ASCompat.toBool(event.target)
+		var _loc2_ = ASCompat.toBool(event.target)
 			&& ASCompat.toBool(ASCompat.dynamicAs(event.target, URLLoader).data) ? ASCompat.asString(ASCompat.dynamicAs(event.target, URLLoader).data) : null;
 		Logger.debugch("HTTP", "Service discovery response (HTTP " + mHttpStatus + ") from " + mUrl + ": " + _loc2_);
 		if (mHttpStatus < 100 || mHttpStatus >= 400) {

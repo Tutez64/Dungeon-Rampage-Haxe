@@ -206,7 +206,7 @@ class GameLogOutput {
 	}
 
 	static function onTrace(channel:String, line:String, priority:Int) {
-		var _loc4_ = ASCompat.coerceFunction(mPreviousTracing ? mPreviousTrace : null);
+		var _loc4_ = mPreviousTracing ? mPreviousTrace : null;
 		write(channel, line);
 		if (_loc4_ != null) {
 			_loc4_(channel, line, priority);

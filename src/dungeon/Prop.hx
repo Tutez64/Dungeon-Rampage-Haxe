@@ -95,7 +95,7 @@ class Prop extends FloorObject {
 		}
 		var _loc2_ = mDistributedDungeonFloor.dungeonFloorFactory.tileFactory.starlingViewFactory;
 		var _loc4_ = this.view.root.rotation * 3.141592653589793 / 180;
-		var _loc3_:String = this.layer == 5 ? "normal" : null;
+		var _loc3_ = this.layer == 5 ? "normal" : null;
 		var _loc5_ = _loc2_.onTextureAssetLoaded(propTexture, this.constant, mPosition.x, mPosition.y, this.view.root.scaleX, this.view.root.scaleY, _loc4_,
 			mTile.isOnStage, this.layer, _loc3_);
 		if (_loc5_ != null) {
@@ -111,7 +111,7 @@ class Prop extends FloorObject {
 		}
 		var _loc2_ = mDistributedDungeonFloor.dungeonFloorFactory.tileFactory.starlingViewFactory;
 		var _loc4_ = this.view.root.rotation * 3.141592653589793 / 180;
-		var _loc3_:String = this.layer == 5 ? "normal" : null;
+		var _loc3_ = this.layer == 5 ? "normal" : null;
 		var _loc5_ = _loc2_.onAnimationLoaded(propAnimation, this.constant, mPosition.x, mPosition.y, this.view.root.scaleX, this.view.root.scaleY, _loc4_,
 			mTile.isOnStage, this.layer, _loc3_);
 		if (_loc5_ != null) {

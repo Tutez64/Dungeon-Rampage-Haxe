@@ -269,7 +269,7 @@ class UIChatLog {
 
 	public function set_starlingPrompt(value:ASFunction):ASFunction {
 		mStarlingPrompt = value;
-		mChatInputText.focusInCallback = ASCompat.coerceFunction(value != null ? updateStarlingPrompt : null);
+		mChatInputText.focusInCallback = value != null ? updateStarlingPrompt : null;
 		if (mChatInputText.showingDefaultText) {
 			resetChatPrompt();
 		}

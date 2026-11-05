@@ -25,7 +25,7 @@ class GlowFilterAdapter {
 		mProps = if (ASCompat.toBool(props)) props else {};
 		mRemove = mProps.remove == true;
 		var _loc3_ = findExisting();
-		mOriginalFilter = ASCompat.coerce(_loc3_ != null ? ASCompat.reinterpretAs(_loc3_.clone(), GlowFilter) : null, flash.filters.GlowFilter);
+		mOriginalFilter = _loc3_ != null ? ASCompat.reinterpretAs(_loc3_.clone(), GlowFilter) : null;
 	}
 
 	static function lerp(from:Float, to:Float, ratio:Float):Float {

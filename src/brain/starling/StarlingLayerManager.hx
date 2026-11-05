@@ -202,7 +202,7 @@ class StarlingLayerManager {
 
 	function overlayLayer(sortIndex:Int, name:String, sort:ASFunction, screenSpace:Bool):StarlingLayer {
 		var _loc7_ = ASCompat.coerce(mLayerMap[sortIndex], brain.starling.StarlingLayer);
-		var _loc6_ = ASCompat.coerce(mStarling != null ? ASCompat.reinterpretAs(mStarling.root, starling.display.Sprite) : null, starling.display.Sprite);
+		var _loc6_ = mStarling != null ? ASCompat.reinterpretAs(mStarling.root, starling.display.Sprite) : null;
 		if (_loc7_ != null || _loc6_ == null) {
 			return _loc7_;
 		}

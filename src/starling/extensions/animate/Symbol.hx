@@ -562,7 +562,7 @@ class Symbol extends DisplayObjectContainer {
 		_loc6_ = 0;
 		while (_loc6_ < _loc8_) {
 			_loc4_ = _loc11_[_loc6_].symbolInstance;
-			_loc5_ = ASCompat.coerce(_loc7_.numChildren > _loc6_ ? ASCompat.reinterpretAs(_loc7_.getChildAt(_loc6_), Symbol) : null, Symbol);
+			_loc5_ = _loc7_.numChildren > _loc6_ ? ASCompat.reinterpretAs(_loc7_.getChildAt(_loc6_), Symbol) : null;
 			_loc12_ = null;
 			_loc13_ = _loc4_.symbolName;
 			if (!_atlas.hasSymbol(_loc13_)) {
@@ -888,7 +888,7 @@ class Symbol extends DisplayObjectContainer {
 		if (ColorTransformStyle.matricesEqual(matrix, _parentColorMatrix)) {
 			return;
 		}
-		_parentColorMatrix = (matrix != null ? ColorTransformStyle.copyMatrix(matrix, _parentColorMatrix) : null : Vector<Float>);
+		_parentColorMatrix = matrix != null ? ColorTransformStyle.copyMatrix(matrix, _parentColorMatrix) : null;
 		updateComposedColor();
 	}
 
@@ -1035,7 +1035,7 @@ class Symbol extends DisplayObjectContainer {
 	function updateBoundaryMatrices(own:Vector<Float>, filtered:Bool) {
 		var _loc4_ = false;
 		if (!ColorTransformStyle.matricesEqual(own, _boundaryLeading)) {
-			_boundaryLeading = (own != null ? ColorTransformStyle.copyMatrix(own, _boundaryLeading) : null : Vector<Float>);
+			_boundaryLeading = own != null ? ColorTransformStyle.copyMatrix(own, _boundaryLeading) : null;
 			_loc4_ = true;
 		}
 		var _loc3_ = _parentColorMatrix;
@@ -1046,10 +1046,10 @@ class Symbol extends DisplayObjectContainer {
 			_boundaryTrailingRgb[17] = 0;
 			_boundaryTrailingRgb[18] = 1;
 			_boundaryTrailingRgb[19] = 0;
-			_loc3_ = (ColorTransformStyle.isIdentity(_boundaryTrailingRgb) ? null : _boundaryTrailingRgb:Vector<Float>);
+			_loc3_ = ColorTransformStyle.isIdentity(_boundaryTrailingRgb) ? null : _boundaryTrailingRgb;
 		}
 		if (!ColorTransformStyle.matricesEqual(_loc3_, _boundaryTrailing)) {
-			_boundaryTrailing = (_loc3_ != null ? ColorTransformStyle.copyMatrix(_loc3_, _boundaryTrailing) : null : Vector<Float>);
+			_boundaryTrailing = _loc3_ != null ? ColorTransformStyle.copyMatrix(_loc3_, _boundaryTrailing) : null;
 			_loc4_ = true;
 		}
 		if (_loc4_) {

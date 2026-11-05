@@ -331,10 +331,7 @@ class StarlingOverlays {
 		mBakesLeft = 4;
 		var _loc6_ = mFacade.camera;
 		var _loc4_ = _loc6_ != null && _loc6_.rotation == 0 && _loc6_._shakeRotation == 0;
-		mView = ASCompat.coerce(_loc4_
-			&& _loc6_.targetObject != null
-			&& _loc6_.targetObject.parent != null ? _loc6_.visibleRectangle : null,
-			flash.geom.Rectangle);
+		mView = _loc4_ && _loc6_.targetObject != null && _loc6_.targetObject.parent != null ? _loc6_.visibleRectangle : null;
 		_loc5_ = 0;
 		while (_loc5_ < mTags.length) {
 			mTags[_loc5_].update(mFrame);
@@ -361,8 +358,7 @@ class StarlingOverlays {
 
 	function ensureRoot():Bool {
 		var _loc1_ = mFacade.starlingLayerManager;
-		var _loc2_ = ASCompat.coerce(_loc1_ != null
-			&& _loc1_.isReady() ? _loc1_.starlingOverlayLayer : null, brain.starling.StarlingLayer);
+		var _loc2_ = _loc1_ != null && _loc1_.isReady() ? _loc1_.starlingOverlayLayer : null;
 		if (_loc2_ == null) {
 			return false;
 		}
@@ -464,9 +460,9 @@ class StarlingOverlays {
 		var _loc9_ = 0;
 		var _loc16_:StarlingDamageFloater = null;
 		mFontRetry = mFrame + 60;
-		var _loc17_ = (mFacade.hud != null ? mFacade.hud.floaterTextClass : null:Dynamic);
-		var _loc19_ = ASCompat.coerce(_loc17_ != null ? ASCompat.dynamicAs(ASCompat.createInstance(_loc17_, []), MovieClip) : null, flash.display.MovieClip);
-		var _loc10_ = ASCompat.coerce(_loc19_ != null ? ASCompat.reinterpretAs(_loc19_.getChildByName("label"), TextField) : null, flash.text.TextField);
+		var _loc17_ = mFacade.hud != null ? mFacade.hud.floaterTextClass : null;
+		var _loc19_ = _loc17_ != null ? ASCompat.dynamicAs(ASCompat.createInstance(_loc17_, []), MovieClip) : null;
+		var _loc10_ = _loc19_ != null ? ASCompat.reinterpretAs(_loc19_.getChildByName("label"), TextField) : null;
 		if (_loc10_ == null) {
 			return;
 		}
@@ -528,7 +524,7 @@ class StarlingOverlays {
 	}
 
 	function critFont(floater:StarlingDamageFloater):BakedGlyphFont {
-		return ASCompat.coerce(floater.crit ? (floater.big ? mBigCrit : mCrit) : null, brain.starling.swfConverter.BakedGlyphFont);
+		return floater.crit ? (floater.big ? mBigCrit : mCrit) : null;
 	}
 
 	function glowOnly(filters:Array<ASAny>):Array<ASAny> {

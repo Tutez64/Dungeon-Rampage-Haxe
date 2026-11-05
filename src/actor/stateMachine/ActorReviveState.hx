@@ -34,7 +34,6 @@ import stateMachine.mainStateMachine.DungeonTutorial;
 import steamInput.UnboundActionEvent;
 import uI.infiniteIsland.II_UIExitDungeonPopUp;
 import uI.popup.UILootLossPopup;
-import uI.UIChatLog;
 import flash.display.DisplayObject;
 import flash.display.MovieClip;
 import flash.events.Event;
@@ -930,7 +929,7 @@ class ActorReviveState extends ActorState {
 	@:isVar var chatBarButtons(get, never):Array<ASAny>;
 
 	function get_chatBarButtons():Array<ASAny> {
-		var _loc1_ = ASCompat.coerce(mDBFacade.hud != null ? mDBFacade.hud.chatLog : null, uI.UIChatLog);
+		var _loc1_ = mDBFacade.hud != null ? mDBFacade.hud.chatLog : null;
 		if (_loc1_ == null || _loc1_.chatLogButton == null || _loc1_.chatSendButton == null) {
 			return [];
 		}
@@ -1036,7 +1035,7 @@ class ActorReviveState extends ActorState {
 		if (mDBFacade.inputManager.check(27) && !mDBFacade.inputManager.pressed(27)) {
 			return;
 		}
-		var _loc1_ = ASCompat.coerceFunction(mReturnToTownButton != null ? mReturnToTownButton.releaseCallback : null);
+		var _loc1_ = mReturnToTownButton != null ? mReturnToTownButton.releaseCallback : null;
 		if (_loc1_ != null) {
 			_loc1_();
 		}

@@ -36,7 +36,7 @@ class StarlingBar implements IHudTick {
 
 	public function new(root:DisplayObject, delta:DisplayObject, ticker:HudTicker) {
 		mBar = barChild(root);
-		mDelta = ASCompat.coerce(delta != null ? barChild(delta) : null, starling.display.DisplayObject);
+		mDelta = delta != null ? barChild(delta) : null;
 		mTicker = ticker;
 		mCut = Std.isOfType(mBar, ArtDisplay) && cast(mBar, ArtDisplay).art.masked;
 		mDeltaCut = Std.isOfType(mDelta, ArtDisplay) && cast(mDelta, ArtDisplay).art.masked;
@@ -50,7 +50,7 @@ class StarlingBar implements IHudTick {
 
 	static function barChild(root:DisplayObject):DisplayObject {
 		var _loc2_ = ASCompat.reinterpretAs(root, DisplayObjectContainer);
-		var _loc3_ = ASCompat.coerce(_loc2_ != null ? _loc2_.getChildByName("bar") : null, starling.display.DisplayObject);
+		var _loc3_ = _loc2_ != null ? _loc2_.getChildByName("bar") : null;
 		return _loc3_ ?? root;
 	}
 

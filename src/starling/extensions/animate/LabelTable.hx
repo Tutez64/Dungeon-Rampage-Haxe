@@ -186,7 +186,7 @@ class LabelTable {
 
 	public function getNextLabel(afterLabel:String, currentFrame:Int):String {
 		var _loc3_ = if (ASCompat.stringAsBool(afterLabel)) afterLabel else labelAt(currentFrame);
-		var _loc4_ = ASCompat.coerce(_loc3_ != null ? ASCompat.dynamicAs(_ranges[_loc3_], LabelRange) : null, LabelRange);
+		var _loc4_ = _loc3_ != null ? ASCompat.dynamicAs(_ranges[_loc3_], LabelRange) : null;
 		return _loc4_ != null ? _loc4_.next : labelAfterFrame(-1, 0);
 	}
 

@@ -350,7 +350,7 @@ class StarlingLayer extends Sprite {
 		_loc6_ = first;
 		while (_loc6_ <= last) {
 			_loc5_ = ASCompat.reinterpretAs(getChildAt(_loc6_), StarlingScenerySprite);
-			_loc3_ = ASCompat.coerce(_loc5_ != null && !_loc5_.isMember ? _loc5_.bakeImage : null, starling.display.Image);
+			_loc3_ = _loc5_ != null && !_loc5_.isMember ? _loc5_.bakeImage : null;
 			if (_loc3_ == null) {
 				trackMaskCandidate(_loc5_);
 				_loc7_ = closeRun(_loc7_);
@@ -533,7 +533,7 @@ class StarlingLayer extends Sprite {
 		_loc4_ = 0;
 		while (_loc4_ < _loc2_) {
 			_loc3_ = ASCompat.reinterpretAs(getChildAt(_loc4_), StarlingScenerySprite);
-			_loc5_ = ASCompat.coerce(_loc3_ != null ? _loc3_.run : null, brain.starling.StarlingBakedRun);
+			_loc5_ = _loc3_ != null ? _loc3_.run : null;
 			if (_loc5_ != null) {
 				if (_loc5_.first < 0) {
 					_loc5_.first = _loc4_;
@@ -549,8 +549,8 @@ class StarlingLayer extends Sprite {
 				if (_loc8_ != null && _loc8_ != _loc5_) {
 					violateByOrder(_loc8_);
 				}
-				_loc8_ = ASCompat.coerce(_loc5_.seen < _loc5_.members.length ? _loc5_ : null, brain.starling.StarlingBakedRun);
-				_loc7_ = ASCompat.coerce(_loc8_ == null ? _loc5_ : null, brain.starling.StarlingBakedRun);
+				_loc8_ = _loc5_.seen < _loc5_.members.length ? _loc5_ : null;
+				_loc7_ = _loc8_ == null ? _loc5_ : null;
 			} else {
 				if (_loc8_ != null) {
 					violateByOrder(_loc8_);
@@ -737,9 +737,7 @@ class StarlingLayer extends Sprite {
 
 	override public function removeChildAt(index:Int, dispose:Bool = false):DisplayObject {
 		var _loc3_ = 0;
-		var _loc5_ = ASCompat.coerce(index >= 0
-			&& index < numChildren ? ASCompat.reinterpretAs(getChildAt(index), StarlingScenerySprite) : null,
-			brain.starling.StarlingScenerySprite);
+		var _loc5_ = index >= 0 && index < numChildren ? ASCompat.reinterpretAs(getChildAt(index), StarlingScenerySprite) : null;
 		var _loc4_ = _loc5_ != null ? mMaskCandidates.indexOf(_loc5_) : -1;
 		if (_loc4_ >= 0) {
 			if (!_loc5_.hasMaskRole) {

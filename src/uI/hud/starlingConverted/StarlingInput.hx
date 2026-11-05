@@ -67,9 +67,8 @@ class StarlingInput {
 		}
 		mFacade = facade;
 		mGroups = Vector.ofArray(([facade.sceneGraphManager.UILayerGroup] : Array<DisplayObjectContainer>));
-		var _loc2_ = ASCompat.coerce(mGroups[0].parent != null ? ASCompat.reinterpretAs(mGroups[0].parent.getChildByName("SceneGraphManager.UILayerGroupT"),
-			DisplayObjectContainer) : null,
-			flash.display.DisplayObjectContainer);
+		var _loc2_ = mGroups[0].parent != null ? ASCompat.reinterpretAs(mGroups[0].parent.getChildByName("SceneGraphManager.UILayerGroupT"),
+			DisplayObjectContainer) : null;
 		if (_loc2_ != null) {
 			mGroups.push(_loc2_);
 		}
@@ -175,7 +174,7 @@ class StarlingInput {
 				_loc6_--;
 			}
 		}
-		_loc2_ = ASCompat.coerce(_loc5_ >= 0 ? mWidgets[_loc5_] : null, uI.hud.starlingConverted.StarlingButton);
+		_loc2_ = _loc5_ >= 0 ? mWidgets[_loc5_] : null;
 		setHover(_loc2_, _loc5_ >= 0 && mCursors[_loc5_]);
 		if (_loc5_ >= 0 && mHoverOnly[_loc5_]) {
 			_loc2_ = null;
