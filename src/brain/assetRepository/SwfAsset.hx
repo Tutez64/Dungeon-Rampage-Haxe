@@ -373,6 +373,7 @@ class SwfAsset extends Asset {
 			if (fontPath == null) {
 				return;
 			}
+			pointHtmlFontAt(textField, format.font, fontPath);
 			format.font = fontPath;
 			textField.embedFonts = true;
 			textField.defaultTextFormat = format;
@@ -539,6 +540,20 @@ class SwfAsset extends Asset {
 		}
 	}
 
+	/**
+		OpenFL keeps the HTML a text field was given and returns it as htmlText, unlike Flash, which writes it
+		from the field's formats. Code restoring a field from its htmlText would then go back to the font
+		name of the SWF, which names other SWFs' exports too, with other glyphs and metrics: the HTML of a
+		field also names the exported font of its own SWF.
+	**/
+	static function pointHtmlFontAt(textField:TextField, fontName:String, fontPath:String):Void {
+		var html:String = @:privateAccess textField.__htmlText;
+		if (!@:privateAccess textField.__isHTML || html == null || fontName == fontPath) {
+			return;
+		}
+		@:privateAccess textField.__htmlText = StringTools.replace(html, 'face="' + fontName + '"', 'face="' + fontPath + '"');
+	}
+
 	static function applyExportedFontPathRecursive(target:DisplayObject, fontPath:String, className:String):Void {
 		var textField:TextField = ASCompat.dynamicAs(target, TextField);
 		var container:DisplayObjectContainer = null;
@@ -563,6 +578,7 @@ class SwfAsset extends Asset {
 			if (format == null || format.font == null || isDeviceFontName(format.font)) {
 				return;
 			}
+			pointHtmlFontAt(textField, format.font, fontPath);
 			format.font = fontPath;
 			textField.embedFonts = true;
 			textField.defaultTextFormat = format;
