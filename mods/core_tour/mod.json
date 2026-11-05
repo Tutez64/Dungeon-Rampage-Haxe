@@ -5,7 +5,7 @@
   "author": "DRH",
   "api": "1.0",
   "uses": ["extends"],
-  "drh": "14",
+  "drh": "14-16",
   "entry": "Main",
   "dependencies": {}
 }
