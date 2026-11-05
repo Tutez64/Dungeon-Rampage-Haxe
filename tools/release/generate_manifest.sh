@@ -26,8 +26,11 @@ Expected archives in DIST_DIR:
   Dungeon.Rampage.Haxe.VERSION.Windows.zip
   Dungeon.Rampage.Haxe.VERSION.macOS.zip
 
-The script derives frame-rate metadata from src/DungeonBustersProject.hx
-and keeps tools/release/launch_options.tsv synchronized with
+The script derives frame-rate metadata from src/DungeonBustersProject.hx,
+or writes frame_rate_in_game when the game sets its frame rate in its own
+settings (src/settings/model/SettingsCatalog.hx, since Dungeon Rampage 1.0).
+Launch options that are also settings there get in_game: true.
+It keeps tools/release/launch_options.tsv synchronized with
 src/brain/utils/FeatureFlags.hx:
   - removed options are removed from launch_options.tsv
   - flag names, config keys and default values are refreshed from source
@@ -312,6 +315,16 @@ with options_file.open(newline="", encoding="utf-8") as file:
 source_file = project_file.parent / "src" / "DungeonBustersProject.hx"
 source = source_file.read_text(encoding="utf-8")
 
+# Since Dungeon Rampage 1.0 the game has its own settings menu: the frame rate and some of the
+# feature flags are set there, and SettingsCatalog names the flag behind each setting.
+settings_catalog_file = project_file.parent / "src" / "settings" / "model" / "SettingsCatalog.hx"
+settings_catalog = (
+    settings_catalog_file.read_text(encoding="utf-8") if settings_catalog_file.is_file() else ""
+)
+for argument in game_arguments:
+    if f'"{argument["name"]}"' in settings_catalog:
+        argument["in_game"] = True
+
 
 def float_constant(name: str) -> int:
     match = re.search(
@@ -327,57 +340,68 @@ flag_match = re.search(
     r'static\s+inline\s+final\s+FRAME_RATE_ARGUMENT:String\s*=\s*"([^"]+)";',
     source,
 )
-if flag_match is None:
-    raise SystemExit(f"Could not read FRAME_RATE_ARGUMENT from {source_file}")
-
-flag = flag_match.group(1)
-custom_min = float_constant("MIN_FRAME_RATE")
-custom_max = float_constant("MAX_FRAME_RATE")
-auto_fallback = float_constant("AUTO_FRAME_RATE_FALLBACK")
-auto_step = float_constant("AUTO_FRAME_RATE_STEP")
-auto_maximum = float_constant("AUTO_FRAME_RATE_MAXIMUM")
-if not flag.startswith("--") or len(flag) <= 2:
-    raise SystemExit(f"Invalid FRAME_RATE_ARGUMENT in {source_file}: {flag!r}")
-if custom_min <= 0 or custom_max < custom_min:
-    raise SystemExit(f"Invalid custom frame-rate range in {source_file}")
-if auto_step <= 0 or auto_maximum < auto_step or auto_maximum % auto_step != 0:
-    raise SystemExit(f"Invalid automatic frame-rate policy in {source_file}")
-if (
-    auto_fallback < auto_step
-    or auto_fallback > auto_maximum
-    or auto_fallback % auto_step != 0
-):
-    raise SystemExit(f"Automatic frame-rate fallback must be one of the generated presets in {source_file}")
-if auto_step < custom_min or auto_maximum > custom_max:
-    raise SystemExit(f"Frame-rate presets must fit inside the custom range in {source_file}")
-
-frame_rate = {
-    "flag": flag,
-    "auto": {
-        "fallback": auto_fallback,
-        "step": auto_step,
-        "maximum": auto_maximum,
-    },
-    "custom_min": custom_min,
-    "custom_max": custom_max,
-}
-
-window = ET.parse(project_file).getroot().find("window")
-project_default = None if window is None else window.get("fps")
-if project_default != str(auto_fallback):
+frame_rate_in_game = flag_match is None and re.search(r'\.setting\("fps"\)', settings_catalog) is not None
+if flag_match is None and not frame_rate_in_game:
     raise SystemExit(
-        f"AUTO_FRAME_RATE_FALLBACK in {source_file} ({auto_fallback}) does not match "
-        f"{project_file} ({project_default!r})"
+        f"Could not read FRAME_RATE_ARGUMENT from {source_file}, "
+        f"nor an fps setting from {settings_catalog_file}"
     )
+
+def read_frame_rate() -> dict:
+    flag = flag_match.group(1)
+    custom_min = float_constant("MIN_FRAME_RATE")
+    custom_max = float_constant("MAX_FRAME_RATE")
+    auto_fallback = float_constant("AUTO_FRAME_RATE_FALLBACK")
+    auto_step = float_constant("AUTO_FRAME_RATE_STEP")
+    auto_maximum = float_constant("AUTO_FRAME_RATE_MAXIMUM")
+    if not flag.startswith("--") or len(flag) <= 2:
+        raise SystemExit(f"Invalid FRAME_RATE_ARGUMENT in {source_file}: {flag!r}")
+    if custom_min <= 0 or custom_max < custom_min:
+        raise SystemExit(f"Invalid custom frame-rate range in {source_file}")
+    if auto_step <= 0 or auto_maximum < auto_step or auto_maximum % auto_step != 0:
+        raise SystemExit(f"Invalid automatic frame-rate policy in {source_file}")
+    if (
+        auto_fallback < auto_step
+        or auto_fallback > auto_maximum
+        or auto_fallback % auto_step != 0
+    ):
+        raise SystemExit(f"Automatic frame-rate fallback must be one of the generated presets in {source_file}")
+    if auto_step < custom_min or auto_maximum > custom_max:
+        raise SystemExit(f"Frame-rate presets must fit inside the custom range in {source_file}")
+
+    frame_rate = {
+        "flag": flag,
+        "auto": {
+            "fallback": auto_fallback,
+            "step": auto_step,
+            "maximum": auto_maximum,
+        },
+        "custom_min": custom_min,
+        "custom_max": custom_max,
+    }
+
+    window = ET.parse(project_file).getroot().find("window")
+    project_default = None if window is None else window.get("fps")
+    if project_default != str(auto_fallback):
+        raise SystemExit(
+            f"AUTO_FRAME_RATE_FALLBACK in {source_file} ({auto_fallback}) does not match "
+            f"{project_file} ({project_default!r})"
+        )
+    return frame_rate
+
+
+launch_options = {"game_arguments": game_arguments}
+if frame_rate_in_game:
+    # the frame rate is set in the game's settings, not from the command line
+    launch_options = {"frame_rate_in_game": True, **launch_options}
+else:
+    launch_options = {"frame_rate": read_frame_rate(), **launch_options}
 
 manifest = {
     "version": version,
     "steam_buildid": steam_buildid,
     "platforms": platforms,
-    "launch_options": {
-        "frame_rate": frame_rate,
-        "game_arguments": game_arguments,
-    },
+    "launch_options": launch_options,
 }
 
 output.write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")

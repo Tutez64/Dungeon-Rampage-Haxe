@@ -28,8 +28,7 @@ on Steam and keep Steam open while playing. Otherwise, DRH cannot connect to the
 ## Why use DRH?
 
 The official game can run poorly and suffer from input delay issues.
-DRH supports a configurable frame rate, with 120 FPS as its built-in default, instead
-of the official game's fixed 24 FPS. It usually provides much better performance,
+DRH is a native build: it usually provides much better performance,
 especially in **Quality** mode, and avoids the input delay issue.
 
 Like the official game, restarting before each new party is recommended because performance can degrade over time.
@@ -153,10 +152,9 @@ For a debug build, append `-debug`.
 
 Replace `build` with `test` if you want the game to launch automatically after compiling.
 
-Native builds accept `--fps auto` or `--fps <value>` to override the default
-frame rate at launch. `auto` selects the first 24 FPS step at or above the primary display refresh
-rate, up to 240 FPS, with a 120 FPS fallback. [DRH Launcher](https://github.com/Tutez64/DRH-Launcher) defaults to `auto`
-and provides matching 24 FPS presets; manual values from 1 to 10000 are also accepted.
+Since V16, as in the official game, the frame rate is set in the game's options (**Display**, **FPS**).
+Earlier native builds accept `--fps auto` or `--fps <value>` instead, which
+[DRH Launcher](https://github.com/Tutez64/DRH-Launcher) sets for them.
 
 ## License and disclaimer
 
