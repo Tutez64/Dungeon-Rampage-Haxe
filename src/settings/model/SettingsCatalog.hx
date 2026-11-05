@@ -19,7 +19,7 @@ class SettingsCatalog {
 
 	public function new(dbFacade:DBFacade) {
 		var _loc3_:SettingDefinition;
-		var __ax4_iter_455:Vector<SettingDefinition>;
+		var __ax4_iter_465:Vector<SettingDefinition>;
 
 		mDBFacade = dbFacade;
 		mDefinitions = new Vector<SettingDefinition>();
@@ -36,9 +36,9 @@ class SettingsCatalog {
 		if (checkNullIteratee(_loc4_))
 			for (_tmp_ in _loc4_) {
 				_loc2_ = _tmp_;
-				__ax4_iter_455 = _loc2_.build();
-				if (checkNullIteratee(__ax4_iter_455))
-					for (_tmp_ in __ax4_iter_455) {
+				__ax4_iter_465 = _loc2_.build();
+				if (checkNullIteratee(__ax4_iter_465))
+					for (_tmp_ in __ax4_iter_465) {
 						_loc3_ = _tmp_;
 						mDefinitions.push(_loc3_);
 						mDefinitionsById[_loc3_.id] = _loc3_;
@@ -71,9 +71,9 @@ class SettingsCatalog {
 	public function getDefinitionsForCategory(category:String):Vector<SettingDefinition> {
 		var _loc2_ = new Vector<SettingDefinition>();
 		var _loc3_:SettingDefinition;
-		final __ax4_iter_456 = mDefinitions;
-		if (checkNullIteratee(__ax4_iter_456))
-			for (_tmp_ in __ax4_iter_456) {
+		final __ax4_iter_466 = mDefinitions;
+		if (checkNullIteratee(__ax4_iter_466))
+			for (_tmp_ in __ax4_iter_466) {
 				_loc3_ = _tmp_;
 				if (_loc3_.category == category) {
 					_loc2_.push(_loc3_);
@@ -84,9 +84,9 @@ class SettingsCatalog {
 
 	public function destroy() {
 		var _loc1_:SettingDefinition;
-		final __ax4_iter_457 = mDefinitions;
-		if (checkNullIteratee(__ax4_iter_457))
-			for (_tmp_ in __ax4_iter_457) {
+		final __ax4_iter_467 = mDefinitions;
+		if (checkNullIteratee(__ax4_iter_467))
+			for (_tmp_ in __ax4_iter_467) {
 				_loc1_ = _tmp_;
 				if (_loc1_.binding != null) {
 					_loc1_.binding.destroy();
@@ -138,9 +138,9 @@ class SettingsCatalog {
 		startupFlag(_loc1_, "steamInput");
 		_loc1_.flag("controllerRumble", "want-controller-rumble");
 		var _loc2_:String;
-		final __ax4_iter_458 = InputAction.ORDERED;
-		if (checkNullIteratee(__ax4_iter_458))
-			for (_tmp_ in __ax4_iter_458) {
+		final __ax4_iter_468 = InputAction.ORDERED;
+		if (checkNullIteratee(__ax4_iter_468))
+			for (_tmp_ in __ax4_iter_468) {
 				_loc2_ = _tmp_;
 				_loc1_.setting(SettingIds.keyBindingIdFor(_loc2_))
 					.keyBinding(_loc2_)

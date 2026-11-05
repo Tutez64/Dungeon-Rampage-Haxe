@@ -142,16 +142,16 @@ class EffectManager {
 
 	public function destroy() {
 		var _loc2_:ASFunction;
-		var __ax4_iter_356:ASDictionary<ASAny, ASAny>;
+		var __ax4_iter_366:ASDictionary<ASAny, ASAny>;
 		var _loc1_:ASFunction;
 		var _loc5_:Array<ASAny> = null;
 		var _loc4_:IMapIterator = null;
 		var _loc3_:EffectGameObject = null;
 		if (mOutstandingEffects != null) {
 			_loc5_ = [];
-			__ax4_iter_356 = mOutstandingEffects;
-			if (checkNullIteratee(__ax4_iter_356))
-				for (_tmp_ in __ax4_iter_356) {
+			__ax4_iter_366 = mOutstandingEffects;
+			if (checkNullIteratee(__ax4_iter_366))
+				for (_tmp_ in __ax4_iter_366) {
 					_loc2_ = ASCompat.coerceFunction(_tmp_);
 					_loc5_.push(_loc2_);
 				}

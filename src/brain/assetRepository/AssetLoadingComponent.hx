@@ -138,9 +138,9 @@ class AssetLoadingComponent extends Component {
 
 	static function rootClipLabels(folder:File):ASObject {
 		var _loc8_:ASObject;
-		var __ax4_iter_377:ASAny;
+		var __ax4_iter_387:ASAny;
 		var _loc11_:ASObject;
-		var __ax4_iter_378:ASAny;
+		var __ax4_iter_388:ASAny;
 		var _loc9_:ASObject = null;
 		var _loc5_:File = null;
 		var _loc4_:FileStream = null;
@@ -174,16 +174,16 @@ class AssetLoadingComponent extends Component {
 						_loc10_.TL
 					else
 						_loc10_.TIMELINE:null;
-					__ax4_iter_377 = _loc6_ != null ?if (ASCompat.toBool(_loc6_.L))
+					__ax4_iter_387 = _loc6_ != null ?if (ASCompat.toBool(_loc6_.L))
 						_loc6_.L
 					else
 						_loc6_.LAYERS:null;
-					if (checkNullIteratee(__ax4_iter_377))
-						for (_tmp_ in __ax4_iter_377) {
+					if (checkNullIteratee(__ax4_iter_387))
+						for (_tmp_ in __ax4_iter_387) {
 							_loc8_ = _tmp_;
-							__ax4_iter_378 = if (ASCompat.toBool(_loc8_.FR)) _loc8_.FR else _loc8_.Frames;
-							if (checkNullIteratee(__ax4_iter_378))
-								for (_tmp_ in __ax4_iter_378) {
+							__ax4_iter_388 = if (ASCompat.toBool(_loc8_.FR)) _loc8_.FR else _loc8_.Frames;
+							if (checkNullIteratee(__ax4_iter_388))
+								for (_tmp_ in __ax4_iter_388) {
 									_loc11_ = _tmp_;
 									_loc7_ = if (ASCompat.toBool(_loc11_.N)) _loc11_.N else _loc11_.name;
 									if (ASCompat.stringAsBool(_loc7_)) {
@@ -302,9 +302,9 @@ class AssetLoadingComponent extends Component {
 		var _loc2_ = new AnimAssetManager();
 		_loc2_.verbose = false;
 		var _loc1_:ASObject;
-		final __ax4_iter_379 = mBundleFactories;
-		if (checkNullIteratee(__ax4_iter_379))
-			for (_tmp_ in __ax4_iter_379) {
+		final __ax4_iter_389 = mBundleFactories;
+		if (checkNullIteratee(__ax4_iter_389))
+			for (_tmp_ in __ax4_iter_389) {
 				_loc1_ = _tmp_;
 				_loc2_.registerFactory(ASCompat.coerce(_loc1_.factory, starling.assets.AssetFactory), ASCompat.toInt(_loc1_.priority));
 			}
@@ -360,7 +360,7 @@ class AssetLoadingComponent extends Component {
 			return;
 		}
 		queueStarlingAssetsForPath(assetPath, function() {
-			var __ax4_iter_380:Array<ASAny>;
+			var __ax4_iter_390:Array<ASAny>;
 			var className:String;
 			var libraryKey:String;
 			var atlasFolder:File;
@@ -374,9 +374,9 @@ class AssetLoadingComponent extends Component {
 			if (checkNullIteratee(animatedClassNames))
 				for (_tmp_ in animatedClassNames) {
 					className = _tmp_;
-					__ax4_iter_380 = [biomeKey, "shared"];
-					if (checkNullIteratee(__ax4_iter_380))
-						for (_tmp_ in __ax4_iter_380) {
+					__ax4_iter_390 = [biomeKey, "shared"];
+					if (checkNullIteratee(__ax4_iter_390))
+						for (_tmp_ in __ax4_iter_390) {
 							libraryKey = _tmp_;
 							atlasFolder = StarlingAssetMapper.getPropAtlasFile(libraryKey, className);
 							if (atlasFolder != null) {
@@ -402,7 +402,7 @@ class AssetLoadingComponent extends Component {
 	public function queueStarlingAssets(biomeKey:String, onComplete:ASFunction = null, isFloorRequest:Bool = false, assetFiles:Array<ASAny> = null,
 			isBackground:Bool = false, backgroundTier:Int = 3) {
 		var _loc12_:String;
-		var __ax4_iter_381:Vector<String>;
+		var __ax4_iter_391:Vector<String>;
 		var _loc8_:Vector<ASFunction> = /*undefined*/ null;
 		var _loc11_ = false;
 		if (mStarlingAssetManager == null) {
@@ -440,9 +440,9 @@ class AssetLoadingComponent extends Component {
 			}
 		}
 		if (isFloorRequest) {
-			__ax4_iter_381 = mPendingBiomeKeys;
-			if (checkNullIteratee(__ax4_iter_381))
-				for (_tmp_ in __ax4_iter_381) {
+			__ax4_iter_391 = mPendingBiomeKeys;
+			if (checkNullIteratee(__ax4_iter_391))
+				for (_tmp_ in __ax4_iter_391) {
 					_loc12_ = _tmp_;
 					if (_loc12_ != biomeKey && ASCompat.toBool(mFloorRequestKeys[_loc12_])) {
 						ASCompat.deleteProperty(mFloorRequestKeys, _loc12_);
@@ -608,9 +608,9 @@ class AssetLoadingComponent extends Component {
 	function loadingBlockingCount():Int {
 		var _loc1_ = 0;
 		var _loc2_:String;
-		final __ax4_iter_382 = mLoadingBiomeKeys;
-		if (checkNullIteratee(__ax4_iter_382))
-			for (_tmp_ in __ax4_iter_382) {
+		final __ax4_iter_392 = mLoadingBiomeKeys;
+		if (checkNullIteratee(__ax4_iter_392))
+			for (_tmp_ in __ax4_iter_392) {
 				_loc2_ = _tmp_;
 				if (!ASCompat.toBool(mBackgroundKeys[_loc2_])) {
 					_loc1_++;
@@ -622,9 +622,9 @@ class AssetLoadingComponent extends Component {
 	function pendingBlockingCount():Int {
 		var _loc1_ = 0;
 		var _loc2_:String;
-		final __ax4_iter_383 = mPendingBiomeKeys;
-		if (checkNullIteratee(__ax4_iter_383))
-			for (_tmp_ in __ax4_iter_383) {
+		final __ax4_iter_393 = mPendingBiomeKeys;
+		if (checkNullIteratee(__ax4_iter_393))
+			for (_tmp_ in __ax4_iter_393) {
 				_loc2_ = _tmp_;
 				if (!ASCompat.toBool(mBackgroundKeys[_loc2_])) {
 					_loc1_++;
@@ -643,9 +643,9 @@ class AssetLoadingComponent extends Component {
 			return false;
 		}
 		var _loc2_:String;
-		final __ax4_iter_384:ASObject = mFloorKeysLoading;
-		if (checkNullIteratee(__ax4_iter_384))
-			for (_tmp_ in __ax4_iter_384.___keys()) {
+		final __ax4_iter_394:ASObject = mFloorKeysLoading;
+		if (checkNullIteratee(__ax4_iter_394))
+			for (_tmp_ in __ax4_iter_394.___keys()) {
 				_loc2_ = _tmp_;
 				if (_loc2_ != biomeKey) {
 					return true;
@@ -655,9 +655,9 @@ class AssetLoadingComponent extends Component {
 			return false;
 		}
 		var _loc3_:String;
-		final __ax4_iter_385 = mLoadingBiomeKeys;
-		if (checkNullIteratee(__ax4_iter_385))
-			for (_tmp_ in __ax4_iter_385) {
+		final __ax4_iter_395 = mLoadingBiomeKeys;
+		if (checkNullIteratee(__ax4_iter_395))
+			for (_tmp_ in __ax4_iter_395) {
 				_loc3_ = _tmp_;
 				if (!ASCompat.toBool(mBackgroundKeys[_loc3_]) && isStaleAtSwitch(_loc3_, _loc4_)) {
 					return true;
@@ -716,9 +716,9 @@ class AssetLoadingComponent extends Component {
 		var _loc4_:String = null;
 		var _loc6_:String = null;
 		var _loc2_:Array<ASAny>;
-		final __ax4_iter_386:ASObject = mLoadingAssetFiles;
-		if (checkNullIteratee(__ax4_iter_386))
-			for (_tmp_ in iterateDynamicValues(__ax4_iter_386)) {
+		final __ax4_iter_396:ASObject = mLoadingAssetFiles;
+		if (checkNullIteratee(__ax4_iter_396))
+			for (_tmp_ in iterateDynamicValues(__ax4_iter_396)) {
 				_loc2_ = ASCompat.coerce(_tmp_, Array);
 				if (checkNullIteratee(files))
 					for (_tmp_ in files) {
@@ -906,9 +906,9 @@ class AssetLoadingComponent extends Component {
 		}
 		var _loc1_ = mStarlingAssetManager.getAssetNames("texture", "", false).length;
 		var _loc2_:AnimAssetManager;
-		final __ax4_iter_387:ASObject = mBundleManagers;
-		if (checkNullIteratee(__ax4_iter_387))
-			for (_tmp_ in iterateDynamicValues(__ax4_iter_387)) {
+		final __ax4_iter_397:ASObject = mBundleManagers;
+		if (checkNullIteratee(__ax4_iter_397))
+			for (_tmp_ in iterateDynamicValues(__ax4_iter_397)) {
 				_loc2_ = ASCompat.coerce(_tmp_, starling.extensions.animate.AnimAssetManager);
 				_loc1_ += _loc2_.getAssetNames("texture", "", false).length;
 			}
@@ -927,9 +927,9 @@ class AssetLoadingComponent extends Component {
 		var _loc3_ = false;
 		var _loc4_:Array<ASAny> = [];
 		var _loc5_:String;
-		final __ax4_iter_388:ASObject = mLoadedBiomeKeys;
-		if (checkNullIteratee(__ax4_iter_388))
-			for (_tmp_ in __ax4_iter_388.___keys()) {
+		final __ax4_iter_398:ASObject = mLoadedBiomeKeys;
+		if (checkNullIteratee(__ax4_iter_398))
+			for (_tmp_ in __ax4_iter_398.___keys()) {
 				_loc5_ = _tmp_;
 				_loc3_ = _loc5_ == StarlingAssetMapper.getPropsOnlyKey(newFloorBiome)
 					&& ASCompat.toNumber(mKeyLastUsed[_loc5_]) < switchGeneration;
@@ -968,9 +968,9 @@ class AssetLoadingComponent extends Component {
 		mEntryBegun = true;
 		var _loc2_:Array<ASAny> = [];
 		var _loc3_:String;
-		final __ax4_iter_389 = mPendingBiomeKeys;
-		if (checkNullIteratee(__ax4_iter_389))
-			for (_tmp_ in __ax4_iter_389) {
+		final __ax4_iter_399 = mPendingBiomeKeys;
+		if (checkNullIteratee(__ax4_iter_399))
+			for (_tmp_ in __ax4_iter_399) {
 				_loc3_ = _tmp_;
 				if (ASCompat.toBool(mBackgroundKeys[_loc3_]) && ASCompat.toNumber(mKeyLastUsed[_loc3_]) < mFloorGeneration) {
 					_loc2_.push(_loc3_);
@@ -1010,9 +1010,9 @@ class AssetLoadingComponent extends Component {
 		}
 		var _loc2_:Array<ASAny> = [];
 		var _loc3_:String;
-		final __ax4_iter_390:ASObject = mLoadedBiomeKeys;
-		if (checkNullIteratee(__ax4_iter_390))
-			for (_tmp_ in __ax4_iter_390.___keys()) {
+		final __ax4_iter_400:ASObject = mLoadedBiomeKeys;
+		if (checkNullIteratee(__ax4_iter_400))
+			for (_tmp_ in __ax4_iter_400.___keys()) {
 				_loc3_ = _tmp_;
 				if (_loc3_ != mCurrentFloorBiome
 					&& !isKeptResident(_loc3_)
@@ -1036,9 +1036,9 @@ class AssetLoadingComponent extends Component {
 				disposeBundle(_loc2_);
 			}
 		var _loc3_:String;
-		final __ax4_iter_391 = mCallbackKeyOrder.concat();
-		if (checkNullIteratee(__ax4_iter_391))
-			for (_tmp_ in __ax4_iter_391) {
+		final __ax4_iter_401 = mCallbackKeyOrder.concat();
+		if (checkNullIteratee(__ax4_iter_401))
+			for (_tmp_ in __ax4_iter_401) {
 				_loc3_ = _tmp_;
 				if (keys.indexOf(_loc3_) != -1) {
 					flushBiomeKeyCallbacks(_loc3_);
@@ -1128,9 +1128,9 @@ class AssetLoadingComponent extends Component {
 		var _loc7_ = isSharedUnresolved();
 		var _loc5_:Array<ASAny> = [];
 		var _loc8_:String;
-		final __ax4_iter_392 = mCallbackKeyOrder;
-		if (checkNullIteratee(__ax4_iter_392))
-			for (_tmp_ in __ax4_iter_392) {
+		final __ax4_iter_402 = mCallbackKeyOrder;
+		if (checkNullIteratee(__ax4_iter_402))
+			for (_tmp_ in __ax4_iter_402) {
 				_loc8_ = _tmp_;
 				if (ASCompat.toBool(mLoadedBiomeKeys[_loc8_])
 					&& !ASCompat.toBool(mFloorRequestKeys[_loc8_])
@@ -1178,9 +1178,9 @@ class AssetLoadingComponent extends Component {
 	public function get_starlingLoadProgress():Float {
 		var _loc1_:Float = 0;
 		var _loc2_:String;
-		final __ax4_iter_393:ASObject = mLoadingProgress;
-		if (checkNullIteratee(__ax4_iter_393))
-			for (_tmp_ in __ax4_iter_393.___keys()) {
+		final __ax4_iter_403:ASObject = mLoadingProgress;
+		if (checkNullIteratee(__ax4_iter_403))
+			for (_tmp_ in __ax4_iter_403.___keys()) {
 				_loc2_ = _tmp_;
 				if (!ASCompat.toBool(mBackgroundKeys[_loc2_])) {
 					_loc1_ += ASCompat.toNumber(mLoadingProgress[_loc2_]);
@@ -1244,9 +1244,9 @@ class AssetLoadingComponent extends Component {
 	function getPublishedTexture(textureName:String):Texture {
 		var _loc2_:Texture = null;
 		var _loc3_:String;
-		final __ax4_iter_394:ASObject = mBundleManagers;
-		if (checkNullIteratee(__ax4_iter_394))
-			for (_tmp_ in __ax4_iter_394.___keys()) {
+		final __ax4_iter_404:ASObject = mBundleManagers;
+		if (checkNullIteratee(__ax4_iter_404))
+			for (_tmp_ in __ax4_iter_404.___keys()) {
 				_loc3_ = _tmp_;
 				_loc2_ = getBundleTexture(_loc3_, textureName);
 				if (_loc2_ != null) {
@@ -1287,9 +1287,9 @@ class AssetLoadingComponent extends Component {
 			}
 		}
 		var _loc4_:String;
-		final __ax4_iter_395:ASObject = mPropManifests;
-		if (checkNullIteratee(__ax4_iter_395))
-			for (_tmp_ in __ax4_iter_395.___keys()) {
+		final __ax4_iter_405:ASObject = mPropManifests;
+		if (checkNullIteratee(__ax4_iter_405))
+			for (_tmp_ in __ax4_iter_405.___keys()) {
 				_loc4_ = _tmp_;
 				if (_loc3_ != null) {
 					break;
@@ -1320,7 +1320,7 @@ class AssetLoadingComponent extends Component {
 
 	function findAnimationBundle(animationName:String, libraryKey:String, binds:Bool = false):AnimAssetManager {
 		var _loc8_:String;
-		var __ax4_iter_396:Array<ASAny>;
+		var __ax4_iter_406:Array<ASAny>;
 		var _loc7_:Vector<String>;
 		var _loc4_:String;
 		if (mStarlingAssetManager == null) {
@@ -1339,9 +1339,9 @@ class AssetLoadingComponent extends Component {
 		var _loc10_ = _loc9_[0];
 		var _loc5_:String = null;
 		if (libraryKey != null) {
-			__ax4_iter_396 = [libraryKey, "shared"];
-			if (checkNullIteratee(__ax4_iter_396))
-				for (_tmp_ in __ax4_iter_396) {
+			__ax4_iter_406 = [libraryKey, "shared"];
+			if (checkNullIteratee(__ax4_iter_406))
+				for (_tmp_ in __ax4_iter_406) {
 					_loc8_ = _tmp_;
 					if (checkNullIteratee(_loc6_))
 						for (_tmp_ in _loc6_) {
@@ -1390,9 +1390,9 @@ class AssetLoadingComponent extends Component {
 		}
 		var _loc3_:String = null;
 		var _loc2_:String;
-		final __ax4_iter_397:ASAny = mAtlasOwners[atlasName];
-		if (checkNullIteratee(__ax4_iter_397))
-			for (_tmp_ in __ax4_iter_397) {
+		final __ax4_iter_407:ASAny = mAtlasOwners[atlasName];
+		if (checkNullIteratee(__ax4_iter_407))
+			for (_tmp_ in __ax4_iter_407) {
 				_loc2_ = _tmp_;
 				_loc4_ = ASCompat.coerce(mBundleManagers[_loc2_], starling.extensions.animate.AnimAssetManager);
 				if (_loc4_ != null

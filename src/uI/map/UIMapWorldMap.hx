@@ -375,9 +375,9 @@ class UIMapWorldMap {
 		var _loc2_:UIButton = null;
 		var _loc3_:UIButton = null;
 		var _loc1_:Array<ASAny>;
-		final __ax4_iter_513 = LEAGUE_BOUNDARY_NODE_IDS;
-		if (checkNullIteratee(__ax4_iter_513))
-			for (_tmp_ in __ax4_iter_513) {
+		final __ax4_iter_523 = LEAGUE_BOUNDARY_NODE_IDS;
+		if (checkNullIteratee(__ax4_iter_523))
+			for (_tmp_ in __ax4_iter_523) {
 				_loc1_ = ASCompat.coerce(_tmp_, Array);
 				_loc2_ = ASCompat.coerce(mOpenNodeButtons.itemFor(_loc1_[0]), brain.uI.UIButton);
 				_loc3_ = ASCompat.coerce(mOpenNodeButtons.itemFor(_loc1_[1]), brain.uI.UIButton);
@@ -904,7 +904,7 @@ class UIMapWorldMap {
 
 	public function deinit() {
 		var _loc1_:UIButton;
-		var __ax4_iter_514:Array<ASAny>;
+		var __ax4_iter_524:Array<ASAny>;
 		mTownStateMachine = null;
 		mDidDrag = false;
 		mShowedDragMessage = false;
@@ -968,9 +968,9 @@ class UIMapWorldMap {
 			mMapDragTask = null;
 		}
 		if (mOpenNodeButtons != null) {
-			__ax4_iter_514 = mOpenNodeButtons.toArray();
-			if (checkNullIteratee(__ax4_iter_514))
-				for (_tmp_ in __ax4_iter_514) {
+			__ax4_iter_524 = mOpenNodeButtons.toArray();
+			if (checkNullIteratee(__ax4_iter_524))
+				for (_tmp_ in __ax4_iter_524) {
 					_loc1_ = ASCompat.coerce(_tmp_, brain.uI.UIButton);
 					_loc1_.enabled = false;
 					_loc1_.destroy();
@@ -1296,9 +1296,9 @@ class UIMapWorldMap {
 
 	function hasLockedNextNode(node:GMMapNode):Bool {
 		var _loc2_:GMMapNode;
-		final __ax4_iter_515 = node.ChildNodes;
-		if (checkNullIteratee(__ax4_iter_515))
-			for (_tmp_ in __ax4_iter_515) {
+		final __ax4_iter_525 = node.ChildNodes;
+		if (checkNullIteratee(__ax4_iter_525))
+			for (_tmp_ in __ax4_iter_525) {
 				_loc2_ = ASCompat.coerce(_tmp_, gameMasterDictionary.GMMapNode);
 				if (_loc2_ != null) {
 					if (mapNodeLocked(_loc2_)) {
@@ -1312,9 +1312,9 @@ class UIMapWorldMap {
 	function hasUnlockedChild(node:GMMapNode):Bool {
 		var _loc2_:GMMapNode = null;
 		var _loc3_:String;
-		final __ax4_iter_516 = node.RevealNodes;
-		if (checkNullIteratee(__ax4_iter_516))
-			for (_tmp_ in __ax4_iter_516) {
+		final __ax4_iter_526 = node.RevealNodes;
+		if (checkNullIteratee(__ax4_iter_526))
+			for (_tmp_ in __ax4_iter_526) {
 				_loc3_ = _tmp_;
 				if (ASCompat.stringAsBool(_loc3_)) {
 					_loc2_ = ASCompat.coerce(mDBFacade.gameMaster.mapNodeByConstant.itemFor(_loc3_), gameMasterDictionary.GMMapNode);
@@ -1364,9 +1364,9 @@ class UIMapWorldMap {
 		var _loc7_:Float = 0.15;
 		var _loc4_ = hasUnlockedChild(node);
 		var _loc8_:String;
-		final __ax4_iter_517 = node.RevealNodes;
-		if (checkNullIteratee(__ax4_iter_517))
-			for (_tmp_ in __ax4_iter_517) {
+		final __ax4_iter_527 = node.RevealNodes;
+		if (checkNullIteratee(__ax4_iter_527))
+			for (_tmp_ in __ax4_iter_527) {
 				_loc8_ = _tmp_;
 				if (ASCompat.stringAsBool(_loc8_)) {
 					_loc3_ = ASCompat.coerce(mDBFacade.gameMaster.mapNodeByConstant.itemFor(_loc8_), gameMasterDictionary.GMMapNode);

@@ -227,9 +227,9 @@ class SettingsList {
 			_loc1_++;
 		}
 		var _loc2_:SettingRow;
-		final __ax4_iter_401 = mRows;
-		if (checkNullIteratee(__ax4_iter_401))
-			for (_tmp_ in __ax4_iter_401) {
+		final __ax4_iter_411 = mRows;
+		if (checkNullIteratee(__ax4_iter_411))
+			for (_tmp_ in __ax4_iter_411) {
 				_loc2_ = _tmp_;
 				_loc2_.leftNavigationAdditionalInteraction = _loc2_.nudgeDown;
 				_loc2_.rightNavigationAdditionalInteraction = _loc2_.nudgeUp;
@@ -251,9 +251,9 @@ class SettingsList {
 
 	function destroyRows() {
 		var _loc1_:SettingRow;
-		final __ax4_iter_402 = mRows;
-		if (checkNullIteratee(__ax4_iter_402))
-			for (_tmp_ in __ax4_iter_402) {
+		final __ax4_iter_412 = mRows;
+		if (checkNullIteratee(__ax4_iter_412))
+			for (_tmp_ in __ax4_iter_412) {
 				_loc1_ = _tmp_;
 				if (_loc1_.root != null && _loc1_.root.parent != null) {
 					_loc1_.root.parent.removeChild(_loc1_.root);
@@ -266,9 +266,9 @@ class SettingsList {
 
 	function onSettingChanged(id:String) {
 		var _loc2_:SettingRow;
-		final __ax4_iter_403 = mRows;
-		if (checkNullIteratee(__ax4_iter_403))
-			for (_tmp_ in __ax4_iter_403) {
+		final __ax4_iter_413 = mRows;
+		if (checkNullIteratee(__ax4_iter_413))
+			for (_tmp_ in __ax4_iter_413) {
 				_loc2_ = _tmp_;
 				_loc2_.refreshFromModel();
 			}

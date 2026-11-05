@@ -10,13 +10,20 @@ import flash.display.DisplayObjectContainer;
 import flash.display.MovieClip;
 
 class ChestInfo extends InventoryBaseInfo {
+	public static inline final STACK_SIZE = (99 : UInt);
+
 	var mGMChestData:GMChest;
 
 	var mIsFromDungeonSummary:Bool = false;
 
+	var mDatabaseIds:Vector<UInt> = new Vector();
+
 	public function new(dbFacade:DBFacade, json:ASObject) {
 		super(dbFacade, json);
 		mIsFromDungeonSummary = false;
+		if (json != null) {
+			mDatabaseIds.push(mDatabaseId);
+		}
 		if (json == null) {
 			return;
 		}
@@ -80,6 +87,43 @@ class ChestInfo extends InventoryBaseInfo {
 			Logger.error("GMChest (setParams) is null cannot find item for ID: " + mGMId);
 		}
 		mGMChestInfo = mGMChestData;
+	}
+
+	@:isVar public var count(get, never):UInt;
+
+	public function get_count():UInt {
+		return (mDatabaseIds.length > 0 ? (mDatabaseIds.length : UInt) : (1 : UInt):UInt);
+	}
+
+	@:isVar public var isFull(get, never):Bool;
+
+	public function get_isFull():Bool {
+		return mDatabaseIds.length >= 99;
+	}
+
+	@:isVar public var databaseIds(get, never):Vector<UInt>;
+
+	public function get_databaseIds():Vector<UInt> {
+		return mDatabaseIds;
+	}
+
+	public function containsDatabaseId(id:UInt):Bool {
+		return mDatabaseIds.indexOf(id) != -1;
+	}
+
+	public function addDatabaseId(id:UInt) {
+		mDatabaseIds.push(id);
+	}
+
+	public function removeDatabaseId(id:UInt):Bool {
+		var _loc2_ = mDatabaseIds.indexOf(id);
+		if (_loc2_ != -1) {
+			mDatabaseIds.splice(_loc2_, (1 : UInt));
+		}
+		if (mDatabaseIds.length > 0) {
+			mDatabaseId = mDatabaseIds[0];
+		}
+		return mDatabaseIds.length > 0;
 	}
 
 	public function isFromDungeonSummary():Bool {

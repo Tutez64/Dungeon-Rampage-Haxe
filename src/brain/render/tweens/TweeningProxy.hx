@@ -184,7 +184,7 @@ class TweeningProxy {
 
 	public function createTimeline(vars:ASObject = null):TweenHandle {
 		var _loc2_:ASObject;
-		var __ax4_iter_411:ASAny;
+		var __ax4_iter_421:ASAny;
 		var _loc7_:String = null;
 		var _loc5_ = Math.NaN;
 		var _loc6_ = Math.NaN;
@@ -198,9 +198,9 @@ class TweeningProxy {
 				_loc7_ = ASCompat.toBool(vars.align) ? ASCompat.toString(vars.align) : "normal";
 				_loc5_ = ASCompat.toNumber(ASCompat.thisOrDefault(ASCompat.toNumber(vars.stagger), 0));
 				_loc6_ = 0;
-				__ax4_iter_411 = vars.tweens;
-				if (checkNullIteratee(__ax4_iter_411))
-					for (_tmp_ in __ax4_iter_411) {
+				__ax4_iter_421 = vars.tweens;
+				if (checkNullIteratee(__ax4_iter_421))
+					for (_tmp_ in __ax4_iter_421) {
 						_loc2_ = _tmp_;
 						_loc8_ = ASCompat.dynamicAs(_loc2_, TweenHandle);
 						if (_loc8_ == null) {

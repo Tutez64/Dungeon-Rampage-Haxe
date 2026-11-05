@@ -257,9 +257,9 @@ class UIShop {
 		var _loc4_:ASAny = null;
 		var _loc5_ = (0 : UInt);
 		mCategorizedGMOffers = new Map();
-		final __ax4_iter_430 = CATEGORIES;
-		if (checkNullIteratee(__ax4_iter_430))
-			for (_tmp_ in __ax4_iter_430) {
+		final __ax4_iter_440 = CATEGORIES;
+		if (checkNullIteratee(__ax4_iter_440))
+			for (_tmp_ in __ax4_iter_440) {
 				_loc6_ = _tmp_;
 				mCategorizedGMOffers.add(_loc6_, new Vector<GMOffer>());
 			}
@@ -867,7 +867,7 @@ class UIShop {
 	}
 
 	function filterOffers() {
-		var __ax4_iter_432:ASAny;
+		var __ax4_iter_442:ASAny;
 		var _loc10_:String = null;
 		var _loc1_:Vector<GMOffer> = /*undefined*/ null;
 		var _loc2_:GMOffer = null;
@@ -881,15 +881,15 @@ class UIShop {
 		var _loc5_ = ASCompat.coerce(mSelectedHero != null ? mDBFacade.dbAccountInfo.inventoryInfo.getAvatarInfoForHeroType(mSelectedHero.Id) : null,
 			account.AvatarInfo);
 		mFilteredGMOffers.clear();
-		final __ax4_iter_431 = CATEGORIES;
-		if (checkNullIteratee(__ax4_iter_431))
-			for (_tmp_ in __ax4_iter_431) {
+		final __ax4_iter_441 = CATEGORIES;
+		if (checkNullIteratee(__ax4_iter_441))
+			for (_tmp_ in __ax4_iter_441) {
 				_loc10_ = _tmp_;
 				_loc1_ = new Vector<GMOffer>();
 				mFilteredGMOffers.add(_loc10_, _loc1_);
-				__ax4_iter_432 = mCategorizedGMOffers.itemFor(_loc10_);
-				if (checkNullIteratee(__ax4_iter_432))
-					for (_tmp_ in __ax4_iter_432) {
+				__ax4_iter_442 = mCategorizedGMOffers.itemFor(_loc10_);
+				if (checkNullIteratee(__ax4_iter_442))
+					for (_tmp_ in __ax4_iter_442) {
 						_loc2_ = ASCompat.coerce(_tmp_, gameMasterDictionary.GMOffer);
 						if (_loc2_.SaleTargetOffer == null) {
 							if (!_loc2_.IsCoinAltOffer) {

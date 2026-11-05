@@ -18,9 +18,9 @@ class DBConfigManager extends ConfigManager {
 		mDBFacade = dbFacade;
 		mEventComponent = new EventComponent(mDBFacade);
 		var _loc2_:String;
-		final __ax4_iter_518 = mFilePathsToOpen.concat(mDBFacade.mAdditionalConfigFilesToLoad);
-		if (checkNullIteratee(__ax4_iter_518))
-			for (_tmp_ in __ax4_iter_518) {
+		final __ax4_iter_528 = mFilePathsToOpen.concat(mDBFacade.mAdditionalConfigFilesToLoad);
+		if (checkNullIteratee(__ax4_iter_528))
+			for (_tmp_ in __ax4_iter_528) {
 				_loc2_ = _tmp_;
 				mConfigsToLoad.push(DBFacade.buildFullDownloadPath(_loc2_));
 			}

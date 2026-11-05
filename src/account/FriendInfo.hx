@@ -27,6 +27,8 @@ class FriendInfo extends EventDispatcher {
 
 	var mTrophies:UInt = 0;
 
+	var mAscensionLevel:UInt = 0;
+
 	var mDBFacade:DBFacade;
 
 	var mResponseCallback:ASFunction;
@@ -53,6 +55,7 @@ class FriendInfo extends EventDispatcher {
 		mAccountId = ASCompat.asUint(friendJson.account_id);
 		mFriendName = ASCompat.asString(friendJson.name);
 		mTrophies = ASCompat.asUint(friendJson.trophies);
+		mAscensionLevel = (friendJson.hasOwnProperty("ascension_level") ? (ASCompat.toInt(friendJson.ascension_level) : UInt) : (0 : UInt):UInt);
 		mSteamAvatarUrl = ASCompat.asString(friendJson.steam_avatar_url);
 		var _loc3_ = mSkinId;
 		var _loc2_ = mPortraitUrl;
@@ -121,6 +124,16 @@ class FriendInfo extends EventDispatcher {
 
 	function set_trophies(value:UInt):UInt {
 		return mTrophies = value;
+	}
+
+	@:isVar public var ascensionLevel(get, set):UInt;
+
+	public function get_ascensionLevel():UInt {
+		return mAscensionLevel;
+	}
+
+	function set_ascensionLevel(value:UInt):UInt {
+		return mAscensionLevel = value;
 	}
 
 	@:isVar public var lastMapNode(get, never):UInt;

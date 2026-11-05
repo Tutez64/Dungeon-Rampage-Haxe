@@ -168,9 +168,9 @@ class AnimationAtlas {
 			out = new Vector<String>();
 		}
 		var _loc2_:String;
-		final __ax4_iter_502 = _labelSymbols;
-		if (checkNullIteratee(__ax4_iter_502))
-			for (_tmp_ in __ax4_iter_502.keys()) {
+		final __ax4_iter_512 = _labelSymbols;
+		if (checkNullIteratee(__ax4_iter_512))
+			for (_tmp_ in __ax4_iter_512.keys()) {
 				_loc2_ = _tmp_;
 				out[out.length] = _loc2_;
 			}
@@ -196,9 +196,9 @@ class AnimationAtlas {
 			out = new Vector<String>();
 		}
 		var _loc3_:String;
-		final __ax4_iter_503 = _symbolData;
-		if (checkNullIteratee(__ax4_iter_503))
-			for (_tmp_ in __ax4_iter_503.keys()) {
+		final __ax4_iter_513 = _symbolData;
+		if (checkNullIteratee(__ax4_iter_513))
+			for (_tmp_ in __ax4_iter_513.keys()) {
 				_loc3_ = _tmp_;
 				if (_loc3_ != "___atlas_sprite___" && _loc3_.indexOf(prefix) == 0) {
 					out[out.length] = _loc3_;
@@ -250,9 +250,9 @@ class AnimationAtlas {
 		var _loc3_ = name.substr(0, _loc4_ + 1);
 		var _loc2_:String = null;
 		var _loc5_:String;
-		final __ax4_iter_504 = _symbolData;
-		if (checkNullIteratee(__ax4_iter_504))
-			for (_tmp_ in __ax4_iter_504.keys()) {
+		final __ax4_iter_514 = _symbolData;
+		if (checkNullIteratee(__ax4_iter_514))
+			for (_tmp_ in __ax4_iter_514.keys()) {
 				_loc5_ = _tmp_;
 				if (_loc5_ != "___atlas_sprite___") {
 					if (_loc5_.indexOf(_loc3_) == 0 && _loc5_.length >= 4 && _loc5_.indexOf(".png", _loc5_.length - 4) != -1) {
@@ -295,7 +295,7 @@ class AnimationAtlas {
 
 	function parseData(data:ASObject) {
 		var _loc3_:ASObject;
-		var __ax4_iter_507:ASAny;
+		var __ax4_iter_517:ASAny;
 		var _loc5_:Array<ASAny> = null;
 		var _loc6_:String = null;
 		var _loc2_:ASObject = data.metadata;
@@ -316,9 +316,9 @@ class AnimationAtlas {
 		}
 		_symbolData = new ASDictionary<ASAny, ASAny>();
 		var _loc4_:ASObject;
-		final __ax4_iter_505:ASAny = data.symbolDictionary.symbols;
-		if (checkNullIteratee(__ax4_iter_505))
-			for (_tmp_ in __ax4_iter_505) {
+		final __ax4_iter_515:ASAny = data.symbolDictionary.symbols;
+		if (checkNullIteratee(__ax4_iter_515))
+			for (_tmp_ in __ax4_iter_515) {
 				_loc4_ = _tmp_;
 				_symbolData[_loc4_.symbolName] = preprocessSymbolData(_loc4_);
 			}
@@ -331,13 +331,13 @@ class AnimationAtlas {
 		};
 		_labelSymbols = new ASDictionary<ASAny, ASAny>();
 		var _loc7_:ASObject;
-		final __ax4_iter_506:ASAny = _loc8_.timeline.layers;
-		if (checkNullIteratee(__ax4_iter_506))
-			for (_tmp_ in __ax4_iter_506) {
+		final __ax4_iter_516:ASAny = _loc8_.timeline.layers;
+		if (checkNullIteratee(__ax4_iter_516))
+			for (_tmp_ in __ax4_iter_516) {
 				_loc7_ = _tmp_;
-				__ax4_iter_507 = _loc7_.frames;
-				if (checkNullIteratee(__ax4_iter_507))
-					for (_tmp_ in __ax4_iter_507) {
+				__ax4_iter_517 = _loc7_.frames;
+				if (checkNullIteratee(__ax4_iter_517))
+					for (_tmp_ in __ax4_iter_517) {
 						_loc3_ = _tmp_;
 						if (!(!_loc3_.hasOwnProperty("name") || _labelSymbols.exists(_loc3_.name))) {
 							_loc5_ = ASCompat.dynamicAs(_loc3_.elements, Array);

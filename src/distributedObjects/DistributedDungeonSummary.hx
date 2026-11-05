@@ -435,9 +435,9 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 	function setUILootSlotsTwoTreasuresVisible(isVisible:Bool) {
 		var _loc3_ = 0;
 		var _loc2_:Array<ASAny>;
-		final __ax4_iter_308 = mUILootSlotsTwoTreasures;
-		if (checkNullIteratee(__ax4_iter_308))
-			for (_tmp_ in __ax4_iter_308) {
+		final __ax4_iter_312 = mUILootSlotsTwoTreasures;
+		if (checkNullIteratee(__ax4_iter_312))
+			for (_tmp_ in __ax4_iter_312) {
 				_loc2_ = ASCompat.coerce(_tmp_, Array);
 				_loc3_ = 0;
 				while (_loc3_ < _loc2_.length) {
@@ -450,9 +450,9 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 	function setUILootSlotsFourTreasuresVisible(isVisible:Bool) {
 		var _loc3_ = 0;
 		var _loc2_:Array<ASAny>;
-		final __ax4_iter_309 = mUILootSlotsFourTreasures;
-		if (checkNullIteratee(__ax4_iter_309))
-			for (_tmp_ in __ax4_iter_309) {
+		final __ax4_iter_313 = mUILootSlotsFourTreasures;
+		if (checkNullIteratee(__ax4_iter_313))
+			for (_tmp_ in __ax4_iter_313) {
 				_loc2_ = ASCompat.coerce(_tmp_, Array);
 				_loc3_ = 0;
 				while (_loc3_ < _loc2_.length) {
@@ -467,9 +467,9 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 			return false;
 		}
 		var _loc1_:DungeonReport;
-		final __ax4_iter_310 = mDungeonReport;
-		if (checkNullIteratee(__ax4_iter_310))
-			for (_tmp_ in __ax4_iter_310) {
+		final __ax4_iter_314 = mDungeonReport;
+		if (checkNullIteratee(__ax4_iter_314))
+			for (_tmp_ in __ax4_iter_314) {
 				_loc1_ = _tmp_;
 				if (_loc1_.valid != 0 && _loc1_.gold_earned != 0) {
 					return false;
@@ -649,7 +649,8 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 								oldLevel = gmHero.getLevelFromExp(mDungeonReport[(i : Int)].xp + mBonusXPTick[(i : Int)],
 									mDungeonReport[(i : Int)].ascension_level);
 								allFinished = false;
-								mBonusXPTick[(i : Int)] += (ASCompat.floatToInt(speed) : UInt);
+								mBonusXPTick[(i : Int)] = (ASCompat.floatToInt(Math.min(mBonusXPTick[(i : Int)] + speed,
+									mDungeonReport[(i : Int)].xp_bonus)) : UInt);
 								currentExp = mDungeonReport[(i : Int)].xp + mBonusXPTick[(i : Int)];
 								level = gmHero.getLevelFromExp(currentExp, mDungeonReport[(i : Int)].ascension_level);
 								levelIndex = (gmHero.getLevelIndex(currentExp, (mDungeonReport[(i : Int)].ascension_level : Int)) : UInt);
@@ -732,7 +733,8 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 								oldLevelTeam = gmHeroTeam.getLevelFromExp(mDungeonReport[(i : Int)].xp + mBonusXPTick[(i : Int)],
 									mDungeonReport[(i : Int)].ascension_level);
 								allFinished = false;
-								mTeamBonusXPTick[(i : Int)] += (ASCompat.floatToInt(speedTeam) : UInt);
+								mTeamBonusXPTick[(i : Int)] = (ASCompat.floatToInt(Math.min(mTeamBonusXPTick[(i : Int)] + speedTeam,
+									mDungeonReport[(i : Int)].team_xp_bonus)) : UInt);
 								currentExpTeam = mDungeonReport[(i : Int)].xp + mBonusXPTick[(i : Int)] + mTeamBonusXPTick[(i : Int)];
 								levelTeam = gmHeroTeam.getLevelFromExp(currentExpTeam, mDungeonReport[(i : Int)].ascension_level);
 								levelIndexTeam = (gmHeroTeam.getLevelIndex(currentExpTeam, (mDungeonReport[(i : Int)].ascension_level : Int)) : UInt);
@@ -1044,6 +1046,7 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 		var _loc2_:GMSkin = null;
 		var _loc3_ = (0 : UInt);
 		var _loc1_:TextField = null;
+		var _loc5_:MovieClip = null;
 		TextUtil.setText(ASCompat.coerce((mScoreReportRoot : ASAny).stats_a.stats.player_name, flash.text.TextField), mDungeonReport[0].name,
 			Locale.summaryNameSizeModifier);
 		TextUtil.setText(ASCompat.coerce((mScoreReportRoot : ASAny).stats_b.stats.player_name, flash.text.TextField), mDungeonReport[1].name,
@@ -1064,7 +1067,7 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 		ASCompat.setProperty((mScoreReportRoot : ASAny).stats_d.stats.player_name, "textColor",
 			PlayerSpecialStatus.getSpecialTextColor(mDungeonReport[3].name,
 				(ASCompat.toInt((mScoreReportRoot : ASAny).stats_d.stats.player_name.textColor) : UInt)));
-		var _loc5_:Array<ASAny> = [
+		var _loc6_:Array<ASAny> = [
 			(mScoreReportRoot : ASAny)
 			.stats_a.stats.avatar,
 			(mScoreReportRoot : ASAny)
@@ -1089,14 +1092,19 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 			if (mDungeonReport[(_loc3_ : Int)].valid == ASCompat.toNumber(true)) {
 				_loc1_ = ASCompat.coerce(_loc4_[(_loc3_ : Int)].stats.trophies.trophies, flash.text.TextField);
 				TextUtil.setText(_loc1_, Std.string(mDungeonReport[(_loc3_ : Int)].trophyCount));
+				_loc5_ = ASCompat.coerce(_loc4_[(_loc3_ : Int)].stats.ascension, flash.display.MovieClip);
+				_loc5_.mouseEnabled = false;
+				_loc5_.mouseChildren = false;
+				_loc5_.visible = mDungeonReport[(_loc3_ : Int)].ascension_level > 0;
+				TextUtil.setText(ASCompat.coerce((_loc5_ : ASAny).level, flash.text.TextField), Std.string(mDungeonReport[(_loc3_ : Int)].ascension_level));
 				_loc2_ = mDBFacade.gameMaster.getSkinByType(mDungeonReport[(_loc3_ : Int)].skin_type);
 				if (_loc2_ == null) {
 					Logger.error("Could not find skin for skin_type: " + mDungeonReport[(_loc3_ : Int)].skin_type);
 				} else {
-					loadPortraitForReport(mDungeonReport[(_loc3_ : Int)], _loc2_, ASCompat.coerce(_loc5_[(_loc3_ : Int)], flash.display.MovieClip), _loc3_);
+					loadPortraitForReport(mDungeonReport[(_loc3_ : Int)], _loc2_, ASCompat.coerce(_loc6_[(_loc3_ : Int)], flash.display.MovieClip), _loc3_);
 				}
 			} else {
-				ASCompat.setProperty(_loc5_[(_loc3_ : Int)], "visible", false);
+				ASCompat.setProperty(_loc6_[(_loc3_ : Int)], "visible", false);
 			}
 			_loc3_++;
 		}
@@ -1431,9 +1439,9 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 		var mcr:MovieClipRenderer;
 		var loot:Array<ASAny>;
 		var yScale:Float;
-		final __ax4_iter_311 = mChestRenderers;
-		if (checkNullIteratee(__ax4_iter_311))
-			for (_tmp_ in __ax4_iter_311) {
+		final __ax4_iter_315 = mChestRenderers;
+		if (checkNullIteratee(__ax4_iter_315))
+			for (_tmp_ in __ax4_iter_315) {
 				mcr = _tmp_;
 				mcr.destroy();
 			}
@@ -1924,7 +1932,7 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 	}
 
 	function keepChestCallback() {
-		if (mDBFacade.dbAccountInfo.inventoryInfo.isThereEmptySpaceInWeaponStorage()) {
+		if (mDBFacade.dbAccountInfo.inventoryInfo.hasRoomForChest(mSelectedGMChest.Id)) {
 			closeKeyChestPopup();
 			keepChestFromInventory(mSelectedItemSlot, false);
 		} else {
@@ -2168,14 +2176,14 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 			i = i + 1;
 		}
 		UIChatLog.growLogUp(ASCompat.coerce((mScoreReportRoot : ASAny).chatLogContainer, flash.display.MovieClip), 1.5);
-		final __ax4_iter_312:Array<ASAny> = [
+		final __ax4_iter_316:Array<ASAny> = [
 			(mScoreReportRoot : ASAny)
 			.UI_chat.chat_btn,
 			(mScoreReportRoot : ASAny)
 			.UI_chat.log_btn
 		];
-		if (checkNullIteratee(__ax4_iter_312))
-			for (_tmp_ in __ax4_iter_312) {
+		if (checkNullIteratee(__ax4_iter_316))
+			for (_tmp_ in __ax4_iter_316) {
 				button = ASCompat.coerce(_tmp_, flash.display.MovieClip);
 				c = 0;
 				while (c < button.numChildren) {
@@ -3028,9 +3036,9 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 			mCountDownTextGold.destroy();
 		}
 		var _loc4_:UIObject;
-		final __ax4_iter_313 = mTeamBonusUI;
-		if (checkNullIteratee(__ax4_iter_313))
-			for (_tmp_ in __ax4_iter_313.iterator()) {
+		final __ax4_iter_317 = mTeamBonusUI;
+		if (checkNullIteratee(__ax4_iter_317))
+			for (_tmp_ in __ax4_iter_317.iterator()) {
 				_loc4_ = ASCompat.coerce(_tmp_, brain.uI.UIObject);
 				_loc4_.destroy();
 			}
@@ -3232,9 +3240,9 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 		mUILootSlotsTwoTreasures.resize(0);
 		mUILootSlotsTwoTreasures = null;
 		var _loc9_:Array<ASAny>;
-		final __ax4_iter_314 = mWeapons;
-		if (checkNullIteratee(__ax4_iter_314))
-			for (_tmp_ in __ax4_iter_314) {
+		final __ax4_iter_318 = mWeapons;
+		if (checkNullIteratee(__ax4_iter_318))
+			for (_tmp_ in __ax4_iter_318) {
 				_loc9_ = ASCompat.coerce(_tmp_, Array);
 				if (checkNullIteratee(_loc9_))
 					for (_tmp_ in _loc9_) {
@@ -3431,8 +3439,8 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 	}
 
 	function setupMenuNavigation() {
-		var __ax4_iter_315:ASAny;
-		var __ax4_iter_316:ASAny;
+		var __ax4_iter_319:ASAny;
+		var __ax4_iter_320:ASAny;
 		var _loc12_ = 0;
 		var _loc13_:UIObject = null;
 		var _loc16_ = 0;
@@ -3466,9 +3474,9 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 			if (ASCompat.toBool(mAvatarButtons[_loc12_])) {
 				_loc23_.push(mAvatarButtons[_loc12_]);
 			}
-			__ax4_iter_315 = mPlayerBoosterUIs[_loc12_];
-			if (checkNullIteratee(__ax4_iter_315))
-				for (_tmp_ in __ax4_iter_315) {
+			__ax4_iter_319 = mPlayerBoosterUIs[_loc12_];
+			if (checkNullIteratee(__ax4_iter_319))
+				for (_tmp_ in __ax4_iter_319) {
 					_loc13_ = ASCompat.coerce(_tmp_, brain.uI.UIObject);
 					_loc23_.push(_loc13_);
 				}
@@ -3481,9 +3489,9 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 			if (ASCompat.toBool(mReportPlayerButtons[_loc12_])) {
 				_loc23_.push(mReportPlayerButtons[_loc12_]);
 			}
-			__ax4_iter_316 = mWeapons[_loc12_];
-			if (checkNullIteratee(__ax4_iter_316))
-				for (_tmp_ in __ax4_iter_316) {
+			__ax4_iter_320 = mWeapons[_loc12_];
+			if (checkNullIteratee(__ax4_iter_320))
+				for (_tmp_ in __ax4_iter_320) {
 					_loc13_ = ASCompat.coerce(_tmp_, brain.uI.UIObject);
 					_loc23_.push(_loc13_);
 				}

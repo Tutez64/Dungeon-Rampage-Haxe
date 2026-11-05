@@ -142,9 +142,9 @@ class HudCutFade {
 			mWash.dispose();
 		}
 		var _loc1_:Quad;
-		final __ax4_iter_218 = mQuads;
-		if (checkNullIteratee(__ax4_iter_218))
-			for (_tmp_ in __ax4_iter_218) {
+		final __ax4_iter_221 = mQuads;
+		if (checkNullIteratee(__ax4_iter_221))
+			for (_tmp_ in __ax4_iter_221) {
 				_loc1_ = _tmp_;
 				_loc1_.dispose();
 			}

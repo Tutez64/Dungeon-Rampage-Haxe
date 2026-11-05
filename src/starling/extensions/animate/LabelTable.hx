@@ -35,9 +35,9 @@ class LabelTable {
 			_loc4_++;
 		}
 		var _loc5_:LabelRange;
-		final __ax4_iter_501 = _ranges;
-		if (checkNullIteratee(__ax4_iter_501))
-			for (_tmp_ in __ax4_iter_501) {
+		final __ax4_iter_511 = _ranges;
+		if (checkNullIteratee(__ax4_iter_511))
+			for (_tmp_ in __ax4_iter_511) {
 				_loc5_ = ASCompat.coerce(_tmp_, LabelRange);
 				_loc5_.next = labelAfterFrame(_loc5_.start, _loc5_.index + 1);
 				_loc7_ = getFrame(_loc5_.next);

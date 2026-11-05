@@ -32,9 +32,9 @@ class HudPages extends BakedPages {
 	public function get_accountedBytes():Float {
 		var _loc2_:HudPage = null;
 		var _loc1_:Float = 0;
-		final __ax4_iter_256 = mPages;
-		if (checkNullIteratee(__ax4_iter_256))
-			for (_tmp_ in __ax4_iter_256) {
+		final __ax4_iter_259 = mPages;
+		if (checkNullIteratee(__ax4_iter_259))
+			for (_tmp_ in __ax4_iter_259) {
 				_loc2_ = _tmp_;
 				_loc1_ += BakeBudget.accountedBytes(_loc2_.mWidth, _loc2_.mHeight, _loc2_.mRectangle);
 			}
@@ -46,9 +46,9 @@ class HudPages extends BakedPages {
 	function get_pinnedBytes():Float {
 		var _loc2_:HudCell = null;
 		var _loc1_:Float = 0;
-		final __ax4_iter_257:ASObject = mCells;
-		if (checkNullIteratee(__ax4_iter_257))
-			for (_tmp_ in iterateDynamicValues(__ax4_iter_257)) {
+		final __ax4_iter_260:ASObject = mCells;
+		if (checkNullIteratee(__ax4_iter_260))
+			for (_tmp_ in iterateDynamicValues(__ax4_iter_260)) {
 				_loc2_ = ASCompat.coerce(_tmp_, uI.hud.starlingConverted.HudCell);
 				if (_loc2_.mPinned) {
 					_loc1_ += _loc2_.pixelWidth * _loc2_.pixelHeight * 4;
@@ -115,7 +115,7 @@ class HudPages extends BakedPages {
 	}
 
 	function place(cell:HudCell, bake:BakedPicture):Bool {
-		var __ax4_iter_258:Vector<HudPage>;
+		var __ax4_iter_261:Vector<HudPage>;
 		var _loc6_:HudPage = null;
 		var _loc4_:HudPage = null;
 		sCapacityRefused = false;
@@ -128,9 +128,9 @@ class HudPages extends BakedPages {
 		HudArt.beginEviction();
 		while (true) {
 			if (!_loc3_) {
-				__ax4_iter_258 = mPages;
-				if (checkNullIteratee(__ax4_iter_258))
-					for (_tmp_ in __ax4_iter_258) {
+				__ax4_iter_261 = mPages;
+				if (checkNullIteratee(__ax4_iter_261))
+					for (_tmp_ in __ax4_iter_261) {
 						_loc4_ = _tmp_;
 						if (!_loc4_.mSingle && _loc4_.place(_loc5_ + 1, _loc7_ + 1, mPoint)) {
 							_loc6_ = _loc4_;
@@ -199,9 +199,9 @@ class HudPages extends BakedPages {
 
 	override public function uploadDirty() {
 		var _loc1_:HudPage = null;
-		final __ax4_iter_259 = mPages;
-		if (checkNullIteratee(__ax4_iter_259))
-			for (_tmp_ in __ax4_iter_259) {
+		final __ax4_iter_262 = mPages;
+		if (checkNullIteratee(__ax4_iter_262))
+			for (_tmp_ in __ax4_iter_262) {
 				_loc1_ = _tmp_;
 				try {
 					_loc1_.upload();
@@ -214,16 +214,16 @@ class HudPages extends BakedPages {
 	override public function dispose() {
 		var _loc2_:HudCell = null;
 		var _loc1_:HudPage = null;
-		final __ax4_iter_260:ASObject = mCells;
-		if (checkNullIteratee(__ax4_iter_260))
-			for (_tmp_ in iterateDynamicValues(__ax4_iter_260)) {
+		final __ax4_iter_263:ASObject = mCells;
+		if (checkNullIteratee(__ax4_iter_263))
+			for (_tmp_ in iterateDynamicValues(__ax4_iter_263)) {
 				_loc2_ = ASCompat.coerce(_tmp_, uI.hud.starlingConverted.HudCell);
 				_loc2_.mTexture.dispose();
 				_loc2_.mTexture = null;
 			}
-		final __ax4_iter_261 = mPages;
-		if (checkNullIteratee(__ax4_iter_261))
-			for (_tmp_ in __ax4_iter_261) {
+		final __ax4_iter_264 = mPages;
+		if (checkNullIteratee(__ax4_iter_264))
+			for (_tmp_ in __ax4_iter_264) {
 				_loc1_ = _tmp_;
 				_loc1_.dispose();
 			}

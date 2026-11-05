@@ -1,5 +1,6 @@
 package uI.inventory;
 
+import account.ChestInfo;
 import account.InventoryBaseInfo;
 import account.ItemInfo;
 import account.StackableInfo;
@@ -116,6 +117,9 @@ class UIInventoryItem extends UIButton {
 			if (ASCompat.reinterpretAs(mInfo, StackableInfo) != null) {
 				_loc2_ = (cast(mInfo, StackableInfo).count : UInt);
 				TextUtil.setText(mStackCountLabel, "x" + Std.string(_loc2_));
+				mStackCountLabel.visible = true;
+			} else if (Std.isOfType(mInfo, ChestInfo) && cast(mInfo, ChestInfo).count > 1) {
+				TextUtil.setText(mStackCountLabel, "x" + Std.string(cast(mInfo, ChestInfo).count));
 				mStackCountLabel.visible = true;
 			}
 		} else {

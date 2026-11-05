@@ -34,9 +34,9 @@ class FilterChain extends FragmentFilter {
 
 	override public function dispose() {
 		var _loc1_:FragmentFilter;
-		final __ax4_iter_531 = _filters;
-		if (checkNullIteratee(__ax4_iter_531))
-			for (_tmp_ in __ax4_iter_531) {
+		final __ax4_iter_541 = _filters;
+		if (checkNullIteratee(__ax4_iter_541))
+			for (_tmp_ in __ax4_iter_541) {
 				_loc1_ = _tmp_;
 				_loc1_.dispose();
 			}
@@ -126,9 +126,9 @@ class FilterChain extends FragmentFilter {
 		var _loc2_:Padding = null;
 		sPadding.setTo();
 		var _loc1_:FragmentFilter;
-		final __ax4_iter_532 = _filters;
-		if (checkNullIteratee(__ax4_iter_532))
-			for (_tmp_ in __ax4_iter_532) {
+		final __ax4_iter_542 = _filters;
+		if (checkNullIteratee(__ax4_iter_542))
+			for (_tmp_ in __ax4_iter_542) {
 				_loc1_ = _tmp_;
 				_loc2_ = _loc1_.padding;
 				if (_loc2_.left > sPadding.left) {

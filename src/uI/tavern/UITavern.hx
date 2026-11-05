@@ -268,16 +268,16 @@ class UITavern {
 				var _loc2_ = param1.getClass("weapon_tavern_tooltip");
 				var _loc3_ = param1.getClass("tavern_gloat");
 				var _loc4_:UIObject;
-				final __ax4_iter_520 = mWeaponIcons3;
-				if (checkNullIteratee(__ax4_iter_520))
-					for (_tmp_ in __ax4_iter_520) {
+				final __ax4_iter_530 = mWeaponIcons3;
+				if (checkNullIteratee(__ax4_iter_530))
+					for (_tmp_ in __ax4_iter_530) {
 						_loc4_ = _tmp_;
 						_loc4_.tooltip = ASCompat.coerce(ASCompat.createInstance(_loc2_, []), flash.display.MovieClip);
 						_loc4_.tooltipPos = new Point(0, 0);
 					}
-				final __ax4_iter_521 = mWeaponIcons4;
-				if (checkNullIteratee(__ax4_iter_521))
-					for (_tmp_ in __ax4_iter_521) {
+				final __ax4_iter_531 = mWeaponIcons4;
+				if (checkNullIteratee(__ax4_iter_531))
+					for (_tmp_ in __ax4_iter_531) {
 						_loc4_ = _tmp_;
 						_loc4_.tooltip = ASCompat.coerce(ASCompat.createInstance(_loc2_, []), flash.display.MovieClip);
 						_loc4_.tooltipPos = new Point(0, 0);
@@ -353,9 +353,9 @@ class UITavern {
 		var _loc3_ = 0;
 		var _loc1_ = mDBFacade.gameMaster.Offers;
 		var _loc4_:GMHero;
-		final __ax4_iter_522 = mDBFacade.gameMaster.Heroes;
-		if (checkNullIteratee(__ax4_iter_522))
-			for (_tmp_ in __ax4_iter_522) {
+		final __ax4_iter_532 = mDBFacade.gameMaster.Heroes;
+		if (checkNullIteratee(__ax4_iter_532))
+			for (_tmp_ in __ax4_iter_532) {
 				_loc4_ = _tmp_;
 				if (!(_loc4_.Hidden && !mDBFacade.dbConfigManager.getConfigBoolean("want_hidden_heroes", false))) {
 					mHeroIds.push(_loc4_.Id);
@@ -377,7 +377,7 @@ class UITavern {
 
 	function loadSkinOffers() {
 		var _loc3_:GMSkin;
-		var __ax4_iter_523:Vector<GMSkin>;
+		var __ax4_iter_533:Vector<GMSkin>;
 		var _loc2_:GMOffer = null;
 		var _loc4_ = 0;
 		var _loc1_ = mDBFacade.gameMaster.Offers;
@@ -385,9 +385,9 @@ class UITavern {
 		while (_loc4_ < _loc1_.length) {
 			_loc2_ = _loc1_[_loc4_];
 			if (_loc2_.Tab == "SKIN" && _loc2_.Location == "STORE" && !_loc2_.IsBundle && !_loc2_.IsCoinAltOffer && _loc2_.isVisible()) {
-				__ax4_iter_523 = mDBFacade.gameMaster.Skins;
-				if (checkNullIteratee(__ax4_iter_523))
-					for (_tmp_ in __ax4_iter_523) {
+				__ax4_iter_533 = mDBFacade.gameMaster.Skins;
+				if (checkNullIteratee(__ax4_iter_533))
+					for (_tmp_ in __ax4_iter_533) {
 						_loc3_ = _tmp_;
 						if (_loc2_.Details[0].SkinId == _loc3_.Id) {
 							mSkinOffers.add(_loc3_.Id, _loc2_);

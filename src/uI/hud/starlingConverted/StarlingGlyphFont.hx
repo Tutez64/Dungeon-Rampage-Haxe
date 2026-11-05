@@ -165,7 +165,7 @@ class StarlingGlyphFont {
 		var __finallyReturn2:HudGlyphTable;
 		var __finallyReturn3:HudGlyphTable;
 		var __finallyReturn4:HudGlyphTable;
-		var __ax4_iter_219:Vector<Texture>;
+		var __ax4_iter_222:Vector<Texture>;
 		var __finallyReturn5:HudGlyphTable;
 		var _loc21_ = 0;
 		var _loc9_ = 0;
@@ -195,7 +195,7 @@ class StarlingGlyphFont {
 			var __finallyReturn2:HudGlyphTable;
 			var __finallyReturn3:HudGlyphTable;
 			var __finallyReturn4:HudGlyphTable;
-			var __ax4_iter_219:Vector<Texture>;
+			var __ax4_iter_222:Vector<Texture>;
 			var __finallyReturn5:HudGlyphTable;
 			try {
 				try {
@@ -340,9 +340,9 @@ class StarlingGlyphFont {
 						_loc21_++;
 					}
 				} catch (error:Dynamic) {
-					__ax4_iter_219 = _loc15_.mTextures;
-					if (checkNullIteratee(__ax4_iter_219))
-						for (_tmp_ in __ax4_iter_219) {
+					__ax4_iter_222 = _loc15_.mTextures;
+					if (checkNullIteratee(__ax4_iter_222))
+						for (_tmp_ in __ax4_iter_222) {
 							_loc18_ = _tmp_;
 							if (_loc18_ != null) {
 								_loc18_.dispose();
@@ -398,7 +398,7 @@ class StarlingGlyphFont {
 	}
 
 	static function signature(field:TextField):String {
-		var __ax4_iter_221:Array<ASAny>;
+		var __ax4_iter_224:Array<ASAny>;
 		var _loc2_:ASObject = null;
 		var _loc4_:String = null;
 		var _loc7_:String = null;
@@ -428,15 +428,15 @@ class StarlingGlyphFont {
 			field.sharpness,
 			field.thickness
 		];
-		final __ax4_iter_220 = field.filters;
-		if (checkNullIteratee(__ax4_iter_220))
-			for (_tmp_ in __ax4_iter_220) {
+		final __ax4_iter_223 = field.filters;
+		if (checkNullIteratee(__ax4_iter_223))
+			for (_tmp_ in __ax4_iter_223) {
 				_loc2_ = _tmp_;
 				_loc7_ = ASCompat.getQualifiedClassName(_loc2_);
 				_loc5_.push(_loc7_);
-				__ax4_iter_221 = filterProps(_loc2_, _loc7_);
-				if (checkNullIteratee(__ax4_iter_221))
-					for (_tmp_ in __ax4_iter_221) {
+				__ax4_iter_224 = filterProps(_loc2_, _loc7_);
+				if (checkNullIteratee(__ax4_iter_224))
+					for (_tmp_ in __ax4_iter_224) {
 						_loc4_ = _tmp_;
 						_loc8_ = _loc2_[_loc4_];
 						if (Std.isOfType(_loc8_, Array)) {
@@ -467,17 +467,17 @@ class StarlingGlyphFont {
 		}
 		_loc6_ = [];
 		var _loc5_ = ASCompat.describeType(filter);
-		final __ax4_iter_222 = _loc5_.child("accessor");
-		if (checkNullIteratee(__ax4_iter_222))
-			for (_tmp_ in __ax4_iter_222) {
+		final __ax4_iter_225 = _loc5_.child("accessor");
+		if (checkNullIteratee(__ax4_iter_225))
+			for (_tmp_ in __ax4_iter_225) {
 				_loc3_ = _tmp_;
 				if (_loc3_.attribute("access") != "writeonly") {
 					_loc6_.push(_loc3_.attribute("name"));
 				}
 			}
-		final __ax4_iter_223 = _loc5_.child("variable");
-		if (checkNullIteratee(__ax4_iter_223))
-			for (_tmp_ in __ax4_iter_223) {
+		final __ax4_iter_226 = _loc5_.child("variable");
+		if (checkNullIteratee(__ax4_iter_226))
+			for (_tmp_ in __ax4_iter_226) {
 				_loc4_ = _tmp_;
 				_loc6_.push(_loc4_.attribute("name"));
 			}

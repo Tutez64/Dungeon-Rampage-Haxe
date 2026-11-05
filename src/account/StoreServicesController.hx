@@ -138,9 +138,9 @@ class StoreServicesController {
 	public static function alreadyOwns(dbFacade:DBFacade, gmOffer:GMOffer):Bool {
 		var _loc3_ = dbFacade.dbAccountInfo.inventoryInfo;
 		var _loc4_:GMOfferDetail;
-		final __ax4_iter_336 = gmOffer.Details;
-		if (checkNullIteratee(__ax4_iter_336))
-			for (_tmp_ in __ax4_iter_336) {
+		final __ax4_iter_340 = gmOffer.Details;
+		if (checkNullIteratee(__ax4_iter_340))
+			for (_tmp_ in __ax4_iter_340) {
 				_loc4_ = _tmp_;
 				if (_loc4_.HeroId != 0 && _loc3_.ownsItem(_loc4_.HeroId)) {
 					return true;
@@ -169,9 +169,9 @@ class StoreServicesController {
 	public static function weaponInventoryWouldOverflow(dbFacade:DBFacade, gmOffer:GMOffer):Bool {
 		var _loc4_ = (0 : UInt);
 		var _loc5_:GMOfferDetail;
-		final __ax4_iter_337 = gmOffer.Details;
-		if (checkNullIteratee(__ax4_iter_337))
-			for (_tmp_ in __ax4_iter_337) {
+		final __ax4_iter_341 = gmOffer.Details;
+		if (checkNullIteratee(__ax4_iter_341))
+			for (_tmp_ in __ax4_iter_341) {
 				_loc5_ = _tmp_;
 				if (_loc5_.WeaponId != 0) {
 					_loc4_++;
@@ -190,9 +190,9 @@ class StoreServicesController {
 		var _loc3_ = (0 : UInt);
 		var _loc6_:GMStackable = null;
 		var _loc7_ = new Map();
-		final __ax4_iter_338 = gmOffer.Details;
-		if (checkNullIteratee(__ax4_iter_338))
-			for (_tmp_ in __ax4_iter_338) {
+		final __ax4_iter_342 = gmOffer.Details;
+		if (checkNullIteratee(__ax4_iter_342))
+			for (_tmp_ in __ax4_iter_342) {
 				_loc8_ = _tmp_;
 				_loc4_ = _loc8_.StackableId;
 				if (_loc4_ != 0) {
@@ -204,9 +204,9 @@ class StoreServicesController {
 					}
 				}
 			}
-		final __ax4_iter_339 = gmOffer.Details;
-		if (checkNullIteratee(__ax4_iter_339))
-			for (_tmp_ in __ax4_iter_339) {
+		final __ax4_iter_343 = gmOffer.Details;
+		if (checkNullIteratee(__ax4_iter_343))
+			for (_tmp_ in __ax4_iter_343) {
 				_loc8_ = _tmp_;
 				_loc4_ = _loc8_.StackableId;
 				if (_loc4_ != 0) {
@@ -224,9 +224,9 @@ class StoreServicesController {
 	public static function weaponStorageWouldOverflow(dbFacade:DBFacade, gmOffer:GMOffer):Bool {
 		var _loc5_ = (0 : UInt);
 		var _loc4_:GMOfferDetail;
-		final __ax4_iter_340 = gmOffer.Details;
-		if (checkNullIteratee(__ax4_iter_340))
-			for (_tmp_ in __ax4_iter_340) {
+		final __ax4_iter_344 = gmOffer.Details;
+		if (checkNullIteratee(__ax4_iter_344))
+			for (_tmp_ in __ax4_iter_344) {
 				_loc4_ = _tmp_;
 				_loc5_ += _loc4_.WeaponSlots;
 			}

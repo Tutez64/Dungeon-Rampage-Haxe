@@ -99,9 +99,9 @@ class StarlingWeaponTooltip extends MovieClip {
 		while (ASCompat.toNumberField((mRoot : ASAny).icon, "numChildren") > 1) {
 			(mRoot : ASAny).icon.removeChildAt(1);
 		}
-		final __ax4_iter_185 = mModifiers;
-		if (checkNullIteratee(__ax4_iter_185))
-			for (_tmp_ in __ax4_iter_185) {
+		final __ax4_iter_188 = mModifiers;
+		if (checkNullIteratee(__ax4_iter_188))
+			for (_tmp_ in __ax4_iter_188) {
 				_loc1_ = _tmp_;
 				try {
 					_loc1_.destroy();

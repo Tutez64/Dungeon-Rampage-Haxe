@@ -107,9 +107,9 @@ class StarlingOffScreenManager {
 		if (actor == null || actor == mOwner || actor.isDestroyed) {
 			return;
 		}
-		final __ax4_iter_278 = mClips;
-		if (checkNullIteratee(__ax4_iter_278))
-			for (_tmp_ in __ax4_iter_278) {
+		final __ax4_iter_282 = mClips;
+		if (checkNullIteratee(__ax4_iter_282))
+			for (_tmp_ in __ax4_iter_282) {
 				_loc2_ = _tmp_;
 				if (_loc2_.player == actor) {
 					return;
@@ -209,9 +209,9 @@ class StarlingOffScreenManager {
 
 	public function handlePicChange(playerId:Int, type:String) {
 		var _loc3_:StarlingOffScreenClip = null;
-		final __ax4_iter_279 = mClips;
-		if (checkNullIteratee(__ax4_iter_279))
-			for (_tmp_ in __ax4_iter_279) {
+		final __ax4_iter_283 = mClips;
+		if (checkNullIteratee(__ax4_iter_283))
+			for (_tmp_ in __ax4_iter_283) {
 				_loc3_ = _tmp_;
 				if (_loc3_.player.id == (playerId : UInt)) {
 					_loc3_.handlePicChange(type);
@@ -222,9 +222,9 @@ class StarlingOffScreenManager {
 
 	public function dispose() {
 		var _loc1_:StarlingOffScreenClip = null;
-		final __ax4_iter_280 = mClips;
-		if (checkNullIteratee(__ax4_iter_280))
-			for (_tmp_ in __ax4_iter_280) {
+		final __ax4_iter_284 = mClips;
+		if (checkNullIteratee(__ax4_iter_284))
+			for (_tmp_ in __ax4_iter_284) {
 				_loc1_ = _tmp_;
 				if (mCut != null) {
 					mCut.removeDynamic(_loc1_.root);

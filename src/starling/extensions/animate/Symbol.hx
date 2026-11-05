@@ -1068,7 +1068,7 @@ class Symbol extends DisplayObjectContainer {
 
 	function updateSymbolFilters() {
 		var _loc3_:FragmentFilter;
-		var __ax4_iter_499:Array<ASAny>;
+		var __ax4_iter_509:Array<ASAny>;
 		if (_filterChain != null) {
 			while (_filterChain.numFilters > 0) {
 				_filterChain.removeFilterAt(0, false);
@@ -1107,9 +1107,9 @@ class Symbol extends DisplayObjectContainer {
 				_filterChain.addFilter(_loc2_);
 			}
 			if (_elementFilters != null) {
-				__ax4_iter_499 = _elementFilters;
-				if (checkNullIteratee(__ax4_iter_499))
-					for (_tmp_ in __ax4_iter_499) {
+				__ax4_iter_509 = _elementFilters;
+				if (checkNullIteratee(__ax4_iter_509))
+					for (_tmp_ in __ax4_iter_509) {
 						_loc3_ = ASCompat.coerce(_tmp_, starling.filters.FragmentFilter);
 						_filterChain.addFilter(_loc3_);
 					}
@@ -1128,12 +1128,12 @@ class Symbol extends DisplayObjectContainer {
 
 	function clearFilters() {
 		var _loc1_:FragmentFilter;
-		var __ax4_iter_500:Array<ASAny>;
+		var __ax4_iter_510:Array<ASAny>;
 		this.filter = null;
 		if (_elementFilters != null) {
-			__ax4_iter_500 = _elementFilters;
-			if (checkNullIteratee(__ax4_iter_500))
-				for (_tmp_ in __ax4_iter_500) {
+			__ax4_iter_510 = _elementFilters;
+			if (checkNullIteratee(__ax4_iter_510))
+				for (_tmp_ in __ax4_iter_510) {
 					_loc1_ = ASCompat.coerce(_tmp_, starling.filters.FragmentFilter);
 					_loc1_.dispose();
 				}

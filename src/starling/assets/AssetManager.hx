@@ -98,9 +98,9 @@ class AssetManager extends EventDispatcher {
 		var _loc2_:ASObject;
 		purgeQueue();
 		var _loc1_:ASDictionary<ASAny, ASAny>;
-		final __ax4_iter_365 = _assets;
-		if (checkNullIteratee(__ax4_iter_365))
-			for (_tmp_ in __ax4_iter_365) {
+		final __ax4_iter_375 = _assets;
+		if (checkNullIteratee(__ax4_iter_375))
+			for (_tmp_ in __ax4_iter_375) {
 				_loc1_ = (_tmp_ : ASDictionary<ASAny, ASAny>);
 				if (checkNullIteratee(_loc1_))
 					for (_tmp_ in _loc1_) {
@@ -118,8 +118,8 @@ class AssetManager extends EventDispatcher {
 	}
 
 	public function enqueue(..._rest:ASAny) {
-		var __ax4_iter_366:compat.XMLList;
-		var __ax4_iter_367:compat.XMLList;
+		var __ax4_iter_376:compat.XMLList;
+		var __ax4_iter_377:compat.XMLList;
 		var rest = ASCompat.restToArray(_rest);
 		var asset:ASObject;
 		var typeXml:compat.XML;
@@ -146,19 +146,19 @@ class AssetManager extends EventDispatcher {
 					if (_verbose) {
 						log("Looking for static embedded assets in \'" + typeXml.attribute("name").toString().split("::").pop() + "\'");
 					}
-					__ax4_iter_366 = ASCompat.filterXmlList(typeXml.child("constant"), function(__xml:compat.XML):Bool {
+					__ax4_iter_376 = ASCompat.filterXmlList(typeXml.child("constant"), function(__xml:compat.XML):Bool {
 						return __xml.attribute("type") == "Class";
 					});
-					if (checkNullIteratee(__ax4_iter_366))
-						for (_tmp_ in __ax4_iter_366) {
+					if (checkNullIteratee(__ax4_iter_376))
+						for (_tmp_ in __ax4_iter_376) {
 							childNode = _tmp_;
 							processNode(childNode);
 						}
-					__ax4_iter_367 = ASCompat.filterXmlList(typeXml.child("variable"), function(__xml:compat.XML):Bool {
+					__ax4_iter_377 = ASCompat.filterXmlList(typeXml.child("variable"), function(__xml:compat.XML):Bool {
 						return __xml.attribute("type") == "Class";
 					});
-					if (checkNullIteratee(__ax4_iter_367))
-						for (_tmp_ in __ax4_iter_367) {
+					if (checkNullIteratee(__ax4_iter_377))
+						for (_tmp_ in __ax4_iter_377) {
 							childNode = _tmp_;
 							processNode(childNode);
 						}
@@ -185,11 +185,11 @@ class AssetManager extends EventDispatcher {
 		var _loc10_:compat.XMLList;
 		var _loc2_:compat.XML = null;
 		var _loc3_:compat.XML = null;
-		final __ax4_iter_368 = ASCompat.filterXmlList(variableDeclarationNode.child("metadata"), function(__xml:compat.XML):Bool {
+		final __ax4_iter_378 = ASCompat.filterXmlList(variableDeclarationNode.child("metadata"), function(__xml:compat.XML):Bool {
 			return __xml.attribute("name") == "Embed";
 		});
-		if (checkNullIteratee(__ax4_iter_368))
-			for (_tmp_ in __ax4_iter_368) {
+		if (checkNullIteratee(__ax4_iter_378))
+			for (_tmp_ in __ax4_iter_378) {
 				_loc2_ = _tmp_;
 				_loc11_ = 0;
 				_loc10_ = ASCompat.filterXmlList(_loc2_.child("arg"), function(__xml:compat.XML):Bool {
@@ -209,11 +209,11 @@ class AssetManager extends EventDispatcher {
 		var _loc10_:compat.XMLList;
 		var _loc2_:compat.XML = null;
 		var _loc3_:compat.XML = null;
-		final __ax4_iter_369 = ASCompat.filterXmlList(variableDeclarationNode.child("metadata"), function(__xml:compat.XML):Bool {
+		final __ax4_iter_379 = ASCompat.filterXmlList(variableDeclarationNode.child("metadata"), function(__xml:compat.XML):Bool {
 			return __xml.attribute("name") == "Embed";
 		});
-		if (checkNullIteratee(__ax4_iter_369))
-			for (_tmp_ in __ax4_iter_369) {
+		if (checkNullIteratee(__ax4_iter_379))
+			for (_tmp_ in __ax4_iter_379) {
 				_loc2_ = _tmp_;
 				_loc11_ = 0;
 				_loc10_ = ASCompat.filterXmlList(_loc2_.child("arg"), function(__xml:compat.XML):Bool {
@@ -594,9 +594,9 @@ class AssetManager extends EventDispatcher {
 			out = new Vector<Texture>((0 : UInt));
 		}
 		var _loc3_:String;
-		final __ax4_iter_370 = getTextureNames(prefix, sNames);
-		if (checkNullIteratee(__ax4_iter_370))
-			for (_tmp_ in __ax4_iter_370) {
+		final __ax4_iter_380 = getTextureNames(prefix, sNames);
+		if (checkNullIteratee(__ax4_iter_380))
+			for (_tmp_ in __ax4_iter_380) {
 				_loc3_ = _tmp_;
 				out[out.length] = getTexture(_loc3_);
 			}

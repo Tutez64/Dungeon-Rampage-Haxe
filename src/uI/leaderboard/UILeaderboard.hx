@@ -326,9 +326,9 @@ class UILeaderboard {
 				_loc6_.clearDownNavigation();
 			}
 		var _loc4_:LeaderboardFriendSlot;
-		final __ax4_iter_142 = mFriendSlots;
-		if (checkNullIteratee(__ax4_iter_142))
-			for (_tmp_ in __ax4_iter_142) {
+		final __ax4_iter_145 = mFriendSlots;
+		if (checkNullIteratee(__ax4_iter_145))
+			for (_tmp_ in __ax4_iter_145) {
 				_loc4_ = _tmp_;
 				_loc4_.friendPicButton.clearLeftNavigation();
 				_loc4_.friendPicButton.clearRightNavigation();
@@ -422,9 +422,9 @@ class UILeaderboard {
 
 	public function setupTooltipNavigation(friendPicButton:UIButton, firstButton:UIButton, secondButton:UIButton = null) {
 		var _loc5_:LeaderboardFriendSlot;
-		final __ax4_iter_143 = mFriendSlots;
-		if (checkNullIteratee(__ax4_iter_143))
-			for (_tmp_ in __ax4_iter_143) {
+		final __ax4_iter_146 = mFriendSlots;
+		if (checkNullIteratee(__ax4_iter_146))
+			for (_tmp_ in __ax4_iter_146) {
 				_loc5_ = _tmp_;
 				resetFriendSlotUpNavigation(_loc5_.friendPicButton);
 			}
@@ -469,9 +469,9 @@ class UILeaderboard {
 			_loc4_++;
 		}
 		var _loc2_:LeaderboardFriendSlot;
-		final __ax4_iter_144 = mFriendSlots;
-		if (checkNullIteratee(__ax4_iter_144))
-			for (_tmp_ in __ax4_iter_144) {
+		final __ax4_iter_147 = mFriendSlots;
+		if (checkNullIteratee(__ax4_iter_147))
+			for (_tmp_ in __ax4_iter_147) {
 				_loc2_ = _tmp_;
 				resetFriendSlotUpNavigation(_loc2_.friendPicButton);
 			}
@@ -663,9 +663,9 @@ class UILeaderboard {
 			mDBFacade.menuNavigationController.setFocusedUiObject(mFriendSlots[(mCurrentPopupIndex : Int)].friendPicButton);
 		}
 		var _loc1_:LeaderboardFriendSlot;
-		final __ax4_iter_145 = mFriendSlots;
-		if (checkNullIteratee(__ax4_iter_145))
-			for (_tmp_ in __ax4_iter_145) {
+		final __ax4_iter_148 = mFriendSlots;
+		if (checkNullIteratee(__ax4_iter_148))
+			for (_tmp_ in __ax4_iter_148) {
 				_loc1_ = _tmp_;
 				resetFriendSlotUpNavigation(_loc1_.friendPicButton);
 			}
@@ -784,9 +784,9 @@ class UILeaderboard {
 
 	public function callStopOnPopupTimeToLiveTask(event:MouseEvent = null) {
 		var _loc2_:LeaderboardFriendSlot;
-		final __ax4_iter_146 = mFriendSlots;
-		if (checkNullIteratee(__ax4_iter_146))
-			for (_tmp_ in __ax4_iter_146) {
+		final __ax4_iter_149 = mFriendSlots;
+		if (checkNullIteratee(__ax4_iter_149))
+			for (_tmp_ in __ax4_iter_149) {
 				_loc2_ = _tmp_;
 				_loc2_.stopPopupTimeToLiveTask();
 			}
@@ -796,9 +796,9 @@ class UILeaderboard {
 		initialized = false;
 		mDBFacade = null;
 		var _loc2_:LeaderboardFriendSlot;
-		final __ax4_iter_147 = mFriendSlots;
-		if (checkNullIteratee(__ax4_iter_147))
-			for (_tmp_ in __ax4_iter_147) {
+		final __ax4_iter_150 = mFriendSlots;
+		if (checkNullIteratee(__ax4_iter_150))
+			for (_tmp_ in __ax4_iter_150) {
 				_loc2_ = _tmp_;
 				_loc2_.destroy();
 				_loc2_ = null;
@@ -816,16 +816,16 @@ class UILeaderboard {
 		}
 		mAlertRenderer = null;
 		var _loc3_:FriendInfo;
-		final __ax4_iter_148 = mOnlineFriends;
-		if (checkNullIteratee(__ax4_iter_148))
-			for (_tmp_ in __ax4_iter_148) {
+		final __ax4_iter_151 = mOnlineFriends;
+		if (checkNullIteratee(__ax4_iter_151))
+			for (_tmp_ in __ax4_iter_151) {
 				_loc3_ = _tmp_;
 				_loc3_ = null;
 			}
 		var _loc1_:FriendInfo;
-		final __ax4_iter_149 = mOfflineFriends;
-		if (checkNullIteratee(__ax4_iter_149))
-			for (_tmp_ in __ax4_iter_149) {
+		final __ax4_iter_152 = mOfflineFriends;
+		if (checkNullIteratee(__ax4_iter_152))
+			for (_tmp_ in __ax4_iter_152) {
 				_loc1_ = _tmp_;
 				_loc1_ = null;
 			}

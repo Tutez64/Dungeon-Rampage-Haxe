@@ -55,21 +55,21 @@ class RarityArt {
 	}
 
 	@:allow(uI.hud.starlingConverted) static function verifySlots(layout:ArtNode, facade:DBFacade) {
-		var __ax4_iter_168:Vector<gameMasterDictionary.GMRarity>;
+		var __ax4_iter_171:Vector<gameMasterDictionary.GMRarity>;
 		var _loc3_:String = null;
 		var _loc6_:ASObject = null;
 		var _loc5_:String = null;
 		var _loc4_:ArtNode = null;
-		final __ax4_iter_167 = SLOT_PATHS;
-		if (checkNullIteratee(__ax4_iter_167))
-			for (_tmp_ in __ax4_iter_167) {
+		final __ax4_iter_170 = SLOT_PATHS;
+		if (checkNullIteratee(__ax4_iter_170))
+			for (_tmp_ in __ax4_iter_170) {
 				_loc3_ = _tmp_;
 				if (layout == null || layout.find(_loc3_) == null) {
 					HudArt.fatal("Required HUD rarity slot missing: " + _loc3_);
 				}
-				__ax4_iter_168 = facade.gameMaster.Rarity;
-				if (checkNullIteratee(__ax4_iter_168))
-					for (_tmp_ in __ax4_iter_168) {
+				__ax4_iter_171 = facade.gameMaster.Rarity;
+				if (checkNullIteratee(__ax4_iter_171))
+					for (_tmp_ in __ax4_iter_171) {
 						_loc6_ = _tmp_;
 						if (!(_loc6_ == null || !ASCompat.toBool(_loc6_.HasColoredBackground))) {
 							_loc5_ = StarlingHudSlot.rarityKey(layout, _loc6_.BackgroundSwf, _loc6_.BackgroundIcon);
@@ -88,9 +88,9 @@ class RarityArt {
 		var _loc4_:String = null;
 		sLoaded = done;
 		var _loc6_:ASObject = {};
-		final __ax4_iter_169 = facade.gameMaster.Rarity;
-		if (checkNullIteratee(__ax4_iter_169))
-			for (_tmp_ in __ax4_iter_169) {
+		final __ax4_iter_172 = facade.gameMaster.Rarity;
+		if (checkNullIteratee(__ax4_iter_172))
+			for (_tmp_ in __ax4_iter_172) {
 				_loc8_ = _tmp_;
 				if (ASCompat.toBool(_loc8_.HasColoredBackground)) {
 					_loc4_ = _loc8_.BackgroundSwf;
@@ -113,9 +113,9 @@ class RarityArt {
 				}
 			}
 		var _loc5_ = new Vector<String>((0 : UInt));
-		final __ax4_iter_170:ASObject = sLibraries;
-		if (checkNullIteratee(__ax4_iter_170))
-			for (_tmp_ in __ax4_iter_170.___keys()) {
+		final __ax4_iter_173:ASObject = sLibraries;
+		if (checkNullIteratee(__ax4_iter_173))
+			for (_tmp_ in __ax4_iter_173.___keys()) {
 				_loc4_ = _tmp_;
 				_loc5_.push(_loc4_);
 			}
@@ -143,9 +143,9 @@ class RarityArt {
 		if (--sLoading > 0) {
 			return;
 		}
-		final __ax4_iter_171 = sDefinitions;
-		if (checkNullIteratee(__ax4_iter_171))
-			for (_tmp_ in __ax4_iter_171) {
+		final __ax4_iter_174 = sDefinitions;
+		if (checkNullIteratee(__ax4_iter_174))
+			for (_tmp_ in __ax4_iter_174) {
 				_loc1_ = _tmp_;
 				ASCompat.setProperty(_loc1_, "symbol",
 					HudArt.requireClass(ASCompat.coerce(sLibraries[_loc1_.swf], brain.assetRepository.SwfAsset), _loc1_.swf, _loc1_.name));
@@ -166,8 +166,8 @@ class RarityArt {
 	}
 
 	static function bakeSafely(pages:BakedPages, frames:BakedPages, scale:Float, art:ASObject, done:ASFunction) {
-		var __ax4_iter_173:Vector<String>;
-		var __ax4_iter_174:Array<Dynamic>;
+		var __ax4_iter_176:Vector<String>;
+		var __ax4_iter_177:Array<Dynamic>;
 		var _loc11_:ASObject = null;
 		var _loc6_:String = null;
 		var _loc7_:String = null;
@@ -181,22 +181,22 @@ class RarityArt {
 		sFailures = 0;
 		var _loc10_ = scale;
 		var _loc12_:ASObject = {};
-		final __ax4_iter_172 = Vector.ofArray(["ui_hud_old", "ui_hud"]);
-		if (checkNullIteratee(__ax4_iter_172))
-			for (_tmp_ in __ax4_iter_172) {
+		final __ax4_iter_175 = Vector.ofArray(["ui_hud_old", "ui_hud"]);
+		if (checkNullIteratee(__ax4_iter_175))
+			for (_tmp_ in __ax4_iter_175) {
 				_loc6_ = _tmp_;
 				_loc8_ = ASCompat.dynamicAs(art[_loc6_], ArtNode);
 				if (_loc8_ != null) {
-					__ax4_iter_173 = SLOT_PATHS;
-					if (checkNullIteratee(__ax4_iter_173))
-						for (_tmp_ in __ax4_iter_173) {
+					__ax4_iter_176 = SLOT_PATHS;
+					if (checkNullIteratee(__ax4_iter_176))
+						for (_tmp_ in __ax4_iter_176) {
 							_loc7_ = _tmp_;
 							if (_loc8_.find(_loc7_) == null) {
 								throw new Error("Required HUD rarity slot missing: " + _loc6_ + "." + _loc7_);
 							}
-							__ax4_iter_174 = sDefinitions;
-							if (checkNullIteratee(__ax4_iter_174))
-								for (_tmp_ in __ax4_iter_174) {
+							__ax4_iter_177 = sDefinitions;
+							if (checkNullIteratee(__ax4_iter_177))
+								for (_tmp_ in __ax4_iter_177) {
 									_loc11_ = _tmp_;
 									_loc9_ = key(_loc11_.swf, _loc11_.name, scale);
 									if (!(ASCompat.toBool(_loc12_[_loc9_]) || art["content|" + _loc9_] != null)) {
@@ -324,17 +324,17 @@ class RarityArt {
 		if (art.cell != null && !art.cell.isEmpty) {
 			return true;
 		}
-		final __ax4_iter_175 = art.frames;
-		if (checkNullIteratee(__ax4_iter_175))
-			for (_tmp_ in __ax4_iter_175) {
+		final __ax4_iter_178 = art.frames;
+		if (checkNullIteratee(__ax4_iter_178))
+			for (_tmp_ in __ax4_iter_178) {
 				_loc3_ = _tmp_;
 				if (_loc3_ != null && _loc3_.cell != null && !_loc3_.cell.isEmpty) {
 					return true;
 				}
 			}
-		final __ax4_iter_176 = art.children;
-		if (checkNullIteratee(__ax4_iter_176))
-			for (_tmp_ in __ax4_iter_176) {
+		final __ax4_iter_179 = art.children;
+		if (checkNullIteratee(__ax4_iter_179))
+			for (_tmp_ in __ax4_iter_179) {
 				_loc2_ = _tmp_;
 				if (hasPixels(_loc2_)) {
 					return true;

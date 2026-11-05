@@ -153,9 +153,9 @@ import starling.styles.MeshStyle;
 
 	@:allow(uI.hud.starlingConverted) function refreshTextFilters() {
 		var _loc1_:ArtDisplay = null;
-		final __ax4_iter_281 = mChildren;
-		if (checkNullIteratee(__ax4_iter_281))
-			for (_tmp_ in __ax4_iter_281) {
+		final __ax4_iter_285 = mChildren;
+		if (checkNullIteratee(__ax4_iter_285))
+			for (_tmp_ in __ax4_iter_285) {
 				_loc1_ = _tmp_;
 				_loc1_.refreshTextFilters();
 			}
@@ -163,9 +163,9 @@ import starling.styles.MeshStyle;
 
 	@:allow(uI.hud.starlingConverted) function prepareTextFilters() {
 		var _loc1_:ArtDisplay = null;
-		final __ax4_iter_282 = mChildren;
-		if (checkNullIteratee(__ax4_iter_282))
-			for (_tmp_ in __ax4_iter_282) {
+		final __ax4_iter_286 = mChildren;
+		if (checkNullIteratee(__ax4_iter_286))
+			for (_tmp_ in __ax4_iter_286) {
 				_loc1_ = _tmp_;
 				_loc1_.prepareTextFilters();
 			}
@@ -232,7 +232,7 @@ import starling.styles.MeshStyle;
 	}
 
 	@:allow(uI.hud.starlingConverted) function setGrayscale(value:Bool):Bool {
-		var __ax4_iter_283:Vector<ArtFrame>;
+		var __ax4_iter_287:Vector<ArtFrame>;
 		var _loc4_:ArtFrame = null;
 		var _loc5_:ArtDisplay = null;
 		var _loc3_ = true;
@@ -242,9 +242,9 @@ import starling.styles.MeshStyle;
 			if (mArt.cell != null && HudArtConverter.grayscale(mArt.cell, _loc2_) == null) {
 				_loc3_ = false;
 			}
-			__ax4_iter_283 = mArt.frames;
-			if (checkNullIteratee(__ax4_iter_283))
-				for (_tmp_ in __ax4_iter_283) {
+			__ax4_iter_287 = mArt.frames;
+			if (checkNullIteratee(__ax4_iter_287))
+				for (_tmp_ in __ax4_iter_287) {
 					_loc4_ = _tmp_;
 					if (_loc4_ != null && _loc4_.cell != null && HudArtConverter.grayscale(_loc4_.cell, _loc2_) == null) {
 						_loc3_ = false;
@@ -255,9 +255,9 @@ import starling.styles.MeshStyle;
 		if (mImage != null && mCell__UI_Hud_StarlingConverted_ArtDisplay != null) {
 			mImage.cell = value ? HudArtConverter.grayCell(mCell__UI_Hud_StarlingConverted_ArtDisplay) : mCell__UI_Hud_StarlingConverted_ArtDisplay;
 		}
-		final __ax4_iter_284 = mChildren;
-		if (checkNullIteratee(__ax4_iter_284))
-			for (_tmp_ in __ax4_iter_284) {
+		final __ax4_iter_288 = mChildren;
+		if (checkNullIteratee(__ax4_iter_288))
+			for (_tmp_ in __ax4_iter_288) {
 				_loc5_ = _tmp_;
 				if (!_loc5_.setGrayscale(value)) {
 					_loc3_ = false;
@@ -306,9 +306,9 @@ import starling.styles.MeshStyle;
 			}
 		}
 		applyContentColor(_loc1_, _loc3_, _loc4_, _loc7_, _loc8_, _loc2_);
-		final __ax4_iter_285 = mChildren;
-		if (checkNullIteratee(__ax4_iter_285))
-			for (_tmp_ in __ax4_iter_285) {
+		final __ax4_iter_289 = mChildren;
+		if (checkNullIteratee(__ax4_iter_289))
+			for (_tmp_ in __ax4_iter_289) {
 				_loc9_ = _tmp_;
 				_loc9_.tint(_loc1_, _loc3_, _loc4_, _loc7_, _loc8_, _loc2_);
 			}
@@ -322,9 +322,9 @@ import starling.styles.MeshStyle;
 
 	@:allow(uI.hud.starlingConverted) function driveChildren(head:Float) {
 		var _loc2_:ArtDisplay = null;
-		final __ax4_iter_286 = mChildren;
-		if (checkNullIteratee(__ax4_iter_286))
-			for (_tmp_ in __ax4_iter_286) {
+		final __ax4_iter_290 = mChildren;
+		if (checkNullIteratee(__ax4_iter_290))
+			for (_tmp_ in __ax4_iter_290) {
 				_loc2_ = _tmp_;
 				if (_loc2_.visible) {
 					if (!(Std.isOfType(_loc2_, TimelineView) && cast(_loc2_, TimelineView).stageRate)) {
@@ -340,9 +340,9 @@ import starling.styles.MeshStyle;
 
 	@:allow(uI.hud.starlingConverted) function resetChildren() {
 		var _loc1_:ArtDisplay = null;
-		final __ax4_iter_287 = mChildren;
-		if (checkNullIteratee(__ax4_iter_287))
-			for (_tmp_ in __ax4_iter_287) {
+		final __ax4_iter_291 = mChildren;
+		if (checkNullIteratee(__ax4_iter_291))
+			for (_tmp_ in __ax4_iter_291) {
 				_loc1_ = _tmp_;
 				if (!(Std.isOfType(_loc1_, TimelineView) && cast(_loc1_, TimelineView).stageRate)) {
 					if (Std.isOfType(_loc1_, TimelineView)) {
@@ -355,9 +355,9 @@ import starling.styles.MeshStyle;
 
 	@:allow(uI.hud.starlingConverted) function setStageRate(value:Bool) {
 		var _loc2_:ArtDisplay = null;
-		final __ax4_iter_288 = mChildren;
-		if (checkNullIteratee(__ax4_iter_288))
-			for (_tmp_ in __ax4_iter_288) {
+		final __ax4_iter_292 = mChildren;
+		if (checkNullIteratee(__ax4_iter_292))
+			for (_tmp_ in __ax4_iter_292) {
 				_loc2_ = _tmp_;
 				if (Std.isOfType(_loc2_, TimelineView)) {
 					cast(_loc2_, TimelineView).stageRate = value;
@@ -377,9 +377,9 @@ import starling.styles.MeshStyle;
 		if (Std.isOfType(this, TimelineView)) {
 			cast(this, TimelineView).advanceWhileHidden = value;
 		}
-		final __ax4_iter_289 = mChildren;
-		if (checkNullIteratee(__ax4_iter_289))
-			for (_tmp_ in __ax4_iter_289) {
+		final __ax4_iter_293 = mChildren;
+		if (checkNullIteratee(__ax4_iter_293))
+			for (_tmp_ in __ax4_iter_293) {
 				_loc2_ = _tmp_;
 				_loc2_.advanceHiddenTimelines(value);
 			}

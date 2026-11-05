@@ -14,7 +14,7 @@ class TextFilterBake {
 
 	@:allow(uI.hud.starlingConverted) static function bake(field:TextField, ancestors:Vector<ArtDisplay>, variant:Int, scale:Float,
 			placement:Matrix):BakedPicture {
-		var __ax4_iter_165:Array<ASAny>;
+		var __ax4_iter_168:Array<ASAny>;
 		var _loc11_:Sprite = null;
 		var _loc6_:ArtDisplay = null;
 		var _loc12_:Array<ASAny> = null;
@@ -42,9 +42,9 @@ class TextFilterBake {
 				}
 				_loc12_ = [];
 				if (_loc8_ > 0) {
-					__ax4_iter_165 = _loc6_.art.filterStates[_loc16_];
-					if (checkNullIteratee(__ax4_iter_165))
-						for (_tmp_ in __ax4_iter_165) {
+					__ax4_iter_168 = _loc6_.art.filterStates[_loc16_];
+					if (checkNullIteratee(__ax4_iter_168))
+						for (_tmp_ in __ax4_iter_168) {
 							_loc13_ = ASCompat.coerce(_tmp_, flash.filters.BitmapFilter);
 							_loc12_.push(_loc13_.clone());
 						}

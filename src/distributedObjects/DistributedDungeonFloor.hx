@@ -595,9 +595,9 @@ class DistributedDungeonFloor extends Floor implements IDistributedDungeonFloor 
 		mEntryGeneration = _loc2_.floorGeneration;
 		var _loc1_ = ASCompat.reinterpretAs(parentArea, DistributedDungionArea);
 		var _loc3_:String;
-		final __ax4_iter_321 = TrickleCacheLoader.starlingAtlasPaths(mDBFacade, (_loc1_ != null ? _loc1_.mCacheNpc : null : Vector<UInt>));
-		if (checkNullIteratee(__ax4_iter_321))
-			for (_tmp_ in __ax4_iter_321) {
+		final __ax4_iter_325 = TrickleCacheLoader.starlingAtlasPaths(mDBFacade, (_loc1_ != null ? _loc1_.mCacheNpc : null : Vector<UInt>));
+		if (checkNullIteratee(__ax4_iter_325))
+			for (_tmp_ in __ax4_iter_325) {
 				_loc3_ = _tmp_;
 				_loc2_.queueStarlingAssetsForPath(_loc3_);
 			}
@@ -876,9 +876,9 @@ class DistributedDungeonFloor extends Floor implements IDistributedDungeonFloor 
 		mRemoteActors.clear();
 		mRemoteActors = null;
 		var _loc11_:ASObject;
-		final __ax4_iter_322 = mDoobers;
-		if (checkNullIteratee(__ax4_iter_322))
-			for (_tmp_ in __ax4_iter_322.keys()) {
+		final __ax4_iter_326 = mDoobers;
+		if (checkNullIteratee(__ax4_iter_326))
+			for (_tmp_ in __ax4_iter_326.keys()) {
 				_loc11_ = _tmp_;
 				_loc3_ = ASCompat.dynamicAs(_loc11_, DooberGameObject);
 				if (_loc3_ != null && !_loc3_.isDestroyed) {
@@ -888,9 +888,9 @@ class DistributedDungeonFloor extends Floor implements IDistributedDungeonFloor 
 		mDoobers = null;
 		var _loc2_:Array<ASAny> = [];
 		var _loc9_:ASObject;
-		final __ax4_iter_323 = mProjectiles;
-		if (checkNullIteratee(__ax4_iter_323))
-			for (_tmp_ in __ax4_iter_323.keys()) {
+		final __ax4_iter_327 = mProjectiles;
+		if (checkNullIteratee(__ax4_iter_327))
+			for (_tmp_ in __ax4_iter_327.keys()) {
 				_loc9_ = _tmp_;
 				_loc2_.push(_loc9_);
 			}

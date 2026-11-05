@@ -81,7 +81,7 @@ class UIShopWeaponOffer extends UIShopOffer {
 
 	override public function destroy() {
 		var _loc1_:UIModifier;
-		var __ax4_iter_429:Vector<UIModifier>;
+		var __ax4_iter_439:Vector<UIModifier>;
 		mTapTooltip.destroy();
 		mTapIcon.destroy();
 		mTapIcon = null;
@@ -92,9 +92,9 @@ class UIShopWeaponOffer extends UIShopOffer {
 		mRollOutCallback = null;
 		mWeaponDescTooltip.destroy();
 		if (mUIModifierList != null) {
-			__ax4_iter_429 = mUIModifierList;
-			if (checkNullIteratee(__ax4_iter_429))
-				for (_tmp_ in __ax4_iter_429) {
+			__ax4_iter_439 = mUIModifierList;
+			if (checkNullIteratee(__ax4_iter_439))
+				for (_tmp_ in __ax4_iter_439) {
 					_loc1_ = _tmp_;
 					_loc1_.destroy();
 				}

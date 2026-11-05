@@ -514,6 +514,7 @@ class DBAccountInfo {
 			"account_id": this.mId,
 			"name": this.mName,
 			"trophies": this.trophies,
+			"ascension_level": activeAscensionLevel,
 			"steam_avatar_url": mDBFacade.mSteamAvatarUrl,
 			"status_online": true,
 			"in_dungeon": false
@@ -608,6 +609,12 @@ class DBAccountInfo {
 
 	public function get_trophies():UInt {
 		return mTrophyCount;
+	}
+
+	@:isVar var activeAscensionLevel(get, never):UInt;
+
+	function get_activeAscensionLevel():UInt {
+		return mActiveAvatar != null ? mActiveAvatar.mAscensionLevel : (0 : UInt);
 	}
 
 	public function hasAllTrophies():Bool {
@@ -757,6 +764,10 @@ class DBAccountInfo {
 		mActiveAvatar = mInventory.getAvatarInfoForAvatarInstanceId((_loc3_ : UInt));
 		if (mLocalFriendInfo != null) {
 			mLocalFriendInfo.refreshOwnPortrait();
+			if (mLocalFriendInfo.ascensionLevel != activeAscensionLevel) {
+				mLocalFriendInfo.ascensionLevel = activeAscensionLevel;
+				mEventComponent.dispatchEvent(new Event("REFRESH_FRIENDS_EVENT"));
+			}
 		}
 		mEventComponent.dispatchEvent(new Event("ACTIVE_AVATAR_CHANGED_EVENT"));
 		parseCurrency(details);

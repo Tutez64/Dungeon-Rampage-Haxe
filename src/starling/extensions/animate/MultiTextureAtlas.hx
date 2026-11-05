@@ -57,9 +57,9 @@ class MultiTextureAtlas extends TextureAtlas {
 		var _loc5_ = new Vector<String>((0 : UInt));
 		var _loc7_ = Pool.getRectangle();
 		var _loc8_:ASObject;
-		final __ax4_iter_508:ASAny = data.ATLAS.SPRITES;
-		if (checkNullIteratee(__ax4_iter_508))
-			for (_tmp_ in __ax4_iter_508) {
+		final __ax4_iter_518:ASAny = data.ATLAS.SPRITES;
+		if (checkNullIteratee(__ax4_iter_518))
+			for (_tmp_ in __ax4_iter_518) {
 				_loc8_ = _tmp_;
 				_loc4_ = _loc8_.SPRITE;
 				_loc6_ = _loc4_.name;
@@ -81,9 +81,9 @@ class MultiTextureAtlas extends TextureAtlas {
 			return;
 		}
 		var _loc2_:String;
-		final __ax4_iter_509:ASAny = _loc4_.names;
-		if (checkNullIteratee(__ax4_iter_509))
-			for (_tmp_ in __ax4_iter_509) {
+		final __ax4_iter_519:ASAny = _loc4_.names;
+		if (checkNullIteratee(__ax4_iter_519))
+			for (_tmp_ in __ax4_iter_519) {
 				_loc2_ = _tmp_;
 				removeRegion(_loc2_);
 			}
@@ -133,24 +133,24 @@ class MultiTextureAtlas extends TextureAtlas {
 	}
 
 	override public function getNames(prefix:String = "", out:Vector<String> = null):Vector<String> {
-		var __ax4_iter_510:ASDictionary<ASAny, ASAny>;
+		var __ax4_iter_520:ASDictionary<ASAny, ASAny>;
 		var _loc3_:String = null;
 		if (out == null) {
 			out = new Vector<String>((0 : UInt));
 		}
 		if (_regionNames == null) {
 			_regionNames = new Vector<String>((0 : UInt));
-			__ax4_iter_510 = _regions;
-			if (checkNullIteratee(__ax4_iter_510))
-				for (_tmp_ in __ax4_iter_510.keys()) {
+			__ax4_iter_520 = _regions;
+			if (checkNullIteratee(__ax4_iter_520))
+				for (_tmp_ in __ax4_iter_520.keys()) {
 					_loc3_ = _tmp_;
 					_regionNames[_regionNames.length] = _loc3_;
 				}
 			ASCompat.ASVector.sortWithOptions(_regionNames, 1);
 		}
-		final __ax4_iter_511 = _regionNames;
-		if (checkNullIteratee(__ax4_iter_511))
-			for (_tmp_ in __ax4_iter_511) {
+		final __ax4_iter_521 = _regionNames;
+		if (checkNullIteratee(__ax4_iter_521))
+			for (_tmp_ in __ax4_iter_521) {
 				_loc3_ = _tmp_;
 				if (_loc3_.indexOf(prefix) == 0) {
 					out[out.length] = _loc3_;
@@ -185,9 +185,9 @@ class MultiTextureAtlas extends TextureAtlas {
 
 	override public function removeRegions(prefix:String = "") {
 		var _loc2_:String;
-		final __ax4_iter_512 = _regions;
-		if (checkNullIteratee(__ax4_iter_512))
-			for (_tmp_ in __ax4_iter_512.keys()) {
+		final __ax4_iter_522 = _regions;
+		if (checkNullIteratee(__ax4_iter_522))
+			for (_tmp_ in __ax4_iter_522.keys()) {
 				_loc2_ = _tmp_;
 				if (prefix == "" || _loc2_.indexOf(prefix) == 0) {
 					removeRegion(_loc2_);

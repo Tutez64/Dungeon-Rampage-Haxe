@@ -64,9 +64,9 @@ class WeaponRenderer extends ActorRenderer {
 			return true;
 		}
 		var _loc2_:String;
-		final __ax4_iter_331 = DIRECTION_LABEL_SUFFIXES;
-		if (checkNullIteratee(__ax4_iter_331))
-			for (_tmp_ in __ax4_iter_331) {
+		final __ax4_iter_335 = DIRECTION_LABEL_SUFFIXES;
+		if (checkNullIteratee(__ax4_iter_335))
+			for (_tmp_ in __ax4_iter_335) {
 				_loc2_ = _tmp_;
 				if (animation.hasFrameLabelSuffix(_loc2_)) {
 					return true;

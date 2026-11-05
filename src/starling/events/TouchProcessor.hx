@@ -82,7 +82,7 @@ class TouchProcessor {
 	}
 
 	public function advanceTime(passedTime:Float) {
-		var __ax4_iter_150:Vector<Touch>;
+		var __ax4_iter_153:Vector<Touch>;
 		var _loc3_ = 0;
 		var _loc4_:Touch = null;
 		var _loc5_:TouchData = null;
@@ -104,9 +104,9 @@ class TouchProcessor {
 		}
 		while (_queue.length > 0 || _loc2_ == 0) {
 			_loc2_++;
-			__ax4_iter_150 = _currentTouches;
-			if (checkNullIteratee(__ax4_iter_150))
-				for (_tmp_ in __ax4_iter_150) {
+			__ax4_iter_153 = _currentTouches;
+			if (checkNullIteratee(__ax4_iter_153))
+				for (_tmp_ in __ax4_iter_153) {
 					_loc4_ = _tmp_;
 					if (_loc4_.phase == "began" || _loc4_.phase == "moved") {
 						_loc4_.phase = "stationary";
@@ -171,9 +171,9 @@ class TouchProcessor {
 				}
 			}
 		var _loc5_:ASObject;
-		final __ax4_iter_151 = sHoveringTouchData;
-		if (checkNullIteratee(__ax4_iter_151))
-			for (_tmp_ in __ax4_iter_151) {
+		final __ax4_iter_154 = sHoveringTouchData;
+		if (checkNullIteratee(__ax4_iter_154))
+			for (_tmp_ in __ax4_iter_154) {
 				_loc5_ = _tmp_;
 				if (_loc5_.touch.target != _loc5_.target) {
 					_touchEvent.dispatch((_loc5_.bubbleChain : Vector<EventDispatcher>));
@@ -259,16 +259,16 @@ class TouchProcessor {
 
 	public function cancelTouches() {
 		var _loc1_:Touch;
-		var __ax4_iter_152:Vector<Touch>;
+		var __ax4_iter_155:Vector<Touch>;
 		if (_isProcessing) {
 			_cancelRequested = true;
 			return;
 		}
 		_cancelRequested = false;
 		if (_currentTouches.length > 0) {
-			__ax4_iter_152 = _currentTouches;
-			if (checkNullIteratee(__ax4_iter_152))
-				for (_tmp_ in __ax4_iter_152) {
+			__ax4_iter_155 = _currentTouches;
+			if (checkNullIteratee(__ax4_iter_155))
+				for (_tmp_ in __ax4_iter_155) {
 					_loc1_ = _tmp_;
 					if (_loc1_.phase == "began" || _loc1_.phase == "moved" || _loc1_.phase == "stationary") {
 						_loc1_.phase = "ended";
@@ -302,9 +302,9 @@ class TouchProcessor {
 		var _loc5_:Touch = null;
 		var _loc2_ = _multitapDistance * _multitapDistance;
 		var _loc3_:Touch;
-		final __ax4_iter_153 = _lastTaps;
-		if (checkNullIteratee(__ax4_iter_153))
-			for (_tmp_ in __ax4_iter_153) {
+		final __ax4_iter_156 = _lastTaps;
+		if (checkNullIteratee(__ax4_iter_156))
+			for (_tmp_ in __ax4_iter_156) {
 				_loc3_ = _tmp_;
 				_loc4_ = Math.pow(_loc3_.globalX - touch.globalX, 2) + Math.pow(_loc3_.globalY - touch.globalY, 2);
 				if (_loc4_ <= _loc2_) {
@@ -335,9 +335,9 @@ class TouchProcessor {
 
 	function getCurrentTouch(touchID:Int):Touch {
 		var _loc2_:Touch;
-		final __ax4_iter_154 = _currentTouches;
-		if (checkNullIteratee(__ax4_iter_154))
-			for (_tmp_ in __ax4_iter_154) {
+		final __ax4_iter_157 = _currentTouches;
+		if (checkNullIteratee(__ax4_iter_157))
+			for (_tmp_ in __ax4_iter_157) {
 				_loc2_ = _tmp_;
 				if (_loc2_.id == touchID) {
 					return _loc2_;

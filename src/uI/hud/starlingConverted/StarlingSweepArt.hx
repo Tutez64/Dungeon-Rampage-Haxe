@@ -692,7 +692,7 @@ class StarlingSweepArt {
 
 	public function bakeDisc(clip:MovieClip, pixelScale:Float, onSeek:ASFunction = null):BakedPicture {
 		var _loc8_:Int;
-		var __ax4_iter_217:Vector<Int>;
+		var __ax4_iter_220:Vector<Int>;
 		var __finallyReturn0:BakedPicture;
 		var __finallyReturn1:BakedPicture;
 		var __finallyReturn2:BakedPicture;
@@ -718,7 +718,7 @@ class StarlingSweepArt {
 		var _loc4_ = clip.visible;
 		{
 			var _loc8_:Int;
-			var __ax4_iter_217:Vector<Int>;
+			var __ax4_iter_220:Vector<Int>;
 			var __finallyReturn0:BakedPicture;
 			var __finallyReturn1:BakedPicture;
 			var __finallyReturn2:BakedPicture;
@@ -727,9 +727,9 @@ class StarlingSweepArt {
 					clip.visible = true;
 					_loc6_ = new BitmapData(_loc18_, _loc20_, true, (0 : UInt));
 					_loc12_ = new Matrix(pixelScale, 0, 0, pixelScale, -_loc16_, -_loc15_);
-					__ax4_iter_217 = coverFrames;
-					if (checkNullIteratee(__ax4_iter_217))
-						for (_tmp_ in __ax4_iter_217) {
+					__ax4_iter_220 = coverFrames;
+					if (checkNullIteratee(__ax4_iter_220))
+						for (_tmp_ in __ax4_iter_220) {
 							_loc8_ = _tmp_;
 							seek(clip, _loc8_, onSeek);
 							_loc6_.fillRect(_loc6_.rect, (0 : UInt));

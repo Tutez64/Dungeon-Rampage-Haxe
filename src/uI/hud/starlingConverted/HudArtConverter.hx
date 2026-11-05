@@ -179,15 +179,15 @@ class HudArtConverter {
 	}
 
 	static function buildBounds(node:ArtNode):Rectangle {
-		var __ax4_iter_243:Vector<ArtChildState>;
-		var __ax4_iter_244:Vector<ArtNode>;
+		var __ax4_iter_246:Vector<ArtChildState>;
+		var __ax4_iter_247:Vector<ArtNode>;
 		var _loc4_:ArtNode = null;
 		var _loc5_:ArtFrame = null;
 		var _loc3_:ArtChildState = null;
 		var _loc2_ = new Rectangle();
-		final __ax4_iter_241 = node.children;
-		if (checkNullIteratee(__ax4_iter_241))
-			for (_tmp_ in __ax4_iter_241) {
+		final __ax4_iter_244 = node.children;
+		if (checkNullIteratee(__ax4_iter_244))
+			for (_tmp_ in __ax4_iter_244) {
 				_loc4_ = _tmp_;
 				buildBounds(_loc4_);
 			}
@@ -195,15 +195,15 @@ class HudArtConverter {
 		if (node.model != null) {
 			_loc2_ = node.model.getBounds(node.model);
 		}
-		final __ax4_iter_242 = node.frames;
-		if (checkNullIteratee(__ax4_iter_242))
-			for (_tmp_ in __ax4_iter_242) {
+		final __ax4_iter_245 = node.frames;
+		if (checkNullIteratee(__ax4_iter_245))
+			for (_tmp_ in __ax4_iter_245) {
 				_loc5_ = _tmp_;
 				if (_loc5_ != null) {
 					addCellBounds(_loc2_, _loc5_.cell);
-					__ax4_iter_243 = _loc5_.children;
-					if (checkNullIteratee(__ax4_iter_243))
-						for (_tmp_ in __ax4_iter_243) {
+					__ax4_iter_246 = _loc5_.children;
+					if (checkNullIteratee(__ax4_iter_246))
+						for (_tmp_ in __ax4_iter_246) {
 							_loc3_ = _tmp_;
 							if (_loc3_.visible && _loc3_.alpha > 0) {
 								addTransformed(_loc2_, node.children[_loc3_.child].maximalBounds, _loc3_.matrix, _loc3_.parentClip);
@@ -212,9 +212,9 @@ class HudArtConverter {
 				}
 			}
 		if (node.frames.length == 0) {
-			__ax4_iter_244 = node.children;
-			if (checkNullIteratee(__ax4_iter_244))
-				for (_tmp_ in __ax4_iter_244) {
+			__ax4_iter_247 = node.children;
+			if (checkNullIteratee(__ax4_iter_247))
+				for (_tmp_ in __ax4_iter_247) {
 					_loc4_ = _tmp_;
 					addTransformed(_loc2_, _loc4_.maximalBounds, _loc4_.matrix, _loc4_.parentClip);
 				}
@@ -567,9 +567,9 @@ class HudArtConverter {
 
 	static function readLabels(node:ArtNode, clip:MovieClip) {
 		var _loc3_:FrameLabel = null;
-		final __ax4_iter_245 = clip.currentLabels;
-		if (checkNullIteratee(__ax4_iter_245))
-			for (_tmp_ in __ax4_iter_245) {
+		final __ax4_iter_248 = clip.currentLabels;
+		if (checkNullIteratee(__ax4_iter_248))
+			for (_tmp_ in __ax4_iter_248) {
 				_loc3_ = _tmp_;
 				node.labels[_loc3_.name] = _loc3_.frame - 1;
 				if (node.labelLoop == 0 && _loc3_.name == "loop") {
@@ -786,15 +786,15 @@ class HudArtConverter {
 
 	function finish(silhouettes:Bool = true) {
 		var _loc2_:ASObject;
-		var __ax4_iter_246:ASDictionary<ASAny, ASAny>;
-		var __ax4_iter_247:ASDictionary<ASAny, ASAny>;
-		var __ax4_iter_248:ASDictionary<ASAny, ASAny>;
 		var __ax4_iter_249:ASDictionary<ASAny, ASAny>;
+		var __ax4_iter_250:ASDictionary<ASAny, ASAny>;
+		var __ax4_iter_251:ASDictionary<ASAny, ASAny>;
+		var __ax4_iter_252:ASDictionary<ASAny, ASAny>;
 		var _loc3_:DisplayObject = null;
 		{
 			var _loc2_:ASObject;
-			var __ax4_iter_246:ASDictionary<ASAny, ASAny>;
-			var __ax4_iter_247:ASDictionary<ASAny, ASAny>;
+			var __ax4_iter_249:ASDictionary<ASAny, ASAny>;
+			var __ax4_iter_250:ASDictionary<ASAny, ASAny>;
 			try {
 				try {
 					if (silhouettes && mRoot != null && mError == null) {
@@ -805,9 +805,9 @@ class HudArtConverter {
 				};
 			} catch (__finallyError0:Dynamic) {
 				{
-					__ax4_iter_246 = mTouched;
-					if (checkNullIteratee(__ax4_iter_246))
-						for (_tmp_ in __ax4_iter_246.keys()) {
+					__ax4_iter_249 = mTouched;
+					if (checkNullIteratee(__ax4_iter_249))
+						for (_tmp_ in __ax4_iter_249.keys()) {
 							_loc2_ = _tmp_;
 							_loc3_ = ASCompat.dynamicAs(_loc2_, DisplayObject);
 							try {
@@ -821,9 +821,9 @@ class HudArtConverter {
 					} catch (restoreError:ASAny) {
 						recordError(restoreError);
 					}
-					__ax4_iter_247 = mTouched;
-					if (checkNullIteratee(__ax4_iter_247))
-						for (_tmp_ in __ax4_iter_247.keys()) {
+					__ax4_iter_250 = mTouched;
+					if (checkNullIteratee(__ax4_iter_250))
+						for (_tmp_ in __ax4_iter_250.keys()) {
 							_loc2_ = _tmp_;
 							try {
 								restoreProperties(ASCompat.dynamicAs(_loc2_, DisplayObject), mTouched[_loc2_]);
@@ -838,9 +838,9 @@ class HudArtConverter {
 				throw __finallyError0;
 			};
 			{
-				__ax4_iter_248 = mTouched;
-				if (checkNullIteratee(__ax4_iter_248))
-					for (_tmp_ in __ax4_iter_248.keys()) {
+				__ax4_iter_251 = mTouched;
+				if (checkNullIteratee(__ax4_iter_251))
+					for (_tmp_ in __ax4_iter_251.keys()) {
 						_loc2_ = _tmp_;
 						_loc3_ = ASCompat.dynamicAs(_loc2_, DisplayObject);
 						try {
@@ -854,9 +854,9 @@ class HudArtConverter {
 				} catch (restoreError:ASAny) {
 					recordError(restoreError);
 				}
-				__ax4_iter_249 = mTouched;
-				if (checkNullIteratee(__ax4_iter_249))
-					for (_tmp_ in __ax4_iter_249.keys()) {
+				__ax4_iter_252 = mTouched;
+				if (checkNullIteratee(__ax4_iter_252))
+					for (_tmp_ in __ax4_iter_252.keys()) {
 						_loc2_ = _tmp_;
 						try {
 							restoreProperties(ASCompat.dynamicAs(_loc2_, DisplayObject), mTouched[_loc2_]);
@@ -887,9 +887,9 @@ class HudArtConverter {
 	function labelBehaviour(node:ArtNode):Int {
 		var _loc3_:ArtNode = null;
 		var _loc2_ = 0;
-		final __ax4_iter_250 = node.children;
-		if (checkNullIteratee(__ax4_iter_250))
-			for (_tmp_ in __ax4_iter_250) {
+		final __ax4_iter_253 = node.children;
+		if (checkNullIteratee(__ax4_iter_253))
+			for (_tmp_ in __ax4_iter_253) {
 				_loc3_ = _tmp_;
 				_loc2_ = labelBehaviour(_loc3_);
 				if (_loc2_ != 0) {
@@ -1323,21 +1323,21 @@ class HudArtConverter {
 	}
 
 	function bakeSamples(node:ArtNode) {
-		var __ax4_iter_252:ASAny;
+		var __ax4_iter_255:ASAny;
 		var child:ArtNode;
 		var sample:ASObject;
 		var frame:ArtFrame;
 		mJobs.push(function() {
 			finishSamples(node);
 		});
-		final __ax4_iter_251 = node.children;
-		if (checkNullIteratee(__ax4_iter_251))
-			for (_tmp_ in __ax4_iter_251) {
+		final __ax4_iter_254 = node.children;
+		if (checkNullIteratee(__ax4_iter_254))
+			for (_tmp_ in __ax4_iter_254) {
 				child = _tmp_;
 				if (ASCompat.dictionaryLookupNeNull(mSamples, child)) {
-					__ax4_iter_252 = mSamples[child];
-					if (checkNullIteratee(__ax4_iter_252))
-						for (_tmp_ in __ax4_iter_252) {
+					__ax4_iter_255 = mSamples[child];
+					if (checkNullIteratee(__ax4_iter_255))
+						for (_tmp_ in __ax4_iter_255) {
 							frame = ASCompat.coerce(_tmp_, uI.hud.starlingConverted.ArtFrame);
 							sample = mSampleBakes[frame];
 							if (sample != null) {
@@ -1402,18 +1402,18 @@ class HudArtConverter {
 	}
 
 	function finishSamples(node:ArtNode) {
-		var __ax4_iter_254:Vector<ArtFrame>;
+		var __ax4_iter_257:Vector<ArtFrame>;
 		var _loc2_:ArtNode = null;
 		var _loc3_:ArtFrame = null;
-		final __ax4_iter_253 = node.children;
-		if (checkNullIteratee(__ax4_iter_253))
-			for (_tmp_ in __ax4_iter_253) {
+		final __ax4_iter_256 = node.children;
+		if (checkNullIteratee(__ax4_iter_256))
+			for (_tmp_ in __ax4_iter_256) {
 				_loc2_ = _tmp_;
 				if (ASCompat.toNumber(mSampleCounts[_loc2_]) == 1) {
 					_loc3_ = null;
-					__ax4_iter_254 = _loc2_.frames;
-					if (checkNullIteratee(__ax4_iter_254))
-						for (_tmp_ in __ax4_iter_254) {
+					__ax4_iter_257 = _loc2_.frames;
+					if (checkNullIteratee(__ax4_iter_257))
+						for (_tmp_ in __ax4_iter_257) {
 							_loc3_ = _tmp_;
 							if (_loc3_ != null) {
 								break;
@@ -1699,9 +1699,9 @@ class HudArtConverter {
 	function inheritSilhouettes(node:ArtNode, inherited:Bool) {
 		var _loc3_:ArtNode = null;
 		node.wantsSilhouette = inherited || node.wantsSilhouette;
-		final __ax4_iter_255 = node.children;
-		if (checkNullIteratee(__ax4_iter_255))
-			for (_tmp_ in __ax4_iter_255) {
+		final __ax4_iter_258 = node.children;
+		if (checkNullIteratee(__ax4_iter_258))
+			for (_tmp_ in __ax4_iter_258) {
 				_loc3_ = _tmp_;
 				inheritSilhouettes(_loc3_, node.wantsSilhouette);
 			}

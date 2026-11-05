@@ -180,9 +180,9 @@ class DungeonRewardPanel {
 	public function getNavigationEntry(selectedChest:ChestInfo):UIObject {
 		var _loc2_:DungeonRewardElement = null;
 		var _loc3_:DungeonRewardElement;
-		final __ax4_iter_347 = mDungeonRewardElements;
-		if (checkNullIteratee(__ax4_iter_347))
-			for (_tmp_ in __ax4_iter_347) {
+		final __ax4_iter_356 = mDungeonRewardElements;
+		if (checkNullIteratee(__ax4_iter_356))
+			for (_tmp_ in __ax4_iter_356) {
 				_loc3_ = _tmp_;
 				if (_loc2_ == null) {
 					_loc2_ = _loc3_;

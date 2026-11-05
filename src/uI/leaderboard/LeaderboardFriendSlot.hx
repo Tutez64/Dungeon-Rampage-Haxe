@@ -49,6 +49,8 @@ class LeaderboardFriendSlot {
 
 	var mFriendLevel:MovieClip;
 
+	var mFriendAscension:MovieClip;
+
 	var mOnlinePopup:MovieClip;
 
 	var mOfflinePopup:MovieClip;
@@ -102,6 +104,9 @@ class LeaderboardFriendSlot {
 		mFriendLevel = ASCompat.coerce((mFriendSlot : ASAny).friend_level, flash.display.MovieClip);
 		mFriendLevel.mouseEnabled = false;
 		mFriendLevel.mouseChildren = false;
+		mFriendAscension = ASCompat.coerce((mFriendSlot : ASAny).friend_ascension, flash.display.MovieClip);
+		mFriendAscension.mouseEnabled = false;
+		mFriendAscension.mouseChildren = false;
 		mFriendInviteButton = new UIButton(mDBFacade, ASCompat.coerce((mFriendSlot : ASAny).invite_friend, flash.display.MovieClip));
 		Locale.setText(mFriendInviteButton.label, "LEADERBOARD_INVITE_FRIEND");
 		mFriendInviteButton.rolloverFilter = DBGlobal.UI_ROLLOVER_FILTER;
@@ -173,6 +178,8 @@ class LeaderboardFriendSlot {
 			applyFriendNameSize();
 			mFriendName.textColor = PlayerSpecialStatus.getSpecialTextColor(data.name, mFriendName.textColor);
 			TextUtil.setText(ASCompat.coerce((mFriendLevel : ASAny).level, flash.text.TextField), Std.string(data.trophies));
+			mFriendAscension.visible = data.ascensionLevel > 0;
+			TextUtil.setText(ASCompat.coerce((mFriendAscension : ASAny).level, flash.text.TextField), Std.string(data.ascensionLevel));
 			if (data.isOnline() && data.isInDungeon()) {
 				mJoinOnlineClip.visible = true;
 				mJoinOnlineFriendButton.root.visible = true;
@@ -225,6 +232,7 @@ class LeaderboardFriendSlot {
 			mFriendOnlineClip.visible = false;
 			mMeOnlineClip.visible = false;
 			mFriendLevel.visible = false;
+			mFriendAscension.visible = false;
 		}
 	}
 
@@ -359,6 +367,7 @@ class LeaderboardFriendSlot {
 		mFriendOfflineClip = null;
 		mMeOnlineClip = null;
 		mFriendLevel = null;
+		mFriendAscension = null;
 		mOnlinePopup = null;
 		mOfflinePopup = null;
 		mFriendInfo = null;

@@ -196,9 +196,9 @@ class Starling extends EventDispatcher {
 		var _loc3_ = Multitouch.inputMode == "touchPoint";
 		var _loc2_ = false;
 		var _loc1_:Starling;
-		final __ax4_iter_299 = sAll;
-		if (checkNullIteratee(__ax4_iter_299))
-			for (_tmp_ in __ax4_iter_299) {
+		final __ax4_iter_303 = sAll;
+		if (checkNullIteratee(__ax4_iter_303))
+			for (_tmp_ in __ax4_iter_303) {
 				_loc1_ = _tmp_;
 				if (_loc1_._multitouchEnabled != _loc3_) {
 					_loc2_ = true;
@@ -210,14 +210,14 @@ class Starling extends EventDispatcher {
 
 	static function set_multitouchEnabled(value:Bool):Bool {
 		var _loc2_:Starling;
-		var __ax4_iter_300:Vector<Starling>;
+		var __ax4_iter_304:Vector<Starling>;
 		var _loc4_ = Multitouch.inputMode == "touchPoint";
 		Multitouch.inputMode = value ? "touchPoint" : "none";
 		var _loc3_ = Multitouch.inputMode == "touchPoint";
 		if (_loc4_ != _loc3_) {
-			__ax4_iter_300 = sAll;
-			if (checkNullIteratee(__ax4_iter_300))
-				for (_tmp_ in __ax4_iter_300) {
+			__ax4_iter_304 = sAll;
+			if (checkNullIteratee(__ax4_iter_304))
+				for (_tmp_ in __ax4_iter_304) {
 					_loc2_ = _tmp_;
 					_loc2_.setMultitouchEnabled(_loc3_);
 				}
@@ -250,9 +250,9 @@ class Starling extends EventDispatcher {
 		stage3D.removeEventListener("context3DCreate", onContextRestored, false);
 		stage3D.removeEventListener("error", onStage3DError, false);
 		var _loc2_:String;
-		final __ax4_iter_301 = getTouchEventTypes(_multitouchEnabled);
-		if (checkNullIteratee(__ax4_iter_301))
-			for (_tmp_ in __ax4_iter_301) {
+		final __ax4_iter_305 = getTouchEventTypes(_multitouchEnabled);
+		if (checkNullIteratee(__ax4_iter_305))
+			for (_tmp_ in __ax4_iter_305) {
 				_loc2_ = _tmp_;
 				_nativeStage.removeEventListener(_loc2_, onTouch, false);
 			}

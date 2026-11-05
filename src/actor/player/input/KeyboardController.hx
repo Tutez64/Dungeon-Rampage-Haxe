@@ -91,13 +91,13 @@ class KeyboardController {
 
 	function checkCombatButtons() {
 		var _loc1_:String;
-		var __ax4_iter_426:Vector<String>;
+		var __ax4_iter_436:Vector<String>;
 		if (!mCombatDisabled) {
 			mReleasedCombatKeysThisFrame = new Vector<Int>();
 			mPressedCombatKeysThisFrame = new Vector<Int>();
-			__ax4_iter_426 = InputAction.ATTACK_SLOTS;
-			if (checkNullIteratee(__ax4_iter_426))
-				for (_tmp_ in __ax4_iter_426) {
+			__ax4_iter_436 = InputAction.ATTACK_SLOTS;
+			if (checkNullIteratee(__ax4_iter_436))
+				for (_tmp_ in __ax4_iter_436) {
 					_loc1_ = _tmp_;
 					mPressedCombatKeysThisFrame.push(ASCompat.toInt(mKeyBindings.isDown(_loc1_)));
 					mReleasedCombatKeysThisFrame.push(ASCompat.toInt(mKeyBindings.wasReleased(_loc1_)));
@@ -105,9 +105,9 @@ class KeyboardController {
 		}
 		mReleasedConsumableKeysThisFrame = new Vector<Int>();
 		var _loc2_:String;
-		final __ax4_iter_427 = InputAction.CONSUMABLE_SLOTS;
-		if (checkNullIteratee(__ax4_iter_427))
-			for (_tmp_ in __ax4_iter_427) {
+		final __ax4_iter_437 = InputAction.CONSUMABLE_SLOTS;
+		if (checkNullIteratee(__ax4_iter_437))
+			for (_tmp_ in __ax4_iter_437) {
 				_loc2_ = _tmp_;
 				mReleasedConsumableKeysThisFrame.push(ASCompat.toInt(mKeyBindings.wasReleased(_loc2_)));
 			}

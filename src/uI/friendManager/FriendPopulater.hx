@@ -170,6 +170,10 @@ class FriendPopulater {
 			ASCompat.setProperty((_loc4_ : ASAny).friend_pic.friend_offline, "visible", false);
 		}
 		TextUtil.setText(ASCompat.coerce((_loc4_ : ASAny).friend_level.level, flash.text.TextField), Std.string(friend.trophies));
+		ASCompat.setProperty((_loc4_ : ASAny).friend_ascension, "mouseEnabled", false);
+		ASCompat.setProperty((_loc4_ : ASAny).friend_ascension, "mouseChildren", false);
+		ASCompat.setProperty((_loc4_ : ASAny).friend_ascension, "visible", friend.ascensionLevel > 0);
+		TextUtil.setText(ASCompat.coerce((_loc4_ : ASAny).friend_ascension.level, flash.text.TextField), Std.string(friend.ascensionLevel));
 		var _loc13_ = mFriendsSelectedAcrossPages.hasKey(mCurrentPage * (5 * 3) + idx);
 		var _loc5_ = new UIToggleButton(mDBFacade, idx, ASCompat.coerce((_loc4_ : ASAny).friends_toggle, flash.display.MovieClip), _loc13_,
 			changeToggleStatusCallback);

@@ -28,7 +28,7 @@ class DBInventoryInfo {
 
 	var mChests:Vector<ChestInfo>;
 
-	var mLastPendingChest:Int = 0;
+	var mPendingChestRows:ASObject = {};
 
 	var mKeys:Vector<KeyInfo>;
 
@@ -63,7 +63,6 @@ class DBInventoryInfo {
 		mAvatars = new Map();
 		mItems = new Map();
 		mChests = new Vector<ChestInfo>();
-		mLastPendingChest = -1;
 		mKeys = new Vector<KeyInfo>();
 		mStackablesByDatabaseId = new Map();
 		mStackablesByStackableId = new Map();
@@ -540,35 +539,101 @@ class DBInventoryInfo {
 	}
 
 	function parseChests(chestsJson:ASObject) {
-		var _loc4_:ChestInfo;
-		var _loc6_:ChestInfo = null;
-		var _loc7_ = (0 : UInt);
-		var _loc5_ = false;
-		var _loc3_ = mChests.slice(0);
-		mChests.splice(0, (mChests.length : UInt));
-		var _loc2_:Array<ASAny> = ASCompat.dynamicAs(chestsJson, Array);
-		_loc7_ = (0 : UInt);
-		while (_loc7_ < (_loc2_.length:UInt)) {
-			_loc5_ = false;
-			if (!mFirstParse) {
-				if (checkNullIteratee(_loc3_))
-					for (_tmp_ in _loc3_) {
-						_loc4_ = _tmp_;
-						if (_loc4_.databaseId == ASCompat.toNumberField(_loc2_[(_loc7_ : Int)], "id")) {
-							_loc5_ = true;
-							break;
-						}
+		var _loc6_:UInt;
+		var __ax4_iter_348:Vector<UInt>;
+		var _loc9_ = (0 : UInt);
+		var _loc8_ = false;
+		var _loc4_:ASObject = {};
+		var _loc3_:ChestInfo;
+		final __ax4_iter_347 = mChests;
+		if (checkNullIteratee(__ax4_iter_347))
+			for (_tmp_ in __ax4_iter_347) {
+				_loc3_ = _tmp_;
+				__ax4_iter_348 = _loc3_.databaseIds;
+				if (checkNullIteratee(__ax4_iter_348))
+					for (_tmp_ in __ax4_iter_348) {
+						_loc6_ = _tmp_;
+						_loc4_[Std.string(_loc6_)] = true;
 					}
-			} else {
-				_loc5_ = true;
 			}
-			_loc6_ = new ChestInfo(mDBFacade, _loc2_[(_loc7_ : Int)]);
-			if (!_loc5_) {
-				_loc6_.isNew = true;
+		mChests.splice(0, (mChests.length : UInt));
+		var _loc7_ = ((ASCompat.dynamicAs(chestsJson, Array) : Array<ASAny>)).slice(0);
+		ASCompat.ASArray.sortOn(_loc7_, ["chest_id", "id"], [16, 16]);
+		var _loc2_:ChestInfo = null;
+		var _loc5_:ASObject;
+		if (checkNullIteratee(_loc7_))
+			for (_tmp_ in _loc7_) {
+				_loc5_ = _tmp_;
+				_loc9_ = ASCompat.asUint(_loc5_.id);
+				_loc8_ = !mFirstParse && !ASCompat.toBool(_loc4_[Std.string(_loc9_)]);
+				if (_loc2_ != null && _loc2_.gmId == ASCompat.asUint(_loc5_.chest_id) && !_loc2_.isFull) {
+					_loc2_.addDatabaseId(_loc9_);
+				} else {
+					_loc2_ = new ChestInfo(mDBFacade, _loc5_);
+					mChests.push(_loc2_);
+				}
+				if (_loc8_) {
+					_loc2_.isNew = true;
+				}
 			}
-			mChests.push(_loc6_);
-			_loc7_++;
+	}
+
+	public function getChestStack(gmChestId:UInt):ChestInfo {
+		var _loc2_:ChestInfo;
+		final __ax4_iter_349 = mChests;
+		if (checkNullIteratee(__ax4_iter_349))
+			for (_tmp_ in __ax4_iter_349) {
+				_loc2_ = _tmp_;
+				if (_loc2_.gmId == gmChestId) {
+					return _loc2_;
+				}
+			}
+		return null;
+	}
+
+	public function removeChestRow(chestRowId:UInt) {
+		var _loc2_ = (0 : UInt);
+		_loc2_ = (0 : UInt);
+		while (_loc2_ < (mChests.length:UInt)) {
+			if (mChests[(_loc2_ : Int)].containsDatabaseId(chestRowId)) {
+				if (!mChests[(_loc2_ : Int)].removeDatabaseId(chestRowId)) {
+					mChests.splice((_loc2_ : Int), (1 : UInt));
+				}
+				return;
+			}
+			_loc2_++;
 		}
+	}
+
+	public function chestCountOfType(gmChestId:UInt):UInt {
+		var _loc2_ = (0 : UInt);
+		var _loc3_:ChestInfo;
+		final __ax4_iter_350 = mChests;
+		if (checkNullIteratee(__ax4_iter_350))
+			for (_tmp_ in __ax4_iter_350) {
+				_loc3_ = _tmp_;
+				if (_loc3_.gmId == gmChestId) {
+					_loc2_ += _loc3_.count;
+				}
+			}
+		return _loc2_;
+	}
+
+	public function hasRoomToOpenChest(gmChestId:UInt):Bool {
+		return isThereEmptySpaceInWeaponStorage() || chestCountOfType(gmChestId) % 99 == 1;
+	}
+
+	public function hasRoomForChest(gmChestId:UInt):Bool {
+		var _loc2_:ChestInfo;
+		final __ax4_iter_351 = mChests;
+		if (checkNullIteratee(__ax4_iter_351))
+			for (_tmp_ in __ax4_iter_351) {
+				_loc2_ = _tmp_;
+				if (_loc2_.gmId == gmChestId && !_loc2_.isFull) {
+					return true;
+				}
+			}
+		return isThereEmptySpaceInWeaponStorage();
 	}
 
 	function parseKeys(accountsJson:ASObject) {
@@ -674,35 +739,53 @@ class DBInventoryInfo {
 	public function openChest(chestInstanceId:UInt, forHeroId:UInt, forHeroSkinId:UInt, responseFinishedCallback:ASFunction = null,
 			errorCallback:ASFunction = null) {
 		var rpcFunc:ASFunction;
-		if ((mLastPendingChest : UInt) == chestInstanceId && 0 != 0) {
-			Logger.error("Chest has already been opened on Server. Chest id:" + chestInstanceId);
-			mLastPendingChest = -1;
+		if (!beginChestRequest(chestInstanceId)) {
 			return;
 		}
-		mLastPendingChest = (chestInstanceId : Int);
 		rpcFunc = JSONRPCService.getFunction("OpenChest", mDBFacade.rpcRoot + "account");
 		rpcFunc(mDBFacade.dbAccountInfo.id, chestInstanceId, mDBFacade.validationToken, forHeroId, forHeroSkinId, function(param1:ASAny) {
+			ASCompat.deleteProperty(mPendingChestRows, Std.string(chestInstanceId));
 			mResponseCallback(param1);
 			if (responseFinishedCallback != null) {
 				responseFinishedCallback(chestInstanceId, param1);
 			}
 		}, function(param1:Error) {
+			ASCompat.deleteProperty(mPendingChestRows, Std.string(chestInstanceId));
 			mParseErrorCallback(param1);
 			errorCallback();
 		});
 	}
 
 	public function dropChest(chestInstanceId:UInt, responseFinishedCallback:ASFunction = null, errorCallback:ASFunction = null) {
-		var rpcFunc = JSONRPCService.getFunction("DropChest", mDBFacade.rpcRoot + "account");
+		var rpcFunc:ASFunction;
+		if (!beginChestRequest(chestInstanceId)) {
+			return;
+		}
+		rpcFunc = JSONRPCService.getFunction("DropChest", mDBFacade.rpcRoot + "account");
 		rpcFunc(mDBFacade.dbAccountInfo.id, chestInstanceId, mDBFacade.validationToken, function(param1:ASAny) {
+			ASCompat.deleteProperty(mPendingChestRows, Std.string(chestInstanceId));
 			mResponseCallback(param1);
 			if (responseFinishedCallback != null) {
 				responseFinishedCallback(chestInstanceId, param1);
 			}
 		}, function(param1:Error) {
+			ASCompat.deleteProperty(mPendingChestRows, Std.string(chestInstanceId));
 			mParseErrorCallback(param1);
 			errorCallback();
 		});
+	}
+
+	function beginChestRequest(chestRowId:UInt):Bool {
+		if (ASCompat.toBool(mPendingChestRows[Std.string(chestRowId)])) {
+			Logger.warn("Ignoring a repeated request for chest row " + chestRowId + " while one is pending");
+			return false;
+		}
+		mPendingChestRows[Std.string(chestRowId)] = true;
+		return true;
+	}
+
+	public function isChestRequestPending(chestRowId:UInt):Bool {
+		return mPendingChestRows[Std.string(chestRowId)] == true;
 	}
 
 	public function canThisAvatarEquipThisItem(avatarInfo:AvatarInfo, itemInfo:ItemInfo):Bool {
@@ -917,9 +1000,9 @@ class DBInventoryInfo {
 			}
 		}
 		var _loc2_:ChestInfo;
-		final __ax4_iter_343 = mChests;
-		if (checkNullIteratee(__ax4_iter_343))
-			for (_tmp_ in __ax4_iter_343) {
+		final __ax4_iter_352 = mChests;
+		if (checkNullIteratee(__ax4_iter_352))
+			for (_tmp_ in __ax4_iter_352) {
 				_loc2_ = _tmp_;
 				if (_loc2_.isNew) {
 					return true;
@@ -949,9 +1032,9 @@ class DBInventoryInfo {
 			_loc1_.isNew = false;
 		}
 		var _loc2_:ChestInfo;
-		final __ax4_iter_344 = mChests;
-		if (checkNullIteratee(__ax4_iter_344))
-			for (_tmp_ in __ax4_iter_344) {
+		final __ax4_iter_353 = mChests;
+		if (checkNullIteratee(__ax4_iter_353))
+			for (_tmp_ in __ax4_iter_353) {
 				_loc2_ = _tmp_;
 				_loc2_.isNew = false;
 			}
@@ -961,9 +1044,9 @@ class DBInventoryInfo {
 		var skin:GMSkin;
 		var offer:GMOffer;
 		var result = new Vector<GMSkin>();
-		final __ax4_iter_345 = mDBFacade.gameMaster.Skins;
-		if (checkNullIteratee(__ax4_iter_345))
-			for (_tmp_ in __ax4_iter_345) {
+		final __ax4_iter_354 = mDBFacade.gameMaster.Skins;
+		if (checkNullIteratee(__ax4_iter_354))
+			for (_tmp_ in __ax4_iter_354) {
 				skin = _tmp_;
 				if (skin.ForHero == gmHero.Constant) {
 					offer = ASCompat.coerce(offerBySkinId.itemFor(skin.Id), gameMasterDictionary.GMOffer);

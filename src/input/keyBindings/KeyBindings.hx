@@ -20,9 +20,9 @@ class KeyBindings {
 		mAlternate = {};
 		mChangeListeners = new Vector<ASFunction>();
 		var _loc2_:String;
-		final __ax4_iter_405 = InputAction.ORDERED;
-		if (checkNullIteratee(__ax4_iter_405))
-			for (_tmp_ in __ax4_iter_405) {
+		final __ax4_iter_415 = InputAction.ORDERED;
+		if (checkNullIteratee(__ax4_iter_415))
+			for (_tmp_ in __ax4_iter_415) {
 				_loc2_ = _tmp_;
 				resetToDefault(_loc2_);
 			}
@@ -119,9 +119,9 @@ class KeyBindings {
 			return null;
 		}
 		var _loc2_:String;
-		final __ax4_iter_406 = InputAction.ORDERED;
-		if (checkNullIteratee(__ax4_iter_406))
-			for (_tmp_ in __ax4_iter_406) {
+		final __ax4_iter_416 = InputAction.ORDERED;
+		if (checkNullIteratee(__ax4_iter_416))
+			for (_tmp_ in __ax4_iter_416) {
 				_loc2_ = _tmp_;
 				if (matches(_loc2_, keyCode)) {
 					return _loc2_;
@@ -147,9 +147,9 @@ class KeyBindings {
 			return 0;
 		}
 		var _loc2_:String;
-		final __ax4_iter_407 = InputAction.ORDERED;
-		if (checkNullIteratee(__ax4_iter_407))
-			for (_tmp_ in __ax4_iter_407) {
+		final __ax4_iter_417 = InputAction.ORDERED;
+		if (checkNullIteratee(__ax4_iter_417))
+			for (_tmp_ in __ax4_iter_417) {
 				_loc2_ = _tmp_;
 				if (getPrimary(_loc2_) == _loc3_ || getAlternate(_loc2_) == _loc3_) {
 					return 0;

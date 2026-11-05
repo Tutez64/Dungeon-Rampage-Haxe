@@ -34,6 +34,7 @@ import stateMachine.mainStateMachine.DungeonTutorial;
 import steamInput.UnboundActionEvent;
 import uI.infiniteIsland.II_UIExitDungeonPopUp;
 import uI.popup.UILootLossPopup;
+import uI.UIChatLog;
 import flash.display.DisplayObject;
 import flash.display.MovieClip;
 import flash.events.Event;
@@ -63,6 +64,8 @@ class ActorReviveState extends ActorState {
 
 	public static inline final BOMB_BUTTON_LOCK_DURATION:Float = 2;
 
+	static inline final HUD_MENU_INDEX_OPTIONS = (1 : UInt);
+
 	static final CONTROLLER_ICON_POSITION_FOR_REVIVE:Vector3D = new Vector3D(15, 26);
 
 	static final CONTROLLER_GLYPH_SCALE_REVIVE:Point = new Point(20, 20);
@@ -70,6 +73,10 @@ class ActorReviveState extends ActorState {
 	static final CONTROLLER_ICON_POSITION_FOR_SPECTATE:Vector3D = new Vector3D(50, -60);
 
 	static final CONTROLLER_GLYPH_SCALE_SPECTATE:Point = new Point(50, 50);
+
+	static final DISABLED_LOOK:ColorMatrixFilter = new ColorMatrixFilter(cast([
+		0.3086, 0.6094, 0.082, 0, 0, 0.3086, 0.6094, 0.082, 0, 0, 0.3086, 0.6094, 0.082, 0, 0, 0, 0, 0, 1, 0
+	]));
 
 	var mAssetLoadingComponent:AssetLoadingComponent;
 
@@ -88,6 +95,14 @@ class ActorReviveState extends ActorState {
 	var mDestroyTimerTask:Task;
 
 	var mSpaceBarTask:Task;
+
+	var mPanelTask:Task;
+
+	var mReviveMenuWanted:Bool = false;
+
+	var mLinkedChatButtons:Array<ASAny> = [];
+
+	var mChatBarLocked:Bool = false;
 
 	var mLoadReviveTriggerTask:Task;
 
@@ -147,7 +162,7 @@ class ActorReviveState extends ActorState {
 		});
 		mEventComponent.addListener("CLIENT_COUNTDOWN_FINISHED_EVENT", function(param1:Event) {
 			if (mRevivePanel != null) {
-				mRevivePanel.visible = false;
+				hideRevivePanel();
 			}
 		});
 		mEventComponent.addListener("UI_HIDE_TOGGLE_CHANGED", function(param1:Event) {
@@ -537,7 +552,7 @@ class ActorReviveState extends ActorState {
 			ASCompat.setProperty((mRevivePanel : ASAny).prompt_button_1_buy_all.cash_icon_buy_me, "visible", false);
 			Locale.setText(ASCompat.coerce((mRevivePanel : ASAny).prompt_button_1_buy_all.use_buy_me, flash.text.TextField), "REVIVE_PANEL_USE");
 			reviveAllCallback = function() {
-				mRevivePanel.visible = false;
+				hideRevivePanel();
 				useRezAllPotion();
 			};
 		} else {
@@ -551,7 +566,7 @@ class ActorReviveState extends ActorState {
 			TextUtil.setText(ASCompat.coerce((mSelfReviveAllButton.root : ASAny).cost_text_buy_me, flash.text.TextField), Std.string(offer.Price));
 			reviveAllCallback = function() {
 				if (offer.CurrencyType == GMOffer.PREMIUM_CURRENCY && mDBFacade.dbAccountInfo.premiumCurrency >= offer.Price) {
-					mRevivePanel.visible = false;
+					hideRevivePanel();
 					EventListeners.add(mRevivePanel, "purchaseReviveAll-failed", handleReviveAllPurchaseFail);
 				}
 				buyReviveAll();
@@ -587,7 +602,7 @@ class ActorReviveState extends ActorState {
 			ASCompat.setProperty((mRevivePanel : ASAny).prompt_button_1_buy_me.cash_icon_buy_me, "visible", false);
 			Locale.setText(ASCompat.coerce((mRevivePanel : ASAny).prompt_button_1_buy_me.use_buy_me, flash.text.TextField), "REVIVE_PANEL_USE");
 			reviveMeCallback = function() {
-				mRevivePanel.visible = false;
+				hideRevivePanel();
 				useRezMePotion();
 			};
 		} else {
@@ -607,7 +622,7 @@ class ActorReviveState extends ActorState {
 			TextUtil.setText(ASCompat.coerce((mSelfReviveMeButton.root : ASAny).cost_text_buy_me, flash.text.TextField), Std.string(offer.Price));
 			reviveMeCallback = function() {
 				if (offer.CurrencyType == GMOffer.PREMIUM_CURRENCY && mDBFacade.dbAccountInfo.premiumCurrency >= offer.Price) {
-					mRevivePanel.visible = false;
+					hideRevivePanel();
 				}
 				buyReviveMe();
 			};
@@ -688,12 +703,11 @@ class ActorReviveState extends ActorState {
 			ASCompat.setProperty((mHitTabClip : ASAny).tab, "visible", false);
 			mDBFacade.hud.initControllerIcon("revive_ally", mHitTabClip, CONTROLLER_ICON_POSITION_FOR_SPECTATE, CONTROLLER_GLYPH_SCALE_SPECTATE);
 		}
-		lockBombButtons();
-		if (mDBFacade.steamInputManager.isSteamInputReady) {
-			mDBFacade.menuNavigationController.pushNewLayer("REVIVE_MENU", popReviveMenuLayer, mReturnToTownButton);
-			mSelfReviveMeButton.isAbove(mSelfReviveAllButton);
-			mSelfReviveAllButton.isAbove(mReturnToTownButton);
-		}
+		lockPanelButtons();
+		mReviveMenuWanted = true;
+		mSelfReviveMeButton.isAbove(mSelfReviveAllButton);
+		mSelfReviveAllButton.isAbove(mReturnToTownButton);
+		startPanelTask();
 		setUpLimitedHealthBombGUI((mHeroGameObject.healthBombUsesRemaining : UInt), mRevivePanel);
 		setUpLimitedPartyBombGUI((mHeroGameObject.partyBombUsesRemaining : UInt), mRevivePanel);
 	}
@@ -808,7 +822,7 @@ class ActorReviveState extends ActorState {
 			ASCompat.setProperty((mRevivePanel : ASAny).prompt_button_1_buy_all.cash_icon_buy_me, "visible", false);
 			Locale.setText(ASCompat.coerce((mRevivePanel : ASAny).prompt_button_1_buy_all.use_buy_all, flash.text.TextField), "REVIVE_PANEL_USE");
 			reviveAllCallback = function() {
-				mRevivePanel.visible = false;
+				hideRevivePanel();
 				useRezAllPotion();
 			};
 		} else {
@@ -824,7 +838,7 @@ class ActorReviveState extends ActorState {
 			TextUtil.setText(ASCompat.coerce((mSelfReviveAllButton.root : ASAny).cost_text_buy_all, flash.text.TextField), Std.string(offer.Price));
 			reviveAllCallback = function() {
 				if (offer.CurrencyType == GMOffer.PREMIUM_CURRENCY && mDBFacade.dbAccountInfo.premiumCurrency >= offer.Price) {
-					mRevivePanel.visible = false;
+					hideRevivePanel();
 					EventListeners.add(mRevivePanel, "purchaseReviveAll-failed", handleReviveAllPurchaseFail);
 				}
 				buyReviveAll();
@@ -850,7 +864,7 @@ class ActorReviveState extends ActorState {
 			ASCompat.setProperty((mRevivePanel : ASAny).prompt_button_1_buy_me.cash_icon_buy_me, "visible", false);
 			Locale.setText(ASCompat.coerce((mRevivePanel : ASAny).prompt_button_1_buy_me.use_buy_me, flash.text.TextField), "REVIVE_PANEL_USE");
 			reviveMeCallback = function() {
-				mRevivePanel.visible = false;
+				hideRevivePanel();
 				useRezMePotion();
 			};
 		} else {
@@ -872,7 +886,7 @@ class ActorReviveState extends ActorState {
 			TextUtil.setText(ASCompat.coerce((mSelfReviveMeButton.root : ASAny).cost_text_buy_me, flash.text.TextField), Std.string(offer.Price));
 			reviveMeCallback = function() {
 				if (offer.CurrencyType == GMOffer.PREMIUM_CURRENCY && mDBFacade.dbAccountInfo.premiumCurrency >= offer.Price) {
-					mRevivePanel.visible = false;
+					hideRevivePanel();
 				}
 				buyReviveMe();
 			};
@@ -906,20 +920,178 @@ class ActorReviveState extends ActorState {
 			ASCompat.setProperty((mHitTabClip : ASAny).tab, "visible", false);
 			mDBFacade.hud.initControllerIcon("revive_ally", mHitTabClip, CONTROLLER_ICON_POSITION_FOR_SPECTATE, CONTROLLER_GLYPH_SCALE_SPECTATE);
 		}
-		lockBombButtons();
-		if (mDBFacade.steamInputManager.isSteamInputReady) {
-			mDBFacade.menuNavigationController.pushNewLayer("REVIVE_MENU", popReviveMenuLayer, mReturnToTownButton);
-			mSelfReviveMeButton.isToTheLeftOf(mSelfReviveAllButton);
-			mSelfReviveMeButton.isAbove(mReturnToTownButton);
+		lockPanelButtons();
+		mReviveMenuWanted = true;
+		mSelfReviveMeButton.isToTheLeftOf(mSelfReviveAllButton);
+		mSelfReviveMeButton.isAbove(mReturnToTownButton);
+		startPanelTask();
+	}
+
+	@:isVar var chatBarButtons(get, never):Array<ASAny>;
+
+	function get_chatBarButtons():Array<ASAny> {
+		var _loc1_ = ASCompat.coerce(mDBFacade.hud != null ? mDBFacade.hud.chatLog : null, uI.UIChatLog);
+		if (_loc1_ == null || _loc1_.chatLogButton == null || _loc1_.chatSendButton == null) {
+			return [];
+		}
+		var _loc2_:Array<ASAny> = [_loc1_.chatLogButton, _loc1_.chatSendButton];
+		if (_loc2_[1].root.localToGlobal(new Point()).x < _loc2_[0].root.localToGlobal(new Point()).x) {
+			ASCompat.ASArray.reverse(_loc2_);
+		}
+		return _loc2_;
+	}
+
+	function linkChatBar() {
+		var _loc3_ = chatBarButtons;
+		if (_loc3_.length == mLinkedChatButtons.length && (_loc3_.length == 0 || _loc3_[0] == mLinkedChatButtons[0])) {
+			return;
+		}
+		var _loc2_ = mDBFacade.menuNavigationController;
+		var _loc4_ = _loc2_.getTopUILayer() == "REVIVE_MENU" ? mLinkedChatButtons.indexOf(_loc2_.focusedUiObject) : -1;
+		unlinkChatBar();
+		if (_loc3_.length == 0 || mReturnToTownButton == null) {
+			return;
+		}
+		var _loc5_ = ASCompat.coerce(_loc3_[0], brain.uI.UIButton);
+		var _loc6_ = ASCompat.coerce(_loc3_[1], brain.uI.UIButton);
+		var _loc1_:UIButton;
+		if (checkNullIteratee(_loc3_))
+			for (_tmp_ in _loc3_) {
+				_loc1_ = ASCompat.coerce(_tmp_, brain.uI.UIButton);
+				_loc1_.clearNavigationAndInteractions();
+			}
+		mReturnToTownButton.isAbove(_loc5_);
+		_loc6_.upNavigation = mReturnToTownButton;
+		_loc5_.isToTheLeftOf(_loc6_);
+		mLinkedChatButtons = _loc3_;
+		if (mDBFacade.hud != null) {
+			mDBFacade.hud.useFlashChatBar(true);
+		}
+		if (mBombButtonLockTask != null) {
+			lockChatBar();
+		}
+		if (_loc4_ >= 0) {
+			_loc2_.setFocusedUiObject(ASCompat.coerce(_loc3_[_loc4_], brain.uI.UIObject));
 		}
 	}
 
-	function lockBombButtons() {
+	function unlinkChatBar() {
+		unlockChatBar();
+		if (mLinkedChatButtons.length > 0 && mDBFacade.hud != null) {
+			mDBFacade.hud.useFlashChatBar(false);
+		}
+		var _loc1_:UIButton;
+		final __ax4_iter_142 = mLinkedChatButtons;
+		if (checkNullIteratee(__ax4_iter_142))
+			for (_tmp_ in __ax4_iter_142) {
+				_loc1_ = ASCompat.coerce(_tmp_, brain.uI.UIButton);
+				if (_loc1_.root != null) {
+					_loc1_.clearNavigationAndInteractions();
+				}
+			}
+		if (mReturnToTownButton != null && mReturnToTownButton.root != null) {
+			mReturnToTownButton.clearDownNavigation();
+		}
+		mLinkedChatButtons = [];
+	}
+
+	function setLockedLook(button:UIButton, locked:Bool) {
+		if (button == null || button.root == null) {
+			return;
+		}
+		var _loc3_ = button.root.getChildByName("up");
+		if (_loc3_ == null) {
+			_loc3_ = button.root;
+		}
+		button.enabled = !locked;
+		_loc3_.filters = cast(locked ? [DISABLED_LOOK] : []);
+	}
+
+	function lockChatBar() {
+		var _loc1_:UIButton;
+		final __ax4_iter_143 = mLinkedChatButtons;
+		if (checkNullIteratee(__ax4_iter_143))
+			for (_tmp_ in __ax4_iter_143) {
+				_loc1_ = ASCompat.coerce(_tmp_, brain.uI.UIButton);
+				setLockedLook(_loc1_, true);
+			}
+		mChatBarLocked = true;
+	}
+
+	function unlockChatBar() {
+		if (!mChatBarLocked) {
+			return;
+		}
+		mChatBarLocked = false;
+		var _loc1_:UIButton;
+		final __ax4_iter_144 = mLinkedChatButtons;
+		if (checkNullIteratee(__ax4_iter_144))
+			for (_tmp_ in __ax4_iter_144) {
+				_loc1_ = ASCompat.coerce(_tmp_, brain.uI.UIButton);
+				setLockedLook(_loc1_, false);
+			}
+	}
+
+	function openExitConfirmation() {
+		if (mDBFacade.inputManager.check(27) && !mDBFacade.inputManager.pressed(27)) {
+			return;
+		}
+		var _loc1_ = ASCompat.coerceFunction(mReturnToTownButton != null ? mReturnToTownButton.releaseCallback : null);
+		if (_loc1_ != null) {
+			_loc1_();
+		}
+	}
+
+	function startPanelTask() {
+		linkChatBar();
+		pushReviveMenuWhenFree(false);
+		if (mPanelTask != null) {
+			mPanelTask.destroy();
+		}
+		mPanelTask = mLogicalWorkComponent.doEveryFrame(function(param1:GameClock) {
+			pushReviveMenuWhenFree(true);
+			linkChatBar();
+			if (mLinkedChatButtons.length > 0 && mDBFacade.hud != null) {
+				mDBFacade.hud.useFlashChatBar(true);
+			}
+			if (mDBFacade.hud != null && mDBFacade.keyBindings != null && mDBFacade.keyBindings.wasReleased("openOptionsMenu")) {
+				mDBFacade.hud.handleMenuButtonPressed((1 : UInt));
+			}
+		});
+	}
+
+	function pushReviveMenuWhenFree(deferred:Bool) {
+		if (!mReviveMenuWanted || mDBFacade.menuNavigationController.layerDepth > 0) {
+			return;
+		}
+		mReviveMenuWanted = false;
+		if (deferred && mBombButtonLockTask == null) {
+			lockPanelButtons();
+		}
+		mDBFacade.menuNavigationController.pushNewLayer("REVIVE_MENU", openExitConfirmation, mSelfReviveMeButton);
+	}
+
+	function hideRevivePanel() {
+		mRevivePanel.visible = false;
+		mReviveMenuWanted = false;
+		removeReviveMenuLayer();
+		unlinkChatBar();
+	}
+
+	function removeReviveMenuLayer() {
+		if (!Std.isOfType(mHeroGameObject, HeroGameObjectOwner)) {
+			return;
+		}
+		mDBFacade.menuNavigationController.removeLayer("REVIVE_MENU");
+	}
+
+	function lockPanelButtons() {
 		var reviveMeEnabled = mSelfReviveMeButton.enabled;
 		var reviveAllEnabled = mSelfReviveAllButton.enabled;
 		mSelfReviveMeButton.enabled = false;
 		mSelfReviveAllButton.enabled = false;
-		mReturnToTownButton.enabled = true;
+		setLockedLook(mReturnToTownButton, true);
+		lockChatBar();
 		if (mBombButtonLockTask != null) {
 			mBombButtonLockTask.destroy();
 		}
@@ -931,17 +1103,9 @@ class ActorReviveState extends ActorState {
 			if (mSelfReviveAllButton != null) {
 				mSelfReviveAllButton.enabled = reviveAllEnabled;
 			}
+			setLockedLook(mReturnToTownButton, false);
+			unlockChatBar();
 		});
-	}
-
-	function popReviveMenuLayer() {
-		if (!Std.isOfType(mHeroGameObject, HeroGameObjectOwner)) {
-			return;
-		}
-		if (mDBFacade.menuNavigationController.getTopUILayer() != "REVIVE_MENU") {
-			return;
-		}
-		mDBFacade.menuNavigationController.popLayer("REVIVE_MENU");
 	}
 
 	function popForfeitConfirmLayer() {
@@ -954,7 +1118,7 @@ class ActorReviveState extends ActorState {
 	}
 
 	function handleReviveAllPurchaseFail(event:Event) {
-		mRevivePanel.visible = false;
+		hideRevivePanel();
 	}
 
 	function getHealthBombSplitTestMultiplier():Float {
@@ -1016,7 +1180,10 @@ class ActorReviveState extends ActorState {
 	}
 
 	public function destroyUI() {
-		popReviveMenuLayer();
+		removeReviveMenuLayer();
+		if (Std.isOfType(mHeroGameObject, HeroGameObjectOwner)) {
+			unlinkChatBar();
+		}
 		if (Std.isOfType(mHeroGameObject, HeroGameObjectOwner)) {
 			saturate(100);
 		}
@@ -1032,6 +1199,11 @@ class ActorReviveState extends ActorState {
 			mBombButtonLockTask.destroy();
 			mBombButtonLockTask = null;
 		}
+		if (mPanelTask != null) {
+			mPanelTask.destroy();
+			mPanelTask = null;
+		}
+		mReviveMenuWanted = false;
 		if (mDeadPlayerEffect != null) {
 			if (mHeroGameObject.view.root.contains(mDeadPlayerEffect)) {
 				mHeroGameObject.view.root.removeChild(mDeadPlayerEffect);

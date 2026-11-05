@@ -65,9 +65,9 @@ class SteamAchievementsHelper {
 		}
 		var _loc2_ = 0;
 		var _loc3_:GMMapNode;
-		final __ax4_iter_328 = mDBFacade.gameMaster.MapNodes;
-		if (checkNullIteratee(__ax4_iter_328))
-			for (_tmp_ in __ax4_iter_328) {
+		final __ax4_iter_332 = mDBFacade.gameMaster.MapNodes;
+		if (checkNullIteratee(__ax4_iter_332))
+			for (_tmp_ in __ax4_iter_332) {
 				_loc3_ = _tmp_;
 				if (_loc3_.NodeType == GMMapNode.INFINITE_NODE_TYPE) {
 					_loc5_ = SteamAPINames.getUltimateRampageHighestFloorStatAPIName(_loc3_.Constant);

@@ -29,7 +29,7 @@ class TimelineView extends StatesView implements IHudTick {
 	public var advanceWhileHidden:Bool = false;
 
 	public function new(art:ArtNode, ticker:HudTicker = null) {
-		var __ax4_iter_166:Vector<Vector<Float>>;
+		var __ax4_iter_169:Vector<Vector<Float>>;
 		var _loc4_ = 0;
 		var _loc3_:Vector<Float> = /*undefined*/ null;
 		super(art);
@@ -37,9 +37,9 @@ class TimelineView extends StatesView implements IHudTick {
 		mStageRate = art.stageRate;
 		if (art.sweep != null) {
 			_loc4_ = 1;
-			__ax4_iter_166 = art.sweep.arcs;
-			if (checkNullIteratee(__ax4_iter_166))
-				for (_tmp_ in __ax4_iter_166) {
+			__ax4_iter_169 = art.sweep.arcs;
+			if (checkNullIteratee(__ax4_iter_169))
+				for (_tmp_ in __ax4_iter_169) {
 					_loc3_ = _tmp_;
 					if (_loc3_ != null) {
 						_loc4_ = ASCompat.floatToInt(Math.max(_loc4_, _loc3_.length / 2));

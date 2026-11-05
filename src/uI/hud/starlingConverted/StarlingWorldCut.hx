@@ -159,9 +159,9 @@ class StarlingWorldCut {
 			mRects[_loc4_] = mStaticRects[_loc4_];
 			_loc4_++;
 		}
-		final __ax4_iter_184 = mDynamic;
-		if (checkNullIteratee(__ax4_iter_184))
-			for (_tmp_ in __ax4_iter_184) {
+		final __ax4_iter_187 = mDynamic;
+		if (checkNullIteratee(__ax4_iter_187))
+			for (_tmp_ in __ax4_iter_187) {
 				_loc5_ = _tmp_;
 				_loc6_ = true;
 				_loc3_ = _loc5_;

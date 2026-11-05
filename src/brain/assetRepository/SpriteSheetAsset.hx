@@ -113,9 +113,9 @@ class SpriteSheetAsset extends Asset {
 	override public function destroy() {
 		mFacade = null;
 		var _loc1_:BitmapData;
-		final __ax4_iter_376 = mFrames;
-		if (checkNullIteratee(__ax4_iter_376))
-			for (_tmp_ in __ax4_iter_376) {
+		final __ax4_iter_386 = mFrames;
+		if (checkNullIteratee(__ax4_iter_386))
+			for (_tmp_ in __ax4_iter_386) {
 				_loc1_ = _tmp_;
 				_loc1_.dispose();
 			}

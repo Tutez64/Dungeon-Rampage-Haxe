@@ -543,9 +543,9 @@ class UISkills {
 		var _loc3_ = 0;
 		var _loc1_ = mDBFacade.gameMaster.Offers;
 		var _loc4_:GMHero;
-		final __ax4_iter_533 = mDBFacade.gameMaster.Heroes;
-		if (checkNullIteratee(__ax4_iter_533))
-			for (_tmp_ in __ax4_iter_533) {
+		final __ax4_iter_543 = mDBFacade.gameMaster.Heroes;
+		if (checkNullIteratee(__ax4_iter_543))
+			for (_tmp_ in __ax4_iter_543) {
 				_loc4_ = _tmp_;
 				if (!(_loc4_.Hidden && !mDBFacade.dbConfigManager.getConfigBoolean("want_hidden_heroes", false))) {
 					mHeroIds.push(_loc4_.Id);

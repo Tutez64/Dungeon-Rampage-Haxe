@@ -92,12 +92,12 @@ class KeyBindingSettingRow extends SettingRow {
 
 	override public function destroy() {
 		var _loc1_:MovieClip;
-		var __ax4_iter_326:Vector<MovieClip>;
+		var __ax4_iter_330:Vector<MovieClip>;
 		endCapture();
 		if (mButtonClips != null) {
-			__ax4_iter_326 = mButtonClips;
-			if (checkNullIteratee(__ax4_iter_326))
-				for (_tmp_ in __ax4_iter_326) {
+			__ax4_iter_330 = mButtonClips;
+			if (checkNullIteratee(__ax4_iter_330))
+				for (_tmp_ in __ax4_iter_330) {
 					_loc1_ = _tmp_;
 					_loc1_.removeEventListener("click", swallowButtonClick);
 				}

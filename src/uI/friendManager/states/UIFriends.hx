@@ -151,9 +151,9 @@ class UIFriends extends UIFMState {
 		var rpcFunc:ASFunction;
 		var idx:UInt;
 		mSelectedDRFriends.splice(0, (mSelectedDRFriends.length : UInt));
-		final __ax4_iter_290 = mFriendPopulater.getSelectedToggles();
-		if (checkNullIteratee(__ax4_iter_290))
-			for (_tmp_ in __ax4_iter_290) {
+		final __ax4_iter_294 = mFriendPopulater.getSelectedToggles();
+		if (checkNullIteratee(__ax4_iter_294))
+			for (_tmp_ in __ax4_iter_294) {
 				idx = (ASCompat.toInt(_tmp_) : UInt);
 				mSelectedDRFriends.push(mListOfFriends[(idx : Int)].id);
 			}
@@ -176,9 +176,9 @@ class UIFriends extends UIFMState {
 	function giftButtonCallback() {
 		var _loc1_ = false;
 		var _loc2_:UInt;
-		final __ax4_iter_291 = mFriendPopulater.getSelectedToggles();
-		if (checkNullIteratee(__ax4_iter_291))
-			for (_tmp_ in __ax4_iter_291) {
+		final __ax4_iter_295 = mFriendPopulater.getSelectedToggles();
+		if (checkNullIteratee(__ax4_iter_295))
+			for (_tmp_ in __ax4_iter_295) {
 				_loc2_ = (ASCompat.toInt(_tmp_) : UInt);
 				if (mDBFacade.dbAccountInfo.giftExcludeIds.indexOf(mListOfFriends[(_loc2_ : Int)].excludeId) < 0) {
 					_loc1_ = true;
@@ -192,9 +192,9 @@ class UIFriends extends UIFMState {
 	function drGiftFlow(offerName:String, offerId:UInt) {
 		var _loc3_:Array<ASAny> = [];
 		var _loc4_:UInt;
-		final __ax4_iter_292 = mFriendPopulater.getSelectedToggles();
-		if (checkNullIteratee(__ax4_iter_292))
-			for (_tmp_ in __ax4_iter_292) {
+		final __ax4_iter_296 = mFriendPopulater.getSelectedToggles();
+		if (checkNullIteratee(__ax4_iter_296))
+			for (_tmp_ in __ax4_iter_296) {
 				_loc4_ = (ASCompat.toInt(_tmp_) : UInt);
 				if (mDBFacade.dbAccountInfo.giftExcludeIds.indexOf(mListOfFriends[(_loc4_ : Int)].excludeId) < 0) {
 					_loc3_.push(_loc4_);

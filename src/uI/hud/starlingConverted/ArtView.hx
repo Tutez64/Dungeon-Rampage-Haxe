@@ -42,7 +42,7 @@ class ArtView {
 	}
 
 	@:allow(uI.hud.starlingConverted) static function buildDisplay(art:ArtNode, ticker:HudTicker, objects:ASDictionary<ASAny, ASAny>):ArtDisplay {
-		var __ax4_iter_160:Vector<ArtNode>;
+		var __ax4_iter_163:Vector<ArtNode>;
 		var _loc5_:ArtDisplay = null;
 		var _loc6_:ArtNode = null;
 		var _loc4_:ArtDisplay = null;
@@ -61,9 +61,9 @@ class ArtView {
 			if (art.kind == "static" || art.kind == "flipbook" || art.kind == "states" && art.children.length == 0) {
 				_loc5_.buildImages();
 			}
-			__ax4_iter_160 = art.children;
-			if (checkNullIteratee(__ax4_iter_160))
-				for (_tmp_ in __ax4_iter_160) {
+			__ax4_iter_163 = art.children;
+			if (checkNullIteratee(__ax4_iter_163))
+				for (_tmp_ in __ax4_iter_163) {
 					_loc6_ = _tmp_;
 					_loc4_ = buildDisplay(_loc6_, ticker, objects);
 					_loc5_.addArt(_loc4_);

@@ -87,9 +87,9 @@ class ScalingWeaponController extends WeaponController {
 		var _loc2_ = mWeapon.weaponData.ChargeAttack;
 		mChargeReleaseGMAttack = ASCompat.coerce(mDBFacade.gameMaster.attackByConstant.itemFor(_loc2_), gameMasterDictionary.GMAttack);
 		var _loc1_:GMModifier;
-		final __ax4_iter_329 = mWeapon.modifierList;
-		if (checkNullIteratee(__ax4_iter_329))
-			for (_tmp_ in __ax4_iter_329) {
+		final __ax4_iter_333 = mWeapon.modifierList;
+		if (checkNullIteratee(__ax4_iter_333))
+			for (_tmp_ in __ax4_iter_333) {
 				_loc1_ = _tmp_;
 				if (_loc1_.MODIFIER_TYPE == "MANA_COST") {
 					mWeaponModifierManaReduction = _loc1_.MP_COST;
@@ -140,7 +140,7 @@ class ScalingWeaponController extends WeaponController {
 
 	override public function onWeaponUp(autoAim:Bool = true) {
 		var _loc12_:GMModifier;
-		var __ax4_iter_330:Vector<GMModifier>;
+		var __ax4_iter_334:Vector<GMModifier>;
 		var _loc6_ = Math.NaN;
 		var _loc3_ = (0 : UInt);
 		var _loc10_:AttackTimeline = null;
@@ -190,9 +190,9 @@ class ScalingWeaponController extends WeaponController {
 				}
 				_loc2_ = (0 : UInt);
 				_loc9_ = false;
-				__ax4_iter_330 = mWeapon.modifierList;
-				if (checkNullIteratee(__ax4_iter_330))
-					for (_tmp_ in __ax4_iter_330) {
+				__ax4_iter_334 = mWeapon.modifierList;
+				if (checkNullIteratee(__ax4_iter_334))
+					for (_tmp_ in __ax4_iter_334) {
 						_loc12_ = _tmp_;
 						if (_loc12_.MAX_PROJECTILES > 0) {
 							_loc7_ += (ASCompat.floatToInt(_loc6_ * _loc12_.MAX_PROJECTILES) : UInt);

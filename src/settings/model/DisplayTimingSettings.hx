@@ -94,13 +94,13 @@ class DisplayTimingSettings {
 
 	public function refreshMonitors() {
 		var _loc3_:Screen;
-		var __ax4_iter_448:Array<ASAny>;
+		var __ax4_iter_458:Array<ASAny>;
 		var _loc1_:ScreenMode = null;
 		var _loc2_ = false;
 		try {
-			__ax4_iter_448 = Screen.screens;
-			if (checkNullIteratee(__ax4_iter_448))
-				for (_tmp_ in __ax4_iter_448) {
+			__ax4_iter_458 = Screen.screens;
+			if (checkNullIteratee(__ax4_iter_458))
+				for (_tmp_ in __ax4_iter_458) {
 					_loc3_ = ASCompat.coerce(_tmp_, flash.display.Screen);
 					try {
 						_loc1_ = _loc3_.mode;
@@ -174,9 +174,9 @@ class DisplayTimingSettings {
 			var _loc2_ = 1000 * _loc7_ / _loc9_;
 			var _loc11_ = Math.NaN;
 			var _loc4_:Float;
-			final __ax4_iter_449:Array<ASAny> = [48, 50, 60, 72, 75, 90, 100, 120, 144, 165, 180, 200, 240, 360];
-			if (checkNullIteratee(__ax4_iter_449))
-				for (_tmp_ in __ax4_iter_449) {
+			final __ax4_iter_459:Array<ASAny> = [48, 50, 60, 72, 75, 90, 100, 120, 144, 165, 180, 200, 240, 360];
+			if (checkNullIteratee(__ax4_iter_459))
+				for (_tmp_ in __ax4_iter_459) {
 					_loc4_ = ASCompat.toNumber(_tmp_);
 					if (Math.isNaN(_loc11_) || Math.abs(_loc2_ - _loc4_) < Math.abs(_loc2_ - _loc11_)) {
 						_loc11_ = _loc4_;

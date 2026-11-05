@@ -50,16 +50,16 @@ class PropView extends FloorView {
 		mRoot.addChild(mBody);
 		applySwfFallbackOutline();
 		var _loc2_:DisplayObject;
-		final __ax4_iter_438 = FloorView.findNavCollisions(mBody);
-		if (checkNullIteratee(__ax4_iter_438))
-			for (_tmp_ in __ax4_iter_438) {
+		final __ax4_iter_448 = FloorView.findNavCollisions(mBody);
+		if (checkNullIteratee(__ax4_iter_448))
+			for (_tmp_ in __ax4_iter_448) {
 				_loc2_ = ASCompat.coerce(_tmp_, flash.display.DisplayObject);
 				_loc2_.parent.removeChild(_loc2_);
 			}
 		var _loc3_:DisplayObject;
-		final __ax4_iter_439 = FloorView.findCombatCollisions(mBody);
-		if (checkNullIteratee(__ax4_iter_439))
-			for (_tmp_ in __ax4_iter_439) {
+		final __ax4_iter_449 = FloorView.findCombatCollisions(mBody);
+		if (checkNullIteratee(__ax4_iter_449))
+			for (_tmp_ in __ax4_iter_449) {
 				_loc3_ = ASCompat.coerce(_tmp_, flash.display.DisplayObject);
 				_loc3_.parent.removeChild(_loc3_);
 			}

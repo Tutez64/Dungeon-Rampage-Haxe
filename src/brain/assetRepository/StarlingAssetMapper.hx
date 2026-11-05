@@ -151,18 +151,18 @@ class StarlingAssetMapper {
 	static function isMappedLibraryFolder(folder:File):Bool {
 		var _loc2_ = new compat.RegExp("\\/$").replace(folder.url, "");
 		var _loc3_:String;
-		final __ax4_iter_398:ASObject = mBiomeMap;
-		if (checkNullIteratee(__ax4_iter_398))
-			for (_tmp_ in iterateDynamicValues(__ax4_iter_398)) {
+		final __ax4_iter_408:ASObject = mBiomeMap;
+		if (checkNullIteratee(__ax4_iter_408))
+			for (_tmp_ in iterateDynamicValues(__ax4_iter_408)) {
 				_loc3_ = _tmp_;
 				if (new compat.RegExp("\\/$").replace(AssetLoader.resolveFile(_loc3_).url, "") == _loc2_) {
 					return true;
 				}
 			}
 		var _loc4_:String;
-		final __ax4_iter_399:ASObject = mPropMap;
-		if (checkNullIteratee(__ax4_iter_399))
-			for (_tmp_ in iterateDynamicValues(__ax4_iter_399)) {
+		final __ax4_iter_409:ASObject = mPropMap;
+		if (checkNullIteratee(__ax4_iter_409))
+			for (_tmp_ in iterateDynamicValues(__ax4_iter_409)) {
 				_loc4_ = _tmp_;
 				if (new compat.RegExp("\\/$").replace(AssetLoader.resolveFile(_loc4_).url, "") == _loc2_) {
 					return true;

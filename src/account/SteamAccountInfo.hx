@@ -222,9 +222,9 @@ class SteamAccountInfo {
 	public static function steamResultName(result:Int):String {
 		var _loc3_:String = null;
 		var _loc2_:compat.XML;
-		final __ax4_iter_346 = ASCompat.describeType(SteamResults).child("constant");
-		if (checkNullIteratee(__ax4_iter_346))
-			for (_tmp_ in __ax4_iter_346) {
+		final __ax4_iter_355 = ASCompat.describeType(SteamResults).child("constant");
+		if (checkNullIteratee(__ax4_iter_355))
+			for (_tmp_ in __ax4_iter_355) {
 				_loc2_ = _tmp_;
 				_loc3_ = _loc2_.attribute("name");
 				if (ASCompat.toNumber((SteamResults : ASAny)[_loc3_]) == result) {

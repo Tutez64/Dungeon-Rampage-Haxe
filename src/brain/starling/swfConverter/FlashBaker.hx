@@ -281,7 +281,7 @@ class FlashBaker {
 
 	static function nestedPadding(node:DisplayObject, skipOwn:Bool):Int {
 		var _loc3_:BitmapFilter;
-		var __ax4_iter_498:Array<ASAny>;
+		var __ax4_iter_508:Array<ASAny>;
 		var _loc8_:Rectangle = null;
 		var _loc7_ = 0;
 		var _loc9_:DisplayObject = null;
@@ -290,9 +290,9 @@ class FlashBaker {
 			return 0;
 		}
 		if (!skipOwn) {
-			__ax4_iter_498 = node.filters;
-			if (checkNullIteratee(__ax4_iter_498))
-				for (_tmp_ in __ax4_iter_498) {
+			__ax4_iter_508 = node.filters;
+			if (checkNullIteratee(__ax4_iter_508))
+				for (_tmp_ in __ax4_iter_508) {
 					_loc3_ = ASCompat.coerce(_tmp_, flash.filters.BitmapFilter);
 					_loc8_ = sProbe.generateFilterRect(sProbeRect, _loc3_);
 					_loc6_ += Math.ceil(Math.max(-_loc8_.x,

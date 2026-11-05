@@ -390,9 +390,9 @@ class MenuNavigationController {
 
 	function onSteamInputButtonPressed(eventData:OnSteamInputButtonPressedEvent) {
 		var _loc2_:String;
-		final __ax4_iter_437 = mSteamInputActionsToKeyCodes;
-		if (checkNullIteratee(__ax4_iter_437))
-			for (_tmp_ in __ax4_iter_437.keys()) {
+		final __ax4_iter_447 = mSteamInputActionsToKeyCodes;
+		if (checkNullIteratee(__ax4_iter_447))
+			for (_tmp_ in __ax4_iter_447.keys()) {
 				_loc2_ = _tmp_;
 				if (mSteamInputManager.pressedAction(_loc2_)) {
 					onKeyPressed(ASCompat.toInt(mSteamInputActionsToKeyCodes[_loc2_]), true);
@@ -411,8 +411,16 @@ class MenuNavigationController {
 	}
 
 	public function onKeyPressed(inputCode:Int, fromController:Bool = false) {
+		var _loc5_:UIObject = null;
 		var _loc4_:UIObject = null;
 		var _loc3_:String = mUILayerConstants[(mTopLayer : Int)];
+		if (mFocusedUiObject != null && mFocusedUiObject.root == null && inputCode != 27 && inputCode != 81 && inputCode != 69) {
+			_loc5_ = ASCompat.coerce(mDefaultUIObjs[_loc3_], brain.uI.UIObject);
+			if (_loc5_ != null && _loc5_.root != null) {
+				setFocusedUiObject(_loc5_);
+			}
+			return;
+		}
 		if (inputCode == 81) {
 			if (ASCompat.dictionaryLookupNeNull(mLayerPreviousCategoryCallbacks, _loc3_)) {
 				mLayerPreviousCategoryCallbacks[_loc3_]();
@@ -483,6 +491,9 @@ class MenuNavigationController {
 						+ ")");
 				}
 			} else if (inputCode == 27) {
+				if (fromController && _loc3_ == "REVIVE_MENU") {
+					return;
+				}
 				if (ASCompat.toBool(mLayerExitCallbacks[mUILayerConstants[(mTopLayer : Int)]])) {
 					mLayerExitCallbacks[mUILayerConstants[(mTopLayer : Int)]]();
 				}
@@ -491,6 +502,12 @@ class MenuNavigationController {
 	}
 
 	static function __init__() {
-		RETURN_LAYERS = ["EXIT_DUNGEON", "EXIT_INFINITE_DUNGEON", "TOWN_MENU", "EXIT_POPUP"];
+		RETURN_LAYERS = [
+			"EXIT_DUNGEON",
+			"EXIT_INFINITE_DUNGEON",
+			"TOWN_MENU",
+			"EXIT_POPUP",
+			"REVIVE_MENU"
+		];
 	}
 }

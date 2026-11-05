@@ -270,7 +270,7 @@ class ChestRevealPopUp extends DBUIPopup {
 	}
 
 	public function updateRevealLoot(details:ASAny) {
-		var __ax4_iter_424:Vector<GMOfferDetail>;
+		var __ax4_iter_434:Vector<GMOfferDetail>;
 		var offerId:UInt = 0;
 		var weaponId:UInt = 0;
 		var swfPath:String = null;
@@ -338,9 +338,9 @@ class ChestRevealPopUp extends DBUIPopup {
 				mItemType = (2 : UInt);
 				mRevealedItemId = offerId;
 			} else if (mRevealedGMOffer.Details != null && mRevealedGMOffer.Details.length > 0) {
-				__ax4_iter_424 = mRevealedGMOffer.Details;
-				if (checkNullIteratee(__ax4_iter_424))
-					for (_tmp_ in __ax4_iter_424) {
+				__ax4_iter_434 = mRevealedGMOffer.Details;
+				if (checkNullIteratee(__ax4_iter_434))
+					for (_tmp_ in __ax4_iter_434) {
 						offerDetail = _tmp_;
 						if (offerDetail.StackableId != 0) {
 							gmStackable = ASCompat.coerce(mDBFacade.gameMaster.stackableById.itemFor(offerDetail.StackableId),
@@ -780,7 +780,7 @@ class ChestRevealPopUp extends DBUIPopup {
 
 	override public function destroy() {
 		var _loc1_:UIModifier;
-		var __ax4_iter_425:Vector<UIModifier>;
+		var __ax4_iter_435:Vector<UIModifier>;
 		if (mDBFacade == null) {
 			return;
 		}
@@ -794,9 +794,9 @@ class ChestRevealPopUp extends DBUIPopup {
 		mHoldTooltip = null;
 		mHoldIcon = null;
 		if (mModifiersList.length > 0) {
-			__ax4_iter_425 = mModifiersList;
-			if (checkNullIteratee(__ax4_iter_425))
-				for (_tmp_ in __ax4_iter_425) {
+			__ax4_iter_435 = mModifiersList;
+			if (checkNullIteratee(__ax4_iter_435))
+				for (_tmp_ in __ax4_iter_435) {
 					_loc1_ = _tmp_;
 					_loc1_.destroy();
 				}

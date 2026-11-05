@@ -108,9 +108,9 @@ class AssetLoader {
 		mBytesLoaded = (0 : UInt);
 		mBytesTotal = (0 : UInt);
 		var _loc1_:Loader;
-		final __ax4_iter_400 = mloadersets;
-		if (checkNullIteratee(__ax4_iter_400))
-			for (_tmp_ in __ax4_iter_400) {
+		final __ax4_iter_410 = mloadersets;
+		if (checkNullIteratee(__ax4_iter_410))
+			for (_tmp_ in __ax4_iter_410) {
 				_loc1_ = _tmp_;
 				mBytesLoaded += _loc1_.contentLoaderInfo.bytesLoaded;
 				mBytesTotal += _loc1_.contentLoaderInfo.bytesTotal;

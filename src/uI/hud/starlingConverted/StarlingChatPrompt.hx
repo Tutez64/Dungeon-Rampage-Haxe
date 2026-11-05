@@ -74,9 +74,9 @@ class StarlingChatPrompt {
 		var _loc14_:flash.display.DisplayObject = null;
 
 		var _loc15_ = ASCompat.reinterpretAs(clip.getChildByName("textField"), TextField);
-		final __ax4_iter_262 = Vector.ofArray(["textField", "chat_bar", "chat_btn", "log_btn"]);
-		if (checkNullIteratee(__ax4_iter_262))
-			for (_tmp_ in __ax4_iter_262) {
+		final __ax4_iter_265 = Vector.ofArray(["textField", "chat_bar", "chat_btn", "log_btn"]);
+		if (checkNullIteratee(__ax4_iter_265))
+			for (_tmp_ in __ax4_iter_265) {
 				_loc16_ = _tmp_;
 				if (clip.getChildByName(_loc16_) == null) {
 					HudArt.fatal("Missing Starling chat bar art: " + _loc16_);
@@ -98,9 +98,9 @@ class StarlingChatPrompt {
 		mLabel.visible = false;
 		parent.addChild(mBar);
 		parent.addChild(mLabel);
-		final __ax4_iter_263 = Vector.ofArray(["chat_bar", "chat_btn", "log_btn"]);
-		if (checkNullIteratee(__ax4_iter_263))
-			for (_tmp_ in __ax4_iter_263) {
+		final __ax4_iter_266 = Vector.ofArray(["chat_bar", "chat_btn", "log_btn"]);
+		if (checkNullIteratee(__ax4_iter_266))
+			for (_tmp_ in __ax4_iter_266) {
 				_loc16_ = _tmp_;
 				_loc14_ = clip.getChildByName(_loc16_);
 				mFlashParts.push(_loc14_);
@@ -203,6 +203,26 @@ class StarlingChatPrompt {
 		}
 	}
 
+	public function useFlashBar(value:Bool) {
+		var _loc3_ = 0;
+		if (mDisposed) {
+			return;
+		}
+		mBar.visible = !value;
+		var _loc2_:StarlingButton;
+		final __ax4_iter_267 = mButtons;
+		if (checkNullIteratee(__ax4_iter_267))
+			for (_tmp_ in __ax4_iter_267) {
+				_loc2_ = _tmp_;
+				_loc2_.enabled = !value;
+			}
+		_loc3_ = 0;
+		while (_loc3_ < mFlashParts.length) {
+			mFlashParts[_loc3_].visible = value && mFlashShown[_loc3_];
+			_loc3_++;
+		}
+	}
+
 	@:allow(uI.hud.starlingConverted) @:isVar var labelShown(get, never):Bool;
 
 	function get_labelShown():Bool {
@@ -261,7 +281,7 @@ class StarlingChatPrompt {
 	}
 
 	function buildBar() {
-		var __ax4_iter_264:Vector<String>;
+		var __ax4_iter_268:Vector<String>;
 		var _loc12_:MovieClip = null;
 		var _loc6_:MovieClip = null;
 		var _loc10_:String = null;
@@ -285,9 +305,9 @@ class StarlingChatPrompt {
 			_loc2_.key = _loc14_;
 			try {
 				_loc2_.children.push(bakePart(_loc6_, "chat_bar", _loc14_, _loc4_));
-				__ax4_iter_264 = Vector.ofArray(["chat_btn", "log_btn"]);
-				if (checkNullIteratee(__ax4_iter_264))
-					for (_tmp_ in __ax4_iter_264) {
+				__ax4_iter_268 = Vector.ofArray(["chat_btn", "log_btn"]);
+				if (checkNullIteratee(__ax4_iter_268))
+					for (_tmp_ in __ax4_iter_268) {
 						_loc10_ = _tmp_;
 						_loc13_ = ASCompat.reinterpretAs(_loc6_.getChildByName(_loc10_), MovieClip);
 						if (_loc13_ == null || _loc13_.getChildByName("up") == null) {
@@ -368,9 +388,9 @@ class StarlingChatPrompt {
 			mTicker.cancelBake(mRetry);
 		}
 		mRetry = null;
-		final __ax4_iter_265 = mButtons;
-		if (checkNullIteratee(__ax4_iter_265))
-			for (_tmp_ in __ax4_iter_265) {
+		final __ax4_iter_269 = mButtons;
+		if (checkNullIteratee(__ax4_iter_269))
+			for (_tmp_ in __ax4_iter_269) {
 				_loc1_ = _tmp_;
 				if (mInput != null) {
 					mInput.remove(_loc1_);

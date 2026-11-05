@@ -33,9 +33,9 @@ class BatchProcessor {
 
 	public function dispose() {
 		var _loc1_:MeshBatch;
-		final __ax4_iter_446 = _batches;
-		if (checkNullIteratee(__ax4_iter_446))
-			for (_tmp_ in __ax4_iter_446) {
+		final __ax4_iter_456 = _batches;
+		if (checkNullIteratee(__ax4_iter_456))
+			for (_tmp_ in __ax4_iter_456) {
 				_loc1_ = _tmp_;
 				_loc1_.dispose();
 			}
@@ -157,9 +157,9 @@ private class BatchPool {
 	public function purge() {
 		var _loc1_ = 0;
 		var _loc2_:Array<ASAny>;
-		final __ax4_iter_447 = _batchLists;
-		if (checkNullIteratee(__ax4_iter_447))
-			for (_tmp_ in __ax4_iter_447) {
+		final __ax4_iter_457 = _batchLists;
+		if (checkNullIteratee(__ax4_iter_457))
+			for (_tmp_ in __ax4_iter_457) {
 				_loc2_ = ASCompat.coerce(_tmp_, Array);
 				_loc1_ = 0;
 				while (_loc1_ < _loc2_.length) {

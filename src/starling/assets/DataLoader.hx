@@ -84,9 +84,9 @@ class DataLoader {
 
 	public function close() {
 		var _loc1_:ASAny;
-		final __ax4_iter_364 = _urlLoaders;
-		if (checkNullIteratee(__ax4_iter_364))
-			for (_tmp_ in __ax4_iter_364.keys()) {
+		final __ax4_iter_374 = _urlLoaders;
+		if (checkNullIteratee(__ax4_iter_374))
+			for (_tmp_ in __ax4_iter_374.keys()) {
 				_loc1_ = _tmp_;
 				try {
 					_loc1_.close();

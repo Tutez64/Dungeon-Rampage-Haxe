@@ -69,9 +69,9 @@ class SettingsModel {
 	public function get_hasPendingRestart():Bool {
 		var _loc1_:SettingDefinition = null;
 		var _loc2_:String;
-		final __ax4_iter_460:ASObject = mDirtyIds;
-		if (checkNullIteratee(__ax4_iter_460))
-			for (_tmp_ in __ax4_iter_460.___keys()) {
+		final __ax4_iter_470:ASObject = mDirtyIds;
+		if (checkNullIteratee(__ax4_iter_470))
+			for (_tmp_ in __ax4_iter_470.___keys()) {
 				_loc2_ = _tmp_;
 				_loc1_ = mCatalog.getDefinition(_loc2_);
 				if (_loc1_ != null && _loc1_.requiresRestart) {
@@ -137,9 +137,9 @@ class SettingsModel {
 			return;
 		}
 		var _loc4_:SettingDefinition;
-		final __ax4_iter_461 = mCatalog.definitions;
-		if (checkNullIteratee(__ax4_iter_461))
-			for (_tmp_ in __ax4_iter_461) {
+		final __ax4_iter_471 = mCatalog.definitions;
+		if (checkNullIteratee(__ax4_iter_471))
+			for (_tmp_ in __ax4_iter_471) {
 				_loc4_ = _tmp_;
 				if (_loc4_.isKeyBinding) {
 					_loc5_ = mValues[_loc4_.id];
@@ -173,9 +173,9 @@ class SettingsModel {
 
 	public function revert() {
 		var _loc1_:String;
-		final __ax4_iter_462:ASObject = mDirtyIds;
-		if (checkNullIteratee(__ax4_iter_462))
-			for (_tmp_ in __ax4_iter_462.___keys()) {
+		final __ax4_iter_472:ASObject = mDirtyIds;
+		if (checkNullIteratee(__ax4_iter_472))
+			for (_tmp_ in __ax4_iter_472.___keys()) {
 				_loc1_ = _tmp_;
 				setValue(_loc1_, mLoadedValues[_loc1_]);
 			}
@@ -185,9 +185,9 @@ class SettingsModel {
 
 	public function resetCategory(category:String) {
 		var _loc2_:SettingDefinition;
-		final __ax4_iter_463 = mCatalog.getDefinitionsForCategory(category);
-		if (checkNullIteratee(__ax4_iter_463))
-			for (_tmp_ in __ax4_iter_463) {
+		final __ax4_iter_473 = mCatalog.getDefinitionsForCategory(category);
+		if (checkNullIteratee(__ax4_iter_473))
+			for (_tmp_ in __ax4_iter_473) {
 				_loc2_ = _tmp_;
 				if (_loc2_.isPersisted) {
 					if (Std.isOfType(_loc2_.binding, FeatureFlagBinding)) {
@@ -204,9 +204,9 @@ class SettingsModel {
 
 	public function resetAll() {
 		var _loc1_:String;
-		final __ax4_iter_464 = SettingCategory.ORDERED;
-		if (checkNullIteratee(__ax4_iter_464))
-			for (_tmp_ in __ax4_iter_464) {
+		final __ax4_iter_474 = SettingCategory.ORDERED;
+		if (checkNullIteratee(__ax4_iter_474))
+			for (_tmp_ in __ax4_iter_474) {
 				_loc1_ = _tmp_;
 				resetCategory(_loc1_);
 			}
@@ -217,9 +217,9 @@ class SettingsModel {
 			return;
 		}
 		var _loc1_:String;
-		final __ax4_iter_465:ASObject = mDirtyIds;
-		if (checkNullIteratee(__ax4_iter_465))
-			for (_tmp_ in __ax4_iter_465.___keys()) {
+		final __ax4_iter_475:ASObject = mDirtyIds;
+		if (checkNullIteratee(__ax4_iter_475))
+			for (_tmp_ in __ax4_iter_475.___keys()) {
 				_loc1_ = _tmp_;
 				if (ASCompat.toBool(mForgottenIds[_loc1_])) {
 					ASCompat.deleteProperty(mStoredValues, _loc1_);
@@ -284,9 +284,9 @@ class SettingsModel {
 		mValues = {};
 		mLoadedValues = {};
 		var _loc1_:SettingDefinition;
-		final __ax4_iter_466 = mCatalog.definitions;
-		if (checkNullIteratee(__ax4_iter_466))
-			for (_tmp_ in __ax4_iter_466) {
+		final __ax4_iter_476 = mCatalog.definitions;
+		if (checkNullIteratee(__ax4_iter_476))
+			for (_tmp_ in __ax4_iter_476) {
 				_loc1_ = _tmp_;
 				if (_loc1_.isPersisted) {
 					if (mStoredValues.hasOwnProperty(_loc1_.id)) {
@@ -302,9 +302,9 @@ class SettingsModel {
 	function resolvePreset(definition:SettingDefinition):ASAny {
 		var _loc2_:SettingChoice = null;
 		var _loc3_:SettingChoice;
-		final __ax4_iter_467 = definition.choices;
-		if (checkNullIteratee(__ax4_iter_467))
-			for (_tmp_ in __ax4_iter_467) {
+		final __ax4_iter_477 = definition.choices;
+		if (checkNullIteratee(__ax4_iter_477))
+			for (_tmp_ in __ax4_iter_477) {
 				_loc3_ = _tmp_;
 				if (_loc3_.derived) {
 					_loc2_ = _loc3_;
@@ -335,9 +335,9 @@ class SettingsModel {
 			return;
 		}
 		var _loc4_:String;
-		final __ax4_iter_468:ASObject = _loc3_.memberValues;
-		if (checkNullIteratee(__ax4_iter_468))
-			for (_tmp_ in __ax4_iter_468.___keys()) {
+		final __ax4_iter_478:ASObject = _loc3_.memberValues;
+		if (checkNullIteratee(__ax4_iter_478))
+			for (_tmp_ in __ax4_iter_478.___keys()) {
 				_loc4_ = _tmp_;
 				choosePresetMember(_loc4_, _loc3_.memberValues[_loc4_]);
 			}

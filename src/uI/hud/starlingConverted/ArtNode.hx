@@ -143,17 +143,17 @@ class ArtNode {
 	function pinCells(delta:Int) {
 		var _loc2_:BakedCell = null;
 		var _loc3_:ArtNode = null;
-		final __ax4_iter_224 = mCells;
-		if (checkNullIteratee(__ax4_iter_224))
-			for (_tmp_ in __ax4_iter_224) {
+		final __ax4_iter_227 = mCells;
+		if (checkNullIteratee(__ax4_iter_227))
+			for (_tmp_ in __ax4_iter_227) {
 				_loc2_ = _tmp_;
 				if (Std.isOfType(_loc2_, HudCell)) {
 					cast(_loc2_, HudCell).mLiveViews = cast(_loc2_, HudCell).mLiveViews + delta;
 				}
 			}
-		final __ax4_iter_225 = children;
-		if (checkNullIteratee(__ax4_iter_225))
-			for (_tmp_ in __ax4_iter_225) {
+		final __ax4_iter_228 = children;
+		if (checkNullIteratee(__ax4_iter_228))
+			for (_tmp_ in __ax4_iter_228) {
 				_loc3_ = _tmp_;
 				_loc3_.pinCells(delta);
 			}
@@ -161,47 +161,47 @@ class ArtNode {
 
 	@:allow(uI.hud.starlingConverted) function canEvict():Bool {
 		var __finallyReturn0:Bool;
-		var __ax4_iter_226:ASDictionary<ASAny, ASAny>;
-		var __ax4_iter_227:ASDictionary<ASAny, ASAny>;
+		var __ax4_iter_229:ASDictionary<ASAny, ASAny>;
+		var __ax4_iter_230:ASDictionary<ASAny, ASAny>;
 		var _loc6_:Int;
 		var _loc5_:ASDictionary<ASAny, ASAny>;
 		var __finallyReturn1:Bool;
-		var __ax4_iter_228:ASDictionary<ASAny, ASAny>;
-		var __ax4_iter_229:ASDictionary<ASAny, ASAny>;
-		var __finallyReturn2:Bool;
-		var __ax4_iter_230:ASDictionary<ASAny, ASAny>;
 		var __ax4_iter_231:ASDictionary<ASAny, ASAny>;
 		var __ax4_iter_232:ASDictionary<ASAny, ASAny>;
+		var __finallyReturn2:Bool;
 		var __ax4_iter_233:ASDictionary<ASAny, ASAny>;
 		var __ax4_iter_234:ASDictionary<ASAny, ASAny>;
 		var __ax4_iter_235:ASDictionary<ASAny, ASAny>;
+		var __ax4_iter_236:ASDictionary<ASAny, ASAny>;
+		var __ax4_iter_237:ASDictionary<ASAny, ASAny>;
+		var __ax4_iter_238:ASDictionary<ASAny, ASAny>;
 		var _loc1_:ASObject = null;
 		{
 			var __finallyReturn0:Bool;
-			var __ax4_iter_226:ASDictionary<ASAny, ASAny>;
-			var __ax4_iter_227:ASDictionary<ASAny, ASAny>;
-			var __finallyReturn1:Bool;
-			var __ax4_iter_228:ASDictionary<ASAny, ASAny>;
 			var __ax4_iter_229:ASDictionary<ASAny, ASAny>;
-			var __finallyReturn2:Bool;
 			var __ax4_iter_230:ASDictionary<ASAny, ASAny>;
+			var __finallyReturn1:Bool;
 			var __ax4_iter_231:ASDictionary<ASAny, ASAny>;
 			var __ax4_iter_232:ASDictionary<ASAny, ASAny>;
+			var __finallyReturn2:Bool;
 			var __ax4_iter_233:ASDictionary<ASAny, ASAny>;
+			var __ax4_iter_234:ASDictionary<ASAny, ASAny>;
+			var __ax4_iter_235:ASDictionary<ASAny, ASAny>;
+			var __ax4_iter_236:ASDictionary<ASAny, ASAny>;
 			try {
 				if (!countCachedCells(sEvictCells, sEvictNodes)) {
 					{
 						__finallyReturn0 = false;
 						{
-							__ax4_iter_226 = sEvictCells;
-							if (checkNullIteratee(__ax4_iter_226))
-								for (_tmp_ in __ax4_iter_226.keys()) {
+							__ax4_iter_229 = sEvictCells;
+							if (checkNullIteratee(__ax4_iter_229))
+								for (_tmp_ in __ax4_iter_229.keys()) {
 									_loc1_ = _tmp_;
 									sEvictCells.remove(_loc1_);
 								}
-							__ax4_iter_227 = sEvictNodes;
-							if (checkNullIteratee(__ax4_iter_227))
-								for (_tmp_ in __ax4_iter_227.keys()) {
+							__ax4_iter_230 = sEvictNodes;
+							if (checkNullIteratee(__ax4_iter_230))
+								for (_tmp_ in __ax4_iter_230.keys()) {
 									_loc1_ = _tmp_;
 									sEvictNodes.remove(_loc1_);
 								}
@@ -219,15 +219,15 @@ class ArtNode {
 								{
 									__finallyReturn1 = false;
 									{
-										__ax4_iter_228 = sEvictCells;
-										if (checkNullIteratee(__ax4_iter_228))
-											for (_tmp_ in __ax4_iter_228.keys()) {
+										__ax4_iter_231 = sEvictCells;
+										if (checkNullIteratee(__ax4_iter_231))
+											for (_tmp_ in __ax4_iter_231.keys()) {
 												_loc1_ = _tmp_;
 												sEvictCells.remove(_loc1_);
 											}
-										__ax4_iter_229 = sEvictNodes;
-										if (checkNullIteratee(__ax4_iter_229))
-											for (_tmp_ in __ax4_iter_229.keys()) {
+										__ax4_iter_232 = sEvictNodes;
+										if (checkNullIteratee(__ax4_iter_232))
+											for (_tmp_ in __ax4_iter_232.keys()) {
 												_loc1_ = _tmp_;
 												sEvictNodes.remove(_loc1_);
 											}
@@ -239,15 +239,15 @@ class ArtNode {
 					{
 						__finallyReturn2 = true;
 						{
-							__ax4_iter_230 = sEvictCells;
-							if (checkNullIteratee(__ax4_iter_230))
-								for (_tmp_ in __ax4_iter_230.keys()) {
+							__ax4_iter_233 = sEvictCells;
+							if (checkNullIteratee(__ax4_iter_233))
+								for (_tmp_ in __ax4_iter_233.keys()) {
 									_loc1_ = _tmp_;
 									sEvictCells.remove(_loc1_);
 								}
-							__ax4_iter_231 = sEvictNodes;
-							if (checkNullIteratee(__ax4_iter_231))
-								for (_tmp_ in __ax4_iter_231.keys()) {
+							__ax4_iter_234 = sEvictNodes;
+							if (checkNullIteratee(__ax4_iter_234))
+								for (_tmp_ in __ax4_iter_234.keys()) {
 									_loc1_ = _tmp_;
 									sEvictNodes.remove(_loc1_);
 								}
@@ -257,15 +257,15 @@ class ArtNode {
 				}
 			} catch (__finallyError3:Dynamic) {
 				{
-					__ax4_iter_232 = sEvictCells;
-					if (checkNullIteratee(__ax4_iter_232))
-						for (_tmp_ in __ax4_iter_232.keys()) {
+					__ax4_iter_235 = sEvictCells;
+					if (checkNullIteratee(__ax4_iter_235))
+						for (_tmp_ in __ax4_iter_235.keys()) {
 							_loc1_ = _tmp_;
 							sEvictCells.remove(_loc1_);
 						}
-					__ax4_iter_233 = sEvictNodes;
-					if (checkNullIteratee(__ax4_iter_233))
-						for (_tmp_ in __ax4_iter_233.keys()) {
+					__ax4_iter_236 = sEvictNodes;
+					if (checkNullIteratee(__ax4_iter_236))
+						for (_tmp_ in __ax4_iter_236.keys()) {
 							_loc1_ = _tmp_;
 							sEvictNodes.remove(_loc1_);
 						}
@@ -273,15 +273,15 @@ class ArtNode {
 				throw __finallyError3;
 			};
 			{
-				__ax4_iter_234 = sEvictCells;
-				if (checkNullIteratee(__ax4_iter_234))
-					for (_tmp_ in __ax4_iter_234.keys()) {
+				__ax4_iter_237 = sEvictCells;
+				if (checkNullIteratee(__ax4_iter_237))
+					for (_tmp_ in __ax4_iter_237.keys()) {
 						_loc1_ = _tmp_;
 						sEvictCells.remove(_loc1_);
 					}
-				__ax4_iter_235 = sEvictNodes;
-				if (checkNullIteratee(__ax4_iter_235))
-					for (_tmp_ in __ax4_iter_235.keys()) {
+				__ax4_iter_238 = sEvictNodes;
+				if (checkNullIteratee(__ax4_iter_238))
+					for (_tmp_ in __ax4_iter_238.keys()) {
 						_loc1_ = _tmp_;
 						sEvictNodes.remove(_loc1_);
 					}
@@ -294,17 +294,17 @@ class ArtNode {
 		var _loc1_:BakedCell = null;
 		var _loc2_:ArtNode = null;
 		mPinned = true;
-		final __ax4_iter_236 = mCells;
-		if (checkNullIteratee(__ax4_iter_236))
-			for (_tmp_ in __ax4_iter_236) {
+		final __ax4_iter_239 = mCells;
+		if (checkNullIteratee(__ax4_iter_239))
+			for (_tmp_ in __ax4_iter_239) {
 				_loc1_ = _tmp_;
 				if (Std.isOfType(_loc1_, HudCell)) {
 					cast(_loc1_, HudCell).mPinned = true;
 				}
 			}
-		final __ax4_iter_237 = children;
-		if (checkNullIteratee(__ax4_iter_237))
-			for (_tmp_ in __ax4_iter_237) {
+		final __ax4_iter_240 = children;
+		if (checkNullIteratee(__ax4_iter_240))
+			for (_tmp_ in __ax4_iter_240) {
 				_loc2_ = _tmp_;
 				_loc2_.pinStartupTree();
 			}
@@ -320,9 +320,9 @@ class ArtNode {
 		if (mPinned || mViews > 0) {
 			return false;
 		}
-		final __ax4_iter_238 = mCells;
-		if (checkNullIteratee(__ax4_iter_238))
-			for (_tmp_ in __ax4_iter_238) {
+		final __ax4_iter_241 = mCells;
+		if (checkNullIteratee(__ax4_iter_241))
+			for (_tmp_ in __ax4_iter_241) {
 				_loc3_ = _tmp_;
 				if (Std.isOfType(_loc3_, HudCell)
 					&& (cast(_loc3_, HudCell).mPinned
@@ -332,9 +332,9 @@ class ArtNode {
 				}
 				cells[_loc3_] = ASCompat.toInt(cells[_loc3_]) + 1;
 			}
-		final __ax4_iter_239 = children;
-		if (checkNullIteratee(__ax4_iter_239))
-			for (_tmp_ in __ax4_iter_239) {
+		final __ax4_iter_242 = children;
+		if (checkNullIteratee(__ax4_iter_242))
+			for (_tmp_ in __ax4_iter_242) {
 				_loc4_ = _tmp_;
 				if (!_loc4_.countCachedCells(cells, seen)) {
 					return false;
@@ -406,9 +406,9 @@ class ArtNode {
 		}
 		mCells.length = 0;
 		mOwners.length = 0;
-		final __ax4_iter_240 = children;
-		if (checkNullIteratee(__ax4_iter_240))
-			for (_tmp_ in __ax4_iter_240) {
+		final __ax4_iter_243 = children;
+		if (checkNullIteratee(__ax4_iter_243))
+			for (_tmp_ in __ax4_iter_243) {
 				_loc5_ = _tmp_;
 				_loc5_.releaseTree(pages, visited);
 			}

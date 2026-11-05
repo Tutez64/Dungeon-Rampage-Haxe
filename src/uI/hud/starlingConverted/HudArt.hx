@@ -171,6 +171,7 @@ class HudArt {
 			"stacks_hud",
 			"buff_cooldown_icon",
 			"floater_text",
+			"options_panel_button",
 			"UI_widget",
 			"UI_nametag",
 			"UI_speechbubble_typing",
@@ -216,7 +217,10 @@ class HudArt {
 		sSwfs.push(asset);
 		_loc2_ = 0;
 		while (_loc2_ < sSymbols.length) {
-			if (sSymbols[_loc2_] != "UI_widget" && sSymbols[_loc2_] != "UI_nametag" && sSymbols[_loc2_] != "UI_speechbubble_typing") {
+			if (sSymbols[_loc2_] != "options_panel_button"
+				&& sSymbols[_loc2_] != "UI_widget"
+				&& sSymbols[_loc2_] != "UI_nametag"
+				&& sSymbols[_loc2_] != "UI_speechbubble_typing") {
 				sClasses[sSymbols[_loc2_]] = requireClass(asset, "Resources/Art2D/UI/db_UI_HUD.swf", sSymbols[_loc2_]);
 			}
 			_loc2_++;
@@ -227,6 +231,7 @@ class HudArt {
 	static function loadedTown(asset:SwfAsset) {
 		TimelineMasks.register(asset);
 		sSwfs.push(asset);
+		ASCompat.setProperty(sClasses, "options_panel_button", requireClass(asset, "Resources/Art2D/UI/db_UI_town.swf", "options_panel_button"));
 		ASCompat.setProperty(sClasses, "legendary_background_icon", requireClass(asset, "Resources/Art2D/UI/db_UI_town.swf", "legendary_background_icon"));
 		loaded();
 	}
@@ -346,14 +351,14 @@ class HudArt {
 	}
 
 	static function discardPending() {
-		var __ax4_iter_266:ASObject;
+		var __ax4_iter_270:ASObject;
 		var _loc1_:ArtNode = null;
 		HudIconBake.cancel();
 		RarityArt.cancel();
 		if (sPendingArt != null) {
-			__ax4_iter_266 = sPendingArt;
-			if (checkNullIteratee(__ax4_iter_266))
-				for (_tmp_ in iterateDynamicValues(__ax4_iter_266)) {
+			__ax4_iter_270 = sPendingArt;
+			if (checkNullIteratee(__ax4_iter_270))
+				for (_tmp_ in iterateDynamicValues(__ax4_iter_270)) {
 					_loc1_ = ASCompat.coerce(_tmp_, uI.hud.starlingConverted.ArtNode);
 					try {
 						_loc1_.release(sPendingPages);
@@ -425,9 +430,9 @@ class HudArt {
 		sPendingFramePages = new HudPages(true);
 		sPendingArt = {};
 		sBakeSymbols = new Vector<String>((0 : UInt));
-		final __ax4_iter_267 = sSymbols;
-		if (checkNullIteratee(__ax4_iter_267))
-			for (_tmp_ in __ax4_iter_267) {
+		final __ax4_iter_271 = sSymbols;
+		if (checkNullIteratee(__ax4_iter_271))
+			for (_tmp_ in __ax4_iter_271) {
 				_loc2_ = _tmp_;
 				if (!((_loc2_ == "ui_hud" || _loc2_ == "ui_hud_old") && _loc2_ != sLayout && !ASCompat.toBool(sPinnedSymbols[_loc2_]))) {
 					sBakeSymbols.push(_loc2_);
@@ -560,9 +565,9 @@ class HudArt {
 				};
 			}
 		}
-		final __ax4_iter_268 = node.children;
-		if (checkNullIteratee(__ax4_iter_268))
-			for (_tmp_ in __ax4_iter_268) {
+		final __ax4_iter_272 = node.children;
+		if (checkNullIteratee(__ax4_iter_272))
+			for (_tmp_ in __ax4_iter_272) {
 				_loc5_ = _tmp_;
 				prepareText(_loc5_, path + "." + _loc5_.name);
 			}
@@ -582,6 +587,9 @@ class HudArt {
 	}
 
 	static function symbolScale(symbol:String):Float {
+		if (symbol == "options_panel_button") {
+			return 0.9;
+		}
 		if (symbol.indexOf("UI_teamloot_") == 0) {
 			return 1.8;
 		}
@@ -729,7 +737,7 @@ class HudArt {
 	}
 
 	static function completeBake() {
-		var __ax4_iter_272:Vector<ASFunction>;
+		var __ax4_iter_276:Vector<ASFunction>;
 		var _loc1_:ArtNode = null;
 		var _loc4_:String = null;
 		var _loc3_:ASFunction = null;
@@ -756,15 +764,15 @@ class HudArt {
 			"retired": false,
 			"release": releaseLease
 		};
-		final __ax4_iter_269:ASObject = sPendingArt;
-		if (checkNullIteratee(__ax4_iter_269))
-			for (_tmp_ in __ax4_iter_269.___keys()) {
+		final __ax4_iter_273:ASObject = sPendingArt;
+		if (checkNullIteratee(__ax4_iter_273))
+			for (_tmp_ in __ax4_iter_273.___keys()) {
 				_loc4_ = _tmp_;
 				assignLease(ASCompat.dynamicAs(sPendingArt[_loc4_], ArtNode), _loc5_);
 			}
-		final __ax4_iter_270 = Vector.ofArray(["ui_hud_old", "ui_hud"]);
-		if (checkNullIteratee(__ax4_iter_270))
-			for (_tmp_ in __ax4_iter_270) {
+		final __ax4_iter_274 = Vector.ofArray(["ui_hud_old", "ui_hud"]);
+		if (checkNullIteratee(__ax4_iter_274))
+			for (_tmp_ in __ax4_iter_274) {
 				_loc4_ = _tmp_;
 				_loc1_ = ASCompat.dynamicAs(sPendingArt[_loc4_], ArtNode);
 				if (_loc1_ != null) {
@@ -782,16 +790,16 @@ class HudArt {
 		sLease = _loc5_;
 		sLeases.push(sLease);
 		sizeStarlingCap();
-		final __ax4_iter_271:ASObject = sArt;
-		if (checkNullIteratee(__ax4_iter_271))
-			for (_tmp_ in __ax4_iter_271.___keys()) {
+		final __ax4_iter_275:ASObject = sArt;
+		if (checkNullIteratee(__ax4_iter_275))
+			for (_tmp_ in __ax4_iter_275.___keys()) {
 				_loc4_ = _tmp_;
 				_loc1_ = ASCompat.dynamicAs(sArt[_loc4_], ArtNode);
 				cacheContent(_loc1_, _loc4_, sArt, sPages);
 			}
 		sReady = true;
 		{
-			var __ax4_iter_272:Vector<ASFunction>;
+			var __ax4_iter_276:Vector<ASFunction>;
 			try {
 				while (sCallbacks.length > 0) {
 					_loc3_ = sCallbacks.shift();
@@ -802,9 +810,9 @@ class HudArt {
 					}
 				}
 				if (_loc2_ != null) {
-					__ax4_iter_272 = sRebakedCallbacks;
-					if (checkNullIteratee(__ax4_iter_272))
-						for (_tmp_ in __ax4_iter_272) {
+					__ax4_iter_276 = sRebakedCallbacks;
+					if (checkNullIteratee(__ax4_iter_276))
+						for (_tmp_ in __ax4_iter_276) {
 							_loc3_ = _tmp_;
 							try {
 								_loc3_();
@@ -1013,9 +1021,9 @@ class HudArt {
 		if (_loc2_ != null) {
 			return _loc2_;
 		}
-		final __ax4_iter_273 = sSwfs;
-		if (checkNullIteratee(__ax4_iter_273))
-			for (_tmp_ in __ax4_iter_273) {
+		final __ax4_iter_277 = sSwfs;
+		if (checkNullIteratee(__ax4_iter_277))
+			for (_tmp_ in __ax4_iter_277) {
 				_loc4_ = _tmp_;
 				try {
 					_loc2_ = _loc4_.getClass(symbolName, true);
@@ -1028,9 +1036,9 @@ class HudArt {
 				}
 			}
 		var _loc3_ = "";
-		final __ax4_iter_274 = sSwfs;
-		if (checkNullIteratee(__ax4_iter_274))
-			for (_tmp_ in __ax4_iter_274) {
+		final __ax4_iter_278 = sSwfs;
+		if (checkNullIteratee(__ax4_iter_278))
+			for (_tmp_ in __ax4_iter_278) {
 				_loc4_ = _tmp_;
 				_loc3_ += _loc4_.swfPath + " ";
 			}
@@ -1257,9 +1265,9 @@ class HudArt {
 	static function residentBytes():Float {
 		var _loc2_:ASObject = null;
 		var _loc1_:Float = 0;
-		final __ax4_iter_275 = sLeases;
-		if (checkNullIteratee(__ax4_iter_275))
-			for (_tmp_ in __ax4_iter_275) {
+		final __ax4_iter_279 = sLeases;
+		if (checkNullIteratee(__ax4_iter_279))
+			for (_tmp_ in __ax4_iter_279) {
 				_loc2_ = _tmp_;
 				_loc1_ += cast(_loc2_.pages, HudPages).accountedBytes + cast(_loc2_.framePages, HudPages).accountedBytes;
 			}
@@ -1275,9 +1283,9 @@ class HudArt {
 			return;
 		}
 		node.lease = lease;
-		final __ax4_iter_276 = node.children;
-		if (checkNullIteratee(__ax4_iter_276))
-			for (_tmp_ in __ax4_iter_276) {
+		final __ax4_iter_280 = node.children;
+		if (checkNullIteratee(__ax4_iter_280))
+			for (_tmp_ in __ax4_iter_280) {
 				_loc3_ = _tmp_;
 				assignLease(_loc3_, lease);
 			}
@@ -1285,9 +1293,9 @@ class HudArt {
 
 	static function releaseLease(lease:ASObject) {
 		var _loc2_:ArtNode = null;
-		final __ax4_iter_277:ASAny = lease.art;
-		if (checkNullIteratee(__ax4_iter_277))
-			for (_tmp_ in __ax4_iter_277) {
+		final __ax4_iter_281:ASAny = lease.art;
+		if (checkNullIteratee(__ax4_iter_281))
+			for (_tmp_ in __ax4_iter_281) {
 				_loc2_ = ASCompat.coerce(_tmp_, uI.hud.starlingConverted.ArtNode);
 				_loc2_.release(ASCompat.coerce(lease.pages, brain.starling.swfConverter.BakedPages));
 			}

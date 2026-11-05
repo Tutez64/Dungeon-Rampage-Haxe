@@ -103,9 +103,9 @@ class WeaponGameObject extends GameObject {
 			return;
 		}
 		var _loc1_:String;
-		final __ax4_iter_332 = mGMWeapon.AttackArray;
-		if (checkNullIteratee(__ax4_iter_332))
-			for (_tmp_ in __ax4_iter_332) {
+		final __ax4_iter_336 = mGMWeapon.AttackArray;
+		if (checkNullIteratee(__ax4_iter_336))
+			for (_tmp_ in __ax4_iter_336) {
 				_loc1_ = _tmp_;
 				if (_loc1_ == null) {
 					break;
@@ -130,7 +130,7 @@ class WeaponGameObject extends GameObject {
 
 	function preloadProjectileAssetsForAttack(gmAttack:GMAttack) {
 		var _loc2_:ASObject;
-		var __ax4_iter_334:ASAny;
+		var __ax4_iter_338:ASAny;
 		var _loc3_:GMProjectile = null;
 		if (ASCompat.stringAsBool(gmAttack.Projectile)) {
 			_loc3_ = ASCompat.coerce(mDBFacade.gameMaster.projectileByConstant.itemFor(gmAttack.Projectile), gameMasterDictionary.GMProjectile);
@@ -147,13 +147,13 @@ class WeaponGameObject extends GameObject {
 			return;
 		}
 		var _loc5_:ASObject;
-		final __ax4_iter_333:ASAny = _loc4_.frames;
-		if (checkNullIteratee(__ax4_iter_333))
-			for (_tmp_ in __ax4_iter_333) {
+		final __ax4_iter_337:ASAny = _loc4_.frames;
+		if (checkNullIteratee(__ax4_iter_337))
+			for (_tmp_ in __ax4_iter_337) {
 				_loc5_ = _tmp_;
-				__ax4_iter_334 = _loc5_.actions;
-				if (checkNullIteratee(__ax4_iter_334))
-					for (_tmp_ in __ax4_iter_334) {
+				__ax4_iter_338 = _loc5_.actions;
+				if (checkNullIteratee(__ax4_iter_338))
+					for (_tmp_ in __ax4_iter_338) {
 						_loc2_ = _tmp_;
 						if (_loc2_ != null) {
 							if (ASCompat.toBool(_loc2_.attackEffectPath) && ASCompat.toBool(_loc2_.attackEffectName)) {
@@ -222,9 +222,9 @@ class WeaponGameObject extends GameObject {
 
 	public function updateStatsForModifiers() {
 		var _loc1_:GMModifier;
-		final __ax4_iter_335 = mModifiers;
-		if (checkNullIteratee(__ax4_iter_335))
-			for (_tmp_ in __ax4_iter_335) {
+		final __ax4_iter_339 = mModifiers;
+		if (checkNullIteratee(__ax4_iter_339))
+			for (_tmp_ in __ax4_iter_339) {
 				_loc1_ = _tmp_;
 				mAttackSpeedModifier[0] *= _loc1_.MELEE_SPD;
 				mAttackSpeedModifier[1] *= _loc1_.SHOOT_SPD;

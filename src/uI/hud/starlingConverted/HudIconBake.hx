@@ -61,9 +61,9 @@ class HudIconBake {
 		var _loc4_:String = null;
 		sLoaded = done;
 		var _loc6_:ASObject = facade.gameMaster;
-		final __ax4_iter_178:ASAny = _loc6_.Stackables;
-		if (checkNullIteratee(__ax4_iter_178))
-			for (_tmp_ in __ax4_iter_178) {
+		final __ax4_iter_181:ASAny = _loc6_.Stackables;
+		if (checkNullIteratee(__ax4_iter_181))
+			for (_tmp_ in __ax4_iter_181) {
 				_loc5_ = _tmp_;
 				if (_loc5_.UsageAttack != null
 					&& ASCompat.toNumberField(_loc5_.UsageAttack, "length") > 0
@@ -71,17 +71,17 @@ class HudIconBake {
 					add(_loc5_.UISwfFilepath, _loc5_.IconName, 0.6, false, true, "consumables_01.graphic");
 				}
 			}
-		final __ax4_iter_179:ASAny = _loc6_.Buffs;
-		if (checkNullIteratee(__ax4_iter_179))
-			for (_tmp_ in __ax4_iter_179) {
+		final __ax4_iter_182:ASAny = _loc6_.Buffs;
+		if (checkNullIteratee(__ax4_iter_182))
+			for (_tmp_ in __ax4_iter_182) {
 				_loc5_ = _tmp_;
 				if (ASCompat.toBool(_loc5_.ShowInHUD)) {
 					add(_loc5_.IconSwf, _loc5_.IconName, 0.75, false, false, "buff_cooldown_icon.graphic");
 				}
 			}
-		final __ax4_iter_180:ASAny = _loc6_.Npcs;
-		if (checkNullIteratee(__ax4_iter_180))
-			for (_tmp_ in __ax4_iter_180) {
+		final __ax4_iter_183:ASAny = _loc6_.Npcs;
+		if (checkNullIteratee(__ax4_iter_183))
+			for (_tmp_ in __ax4_iter_183) {
 				_loc5_ = _tmp_;
 				if (_loc5_.CharType == "PET" && ASCompat.toBool(_loc5_.UsePetUI)) {
 					add(_loc5_.IconSwfFilepath, _loc5_.IconName, 1.1764705882352942, false, false, "pet.graphic");
@@ -91,25 +91,25 @@ class HudIconBake {
 				}
 			}
 		var _loc8_:ASObject = _loc6_.getSkinByType(facade.dbAccountInfo.activeAvatarSkinId);
-		final __ax4_iter_181:ASAny = _loc6_.Skins;
-		if (checkNullIteratee(__ax4_iter_181))
-			for (_tmp_ in __ax4_iter_181) {
+		final __ax4_iter_184:ASAny = _loc6_.Skins;
+		if (checkNullIteratee(__ax4_iter_184))
+			for (_tmp_ in __ax4_iter_184) {
 				_loc5_ = _tmp_;
 				avatar(_loc5_.IconSwfFilepath, _loc5_.IconName);
 			}
 		if (_loc8_ != null) {
 			add(_loc8_.UISwfFilepath, _loc8_.IconName, 1, false, false, "UI_profile.avatar", true);
 		}
-		final __ax4_iter_182:ASAny = _loc6_.DungeonModifiers;
-		if (checkNullIteratee(__ax4_iter_182))
-			for (_tmp_ in __ax4_iter_182) {
+		final __ax4_iter_185:ASAny = _loc6_.DungeonModifiers;
+		if (checkNullIteratee(__ax4_iter_185))
+			for (_tmp_ in __ax4_iter_185) {
 				_loc5_ = _tmp_;
 				add(_loc5_.IconFilepath, _loc5_.IconName, 1, false, false, "floor_modifier01");
 			}
 		var _loc7_ = new Vector<String>((0 : UInt));
-		final __ax4_iter_183:ASObject = sLibraries;
-		if (checkNullIteratee(__ax4_iter_183))
-			for (_tmp_ in __ax4_iter_183.___keys()) {
+		final __ax4_iter_186:ASObject = sLibraries;
+		if (checkNullIteratee(__ax4_iter_186))
+			for (_tmp_ in __ax4_iter_186.___keys()) {
 				_loc4_ = _tmp_;
 				_loc7_.push(_loc4_);
 			}

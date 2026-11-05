@@ -17,9 +17,9 @@ class UIRadioButton extends UIButton {
 
 	static function deselectAllInGroup(selectedButton:UIRadioButton) {
 		var _loc2_:UIRadioButton;
-		final __ax4_iter_156 = mAllRadioButtons;
-		if (checkNullIteratee(__ax4_iter_156))
-			for (_tmp_ in __ax4_iter_156) {
+		final __ax4_iter_159 = mAllRadioButtons;
+		if (checkNullIteratee(__ax4_iter_159))
+			for (_tmp_ in __ax4_iter_159) {
 				_loc2_ = _tmp_;
 				if (_loc2_ != selectedButton && _loc2_.group == selectedButton.group) {
 					_loc2_.selected = false;

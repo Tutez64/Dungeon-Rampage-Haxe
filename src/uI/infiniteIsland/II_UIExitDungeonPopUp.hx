@@ -139,9 +139,9 @@ class II_UIExitDungeonPopUp extends DBUITwoButtonPopup {
 		Locale.setText(mCurrentRewardTF, "II_DINGELPUS_EXIT_POPUP_CURRENT_REWARD");
 		mRewardChests = new Vector<MovieClip>();
 		var _loc6_ = 0;
-		final __ax4_iter_361 = mRewards;
-		if (checkNullIteratee(__ax4_iter_361))
-			for (_tmp_ in __ax4_iter_361) {
+		final __ax4_iter_371 = mRewards;
+		if (checkNullIteratee(__ax4_iter_371))
+			for (_tmp_ in __ax4_iter_371) {
 				_loc1_ = _tmp_;
 				if (_loc6_ < mRewardSlots.length) {
 					_loc3_ = false;

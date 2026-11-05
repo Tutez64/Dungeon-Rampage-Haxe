@@ -136,10 +136,6 @@ class UIHud implements IGameHud {
 
 	static final CONTROLLER_GLYPH_SCALE_WEAPON_BUTTONS:Point = new Point(25, 25);
 
-	static final CONTROLLER_ICON_POSITION_FOR_CLOSE_BUTTON:Vector3D = new Vector3D(-5, -27);
-
-	static final CONTROLLER_GLYPH_SCALE_CLOSE_BUTTON:Point = new Point(25, 25);
-
 	static final CONTROLLER_ICON_POSITION_FOR_CHAT_SEND_BUTTON:Vector3D = new Vector3D(32, -10);
 
 	static final CONTROLLER_ICON_POSITION_FOR_CHAT_LOG_BUTTON:Vector3D = new Vector3D(25, -10);
@@ -266,6 +262,10 @@ class UIHud implements IGameHud {
 
 	var mCoinBonusText:TextField;
 
+	var mOptionsButton:UIButton;
+
+	var mOptionsClip:MovieClip;
+
 	var mSettingsPopup:SettingsPopup;
 
 	var mSettingsModel:SettingsModel;
@@ -373,6 +373,7 @@ class UIHud implements IGameHud {
 		mAssetLoadingComponent.getSwfAsset(DBFacade.buildFullDownloadPath("Resources/Art2D/UI/db_UI_HUD.swf"), function(param1:SwfAsset) {
 			setupUI(param1, (ASCompat.toInt(settingsModel.getValue("hudStyle")) : UInt));
 		});
+		mAssetLoadingComponent.getSwfAsset(DBFacade.buildFullDownloadPath("Resources/Art2D/UI/db_UI_town.swf"), setupOptions);
 		mXpBulgeTask = null;
 		mProfileBulgeTask = null;
 		mBuffs = new Vector<BuffGameObject>();
@@ -450,6 +451,27 @@ class UIHud implements IGameHud {
 		return mSwfAsset;
 	}
 
+	function setupOptions(swfAsset:SwfAsset) {
+		if (mDBFacade == null || mRoot == null || mOptionsButton != null) {
+			return;
+		}
+		var _loc2_ = swfAsset.getClass("options_panel_button");
+		if (_loc2_ == null) {
+			Logger.warn("HUD settings gear art missing");
+			return;
+		}
+		var _loc4_ = ASCompat.dynamicAs(ASCompat.createInstance(_loc2_, []), MovieClip);
+		var _loc3_ = HudTopRightLayout.gearPosition();
+		_loc4_.x = _loc3_.x;
+		_loc4_.y = _loc3_.y;
+		_loc4_.scaleX = _loc4_.scaleY = 0.9;
+		mOptionsClip = _loc4_;
+		mOptionsButton = new UIButton(mDBFacade, _loc4_);
+		mOptionsButton.releaseCallback = toggleSettingsPopup;
+		mRoot.addChild(_loc4_);
+		initTopRightControllerIcon("open_options_menu", _loc4_, true);
+	}
+
 	function setDooberLocations(hudType:UInt) {
 		switch (hudType) {
 			case 0:
@@ -482,6 +504,7 @@ class UIHud implements IGameHud {
 		var cooldownIndex:Int;
 		var hudClassName:String;
 		var hudClass:Dynamic;
+		var closePosition:Point;
 		var i:UInt;
 		var tooltipOffsset:Point;
 		mHudType = hudType;
@@ -616,6 +639,9 @@ class UIHud implements IGameHud {
 		hudClass = swfAsset.getClass(hudClassName);
 		mUIRoot = ASCompat.coerce(ASCompat.createInstance(hudClass, []), flash.display.MovieClip);
 		mRoot.addChild(mUIRoot);
+		if (mOptionsClip != null) {
+			mRoot.setChildIndex(mOptionsClip, mRoot.numChildren - 1);
+		}
 		mFloaterTextClass = swfAsset.getClass("floater_text");
 		mStacksHud.initializeHud(swfAsset.getClass("stacks_hud"));
 		if (mUIChatLog != null) {
@@ -627,6 +653,10 @@ class UIHud implements IGameHud {
 		if (mHudType != 1) {
 			mUIChatLog.textSizeModifier = 1.18;
 		}
+		closePosition = HudTopRightLayout.closePosition(ASCompat.toNumberField((mUIRoot : ASAny).close, "scaleX"),
+			ASCompat.toNumberField((mUIRoot : ASAny).close, "scaleY"));
+		ASCompat.setProperty((mUIRoot : ASAny).close, "x", closePosition.x);
+		ASCompat.setProperty((mUIRoot : ASAny).close, "y", closePosition.y);
 		mCloseButton = new UIButton(mDBFacade, ASCompat.coerce((mUIRoot : ASAny).close, flash.display.MovieClip));
 		mCloseButton.releaseCallback = function() {
 			closeButtonReleaseCallback();
@@ -792,7 +822,7 @@ class UIHud implements IGameHud {
 		initControllerIconOn("use_consumable_one", mConsumable1Button, CONTROLLER_ICON_POSITION_FOR_WEAPON_BUTTONS, CONTROLLER_GLYPH_SCALE_WEAPON_BUTTONS);
 		initControllerIconOn("use_consumable_two", mConsumable2Button, CONTROLLER_ICON_POSITION_FOR_WEAPON_BUTTONS, CONTROLLER_GLYPH_SCALE_WEAPON_BUTTONS);
 		initControllerIconOn("use_dungeon_buster", mDungeonBusterButton, CONTROLLER_ICON_POSITION_FOR_DUNGEON_BUSTER, CONTROLLER_GLYPH_SCALE_DUNGEON_BUSTER);
-		initControllerIconOn("toggle_menu", mCloseButton, CONTROLLER_ICON_POSITION_FOR_CLOSE_BUTTON, CONTROLLER_GLYPH_SCALE_CLOSE_BUTTON);
+		initTopRightControllerIcon("toggle_menu", ASCompat.coerce(mCloseButton != null ? mCloseButton.root : null, flash.display.MovieClip), false);
 		initControllerIconOn("toggle_chat_log", ASCompat.coerce(mUIChatLog != null ? mUIChatLog.chatLogButton : null, brain.uI.UIButton),
 			CONTROLLER_ICON_POSITION_FOR_CHAT_LOG_BUTTON, CONTROLLER_GLYPH_SCALE_CHAT_BUTTONS);
 		if (mDBFacade.steamInputManager.usesSteamOnScreenKeyboard) {
@@ -832,6 +862,15 @@ class UIHud implements IGameHud {
 		TextUtil.setText(ASCompat.coerce((mUIRoot : ASAny).UI_buster_active.buster_activated.over.mc.db_pressbutton_text, flash.text.TextField), _loc1_);
 	}
 
+	function initTopRightControllerIcon(action:String, owner:MovieClip, gear:Bool) {
+		if (owner == null) {
+			return;
+		}
+		var _loc4_ = HudTopRightLayout.glyphPosition(gear, owner.scaleX, owner.scaleY);
+		addControllerIcon(gear ? mExternalControllerIcons : mHudControllerIcons, action, owner, new Vector3D(_loc4_.x, _loc4_.y),
+			HudTopRightLayout.glyphSize(owner.scaleX, owner.scaleY));
+	}
+
 	function initControllerIconOn(inActionName:String, inButton:UIButton, iconPosition:Vector3D, iconScale:Point) {
 		if (inButton == null || inButton.root == null) {
 			return;
@@ -865,14 +904,14 @@ class UIHud implements IGameHud {
 			return;
 		}
 		var _loc3_:TextField;
-		final __ax4_iter_417:Array<ASAny> = [
+		final __ax4_iter_427:Array<ASAny> = [
 			(_loc4_ : ASAny)
 			.up.db_pressbutton_text,
 			(_loc4_ : ASAny)
 			.over.mc.db_pressbutton_text
 		];
-		if (checkNullIteratee(__ax4_iter_417))
-			for (_tmp_ in __ax4_iter_417) {
+		if (checkNullIteratee(__ax4_iter_427))
+			for (_tmp_ in __ax4_iter_427) {
 				_loc3_ = ASCompat.coerce(_tmp_, flash.text.TextField);
 				if (_loc3_ != null) {
 					_loc2_ = mBusterPressTextOriginals[_loc3_];
@@ -1025,7 +1064,8 @@ class UIHud implements IGameHud {
 	}
 
 	function onSteamInputButtonReleased(event:OnSteamInputButtonReleasedEvent) {
-		if (event.actionName == "menu_options" && mSettingsPopup != null) {
+		if (event.actionName == "menu_options"
+			&& (mSettingsPopup != null || mDBFacade.menuNavigationController.getTopUILayer() == "REVIVE_MENU")) {
 			toggleSettingsPopup();
 		}
 	}
@@ -2015,6 +2055,12 @@ class UIHud implements IGameHud {
 			mBoosterTimer.stop();
 			mBoosterTimer = null;
 		}
+		if (mOptionsButton != null) {
+			removeControllerIcons(mOptionsClip);
+			mOptionsButton.destroy();
+			mOptionsButton = null;
+			mOptionsClip = null;
+		}
 		mDBFacade = null;
 		if (mSettingsPopup != null) {
 			mSettingsPopup.destroy();
@@ -2133,18 +2179,18 @@ class UIHud implements IGameHud {
 			mPetPortrait.destroy();
 		}
 		mPetPortrait = null;
-		final __ax4_iter_418 = mWeaponButtons;
-		if (checkNullIteratee(__ax4_iter_418))
-			for (_tmp_ in __ax4_iter_418) {
+		final __ax4_iter_428 = mWeaponButtons;
+		if (checkNullIteratee(__ax4_iter_428))
+			for (_tmp_ in __ax4_iter_428) {
 				_loc1_ = _tmp_;
 				if (_loc1_ != null) {
 					_loc1_.destroy();
 				}
 				_loc1_ = null;
 			}
-		final __ax4_iter_419 = mConsumableWeaponButtons;
-		if (checkNullIteratee(__ax4_iter_419))
-			for (_tmp_ in __ax4_iter_419) {
+		final __ax4_iter_429 = mConsumableWeaponButtons;
+		if (checkNullIteratee(__ax4_iter_429))
+			for (_tmp_ in __ax4_iter_429) {
 				_loc1_ = _tmp_;
 				if (_loc1_ != null) {
 					_loc1_.destroy();
@@ -2214,9 +2260,9 @@ class UIHud implements IGameHud {
 
 	public function setWeaponHighlight(currentWeaponIndex:Int) {
 		var _loc2_:UIButton;
-		final __ax4_iter_420 = mWeaponButtons;
-		if (checkNullIteratee(__ax4_iter_420))
-			for (_tmp_ in __ax4_iter_420) {
+		final __ax4_iter_430 = mWeaponButtons;
+		if (checkNullIteratee(__ax4_iter_430))
+			for (_tmp_ in __ax4_iter_430) {
 				_loc2_ = _tmp_;
 				ASCompat.setProperty((_loc2_.root : ASAny).selectionFrame, "visible", false);
 			}
@@ -2237,6 +2283,8 @@ class UIHud implements IGameHud {
 	public function get_chatLog():UIChatLog {
 		return mUIChatLog;
 	}
+
+	public function useFlashChatBar(value:Bool) {}
 
 	public function isInCooldown() {
 		showText("IS_IN_COOLDOWN");
@@ -2465,7 +2513,7 @@ class UIHud implements IGameHud {
 		} else if (index == 2) {
 			mUIChatLog.tryToggleChatLog();
 		} else if (index == 3) {
-			if (mDBFacade.steamInputManager.usesSteamOnScreenKeyboard) {
+			if (mDBFacade.steamInputManager.usesSteamOnScreenKeyboard && mUIChatLog.mayOpenChatFromAction()) {
 				mUIChatLog.focusChatInput();
 			}
 		}

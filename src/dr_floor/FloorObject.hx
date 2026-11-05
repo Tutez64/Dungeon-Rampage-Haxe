@@ -114,9 +114,9 @@ class FloorObject extends GameObject {
 
 	public function removeNavColliders() {
 		var _loc1_:NavCollider;
-		final __ax4_iter_525 = mNavCollisions;
-		if (checkNullIteratee(__ax4_iter_525))
-			for (_tmp_ in __ax4_iter_525) {
+		final __ax4_iter_535 = mNavCollisions;
+		if (checkNullIteratee(__ax4_iter_535))
+			for (_tmp_ in __ax4_iter_535) {
 				_loc1_ = _tmp_;
 				_loc1_.destroy();
 			}
@@ -127,9 +127,9 @@ class FloorObject extends GameObject {
 
 	public function set_navCollidersActive(value:Bool):Bool {
 		var _loc2_:NavCollider;
-		final __ax4_iter_526 = mNavCollisions;
-		if (checkNullIteratee(__ax4_iter_526))
-			for (_tmp_ in __ax4_iter_526) {
+		final __ax4_iter_536 = mNavCollisions;
+		if (checkNullIteratee(__ax4_iter_536))
+			for (_tmp_ in __ax4_iter_536) {
 				_loc2_ = _tmp_;
 				_loc2_.active = value;
 			}
@@ -276,9 +276,9 @@ class FloorObject extends GameObject {
 		mTile = null;
 		mDistributedDungeonFloor = null;
 		var _loc1_:NavCollider;
-		final __ax4_iter_527 = mNavCollisions;
-		if (checkNullIteratee(__ax4_iter_527))
-			for (_tmp_ in __ax4_iter_527) {
+		final __ax4_iter_537 = mNavCollisions;
+		if (checkNullIteratee(__ax4_iter_537))
+			for (_tmp_ in __ax4_iter_537) {
 				_loc1_ = _tmp_;
 				_loc1_.destroy();
 			}

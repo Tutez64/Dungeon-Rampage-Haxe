@@ -25,6 +25,8 @@ interface IGameHud {
 
 	@:isVar var chatLog(get, never):UIChatLog;
 
+	function useFlashChatBar(value:Bool):Void;
+
 	@:isVar var floaterTextClass(get, never):Dynamic;
 
 	@:isVar var teamLootDestination(get, never):Vector3D;

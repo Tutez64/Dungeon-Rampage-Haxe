@@ -187,8 +187,10 @@ class ChestInfoCard extends UIObject {
 
 	public function refreshChestInfoUI() {
 		loadIcon();
-		TextUtil.setText(ASCompat.coerce((mChestCardMC : ASAny).label, flash.text.TextField),
-			GameMasterLocale.getGameMasterSubString("CHEST_NAME", mChestInfo.gmChestInfo.Rarity));
+		var _loc1_ = GameMasterLocale.getGameMasterSubString("CHEST_NAME", mChestInfo.gmChestInfo.Rarity);
+		TextUtil.setText(ASCompat.coerce((mChestCardMC : ASAny).label, flash.text.TextField), mChestInfo.count > 1 ? _loc1_
+			+ " x"
+			+ mChestInfo.count : _loc1_);
 		if (mChestInfo.isFromDungeonSummary()) {
 			ASCompat.setProperty((mChestCardMC : ASAny).selection_01, "visible", false);
 			ASCompat.setProperty((mChestCardMC : ASAny).selection_02, "visible", true);

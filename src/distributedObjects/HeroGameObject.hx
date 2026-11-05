@@ -176,9 +176,9 @@ class HeroGameObject extends ActorGameObject implements IHeroGameObject {
 		mHeroStateMachine.destroy();
 		mHeroStateMachine = null;
 		var _loc1_:ConsumableWeaponGameObject;
-		final __ax4_iter_317 = mConsumableWeapons;
-		if (checkNullIteratee(__ax4_iter_317))
-			for (_tmp_ in __ax4_iter_317) {
+		final __ax4_iter_321 = mConsumableWeapons;
+		if (checkNullIteratee(__ax4_iter_321))
+			for (_tmp_ in __ax4_iter_321) {
 				_loc1_ = _tmp_;
 				if (_loc1_ != null) {
 					_loc1_.destroy();
@@ -385,9 +385,9 @@ class HeroGameObject extends ActorGameObject implements IHeroGameObject {
 		mCoverModMultiplier = 0;
 		mComprehensionModMultiplier = 0;
 		var _loc1_:WeaponDetails;
-		final __ax4_iter_318 = mWeaponDetails;
-		if (checkNullIteratee(__ax4_iter_318))
-			for (_tmp_ in __ax4_iter_318) {
+		final __ax4_iter_322 = mWeaponDetails;
+		if (checkNullIteratee(__ax4_iter_322))
+			for (_tmp_ in __ax4_iter_322) {
 				_loc1_ = _tmp_;
 				switch (_loc1_.legendarymodifier - 1) {
 					case 0:
@@ -555,9 +555,9 @@ class HeroGameObject extends ActorGameObject implements IHeroGameObject {
 	override function setupConsumables() {
 		var _loc4_:ConsumableWeaponGameObject = null;
 		var _loc2_:ConsumableWeaponGameObject;
-		final __ax4_iter_319 = mConsumableWeapons;
-		if (checkNullIteratee(__ax4_iter_319))
-			for (_tmp_ in __ax4_iter_319) {
+		final __ax4_iter_323 = mConsumableWeapons;
+		if (checkNullIteratee(__ax4_iter_323))
+			for (_tmp_ in __ax4_iter_323) {
 				_loc2_ = _tmp_;
 				if (_loc2_ != null) {
 					_loc2_.destroy();
@@ -566,9 +566,9 @@ class HeroGameObject extends ActorGameObject implements IHeroGameObject {
 		var _loc1_ = (0 : UInt);
 		mConsumableWeapons = new Vector<ConsumableWeaponGameObject>();
 		var _loc3_:ConsumableDetails;
-		final __ax4_iter_320 = mConsumableDetails;
-		if (checkNullIteratee(__ax4_iter_320))
-			for (_tmp_ in __ax4_iter_320) {
+		final __ax4_iter_324 = mConsumableDetails;
+		if (checkNullIteratee(__ax4_iter_324))
+			for (_tmp_ in __ax4_iter_324) {
 				_loc3_ = _tmp_;
 				if (_loc3_.type != 0) {
 					_loc4_ = new ConsumableWeaponGameObject(_loc3_, this, mActorView, mDBFacade, mDistributedDungeonFloor, _loc1_);

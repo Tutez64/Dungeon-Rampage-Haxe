@@ -261,9 +261,9 @@ class StarlingButton {
 
 	public function clearStateArt() {
 		var _loc1_:DisplayObject = null;
-		final __ax4_iter_177 = mStates;
-		if (checkNullIteratee(__ax4_iter_177))
-			for (_tmp_ in __ax4_iter_177) {
+		final __ax4_iter_180 = mStates;
+		if (checkNullIteratee(__ax4_iter_180))
+			for (_tmp_ in __ax4_iter_180) {
 				_loc1_ = _tmp_;
 				if (_loc1_ != null) {
 					animate(_loc1_, false);

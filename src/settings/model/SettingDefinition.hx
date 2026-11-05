@@ -121,9 +121,9 @@ class SettingDefinition {
 			return false;
 		}
 		var _loc1_:SettingChoice;
-		final __ax4_iter_469 = choices;
-		if (checkNullIteratee(__ax4_iter_469))
-			for (_tmp_ in __ax4_iter_469) {
+		final __ax4_iter_479 = choices;
+		if (checkNullIteratee(__ax4_iter_479))
+			for (_tmp_ in __ax4_iter_479) {
 				_loc1_ = _tmp_;
 				if (_loc1_.memberValues != null) {
 					return true;
@@ -137,9 +137,9 @@ class SettingDefinition {
 			return null;
 		}
 		var _loc2_:SettingChoice;
-		final __ax4_iter_470 = choices;
-		if (checkNullIteratee(__ax4_iter_470))
-			for (_tmp_ in __ax4_iter_470) {
+		final __ax4_iter_480 = choices;
+		if (checkNullIteratee(__ax4_iter_480))
+			for (_tmp_ in __ax4_iter_480) {
 				_loc2_ = _tmp_;
 				if (_loc2_.value == value) {
 					return _loc2_;

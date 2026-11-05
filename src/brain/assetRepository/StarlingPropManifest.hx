@@ -58,9 +58,9 @@ class StarlingPropManifest {
 		}
 		var _loc6_ = 0;
 		var _loc7_:String;
-		final __ax4_iter_375:ASAny = _loc3_.props;
-		if (checkNullIteratee(__ax4_iter_375))
-			for (_tmp_ in __ax4_iter_375.___keys()) {
+		final __ax4_iter_385:ASAny = _loc3_.props;
+		if (checkNullIteratee(__ax4_iter_385))
+			for (_tmp_ in __ax4_iter_385.___keys()) {
 				_loc7_ = _tmp_;
 				_loc4_ = ASCompat.dynamicAs(_loc3_.props[_loc7_].parts, Array);
 				if (!(_loc4_ == null || _loc4_.length == 0)) {

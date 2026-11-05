@@ -79,9 +79,9 @@ class BlendMode {
 			registerDefaults();
 		}
 		var _loc2_:BlendMode;
-		final __ax4_iter_416:ASObject = sBlendModes;
-		if (checkNullIteratee(__ax4_iter_416))
-			for (_tmp_ in iterateDynamicValues(__ax4_iter_416)) {
+		final __ax4_iter_426:ASObject = sBlendModes;
+		if (checkNullIteratee(__ax4_iter_426))
+			for (_tmp_ in iterateDynamicValues(__ax4_iter_426)) {
 				_loc2_ = ASCompat.coerce(_tmp_, BlendMode);
 				out.insert(0, _loc2_);
 			}

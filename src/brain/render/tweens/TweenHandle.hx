@@ -135,7 +135,7 @@ class TweenHandle extends EventDispatcher implements IAnimatable {
 
 	public function advanceTime(time:Float) {
 		var _loc2_:Tween;
-		var __ax4_iter_412:Vector<Tween>;
+		var __ax4_iter_422:Vector<Tween>;
 		if (mKilled || mFinished || mPaused || time == 0) {
 			return;
 		}
@@ -154,9 +154,9 @@ class TweenHandle extends EventDispatcher implements IAnimatable {
 		mCompletionPending = false;
 		mPrimary.advanceTime(time);
 		if (mSideTweens != null) {
-			__ax4_iter_412 = mSideTweens;
-			if (checkNullIteratee(__ax4_iter_412))
-				for (_tmp_ in __ax4_iter_412) {
+			__ax4_iter_422 = mSideTweens;
+			if (checkNullIteratee(__ax4_iter_422))
+				for (_tmp_ in __ax4_iter_422) {
 					_loc2_ = _tmp_;
 					_loc2_.advanceTime(time);
 				}
@@ -203,7 +203,7 @@ class TweenHandle extends EventDispatcher implements IAnimatable {
 
 	public function kill() {
 		var _loc1_:ASFunction;
-		var __ax4_iter_413:Vector<ASFunction>;
+		var __ax4_iter_423:Vector<ASFunction>;
 		if (mKilled) {
 			return;
 		}
@@ -217,9 +217,9 @@ class TweenHandle extends EventDispatcher implements IAnimatable {
 			timeline.killChildren();
 		}
 		if (mKillHooks != null) {
-			__ax4_iter_413 = mKillHooks;
-			if (checkNullIteratee(__ax4_iter_413))
-				for (_tmp_ in __ax4_iter_413) {
+			__ax4_iter_423 = mKillHooks;
+			if (checkNullIteratee(__ax4_iter_423))
+				for (_tmp_ in __ax4_iter_423) {
 					_loc1_ = _tmp_;
 					_loc1_();
 				}
@@ -329,11 +329,11 @@ class TweenHandle extends EventDispatcher implements IAnimatable {
 
 	function executeComplete() {
 		var _loc1_:ASFunction;
-		var __ax4_iter_414:Vector<ASFunction>;
+		var __ax4_iter_424:Vector<ASFunction>;
 		if (mCompleteHooks != null) {
-			__ax4_iter_414 = mCompleteHooks;
-			if (checkNullIteratee(__ax4_iter_414))
-				for (_tmp_ in __ax4_iter_414) {
+			__ax4_iter_424 = mCompleteHooks;
+			if (checkNullIteratee(__ax4_iter_424))
+				for (_tmp_ in __ax4_iter_424) {
 					_loc1_ = _tmp_;
 					_loc1_();
 				}

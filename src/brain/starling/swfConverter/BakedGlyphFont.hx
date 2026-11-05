@@ -239,7 +239,7 @@ class BakedGlyphFont {
 
 	static function signature(field:TextField):String {
 		var _loc4_:String;
-		var __ax4_iter_495:Array<ASAny>;
+		var __ax4_iter_505:Array<ASAny>;
 		var _loc6_:String = null;
 		var _loc7_:ASAny = /*undefined*/ null;
 		var _loc3_ = field.defaultTextFormat;
@@ -263,15 +263,15 @@ class BakedGlyphFont {
 			field.thickness
 		];
 		var _loc2_:ASObject;
-		final __ax4_iter_494 = field.filters;
-		if (checkNullIteratee(__ax4_iter_494))
-			for (_tmp_ in __ax4_iter_494) {
+		final __ax4_iter_504 = field.filters;
+		if (checkNullIteratee(__ax4_iter_504))
+			for (_tmp_ in __ax4_iter_504) {
 				_loc2_ = _tmp_;
 				_loc6_ = ASCompat.getQualifiedClassName(_loc2_);
 				_loc5_.push(_loc6_);
-				__ax4_iter_495 = filterProps(_loc2_, _loc6_);
-				if (checkNullIteratee(__ax4_iter_495))
-					for (_tmp_ in __ax4_iter_495) {
+				__ax4_iter_505 = filterProps(_loc2_, _loc6_);
+				if (checkNullIteratee(__ax4_iter_505))
+					for (_tmp_ in __ax4_iter_505) {
 						_loc4_ = _tmp_;
 						_loc7_ = _loc2_[_loc4_];
 						if (Std.isOfType(_loc7_, Array)) {
@@ -301,18 +301,18 @@ class BakedGlyphFont {
 		_loc6_ = [];
 		var _loc5_ = ASCompat.describeType(filter);
 		var _loc3_:compat.XML;
-		final __ax4_iter_496 = _loc5_.child("accessor");
-		if (checkNullIteratee(__ax4_iter_496))
-			for (_tmp_ in __ax4_iter_496) {
+		final __ax4_iter_506 = _loc5_.child("accessor");
+		if (checkNullIteratee(__ax4_iter_506))
+			for (_tmp_ in __ax4_iter_506) {
 				_loc3_ = _tmp_;
 				if (_loc3_.attribute("access") != "writeonly") {
 					_loc6_.push(_loc3_.attribute("name"));
 				}
 			}
 		var _loc4_:compat.XML;
-		final __ax4_iter_497 = _loc5_.child("variable");
-		if (checkNullIteratee(__ax4_iter_497))
-			for (_tmp_ in __ax4_iter_497) {
+		final __ax4_iter_507 = _loc5_.child("variable");
+		if (checkNullIteratee(__ax4_iter_507))
+			for (_tmp_ in __ax4_iter_507) {
 				_loc4_ = _tmp_;
 				_loc6_.push(_loc4_.attribute("name"));
 			}

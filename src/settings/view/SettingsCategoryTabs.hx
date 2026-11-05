@@ -184,9 +184,9 @@ class SettingsCategoryTabs {
 
 	public function destroy() {
 		var _loc1_:UIRadioButton;
-		final __ax4_iter_404 = mButtons;
-		if (checkNullIteratee(__ax4_iter_404))
-			for (_tmp_ in __ax4_iter_404) {
+		final __ax4_iter_414 = mButtons;
+		if (checkNullIteratee(__ax4_iter_414))
+			for (_tmp_ in __ax4_iter_414) {
 				_loc1_ = _tmp_;
 				_loc1_.destroy();
 			}

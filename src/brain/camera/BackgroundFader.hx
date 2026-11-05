@@ -83,9 +83,9 @@ class BackgroundFader {
 		mRectSprite.alpha = 0;
 		mFacade.sceneGraphManager.addChild(mRectSprite, 42);
 		var _loc1_:Sprite;
-		final __ax4_iter_297 = mExcludes;
-		if (checkNullIteratee(__ax4_iter_297))
-			for (_tmp_ in __ax4_iter_297) {
+		final __ax4_iter_301 = mExcludes;
+		if (checkNullIteratee(__ax4_iter_301))
+			for (_tmp_ in __ax4_iter_301) {
 				_loc1_ = ASCompat.coerce(_tmp_, flash.display.Sprite);
 				mFacade.sceneGraphManager.addChild(_loc1_, 46);
 			}
@@ -117,9 +117,9 @@ class BackgroundFader {
 		mFramesElapsed = (0 : UInt);
 		mFacade.sceneGraphManager.removeChild(mRectSprite);
 		var _loc1_:Sprite;
-		final __ax4_iter_298 = mExcludes;
-		if (checkNullIteratee(__ax4_iter_298))
-			for (_tmp_ in __ax4_iter_298) {
+		final __ax4_iter_302 = mExcludes;
+		if (checkNullIteratee(__ax4_iter_302))
+			for (_tmp_ in __ax4_iter_302) {
 				_loc1_ = ASCompat.coerce(_tmp_, flash.display.Sprite);
 				mFacade.sceneGraphManager.addChild(_loc1_, 20);
 			}

@@ -2,6 +2,7 @@ package uI.inventory;
 
 import account.AvatarInfo;
 import account.ChestInfo;
+import account.DBInventoryInfo;
 import account.InventoryBaseInfo;
 import account.ItemInfo;
 import account.PetInfo;
@@ -114,6 +115,8 @@ class UIInventory {
 	var mNewItemIds:Array<ASAny>;
 
 	var mNewChestIds:Array<ASAny>;
+
+	var mLastActedChestGmId:UInt = (0 : UInt);
 
 	var mNewStackableIds:Array<ASAny>;
 
@@ -448,8 +451,35 @@ class UIInventory {
 
 	function closeEquipButton() {}
 
+	function currentChestStack(chestInfo:ChestInfo):ChestInfo {
+		if (chestInfo == null || chestInfo.isFromDungeonSummary()) {
+			return chestInfo;
+		}
+		var _loc3_ = mDBFacade.dbAccountInfo.inventoryInfo;
+		var _loc2_:ChestInfo;
+		final __ax4_iter_359 = _loc3_.chests;
+		if (checkNullIteratee(__ax4_iter_359))
+			for (_tmp_ in __ax4_iter_359) {
+				_loc2_ = _tmp_;
+				if (_loc2_.containsDatabaseId(chestInfo.databaseId)) {
+					return _loc2_;
+				}
+			}
+		return _loc3_.getChestStack(chestInfo.gmId);
+	}
+
 	function abandonChest(chestInfo:ChestInfo) {
 		var index:Int;
+		chestInfo = currentChestStack(chestInfo);
+		if (chestInfo == null) {
+			return;
+		}
+		if (mDBFacade.dbAccountInfo.inventoryInfo.isChestRequestPending(chestInfo.databaseId)) {
+			return;
+		}
+		if (!chestInfo.isFromDungeonSummary()) {
+			mLastActedChestGmId = chestInfo.gmId;
+		}
 		mAbandonChestPopUp = new UIAbandonChestPopup(mDBFacade, closeAbandonChestPopUp, function() {
 			mDBFacade.metrics.log("ChestAbandoned", {
 				"chestId": chestInfo.gmChestInfo.Id,
@@ -484,29 +514,45 @@ class UIInventory {
 	}
 
 	function openChest(chestInfo:ChestInfo) {
-		var _loc4_ = (0 : UInt);
-		var _loc6_ = (0 : UInt);
-		var _loc2_ = (0 : UInt);
-		var _loc3_ = mChestCard;
-		if (UIHud.isThisAConsumbleChestId((chestInfo.gmChestInfo.Id : Int))) {
-			_loc3_ = mConsumableChestCard;
+		var _loc2_:DBInventoryInfo = null;
+		var _loc5_ = (0 : UInt);
+		var _loc7_ = (0 : UInt);
+		var _loc3_ = (0 : UInt);
+		chestInfo = currentChestStack(chestInfo);
+		if (chestInfo == null) {
+			return;
 		}
-		if (_loc3_.canChestBeOpened()) {
+		if (!chestInfo.isFromDungeonSummary()) {
+			_loc2_ = mDBFacade.dbAccountInfo.inventoryInfo;
+			if (_loc2_.isChestRequestPending(chestInfo.databaseId)) {
+				return;
+			}
+			if (!_loc2_.hasRoomToOpenChest(chestInfo.gmId)) {
+				showChestOpenFullPopUp("UIInventory.openChest()");
+				return;
+			}
+			mLastActedChestGmId = chestInfo.gmId;
+		}
+		var _loc4_ = mChestCard;
+		if (UIHud.isThisAConsumbleChestId((chestInfo.gmChestInfo.Id : Int))) {
+			_loc4_ = mConsumableChestCard;
+		}
+		if (_loc4_.canChestBeOpened()) {
 			if (chestInfo.isFromDungeonSummary()) {
 				mDungeonSummary.openChestFromInventory(chestInfo.gmChestInfo, true);
 			} else {
-				_loc3_.createRevealPopUp(closeRevealPopUp, goToStorage);
-				_loc4_ = mHeroWithEquipPicker.currentlySelectedHero.Id;
-				_loc6_ = mDBFacade.dbAccountInfo.inventoryInfo.getAvatarInfoForHeroType(_loc4_).id;
-				_loc2_ = mDBFacade.dbAccountInfo.inventoryInfo.getAvatarInfoForHeroType(_loc4_).skinId;
-				mDBFacade.dbAccountInfo.inventoryInfo.openChest(chestInfo.databaseId, _loc6_, _loc2_, updateRevealLoot, openChestFailedPopUp);
+				_loc4_.createRevealPopUp(closeRevealPopUp, goToStorage);
+				_loc5_ = mHeroWithEquipPicker.currentlySelectedHero.Id;
+				_loc7_ = mDBFacade.dbAccountInfo.inventoryInfo.getAvatarInfoForHeroType(_loc5_).id;
+				_loc3_ = mDBFacade.dbAccountInfo.inventoryInfo.getAvatarInfoForHeroType(_loc5_).skinId;
+				mDBFacade.dbAccountInfo.inventoryInfo.openChest(chestInfo.databaseId, _loc7_, _loc3_, updateRevealLoot, openChestFailedPopUp);
 			}
 		} else {
-			_loc3_.showBuyKeysPopUp();
+			_loc4_.showBuyKeysPopUp();
 		}
-		var _loc5_ = mNewChestIds.indexOf(chestInfo.databaseId);
-		if (_loc5_ != -1) {
-			mNewChestIds.splice(_loc5_, (1 : UInt));
+		var _loc6_ = mNewChestIds.indexOf(chestInfo.databaseId);
+		if (_loc6_ != -1) {
+			mNewChestIds.splice(_loc6_, (1 : UInt));
 		}
 	}
 
@@ -530,12 +576,12 @@ class UIInventory {
 
 	function focusAfterChestReveal(itemType:UInt, keptItem:Bool) {
 		var _loc3_:UIInventoryItem;
-		var __ax4_iter_350:Vector<UIInventoryItem>;
+		var __ax4_iter_360:Vector<UIInventoryItem>;
 		var _loc4_:UIObject = null;
 		if (keptItem && itemType == 1) {
-			__ax4_iter_350 = mItems;
-			if (checkNullIteratee(__ax4_iter_350))
-				for (_tmp_ in __ax4_iter_350) {
+			__ax4_iter_360 = mItems;
+			if (checkNullIteratee(__ax4_iter_360))
+				for (_tmp_ in __ax4_iter_360) {
 					_loc3_ = _tmp_;
 					if (_loc3_.info == mSelectedItemInfo && _loc3_.canBeFocused()) {
 						_loc4_ = _loc3_;
@@ -574,17 +620,24 @@ class UIInventory {
 
 	function openChestDS(chestInfo:ChestInfo) {
 		if (mDungeonSummary != null && !mDBFacade.dbAccountInfo.inventoryInfo.isThereEmptySpaceInWeaponStorage()) {
-			mChestOpenFullPopUp = new DBUIOneButtonPopup(mDBFacade, "POPUP_STORAGE_FULL", Locale.getString("STORAGE_FULL"),
-				Locale.getString("CLEAR_INVENTORY"), Locale.getString("RETURN"), returnFromOpenFullPopUp, true, returnFromOpenFullPopUp);
-			MemoryTracker.track(mChestOpenFullPopUp, "DBUIOneButtonPopup - created in UIInventory.openChestDS()");
-			mSceneGraphComponent.addChild(mChestOpenFullPopUp.root, (105 : UInt));
+			showChestOpenFullPopUp("UIInventory.openChestDS()");
 			return;
 		}
 		openChest(chestInfo);
 	}
 
+	function showChestOpenFullPopUp(createdIn:String) {
+		if (mChestOpenFullPopUp != null) {
+			return;
+		}
+		mChestOpenFullPopUp = new DBUIOneButtonPopup(mDBFacade, "POPUP_STORAGE_FULL", Locale.getString("STORAGE_FULL"), Locale.getString("CLEAR_INVENTORY"),
+			Locale.getString("RETURN"), returnFromOpenFullPopUp, true, returnFromOpenFullPopUp);
+		MemoryTracker.track(mChestOpenFullPopUp, "DBUIOneButtonPopup - created in " + createdIn);
+		mSceneGraphComponent.addChild(mChestOpenFullPopUp.root, (105 : UInt));
+	}
+
 	function keepChestDS(chestInfo:ChestInfo) {
-		if (mDungeonSummary != null && !mDBFacade.dbAccountInfo.inventoryInfo.isThereEmptySpaceInWeaponStorage()) {
+		if (mDungeonSummary != null && !mDBFacade.dbAccountInfo.inventoryInfo.hasRoomForChest(chestInfo.gmId)) {
 			mChestOpenFullPopUp = new DBUIOneButtonPopup(mDBFacade, "POPUP_STORAGE_FULL", Locale.getString("STORAGE_FULL"),
 				Locale.getString("CLEAR_INVENTORY"), Locale.getString("RETURN"), returnFromOpenFullPopUp, true, returnFromOpenFullPopUp);
 			MemoryTracker.track(mChestOpenFullPopUp, "DBUIOneButtonPopup - created in UIInventory.keepChestDS()");
@@ -607,15 +660,7 @@ class UIInventory {
 	}
 
 	function removeChestFromInventory(chestInstanceId:UInt) {
-		var _loc2_ = (0 : UInt);
-		_loc2_ = (0 : UInt);
-		while (_loc2_ < (mDBFacade.dbAccountInfo.inventoryInfo.chests.length:UInt)) {
-			if (mDBFacade.dbAccountInfo.inventoryInfo.chests[(_loc2_ : Int)].gmId == chestInstanceId) {
-				mDBFacade.dbAccountInfo.inventoryInfo.chests.splice((_loc2_ : Int), (1 : UInt));
-				break;
-			}
-			_loc2_++;
-		}
+		mDBFacade.dbAccountInfo.inventoryInfo.removeChestRow(chestInstanceId);
 		takeItemCallback();
 	}
 
@@ -663,9 +708,9 @@ class UIInventory {
 		var _loc10_:InventoryBaseInfo = null;
 		var _loc5_:IMapIterator = null;
 		mCategorizedItems = new Map();
-		final __ax4_iter_351 = CATEGORY_ARRAY;
-		if (checkNullIteratee(__ax4_iter_351))
-			for (_tmp_ in __ax4_iter_351) {
+		final __ax4_iter_361 = CATEGORY_ARRAY;
+		if (checkNullIteratee(__ax4_iter_361))
+			for (_tmp_ in __ax4_iter_361) {
 				_loc7_ = _tmp_;
 				mCategorizedItems.add(_loc7_, new Vector<InventoryBaseInfo>());
 			}
@@ -674,9 +719,9 @@ class UIInventory {
 		var _loc3_ = mDBFacade.dbAccountInfo.inventoryInfo.stackables;
 		var _loc1_ = mDBFacade.dbAccountInfo.inventoryInfo.pets;
 		var _loc4_:Map;
-		final __ax4_iter_352:Array<ASAny> = [_loc8_, _loc3_, _loc1_];
-		if (checkNullIteratee(__ax4_iter_352))
-			for (_tmp_ in __ax4_iter_352) {
+		final __ax4_iter_362:Array<ASAny> = [_loc8_, _loc3_, _loc1_];
+		if (checkNullIteratee(__ax4_iter_362))
+			for (_tmp_ in __ax4_iter_362) {
 				_loc4_ = ASCompat.coerce(_tmp_, collections.Map);
 				_loc5_ = ASCompat.reinterpretAs(_loc4_.iterator(), IMapIterator);
 				while (_loc5_.hasNext()) {
@@ -758,7 +803,13 @@ class UIInventory {
 			}
 			return (cast(infoB, ItemInfo).requiredLevel - cast(infoA, ItemInfo).requiredLevel:Int);
 		}
-		return (infoB.gmId - infoA.gmId:Int);
+		if (infoA.gmId != infoB.gmId) {
+			return (infoB.gmId - infoA.gmId:Int);
+		}
+		if (Std.isOfType(infoA, ChestInfo) && Std.isOfType(infoB, ChestInfo)) {
+			return infoA.databaseId < infoB.databaseId ? -1 : (infoA.databaseId > infoB.databaseId ? 1 : 0);
+		}
+		return 0;
 	}
 
 	function weaponSortComparator(infoA:InventoryBaseInfo, infoB:InventoryBaseInfo):Int {
@@ -820,6 +871,14 @@ class UIInventory {
 		}
 		if (!dontRefreshChestSelection) {
 			mSelectedItemInfo = checkIfRevealedWeaponExists();
+			if (mSelectedItemInfo != null) {
+				mLastActedChestGmId = (0 : UInt);
+			} else if (mLastActedChestGmId != 0) {
+				mSelectedItemInfo = mDBFacade.dbAccountInfo.inventoryInfo.getChestStack(mLastActedChestGmId);
+				if (mSelectedItemInfo == null) {
+					mLastActedChestGmId = (0 : UInt);
+				}
+			}
 		}
 		if (mSelectedItemInfo != null && Std.isOfType(mSelectedItemInfo, ItemInfo)) {
 			jumpToWeaponOffer(mSelectedItemInfo);
@@ -863,11 +922,11 @@ class UIInventory {
 	}
 
 	function checkIfRevealedWeaponExists():InventoryBaseInfo {
-		var __ax4_iter_353:ASAny;
+		var __ax4_iter_363:ASAny;
 		var _loc10_:Int;
 		var _loc9_:Vector<GMOfferDetail>;
 		var _loc2_:GMOfferDetail;
-		var __ax4_iter_354:ASAny;
+		var __ax4_iter_364:ASAny;
 		var _loc6_:InventoryBaseInfo = null;
 		var _loc1_:GMWeaponItem = null;
 		var _loc4_ = (0 : UInt);
@@ -880,9 +939,9 @@ class UIInventory {
 			mCurrentTab = GMInventoryBase.WEAPON_CATEGORY;
 			mRevealedItemOfferId %= (100000 : UInt);
 			_loc1_ = ASCompat.coerce(mDBFacade.gameMaster.weaponItemById.itemFor(mRevealedItemOfferId), gameMasterDictionary.GMWeaponItem);
-			__ax4_iter_353 = mCategorizedItems.itemFor(mCurrentTab);
-			if (checkNullIteratee(__ax4_iter_353))
-				for (_tmp_ in __ax4_iter_353) {
+			__ax4_iter_363 = mCategorizedItems.itemFor(mCurrentTab);
+			if (checkNullIteratee(__ax4_iter_363))
+				for (_tmp_ in __ax4_iter_363) {
 					_loc6_ = ASCompat.coerce(_tmp_, account.InventoryBaseInfo);
 					if (Std.isOfType(_loc6_, ItemInfo)) {
 						_loc4_ = ASCompat.reinterpretAs(_loc6_, ItemInfo).gmWeaponItem.Id;
@@ -903,9 +962,9 @@ class UIInventory {
 				}
 			if (_loc3_ != null) {
 				mCurrentTab = GMInventoryBase.POWERUP_CATEGORY;
-				__ax4_iter_354 = mCategorizedItems.itemFor(mCurrentTab);
-				if (checkNullIteratee(__ax4_iter_354))
-					for (_tmp_ in __ax4_iter_354) {
+				__ax4_iter_364 = mCategorizedItems.itemFor(mCurrentTab);
+				if (checkNullIteratee(__ax4_iter_364))
+					for (_tmp_ in __ax4_iter_364) {
 						_loc6_ = ASCompat.coerce(_tmp_, account.InventoryBaseInfo);
 						if (_loc6_.gmId == _loc3_.Id) {
 							mRevealedItemType = mRevealedItemOfferId = (0 : UInt);
@@ -1152,6 +1211,9 @@ class UIInventory {
 		restoreBoosterItemNavigation();
 		mSelectedItemInfo = info;
 		mSelectedItemNavigationSource = navigationSource;
+		if (!Std.isOfType(info, ChestInfo) || info.gmId != mLastActedChestGmId) {
+			mLastActedChestGmId = (0 : UInt);
+		}
 		var _loc4_ = false;
 		if (Std.isOfType(info, StackableInfo)) {
 			_loc3_ = ASCompat.reinterpretAs(info, StackableInfo);
@@ -1695,9 +1757,9 @@ class UIInventory {
 
 	function getFirstFocusableInventoryItem():UIObject {
 		var _loc1_:UIInventoryItem;
-		final __ax4_iter_355 = mItems;
-		if (checkNullIteratee(__ax4_iter_355))
-			for (_tmp_ in __ax4_iter_355) {
+		final __ax4_iter_365 = mItems;
+		if (checkNullIteratee(__ax4_iter_365))
+			for (_tmp_ in __ax4_iter_365) {
 				_loc1_ = _tmp_;
 				if (_loc1_.canBeFocused()) {
 					return _loc1_;
