@@ -742,11 +742,11 @@
       "APTITUDE": "Increases player mana by 10 \u002B Weapon Level * 0.4",
       "BARRIER": "Reduces Melee Damage taken by 25%. Does not stack.",
       "BEAST_MASTER": "Increases pet health by 10 \u002B Weapon Level * 0.9",
-      "BRAIN_TRUST": "Increases experience dropped from enemies by 5%",
+      "BRAIN_TRUST": "Increases all experience gained by 25%. Multiple modifiers do not stack.",
       "BUSTER_GENERATOR": "Gain 1 Buster Point per enemy killed!",
       "COMPREHENSION": "Reduces Magic Damage taken by 25%. Does not stack.",
       "COVER": "Reduces Ranged Damage taken by 25%. Does not stack.",
-      "MIDAS_TOUCH": "Increases gold dropped from enemies by 5%",
+      "MIDAS_TOUCH": "Increases all gold gained by 25%. Multiple modifiers do not stack.",
       "STAMINA": "Increases player health by 10 \u002B Weapon Level * 0.9"
     },
     "LEGENDARY_MODIFIER_NAME": {

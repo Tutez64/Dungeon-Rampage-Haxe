@@ -657,7 +657,7 @@
     "GO_TO_INVENTORY_BODY": "To Keep This Chest, you will need to free up space in your storage.",
     "GO_TO_INVENTORY_BODY_OPEN": "To Open This Chest, you will need to free up space in your storage.",
     "ABANDON_CHEST_POPUP_TITLE": "ABANDON CHEST",
-    "ABANDON_CHEST_POPUP_DESC": "Do you really want to Abandon this chest ?",
+    "ABANDON_CHEST_POPUP_DESC": "Do you really want to Abandon one chest?",
     "ABANDON_CHEST_POPUP_CONFIRM": "CONFIRM",
     "ABANDON_CHEST_POPUP_CANCEL": "CANCEL",
     "ABANDON": "ABANDON",

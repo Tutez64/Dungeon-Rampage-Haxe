@@ -1,5 +1,5 @@
 {
-  "Exported": 1793221947,
+  "Exported": 1793810257,
   "Hero" : [
     {
       "Release" : "L",
@@ -2174,127 +2174,127 @@
     {
       "Level" : 101,
       "XpForLevel" : 26550,
-      "GemCost" : 1000
+      "GemCost" : 500
     },
     {
       "Level" : 102,
       "XpForLevel" : 27070,
-      "GemCost" : 1000
+      "GemCost" : 500
     },
     {
       "Level" : 103,
       "XpForLevel" : 27590,
-      "GemCost" : 1000
+      "GemCost" : 500
     },
     {
       "Level" : 104,
       "XpForLevel" : 28120,
-      "GemCost" : 1000
+      "GemCost" : 500
     },
     {
       "Level" : 105,
       "XpForLevel" : 28650,
-      "GemCost" : 1000
+      "GemCost" : 500
     },
     {
       "Level" : 106,
       "XpForLevel" : 29190,
-      "GemCost" : 1000
+      "GemCost" : 600
     },
     {
       "Level" : 107,
       "XpForLevel" : 29730,
-      "GemCost" : 1000
+      "GemCost" : 600
     },
     {
       "Level" : 108,
       "XpForLevel" : 30280,
-      "GemCost" : 1000
+      "GemCost" : 600
     },
     {
       "Level" : 109,
       "XpForLevel" : 30830,
-      "GemCost" : 1000
+      "GemCost" : 600
     },
     {
       "Level" : 110,
       "XpForLevel" : 31390,
-      "GemCost" : 1000
+      "GemCost" : 600
     },
     {
       "Level" : 111,
       "XpForLevel" : 31950,
-      "GemCost" : 1000
+      "GemCost" : 700
     },
     {
       "Level" : 112,
       "XpForLevel" : 32520,
-      "GemCost" : 1000
+      "GemCost" : 700
     },
     {
       "Level" : 113,
       "XpForLevel" : 33090,
-      "GemCost" : 1000
+      "GemCost" : 700
     },
     {
       "Level" : 114,
       "XpForLevel" : 33670,
-      "GemCost" : 1000
+      "GemCost" : 700
     },
     {
       "Level" : 115,
       "XpForLevel" : 34250,
-      "GemCost" : 1000
+      "GemCost" : 700
     },
     {
       "Level" : 116,
       "XpForLevel" : 34840,
-      "GemCost" : 1000
+      "GemCost" : 800
     },
     {
       "Level" : 117,
       "XpForLevel" : 35430,
-      "GemCost" : 1000
+      "GemCost" : 800
     },
     {
       "Level" : 118,
       "XpForLevel" : 36030,
-      "GemCost" : 1000
+      "GemCost" : 800
     },
     {
       "Level" : 119,
       "XpForLevel" : 36630,
-      "GemCost" : 1000
+      "GemCost" : 800
     },
     {
       "Level" : 120,
       "XpForLevel" : 37240,
-      "GemCost" : 1000
+      "GemCost" : 800
     },
     {
       "Level" : 121,
       "XpForLevel" : 37850,
-      "GemCost" : 1000
+      "GemCost" : 900
     },
     {
       "Level" : 122,
       "XpForLevel" : 38470,
-      "GemCost" : 1000
+      "GemCost" : 900
     },
     {
       "Level" : 123,
       "XpForLevel" : 39090,
-      "GemCost" : 1000
+      "GemCost" : 900
     },
     {
       "Level" : 124,
       "XpForLevel" : 39720,
-      "GemCost" : 1000
+      "GemCost" : 900
     },
     {
       "Level" : 125,
       "XpForLevel" : 40350,
-      "GemCost" : 1000
+      "GemCost" : 900
     },
     {
       "Level" : 126,
@@ -91112,14 +91112,14 @@
       "Constant" : "BRAIN_TRUST",
       "Name" : "Brain Trust",
       "IconName" : "icon_modifier_brainTrust",
-      "Description" : "Increases experience dropped from enemies by 5%"
+      "Description" : "Increases all experience gained by 25%. Multiple modifiers do not stack."
     },
     {
       "Id" : 9,
       "Constant" : "MIDAS_TOUCH",
       "Name" : "Midas Touch",
       "IconName" : "icon_modifier_midasTouch",
-      "Description" : "Increases gold dropped from enemies by 5%"
+      "Description" : "Increases all gold gained by 25%. Multiple modifiers do not stack."
     },
     {
       "Id" : 10,
