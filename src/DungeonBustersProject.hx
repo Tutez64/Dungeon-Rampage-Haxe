@@ -65,7 +65,13 @@ class DungeonBustersProject extends GameEntry {
 		} else if (Std.isOfType(param1.error, ErrorEvent)) {
 			_loc2_ = cast(param1.error, ErrorEvent).text;
 		} else {
+			#if cpp
+			// A Haxe exception (hxcpp's Null Object Reference, Invalid field access, a thrown
+			// String...) is not an Error: say what it is, with its stack when the build keeps one.
+			_loc2_ = Std.string(param1.error) + haxe.CallStack.toString(haxe.CallStack.exceptionStack());
+			#else
 			_loc2_ = "Unknown error";
+			#end
 		}
 		var _loc3_ = 0;
 		if (mDBFacade != null && mDBFacade.gameClock != null) {
