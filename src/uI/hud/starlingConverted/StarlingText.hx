@@ -178,6 +178,7 @@ class StarlingText extends ArtDisplay {
 					_loc13_.htmlText = _loc9_;
 					restoreBox(_loc13_, _loc7_, _loc5_);
 				};
+				ASCompat.rethrowKeepingStack(__finallyError0);
 				throw __finallyError0;
 			};
 			{
@@ -200,6 +201,7 @@ class StarlingText extends ArtDisplay {
 					_loc13_.htmlText = _loc9_;
 					restoreBox(_loc13_, _loc7_, _loc5_);
 				};
+				ASCompat.rethrowKeepingStack(__finallyError1);
 				throw __finallyError1;
 			};
 			{
@@ -338,6 +340,7 @@ class StarlingText extends ArtDisplay {
 					_loc8_.htmlText = _loc1_;
 					restoreBox(_loc8_, _loc10_, _loc9_);
 				};
+				ASCompat.rethrowKeepingStack(__finallyError0);
 				throw __finallyError0;
 			};
 			{
@@ -404,6 +407,7 @@ class StarlingText extends ArtDisplay {
 					_loc9_.htmlText = _loc2_;
 					restoreBox(_loc9_, _loc12_, _loc10_);
 				};
+				ASCompat.rethrowKeepingStack(__finallyError1);
 				throw __finallyError1;
 			};
 			{
@@ -646,6 +650,7 @@ class StarlingText extends ArtDisplay {
 				{
 					mBakingVariant = -1;
 				};
+				ASCompat.rethrowKeepingStack(__finallyError0);
 				throw __finallyError0;
 			};
 			{
@@ -778,6 +783,7 @@ class StarlingText extends ArtDisplay {
 						_loc14_.htmlText = _loc8_;
 						restoreBox(_loc14_, _loc7_, _loc6_);
 					};
+					ASCompat.rethrowKeepingStack(__finallyError0);
 					throw __finallyError0;
 				};
 				{
@@ -911,6 +917,7 @@ class StarlingText extends ArtDisplay {
 				{
 					mArt.model.filters = cast(_loc4_);
 				};
+				ASCompat.rethrowKeepingStack(__finallyError0);
 				throw __finallyError0;
 			};
 			{

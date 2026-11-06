@@ -71,6 +71,7 @@ class FlashBaker {
 							}
 					}
 				};
+				ASCompat.rethrowKeepingStack(__finallyError0);
 				throw __finallyError0;
 			};
 			{
@@ -145,6 +146,7 @@ class FlashBaker {
 						source.filters = cast(_loc7_);
 					}
 				};
+				ASCompat.rethrowKeepingStack(__finallyError0);
 				throw __finallyError0;
 			};
 			{

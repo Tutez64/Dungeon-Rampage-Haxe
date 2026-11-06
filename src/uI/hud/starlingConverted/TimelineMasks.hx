@@ -148,6 +148,7 @@ class TimelineMasks {
 					mBytes = null;
 					bytes.position = _loc3_;
 				};
+				ASCompat.rethrowKeepingStack(__finallyError0);
 				throw __finallyError0;
 			};
 			{

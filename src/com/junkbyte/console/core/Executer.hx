@@ -9,8 +9,8 @@ import flash.events.IEventDispatcher;
 import haxe.Constraints.IMap;
 import haxe.ds.StringMap;
 import haxe.rtti.Rtti;
-import flash.utils.QName;
 import flash.utils.Namespace;
+import flash.utils.QName;
 
 class Executer extends EventDispatcher {
 	public static var RETURNED:String = "returned";

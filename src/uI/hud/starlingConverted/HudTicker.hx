@@ -96,6 +96,7 @@ class HudTicker {
 					compact(mViews);
 					compact(mStageViews);
 				};
+				ASCompat.rethrowKeepingStack(__finallyError0);
 				throw __finallyError0;
 			};
 			{
@@ -205,6 +206,7 @@ class HudTicker {
 					mTicking = false;
 					compact(mViews);
 				};
+				ASCompat.rethrowKeepingStack(__finallyError0);
 				throw __finallyError0;
 			};
 			{

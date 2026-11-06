@@ -259,6 +259,7 @@ class SessionTransport extends EventDispatcher implements IGameTransport {
 				{
 					mInsideConnect = false;
 				};
+				ASCompat.rethrowKeepingStack(__finallyError0);
 				throw __finallyError0;
 			};
 			{

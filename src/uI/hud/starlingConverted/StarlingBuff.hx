@@ -90,6 +90,7 @@ class StarlingBuff {
 				{
 					dispose();
 				};
+				ASCompat.rethrowKeepingStack(__finallyError1);
 				throw __finallyError1;
 			};
 			{

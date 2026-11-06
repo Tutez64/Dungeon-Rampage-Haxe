@@ -194,6 +194,7 @@ class StarlingStatsReporter {
 				{
 					_loc3_.close();
 				};
+				ASCompat.rethrowKeepingStack(__finallyError0);
 				throw __finallyError0;
 			};
 			{

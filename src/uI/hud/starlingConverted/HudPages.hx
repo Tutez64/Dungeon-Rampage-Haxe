@@ -105,6 +105,7 @@ class HudPages extends BakedPages {
 				{
 					bake.dispose();
 				};
+				ASCompat.rethrowKeepingStack(__finallyError2);
 				throw __finallyError2;
 			};
 			{

@@ -400,6 +400,7 @@ class HudArt {
 				{
 					sHandlingFrame = false;
 				};
+				ASCompat.rethrowKeepingStack(__finallyError0);
 				throw __finallyError0;
 			};
 			{
@@ -498,6 +499,7 @@ class HudArt {
 						{
 							HudArtConverter.endWork();
 						};
+						ASCompat.rethrowKeepingStack(__finallyError0);
 						throw __finallyError0;
 					};
 					{
@@ -556,6 +558,7 @@ class HudArt {
 							_loc3_.dispose();
 						}
 					};
+					ASCompat.rethrowKeepingStack(__finallyError0);
 					throw __finallyError0;
 				};
 				{
@@ -830,6 +833,7 @@ class HudArt {
 						}
 					}
 				};
+				ASCompat.rethrowKeepingStack(__finallyError0);
 				throw __finallyError0;
 			};
 			{
@@ -904,6 +908,7 @@ class HudArt {
 				{
 					sHandlingFrame = false;
 				};
+				ASCompat.rethrowKeepingStack(__finallyError0);
 				throw __finallyError0;
 			};
 			{
@@ -1129,6 +1134,7 @@ class HudArt {
 				{
 					HudArtConverter.endWork();
 				};
+				ASCompat.rethrowKeepingStack(__finallyError0);
 				throw __finallyError0;
 			};
 			{
@@ -1167,6 +1173,7 @@ class HudArt {
 				{
 					setPinBakes(sPages, sFramePages, false);
 				};
+				ASCompat.rethrowKeepingStack(__finallyError0);
 				throw __finallyError0;
 			};
 			{

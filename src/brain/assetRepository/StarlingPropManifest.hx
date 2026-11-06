@@ -38,6 +38,7 @@ class StarlingPropManifest {
 				{
 					_loc2_.close();
 				};
+				ASCompat.rethrowKeepingStack(__finallyError0);
 				throw __finallyError0;
 			};
 			{

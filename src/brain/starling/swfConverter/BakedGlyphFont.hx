@@ -92,6 +92,7 @@ class BakedGlyphFont {
 					model.width = _loc13_;
 					model.height = _loc17_;
 				};
+				ASCompat.rethrowKeepingStack(__finallyError1);
 				throw __finallyError1;
 			};
 			{

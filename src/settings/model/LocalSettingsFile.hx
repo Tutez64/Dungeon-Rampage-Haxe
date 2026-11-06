@@ -42,6 +42,7 @@ class LocalSettingsFile {
 				{
 					_loc2_.close();
 				};
+				ASCompat.rethrowKeepingStack(__finallyError1);
 				throw __finallyError1;
 			};
 			{
@@ -73,6 +74,7 @@ class LocalSettingsFile {
 				{
 					_loc2_.close();
 				};
+				ASCompat.rethrowKeepingStack(__finallyError0);
 				throw __finallyError0;
 			};
 			{

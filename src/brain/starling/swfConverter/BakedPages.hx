@@ -230,6 +230,7 @@ class BakedPages {
 				{
 					bake.dispose();
 				};
+				ASCompat.rethrowKeepingStack(__finallyError3);
 				throw __finallyError3;
 			};
 			{

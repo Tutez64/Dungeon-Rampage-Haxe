@@ -26,6 +26,7 @@ class ArtView {
 						mRoot = null;
 						mArt.releaseView();
 					};
+					ASCompat.rethrowKeepingStack(__finallyError0);
 					throw __finallyError0;
 				};
 				{
@@ -110,6 +111,7 @@ class ArtView {
 						mRoot = null;
 						mArt.releaseView();
 					};
+					ASCompat.rethrowKeepingStack(__finallyError0);
 					throw __finallyError0;
 				};
 				{

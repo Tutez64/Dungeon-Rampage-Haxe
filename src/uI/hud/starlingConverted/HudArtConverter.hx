@@ -116,6 +116,7 @@ class HudArtConverter {
 					_loc5_.mWorking = false;
 					sWorkDepth = sWorkDepth - 1;
 				};
+				ASCompat.rethrowKeepingStack(__finallyError0);
 				throw __finallyError0;
 			};
 			{
@@ -147,6 +148,7 @@ class HudArtConverter {
 					_loc7_.mWorking = false;
 					sWorkDepth = sWorkDepth - 1;
 				};
+				ASCompat.rethrowKeepingStack(__finallyError0);
 				throw __finallyError0;
 			};
 			{
@@ -692,6 +694,7 @@ class HudArtConverter {
 						mDriver.addEventListener("exitFrame", onFrame);
 					}
 				};
+				ASCompat.rethrowKeepingStack(__finallyError0);
 				throw __finallyError0;
 			};
 			{
@@ -731,6 +734,7 @@ class HudArtConverter {
 					mWorking = false;
 					sWorkDepth = sWorkDepth - 1;
 				};
+				ASCompat.rethrowKeepingStack(__finallyError0);
 				throw __finallyError0;
 			};
 			{
@@ -774,6 +778,7 @@ class HudArtConverter {
 						mRoot.failures = mFailures;
 					}
 				};
+				ASCompat.rethrowKeepingStack(__finallyError0);
 				throw __finallyError0;
 			};
 			{
@@ -835,6 +840,7 @@ class HudArtConverter {
 					mOriginal = null;
 					mTouched = new ASDictionary<ASAny, ASAny>();
 				};
+				ASCompat.rethrowKeepingStack(__finallyError0);
 				throw __finallyError0;
 			};
 			{
@@ -1840,6 +1846,7 @@ class HudArtConverter {
 					source.transform.colorTransform = _loc10_;
 					source.visible = _loc19_;
 				};
+				ASCompat.rethrowKeepingStack(__finallyError3);
 				throw __finallyError3;
 			};
 			{

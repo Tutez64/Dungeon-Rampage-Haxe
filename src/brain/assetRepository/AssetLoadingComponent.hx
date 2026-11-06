@@ -163,6 +163,7 @@ class AssetLoadingComponent extends Component {
 							{
 								_loc4_.close();
 							};
+							ASCompat.rethrowKeepingStack(__finallyError0);
 							throw __finallyError0;
 						};
 						{
@@ -583,6 +584,7 @@ class AssetLoadingComponent extends Component {
 					mIsStartingLoads = false;
 					loadStartedBundles();
 				};
+				ASCompat.rethrowKeepingStack(__finallyError0);
 				throw __finallyError0;
 			};
 			{

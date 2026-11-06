@@ -184,6 +184,7 @@ class StarlingSweepArt {
 					}
 					clip.visible = _loc3_;
 				};
+				ASCompat.rethrowKeepingStack(__finallyError4);
 				throw __finallyError4;
 			};
 			{
@@ -247,6 +248,7 @@ class StarlingSweepArt {
 				{
 					_loc7_.dispose();
 				};
+				ASCompat.rethrowKeepingStack(__finallyError0);
 				throw __finallyError0;
 			};
 			{
@@ -464,6 +466,7 @@ class StarlingSweepArt {
 						_loc13_.dispose();
 					}
 				};
+				ASCompat.rethrowKeepingStack(__finallyError5);
 				throw __finallyError5;
 			};
 			{
@@ -817,6 +820,7 @@ class StarlingSweepArt {
 						_loc6_.dispose();
 					}
 				};
+				ASCompat.rethrowKeepingStack(__finallyError3);
 				throw __finallyError3;
 			};
 			{

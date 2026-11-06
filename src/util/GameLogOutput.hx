@@ -241,6 +241,7 @@ class GameLogOutput {
 				{
 					mWriting = false;
 				};
+				ASCompat.rethrowKeepingStack(__finallyError0);
 				throw __finallyError0;
 			};
 			{

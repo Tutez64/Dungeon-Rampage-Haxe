@@ -20,6 +20,7 @@ class BakedRoot extends Sprite {
 				{
 					painter.cacheEnabled = _loc2_;
 				};
+				ASCompat.rethrowKeepingStack(__finallyError0);
 				throw __finallyError0;
 			};
 			{

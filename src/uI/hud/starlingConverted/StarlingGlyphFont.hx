@@ -102,6 +102,7 @@ class StarlingGlyphFont {
 					model.height = _loc9_.height;
 					model.transform.matrix = _loc11_;
 				};
+				ASCompat.rethrowKeepingStack(__finallyError1);
 				throw __finallyError1;
 			};
 			{
@@ -381,6 +382,7 @@ class StarlingGlyphFont {
 						_loc12_.dispose();
 					}
 				};
+				ASCompat.rethrowKeepingStack(__finallyError6);
 				throw __finallyError6;
 			};
 			{

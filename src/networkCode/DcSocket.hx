@@ -630,6 +630,7 @@ class DcSocket {
 						{
 							mPacketInUse = _loc5_;
 						};
+						ASCompat.rethrowKeepingStack(__finallyError0);
 						throw __finallyError0;
 					};
 					{
