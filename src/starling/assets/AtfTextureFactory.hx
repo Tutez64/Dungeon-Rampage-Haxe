@@ -30,7 +30,7 @@ class AtfTextureFactory extends AssetFactory {
 			try {
 				texture = Texture.fromData(reference.data, reference.textureOptions);
 			} catch (e:Dynamic) {
-				onError(e.message);
+				onError(ASCompat.asError(e).message);
 			}
 			if (ASCompat.stringAsBool(url) && texture != null) {
 				texture.root.onRestore = function() {
@@ -41,7 +41,7 @@ class AtfTextureFactory extends AssetFactory {
 							try {
 								texture.root.uploadAtfData(data);
 							} catch (e:Dynamic) {
-								helper.log("Texture restoration failed: " + Std.string(e.message));
+								helper.log("Texture restoration failed: " + ASCompat.asError(e).message);
 							}
 							helper.onEndRestore();
 						});

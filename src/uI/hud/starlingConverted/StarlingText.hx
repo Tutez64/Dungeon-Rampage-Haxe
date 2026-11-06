@@ -555,10 +555,10 @@ class StarlingText extends ArtDisplay {
 			if (mWhiteText != null) {
 				mWhiteText.visible = false;
 			}
-			if (Std.isOfType(error, HudFatalError) || !HudArt.ready) {
+			if (Std.isOfType(ASCompat.asError(error), HudFatalError) || !HudArt.ready) {
 				throw error;
 			}
-			StarlingHud.reportError(error);
+			StarlingHud.reportError(ASCompat.asError(error));
 			if (mTicker != null && (Starling.current == null || !Starling.current.contextValid)) {
 				mTicker.deferBake(mContextRetry);
 			}
@@ -772,7 +772,7 @@ class StarlingText extends ArtDisplay {
 							_loc13_ = HudArt.bakeOn(mPages, _loc16_, _loc14_, mScale, false);
 						}
 					} catch (error:Dynamic) {
-						StarlingHud.reportError(error);
+						StarlingHud.reportError(ASCompat.asError(error));
 						_loc13_ = null;
 					}
 				} catch (__finallyError0:Dynamic) {

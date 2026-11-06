@@ -66,7 +66,7 @@ class SteamIdConverter {
 			_loc2_ = subtractDecimalStrings(steamID64, "76561197960265728");
 			return (ASCompat.toInt(_loc2_) : UInt);
 		} catch (e:Dynamic) {
-			Logger.error("Error during string subtraction for SteamID64 " + steamID64 + ": " + Std.string(e.message));
+			Logger.error("Error during string subtraction for SteamID64 " + steamID64 + ": " + ASCompat.asError(e).message);
 			_loc6_ = 0;
 		}
 		return (_loc6_ : UInt);

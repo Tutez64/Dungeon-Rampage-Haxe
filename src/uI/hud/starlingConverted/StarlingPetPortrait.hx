@@ -118,7 +118,7 @@ class StarlingPetPortrait {
 			mHp.value = event.maxHp > 0 ? event.hp / event.maxHp : 0;
 			mChanged();
 		} catch (error:Dynamic) {
-			StarlingHud.reportError(error);
+			StarlingHud.reportError(ASCompat.asError(error));
 		}
 	}
 
@@ -167,7 +167,7 @@ class StarlingPetPortrait {
 				mTask = null;
 			}
 		} catch (error:Dynamic) {
-			StarlingHud.reportError(error);
+			StarlingHud.reportError(ASCompat.asError(error));
 		}
 	}
 
@@ -199,14 +199,14 @@ class StarlingPetPortrait {
 		try {
 			mInput.remove(mPetButton);
 		} catch (error:Dynamic) {
-			StarlingHud.reportError(error);
+			StarlingHud.reportError(ASCompat.asError(error));
 		}
 		try {
 			if (mNoneButton != null) {
 				mInput.remove(mNoneButton);
 			}
 		} catch (noneError:Dynamic) {
-			StarlingHud.reportError(noneError);
+			StarlingHud.reportError(ASCompat.asError(noneError));
 		}
 		StarlingHud.disposeResource(mPetButton);
 		StarlingHud.disposeResource(mNoneButton);

@@ -325,7 +325,7 @@ class AssetManager extends EventDispatcher {
 					try {
 						postProcessors.shift().execute(self);
 					} catch (e:Dynamic) {
-						starling.utils.Execute.execute(onError, e.message);
+						starling.utils.Execute.execute(onError, ASCompat.asError(e).message);
 					}
 					ASCompat.setTimeout(runPostProcessors, 1);
 				} else {

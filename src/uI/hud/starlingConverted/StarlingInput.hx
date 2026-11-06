@@ -132,7 +132,7 @@ class StarlingInput {
 			route(event);
 		} catch (error:Dynamic) {
 			if (onError != null) {
-				onError(error);
+				onError(ASCompat.asError(error));
 			}
 		}
 	}
@@ -300,7 +300,7 @@ class StarlingInput {
 			mLeft = mRight = mMiddle = mClick = mRightClick = mMiddleClick = mGamePress = false;
 		} catch (error:Dynamic) {
 			if (onError != null) {
-				onError(error);
+				onError(ASCompat.asError(error));
 			}
 		}
 	}
@@ -333,7 +333,7 @@ class StarlingInput {
 					_loc1_.dispose();
 				} catch (error:Dynamic) {
 					if (onError != null) {
-						onError(error);
+						onError(ASCompat.asError(error));
 					}
 				}
 			}

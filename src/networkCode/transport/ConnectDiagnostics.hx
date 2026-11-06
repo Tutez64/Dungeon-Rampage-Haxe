@@ -147,7 +147,7 @@ private class HttpsProbe {
 			mLoader.addEventListener("securityError", onError);
 			mLoader.load(_loc3_);
 		} catch (error:Dynamic) {
-			report("could not start: " + Std.string(error.message));
+			report("could not start: " + ASCompat.asError(error).message);
 		}
 	}
 
@@ -244,7 +244,7 @@ private class DnsLookup {
 			mResolvers.push(resolver);
 			resolver.lookup(mHost, recordType);
 		} catch (error:Dynamic) {
-			answer(label, "error(" + Std.string(error.message) + ")");
+			answer(label, "error(" + ASCompat.asError(error).message + ")");
 		}
 	}
 

@@ -49,7 +49,7 @@ class StarlingRaster {
 			}
 			return _loc5_;
 		} catch (error:Dynamic) {
-			StarlingHud.reportError(error);
+			StarlingHud.reportError(ASCompat.asError(error));
 		}
 		return null;
 	}

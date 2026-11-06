@@ -126,7 +126,7 @@ class StarlingModifierIcon {
 		try {
 			mToolTip.show();
 		} catch (error:Dynamic) {
-			StarlingHud.reportError(error);
+			StarlingHud.reportError(ASCompat.asError(error));
 		}
 	}
 
@@ -134,7 +134,7 @@ class StarlingModifierIcon {
 		try {
 			mToolTip.hide();
 		} catch (error:Dynamic) {
-			StarlingHud.reportError(error);
+			StarlingHud.reportError(ASCompat.asError(error));
 		}
 	}
 

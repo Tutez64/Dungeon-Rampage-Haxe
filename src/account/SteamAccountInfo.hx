@@ -49,9 +49,9 @@ class SteamAccountInfo {
 				}
 			}
 		} catch (e:Dynamic) {
-			dbFacade.mSteamLoginFailure = "Steamworks error: " + Std.string(e.message);
+			dbFacade.mSteamLoginFailure = "Steamworks error: " + ASCompat.asError(e).message;
 			Logger.warn("*** STEAMWORKS ERROR ***");
-			Logger.error(e.message, e);
+			Logger.error(ASCompat.asError(e).message, ASCompat.asError(e));
 		}
 	}
 
@@ -71,7 +71,7 @@ class SteamAccountInfo {
 			dbFacade.mSteamAuthTicketHandle = dbFacade.mSteamworks.getAuthTicketForWebApiResultHandle();
 			dbFacade.mSteamWebApiAuthTicket = _loc3_;
 		} catch (e:Dynamic) {
-			dbFacade.mSteamLoginFailure = "Steamworks error reading the login ticket: " + Std.string(e.message);
+			dbFacade.mSteamLoginFailure = "Steamworks error reading the login ticket: " + ASCompat.asError(e).message;
 		}
 	}
 

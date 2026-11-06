@@ -50,7 +50,7 @@ class XmlFactory extends AssetFactory {
 			try {
 				xml = new compat.XML(ASCompat.toString(bytes));
 			} catch (e:Dynamic) {
-				onError("Could not parse XML: " + Std.string(e.message));
+				onError("Could not parse XML: " + ASCompat.asError(e).message);
 				return;
 			}
 		}

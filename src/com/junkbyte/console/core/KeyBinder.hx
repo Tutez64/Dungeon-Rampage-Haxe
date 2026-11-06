@@ -146,7 +146,7 @@ class KeyBinder extends ConsoleCore {
 				}
 			}
 		} catch (_loc_e_:Dynamic) {
-			_loc3_ = _loc_e_;
+			_loc3_ = ASCompat.asError(_loc_e_);
 		}
 		return true;
 	}

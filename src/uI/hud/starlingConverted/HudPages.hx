@@ -207,7 +207,7 @@ class HudPages extends BakedPages {
 				try {
 					_loc1_.upload();
 				} catch (error:Dynamic) {
-					StarlingHud.reportError(error);
+					StarlingHud.reportError(ASCompat.asError(error));
 				}
 			}
 	}

@@ -148,7 +148,7 @@ class StarlingGlyphFont {
 			if (!HudArt.ready) {
 				throw error;
 			}
-			StarlingHud.reportError(error);
+			StarlingHud.reportError(ASCompat.asError(error));
 			return null;
 		}
 		if (_loc9_ == null) {
@@ -355,7 +355,7 @@ class StarlingGlyphFont {
 					if (!HudArt.ready) {
 						throw error;
 					}
-					StarlingHud.reportError(error);
+					StarlingHud.reportError(ASCompat.asError(error));
 					{
 						__finallyReturn5 = null;
 						{

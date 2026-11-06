@@ -149,7 +149,7 @@ class StarlingHudIcon {
 					}
 					return true;
 				} catch (error:Dynamic) {
-					StarlingHud.reportError(error);
+					StarlingHud.reportError(ASCompat.asError(error));
 					_loc8_ = true;
 				}
 				return _loc8_;

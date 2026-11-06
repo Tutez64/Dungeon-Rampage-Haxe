@@ -120,7 +120,7 @@ class Ruler extends Sprite {
 			ASCompat.setProperty(_loc4_, "ty", -_master.stage.mouseY + 15);
 			_loc3_.draw(_master.stage, _loc4_);
 		} catch (_loc_e_:Dynamic) {
-			_loc5_ = _loc_e_;
+			_loc5_ = ASCompat.asError(_loc_e_);
 			_loc3_ = null;
 		}
 		_zoom.bitmapData = _loc3_;

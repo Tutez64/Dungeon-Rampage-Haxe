@@ -407,7 +407,7 @@ import starling.styles.MeshStyle;
 			try {
 				_loc1_.dispose();
 			} catch (error:Dynamic) {
-				StarlingHud.reportError(error);
+				StarlingHud.reportError(ASCompat.asError(error));
 			}
 		}
 		mChildren.length = 0;

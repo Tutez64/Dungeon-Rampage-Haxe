@@ -53,8 +53,8 @@ class ServiceDiscoveryLoader {
 				&& ASCompat.toBool(_loc3_.gameSocketAddress)
 				&& ASCompat.toBool(_loc3_.gameSocketPort);
 		} catch (e:Dynamic) {
-			Logger.fatal("Service discovery returned unparseable response from " + mUrl + ": " + Std.string(e.message));
-			complete(null, 1503, "Invalid service discovery JSON: " + Std.string(e.message));
+			Logger.fatal("Service discovery returned unparseable response from " + mUrl + ": " + ASCompat.asError(e).message);
+			complete(null, 1503, "Invalid service discovery JSON: " + ASCompat.asError(e).message);
 			return;
 		}
 		if (_loc4_) {

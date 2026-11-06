@@ -64,7 +64,7 @@ class UIReconnectingIndicator {
 			try {
 				mDBFacade.removeRootDisplayObject(_loc1_);
 			} catch (error:Dynamic) {
-				Logger.warn("The reconnecting indicator was already gone: " + Std.string(error.message));
+				Logger.warn("The reconnecting indicator was already gone: " + ASCompat.asError(error).message);
 			}
 		}
 		mDBFacade = null;

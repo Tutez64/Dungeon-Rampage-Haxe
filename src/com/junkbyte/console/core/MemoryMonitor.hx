@@ -160,7 +160,7 @@ class MemoryMonitor extends ConsoleCore {
 			try {
 				get_remoter().send("gc");
 			} catch (_loc_e_:Dynamic) {
-				_loc2_ = _loc_e_;
+				_loc2_ = ASCompat.asError(_loc_e_);
 				report(_loc2_, 10);
 			}
 		} else {
@@ -171,7 +171,7 @@ class MemoryMonitor extends ConsoleCore {
 					_loc3_ = true;
 				}
 			} catch (_loc_e_:Dynamic) {
-				_loc2_ = _loc_e_;
+				_loc2_ = ASCompat.asError(_loc_e_);
 			}
 			_loc4_ = "Manual garbage collection " + (_loc3_ ? "successful." : "FAILED. You need debugger version of flash player.");
 			report(_loc4_, _loc3_ ? -1 : 10);

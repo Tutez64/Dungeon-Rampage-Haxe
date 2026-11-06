@@ -173,7 +173,7 @@ class StarlingBuff {
 				mInput.remove(mButton);
 			}
 		} catch (error:Dynamic) {
-			StarlingHud.reportError(error);
+			StarlingHud.reportError(ASCompat.asError(error));
 		}
 		mInput = null;
 		StarlingHud.disposeResource(mTooltip);

@@ -25,7 +25,7 @@ class JsonFactory extends AssetFactory {
 			_loc6_ = haxe.Json.parse(_loc5_.readUTFBytes(_loc5_.length));
 			onComplete(reference.name, _loc6_);
 		} catch (e:Dynamic) {
-			onError("Could not parse JSON: " + Std.string(e.message));
+			onError("Could not parse JSON: " + ASCompat.asError(e).message);
 		}
 	}
 }

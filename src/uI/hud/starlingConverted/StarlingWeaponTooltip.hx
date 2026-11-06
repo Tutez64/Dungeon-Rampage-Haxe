@@ -106,7 +106,7 @@ class StarlingWeaponTooltip extends MovieClip {
 				try {
 					_loc1_.destroy();
 				} catch (error:Dynamic) {
-					StarlingHud.reportError(error);
+					StarlingHud.reportError(ASCompat.asError(error));
 				}
 			}
 		mModifiers.length = 0;

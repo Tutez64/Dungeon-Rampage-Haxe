@@ -191,7 +191,7 @@ class StarlingOffScreenClip {
 			mHp.value = event.maxHp > 0 ? event.hp / event.maxHp : 0;
 			mChanged();
 		} catch (error:Dynamic) {
-			StarlingHud.reportError(error);
+			StarlingHud.reportError(ASCompat.asError(error));
 		}
 	}
 
@@ -201,7 +201,7 @@ class StarlingOffScreenClip {
 				setChat(event.message);
 			}
 		} catch (error:Dynamic) {
-			StarlingHud.reportError(error);
+			StarlingHud.reportError(ASCompat.asError(error));
 		}
 	}
 
@@ -212,7 +212,7 @@ class StarlingOffScreenClip {
 				mChanged();
 			}
 		} catch (error:Dynamic) {
-			StarlingHud.reportError(error);
+			StarlingHud.reportError(ASCompat.asError(error));
 		}
 	}
 
@@ -249,7 +249,7 @@ class StarlingOffScreenClip {
 			}
 			mChanged();
 		} catch (error:Dynamic) {
-			StarlingHud.reportError(error);
+			StarlingHud.reportError(ASCompat.asError(error));
 		}
 	}
 
@@ -363,14 +363,14 @@ class StarlingOffScreenClip {
 				mBalloon.removeFromParent(true);
 			}
 		} catch (error:Dynamic) {
-			StarlingHud.reportError(error);
+			StarlingHud.reportError(ASCompat.asError(error));
 		}
 		try {
 			if (mBalloonCell != null) {
 				mBalloonPages.release(mBalloonCell);
 			}
 		} catch (cellError:Dynamic) {
-			StarlingHud.reportError(cellError);
+			StarlingHud.reportError(ASCompat.asError(cellError));
 		}
 		mBalloonPages = null;
 		mBalloonCell = null;
@@ -422,7 +422,7 @@ class StarlingOffScreenClip {
 		try {
 			clearChat();
 		} catch (error:Dynamic) {
-			StarlingHud.reportError(error);
+			StarlingHud.reportError(ASCompat.asError(error));
 		}
 		StarlingHud.disposeResource(mEvents, "destroy");
 		StarlingHud.disposeResource(mAvatar);

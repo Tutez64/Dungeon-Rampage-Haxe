@@ -99,7 +99,7 @@ class NativeWebSocketTransport extends EventDispatcher implements IGameTransport
 			mNative.addEventListener("certificateError", onNativeCertificateError);
 			mNative.connect(mUrl);
 		} catch (error:Dynamic) {
-			fail((602 : UInt), error.message);
+			fail((602 : UInt), ASCompat.asError(error).message);
 		}
 	}
 
@@ -111,8 +111,8 @@ class NativeWebSocketTransport extends EventDispatcher implements IGameTransport
 			bytes.position = (0 : UInt);
 			mNative.sendMessage(2, bytes);
 		} catch (error:Dynamic) {
-			Logger.warnch("WS", "NativeWebSocketTransport send failed: " + Std.string(error.message));
-			fail((602 : UInt), error.message);
+			Logger.warnch("WS", "NativeWebSocketTransport send failed: " + ASCompat.asError(error).message);
+			fail((602 : UInt), ASCompat.asError(error).message);
 		}
 	}
 
@@ -123,8 +123,8 @@ class NativeWebSocketTransport extends EventDispatcher implements IGameTransport
 		try {
 			mNative.sendMessage(1, text);
 		} catch (error:Dynamic) {
-			Logger.warnch("WS", "NativeWebSocketTransport sendText failed: " + Std.string(error.message));
-			fail((602 : UInt), error.message);
+			Logger.warnch("WS", "NativeWebSocketTransport sendText failed: " + ASCompat.asError(error).message);
+			fail((602 : UInt), ASCompat.asError(error).message);
 		}
 	}
 
@@ -175,8 +175,8 @@ class NativeWebSocketTransport extends EventDispatcher implements IGameTransport
 				_loc3_ = (_loc2_.data : ByteArray);
 			}
 		} catch (error:Dynamic) {
-			Logger.error("NativeWebSocketTransport cannot read a websocketData event: " + Std.string(error.message));
-			fail((602 : UInt), "Unreadable websocketData event: " + Std.string(error.message));
+			Logger.error("NativeWebSocketTransport cannot read a websocketData event: " + ASCompat.asError(error).message);
+			fail((602 : UInt), "Unreadable websocketData event: " + ASCompat.asError(error).message);
 			return;
 		}
 		if (_loc5_ != null) {

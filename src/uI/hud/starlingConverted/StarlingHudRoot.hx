@@ -19,11 +19,11 @@ class StarlingHudRoot extends BakedRoot {
 		try {
 			super.render(painter);
 		} catch (error:Dynamic) {
-			StarlingHud.reportError(error);
+			StarlingHud.reportError(ASCompat.asError(error));
 			try {
 				painter.finishMeshBatch();
 			} catch (flushError:Dynamic) {
-				StarlingHud.reportError(flushError);
+				StarlingHud.reportError(ASCompat.asError(flushError));
 			}
 			painter.state.copyFrom(sSaved);
 			if (painter.stencilReferenceValue != _loc2_) {

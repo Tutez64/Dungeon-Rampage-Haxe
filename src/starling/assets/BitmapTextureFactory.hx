@@ -57,7 +57,7 @@ class BitmapTextureFactory extends AssetFactory {
 			try {
 				texture = Texture.fromData(param1, options);
 			} catch (e:Dynamic) {
-				onError(e.message);
+				onError(ASCompat.asError(e).message);
 			}
 			if (texture != null && ASCompat.stringAsBool(url)) {
 				texture.root.onRestore = restoreTexture;
@@ -75,7 +75,7 @@ class BitmapTextureFactory extends AssetFactory {
 					try {
 						texture.root.uploadBitmapData(bitmapData);
 					} catch (e:Dynamic) {
-						helper.log("Texture restoration failed: " + Std.string(e.message));
+						helper.log("Texture restoration failed: " + ASCompat.asError(e).message);
 					}
 					helper.onEndRestore();
 				});

@@ -267,11 +267,11 @@ class StarlingChatPrompt {
 			}
 			return true;
 		} catch (error:Dynamic) {
-			if (Std.isOfType(error, HudFatalError) || !mBakeFailed) {
-				StarlingHud.reportError(error);
+			if (Std.isOfType(ASCompat.asError(error), HudFatalError) || !mBakeFailed) {
+				StarlingHud.reportError(ASCompat.asError(error));
 			}
 			mBakeFailed = true;
-			if (!Std.isOfType(error, HudFatalError)) {
+			if (!Std.isOfType(ASCompat.asError(error), HudFatalError)) {
 				return false;
 			}
 			_loc5_ = true;

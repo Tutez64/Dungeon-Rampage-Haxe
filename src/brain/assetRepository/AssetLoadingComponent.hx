@@ -193,7 +193,7 @@ class AssetLoadingComponent extends Component {
 								}
 						}
 				} catch (e:Dynamic) {
-					Logger.error("AssetLoadingComponent.rootClipLabels: could not read " + _loc5_.nativePath + ": " + Std.string(e.message));
+					Logger.error("AssetLoadingComponent.rootClipLabels: could not read " + _loc5_.nativePath + ": " + ASCompat.asError(e).message);
 				}
 			}
 			sRootClipLabels[_loc2_] = _loc9_;
@@ -1170,7 +1170,7 @@ class AssetLoadingComponent extends Component {
 				try {
 					_loc3_();
 				} catch (e:Dynamic) {
-					Logger.error("AssetLoadingComponent.flushBiomeKeyCallbacks: ready callback threw: " + Std.string(e.message));
+					Logger.error("AssetLoadingComponent.flushBiomeKeyCallbacks: ready callback threw: " + ASCompat.asError(e).message);
 				}
 			}
 	}

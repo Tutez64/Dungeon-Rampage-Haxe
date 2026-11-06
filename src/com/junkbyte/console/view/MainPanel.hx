@@ -312,7 +312,7 @@ class MainPanel extends ConsolePanel {
 				setHints(console.get_cl().getHintsFor(_loc3_, 10));
 				return;
 			} catch (_loc_e_:Dynamic) {
-				_loc4_ = _loc_e_;
+				_loc4_ = ASCompat.asError(_loc_e_);
 			}
 		}
 		setHints();
@@ -921,7 +921,7 @@ class MainPanel extends ConsolePanel {
 			stage.focus = _cmdField;
 			setCLSelectionAtEnd();
 		} catch (_loc_e_:Dynamic) {
-			_loc3_ = _loc_e_;
+			_loc3_ = ASCompat.asError(_loc_e_);
 		}
 	}
 
@@ -1126,7 +1126,7 @@ class MainPanel extends ConsolePanel {
 				try {
 					_loc7_.save(_loc6_, "log.txt");
 				} catch (_loc_e_:Dynamic) {
-					_loc8_ = _loc_e_;
+					_loc8_ = ASCompat.asError(_loc_e_);
 					console.report("Save to file is not supported in your flash player.", 8);
 				}
 			} else {
@@ -1194,7 +1194,7 @@ class MainPanel extends ConsolePanel {
 				stage.focus = _cmdField;
 				setCLSelectionAtEnd();
 			} catch (_loc_e_:Dynamic) {
-				_loc3_ = _loc_e_;
+				_loc3_ = ASCompat.asError(_loc_e_);
 			}
 		}
 	}

@@ -35,7 +35,7 @@ class SoundFactory extends AssetFactory {
 				_loc6_ = new Sound();
 				_loc6_.loadCompressedDataFromByteArray(_loc5_, _loc5_.length);
 			} catch (e:Dynamic) {
-				onError("Could not load sound data: " + Std.string(e.message));
+				onError("Could not load sound data: " + ASCompat.asError(e).message);
 				return;
 			}
 		}

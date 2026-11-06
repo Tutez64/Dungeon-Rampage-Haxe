@@ -118,7 +118,7 @@ class GameClock {
 			}
 		} catch (e:Dynamic) {
 			_loc7_ = "Unable to parse the string [" + str + "] into a date. ";
-			_loc7_ = _loc7_ + ("The internal error was: " + Std.string(e));
+			_loc7_ = _loc7_ + ("The internal error was: " + Std.string(ASCompat.asError(e)));
 			throw new Error(_loc7_);
 		}
 		return _loc4_;

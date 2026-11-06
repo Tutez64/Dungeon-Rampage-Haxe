@@ -392,7 +392,7 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 			});
 			mTeamBonusUI = new Map();
 		} catch (e:Dynamic) {
-			Logger.error("An error occurred while attempting to construct distributed dungeon summary.  Error: " + Std.string(e.message));
+			Logger.error("An error occurred while attempting to construct distributed dungeon summary.  Error: " + ASCompat.asError(e).message);
 		}
 		Logger.info("Finished construction of DDS");
 	}

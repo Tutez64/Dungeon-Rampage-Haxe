@@ -361,7 +361,7 @@ class StarlingHudSlot {
 					mChanged();
 					return true;
 				} catch (error:Dynamic) {
-					StarlingHud.reportError(error);
+					StarlingHud.reportError(ASCompat.asError(error));
 					_loc10_ = true;
 				}
 				return _loc10_;
@@ -418,7 +418,7 @@ class StarlingHudSlot {
 			});
 			mFacade.mTween.tweenMaxTo(this, 0.25, {"flashAmount": 0});
 		} catch (error:Dynamic) {
-			StarlingHud.reportError(error);
+			StarlingHud.reportError(ASCompat.asError(error));
 		}
 	}
 
@@ -436,7 +436,7 @@ class StarlingHudSlot {
 				mChanged();
 			}
 		} catch (error:Dynamic) {
-			StarlingHud.reportError(error);
+			StarlingHud.reportError(ASCompat.asError(error));
 		}
 		return value;
 	}
@@ -477,7 +477,7 @@ class StarlingHudSlot {
 		try {
 			reset();
 		} catch (error:Dynamic) {
-			StarlingHud.reportError(error);
+			StarlingHud.reportError(ASCompat.asError(error));
 		}
 		StarlingHud.disposeResource(mIcon);
 		StarlingHud.disposeResource(mRarity);

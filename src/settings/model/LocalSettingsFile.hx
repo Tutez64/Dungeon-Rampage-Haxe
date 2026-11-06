@@ -29,7 +29,7 @@ class LocalSettingsFile {
 					_loc2_.open(_loc1_, flash.filesystem.FileMode.READ);
 					_loc3_ = _loc2_.readUTFBytes(_loc2_.bytesAvailable);
 				} catch (error:Dynamic) {
-					Logger.warn("Could not read settings.json, falling back to defaults: " + Std.string(error.message));
+					Logger.warn("Could not read settings.json, falling back to defaults: " + ASCompat.asError(error).message);
 					{
 						__finallyReturn0 = null;
 						{
@@ -55,7 +55,7 @@ class LocalSettingsFile {
 				return _loc4_;
 			}
 		} catch (parseError:Dynamic) {
-			Logger.warn("Could not parse settings.json, falling back to defaults: " + Std.string(parseError.message));
+			Logger.warn("Could not parse settings.json, falling back to defaults: " + ASCompat.asError(parseError).message);
 		}
 		return null;
 	}
@@ -68,7 +68,7 @@ class LocalSettingsFile {
 					_loc2_.open(resolveFile(), flash.filesystem.FileMode.WRITE);
 					_loc2_.writeUTFBytes(haxe.Json.stringify(blob));
 				} catch (error:Dynamic) {
-					Logger.error("Could not write settings.json: " + Std.string(error.message));
+					Logger.error("Could not write settings.json: " + ASCompat.asError(error).message);
 				};
 			} catch (__finallyError0:Dynamic) {
 				{

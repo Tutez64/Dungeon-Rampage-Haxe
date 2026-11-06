@@ -55,7 +55,7 @@ class Graphing extends ConsoleCore {
 				_loc6_ = ASCompat.toNumber(_loc5_.getCurrentValue());
 				_loc5_.setValue(_loc6_, group.averaging);
 			} catch (_loc_e_:Dynamic) {
-				_loc7_ = _loc_e_;
+				_loc7_ = ASCompat.asError(_loc_e_);
 				report("Error with graph value for key [" + Std.string(_loc5_.key) + "] in [" + group.name + "]. " + Std.string(_loc7_), 10);
 				remove(group.name, _loc5_.get_obj(), _loc5_.get_prop());
 			}
@@ -345,7 +345,7 @@ class Graphing extends ConsoleCore {
 		try {
 			_loc15_ = ASCompat.toNumber(_loc14_.setObject(obj, prop));
 		} catch (_loc_e_:Dynamic) {
-			_loc16_ = _loc_e_;
+			_loc16_ = ASCompat.asError(_loc_e_);
 			report("Error with graph value for [" + key + "] in [" + n + "]. " + Std.string(_loc16_), 10);
 			return;
 		}

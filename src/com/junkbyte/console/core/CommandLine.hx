@@ -221,7 +221,7 @@ class CommandLine extends ConsoleCore {
 				_loc5_ = _loc6_.exec(_scope, str);
 			}
 		} catch (_loc_e_:Dynamic) {
-			_loc10_ = _loc_e_;
+			_loc10_ = ASCompat.asError(_loc_e_);
 			reportError(_loc10_);
 		}
 		return _loc5_;
@@ -501,7 +501,7 @@ class CommandLine extends ConsoleCore {
 					run(_loc9_);
 				}
 			} catch (_loc_e_:Dynamic) {
-				_loc11_ = _loc_e_;
+				_loc11_ = ASCompat.asError(_loc_e_);
 				reportError(_loc11_);
 			}
 		} else {

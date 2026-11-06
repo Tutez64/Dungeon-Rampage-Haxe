@@ -188,7 +188,7 @@ class StarlingStatsReporter {
 					_loc3_.open(resolveReportFile(), flash.filesystem.FileMode.WRITE);
 					_loc3_.writeUTFBytes(_loc5_.join("\n") + "\n");
 				} catch (e:Dynamic) {
-					Logger.error("StarlingStatsReporter: failed to write report: " + Std.string(e.message));
+					Logger.error("StarlingStatsReporter: failed to write report: " + ASCompat.asError(e).message);
 				};
 			} catch (__finallyError0:Dynamic) {
 				{

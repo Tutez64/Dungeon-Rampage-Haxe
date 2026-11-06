@@ -72,7 +72,7 @@ class HudPage {
 				_loc6_.mPixels.dispose();
 			}
 			BakeBudget.unreserve("hudStarling", width, height, _loc5_);
-			StarlingHud.reportError(error);
+			StarlingHud.reportError(ASCompat.asError(error));
 			return null;
 		}
 		return _loc6_;
@@ -125,7 +125,7 @@ class HudPage {
 			mDirty = false;
 		} catch (error:Dynamic) {
 			mDirty = true;
-			StarlingHud.reportError(error);
+			StarlingHud.reportError(ASCompat.asError(error));
 		}
 	}
 

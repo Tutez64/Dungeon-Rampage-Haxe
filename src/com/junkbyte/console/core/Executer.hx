@@ -764,7 +764,7 @@ class Executer extends EventDispatcher {
 		try {
 			_exec(str);
 		} catch (_loc_e_:Dynamic) {
-			_loc4_ = _loc_e_;
+			_loc4_ = ASCompat.asError(_loc_e_);
 			reset();
 			throw _loc4_;
 		}

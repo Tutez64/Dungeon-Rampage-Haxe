@@ -76,7 +76,7 @@ class StarlingTooltip {
 			}
 			mClip.visible = true;
 		} catch (error:Dynamic) {
-			StarlingHud.reportError(error);
+			StarlingHud.reportError(ASCompat.asError(error));
 		}
 	}
 

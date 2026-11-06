@@ -58,7 +58,7 @@ class StarlingSweepArt {
 			_loc3_ = analyse(clip, onSeek);
 		} catch (error:Dynamic) {
 			_loc3_ = null;
-			lastRefusal = "error " + error.errorID;
+			lastRefusal = "error " + ASCompat.asError(error).errorID;
 		}
 		sByClip[clip] = (_loc3_ : ASAny) ?? (false : ASAny);
 		return _loc3_;

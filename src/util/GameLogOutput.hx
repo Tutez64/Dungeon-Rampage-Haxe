@@ -64,7 +64,8 @@ class GameLogOutput {
 						openFile(_loc6_, true);
 					} catch (error:Dynamic) {
 						close();
-						_loc8_ = ASCompat.stringAsBool(_loc9_) ? "Could not " + _loc9_ + " \"" + _loc2_ + "\": " + Std.string(error.message) : error.message;
+						_loc8_ = ASCompat.stringAsBool(_loc9_) ? "Could not " + _loc9_ + " \"" + _loc2_ + "\": " + ASCompat.asError(error)
+							.message : ASCompat.asError(error).message;
 						warn("Log output unavailable: " + new compat.RegExp("\\.+$").replace(_loc8_, "") + ". Continuing without file logging.");
 					}
 					return;
@@ -156,7 +157,7 @@ class GameLogOutput {
 			_loc3_.createDirectory();
 		} catch (error:Dynamic) {
 			throw new Error("Could not create log directory \"" + _loc3_.nativePath + "\" for log file \"" + destination.nativePath + "\": "
-				+ Std.string(error.message));
+				+ ASCompat.asError(error).message);
 		}
 		releaseOutput();
 		var _loc4_:FileStream;
@@ -168,7 +169,7 @@ class GameLogOutput {
 			_loc4_.open(destination, flash.filesystem.FileMode.APPEND);
 		} catch (openError:Dynamic) {
 			close();
-			throw new Error("Could not open log file \"" + destination.nativePath + "\": " + Std.string(openError.message));
+			throw new Error("Could not open log file \"" + destination.nativePath + "\": " + ASCompat.asError(openError).message);
 		}
 		useStream(_loc4_);
 		if (includeHistory) {
@@ -234,7 +235,7 @@ class GameLogOutput {
 					warn("Log output disabled after write failure to "
 						+ _loc4_
 						+ ": "
-						+ Std.string(error.message.replace(new compat.RegExp("\\.+$"), ""))
+						+ Std.string(new compat.RegExp("\\.+$").replace(ASCompat.asError(error).message, ""))
 						+ ". Continuing without this log output.");
 				};
 			} catch (__finallyError0:Dynamic) {

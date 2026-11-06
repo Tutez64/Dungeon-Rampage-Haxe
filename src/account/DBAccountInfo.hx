@@ -212,7 +212,7 @@ class DBAccountInfo {
 					getUsersFriendInfo();
 				}
 			} catch (error:Dynamic) {
-				Logger.error("Failed to parse account info JSON: " + Std.string(error.message));
+				Logger.error("Failed to parse account info JSON: " + ASCompat.asError(error).message);
 				onAccountInfoError(param1);
 			}
 		};

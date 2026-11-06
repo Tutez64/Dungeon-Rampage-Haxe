@@ -88,7 +88,7 @@ class TlsSocketTransport extends EventDispatcher implements IGameTransport {
 			mSocket.addEventListener("certificateError", onCertificateError);
 			mSocket.connect(mHost, mPort);
 		} catch (error:Dynamic) {
-			fail((602 : UInt), error.message);
+			fail((602 : UInt), ASCompat.asError(error).message);
 		}
 	}
 
@@ -100,7 +100,7 @@ class TlsSocketTransport extends EventDispatcher implements IGameTransport {
 			mSocket.writeBytes(bytes, 0, bytes.length);
 			mSocket.flush();
 		} catch (error:Dynamic) {
-			fail((602 : UInt), error.message);
+			fail((602 : UInt), ASCompat.asError(error).message);
 		}
 	}
 

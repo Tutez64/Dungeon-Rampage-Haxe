@@ -335,7 +335,7 @@ class StarlingHud implements IGameHud {
 				resource[method]();
 			}
 		} catch (error:Dynamic) {
-			reportError(error);
+			reportError(ASCompat.asError(error));
 		}
 	}
 
@@ -378,7 +378,7 @@ class StarlingHud implements IGameHud {
 				}
 			});
 		} catch (error:Dynamic) {
-			failed(error);
+			failed(ASCompat.asError(error));
 		}
 	}
 
@@ -568,7 +568,7 @@ class StarlingHud implements IGameHud {
 					invalidateBounds, chatButtonsReady);
 			} catch (error:Dynamic) {
 				mChatPromptFailed = true;
-				failed(error);
+				failed(ASCompat.asError(error));
 				return;
 			}
 			mChat.starlingPrompt = mChatPrompt.show;
@@ -592,7 +592,7 @@ class StarlingHud implements IGameHud {
 				updateControllerIcons();
 			}
 		} catch (error:Dynamic) {
-			failed(error);
+			failed(ASCompat.asError(error));
 		}
 	}
 
@@ -710,7 +710,7 @@ class StarlingHud implements IGameHud {
 		try {
 			_loc4_.setContent(value, baked ? "baked" : "glyphs");
 		} catch (error:Dynamic) {
-			failed(error);
+			failed(ASCompat.asError(error));
 		}
 		if (drawn(_loc4_)) {
 			invalidateBounds();
@@ -759,7 +759,7 @@ class StarlingHud implements IGameHud {
 				populateHero();
 			}
 		} catch (error:Dynamic) {
-			failed(error);
+			failed(ASCompat.asError(error));
 		}
 	}
 
@@ -829,7 +829,7 @@ class StarlingHud implements IGameHud {
 				refreshKeyboardLabels();
 			}
 		} catch (error:Dynamic) {
-			failed(error);
+			failed(ASCompat.asError(error));
 		}
 	}
 
@@ -841,7 +841,7 @@ class StarlingHud implements IGameHud {
 			profileOut();
 			xpOut();
 		} catch (error:Dynamic) {
-			failed(error);
+			failed(ASCompat.asError(error));
 		}
 	}
 
@@ -864,7 +864,7 @@ class StarlingHud implements IGameHud {
 		try {
 			setHp(event.hp, event.maxHp);
 		} catch (error:Dynamic) {
-			failed(error);
+			failed(ASCompat.asError(error));
 		}
 	}
 
@@ -872,7 +872,7 @@ class StarlingHud implements IGameHud {
 		try {
 			setMana(event.mana, event.maxMana);
 		} catch (error:Dynamic) {
-			failed(error);
+			failed(ASCompat.asError(error));
 		}
 	}
 
@@ -880,7 +880,7 @@ class StarlingHud implements IGameHud {
 		try {
 			setXp(event.experience);
 		} catch (error:Dynamic) {
-			failed(error);
+			failed(ASCompat.asError(error));
 		}
 	}
 
@@ -888,7 +888,7 @@ class StarlingHud implements IGameHud {
 		try {
 			setCurrency((event.basicCurrency : Int), (event.premiumCurrency : Int));
 		} catch (error:Dynamic) {
-			failed(error);
+			failed(ASCompat.asError(error));
 		}
 	}
 
@@ -897,7 +897,7 @@ class StarlingHud implements IGameHud {
 			refreshBonuses();
 			scheduleBooster();
 		} catch (error:Dynamic) {
-			failed(error);
+			failed(ASCompat.asError(error));
 		}
 	}
 
@@ -908,7 +908,7 @@ class StarlingHud implements IGameHud {
 			}
 			updateControllerIcons();
 		} catch (error:Dynamic) {
-			failed(error);
+			failed(ASCompat.asError(error));
 		}
 	}
 
@@ -917,7 +917,7 @@ class StarlingHud implements IGameHud {
 			mHudType = (event.hudType == 1 ? (1 : UInt) : (0 : UInt):UInt);
 			refreshHUD();
 		} catch (error:Dynamic) {
-			failed(error);
+			failed(ASCompat.asError(error));
 		}
 	}
 
@@ -932,7 +932,7 @@ class StarlingHud implements IGameHud {
 			visible("UI_profile.HP_bar_invincible", event.mIsInvulnerable);
 			visible("UI_profile.HP_bar", !event.mIsInvulnerable);
 		} catch (error:Dynamic) {
-			failed(error);
+			failed(ASCompat.asError(error));
 		}
 	}
 
@@ -944,7 +944,7 @@ class StarlingHud implements IGameHud {
 			mHp.value = mInvulnerable.value = max > 0 ? current / max : 0;
 			text("UI_profile.HP_text", Std.string(current) + " / " + Std.string(max));
 		} catch (error:Dynamic) {
-			failed(error);
+			failed(ASCompat.asError(error));
 		}
 	}
 
@@ -956,7 +956,7 @@ class StarlingHud implements IGameHud {
 			mMana.value = max > 0 ? current / max : 0;
 			text("UI_profile.mana_text", Std.string(current) + " / " + Std.string(max));
 		} catch (error:Dynamic) {
-			failed(error);
+			failed(ASCompat.asError(error));
 		}
 	}
 
@@ -979,7 +979,7 @@ class StarlingHud implements IGameHud {
 				bulgeXpBar();
 			}
 		} catch (error:Dynamic) {
-			failed(error);
+			failed(ASCompat.asError(error));
 		}
 	}
 
@@ -988,7 +988,7 @@ class StarlingHud implements IGameHud {
 			setBasicCurrency(basicCurrency);
 			setPremiumCurrency(premiumCurrency);
 		} catch (error:Dynamic) {
-			failed(error);
+			failed(ASCompat.asError(error));
 		}
 	}
 
@@ -996,7 +996,7 @@ class StarlingHud implements IGameHud {
 		try {
 			text("UI_currency_coin.game_currency_text", Std.string(basicCurrency));
 		} catch (error:Dynamic) {
-			failed(error);
+			failed(ASCompat.asError(error));
 		}
 	}
 
@@ -1004,7 +1004,7 @@ class StarlingHud implements IGameHud {
 		try {
 			text("UI_currency_cash.cash_text", Std.string(premiumCurrency));
 		} catch (error:Dynamic) {
-			failed(error);
+			failed(ASCompat.asError(error));
 		}
 	}
 
@@ -1054,7 +1054,7 @@ class StarlingHud implements IGameHud {
 			refreshBonuses();
 			scheduleBooster();
 		} catch (error:Dynamic) {
-			failed(error);
+			failed(ASCompat.asError(error));
 		}
 	}
 
@@ -1131,7 +1131,7 @@ class StarlingHud implements IGameHud {
 					invalidateBounds();
 					return true;
 				} catch (error:Dynamic) {
-					failed(error);
+					failed(ASCompat.asError(error));
 					_loc7_ = true;
 				}
 				return _loc7_;
@@ -1175,7 +1175,7 @@ class StarlingHud implements IGameHud {
 			mXpBulging = true;
 			invalidateBounds();
 		} catch (error:Dynamic) {
-			failed(error);
+			failed(ASCompat.asError(error));
 		}
 	}
 
@@ -1189,7 +1189,7 @@ class StarlingHud implements IGameHud {
 			mProfileBulging = true;
 			invalidateBounds();
 		} catch (error:Dynamic) {
-			failed(error);
+			failed(ASCompat.asError(error));
 		}
 	}
 
@@ -1209,7 +1209,7 @@ class StarlingHud implements IGameHud {
 				invalidateBounds();
 			}
 		} catch (transformError:Dynamic) {
-			failed(transformError);
+			failed(ASCompat.asError(transformError));
 		}
 		if (HudArtConverter.busy) {
 			return;
@@ -1242,7 +1242,7 @@ class StarlingHud implements IGameHud {
 				mCut.update();
 			}
 		} catch (error:Dynamic) {
-			failed(error);
+			failed(ASCompat.asError(error));
 		}
 	}
 
@@ -1257,7 +1257,7 @@ class StarlingHud implements IGameHud {
 				mCut.fade(_loc3_, _loc2_);
 			}
 		} catch (error:Dynamic) {
-			failed(error);
+			failed(ASCompat.asError(error));
 		}
 	}
 
@@ -1281,7 +1281,7 @@ class StarlingHud implements IGameHud {
 		try {
 			callback();
 		} catch (error:Dynamic) {
-			failed(error);
+			failed(ASCompat.asError(error));
 		}
 	}
 
@@ -1318,7 +1318,7 @@ class StarlingHud implements IGameHud {
 		try {
 			mSuppressNextExitMenuToggle = mFacade.inputManager.check(27);
 		} catch (error:Dynamic) {
-			failed(error);
+			failed(ASCompat.asError(error));
 		}
 	}
 
@@ -1345,7 +1345,7 @@ class StarlingHud implements IGameHud {
 				toggleSettingsPopup();
 			}
 		} catch (error:Dynamic) {
-			failed(error);
+			failed(ASCompat.asError(error));
 		}
 	}
 
@@ -1399,7 +1399,7 @@ class StarlingHud implements IGameHud {
 			}
 			mFacade.camera.yCilppingFromBottom = mHudType == 1 ? 90 : 0;
 		} catch (error:Dynamic) {
-			failed(error);
+			failed(ASCompat.asError(error));
 		}
 	}
 
@@ -1464,7 +1464,7 @@ class StarlingHud implements IGameHud {
 			mFacade.camera.yCilppingFromBottom = 0;
 			mFacade.camera.forceRedraw();
 		} catch (error:Dynamic) {
-			failed(error);
+			failed(ASCompat.asError(error));
 		}
 	}
 
@@ -1498,7 +1498,7 @@ class StarlingHud implements IGameHud {
 					mPortrait.removeFromParent(true);
 				}
 			} catch (portraitError:Dynamic) {
-				failed(portraitError);
+				failed(ASCompat.asError(portraitError));
 			}
 			mPortrait = null;
 			mHeroOwner = null;
@@ -1521,7 +1521,7 @@ class StarlingHud implements IGameHud {
 				mChat.heroOwner = null;
 			}
 		} catch (error:Dynamic) {
-			failed(error);
+			failed(ASCompat.asError(error));
 		}
 	}
 
@@ -1657,7 +1657,7 @@ class StarlingHud implements IGameHud {
 				sCurrent = null;
 			}
 		} catch (error:Dynamic) {
-			failed(error);
+			failed(ASCompat.asError(error));
 		}
 	}
 
@@ -1687,7 +1687,7 @@ class StarlingHud implements IGameHud {
 				restoreSlotCooldowns();
 			}
 		} catch (error:Dynamic) {
-			failed(error);
+			failed(ASCompat.asError(error));
 		}
 	}
 
@@ -1697,7 +1697,7 @@ class StarlingHud implements IGameHud {
 				mHealthFull.show();
 			}
 		} catch (error:Dynamic) {
-			failed(error);
+			failed(ASCompat.asError(error));
 		}
 	}
 
@@ -1707,7 +1707,7 @@ class StarlingHud implements IGameHud {
 				mManaFull.show();
 			}
 		} catch (error:Dynamic) {
-			failed(error);
+			failed(ASCompat.asError(error));
 		}
 	}
 
@@ -1724,7 +1724,7 @@ class StarlingHud implements IGameHud {
 			}
 			text("UI_center_message", Locale.getString(localeTextName), true);
 		} catch (error:Dynamic) {
-			failed(error);
+			failed(ASCompat.asError(error));
 		}
 	}
 
@@ -1739,7 +1739,7 @@ class StarlingHud implements IGameHud {
 				invalidateBounds();
 			}
 		} catch (error:Dynamic) {
-			failed(error);
+			failed(ASCompat.asError(error));
 		}
 	}
 
@@ -1748,7 +1748,7 @@ class StarlingHud implements IGameHud {
 			visible("UI_center_message", true);
 			text("UI_center_message", Locale.getString("NOT_ENOUGH_MANA"), true);
 		} catch (error:Dynamic) {
-			failed(error);
+			failed(ASCompat.asError(error));
 		}
 	}
 
@@ -1756,7 +1756,7 @@ class StarlingHud implements IGameHud {
 		try {
 			visible("UI_center_message", false);
 		} catch (error:Dynamic) {
-			failed(error);
+			failed(ASCompat.asError(error));
 		}
 	}
 
@@ -1793,7 +1793,7 @@ class StarlingHud implements IGameHud {
 			mFacade.mDistributedObjectManager.mMatchMaker.RequestExit();
 			mFacade.dbAccountInfo.dbAccountParams.flushParams();
 		} catch (error:Dynamic) {
-			failed(error);
+			failed(ASCompat.asError(error));
 		}
 	}
 
@@ -1812,7 +1812,7 @@ class StarlingHud implements IGameHud {
 		try {
 			mSuppressNextExitMenuToggle = mFacade.inputManager.check(27) || mFacade.steamInputManager.pressedAction("menu_cancel");
 		} catch (error:Dynamic) {
-			failed(error);
+			failed(ASCompat.asError(error));
 		}
 	}
 
@@ -1838,7 +1838,7 @@ class StarlingHud implements IGameHud {
 				mChat.focusChatInput();
 			}
 		} catch (error:Dynamic) {
-			failed(error);
+			failed(ASCompat.asError(error));
 		}
 	}
 
@@ -1884,11 +1884,11 @@ class StarlingHud implements IGameHud {
 					ownerGlyphs[inActionName] = _loc3_;
 					placeGlyph(_loc3_, inOwner, iconPosition, iconScale);
 				} catch (error:Dynamic) {
-					failed(error);
+					failed(ASCompat.asError(error));
 				}
 			});
 		} catch (error:Dynamic) {
-			failed(error);
+			failed(ASCompat.asError(error));
 		}
 	}
 
@@ -1909,7 +1909,7 @@ class StarlingHud implements IGameHud {
 				}
 			mGlyphs.remove(inOwner);
 		} catch (error:Dynamic) {
-			failed(error);
+			failed(ASCompat.asError(error));
 		}
 	}
 
@@ -1963,7 +1963,7 @@ class StarlingHud implements IGameHud {
 			mGlyphTask = null;
 			updateControllerIcons();
 		} catch (error:Dynamic) {
-			failed(error);
+			failed(ASCompat.asError(error));
 		}
 	}
 
@@ -2089,7 +2089,7 @@ class StarlingHud implements IGameHud {
 				}
 				invalidateBounds();
 			} catch (error:Dynamic) {
-				failed(error);
+				failed(ASCompat.asError(error));
 			}
 		});
 	}
@@ -2139,7 +2139,7 @@ class StarlingHud implements IGameHud {
 		try {
 			return HudArt.ready || HudArt.fatalFailure ? HudArt.swfClass("floater_text") : null;
 		} catch (error:Dynamic) {
-			failed(error);
+			failed(ASCompat.asError(error));
 			_loc3_ = null;
 		}
 		return (_loc3_ : Dynamic);
@@ -2179,7 +2179,7 @@ class StarlingHud implements IGameHud {
 		try {
 			hideBuster();
 		} catch (error:Dynamic) {
-			failed(error);
+			failed(ASCompat.asError(error));
 		}
 	}
 
@@ -2194,7 +2194,7 @@ class StarlingHud implements IGameHud {
 			}
 			invalidateBounds();
 		} catch (error:Dynamic) {
-			failed(error);
+			failed(ASCompat.asError(error));
 		}
 	}
 
@@ -2208,7 +2208,7 @@ class StarlingHud implements IGameHud {
 				mWeapons[currentWeaponIndex].startCooldown(cooldownTime);
 			}
 		} catch (error:Dynamic) {
-			failed(error);
+			failed(ASCompat.asError(error));
 		}
 	}
 
@@ -2222,7 +2222,7 @@ class StarlingHud implements IGameHud {
 				mWeapons[currentWeaponIndex].stopCooldown();
 			}
 		} catch (error:Dynamic) {
-			failed(error);
+			failed(ASCompat.asError(error));
 		}
 	}
 
@@ -2236,7 +2236,7 @@ class StarlingHud implements IGameHud {
 				mConsumables[currentWeaponIndex].startCooldown(cooldownTime);
 			}
 		} catch (error:Dynamic) {
-			failed(error);
+			failed(ASCompat.asError(error));
 		}
 	}
 
@@ -2250,7 +2250,7 @@ class StarlingHud implements IGameHud {
 				mConsumables[currentWeaponIndex].stopCooldown();
 			}
 		} catch (error:Dynamic) {
-			failed(error);
+			failed(ASCompat.asError(error));
 		}
 	}
 
@@ -2298,7 +2298,7 @@ class StarlingHud implements IGameHud {
 				mConsumables[(slot : Int)].decrement();
 			}
 		} catch (error:Dynamic) {
-			failed(error);
+			failed(ASCompat.asError(error));
 		}
 	}
 
@@ -2310,7 +2310,7 @@ class StarlingHud implements IGameHud {
 			mConsumables[(slot : Int)].exhaust();
 			grayscaleGlyph(slot == 0 ? "use_consumable_one" : "use_consumable_two");
 		} catch (error:Dynamic) {
-			failed(error);
+			failed(ASCompat.asError(error));
 		}
 	}
 
@@ -2366,11 +2366,11 @@ class StarlingHud implements IGameHud {
 					mLootTask = mWork.doLater(2, closeTeamLoot);
 					invalidateBounds();
 				} catch (error:Dynamic) {
-					failed(error);
+					failed(ASCompat.asError(error));
 				}
 			});
 		} catch (error:Dynamic) {
-			failed(error);
+			failed(ASCompat.asError(error));
 		}
 	}
 
@@ -2395,7 +2395,7 @@ class StarlingHud implements IGameHud {
 				"onComplete": lootClosed
 			});
 		} catch (error:Dynamic) {
-			failed(error);
+			failed(ASCompat.asError(error));
 		}
 	}
 
@@ -2409,7 +2409,7 @@ class StarlingHud implements IGameHud {
 			}
 			invalidateBounds();
 		} catch (error:Dynamic) {
-			failed(error);
+			failed(ASCompat.asError(error));
 		}
 	}
 
@@ -2436,7 +2436,7 @@ class StarlingHud implements IGameHud {
 			mStacksShown = true;
 			updateStacks();
 		} catch (error:Dynamic) {
-			failed(error);
+			failed(ASCompat.asError(error));
 		}
 	}
 
@@ -2445,7 +2445,7 @@ class StarlingHud implements IGameHud {
 			mStacksShown = false;
 			updateStacks();
 		} catch (error:Dynamic) {
-			failed(error);
+			failed(ASCompat.asError(error));
 		}
 	}
 
@@ -2455,7 +2455,7 @@ class StarlingHud implements IGameHud {
 				mOffScreen.handlePicChange(playerId, picType);
 			}
 		} catch (error:Dynamic) {
-			failed(error);
+			failed(ASCompat.asError(error));
 		}
 	}
 
@@ -2469,7 +2469,7 @@ class StarlingHud implements IGameHud {
 				createBuff(buffGO);
 			}
 		} catch (error:Dynamic) {
-			failed(error);
+			failed(ASCompat.asError(error));
 		}
 	}
 
@@ -2481,7 +2481,7 @@ class StarlingHud implements IGameHud {
 				_loc2_.updateInstance();
 			}
 		} catch (error:Dynamic) {
-			failed(error);
+			failed(ASCompat.asError(error));
 		}
 	}
 
@@ -2490,7 +2490,7 @@ class StarlingHud implements IGameHud {
 			mPet = petNPC;
 			updatePet();
 		} catch (error:Dynamic) {
-			failed(error);
+			failed(ASCompat.asError(error));
 		}
 	}
 
@@ -2509,7 +2509,7 @@ class StarlingHud implements IGameHud {
 			}
 			invalidateBounds();
 		} catch (error:Dynamic) {
-			failed(error);
+			failed(ASCompat.asError(error));
 		}
 	}
 
@@ -2564,7 +2564,7 @@ class StarlingHud implements IGameHud {
 			_loc2_ = event.busterPoints;
 			setBusterPoints(_loc2_);
 		} catch (error:Dynamic) {
-			failed(error);
+			failed(ASCompat.asError(error));
 		}
 	}
 
@@ -2580,7 +2580,7 @@ class StarlingHud implements IGameHud {
 				hideBuster();
 			}
 		} catch (error:Dynamic) {
-			failed(error);
+			failed(ASCompat.asError(error));
 		}
 	}
 
@@ -2595,7 +2595,7 @@ class StarlingHud implements IGameHud {
 			mBusterBanner.stageRate = false;
 			mBusterBanner.play(1, false, busterReady);
 		} catch (error:Dynamic) {
-			failed(error);
+			failed(ASCompat.asError(error));
 		}
 	}
 
@@ -2615,7 +2615,7 @@ class StarlingHud implements IGameHud {
 				mBusterPulse.play(0, true);
 			}
 		} catch (error:Dynamic) {
-			failed(error);
+			failed(ASCompat.asError(error));
 		}
 	}
 
@@ -2664,7 +2664,7 @@ class StarlingHud implements IGameHud {
 				mEvents.dispatchEvent(new DungeonBusterControlActivatedEvent());
 			}
 		} catch (error:Dynamic) {
-			failed(error);
+			failed(ASCompat.asError(error));
 		}
 	}
 
@@ -2859,7 +2859,7 @@ class StarlingHud implements IGameHud {
 			try {
 				visible("floor_modifier0" + (index + 1), true);
 			} catch (error:Dynamic) {
-				failed(error);
+				failed(ASCompat.asError(error));
 			}
 		});
 		mModifierIcons.push(icon);
@@ -2877,7 +2877,7 @@ class StarlingHud implements IGameHud {
 				"npcId": (_loc1_ != null ? _loc1_.id : 0),
 				"isDead": mPetPortrait != null && mPetPortrait.isDead};
 		} catch (error:Dynamic) {
-			failed(error);
+			failed(ASCompat.asError(error));
 			_loc4_ = null;
 		}
 		return _loc4_;

@@ -59,9 +59,9 @@ class HudTicker {
 			advanceStage();
 		} catch (error:Dynamic) {
 			if (onError != null) {
-				onError(error);
+				onError(ASCompat.asError(error));
 			} else {
-				StarlingHud.reportError(error);
+				StarlingHud.reportError(ASCompat.asError(error));
 			}
 		}
 	}
@@ -112,9 +112,9 @@ class HudTicker {
 			view.tick(length, stageFrame);
 		} catch (error:Dynamic) {
 			if (onError != null) {
-				onError(error);
+				onError(ASCompat.asError(error));
 			} else {
-				StarlingHud.reportError(error);
+				StarlingHud.reportError(ASCompat.asError(error));
 			}
 		}
 	}
@@ -186,7 +186,7 @@ class HudTicker {
 							}
 						} catch (error:Dynamic) {
 							cancelBake(_loc5_);
-							StarlingHud.reportError(error);
+							StarlingHud.reportError(ASCompat.asError(error));
 						}
 						if (_loc4_ < mPending.length && mPending[_loc4_] == _loc5_) {
 							_loc4_++;

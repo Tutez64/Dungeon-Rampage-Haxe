@@ -120,7 +120,7 @@ class Console extends Sprite {
 				_so = SharedObject.getLocal(_config.sharedObjectName, _config.sharedObjectPath);
 				_soData = _so.data;
 			} catch (_loc_e_:Dynamic) {
-				_loc4_ = _loc_e_;
+				_loc4_ = ASCompat.asError(_loc_e_);
 			}
 		}
 		_config.get_style().updateStyleSheet();
@@ -518,7 +518,7 @@ class Console extends Sprite {
 				_loc3_.addEventListener("uncaughtError", uncaughtErrorHandle, false, 0, true);
 			}
 		} catch (_loc_e_:Dynamic) {
-			_loc4_ = _loc_e_;
+			_loc4_ = ASCompat.asError(_loc_e_);
 		}
 	}
 

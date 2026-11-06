@@ -147,7 +147,7 @@ class HudArt {
 			if (!sReady) {
 				throw error;
 			}
-			StarlingHud.reportError(error);
+			StarlingHud.reportError(ASCompat.asError(error));
 			_loc8_ = null;
 		}
 		if (_loc8_ == null && !sReady) {
@@ -265,7 +265,7 @@ class HudArt {
 		try {
 			_loc4_ = asset.getClass(name, true);
 		} catch (error:Dynamic) {
-			fatal("HUD class load failed: " + swf + " " + name + " " + Std.string(error.message));
+			fatal("HUD class load failed: " + swf + " " + name + " " + ASCompat.asError(error).message);
 		}
 		return _loc4_;
 	}
@@ -275,7 +275,7 @@ class HudArt {
 			try {
 				onLoaded(param1);
 			} catch (error:Dynamic) {
-				fatal("HUD startup SWF: " + path + " " + Std.string(error.message), true);
+				fatal("HUD startup SWF: " + path + " " + ASCompat.asError(error).message, true);
 			}
 		}, function() {
 			fatal("HUD startup SWF load failed: " + path, true);
@@ -419,7 +419,7 @@ class HudArt {
 		try {
 			startBake(sPixelScale);
 		} catch (error:Dynamic) {
-			fail("HUD context/bake: " + Std.string(error.message), error);
+			fail("HUD context/bake: " + ASCompat.asError(error).message, ASCompat.asError(error));
 		}
 	}
 
@@ -550,7 +550,7 @@ class HudArt {
 						_loc3_ = new StarlingText(node, node.textPages, node.pixelScale,
 							_loc4_ ? "glyphs" : (node.name == "NametagText" || node.name == "AlertText" ? "baked" : "auto"));
 					} catch (error:Dynamic) {
-						fail("HUD text preparation: " + path + " " + Std.string(error.message), error);
+						fail("HUD text preparation: " + path + " " + ASCompat.asError(error).message, ASCompat.asError(error));
 					};
 				} catch (__finallyError0:Dynamic) {
 					{
@@ -704,7 +704,7 @@ class HudArt {
 		try {
 			convertedSafely(art);
 		} catch (error:Dynamic) {
-			fail("HUD conversion completion: " + Std.string(error.message), error);
+			fail("HUD conversion completion: " + ASCompat.asError(error).message, ASCompat.asError(error));
 		}
 	}
 
@@ -809,7 +809,7 @@ class HudArt {
 					try {
 						_loc3_();
 					} catch (error:Dynamic) {
-						StarlingHud.reportError(error);
+						StarlingHud.reportError(ASCompat.asError(error));
 					}
 				}
 				if (_loc2_ != null) {
@@ -820,7 +820,7 @@ class HudArt {
 							try {
 								_loc3_();
 							} catch (rebakedError:Dynamic) {
-								StarlingHud.reportError(rebakedError);
+								StarlingHud.reportError(ASCompat.asError(rebakedError));
 							}
 						}
 				}
@@ -956,7 +956,7 @@ class HudArt {
 				rebake(Starling.contentScaleFactor);
 			}
 		} catch (error:Dynamic) {
-			fail("HUD scale monitor: " + Std.string(error.message), error);
+			fail("HUD scale monitor: " + ASCompat.asError(error).message, ASCompat.asError(error));
 		}
 	}
 
@@ -1033,7 +1033,7 @@ class HudArt {
 				try {
 					_loc2_ = _loc4_.getClass(symbolName, true);
 				} catch (error:Dynamic) {
-					fatal("HUD class load failed: " + _loc4_.swfPath + " " + symbolName + " " + Std.string(error.message));
+					fatal("HUD class load failed: " + _loc4_.swfPath + " " + symbolName + " " + ASCompat.asError(error).message);
 				}
 				if (_loc2_ != null) {
 					sClasses[symbolName] = _loc2_;
@@ -1147,7 +1147,7 @@ class HudArt {
 		try {
 			demandConvertedSafely(node);
 		} catch (error:Dynamic) {
-			fail("HUD demand completion: " + Std.string(error.message), error);
+			fail("HUD demand completion: " + ASCompat.asError(error).message, ASCompat.asError(error));
 		}
 	}
 
@@ -1167,7 +1167,7 @@ class HudArt {
 				try {
 					prepareText(node, sDemandActive.symbol);
 				} catch (error:Dynamic) {
-					fail("HUD text preparation: " + Std.string(error.message), error);
+					fail("HUD text preparation: " + ASCompat.asError(error).message, ASCompat.asError(error));
 				};
 			} catch (__finallyError0:Dynamic) {
 				{
@@ -1247,7 +1247,7 @@ class HudArt {
 			try {
 				_loc2_(node);
 			} catch (error:Dynamic) {
-				StarlingHud.reportError(error);
+				StarlingHud.reportError(ASCompat.asError(error));
 			}
 		}
 		nextDemand();

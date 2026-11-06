@@ -88,7 +88,7 @@ class AnimationAtlasFactory extends JsonFactory {
 						_loc3_.addSheet(fullName, _loc2_, json);
 					} catch (e:Dynamic) {
 						_loc3_.removeSheet(fullName);
-						onError("Failed to add sheet \'" + fullName + "\': " + Std.string(e.message));
+						onError("Failed to add sheet \'" + fullName + "\': " + ASCompat.asError(e).message);
 						return;
 					}
 					param1.removeObject(fullName);
@@ -114,7 +114,7 @@ class AnimationAtlasFactory extends JsonFactory {
 					try {
 						param1.addAsset(baseName, new AnimationAtlas(json, _loc2_), "animationAtlas");
 					} catch (e:Dynamic) {
-						onError("Failed to create animation atlas \'" + baseName + "\': " + Std.string(e.message));
+						onError("Failed to create animation atlas \'" + baseName + "\': " + ASCompat.asError(e).message);
 					}
 				});
 			}

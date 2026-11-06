@@ -200,7 +200,7 @@ class LoadingPrewarm {
 		try {
 			plan();
 		} catch (error:Dynamic) {
-			Logger.error("LoadingPrewarm: planning failed: " + Std.string(error.message));
+			Logger.error("LoadingPrewarm: planning failed: " + ASCompat.asError(error).message);
 		}
 		var _loc2_ = mDBFacade.assetLoadingComponent;
 		var _loc4_:PrewarmJob;
@@ -290,7 +290,7 @@ class LoadingPrewarm {
 			} catch (error:Dynamic) {
 				_loc8_.abort(mDBFacade);
 				_loc2_ = PrewarmJob.DONE;
-				Logger.error("LoadingPrewarm: building " + _loc8_.name + " failed: " + Std.string(error.message));
+				Logger.error("LoadingPrewarm: building " + _loc8_.name + " failed: " + ASCompat.asError(error).message);
 			}
 			if (_loc2_ == PrewarmJob.DONE) {
 				mNext = mNext + 1;
@@ -794,7 +794,7 @@ private class PrewarmJob {
 						dbFacade.effectPool.checkin(_loc3_);
 					}
 				} catch (error:Dynamic) {
-					Logger.error("LoadingPrewarm: returning " + name + " to the effect pool failed: " + Std.string(error.message));
+					Logger.error("LoadingPrewarm: returning " + name + " to the effect pool failed: " + ASCompat.asError(error).message);
 				}
 			}
 	}

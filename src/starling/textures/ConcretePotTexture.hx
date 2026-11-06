@@ -133,7 +133,7 @@ class ConcretePotTexture extends ConcreteTexture {
 			try {
 				(base : ASAny)["uploadFromBitmapDataAsync"](source, mipLevel);
 			} catch (error:Dynamic) {
-				if (!(error.errorID == 3708 || error.errorID == 1069)) {
+				if (!(ASCompat.asError(error).errorID == 3708 || ASCompat.asError(error).errorID == 1069)) {
 					throw error;
 				}
 				sAsyncUploadEnabled = false;

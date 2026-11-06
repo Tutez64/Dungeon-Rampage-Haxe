@@ -247,7 +247,7 @@ class SessionTransport extends EventDispatcher implements IGameTransport {
 				try {
 					mInner.connect();
 				} catch (error:Dynamic) {
-					finishWithFailure((602 : UInt), error.message);
+					finishWithFailure((602 : UInt), ASCompat.asError(error).message);
 					{
 						{
 							mInsideConnect = false;
@@ -363,7 +363,7 @@ class SessionTransport extends EventDispatcher implements IGameTransport {
 		try {
 			return ASCompat.dynamicAs(mCredentialSource(), SessionCredential);
 		} catch (error:Dynamic) {
-			warnOnceAboutCredential("SessionTransport could not read its credential: " + Std.string(error.message) + "; sending none.");
+			warnOnceAboutCredential("SessionTransport could not read its credential: " + ASCompat.asError(error).message + "; sending none.");
 		}
 		return null;
 	}
@@ -467,7 +467,7 @@ class SessionTransport extends EventDispatcher implements IGameTransport {
 			_loc2_.sendText(text);
 			return mInner == _loc2_ && _loc2_.connected;
 		} catch (error:Dynamic) {
-			Logger.warnch("WS", "SessionTransport could not send a control message: " + Std.string(error.message));
+			Logger.warnch("WS", "SessionTransport could not send a control message: " + ASCompat.asError(error).message);
 			_loc5_ = false;
 		}
 		return _loc5_;
@@ -632,7 +632,7 @@ class SessionTransport extends EventDispatcher implements IGameTransport {
 		try {
 			_loc1_ = ASCompat.dynamicAs(mInnerFactory(_loc2_), IGameTransport);
 		} catch (factoryError:Dynamic) {
-			attemptFailed(0, "could not build a transport for " + _loc2_ + ": " + Std.string(factoryError.message));
+			attemptFailed(0, "could not build a transport for " + _loc2_ + ": " + ASCompat.asError(factoryError).message);
 			return;
 		}
 		if (_loc1_ == null) {
@@ -644,7 +644,7 @@ class SessionTransport extends EventDispatcher implements IGameTransport {
 		try {
 			_loc1_.connect();
 		} catch (connectError:Dynamic) {
-			attemptFailed(0, connectError.message);
+			attemptFailed(0, ASCompat.asError(connectError).message);
 		}
 	}
 

@@ -220,7 +220,7 @@ class GameMaster {
 		try {
 			buildDictionary(splitTests);
 		} catch (_loc_e_:Dynamic) {
-			_loc4_ = _loc_e_;
+			_loc4_ = ASCompat.asError(_loc_e_);
 			Logger.fatal("Failed to process DB_GameMaster_C.json\n" + Std.string(_loc4_.message), _loc4_);
 		}
 		PostProcess(splitTests);

@@ -203,7 +203,7 @@ class AssetLoader {
 			mAssetCreatedCallback(mAssetLoaderInfo, _loc2_);
 			updateTrackingLoad(_loc4_.getRawAssetPath());
 		} catch (e:Dynamic) {
-			Logger.error("Loader.loadComplete error processing: " + mAssetLoaderInfo.getRawAssetPath(), e);
+			Logger.error("Loader.loadComplete error processing: " + mAssetLoaderInfo.getRawAssetPath(), ASCompat.asError(e));
 			if (mErrorCallback != null) {
 				mErrorCallback(mAssetLoaderInfo);
 			}
@@ -225,7 +225,7 @@ class AssetLoader {
 			mAssetCreatedCallback(mAssetLoaderInfo, _loc2_);
 			updateTrackingLoad(_loc4_.getRawAssetPath());
 		} catch (e:Dynamic) {
-			Logger.error("Loader.urlLoadComplete error processing: " + mAssetLoaderInfo.getRawAssetPath(), e);
+			Logger.error("Loader.urlLoadComplete error processing: " + mAssetLoaderInfo.getRawAssetPath(), ASCompat.asError(e));
 			updateTrackingLoad(_loc4_.getRawAssetPath());
 			if (mErrorCallback != null) {
 				mErrorCallback(mAssetLoaderInfo);

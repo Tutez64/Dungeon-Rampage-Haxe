@@ -87,7 +87,7 @@ class DisplayTimingSettings {
 			}
 		} catch (error:Dynamic) {
 			mVsyncAvailable = false;
-			Logger.warn("Could not apply VSync preference: " + Std.string(error.message));
+			Logger.warn("Could not apply VSync preference: " + ASCompat.asError(error).message);
 			notify("vsync");
 		}
 	}

@@ -26,7 +26,7 @@ class StarlingPropManifest {
 					_loc2_.open(manifestFile, flash.filesystem.FileMode.READ);
 					_loc3_ = haxe.Json.parse(_loc2_.readUTFBytes(_loc2_.bytesAvailable));
 				} catch (error:Dynamic) {
-					Logger.error("StarlingPropManifest.load: could not read " + manifestFile.nativePath + ": " + Std.string(error.message));
+					Logger.error("StarlingPropManifest.load: could not read " + manifestFile.nativePath + ": " + ASCompat.asError(error).message);
 					{
 						{
 							_loc2_.close();

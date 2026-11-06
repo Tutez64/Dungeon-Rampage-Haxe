@@ -55,7 +55,7 @@ class SafeAtfTextureFactory extends AtfTextureFactory {
 						try {
 							texture.root.uploadAtfData(data);
 						} catch (e:Dynamic) {
-							helper.log("Texture restoration failed: " + Std.string(e.message));
+							helper.log("Texture restoration failed: " + ASCompat.asError(e).message);
 						}
 						helper.onEndRestore();
 					});
@@ -74,7 +74,7 @@ class SafeAtfTextureFactory extends AtfTextureFactory {
 			try {
 				texture = Texture.fromData(reference.data, reference.textureOptions);
 			} catch (e:Dynamic) {
-				onError(e.message);
+				onError(ASCompat.asError(e).message);
 			}
 			if (texture != null) {
 				base = texture.root.base;

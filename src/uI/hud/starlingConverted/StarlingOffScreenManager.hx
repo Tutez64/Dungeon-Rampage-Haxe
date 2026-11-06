@@ -82,7 +82,7 @@ class StarlingOffScreenManager {
 				add(_loc2_);
 			}
 		} catch (error:Dynamic) {
-			StarlingHud.reportError(error);
+			StarlingHud.reportError(ASCompat.asError(error));
 		}
 	}
 
@@ -98,7 +98,7 @@ class StarlingOffScreenManager {
 				_loc2_++;
 			}
 		} catch (error:Dynamic) {
-			StarlingHud.reportError(error);
+			StarlingHud.reportError(ASCompat.asError(error));
 		}
 	}
 
@@ -232,7 +232,7 @@ class StarlingOffScreenManager {
 				try {
 					_loc1_.dispose();
 				} catch (error:Dynamic) {
-					StarlingHud.reportError(error);
+					StarlingHud.reportError(ASCompat.asError(error));
 				}
 			}
 		mClips.length = 0;

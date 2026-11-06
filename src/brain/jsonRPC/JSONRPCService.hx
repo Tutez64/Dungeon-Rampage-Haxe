@@ -95,7 +95,7 @@ function getMethod(name:String, url:String):ASFunction {
 			}, false, 7000);
 			Logger.debugch("HTTP", Std.string(counter) + " Request=" + url + " data=" + sanitizeForLog(Std.string(req.data)));
 		} catch (e:Dynamic) {
-			inv.handleError(e);
+			inv.handleError(ASCompat.asError(e));
 			return inv;
 		}
 		resp.addEventListener("ioError", function(param1:flash.events.IOErrorEvent) {
@@ -135,7 +135,7 @@ function getMethod(name:String, url:String):ASFunction {
 				_loc3_ = JsonCodec.decode(_loc2_);
 			} catch (e:Dynamic) {
 				Logger.warn(Std.string(counter) + " JSONRPCService error parsing JSON: " + sanitizeForLog(_loc2_, name));
-				inv.handleError(e);
+				inv.handleError(ASCompat.asError(e));
 				return;
 			}
 			if (_loc3_.error == null) {
