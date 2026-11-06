@@ -74,6 +74,9 @@ class StarlingLayerManager {
 	}
 
 	public function init(stage:flash.display.Stage, designWidth:Float, designHeight:Float) {
+		#if !flash
+		starling.display.Mesh.defaultStyle = starling.styles.MultiAtlasStyle;
+		#end
 		mStarling = new Starling(starling.display.Sprite, stage);
 		mStarling.stage.stageWidth = ASCompat.floatToInt(designWidth);
 		mStarling.stage.stageHeight = ASCompat.floatToInt(designHeight);
