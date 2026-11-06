@@ -5,6 +5,7 @@ import flash.display.MovieClip;
 #if cpp
 import flash.display.DisplayObject;
 import flash.display.DisplayObjectContainer;
+import flash.display.LoaderInfo;
 import flash.media.Sound;
 import flash.text.TextField;
 import flash.text.TextFormat;
@@ -24,6 +25,8 @@ import sys.FileSystem;
 #end
 
 #if cpp
+@:access(openfl.display.DisplayObject)
+@:access(openfl.display.LoaderInfo)
 @:access(openfl.display.MovieClip)
 @:access(swf.exporters.animate.AnimateLibrary)
 @:access(swf.exporters.animate.AnimateSpriteSymbol)
@@ -94,6 +97,7 @@ class SwfAsset extends Asset {
 		if (mPreprocessedRootObject == null) {
 			mPreprocessedRootObject = instantiatePreprocessedRootObject(mPreprocessedLibrary, mSwfPath);
 			if (mPreprocessedRootObject != null) {
+				giveRootLoaderInfo(mPreprocessedRootObject, mPreprocessedLibrary, mSwfPath);
 				applyRootInstanceProperties(mPreprocessedRootObject, mPreprocessedLibrary, mSwfPath);
 				applyExportedFonts(mPreprocessedRootObject, mPreprocessedLibraryName, mSwfPath);
 			}
@@ -292,6 +296,21 @@ class SwfAsset extends Asset {
 			Reflect.setField(cloned, field, cloneInstanceProperty(Reflect.field(value, field)));
 		}
 		return cloned;
+	}
+
+	// In Flash, the root of a loaded SWF reports its LoaderInfo (url, frame rate...), which the
+	// game reads (the frame rate of an intro cutscene's video). A preprocessed library's root
+	// comes from no Loader: give it one with what the library knows.
+	function giveRootLoaderInfo(root:MovieClip, library:AssetLibrary, swfPath:String):Void {
+		var animateLibrary:AnimateLibrary = Std.isOfType(library, AnimateLibrary) ? cast library : null;
+		var info = LoaderInfo.create(null);
+		info.url = swfPath;
+		info.contentType = "application/x-shockwave-flash";
+		info.content = root;
+		if (animateLibrary != null) {
+			info.frameRate = animateLibrary.frameRate;
+		}
+		root.__loaderInfo = info;
 	}
 
 	function instantiatePreprocessedRootObject(library:AssetLibrary, swfPath:String):MovieClip {
