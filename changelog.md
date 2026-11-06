@@ -29,6 +29,8 @@ visual problems or regressions. Please report them.
   without allocations, and on Linux faster access to the garbage collector's thread data.
 - Internal: the conversion also covers the classes the official game now compiles from Haxe, with their types
   taken from its bytecode.
+- Logs: an uncaught error such as a null access is described in the logs, instead of `Unknown error`, which
+  makes bug reports more useful.
 - Internal: the IntelliJ project uses the Haxe plugin v2, and `Execute` runs `lime test` on `project.xml`. The
   build steps register libhxcpp under its own name too, as the plugin looks for it: run
   `haxelib dev libhxcpp submodules/libhxcpp` once.
