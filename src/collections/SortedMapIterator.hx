@@ -18,7 +18,7 @@ class SortedMapIterator implements IMapIterator {
 	public function next():ASAny {
 		if (_next == null) {
 			_current = null;
-			return /*undefined*/ null;
+			return ASCompat.UNDEFINED;
 		}
 		_current = _next;
 		var _loc1_ = _map.indexOfNode(_current, _nextIndex);
@@ -37,7 +37,7 @@ class SortedMapIterator implements IMapIterator {
 		if (_current != null) {
 			return _current.key;
 		}
-		return /*undefined*/ null;
+		return ASCompat.UNDEFINED;
 	}
 
 	@:isVar public var current(get, never):ASAny;
@@ -46,6 +46,6 @@ class SortedMapIterator implements IMapIterator {
 		if (_current != null) {
 			return _current.item;
 		}
-		return /*undefined*/ null;
+		return ASCompat.UNDEFINED;
 	}
 }

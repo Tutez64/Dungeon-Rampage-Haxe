@@ -36,7 +36,7 @@ class SortedMap {
 	public function removeKey(key:ASAny):ASAny {
 		var _loc2_:ASAny = nodeFor(key);
 		if (ASCompat.typeof(_loc2_) == "undefined") {
-			return /*undefined*/ null;
+			return ASCompat.UNDEFINED;
 		}
 		removeNodeAt(_nodes.indexOf(_loc2_));
 		return _loc2_.item;
@@ -63,13 +63,13 @@ class SortedMap {
 			if (_stringMap.hasKey(key)) {
 				return _stringMap.get(key);
 			}
-			return /*undefined*/ null;
+			return ASCompat.UNDEFINED;
 		}
 		var _loc2_ = _items;
 		if (_loc2_.exists(key)) {
 			return _items[key];
 		}
-		return /*undefined*/ null;
+		return ASCompat.UNDEFINED;
 	}
 
 	public function nodeAt(index:Int):SortedMapNode {
@@ -86,7 +86,7 @@ class SortedMap {
 	public function itemFor(key:ASAny):ASAny {
 		var _loc2_:ASAny = nodeFor(key);
 		if (ASCompat.typeof(_loc2_) == "undefined") {
-			return /*undefined*/ null;
+			return ASCompat.UNDEFINED;
 		}
 		return _loc2_.item;
 	}

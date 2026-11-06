@@ -294,7 +294,7 @@ class TweeningProxy {
 	}
 
 	function createTween(target:ASObject, duration:Float, vars:ASObject, fromVars:ASObject):TweenHandle {
-		var _loc14_:ASAny = /*undefined*/ null;
+		var _loc14_:ASAny = ASCompat.UNDEFINED;
 		var _loc10_:TintAdapter = null;
 		var _loc15_:GlowFilterAdapter = null;
 		var _loc7_:ColorMatrixFilterAdapter = null;

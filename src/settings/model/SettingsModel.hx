@@ -279,7 +279,7 @@ class SettingsModel {
 	}
 
 	function loadAndApply() {
-		var _loc2_:ASAny = /*undefined*/ null;
+		var _loc2_:ASAny = ASCompat.UNDEFINED;
 		mStoredValues = mStore.readAll(mCatalog);
 		mValues = {};
 		mLoadedValues = {};

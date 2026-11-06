@@ -43,7 +43,7 @@ class SimplePriorityQueue {
 	}
 
 	public function dequeue():IPrioritizable {
-		var _loc1_:ASAny = /*undefined*/ null;
+		var _loc1_:ASAny = ASCompat.UNDEFINED;
 		if (_count >= 1) {
 			_loc1_ = _heap[1];
 			_posLookup.remove(_loc1_);

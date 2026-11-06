@@ -9,7 +9,7 @@ class LinkedListIterator implements ILinkedListIterator {
 
 	public function next():ASAny {
 		if (_next == null) {
-			return /*undefined*/ null;
+			return ASCompat.UNDEFINED;
 		}
 		var _loc1_:ASAny = _next.item;
 		_next = _next.right;

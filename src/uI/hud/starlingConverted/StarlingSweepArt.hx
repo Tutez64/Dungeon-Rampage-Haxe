@@ -83,7 +83,7 @@ class StarlingSweepArt {
 		var _loc7_:Rectangle = null;
 		var _loc12_:String = null;
 		var _loc11_:Rectangle = null;
-		var _loc5_:ASAny = /*undefined*/ null;
+		var _loc5_:ASAny = ASCompat.UNDEFINED;
 		var _loc4_:StarlingSweepArt = null;
 		var _loc6_ = clip.totalFrames;
 		if (_loc6_ < 2 || _loc6_ > 200) {
@@ -700,7 +700,7 @@ class StarlingSweepArt {
 		var __finallyReturn1:BakedPicture;
 		var __finallyReturn2:BakedPicture;
 		var _loc6_:BitmapData = null;
-		var _loc9_:ASAny = /*undefined*/ null;
+		var _loc9_:ASAny = ASCompat.UNDEFINED;
 		var _loc12_:Matrix = null;
 		var _loc10_:Vector<UInt> = /*undefined*/ null;
 		var _loc11_ = 0;

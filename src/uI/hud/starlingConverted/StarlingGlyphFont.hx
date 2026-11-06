@@ -404,7 +404,7 @@ class StarlingGlyphFont {
 		var _loc2_:ASObject = null;
 		var _loc4_:String = null;
 		var _loc7_:String = null;
-		var _loc8_:ASAny = /*undefined*/ null;
+		var _loc8_:ASAny = ASCompat.UNDEFINED;
 		var _loc3_ = field.defaultTextFormat;
 		var _loc6_ = field.getBounds(field);
 		var _loc5_:Array<ASAny> = [

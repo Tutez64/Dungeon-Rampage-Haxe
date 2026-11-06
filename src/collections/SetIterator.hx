@@ -32,7 +32,7 @@ class SetIterator implements ISetIterator {
 	public function next():ASAny {
 		if (_next == -1) {
 			_current = -1;
-			return /*undefined*/ null;
+			return ASCompat.UNDEFINED;
 		}
 		_current = _next;
 		_next = _next >= _items.length - 1 ? -1 : _next + 1;

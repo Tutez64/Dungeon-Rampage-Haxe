@@ -241,7 +241,7 @@ class BakedGlyphFont {
 		var _loc4_:String;
 		var __ax4_iter_505:Array<ASAny>;
 		var _loc6_:String = null;
-		var _loc7_:ASAny = /*undefined*/ null;
+		var _loc7_:ASAny = ASCompat.UNDEFINED;
 		var _loc3_ = field.defaultTextFormat;
 		var _loc5_:Array<ASAny> = [
 			_loc3_.font,

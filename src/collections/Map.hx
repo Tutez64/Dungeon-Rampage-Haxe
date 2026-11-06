@@ -80,14 +80,14 @@ class Map {
 		var _loc4_:ASDictionary<ASAny, ASAny> = null;
 		if (Std.isOfType(key, String)) {
 			if (!_stringMap.hasKey(key)) {
-				return /*undefined*/ null;
+				return ASCompat.UNDEFINED;
 			}
 			_loc2_ = _stringMap.get(key);
 			_stringMap.remove(key);
 		} else {
 			_loc3_ = _keys;
 			if (!_loc3_.exists(key)) {
-				return /*undefined*/ null;
+				return ASCompat.UNDEFINED;
 			}
 			_loc2_ = _items[key];
 			_loc4_ = _keys;

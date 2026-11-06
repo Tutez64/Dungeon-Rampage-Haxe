@@ -102,7 +102,7 @@ class StringKeyStore {
 	public function get(key:String):ASAny {
 		if (isReserved(key)) {
 			if (_overflow == null) {
-				return /*undefined*/ null;
+				return ASCompat.UNDEFINED;
 			}
 			return _overflow[ASCompat.escape(key)];
 		}

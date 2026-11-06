@@ -16,7 +16,7 @@ class SettingsStore {
 
 	public static function applyStartupFlags(featureFlags:FeatureFlags) {
 		var _loc3_:String = null;
-		var _loc5_:ASAny = /*undefined*/ null;
+		var _loc5_:ASAny = ASCompat.UNDEFINED;
 		var _loc2_:ASObject = new LocalSettingsFile().read();
 		if (_loc2_ == null) {
 			return;
@@ -67,11 +67,11 @@ class SettingsStore {
 
 	static function storedFlagValue(stored:ASObject, id:String, defaultValue:Bool):ASAny {
 		if (stored == null || !stored.hasOwnProperty(id)) {
-			return /*undefined*/ null;
+			return ASCompat.UNDEFINED;
 		}
 		var _loc4_ = coerceBoolean(stored[id]);
 		if (!stored.hasOwnProperty("settingsFileVersion") && _loc4_ == defaultValue) {
-			return /*undefined*/ null;
+			return ASCompat.UNDEFINED;
 		}
 		return _loc4_;
 	}
@@ -88,7 +88,7 @@ class SettingsStore {
 	}
 
 	public function readAll(catalog:SettingsCatalog):ASObject {
-		var _loc4_:ASAny = /*undefined*/ null;
+		var _loc4_:ASAny = ASCompat.UNDEFINED;
 		var _loc2_:ASObject = mLocalFile.read();
 		var _loc3_:ASObject = {};
 		var _loc5_:SettingDefinition;
