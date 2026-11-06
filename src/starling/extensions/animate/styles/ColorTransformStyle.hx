@@ -50,7 +50,7 @@ class ColorTransformStyle extends MeshStyle {
 		} else {
 			if (_loc4_ == null) {
 				_loc3_ = Std.isOfType(mesh.style, MaskStyle);
-				if (!_loc3_ && mesh.style != null && mesh.style.type != MeshStyle) {
+				if (!_loc3_ && mesh.style != null && mesh.style.type != MeshStyle && mesh.style.type != Mesh.defaultStyle) {
 					return;
 				}
 				_loc4_ = ASCompat.coerce(_loc3_ ? new MaskColorTransformStyle() : new ColorTransformStyle(), ColorTransformStyle);
