@@ -24,8 +24,8 @@ visual problems or regressions. Please report them.
 
 ### Improved
 
-- Performance: expect similar or better FPS. Among the changes: faster type checks and dictionary lookups in
-  the converted game code, text no longer looking for a missing font file on each update, loops over vectors
+- Performance: expect better FPS. Among the changes: meshes from several atlases drawn in one draw
+  call, faster type checks and dictionary lookups in the converted game code, text no longer looking for a missing font file on each update, loops over vectors
   without allocations, and on Linux faster access to the garbage collector's thread data.
 - Internal: the conversion also covers the classes the official game now compiles from Haxe, with their types
   taken from its bytecode.
