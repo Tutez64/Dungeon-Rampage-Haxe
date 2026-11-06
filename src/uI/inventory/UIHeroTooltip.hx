@@ -1,0 +1,64 @@
+package uI.inventory;
+
+import account.AvatarInfo;
+import brain.utils.TextUtil;
+import facade.DBFacade;
+import facade.GameMasterLocale;
+import facade.Locale;
+import gameMasterDictionary.GMHero;
+import flash.display.MovieClip;
+import flash.text.TextField;
+
+class UIHeroTooltip extends MovieClip {
+	var mDBFacade:DBFacade;
+
+	var mRoot:MovieClip;
+
+	var mLabel:TextField;
+
+	var mLevelLabel:TextField;
+
+	var mDescriptionLabel:TextField;
+
+	var mStar:MovieClip;
+
+	public function new(dbFacade:DBFacade, templateClass:Dynamic) {
+		super();
+		mDBFacade = dbFacade;
+		mRoot = ASCompat.coerce(ASCompat.createInstance(templateClass, []), flash.display.MovieClip);
+		this.addChild(mRoot);
+		mLabel = ASCompat.coerce((mRoot : ASAny).title_label, flash.text.TextField);
+		mLevelLabel = ASCompat.coerce((mRoot : ASAny).level_star_label, flash.text.TextField);
+		mDescriptionLabel = ASCompat.coerce((mRoot : ASAny).description_label, flash.text.TextField);
+		mStar = ASCompat.coerce((mRoot : ASAny).star, flash.display.MovieClip);
+	}
+
+	public function destroy() {
+		mDBFacade = null;
+		this.removeChild(mRoot);
+		mRoot = null;
+	}
+
+	@:isVar public var ownedHero(never, set):AvatarInfo;
+
+	public function set_ownedHero(avatarInfo:AvatarInfo):AvatarInfo {
+		TextUtil.setText(mLabel, GameMasterLocale.getGameMasterSubString("SKIN_NAME", avatarInfo.gmHero.Constant).toUpperCase());
+		TextUtil.setText(mLevelLabel, Std.string(avatarInfo.cloutLevel));
+		mLevelLabel.visible = true;
+		mStar.visible = true;
+		mDescriptionLabel.visible = false;
+		return avatarInfo;
+	}
+
+	@:isVar public var unownedHero(never, set):GMHero;
+
+	public function set_unownedHero(gmHero:GMHero):GMHero {
+		TextUtil.setText(mLabel, GameMasterLocale.getGameMasterSubString("SKIN_NAME", gmHero.Constant).toUpperCase());
+		mLevelLabel.visible = false;
+		mStar.visible = false;
+		Locale.setText(mDescriptionLabel, "HERO_NOT_UNLOCKED_TOOLTIP", null, 1.55);
+		TextUtil.fitToField(mDescriptionLabel);
+		mDescriptionLabel.visible = true;
+		return gmHero;
+	}
+}
