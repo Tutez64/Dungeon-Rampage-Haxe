@@ -384,25 +384,34 @@ class StarlingSweepArt {
 				_loc20_ = _loc14_;
 				_loc9_ = 2147483647;
 				_loc37_ = ASCompat.floatToInt(Math.max(1, total / 6));
+				// The anti-aliasing of the art's edges differs from Flash's by a fraction of a pixel, and
+				// several centres can then tie with no mismatch, of which the first was kept: one pixel off,
+				// it tilted the sweep's edges. The search goes by half pixels, and a tie goes to the centre
+				// whose edges are rays from it, as the samples along each direction then agree.
+				var bestMixed = 2147483647;
 				_loc24_ = -2;
 				while (_loc24_ <= 2) {
 					_loc23_ = -2;
 					while (_loc23_ <= 2) {
 						_loc11_ = 0;
 						_loc19_ = 1;
-						while (_loc19_ <= total && _loc11_ < _loc9_) {
+						while (_loc19_ <= total && _loc11_ <= _loc9_) {
 							_loc10_ = runs(coverage(_loc29_[_loc19_], _loc26_, _loc32_, _loc17_ + _loc23_, _loc14_ + _loc24_, _loc12_, null));
 							_loc11_ += mismatches(_loc29_[_loc19_], _loc26_, _loc10_, _loc32_, _loc21_, _loc17_ + _loc23_, _loc14_ + _loc24_);
 							_loc19_ += _loc37_;
 						}
-						if (_loc11_ < _loc9_) {
-							_loc9_ = _loc11_;
-							_loc18_ = _loc17_ + _loc23_;
-							_loc20_ = _loc14_ + _loc24_;
+						if (_loc11_ <= _loc9_) {
+							var mixed = mixedVotes(_loc29_, _loc26_, _loc32_, total, _loc37_, _loc17_ + _loc23_, _loc14_ + _loc24_, _loc12_);
+							if (_loc11_ < _loc9_ || mixed < bestMixed) {
+								_loc9_ = _loc11_;
+								bestMixed = mixed;
+								_loc18_ = _loc17_ + _loc23_;
+								_loc20_ = _loc14_ + _loc24_;
+							}
 						}
-						_loc23_ += 1;
+						_loc23_ += 0.5;
 					}
-					_loc24_ += 1;
+					_loc24_ += 0.5;
 				}
 				_loc15_ = new StarlingSweepArt();
 				_loc15_.frames = total;
@@ -584,6 +593,37 @@ class StarlingSweepArt {
 			_loc9_++;
 		}
 		return _loc14_;
+	}
+
+	/** Directions in which the samples of coverage() disagree, over the frames the centre search samples. **/
+	static function mixedVotes(frames:Vector<Vector<UInt>>, union:Vector<UInt>, w:Int, total:Int, step:Int, pcx:Float, pcy:Float, radius:Float):Int {
+		var count = 0;
+		var frame = 1;
+		while (frame <= total) {
+			var px = frames[frame];
+			for (deg in 0...360) {
+				var sin = Math.sin((deg + 0.5) * 0.017453292519943295);
+				var cos = Math.cos((deg + 0.5) * 0.017453292519943295);
+				var covered = 0;
+				var uncovered = 0;
+				var r = 0.35;
+				while (r < 0.8) {
+					var i = ASCompat.floatToInt(pcy - radius * r * cos) * w + ASCompat.floatToInt(pcx + radius * r * sin);
+					if (i >= 0 && i < union.length) {
+						var unionAlpha = ((union[i] : Int) >>> 24);
+						if (unionAlpha >= 40) {
+							if (((px[i] : Int) >>> 24) * 2 >= unionAlpha) covered++; else uncovered++;
+						}
+					}
+					r += 0.2;
+				}
+				if (covered > 0 && uncovered > 0) {
+					count++;
+				}
+			}
+			frame += step;
+		}
+		return count;
 	}
 
 	static function mismatches(px:Vector<UInt>, union:Vector<UInt>, arcs:Vector<Float>, w:Int, h:Int, pcx:Float, pcy:Float):Int {
