@@ -28,10 +28,27 @@ class DisplayTimingSettings {
 		mStage.addEventListener("vSyncStateChangeAvailability", onVsyncAvailability);
 		NativeApplication.nativeApplication.addEventListener("exiting", onExit);
 		var _loc2_:ASObject = new LocalSettingsFile().read();
-		frameRate = _loc2_ != null && _loc2_.hasOwnProperty("fps") ? FrameRateOptions.coerce(_loc2_["fps"]) : 60;
+		frameRate = _loc2_ != null && _loc2_.hasOwnProperty("fps") ? FrameRateOptions.coerce(_loc2_["fps"]) : defaultFrameRate();
 		if (_loc2_ != null && _loc2_.hasOwnProperty("vsync")) {
 			mVsync = _loc2_["vsync"] == true || ASCompat.toString(_loc2_["vsync"]) == "true" || ASCompat.toString(_loc2_["vsync"]) == "1";
 		}
+	}
+
+	/** Without a saved choice, the main screen's refresh rate, or 120 FPS when it is unknown, as DRH had before 1.0. **/
+	public function defaultFrameRate():Float {
+		#if flash
+		return 60;
+		#else
+		var rate = 120.0;
+		try {
+			var mode = Screen.mainScreen.mode;
+			if (mode != null && mode.refreshRate > 0) {
+				rate = mode.refreshRate;
+			}
+		} catch (error:Dynamic) {}
+		Logger.info("Default frame rate: " + rate);
+		return rate;
+		#end
 	}
 
 	@:isVar public var frameRates(get, never):FrameRateOptions;
