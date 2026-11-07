@@ -1405,8 +1405,12 @@ class FRESteamWorks extends EventDispatcher {
 			var origins:Array<EInputActionOrigin> = [];
 			Steam.controllers.getDigitalActionOrigins(parseHandle(inputHandle), parseHandle(actionSetHandle), parseHandle(digitalActionHandle), origins);
 			for (origin in origins) {
+				// SteamWrap gives every slot of Steam's array: the empty ones hold k_EInputActionOrigin_None.
 				if ((origin : Null<EInputActionOrigin>) != null) {
-					result.push(Std.string(cast(origin, Int)));
+					var originId = Std.string(cast(origin, Int));
+					if (originId != "0") {
+						result.push(originId);
+					}
 				}
 			}
 		}
