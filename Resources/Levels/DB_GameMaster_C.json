@@ -1,5 +1,5 @@
 {
-  "Exported": 1793810257,
+  "Exported": 1793981527,
   "Hero" : [
     {
       "Release" : "L",
@@ -114699,7 +114699,7 @@
     {
       "Release" : "L",
       "Id" : 51402,
-      "Price" : 32,
+      "Price" : 35,
       "Name" : "30 Item Slots",
       "CurrencyType" : "PREMIUM",
       "Tab" : "STORAGE",
@@ -114727,7 +114727,7 @@
     {
       "Release" : "L",
       "Id" : 51404,
-      "Price" : 7,
+      "Price" : 10,
       "Name" : "5 Item Slots",
       "CurrencyType" : "PREMIUM",
       "Tab" : "STORAGE",
