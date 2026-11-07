@@ -1,6 +1,6 @@
 assets.swf:
 Main DefineSrite, frame 1: duplicate last PlaceObject2 and edit characterId and depth to the chid of the added (duplicated) text
 Horizontal: 1000
-Vertical: 550
+Vertical: 600
 
 DefineFont3: incorporate needed characters
