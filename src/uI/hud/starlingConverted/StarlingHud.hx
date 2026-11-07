@@ -1076,7 +1076,7 @@ class StarlingHud implements IGameHud {
 		if (skin == null) {
 			return;
 		}
-		avatar = ASCompat.reinterpretAs(ASCompat.thisOrDefault(node("avatar"), node("UI_profile.avatar")), DisplayObjectContainer);
+		avatar = ASCompat.reinterpretAs(ASCompat.orValue(node("avatar"), node("UI_profile.avatar")), DisplayObjectContainer);
 		if (avatar == null) {
 			return;
 		}
@@ -1143,7 +1143,7 @@ class StarlingHud implements IGameHud {
 	}
 
 	function attachPortrait(cell:BakedCell) {
-		var _loc2_ = ASCompat.reinterpretAs(ASCompat.thisOrDefault(node("avatar"), node("UI_profile.avatar")), DisplayObjectContainer);
+		var _loc2_ = ASCompat.reinterpretAs(ASCompat.orValue(node("avatar"), node("UI_profile.avatar")), DisplayObjectContainer);
 		if (_loc2_ == null) {
 			return;
 		}
@@ -2064,14 +2064,14 @@ class StarlingHud implements IGameHud {
 				if (mDestroyed || generation != mGlyphGeneration) {
 					return;
 				}
-				_loc4_ = ASCompat.dynamicAs(mGlyphTextures[path], Texture);
+				_loc4_ = ASCompat.dynamicAs(ASDictionary.getString(mGlyphTextures, path), Texture);
 				if (_loc4_ == null) {
 					_loc4_ = Texture.fromBitmapData(param1.image.bitmapData);
 					mGlyphTextures[path] = _loc4_;
 				}
 				mGlyphPixels[path] = param1.image.bitmapData;
 				mGlyphPaths[action] = path;
-				_loc3_ = ASCompat.dynamicAs(mStarlingGlyphs[action], Image);
+				_loc3_ = ASCompat.dynamicAs(ASDictionary.getString(mStarlingGlyphs, action), Image);
 				if (_loc3_ != null) {
 					_loc3_.removeFromParent(true);
 				}
@@ -2096,14 +2096,14 @@ class StarlingHud implements IGameHud {
 
 	function grayscaleGlyph(action:String) {
 		var _loc4_:BitmapData = null;
-		var _loc3_ = ASCompat.dynamicAs(mStarlingGlyphs[action], Image);
-		var _loc2_:String = mGlyphPaths[action];
-		var _loc6_ = ASCompat.dynamicAs(mGlyphPixels[_loc2_], BitmapData);
+		var _loc3_ = ASCompat.dynamicAs(ASDictionary.getString(mStarlingGlyphs, action), Image);
+		var _loc2_:String = ASDictionary.getString(mGlyphPaths, action);
+		var _loc6_ = ASCompat.dynamicAs(ASDictionary.getString(mGlyphPixels, _loc2_), BitmapData);
 		if (_loc3_ == null || _loc6_ == null) {
 			return;
 		}
 		var _loc7_ = _loc2_ + "|gray";
-		var _loc5_ = ASCompat.dynamicAs(mGlyphTextures[_loc7_], Texture);
+		var _loc5_ = ASCompat.dynamicAs(ASDictionary.getString(mGlyphTextures, _loc7_), Texture);
 		if (_loc5_ == null) {
 			_loc4_ = _loc6_.clone();
 			_loc4_.applyFilter(_loc4_, _loc4_.rect, new Point(), HudArtConverter.grayscaleFilter());
@@ -2700,8 +2700,8 @@ class StarlingHud implements IGameHud {
 			grayscaleGlyph(action);
 			return;
 		}
-		var _loc2_ = ASCompat.dynamicAs(mStarlingGlyphs[action], Image);
-		var _loc3_ = ASCompat.dynamicAs(mGlyphTextures[mGlyphPaths[action]], Texture);
+		var _loc2_ = ASCompat.dynamicAs(ASDictionary.getString(mStarlingGlyphs, action), Image);
+		var _loc3_ = ASCompat.dynamicAs(mGlyphTextures[ASDictionary.getString(mGlyphPaths, action)], Texture);
 		if (_loc2_ != null && _loc3_ != null) {
 			_loc2_.texture = _loc3_;
 		}

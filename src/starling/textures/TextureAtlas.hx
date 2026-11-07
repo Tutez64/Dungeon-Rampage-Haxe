@@ -64,16 +64,16 @@ class TextureAtlas {
 			for (_tmp_ in __ax4_iter_95) {
 				_loc12_ = _tmp_;
 				_loc13_ = StringUtil.clean(_loc12_.attribute("name"));
-				_loc14_ = ASCompat.toNumber(ASCompat.thisOrDefault(Std.parseFloat(_loc12_.attribute("x")) / _loc3_, 0));
-				_loc16_ = ASCompat.toNumber(ASCompat.thisOrDefault(Std.parseFloat(_loc12_.attribute("y")) / _loc3_, 0));
-				_loc15_ = ASCompat.toNumber(ASCompat.thisOrDefault(Std.parseFloat(_loc12_.attribute("width")) / _loc3_, 0));
-				_loc22_ = ASCompat.toNumber(ASCompat.thisOrDefault(Std.parseFloat(_loc12_.attribute("height")) / _loc3_, 0));
-				_loc4_ = ASCompat.toNumber(ASCompat.thisOrDefault(Std.parseFloat(_loc12_.attribute("frameX")) / _loc3_, 0));
-				_loc9_ = ASCompat.toNumber(ASCompat.thisOrDefault(Std.parseFloat(_loc12_.attribute("frameY")) / _loc3_, 0));
-				_loc11_ = ASCompat.toNumber(ASCompat.thisOrDefault(Std.parseFloat(_loc12_.attribute("frameWidth")) / _loc3_, 0));
-				_loc2_ = ASCompat.toNumber(ASCompat.thisOrDefault(Std.parseFloat(_loc12_.attribute("frameHeight")) / _loc3_, 0));
-				_loc7_ = ASCompat.toNumber(ASCompat.thisOrDefault(Std.parseFloat(_loc12_.attribute("pivotX")) / _loc3_, 0));
-				_loc6_ = ASCompat.toNumber(ASCompat.thisOrDefault(Std.parseFloat(_loc12_.attribute("pivotY")) / _loc3_, 0));
+				_loc14_ = ASCompat.toNumber(ASCompat.orValue(Std.parseFloat(_loc12_.attribute("x")) / _loc3_, 0));
+				_loc16_ = ASCompat.toNumber(ASCompat.orValue(Std.parseFloat(_loc12_.attribute("y")) / _loc3_, 0));
+				_loc15_ = ASCompat.toNumber(ASCompat.orValue(Std.parseFloat(_loc12_.attribute("width")) / _loc3_, 0));
+				_loc22_ = ASCompat.toNumber(ASCompat.orValue(Std.parseFloat(_loc12_.attribute("height")) / _loc3_, 0));
+				_loc4_ = ASCompat.toNumber(ASCompat.orValue(Std.parseFloat(_loc12_.attribute("frameX")) / _loc3_, 0));
+				_loc9_ = ASCompat.toNumber(ASCompat.orValue(Std.parseFloat(_loc12_.attribute("frameY")) / _loc3_, 0));
+				_loc11_ = ASCompat.toNumber(ASCompat.orValue(Std.parseFloat(_loc12_.attribute("frameWidth")) / _loc3_, 0));
+				_loc2_ = ASCompat.toNumber(ASCompat.orValue(Std.parseFloat(_loc12_.attribute("frameHeight")) / _loc3_, 0));
+				_loc7_ = ASCompat.toNumber(ASCompat.orValue(Std.parseFloat(_loc12_.attribute("pivotX")) / _loc3_, 0));
+				_loc6_ = ASCompat.toNumber(ASCompat.orValue(Std.parseFloat(_loc12_.attribute("pivotY")) / _loc3_, 0));
 				_loc5_ = StringUtil.parseBoolean(_loc12_.attribute("rotated"));
 				_loc19_.setTo(_loc14_, _loc16_, _loc15_, _loc22_);
 				_loc21_.setTo(_loc4_, _loc9_, _loc11_, _loc2_);
@@ -94,13 +94,14 @@ class TextureAtlas {
 				_loc8_ = (cast NAME_REGEX.match(_loc10_));
 				if (_loc8_ != null && _loc8_.length > 0) {
 					_loc20_ = _loc8_[1];
-					_loc17_ = ASCompat.coerce(_loc18_[_loc10_], flash.geom.Point);
+					_loc17_ = ASCompat.coerce(ASDictionary.getString(_loc18_, _loc10_), flash.geom.Point);
 					__ax4_iter_96 = _subTextures;
 					if (checkNullIteratee(__ax4_iter_96))
 						for (_tmp_ in __ax4_iter_96.keys()) {
 							_loc13_ = _tmp_;
 							if (_loc13_.indexOf(_loc20_) == 0 && !_loc18_.exists(_loc13_)) {
-								Image.bindPivotPointToTexture(ASCompat.coerce(_subTextures[_loc13_], starling.textures.Texture), _loc17_.x, _loc17_.y);
+								Image.bindPivotPointToTexture(ASCompat.coerce(ASDictionary.getString(_subTextures, _loc13_), starling.textures.Texture),
+									_loc17_.x, _loc17_.y);
 							}
 						}
 				}
@@ -108,7 +109,7 @@ class TextureAtlas {
 	}
 
 	public function getTexture(name:String):Texture {
-		return ASCompat.coerce(_subTextures[name], starling.textures.Texture);
+		return ASCompat.coerce(ASDictionary.getString(_subTextures, name), starling.textures.Texture);
 	}
 
 	public function getTextures(prefix:String = "", out:Vector<Texture> = null):Vector<Texture> {
@@ -154,17 +155,17 @@ class TextureAtlas {
 	}
 
 	public function getRegion(name:String):Rectangle {
-		var _loc2_ = ASCompat.coerce(_subTextures[name], starling.textures.SubTexture);
+		var _loc2_ = ASCompat.coerce(ASDictionary.getString(_subTextures, name), starling.textures.SubTexture);
 		return _loc2_ != null ? _loc2_.region : null;
 	}
 
 	public function getFrame(name:String):Rectangle {
-		var _loc2_ = ASCompat.coerce(_subTextures[name], starling.textures.SubTexture);
+		var _loc2_ = ASCompat.coerce(ASDictionary.getString(_subTextures, name), starling.textures.SubTexture);
 		return _loc2_ != null ? _loc2_.frame : null;
 	}
 
 	public function getRotation(name:String):Bool {
-		var _loc2_ = ASCompat.coerce(_subTextures[name], starling.textures.SubTexture);
+		var _loc2_ = ASCompat.coerce(ASDictionary.getString(_subTextures, name), starling.textures.SubTexture);
 		return _loc2_ != null ? _loc2_.rotated : false;
 	}
 
@@ -181,7 +182,7 @@ class TextureAtlas {
 	}
 
 	public function removeRegion(name:String) {
-		var _loc2_ = ASCompat.coerce(_subTextures[name], starling.textures.SubTexture);
+		var _loc2_ = ASCompat.coerce(ASDictionary.getString(_subTextures, name), starling.textures.SubTexture);
 		if (_loc2_ != null) {
 			_loc2_.dispose();
 		}

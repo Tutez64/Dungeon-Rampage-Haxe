@@ -320,7 +320,7 @@ class Remoting extends ConsoleCore {
 		var _loc10_:ASAny = null;
 		var _loc11_ = (null : ByteArray);
 		var _loc12_ = ASCompat.dynamicAs(null, Exception);
-		if (!ConsoleLib.truthy(_senders[id])) {
+		if (!ConsoleLib.truthy(ASDictionary.getString(_senders, id))) {
 			_senders[id] = true;
 			if (_lastReciever != null) {
 				report("Remote switched to new sender [" + id + "] as primary.", -2);

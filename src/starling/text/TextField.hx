@@ -101,13 +101,13 @@ class TextField extends DisplayObjectContainer {
 	public static function unregisterCompositor(fontName:String, dispose:Bool = true) {
 		fontName = convertToLowerCase(fontName);
 		if (dispose && compositors.exists(fontName)) {
-			compositors[fontName].dispose();
+			ASDictionary.getString(compositors, fontName).dispose();
 		}
 		compositors.remove(fontName);
 	}
 
 	public static function getCompositor(fontName:String):ITextCompositor {
-		return ASCompat.coerce(compositors[convertToLowerCase(fontName)], starling.text.ITextCompositor);
+		return ASCompat.coerce(ASDictionary.getString(compositors, convertToLowerCase(fontName)), starling.text.ITextCompositor);
 	}
 
 	public static function registerBitmapFont(bitmapFont:BitmapFont, name:String = null):String {
@@ -129,7 +129,7 @@ class TextField extends DisplayObjectContainer {
 	@:isVar static var compositors(get, never):ASDictionary<ASAny, ASAny>;
 
 	static function get_compositors():ASDictionary<ASAny, ASAny> {
-		var _loc1_ = ASDictionary.asDictionary(Starling.painter.sharedData["starling.display.TextField.compositors"]);
+		var _loc1_ = ASDictionary.asDictionary(ASDictionary.getString(Starling.painter.sharedData, "starling.display.TextField.compositors"));
 		if (_loc1_ == null) {
 			_loc1_ = new ASDictionary<ASAny, ASAny>();
 			Starling.painter.sharedData["starling.display.TextField.compositors"] = _loc1_;
@@ -138,7 +138,7 @@ class TextField extends DisplayObjectContainer {
 	}
 
 	static function convertToLowerCase(string:String):String {
-		var _loc2_:String = sStringCache[string];
+		var _loc2_:String = ASDictionary.getString(sStringCache, string);
 		if (_loc2_ == null) {
 			_loc2_ = string.toLowerCase();
 			sStringCache[string] = _loc2_;

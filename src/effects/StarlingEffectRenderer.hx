@@ -98,7 +98,7 @@ class StarlingEffectRenderer {
 		var _loc8_ = 0;
 		var _loc4_:BitmapData = null;
 		var _loc5_:Matrix = null;
-		var _loc3_ = ASCompat.dynamicAs(sIconTextureCache[cacheKey], Texture);
+		var _loc3_ = ASCompat.dynamicAs(ASDictionary.getString(sIconTextureCache, cacheKey), Texture);
 		if (_loc3_ == null) {
 			_loc6_ = iconClip.getBounds(iconClip);
 			_loc7_ = ASCompat.floatToInt(Math.max(1, Math.fceil(_loc6_.width)));

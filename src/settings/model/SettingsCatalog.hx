@@ -65,7 +65,7 @@ class SettingsCatalog {
 	}
 
 	public function getDefinition(id:String):SettingDefinition {
-		return ASCompat.dynamicAs(mDefinitionsById[id], SettingDefinition);
+		return ASCompat.dynamicAs(ASDictionary.getString(mDefinitionsById, id), SettingDefinition);
 	}
 
 	public function getDefinitionsForCategory(category:String):Vector<SettingDefinition> {

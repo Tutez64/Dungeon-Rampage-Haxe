@@ -29,7 +29,7 @@ class LabelTable {
 		_loc4_ = 0;
 		while (_loc4_ < _loc3_) {
 			_loc6_ = ASCompat.coerce(frameLabels[_loc4_], flash.display.FrameLabel);
-			if (ASCompat.dynamicAs(_ranges[_loc6_.name], LabelRange) == null) {
+			if (ASCompat.dynamicAs(ASDictionary.getString(_ranges, _loc6_.name), LabelRange) == null) {
 				_ranges[_loc6_.name] = new LabelRange(_loc6_.frame, _loc4_);
 			}
 			_loc4_++;
@@ -132,7 +132,7 @@ class LabelTable {
 		if (label == null) {
 			return -1;
 		}
-		var _loc2_ = ASCompat.dynamicAs(_ranges[label], LabelRange);
+		var _loc2_ = ASCompat.dynamicAs(ASDictionary.getString(_ranges, label), LabelRange);
 		return _loc2_ != null ? _loc2_.start : -1;
 	}
 
@@ -140,7 +140,7 @@ class LabelTable {
 		if (label == null) {
 			return -1;
 		}
-		var _loc2_ = ASCompat.dynamicAs(_ranges[label], LabelRange);
+		var _loc2_ = ASCompat.dynamicAs(ASDictionary.getString(_ranges, label), LabelRange);
 		return _loc2_ != null ? _loc2_.end : -1;
 	}
 
@@ -174,7 +174,7 @@ class LabelTable {
 		if (label == null) {
 			return null;
 		}
-		var _loc2_ = ASCompat.dynamicAs(_ranges[label], LabelRange);
+		var _loc2_ = ASCompat.dynamicAs(ASDictionary.getString(_ranges, label), LabelRange);
 		if (_loc2_ == null) {
 			return null;
 		}
@@ -186,7 +186,7 @@ class LabelTable {
 
 	public function getNextLabel(afterLabel:String, currentFrame:Int):String {
 		var _loc3_ = if (ASCompat.stringAsBool(afterLabel)) afterLabel else labelAt(currentFrame);
-		var _loc4_ = _loc3_ != null ? ASCompat.dynamicAs(_ranges[_loc3_], LabelRange) : null;
+		var _loc4_ = _loc3_ != null ? ASCompat.dynamicAs(ASDictionary.getString(_ranges, _loc3_), LabelRange) : null;
 		return _loc4_ != null ? _loc4_.next : labelAfterFrame(-1, 0);
 	}
 

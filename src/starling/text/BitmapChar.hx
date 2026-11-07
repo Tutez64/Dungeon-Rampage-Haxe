@@ -36,7 +36,7 @@ class BitmapChar {
 		if (_kernings == null || !_kernings.exists(charID)) {
 			return 0;
 		}
-		return ASCompat.toNumber(_kernings[charID]);
+		return ASCompat.toNumber(ASDictionary.getInt(_kernings, charID));
 	}
 
 	public function createImage():Image {

@@ -297,7 +297,7 @@ class StacksWithEquipPicker extends UIObject {
 		if (checkNullIteratee(__ax4_iter_488))
 			for (_tmp_ in __ax4_iter_488.keys()) {
 				_loc1_ = _tmp_;
-				_loc2_ = ASCompat.coerce(mGlyphFilePathToControllerIconData[_loc1_], uI.ControllerIconData);
+				_loc2_ = ASCompat.coerce(ASDictionary.getString(mGlyphFilePathToControllerIconData, _loc1_), uI.ControllerIconData);
 				if (!_loc2_.mIsHidden) {
 					if (_loc2_.mOwner.contains(_loc2_.mControllerGlyph)) {
 						_loc2_.mOwner.removeChild(_loc2_.mControllerGlyph);

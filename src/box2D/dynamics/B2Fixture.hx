@@ -190,7 +190,7 @@ class B2Fixture {
 			_loc4_ = _loc3_.getFixtureA();
 			_loc5_ = _loc3_.getFixtureB();
 			if (_loc4_ == this || _loc5_ == this) {
-				_loc3_.setSensor(ASCompat.thisOrDefault(_loc4_.isSensor(), _loc5_.isSensor()));
+				_loc3_.setSensor(ASCompat.orValue(_loc4_.isSensor(), _loc5_.isSensor()));
 			}
 			_loc2_ = _loc2_.next;
 		}

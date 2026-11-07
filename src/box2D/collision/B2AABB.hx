@@ -61,7 +61,7 @@ class B2AABB {
 		var _loc15_ = Math.NaN;
 		var _loc16_ = Math.NaN;
 		var _loc3_ = -ASCompat.MAX_FLOAT;
-		var _loc4_:Float = ASCompat.MAX_FLOAT;
+		var _loc4_ = ASCompat.MAX_FLOAT;
 		var _loc5_ = input.p1.x;
 		var _loc6_ = input.p1.y;
 		var _loc7_ = input.p2.x - input.p1.x;

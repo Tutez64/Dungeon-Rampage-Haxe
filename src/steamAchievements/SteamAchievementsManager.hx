@@ -125,7 +125,7 @@ class SteamAchievementsManager {
 		switch (_loc2_.StatType) {
 			case 0:
 				if (!mDBFacade.mSteamworks.setStatInt(inAPIName, _loc2_.ClientIntValue)
-					&& !ASCompat.toBool(mNamesSteamRejected[inAPIName])) {
+					&& !ASCompat.toBool(ASDictionary.getString(mNamesSteamRejected, inAPIName))) {
 					mNamesSteamRejected[inAPIName] = true;
 					Logger.warnch("SteamAchievements",
 						"setStatInt("
@@ -167,7 +167,7 @@ class SteamAchievementsManager {
 			Logger.infoch("SteamAchievements", "False. Achievement " + inAPIName + " is already unlocked");
 			return false;
 		}
-		if (ASCompat.toBool(mNamesSteamRejected[inAPIName])) {
+		if (ASCompat.toBool(ASDictionary.getString(mNamesSteamRejected, inAPIName))) {
 			return false;
 		}
 		mDBFacade.mSteamworks.setAchievement(inAPIName);
@@ -216,7 +216,7 @@ class SteamAchievementsManager {
 		var _loc6_ = false;
 		var _loc4_ = getCurrentSteamStats(inAPIName);
 		if (_loc4_ == null) {
-			if (ASCompat.toBool(mNamesNotRegistered[inAPIName])) {
+			if (ASCompat.toBool(ASDictionary.getString(mNamesNotRegistered, inAPIName))) {
 				return false;
 			}
 			mNamesNotRegistered[inAPIName] = true;

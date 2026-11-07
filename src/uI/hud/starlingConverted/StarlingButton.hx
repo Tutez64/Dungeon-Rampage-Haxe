@@ -53,10 +53,10 @@ class StarlingButton {
 		mSpace = designSpace;
 		var _loc5_ = view.node(_loc4_ + "up");
 		mStates.push(_loc5_);
-		mStates.push(ASCompat.thisOrDefault(view.node(_loc4_ + "over"), _loc5_));
-		mStates.push(ASCompat.thisOrDefault(view.node(_loc4_ + "down"), _loc5_));
-		mStates.push(ASCompat.thisOrDefault(view.node(_loc4_ + "disabled"), _loc5_));
-		mStates.push(ASCompat.thisOrDefault(view.node(_loc4_ + "selected"), _loc5_));
+		mStates.push(ASCompat.orValue(view.node(_loc4_ + "over"), _loc5_));
+		mStates.push(ASCompat.orValue(view.node(_loc4_ + "down"), _loc5_));
+		mStates.push(ASCompat.orValue(view.node(_loc4_ + "disabled"), _loc5_));
+		mStates.push(ASCompat.orValue(view.node(_loc4_ + "selected"), _loc5_));
 		mHit = view.node(_loc4_ + "hit");
 		mLabel = view.node(_loc4_ + "label");
 		if (Std.isOfType(mHit, ArtDisplay)) {

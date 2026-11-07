@@ -255,9 +255,9 @@ class DistributedDungeonFloor extends Floor implements IDistributedDungeonFloor 
 		MemoryTracker.track(mDungeonFloorFactory, "DungeonFloorFactory - created in DistributedDungeonFloor.postGenerate()");
 		buildTiles(mTileNetworkComponents, true);
 		mMapNode = mDBFacade.gameMaster.getMapNode(mCurrentMapNodeId);
-		if (mMapNode != null) {
-			mDBFacade.steamAchievementsHelper.checkHighestUltimateRampageFloorAchieved(mMapNode, getCurrentFloorNum());
-			mDBFacade.steamAchievementsHelper.updateMapsAtFloor25Stat(mMapNode);
+		if (mMapNode != null && mMapNode.NodeType == GMMapNode.INFINITE_NODE_TYPE) {
+			mDBFacade.steamAchievementsHelper.checkHighestUltimateRampageFloorAchieved(mMapNode, getCurrentFloorNum() - 1);
+			mDBFacade.steamAchievementsHelper.updateMapsAtFloor25Stat();
 		}
 		buildFloorEndingGui();
 		loadIntroMovie();
@@ -336,6 +336,9 @@ class DistributedDungeonFloor extends Floor implements IDistributedDungeonFloor 
 		mDBFacade.steamAchievementsHelper.unlockDarkBarrowsAsVampireHunter(_loc1_, mMapNode.Constant);
 		if (mMapNode.NodeType == GMMapNode.BOSS_NODE_TYPE) {
 			mDBFacade.steamAchievementsHelper.unlockAchievement(SteamAPINames.getUnlockFloorCompletedAPIName(mMapNode.Constant));
+		} else if (mMapNode.NodeType == GMMapNode.INFINITE_NODE_TYPE) {
+			mDBFacade.steamAchievementsHelper.checkHighestUltimateRampageFloorAchieved(mMapNode, getCurrentFloorNum());
+			mDBFacade.steamAchievementsHelper.updateMapsAtFloor25Stat();
 		}
 		mDBFacade.steamAchievementsHelper.unlockFinishFloorWithThreeTeammatesDowned(mRemoteHeroes);
 		mDBFacade.steamAchievementsHelper.addValueToStatInt(1, "DUNGEONS_COMPLETED");

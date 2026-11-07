@@ -99,35 +99,35 @@ class FeatureFlags {
 	}
 
 	public function getFlagValue(name:String):Bool {
-		return ASCompat.toBool(mFeatureFlags[name].currentValue);
+		return ASCompat.toBool(ASDictionary.getString(mFeatureFlags, name).currentValue);
 	}
 
 	public function getFlagDefaultValue(name:String):Bool {
-		return ASCompat.toBool(mFeatureFlags[name].defaultValue);
+		return ASCompat.toBool(ASDictionary.getString(mFeatureFlags, name).defaultValue);
 	}
 
 	public function setFlagDatabaseValueOnFirstLoad(flagName:String, value:Bool) {
-		mFeatureFlags[flagName].setDbValue(value);
+		ASDictionary.getString(mFeatureFlags, flagName).setDbValue(value);
 	}
 
 	public function setFlagConfigFileValue(flagName:String, value:Bool) {
-		mFeatureFlags[flagName].setConfigFileValue(value);
+		ASDictionary.getString(mFeatureFlags, flagName).setConfigFileValue(value);
 	}
 
 	public function setFlagStoredSettingValue(flagName:String, value:Bool) {
-		mFeatureFlags[flagName].setStoredSettingValue(value);
+		ASDictionary.getString(mFeatureFlags, flagName).setStoredSettingValue(value);
 	}
 
 	public function clearFlagPlayerValues(flagName:String) {
-		mFeatureFlags[flagName].clearPlayerValues();
+		ASDictionary.getString(mFeatureFlags, flagName).clearPlayerValues();
 	}
 
 	public function setFlagCliValue(flagName:String, value:Bool) {
-		mFeatureFlags[flagName].setCliValue(value);
+		ASDictionary.getString(mFeatureFlags, flagName).setCliValue(value);
 	}
 
 	public function setFlagOverrideValue(flagName:String, value:Bool) {
-		mFeatureFlags[flagName].setOverrideValue(value);
+		ASDictionary.getString(mFeatureFlags, flagName).setOverrideValue(value);
 	}
 
 	public function loadFeatureFlagValuesFromCli(arguments:Array<ASAny>) {

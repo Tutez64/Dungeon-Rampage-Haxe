@@ -144,7 +144,7 @@ class MouseCursorManager {
 
 	function refresh() {
 		var _loc2_ = mStack.length > 0 ? mStack[mStack.length - 1].name : mDefaultCursor;
-		var _loc1_:String = mCursors[_loc2_];
+		var _loc1_:String = ASDictionary.getString(mCursors, _loc2_);
 		Mouse.cursor = ASCompat.stringAsBool(_loc1_) ? _loc1_ : "auto";
 	}
 

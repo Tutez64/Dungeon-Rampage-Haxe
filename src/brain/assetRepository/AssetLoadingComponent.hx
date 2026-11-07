@@ -1333,7 +1333,7 @@ class AssetLoadingComponent extends Component {
 			mLabelOwners[animationName],
 			mAtlasOwners[animationName]
 		];
-		var _loc9_ = (ASCompat.thisOrDefault((if (ASCompat.toBool(_loc6_[0])) (_loc6_[0] : Vector<String>) else (_loc6_[1] : Vector<String>) : Vector<String>),
+		var _loc9_ = (ASCompat.orValue((if (ASCompat.toBool(_loc6_[0])) (_loc6_[0] : Vector<String>) else (_loc6_[1] : Vector<String>) : Vector<String>),
 			(_loc6_[2] : Vector<String>)) : Vector<String>);
 		if (_loc9_ == null) {
 			return null;

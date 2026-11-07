@@ -63,7 +63,7 @@ class AnimationAtlasFactory extends JsonFactory {
 
 	static function declaredSheetCount(json:ASObject):Int {
 		var _loc2_:ASObject = if (ASCompat.toBool(json.MD)) json.MD else json.metadata;
-		return _loc2_ != null ? ASCompat.toInt(ASCompat.thisOrDefault(if (ASCompat.toBool(_loc2_.SMC)) _loc2_.SMC else _loc2_.spritemapCount, 0)) : 0;
+		return _loc2_ != null ? ASCompat.toInt(ASCompat.orValue(if (ASCompat.toBool(_loc2_.SMC)) _loc2_.SMC else _loc2_.spritemapCount, 0)) : 0;
 	}
 
 	override public function create(asset:AssetReference, helper:AssetFactoryHelper, onComplete:ASFunction, onError:ASFunction) {

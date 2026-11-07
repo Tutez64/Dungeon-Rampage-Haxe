@@ -64,6 +64,8 @@ class DBAccountInfo {
 
 	var mInventoryLimitWeapons:UInt = 0;
 
+	var mAscensionStorageSlots:UInt = 0;
+
 	var mFriendsInfo:Map;
 
 	var mGiftsInfo:Map;
@@ -148,6 +150,12 @@ class DBAccountInfo {
 
 	public function get_inventoryLimitWeapons():UInt {
 		return mInventoryLimitWeapons;
+	}
+
+	@:isVar public var ascensionStorageSlots(get, never):UInt;
+
+	public function get_ascensionStorageSlots():UInt {
+		return mAscensionStorageSlots;
 	}
 
 	@:isVar public var inventoryLimitOther(get, never):UInt;
@@ -777,6 +785,7 @@ class DBAccountInfo {
 		mId = (ASCompat.toInt(details.id) : UInt);
 		mName = details.name;
 		mInventoryLimitWeapons = (ASCompat.toInt(details.buckets_weapon) : UInt);
+		mAscensionStorageSlots = (ASCompat.toBool(details.ascension_storage_slots) ? (ASCompat.toInt(details.ascension_storage_slots) : UInt) : (0 : UInt):UInt);
 		mInventoryLimitOther = (ASCompat.toInt(details.buckets_other) : UInt);
 		mAccountCreatedDate = ASCompat.asString(details.created);
 		mDungeonsCompleted = (ASCompat.toInt(details.completed_dungeons) : UInt);

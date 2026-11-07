@@ -670,12 +670,12 @@ class AGALMiniAssembler {
 			(ignorelimits ? (1024 : UInt) : ((version == 1 ? (-1 : UInt) : (0 : UInt) : UInt)) : UInt), (0x20 | 1 : UInt));
 		REGMAP["iid"] = new Register("iid", "instance id", (7 : UInt), (ignorelimits ? (1024 : UInt) : (0 : UInt) : UInt), (0x40 | 2 : UInt));
 		REGMAP["vs"] = new Register("vs", "vertex texture sampler", (5 : UInt), (ignorelimits ? (1024 : UInt) : (3 : UInt) : UInt), (0x40 | 2 : UInt));
-		REGMAP["op"] = REGMAP["vo"];
-		REGMAP["i"] = REGMAP["vi"];
-		REGMAP["v"] = REGMAP["vi"];
-		REGMAP["oc"] = REGMAP["fo"];
-		REGMAP["od"] = REGMAP["fd"];
-		REGMAP["fi"] = REGMAP["vi"];
+		REGMAP["op"] = ASDictionary.getString(REGMAP, "vo");
+		REGMAP["i"] = ASDictionary.getString(REGMAP, "vi");
+		REGMAP["v"] = ASDictionary.getString(REGMAP, "vi");
+		REGMAP["oc"] = ASDictionary.getString(REGMAP, "fo");
+		REGMAP["od"] = ASDictionary.getString(REGMAP, "fd");
+		REGMAP["fi"] = ASDictionary.getString(REGMAP, "vi");
 	}
 }
 

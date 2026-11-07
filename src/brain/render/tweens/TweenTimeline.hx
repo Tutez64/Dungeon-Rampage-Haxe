@@ -67,7 +67,7 @@ class TweenTimeline implements IAnimatable {
 			if (!mLabels.exists(_loc2_)) {
 				addLabel(_loc2_, duration);
 			}
-			return ASCompat.toNumber(mLabels[_loc2_]);
+			return ASCompat.toNumber(ASDictionary.getString(mLabels, _loc2_));
 		}
 		var _loc3_ = ASCompat.toNumber(position);
 		return Math.isNaN(_loc3_) ? 0 : _loc3_;

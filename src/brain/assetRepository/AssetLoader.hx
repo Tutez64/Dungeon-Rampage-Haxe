@@ -57,7 +57,7 @@ class AssetLoader {
 	}
 
 	public static function resolveFile(relative:String):File {
-		return ASCompat.thisOrDefault(TestResourceLocator.file(relative), File.applicationDirectory.resolvePath(relative));
+		return ASCompat.orValue(TestResourceLocator.file(relative), File.applicationDirectory.resolvePath(relative));
 	}
 
 	public static function startTrackingLoads(trackedLoadsCallback:ASFunction) {

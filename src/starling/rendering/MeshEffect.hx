@@ -20,7 +20,7 @@ class MeshEffect extends FilterEffect {
 	}
 
 	override function get_programVariantName():UInt {
-		var _loc1_ = (ASCompat.toInt(_optimizeIfNotTinted && !_tinted && _alpha == 1) : UInt);
+		var _loc1_ = ((if (_optimizeIfNotTinted && !_tinted && _alpha == 1) 1 else 0) : UInt);
 		return ((super.programVariantName : Int) | (_loc1_ : Int) << 3 : UInt);
 	}
 

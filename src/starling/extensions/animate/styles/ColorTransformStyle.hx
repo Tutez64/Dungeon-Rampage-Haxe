@@ -287,7 +287,7 @@ private class ColorTransformEffect extends MeshEffect {
 	}
 
 	override function get_programVariantName():UInt {
-		return ((super.programVariantName : Int) | ASCompat.toInt(texture == null) << 4 | ASCompat.toInt(_maskDiscard) << 5 : UInt);
+		return ((super.programVariantName : Int) | (if (texture == null) 1 else 0) << 4 | (if (_maskDiscard) 1 else 0) << 5 : UInt);
 	}
 
 	override function createProgram():Program {

@@ -125,7 +125,7 @@ class B2PolygonShape extends B2Shape {
 			_loc5_[_loc8_] = vs[_loc8_];
 		}
 		_loc5_[count] = _loc5_[0];
-		var _loc9_:Float = ASCompat.MAX_FLOAT;
+		var _loc9_ = ASCompat.MAX_FLOAT;
 		_loc6_ = 1;
 		_loc7_ = count + 1;
 		while (_loc6_ < _loc7_) {

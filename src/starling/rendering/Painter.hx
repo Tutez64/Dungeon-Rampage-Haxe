@@ -179,7 +179,7 @@ import starling.utils.SystemUtil;
 	}
 
 	public function getProgram(name:String):Program {
-		return ASCompat.dynamicAs(programs[name], Program);
+		return ASCompat.dynamicAs(ASDictionary.getString(programs, name), Program);
 	}
 
 	public function hasProgram(name:String):Bool {
@@ -729,7 +729,7 @@ import starling.utils.SystemUtil;
 	@:isVar var programs(get, never):ASDictionary<ASAny, ASAny>;
 
 	function get_programs():ASDictionary<ASAny, ASAny> {
-		var _loc1_ = ASDictionary.asDictionary(sharedData["starling.rendering.Painter.Programs"]);
+		var _loc1_ = ASDictionary.asDictionary(ASDictionary.getString(sharedData, "starling.rendering.Painter.Programs"));
 		if (_loc1_ == null) {
 			_loc1_ = new ASDictionary<ASAny, ASAny>();
 			sharedData["starling.rendering.Painter.Programs"] = _loc1_;

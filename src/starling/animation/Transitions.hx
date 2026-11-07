@@ -47,7 +47,7 @@ class Transitions {
 		if (sTransitions == null) {
 			registerDefaults();
 		}
-		return ASCompat.coerceFunction(sTransitions[name]);
+		return ASCompat.coerceFunction(ASDictionary.getString(sTransitions, name));
 	}
 
 	public static function register(name:String, func:ASFunction) {

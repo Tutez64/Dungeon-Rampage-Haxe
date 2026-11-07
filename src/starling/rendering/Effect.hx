@@ -158,12 +158,12 @@ class Effect {
 	function get_programName():String {
 		var _loc3_ = this.programBaseName;
 		var _loc2_ = this.programVariantName;
-		var _loc4_ = (sProgramNameCache[_loc3_] : ASDictionary<ASAny, ASAny>);
+		var _loc4_ = (ASDictionary.getString(sProgramNameCache, _loc3_) : ASDictionary<ASAny, ASAny>);
 		if (_loc4_ == null) {
 			_loc4_ = new ASDictionary<ASAny, ASAny>();
 			sProgramNameCache[_loc3_] = _loc4_;
 		}
-		var _loc1_:String = _loc4_[_loc2_];
+		var _loc1_:String = ASDictionary.getInt(_loc4_, _loc2_);
 		if (_loc1_ == null) {
 			if (_loc2_ != 0) {
 				_loc1_ = _loc3_ + "#" + ASCompat.toRadix(_loc2_, (16 : UInt));

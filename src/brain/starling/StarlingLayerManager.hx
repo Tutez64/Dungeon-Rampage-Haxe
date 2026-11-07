@@ -144,7 +144,7 @@ class StarlingLayerManager {
 	}
 
 	public function getLayer(inIndex:Int):StarlingLayer {
-		return ASCompat.coerce(mLayerMap[inIndex], brain.starling.StarlingLayer);
+		return ASCompat.coerce(ASDictionary.getInt(mLayerMap, inIndex), brain.starling.StarlingLayer);
 	}
 
 	function onRootCreated(event:ASObject) {
@@ -204,7 +204,7 @@ class StarlingLayerManager {
 	}
 
 	function overlayLayer(sortIndex:Int, name:String, sort:ASFunction, screenSpace:Bool):StarlingLayer {
-		var _loc7_ = ASCompat.coerce(mLayerMap[sortIndex], brain.starling.StarlingLayer);
+		var _loc7_ = ASCompat.coerce(ASDictionary.getInt(mLayerMap, sortIndex), brain.starling.StarlingLayer);
 		var _loc6_ = mStarling != null ? ASCompat.reinterpretAs(mStarling.root, starling.display.Sprite) : null;
 		if (_loc7_ != null || _loc6_ == null) {
 			return _loc7_;
@@ -295,7 +295,7 @@ class StarlingLayerManager {
 	}
 
 	public function markLayerDirty(inLayerIndex:Int) {
-		var _loc2_ = ASCompat.coerce(mLayerMap[inLayerIndex], brain.starling.StarlingLayer);
+		var _loc2_ = ASCompat.coerce(ASDictionary.getInt(mLayerMap, inLayerIndex), brain.starling.StarlingLayer);
 		if (_loc2_ != null) {
 			_loc2_.markDirty();
 		}
@@ -316,6 +316,6 @@ class StarlingLayerManager {
 				_loc1_.destroy();
 			}
 		mLayers.length = 0;
-		mLayerMap["clear"]();
+		ASDictionary.getString(mLayerMap, "clear")();
 	}
 }

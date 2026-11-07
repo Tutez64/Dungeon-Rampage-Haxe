@@ -15,7 +15,7 @@ import starling.display.DisplayObject;
 		if (_eventListeners == null) {
 			_eventListeners = new ASDictionary<ASAny, ASAny>();
 		}
-		var _loc3_:Array<ASAny> = ASCompat.dynamicAs(_eventListeners[type], Array);
+		var _loc3_:Array<ASAny> = ASCompat.dynamicAs(ASDictionary.getString(_eventListeners, type), Array);
 		if (_loc3_ == null) {
 			_eventListeners[type] = [listener];
 		} else if (_loc3_.indexOf(listener) == -1) {
@@ -30,7 +30,7 @@ import starling.display.DisplayObject;
 		var _loc7_:Array<ASAny> = null;
 		var _loc6_ = 0;
 		if (_eventListeners != null) {
-			_loc3_ = ASCompat.dynamicAs(_eventListeners[type], Array);
+			_loc3_ = ASCompat.dynamicAs(ASDictionary.getString(_eventListeners, type), Array);
 			_loc4_ = _loc3_ != null ? _loc3_.length : 0;
 			if (_loc4_ > 0) {
 				_loc5_ = _loc3_.indexOf(listener);
@@ -80,7 +80,7 @@ import starling.display.DisplayObject;
 		var _loc6_ = 0;
 		var _loc5_:ASFunction = null;
 		var _loc2_ = 0;
-		var _loc3_ = _eventListeners != null ? ASCompat.dynamicAs(_eventListeners[event.type], Array) : null;
+		var _loc3_ = _eventListeners != null ? ASCompat.dynamicAs(ASDictionary.getString(_eventListeners, event.type), Array) : null;
 		var _loc4_ = ASCompat.toInt(_loc3_?.length);
 		if (_loc4_ != 0) {
 			event.setCurrentTarget(this);
@@ -149,7 +149,7 @@ import starling.display.DisplayObject;
 	}
 
 	public function hasEventListener(type:String, listener:ASFunction = null):Bool {
-		var _loc3_ = _eventListeners != null ? ASCompat.dynamicAs(_eventListeners[type], Array) : null;
+		var _loc3_ = _eventListeners != null ? ASCompat.dynamicAs(ASDictionary.getString(_eventListeners, type), Array) : null;
 		if (_loc3_ == null) {
 			return false;
 		}

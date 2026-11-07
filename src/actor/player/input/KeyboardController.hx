@@ -112,10 +112,10 @@ class KeyboardController {
 				mReleasedConsumableKeysThisFrame.push(ASCompat.toInt(mKeyBindings.wasReleased(_loc2_)));
 			}
 		mReleasedMenuKeysThisFrame = new Vector<Int>((4 : UInt));
-		mReleasedMenuKeysThisFrame[0] = ASCompat.toInt(mDBFacade.inputManager.released(27));
-		mReleasedMenuKeysThisFrame[1] = ASCompat.toInt(mKeyBindings.wasReleased("openOptionsMenu"));
-		mReleasedMenuKeysThisFrame[2] = ASCompat.toInt(mKeyBindings.wasReleased("toggleChatLog"));
-		mReleasedMenuKeysThisFrame[3] = ASCompat.toInt(mDBFacade.inputManager.released(13));
+		mReleasedMenuKeysThisFrame[0] = (if (mDBFacade.inputManager.released(27)) 1 else 0);
+		mReleasedMenuKeysThisFrame[1] = (if (mKeyBindings.wasReleased("openOptionsMenu")) 1 else 0);
+		mReleasedMenuKeysThisFrame[2] = (if (mKeyBindings.wasReleased("toggleChatLog")) 1 else 0);
+		mReleasedMenuKeysThisFrame[3] = (if (mDBFacade.inputManager.released(13)) 1 else 0);
 	}
 
 	public function determineMotion() {

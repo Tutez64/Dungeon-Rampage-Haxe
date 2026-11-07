@@ -94,7 +94,7 @@ class B2Collision {
 		var _loc15_ = _loc11_.col1.x * _loc13_ + _loc11_.col1.y * _loc14_;
 		var _loc16_ = _loc11_.col2.x * _loc13_ + _loc11_.col2.y * _loc14_;
 		var _loc17_ = 0;
-		var _loc18_:Float = ASCompat.MAX_FLOAT;
+		var _loc18_ = ASCompat.MAX_FLOAT;
 		var _loc19_ = 0;
 		var _loc20_ = _loc9_;
 		while (_loc19_ < _loc20_) {
@@ -201,7 +201,7 @@ class B2Collision {
 		_loc15_ = _loc12_.col2.x * _loc14_ + _loc12_.col2.y * _loc15_;
 		_loc14_ = _loc16_;
 		var _loc17_ = 0;
-		var _loc18_:Float = ASCompat.MAX_FLOAT;
+		var _loc18_ = ASCompat.MAX_FLOAT;
 		var _loc19_ = 0;
 		var _loc20_ = _loc9_;
 		while (_loc19_ < _loc20_) {

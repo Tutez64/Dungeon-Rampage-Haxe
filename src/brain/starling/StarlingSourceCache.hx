@@ -19,7 +19,7 @@ class StarlingSourceCache {
 	}
 
 	public function getOrCreate(key:String, bitmapData:BitmapData):Texture {
-		var _loc3_ = ASCompat.coerce(mEntries[key], TextureCacheEntry);
+		var _loc3_ = ASCompat.coerce(ASDictionary.getString(mEntries, key), TextureCacheEntry);
 		if (_loc3_ != null) {
 			_loc3_.refCount++;
 			bitmapData.dispose();
@@ -32,7 +32,7 @@ class StarlingSourceCache {
 	}
 
 	public function getOrCreateShared(key:String, bitmapData:BitmapData):Texture {
-		var _loc3_ = ASCompat.coerce(mEntries[key], TextureCacheEntry);
+		var _loc3_ = ASCompat.coerce(ASDictionary.getString(mEntries, key), TextureCacheEntry);
 		if (_loc3_ != null) {
 			_loc3_.refCount++;
 			return _loc3_.texture;
@@ -45,7 +45,7 @@ class StarlingSourceCache {
 	}
 
 	public function peek(key:String):Texture {
-		var _loc2_ = ASCompat.coerce(mEntries[key], TextureCacheEntry);
+		var _loc2_ = ASCompat.coerce(ASDictionary.getString(mEntries, key), TextureCacheEntry);
 		if (_loc2_ == null) {
 			return null;
 		}
@@ -57,7 +57,7 @@ class StarlingSourceCache {
 	}
 
 	public function get(key:String):Texture {
-		var _loc2_ = ASCompat.coerce(mEntries[key], TextureCacheEntry);
+		var _loc2_ = ASCompat.coerce(ASDictionary.getString(mEntries, key), TextureCacheEntry);
 		if (_loc2_ == null) {
 			return null;
 		}
@@ -66,7 +66,7 @@ class StarlingSourceCache {
 	}
 
 	public function releaseRef(key:String) {
-		var _loc2_ = ASCompat.coerce(mEntries[key], TextureCacheEntry);
+		var _loc2_ = ASCompat.coerce(ASDictionary.getString(mEntries, key), TextureCacheEntry);
 		if (_loc2_ == null) {
 			return;
 		}
@@ -79,7 +79,7 @@ class StarlingSourceCache {
 	}
 
 	public function registerAtlas(key:String, atlas:TextureAtlas, bitmapData:BitmapData) {
-		var _loc4_ = ASCompat.coerce(mAtlases[key], AtlasCacheEntry);
+		var _loc4_ = ASCompat.coerce(ASDictionary.getString(mAtlases, key), AtlasCacheEntry);
 		if (_loc4_ != null) {
 			_loc4_.refCount++;
 			atlas.dispose();
@@ -91,7 +91,7 @@ class StarlingSourceCache {
 	}
 
 	public function getAtlas(key:String):TextureAtlas {
-		var _loc2_ = ASCompat.coerce(mAtlases[key], AtlasCacheEntry);
+		var _loc2_ = ASCompat.coerce(ASDictionary.getString(mAtlases, key), AtlasCacheEntry);
 		if (_loc2_ == null) {
 			return null;
 		}
@@ -100,7 +100,7 @@ class StarlingSourceCache {
 	}
 
 	public function peekAtlas(key:String):TextureAtlas {
-		var _loc2_ = ASCompat.coerce(mAtlases[key], AtlasCacheEntry);
+		var _loc2_ = ASCompat.coerce(ASDictionary.getString(mAtlases, key), AtlasCacheEntry);
 		if (_loc2_ == null) {
 			return null;
 		}
@@ -108,7 +108,7 @@ class StarlingSourceCache {
 	}
 
 	public function releaseAtlasRef(key:String) {
-		var _loc2_ = ASCompat.coerce(mAtlases[key], AtlasCacheEntry);
+		var _loc2_ = ASCompat.coerce(ASDictionary.getString(mAtlases, key), AtlasCacheEntry);
 		if (_loc2_ == null) {
 			return;
 		}
@@ -128,7 +128,7 @@ class StarlingSourceCache {
 		if (checkNullIteratee(__ax4_iter_91))
 			for (_tmp_ in __ax4_iter_91.keys()) {
 				_loc4_ = _tmp_;
-				_loc1_ = ASCompat.coerce(mEntries[_loc4_], TextureCacheEntry);
+				_loc1_ = ASCompat.coerce(ASDictionary.getString(mEntries, _loc4_), TextureCacheEntry);
 				if (_loc1_.bitmapData != null && _loc1_.texture != null) {
 					_loc1_.texture.root.uploadBitmapData(_loc1_.bitmapData);
 				}
@@ -138,7 +138,7 @@ class StarlingSourceCache {
 		if (checkNullIteratee(__ax4_iter_92))
 			for (_tmp_ in __ax4_iter_92.keys()) {
 				_loc2_ = _tmp_;
-				_loc3_ = ASCompat.coerce(mAtlases[_loc2_], AtlasCacheEntry);
+				_loc3_ = ASCompat.coerce(ASDictionary.getString(mAtlases, _loc2_), AtlasCacheEntry);
 				if (_loc3_.bitmapData != null && _loc3_.atlas != null) {
 					_loc3_.atlas.texture.root.uploadBitmapData(_loc3_.bitmapData);
 				}
@@ -153,7 +153,7 @@ class StarlingSourceCache {
 		if (checkNullIteratee(__ax4_iter_93))
 			for (_tmp_ in __ax4_iter_93.keys()) {
 				_loc4_ = _tmp_;
-				_loc1_ = ASCompat.coerce(mEntries[_loc4_], TextureCacheEntry);
+				_loc1_ = ASCompat.coerce(ASDictionary.getString(mEntries, _loc4_), TextureCacheEntry);
 				_loc1_.texture.dispose();
 				_loc1_.bitmapData.dispose();
 				mEntries.remove(_loc4_);
@@ -163,7 +163,7 @@ class StarlingSourceCache {
 		if (checkNullIteratee(__ax4_iter_94))
 			for (_tmp_ in __ax4_iter_94.keys()) {
 				_loc2_ = _tmp_;
-				_loc3_ = ASCompat.coerce(mAtlases[_loc2_], AtlasCacheEntry);
+				_loc3_ = ASCompat.coerce(ASDictionary.getString(mAtlases, _loc2_), AtlasCacheEntry);
 				_loc3_.atlas.dispose();
 				_loc3_.bitmapData.dispose();
 				mAtlases.remove(_loc2_);

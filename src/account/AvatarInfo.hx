@@ -64,12 +64,15 @@ class AvatarInfo {
 
 	public var mCompletedMapnodeMask:Utf8BitArray;
 
+	public var mTrophyMapnodeMask:Utf8BitArray;
+
 	var mGMHero:GMHero;
 
 	public function new(dbFacade:DBFacade, avatarJson:ASObject, responseCallback:ASFunction) {
 		mMapNodes = new Vector<AvatarMapNodeInfo>();
 		mEquippedConsumables = new Vector<Consumable>();
 		mCompletedMapnodeMask = new Utf8BitArray();
+		mTrophyMapnodeMask = new Utf8BitArray();
 		mDBFacade = dbFacade;
 		mResponseCallback = responseCallback;
 		init(avatarJson);
@@ -80,6 +83,10 @@ class AvatarInfo {
 
 	public function get_mapNodes():Vector<AvatarMapNodeInfo> {
 		return mMapNodes;
+	}
+
+	public function hasTrophy(bitIndex:UInt):Bool {
+		return mTrophyMapnodeMask.getBit(bitIndex);
 	}
 
 	public function destroy() {
@@ -186,6 +193,7 @@ class AvatarInfo {
 			return;
 		}
 		mCompletedMapnodeMask.init(avatarJson.completed_mapnode_mask);
+		mTrophyMapnodeMask.init(avatarJson.trophy_mapnode_mask);
 		accountId = ASCompat.asUint(avatarJson.account_id);
 		avatarType = ASCompat.asUint(avatarJson.avatar_id);
 		created = ASCompat.asString(avatarJson.created);

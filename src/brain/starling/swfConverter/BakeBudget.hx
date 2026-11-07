@@ -84,7 +84,7 @@ class BakeBudget {
 	}
 
 	public static function usedBytes(pool:String):Float {
-		return ASCompat.toNumber(ASCompat.thisOrDefault(ASCompat.toNumber(sUsed[pool]), 0));
+		return ASCompat.toNumber(ASCompat.orValue(ASCompat.toNumber(sUsed[pool]), 0));
 	}
 
 	@:isVar public static var gpuBytes(get, never):Float;

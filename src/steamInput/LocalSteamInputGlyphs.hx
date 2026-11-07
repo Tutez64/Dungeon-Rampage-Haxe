@@ -61,7 +61,7 @@ class LocalSteamInputGlyphs {
 		if (_loc4_ == null) {
 			return null;
 		}
-		return mGlyphPathsByName[normalise(_loc4_)];
+		return ASDictionary.getString(mGlyphPathsByName, normalise(_loc4_));
 	}
 
 	function ensureGlyphIndexIsLoaded() {

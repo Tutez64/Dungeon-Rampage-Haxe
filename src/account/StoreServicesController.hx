@@ -35,7 +35,7 @@ class StoreServicesController {
 
 	public static final COIN_OFFERS:Vector<UInt> = Vector.ofArray(([(51102 : UInt), (51103 : UInt), (51104 : UInt)] : Array<UInt>));
 
-	public static final STORAGE_OFFERS:Vector<UInt> = Vector.ofArray(([(51401 : UInt), (51402 : UInt), (51403 : UInt)] : Array<UInt>));
+	public static final STORAGE_OFFERS:Vector<UInt> = Vector.ofArray(([(51404 : UInt), (51402 : UInt), (51403 : UInt)] : Array<UInt>));
 
 	public static final GIFT_OFFERS:Vector<UInt> = Vector.ofArray(([(51301 : UInt), (51399 : UInt), (51398 : UInt)] : Array<UInt>));
 
@@ -222,18 +222,23 @@ class StoreServicesController {
 	}
 
 	public static function weaponStorageWouldOverflow(dbFacade:DBFacade, gmOffer:GMOffer):Bool {
-		var _loc5_ = (0 : UInt);
-		var _loc4_:GMOfferDetail;
+		var _loc4_ = (0 : UInt);
+		var _loc3_:GMOfferDetail;
 		final __ax4_iter_344 = gmOffer.Details;
 		if (checkNullIteratee(__ax4_iter_344))
 			for (_tmp_ in __ax4_iter_344) {
-				_loc4_ = _tmp_;
-				_loc5_ += _loc4_.WeaponSlots;
+				_loc3_ = _tmp_;
+				_loc4_ += _loc3_.WeaponSlots;
 			}
-		if (_loc5_ == 0) {
+		if (_loc4_ == 0) {
 			return false;
 		}
-		return _loc5_ + dbFacade.dbAccountInfo.inventoryLimitWeapons > 120;
+		return storagePurchaseWouldExceedCap(_loc4_, dbFacade.dbAccountInfo.inventoryLimitWeapons, dbFacade.dbAccountInfo.ascensionStorageSlots);
+	}
+
+	public static function storagePurchaseWouldExceedCap(weaponSlots:UInt, inventoryLimit:UInt, ascensionStorageSlots:UInt):Bool {
+		var _loc4_ = ASCompat.floatToInt(Math.max(0, inventoryLimit - ascensionStorageSlots));
+		return weaponSlots + _loc4_ > 120;
 	}
 
 	public static function requiredHeroForWeapon(dbFacade:DBFacade, gmOffer:GMOffer):UInt {

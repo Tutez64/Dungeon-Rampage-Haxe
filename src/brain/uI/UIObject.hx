@@ -406,55 +406,62 @@ class UIObject {
 	@:isVar public var leftNavigation(get, set):UIObject;
 
 	public function get_leftNavigation():UIObject {
-		return ASCompat.coerce(mNavigationDictionary != null ? ASCompat.coerce(mNavigationDictionary["LEFT"], UIObject) : null, UIObject);
+		return ASCompat.coerce(mNavigationDictionary != null ? ASCompat.coerce(ASDictionary.getString(mNavigationDictionary, "LEFT"), UIObject) : null,
+			UIObject);
 	}
 
 	@:isVar public var rightNavigation(get, set):UIObject;
 
 	public function get_rightNavigation():UIObject {
-		return ASCompat.coerce(mNavigationDictionary != null ? ASCompat.coerce(mNavigationDictionary["RIGHT"], UIObject) : null, UIObject);
+		return ASCompat.coerce(mNavigationDictionary != null ? ASCompat.coerce(ASDictionary.getString(mNavigationDictionary, "RIGHT"), UIObject) : null,
+			UIObject);
 	}
 
 	@:isVar public var upNavigation(get, set):UIObject;
 
 	public function get_upNavigation():UIObject {
-		return ASCompat.coerce(mNavigationDictionary != null ? ASCompat.coerce(mNavigationDictionary["UP"], UIObject) : null, UIObject);
+		return ASCompat.coerce(mNavigationDictionary != null ? ASCompat.coerce(ASDictionary.getString(mNavigationDictionary, "UP"), UIObject) : null, UIObject);
 	}
 
 	@:isVar public var downNavigation(get, set):UIObject;
 
 	public function get_downNavigation():UIObject {
-		return ASCompat.coerce(mNavigationDictionary != null ? ASCompat.coerce(mNavigationDictionary["DOWN"], UIObject) : null, UIObject);
+		return ASCompat.coerce(mNavigationDictionary != null ? ASCompat.coerce(ASDictionary.getString(mNavigationDictionary, "DOWN"), UIObject) : null,
+			UIObject);
 	}
 
 	function set_leftNavigation(leftUiObject:UIObject):UIObject {
-		if (mNavigationDictionary["LEFT"] == leftUiObject) {
+		if (ASDictionary.getString(mNavigationDictionary, "LEFT") == leftUiObject) {
 			Logger.warnch("UI", "Navigation left already set to same target on: " + this.mRoot.name);
 			return leftUiObject;
 		}
 		if (ASCompat.dictionaryLookupNeNull(mNavigationDictionary, "LEFT")) {
-			throw new Error("This UIObject (" + this.mRoot.name + ") can already navigate left towards: "
-				+ Std.string(mNavigationDictionary["LEFT"].mRoot.name));
+			throw new Error("This UIObject ("
+				+ this.mRoot.name
+				+ ") can already navigate left towards: "
+				+ Std.string(ASDictionary.getString(mNavigationDictionary, "LEFT").mRoot.name));
 		}
 		mNavigationDictionary["LEFT"] = leftUiObject;
 		return leftUiObject;
 	}
 
 	function set_rightNavigation(rightUiObject:UIObject):UIObject {
-		if (mNavigationDictionary["RIGHT"] == rightUiObject) {
+		if (ASDictionary.getString(mNavigationDictionary, "RIGHT") == rightUiObject) {
 			Logger.warnch("UI", "Navigation right already set to same target on: " + this.mRoot.name);
 			return rightUiObject;
 		}
 		if (ASCompat.dictionaryLookupNeNull(mNavigationDictionary, "RIGHT")) {
-			throw new Error("This UIObject (" + this.mRoot.name + ") can already navigate right towards: "
-				+ Std.string(mNavigationDictionary["RIGHT"].mRoot.name));
+			throw new Error("This UIObject ("
+				+ this.mRoot.name
+				+ ") can already navigate right towards: "
+				+ Std.string(ASDictionary.getString(mNavigationDictionary, "RIGHT").mRoot.name));
 		}
 		mNavigationDictionary["RIGHT"] = rightUiObject;
 		return rightUiObject;
 	}
 
 	function set_upNavigation(upUiObject:UIObject):UIObject {
-		if (mNavigationDictionary["UP"] == upUiObject) {
+		if (ASDictionary.getString(mNavigationDictionary, "UP") == upUiObject) {
 			Logger.warnch("UI", "Navigation up already set to same target on: " + this.mRoot.name);
 			return upUiObject;
 		}
@@ -462,20 +469,22 @@ class UIObject {
 			throw new Error("This UIObject ("
 				+ this.mRoot.name
 				+ ") can already navigate up towards: "
-				+ Std.string(mNavigationDictionary["UP"].mRoot.name));
+				+ Std.string(ASDictionary.getString(mNavigationDictionary, "UP").mRoot.name));
 		}
 		mNavigationDictionary["UP"] = upUiObject;
 		return upUiObject;
 	}
 
 	function set_downNavigation(downUiObject:UIObject):UIObject {
-		if (mNavigationDictionary["DOWN"] == downUiObject) {
+		if (ASDictionary.getString(mNavigationDictionary, "DOWN") == downUiObject) {
 			Logger.warnch("UI", "Navigation down already set to same target on: " + this.mRoot.name);
 			return downUiObject;
 		}
 		if (ASCompat.dictionaryLookupNeNull(mNavigationDictionary, "DOWN")) {
-			throw new Error("This UIObject (" + this.mRoot.name + ") can already navigate down towards: "
-				+ Std.string(mNavigationDictionary["DOWN"].mRoot.name));
+			throw new Error("This UIObject ("
+				+ this.mRoot.name
+				+ ") can already navigate down towards: "
+				+ Std.string(ASDictionary.getString(mNavigationDictionary, "DOWN").mRoot.name));
 		}
 		mNavigationDictionary["DOWN"] = downUiObject;
 		return downUiObject;
@@ -517,38 +526,49 @@ class UIObject {
 	@:isVar public var leftNavigationAdditionalInteraction(get, set):ASFunction;
 
 	public function get_leftNavigationAdditionalInteraction():ASFunction {
-		return ASCompat.coerceFunction(mNavigationAdditionalInteraction != null ? ASCompat.coerceFunction(mNavigationAdditionalInteraction["LEFT"]) : null);
+		return
+			ASCompat.coerceFunction(mNavigationAdditionalInteraction != null ? ASCompat.coerceFunction(ASDictionary.getString(mNavigationAdditionalInteraction,
+				"LEFT")) : null);
 	}
 
 	@:isVar public var rightNavigationAdditionalInteraction(get, set):ASFunction;
 
 	public function get_rightNavigationAdditionalInteraction():ASFunction {
-		return ASCompat.coerceFunction(mNavigationAdditionalInteraction != null ? ASCompat.coerceFunction(mNavigationAdditionalInteraction["RIGHT"]) : null);
+		return
+			ASCompat.coerceFunction(mNavigationAdditionalInteraction != null ? ASCompat.coerceFunction(ASDictionary.getString(mNavigationAdditionalInteraction,
+				"RIGHT")) : null);
 	}
 
 	@:isVar public var upNavigationAdditionalInteraction(get, set):ASFunction;
 
 	public function get_upNavigationAdditionalInteraction():ASFunction {
-		return ASCompat.coerceFunction(mNavigationAdditionalInteraction != null ? ASCompat.coerceFunction(mNavigationAdditionalInteraction["UP"]) : null);
+		return
+			ASCompat.coerceFunction(mNavigationAdditionalInteraction != null ? ASCompat.coerceFunction(ASDictionary.getString(mNavigationAdditionalInteraction,
+				"UP")) : null);
 	}
 
 	@:isVar public var downNavigationAdditionalInteraction(get, set):ASFunction;
 
 	public function get_downNavigationAdditionalInteraction():ASFunction {
-		return ASCompat.coerceFunction(mNavigationAdditionalInteraction != null ? ASCompat.coerceFunction(mNavigationAdditionalInteraction["DOWN"]) : null);
+		return
+			ASCompat.coerceFunction(mNavigationAdditionalInteraction != null ? ASCompat.coerceFunction(ASDictionary.getString(mNavigationAdditionalInteraction,
+				"DOWN")) : null);
 	}
 
 	@:isVar public var navigationSelectedInteraction(get, set):ASFunction;
 
 	public function get_navigationSelectedInteraction():ASFunction {
-		return ASCompat.coerceFunction(mNavigationAdditionalInteraction != null ? ASCompat.coerceFunction(mNavigationAdditionalInteraction["SELECTED"]) : null);
+		return
+			ASCompat.coerceFunction(mNavigationAdditionalInteraction != null ? ASCompat.coerceFunction(ASDictionary.getString(mNavigationAdditionalInteraction,
+				"SELECTED")) : null);
 	}
 
 	@:isVar public var navigationSetToUnselectedInteraction(get, set):ASFunction;
 
 	public function get_navigationSetToUnselectedInteraction():ASFunction {
 		return
-			ASCompat.coerceFunction(mNavigationAdditionalInteraction != null ? ASCompat.coerceFunction(mNavigationAdditionalInteraction["SET_TO_UNSELECTED"]) : null);
+			ASCompat.coerceFunction(mNavigationAdditionalInteraction != null ? ASCompat.coerceFunction(ASDictionary.getString(mNavigationAdditionalInteraction,
+				"SET_TO_UNSELECTED")) : null);
 	}
 
 	function set_leftNavigationAdditionalInteraction(leftUiObjectInteraction:ASFunction):ASFunction {
@@ -556,7 +576,7 @@ class UIObject {
 			throw new Error("This UIObject ("
 				+ this.mRoot.name
 				+ ") already has an additional interaction:  "
-				+ Std.string(mNavigationAdditionalInteraction["LEFT"].mRoot.name));
+				+ Std.string(ASDictionary.getString(mNavigationAdditionalInteraction, "LEFT").mRoot.name));
 		}
 		mNavigationAdditionalInteraction["LEFT"] = leftUiObjectInteraction;
 		return leftUiObjectInteraction;
@@ -567,7 +587,7 @@ class UIObject {
 			throw new Error("This UIObject ("
 				+ this.mRoot.name
 				+ ") already has an additional interaction:  "
-				+ Std.string(mNavigationAdditionalInteraction["RIGHT"].mRoot.name));
+				+ Std.string(ASDictionary.getString(mNavigationAdditionalInteraction, "RIGHT").mRoot.name));
 		}
 		mNavigationAdditionalInteraction["RIGHT"] = rightUiObjectInteraction;
 		return rightUiObjectInteraction;
@@ -578,7 +598,7 @@ class UIObject {
 			throw new Error("This UIObject ("
 				+ this.mRoot.name
 				+ ") already has an additional interaction:  "
-				+ Std.string(mNavigationAdditionalInteraction["UP"].mRoot.name));
+				+ Std.string(ASDictionary.getString(mNavigationAdditionalInteraction, "UP").mRoot.name));
 		}
 		mNavigationAdditionalInteraction["UP"] = upUiObjectInteraction;
 		return upUiObjectInteraction;
@@ -589,7 +609,7 @@ class UIObject {
 			throw new Error("This UIObject ("
 				+ this.mRoot.name
 				+ ") already has an additional interaction: "
-				+ Std.string(mNavigationAdditionalInteraction["DOWN"].mRoot.name));
+				+ Std.string(ASDictionary.getString(mNavigationAdditionalInteraction, "DOWN").mRoot.name));
 		}
 		mNavigationAdditionalInteraction["DOWN"] = downUiObjectInteraction;
 		return downUiObjectInteraction;
@@ -600,7 +620,7 @@ class UIObject {
 			throw new Error("This UIObject ("
 				+ this.mRoot.name
 				+ ") already has a selected interaction: "
-				+ Std.string(mNavigationAdditionalInteraction["SELECTED"].mRoot.name));
+				+ Std.string(ASDictionary.getString(mNavigationAdditionalInteraction, "SELECTED").mRoot.name));
 		}
 		mNavigationAdditionalInteraction["SELECTED"] = selectedUiObjectInteraction;
 		return selectedUiObjectInteraction;
@@ -611,7 +631,7 @@ class UIObject {
 			throw new Error("This UIObject ("
 				+ this.mRoot.name
 				+ ") already has an unselected interaction: "
-				+ Std.string(mNavigationAdditionalInteraction["SET_TO_UNSELECTED"].mRoot.name));
+				+ Std.string(ASDictionary.getString(mNavigationAdditionalInteraction, "SET_TO_UNSELECTED").mRoot.name));
 		}
 		mNavigationAdditionalInteraction["SET_TO_UNSELECTED"] = selectedUiObjectInteraction;
 		return selectedUiObjectInteraction;

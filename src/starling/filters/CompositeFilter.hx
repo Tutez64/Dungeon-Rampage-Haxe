@@ -246,8 +246,8 @@ private class CompositeEffect extends FilterEffect {
 			_loc9_ = ASCompat.coerce(_loc5_[_loc7_], CompositeLayer);
 			_loc3_ = RenderUtil.getTextureVariantBits(_loc9_.texture);
 			_loc8_ = (CompositeMode.getIndex(_loc9_.mode) : UInt);
-			_loc6_ = (ASCompat.toInt(_loc9_.replaceColor) : UInt);
-			_loc10_ = (ASCompat.toInt(_loc9_.invertAlpha) : UInt);
+			_loc6_ = ((if (_loc9_.replaceColor) 1 else 0) : UInt);
+			_loc10_ = ((if (_loc9_.invertAlpha) 1 else 0) : UInt);
 			_loc4_ = ((_loc3_ : Int) | (_loc8_ : Int) << 3 | (_loc6_ : Int) << 6 | (_loc10_ : Int) << 7 : UInt);
 			_loc2_ = ((_loc2_ | ((_loc4_ : Int) << _loc7_ * 8 : UInt) : UInt) : UInt);
 			_loc7_++;

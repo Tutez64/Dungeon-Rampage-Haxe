@@ -160,7 +160,7 @@ class AnimationAtlas {
 	}
 
 	public function getLabelSymbolName(label:String):String {
-		return ASCompat.asString(_labelSymbols[label]);
+		return ASCompat.asString(ASDictionary.getString(_labelSymbols, label));
 	}
 
 	public function getClipLabels(out:Vector<String>):Vector<String> {
@@ -282,7 +282,7 @@ class AnimationAtlas {
 	}
 
 	@:allow(starling.extensions.animate) function getSymbolData(name:String):ASObject {
-		return _symbolData[name];
+		return ASDictionary.getString(_symbolData, name);
 	}
 
 	@:allow(starling.extensions.animate) function getLabelTable(data:ASObject):LabelTable {
@@ -353,7 +353,7 @@ class AnimationAtlas {
 	}
 
 	function getSymbolPool(name:String):Array<ASAny> {
-		var _loc2_:Array<ASAny> = ASCompat.coerce(_symbolPool[name], Array);
+		var _loc2_:Array<ASAny> = ASCompat.coerce(ASDictionary.getString(_symbolPool, name), Array);
 		if (_loc2_ == null) {
 			_loc2_ = ASCompat.coerce(_symbolPool[name] = [], Array);
 		}

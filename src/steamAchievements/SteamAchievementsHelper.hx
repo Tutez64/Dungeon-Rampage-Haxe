@@ -58,27 +58,31 @@ class SteamAchievementsHelper {
 		}
 	}
 
-	public function updateMapsAtFloor25Stat(inMapNode:GMMapNode):Bool {
-		var _loc5_:String = null;
-		if (inMapNode.NodeType != GMMapNode.INFINITE_NODE_TYPE || mDBFacade.steamAchievementsManager == null) {
+	public function updateTrophiesEarnedStat(inTrophies:UInt) {
+		setHighestStatValueAchieved(inTrophies, "TROPHIES_EARNED");
+	}
+
+	public function updateMapsAtFloor25Stat():Bool {
+		var _loc4_:String = null;
+		if (mDBFacade.steamAchievementsManager == null) {
 			return false;
 		}
-		var _loc2_ = 0;
-		var _loc3_:GMMapNode;
+		var _loc1_ = 0;
+		var _loc2_:GMMapNode;
 		final __ax4_iter_332 = mDBFacade.gameMaster.MapNodes;
 		if (checkNullIteratee(__ax4_iter_332))
 			for (_tmp_ in __ax4_iter_332) {
-				_loc3_ = _tmp_;
-				if (_loc3_.NodeType == GMMapNode.INFINITE_NODE_TYPE) {
-					_loc5_ = SteamAPINames.getUltimateRampageHighestFloorStatAPIName(_loc3_.Constant);
-					if (mDBFacade.steamAchievementsManager.getCurrentSteamStatIntValue(_loc5_) >= 25) {
-						_loc2_++;
+				_loc2_ = _tmp_;
+				if (_loc2_.NodeType == GMMapNode.INFINITE_NODE_TYPE) {
+					_loc4_ = SteamAPINames.getUltimateRampageHighestFloorStatAPIName(_loc2_.Constant);
+					if (mDBFacade.steamAchievementsManager.getCurrentSteamStatIntValue(_loc4_) >= 25) {
+						_loc1_++;
 					}
 				}
 			}
-		var _loc4_ = mDBFacade.steamAchievementsManager.getCurrentSteamStatIntValue("ULTIMATE_RAMPAGE_MAPS_AT_FLOOR_25");
-		if (_loc2_ != _loc4_) {
-			return setValueToStatInt(_loc2_, "ULTIMATE_RAMPAGE_MAPS_AT_FLOOR_25");
+		var _loc3_ = mDBFacade.steamAchievementsManager.getCurrentSteamStatIntValue("ULTIMATE_RAMPAGE_MAPS_AT_FLOOR_25");
+		if (_loc1_ != _loc3_) {
+			return setValueToStatInt(_loc1_, "ULTIMATE_RAMPAGE_MAPS_AT_FLOOR_25");
 		}
 		return false;
 	}
@@ -93,12 +97,12 @@ class SteamAchievementsHelper {
 		}
 	}
 
-	public function checkHighestUltimateRampageFloorAchieved(inMapNode:GMMapNode, inCurrentFloor:UInt) {
-		if (inMapNode.NodeType != GMMapNode.INFINITE_NODE_TYPE) {
+	public function checkHighestUltimateRampageFloorAchieved(inMapNode:GMMapNode, inFloorsCleared:Int) {
+		if (inMapNode.NodeType != GMMapNode.INFINITE_NODE_TYPE || inFloorsCleared <= 0) {
 			return;
 		}
 		var _loc3_ = SteamAPINames.getUltimateRampageHighestFloorStatAPIName(inMapNode.Constant);
-		setHighestStatValueAchieved(inCurrentFloor, _loc3_);
+		setHighestStatValueAchieved(inFloorsCleared, _loc3_);
 	}
 
 	public function checkStorageAchievements(inStorageSlots:Int):Bool {

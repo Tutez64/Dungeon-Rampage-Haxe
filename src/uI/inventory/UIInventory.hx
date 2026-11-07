@@ -860,12 +860,12 @@ class UIInventory {
 		if (mDungeonRewardPanel != null) {
 			mDungeonRewardPanel.refresh();
 		}
-		currentTabIsValidCategory = ASCompat.toBool(ASCompat.ASArray.some(CATEGORY_ARRAY, function(param1:ASAny, param2:UInt, param3:Array<ASAny>):Bool {
+		currentTabIsValidCategory = ASCompat.ASArray.some(CATEGORY_ARRAY, function(param1:ASAny, param2:UInt, param3:Array<ASAny>):Bool {
 			if (mCurrentTab == ASCompat.asString(param1)) {
 				return true;
 			}
 			return false;
-		}));
+		});
 		if (!currentTabIsValidCategory) {
 			mCurrentTab = GMInventoryBase.WEAPON_CATEGORY;
 		}

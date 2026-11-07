@@ -74,8 +74,8 @@ class MenuNavigationController {
 
 	public function pushNewLayer(layerConstant:String, layerExitCallback:ASFunction, defaultObject:UIObject, focusedObject:UIObject = null,
 			previousCategoryCallback:ASFunction = null, nextCategoryCallback:ASFunction = null) {
-		if (ASCompat.toBool(mDefaultUIObjs[layerConstant])
-			|| ASCompat.toBool(mSelectedUIObjs[layerConstant])
+		if (ASCompat.toBool(ASDictionary.getString(mDefaultUIObjs, layerConstant))
+			|| ASCompat.toBool(ASDictionary.getString(mSelectedUIObjs, layerConstant))
 			|| mUILayerConstants.indexOf(layerConstant) != -1) {
 			Logger.debugch("UI", "Layer constant " + layerConstant + " already exists in the UI Manager");
 			return;
@@ -128,7 +128,7 @@ class MenuNavigationController {
 			+ " (Current Layers: "
 			+ getAllCurrentLayers()
 			+ ")");
-		var _loc2_ = ASCompat.coerce(mSelectedUIObjs[layerConstant], brain.uI.UIObject);
+		var _loc2_ = ASCompat.coerce(ASDictionary.getString(mSelectedUIObjs, layerConstant), brain.uI.UIObject);
 		if (_loc2_ != null) {
 			_loc2_.setFocused(false);
 		}
@@ -239,7 +239,10 @@ class MenuNavigationController {
 			return _loc10_;
 		}
 		var _loc2_:String = mUILayerConstants[(mTopLayer : Int)];
-		var _loc5_:Array<ASAny> = [mSelectedUIObjs[_loc2_], mDefaultUIObjs[_loc2_]];
+		var _loc5_:Array<ASAny> = [
+			ASDictionary.getString(mSelectedUIObjs, _loc2_),
+			ASDictionary.getString(mDefaultUIObjs, _loc2_)
+		];
 		var _loc6_ = new ASDictionary<ASAny, ASAny>(true);
 		var _loc3_:Array<ASAny> = [];
 		if (checkNullIteratee(_loc5_))
@@ -395,7 +398,7 @@ class MenuNavigationController {
 			for (_tmp_ in __ax4_iter_447.keys()) {
 				_loc2_ = _tmp_;
 				if (mSteamInputManager.pressedAction(_loc2_)) {
-					onKeyPressed(ASCompat.toInt(mSteamInputActionsToKeyCodes[_loc2_]), true);
+					onKeyPressed(ASCompat.toInt(ASDictionary.getString(mSteamInputActionsToKeyCodes, _loc2_)), true);
 				}
 			}
 	}
@@ -405,8 +408,8 @@ class MenuNavigationController {
 			return;
 		}
 		var _loc2_:String = mUILayerConstants[(mTopLayer : Int)];
-		if (RETURN_LAYERS.indexOf(_loc2_) != -1 && ASCompat.toBool(mLayerExitCallbacks[_loc2_])) {
-			mLayerExitCallbacks[_loc2_]();
+		if (RETURN_LAYERS.indexOf(_loc2_) != -1 && ASCompat.toBool(ASDictionary.getString(mLayerExitCallbacks, _loc2_))) {
+			ASDictionary.getString(mLayerExitCallbacks, _loc2_)();
 		}
 	}
 
@@ -415,7 +418,7 @@ class MenuNavigationController {
 		var _loc4_:UIObject = null;
 		var _loc3_:String = mUILayerConstants[(mTopLayer : Int)];
 		if (mFocusedUiObject != null && mFocusedUiObject.root == null && inputCode != 27 && inputCode != 81 && inputCode != 69) {
-			_loc5_ = ASCompat.coerce(mDefaultUIObjs[_loc3_], brain.uI.UIObject);
+			_loc5_ = ASCompat.coerce(ASDictionary.getString(mDefaultUIObjs, _loc3_), brain.uI.UIObject);
 			if (_loc5_ != null && _loc5_.root != null) {
 				setFocusedUiObject(_loc5_);
 			}
@@ -423,13 +426,13 @@ class MenuNavigationController {
 		}
 		if (inputCode == 81) {
 			if (ASCompat.dictionaryLookupNeNull(mLayerPreviousCategoryCallbacks, _loc3_)) {
-				mLayerPreviousCategoryCallbacks[_loc3_]();
+				ASDictionary.getString(mLayerPreviousCategoryCallbacks, _loc3_)();
 			}
 			return;
 		}
 		if (inputCode == 69) {
 			if (ASCompat.dictionaryLookupNeNull(mLayerNextCategoryCallbacks, _loc3_)) {
-				mLayerNextCategoryCallbacks[_loc3_]();
+				ASDictionary.getString(mLayerNextCategoryCallbacks, _loc3_)();
 			}
 			return;
 		}

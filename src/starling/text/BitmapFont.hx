@@ -151,7 +151,7 @@ class BitmapFont implements ITextCompositor {
 	}
 
 	public function getChar(charID:Int):BitmapChar {
-		return ASCompat.coerce(_chars[charID], starling.text.BitmapChar);
+		return ASCompat.coerce(ASDictionary.getInt(_chars, charID), starling.text.BitmapChar);
 	}
 
 	public function addChar(charID:Int, bitmapChar:BitmapChar) {
@@ -245,7 +245,7 @@ class BitmapFont implements ITextCompositor {
 			return null;
 		}
 		_loc5_ = format.size < 0 ? format.size * -_size : format.size;
-		_loc4_ = ASCompat.thisOrDefault(ASCompat.reinterpretAs(previousStyle, DistanceFieldStyle), new DistanceFieldStyle());
+		_loc4_ = ASCompat.orValue(ASCompat.reinterpretAs(previousStyle, DistanceFieldStyle), new DistanceFieldStyle());
 		_loc4_.multiChannel = _type == "multiChannelDistanceField";
 		_loc4_.softness = _size / (_loc5_ * _distanceFieldSpread);
 		return _loc4_;

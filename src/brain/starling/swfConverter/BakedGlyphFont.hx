@@ -294,7 +294,7 @@ class BakedGlyphFont {
 	}
 
 	static function filterProps(filter:ASObject, type:String):Array<ASAny> {
-		var _loc6_:Array<ASAny> = ASCompat.coerce(sFilterProps[type], Array);
+		var _loc6_:Array<ASAny> = ASCompat.coerce(ASDictionary.getString(sFilterProps, type), Array);
 		if (_loc6_ != null) {
 			return _loc6_;
 		}

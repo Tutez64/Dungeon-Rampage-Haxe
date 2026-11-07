@@ -17,7 +17,7 @@ class ObjectPool {
 		if (checkNullIteratee(__ax4_iter_41))
 			for (_tmp_ in __ax4_iter_41.keys()) {
 				_loc3_ = _tmp_;
-				_loc2_ = (mPool[_loc3_] : Vector<IPoolable>);
+				_loc2_ = (ASDictionary.getString(mPool, _loc3_) : Vector<IPoolable>);
 				_loc1_ += Std.string(_loc2_.length) + "\t: " + _loc3_ + "\n";
 			}
 		return _loc1_;
@@ -36,7 +36,7 @@ class ObjectPool {
 	function getPool(key:String):Vector<IPoolable> {
 		var _loc2_:Vector<IPoolable> = /*undefined*/ null;
 		if (mPool.exists(key)) {
-			return (mPool[key] : Vector<IPoolable>);
+			return (ASDictionary.getString(mPool, key) : Vector<IPoolable>);
 		}
 		_loc2_ = new Vector<IPoolable>();
 		mPool[key] = _loc2_;
@@ -45,7 +45,7 @@ class ObjectPool {
 	}
 
 	function statsFor(key:String):PoolStats {
-		var _loc2_ = ASCompat.coerce(mStats[key], PoolStats);
+		var _loc2_ = ASCompat.coerce(ASDictionary.getString(mStats, key), PoolStats);
 		if (_loc2_ == null) {
 			_loc2_ = new PoolStats();
 			mStats[key] = _loc2_;
@@ -93,8 +93,8 @@ class ObjectPool {
 		if (checkNullIteratee(__ax4_iter_42))
 			for (_tmp_ in __ax4_iter_42.keys()) {
 				_loc4_ = _tmp_;
-				_loc1_ = ASCompat.coerce(mStats[_loc4_], PoolStats);
-				_loc2_ = (mPool[_loc4_] : Vector<IPoolable>);
+				_loc1_ = ASCompat.coerce(ASDictionary.getString(mStats, _loc4_), PoolStats);
+				_loc2_ = (ASDictionary.getString(mPool, _loc4_) : Vector<IPoolable>);
 				_loc3_.push({
 					"key": _loc4_,
 					"pooled": (_loc2_ != null ? _loc2_.length : 0),

@@ -290,7 +290,7 @@ class SteamInputManager {
 	}
 
 	function logGlyphResolutionOnce(origin:String, resolution:String) {
-		if (ASCompat.toBool(mLoggedGlyphOrigins[origin])) {
+		if (ASCompat.toBool(ASDictionary.getString(mLoggedGlyphOrigins, origin))) {
 			return;
 		}
 		mLoggedGlyphOrigins[origin] = true;
@@ -299,10 +299,10 @@ class SteamInputManager {
 
 	public function getGlyphFilePathForAction(inActionName:String):String {
 		if (ASCompat.dictionaryLookupEqNull(mInputActionNameToControllerGlyphFilePath, inActionName)
-			|| mInputActionNameToControllerGlyphFilePath[inActionName] == "error1") {
+			|| ASDictionary.getString(mInputActionNameToControllerGlyphFilePath, inActionName) == "error1") {
 			updateActionOrigins();
 		}
-		return mInputActionNameToControllerGlyphFilePath[inActionName];
+		return ASDictionary.getString(mInputActionNameToControllerGlyphFilePath, inActionName);
 	}
 
 	public function getGlyphFilePathForAnalogAction(inActionName:String):String {
@@ -351,7 +351,7 @@ class SteamInputManager {
 		if (checkNullIteratee(__ax4_iter_114))
 			for (_tmp_ in __ax4_iter_114) {
 				_loc3_ = _tmp_;
-				_loc2_ = ASCompat.coerce(_loc3_.analogInputs[movementActionName], flash.geom.Vector3D);
+				_loc2_ = ASCompat.coerce(ASDictionary.getString(_loc3_.analogInputs, movementActionName), flash.geom.Vector3D);
 				if (_loc2_ != null) {
 					if (_loc2_.lengthSquared > 0) {
 						return _loc2_;
@@ -605,7 +605,7 @@ class SteamInputManager {
 		if (checkNullIteratee(_loc1_))
 			for (_tmp_ in _loc1_) {
 				_loc3_ = _tmp_;
-				_loc2_ = ASCompat.coerce(mHandlesToSteamControllers[_loc3_], steamInput.SteamController);
+				_loc2_ = ASCompat.coerce(ASDictionary.getString(mHandlesToSteamControllers, _loc3_), steamInput.SteamController);
 				if (_loc2_ == null) {
 					_loc2_ = new SteamController(_loc3_, mInGameControlsActionSet, mMenuControlsActionSet);
 					mHandlesToSteamControllers[_loc3_] = _loc2_;

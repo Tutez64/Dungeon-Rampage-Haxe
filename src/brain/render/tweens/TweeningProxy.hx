@@ -48,12 +48,12 @@ class TweeningProxy {
 
 	static function configureTiming(tween:Tween, vars:ASObject) {
 		var _loc3_ = 0;
-		tween.delay = ASCompat.toNumber(ASCompat.thisOrDefault(ASCompat.toNumber(vars.delay), 0));
+		tween.delay = ASCompat.toNumber(ASCompat.orValue(ASCompat.toNumber(vars.delay), 0));
 		if (vars.hasOwnProperty("repeat")) {
 			_loc3_ = ASCompat.toInt(vars.repeat);
 			tween.repeatCount = _loc3_ < 0 ? 0 : _loc3_ + 1;
 		}
-		tween.repeatDelay = ASCompat.toNumber(ASCompat.thisOrDefault(ASCompat.toNumber(vars.repeatDelay), 0));
+		tween.repeatDelay = ASCompat.toNumber(ASCompat.orValue(ASCompat.toNumber(vars.repeatDelay), 0));
 		tween.reverse = vars.yoyo == true;
 	}
 
@@ -196,7 +196,7 @@ class TweeningProxy {
 			_loc3_.onCompleteArgs = ASCompat.dynamicAs(vars.onCompleteParams, Array);
 			if (ASCompat.toBool(vars.tweens)) {
 				_loc7_ = ASCompat.toBool(vars.align) ? ASCompat.toString(vars.align) : "normal";
-				_loc5_ = ASCompat.toNumber(ASCompat.thisOrDefault(ASCompat.toNumber(vars.stagger), 0));
+				_loc5_ = ASCompat.toNumber(ASCompat.orValue(ASCompat.toNumber(vars.stagger), 0));
 				_loc6_ = 0;
 				__ax4_iter_421 = vars.tweens;
 				if (checkNullIteratee(__ax4_iter_421))

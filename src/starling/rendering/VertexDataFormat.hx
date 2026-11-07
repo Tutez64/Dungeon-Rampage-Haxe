@@ -22,13 +22,13 @@ class VertexDataFormat {
 		var _loc2_:VertexDataFormat = null;
 		var _loc3_:String = null;
 		if (sFormats.exists(format)) {
-			return ASCompat.coerce(sFormats[format], VertexDataFormat);
+			return ASCompat.coerce(ASDictionary.getString(sFormats, format), VertexDataFormat);
 		}
 		_loc2_ = new VertexDataFormat();
 		_loc2_.parseFormat(format);
 		_loc3_ = _loc2_._format;
 		if (sFormats.exists(_loc3_)) {
-			_loc2_ = ASCompat.coerce(sFormats[_loc3_], VertexDataFormat);
+			_loc2_ = ASCompat.coerce(ASDictionary.getString(sFormats, _loc3_), VertexDataFormat);
 		}
 		sFormats[format] = _loc2_;
 		sFormats[_loc3_] = _loc2_;

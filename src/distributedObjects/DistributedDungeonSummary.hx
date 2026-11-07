@@ -239,6 +239,10 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 
 	var mDungeonAchievementPanelMovieClipRenderer:MovieClipRenderer;
 
+	var mEarnedTrophy:Bool = false;
+
+	var mHideTrophyArtTask:Task;
+
 	var mTransactionSuccessCallback:ASFunction;
 
 	var mSteamAvatarHolder:MovieClip;
@@ -415,6 +419,9 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 			Logger.error("Couldn\'t find GMMapNode for node id : " + mMapNodeId);
 			return;
 		}
+		var _loc1_ = mDBFacade.dbAccountInfo.activeAvatarInfo;
+		mEarnedTrophy = mDungeonReport[0].receivedTrophy != 0 && (_loc1_ == null || !_loc1_.hasTrophy(mCurrentMapNode.BitIndex));
+		mDBFacade.steamAchievementsHelper.updateTrophiesEarnedStat(mDBFacade.dbAccountInfo.trophies + (mEarnedTrophy ? 1 : 0));
 		mDungeonName = GameMasterLocale.getGameMasterSubString("DUNGEON_NAME", mCurrentMapNode.Constant).toUpperCase();
 		if (this.dungeonSuccess != 0) {
 			mAssetLoadingComponent.getSwfAsset(DBFacade.buildFullDownloadPath("Resources/Art2D/UI/db_UI_score_report.swf"), successScoreReportSwfLoaded);
@@ -555,7 +562,6 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 									mDBFacade.steamAchievementsHelper.unlockAchievement("CHALLENGE_COLLECT_NO_COINS_IN_DUNGEON");
 								}
 								mDBFacade.steamAchievementsHelper.addValueToStatInt(mDungeonReport[(i : Int)].kills, "ENEMIES_KILLED");
-								mDBFacade.steamAchievementsHelper.addValueToStatInt(mDungeonReport[(i : Int)].receivedTrophy, "TROPHIES_EARNED");
 							}
 						}
 						i = i + 1;
@@ -578,17 +584,28 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 					setRevealState((20 : UInt), 0.45);
 
 				case 20:
-					if (mDungeonReport[0].receivedTrophy == 0) {
+					if (!mEarnedTrophy && !(mDungeonReport[0].receivedTrophy != 0 && mCurrentMapNode.InfiniteDungeon == null)) {
 						setRevealState((2 : UInt), 0.45);
 					} else {
 						mDungeonAchievementPanelMovieClipRenderer.clip.visible = true;
-						ASCompat.setProperty((mScoreReportRoot : ASAny).stats_a.stats.trophies, "filters", [new GlowFilter((16633879 : UInt), 1, 8, 8, 10)]);
-						trophies = ASCompat.toInt((mScoreReportRoot : ASAny).stats_a.stats.trophies.trophies.text);
-						trophies = trophies + 1;
-						TextUtil.setText(ASCompat.coerce((mScoreReportRoot : ASAny).stats_a.stats.trophies.trophies, flash.text.TextField),
-							Std.string(trophies));
+						if (mEarnedTrophy) {
+							ASCompat.setProperty((mScoreReportRoot : ASAny).stats_a.stats.trophies, "filters",
+								[new GlowFilter((16633879 : UInt), 1, 8, 8, 10)]);
+							trophies = ASCompat.toInt((mScoreReportRoot : ASAny).stats_a.stats.trophies.trophies.text);
+							trophies = trophies + 1;
+							TextUtil.setText(ASCompat.coerce((mScoreReportRoot : ASAny).stats_a.stats.trophies.trophies, flash.text.TextField),
+								Std.string(trophies));
+						}
 						trophyGetClipLength = (4 : UInt);
 						mDungeonAchievementPanelMovieClipRenderer.play();
+						if (!mEarnedTrophy) {
+							mHideTrophyArtTask = mLogicalWorkComponent.doEveryFrame(function(param1:GameClock) {
+								var _loc2_ = ASCompat.dynamicAs((mScoreReportRoot : ASAny).achievement.trophy, DisplayObject);
+								if (_loc2_ != null) {
+									_loc2_.visible = false;
+								}
+							});
+						}
 						if (mSmashSfx != null) {
 							mSoundComponent.playSfxOneShot(mSmashSfx);
 						}
@@ -601,6 +618,10 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 					}
 
 				case 25:
+					if (mHideTrophyArtTask != null) {
+						mHideTrophyArtTask.destroy();
+						mHideTrophyArtTask = null;
+					}
 					if (mDungeonAchievementPanelMovieClipRenderer != null && mDungeonAchievementPanelMovieClipRenderer.clip != null) {
 						mDungeonAchievementPanelMovieClipRenderer.stop();
 						mDungeonAchievementPanelMovieClipRenderer.clip.visible = false;
@@ -1770,7 +1791,7 @@ class DistributedDungeonSummary extends GameObject implements IDistributedDungeo
 	}
 
 	function get_dungeonSuccess():UInt {
-		return (ASCompat.toInt(mDungeonSuccess) : UInt);
+		return ((if (mDungeonSuccess) 1 else 0) : UInt);
 	}
 
 	function chestPopupCallback(gmChest:GMChest, slot:UInt):ASFunction {

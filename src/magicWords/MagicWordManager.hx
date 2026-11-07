@@ -364,7 +364,7 @@ class MagicWordManager {
 
 	function parseSmallTextOptions(param:String):ASObject {
 		var _loc3_:String = null;
-		var _loc2_:Array<ASAny> = ASCompat.coerce(ASCompat.thisOrDefault((cast new compat.RegExp("\\S+", "g").match(param)), []), Array);
+		var _loc2_:Array<ASAny> = ASCompat.coerce(ASCompat.orValue((cast new compat.RegExp("\\S+", "g").match(param)), []), Array);
 		var _loc4_ = false;
 		if (_loc2_.length > 0) {
 			_loc3_ = ASCompat.toString(_loc2_[_loc2_.length - 1]).toLowerCase();

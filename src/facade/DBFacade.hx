@@ -422,7 +422,7 @@ class DBFacade extends Facade {
 		mAccountBonus = new AccountBonus(this);
 		createTokenRegenTask();
 		logSystemMetrics();
-		NODE_RULES = (ASCompat.toInt(getSplitTestBoolean("NODE_UNLOCK_GLOBAL", false)) : UInt);
+		NODE_RULES = ((if (getSplitTestBoolean("NODE_UNLOCK_GLOBAL", false)) 1 else 0) : UInt);
 		environmentPrefix = dbConfigManager.getConfigString("EnvironmentPrefix", "u");
 		mMenuNavigationController = new MenuNavigationController(this);
 		mCustomSkinVisualsOverrideHandler = new CustomSkinVisualsOverrideHandler(this);

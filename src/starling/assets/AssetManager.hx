@@ -234,11 +234,11 @@ class AssetManager extends EventDispatcher {
 			asset = ASCompat.createInstance(asset, []);
 		}
 		var _loc7_ = new AssetReference(asset);
-		_loc7_.name = ASCompat.thisOrDefault(if (ASCompat.stringAsBool(name)) name else getNameFromUrl(_loc7_.url), getUniqueName());
+		_loc7_.name = ASCompat.orValue(if (ASCompat.stringAsBool(name)) name else getNameFromUrl(_loc7_.url), getUniqueName());
 		_loc7_.extension = if (ASCompat.stringAsBool(customExtension)) customExtension else getExtensionFromUrl(_loc7_.url);
 		_loc7_.mimeType = customMimeType;
 		_loc7_.textureOptions = if (options != null) options else _textureOptions;
-		var _loc6_ = ASCompat.thisOrDefault(getFilenameFromUrl(_loc7_.url), _loc7_.name);
+		var _loc6_ = ASCompat.orValue(getFilenameFromUrl(_loc7_.url), _loc7_.name);
 		_queue.push(_loc7_);
 		log("Enqueuing \'" + _loc6_ + "\'");
 		return _loc7_.name;
@@ -483,13 +483,13 @@ class AssetManager extends EventDispatcher {
 		if (!ASCompat.stringAsBool(type)) {
 			type = AssetType.fromAsset(asset);
 		}
-		var _loc4_ = (_assets[type] : ASDictionary<ASAny, ASAny>);
+		var _loc4_ = (ASDictionary.getString(_assets, type) : ASDictionary<ASAny, ASAny>);
 		if (_loc4_ == null) {
 			_loc4_ = new ASDictionary<ASAny, ASAny>();
 			_assets[type] = _loc4_;
 		}
 		log("Adding " + type + " \'" + name + "\'");
-		var _loc5_:ASObject = _loc4_[name];
+		var _loc5_:ASObject = ASDictionary.getString(_loc4_, name);
 		if (ASCompat.toBool(_loc5_) && _loc5_ != asset) {
 			log("Warning: name was already in use; disposing the previous " + type);
 			disposeAsset(_loc5_);
@@ -505,7 +505,7 @@ class AssetManager extends EventDispatcher {
 		var _loc4_:ASDictionary<ASAny, ASAny> = null;
 		var _loc8_:Texture = null;
 		if (recursive) {
-			_loc5_ = (_assets["assetManager"] : ASDictionary<ASAny, ASAny>);
+			_loc5_ = (ASDictionary.getString(_assets, "assetManager") : ASDictionary<ASAny, ASAny>);
 			if (_loc5_ != null) {
 				if (checkNullIteratee(_loc5_))
 					for (_tmp_ in _loc5_) {
@@ -517,7 +517,7 @@ class AssetManager extends EventDispatcher {
 					}
 			}
 			if (type == "texture") {
-				_loc4_ = (_assets["textureAtlas"] : ASDictionary<ASAny, ASAny>);
+				_loc4_ = (ASDictionary.getString(_assets, "textureAtlas") : ASDictionary<ASAny, ASAny>);
 				if (_loc4_ != null) {
 					if (checkNullIteratee(_loc4_))
 						for (_tmp_ in _loc4_) {
@@ -530,9 +530,9 @@ class AssetManager extends EventDispatcher {
 				}
 			}
 		}
-		var _loc9_ = (_assets[type] : ASDictionary<ASAny, ASAny>);
+		var _loc9_ = (ASDictionary.getString(_assets, type) : ASDictionary<ASAny, ASAny>);
 		if (_loc9_ != null) {
-			return _loc9_[name];
+			return ASDictionary.getString(_loc9_, name);
 		}
 		return null;
 	}
@@ -546,7 +546,7 @@ class AssetManager extends EventDispatcher {
 			out = new Vector<String>();
 		}
 		if (recursive) {
-			_loc6_ = (_assets["assetManager"] : ASDictionary<ASAny, ASAny>);
+			_loc6_ = (ASDictionary.getString(_assets, "assetManager") : ASDictionary<ASAny, ASAny>);
 			if (_loc6_ != null) {
 				if (checkNullIteratee(_loc6_))
 					for (_tmp_ in _loc6_) {
@@ -555,7 +555,7 @@ class AssetManager extends EventDispatcher {
 					}
 			}
 			if (assetType == "texture") {
-				_loc5_ = (_assets["textureAtlas"] : ASDictionary<ASAny, ASAny>);
+				_loc5_ = (ASDictionary.getString(_assets, "textureAtlas") : ASDictionary<ASAny, ASAny>);
 				if (_loc5_ != null) {
 					if (checkNullIteratee(_loc5_))
 						for (_tmp_ in _loc5_) {
@@ -565,16 +565,16 @@ class AssetManager extends EventDispatcher {
 				}
 			}
 		}
-		getDictionaryKeys((_assets[assetType] : ASDictionary<ASAny, ASAny>), prefix, out);
+		getDictionaryKeys((ASDictionary.getString(_assets, assetType) : ASDictionary<ASAny, ASAny>), prefix, out);
 		ASCompat.ASVector.sortWithOptions(out, 1);
 		return out;
 	}
 
 	public function removeAsset(assetType:String, name:String, dispose:Bool = true) {
 		var _loc5_:ASObject = null;
-		var _loc4_ = (_assets[assetType] : ASDictionary<ASAny, ASAny>);
+		var _loc4_ = (ASDictionary.getString(_assets, assetType) : ASDictionary<ASAny, ASAny>);
 		if (_loc4_ != null) {
-			_loc5_ = _loc4_[name];
+			_loc5_ = ASDictionary.getString(_loc4_, name);
 			if (ASCompat.toBool(_loc5_)) {
 				log("Removing " + assetType + " \'" + name + "\'");
 				if (dispose) {

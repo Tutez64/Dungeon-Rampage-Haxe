@@ -76,7 +76,7 @@ class MultiTextureAtlas extends TextureAtlas {
 	}
 
 	public function removeSheet(name:String) {
-		var _loc4_:ASObject = _sheets[name];
+		var _loc4_:ASObject = ASDictionary.getString(_sheets, name);
 		if (_loc4_ == null) {
 			return;
 		}
@@ -129,7 +129,7 @@ class MultiTextureAtlas extends TextureAtlas {
 	}
 
 	override public function getTexture(name:String):Texture {
-		return ASCompat.coerce(_regions[name], starling.textures.Texture);
+		return ASCompat.coerce(ASDictionary.getString(_regions, name), starling.textures.Texture);
 	}
 
 	override public function getNames(prefix:String = "", out:Vector<String> = null):Vector<String> {
@@ -160,22 +160,22 @@ class MultiTextureAtlas extends TextureAtlas {
 	}
 
 	override public function getRegion(name:String):Rectangle {
-		var _loc2_ = ASCompat.coerce(_regions[name], starling.textures.SubTexture);
+		var _loc2_ = ASCompat.coerce(ASDictionary.getString(_regions, name), starling.textures.SubTexture);
 		return _loc2_ != null ? _loc2_.region : null;
 	}
 
 	override public function getFrame(name:String):Rectangle {
-		var _loc2_ = ASCompat.coerce(_regions[name], starling.textures.SubTexture);
+		var _loc2_ = ASCompat.coerce(ASDictionary.getString(_regions, name), starling.textures.SubTexture);
 		return _loc2_ != null ? _loc2_.frame : null;
 	}
 
 	override public function getRotation(name:String):Bool {
-		var _loc2_ = ASCompat.coerce(_regions[name], starling.textures.SubTexture);
+		var _loc2_ = ASCompat.coerce(ASDictionary.getString(_regions, name), starling.textures.SubTexture);
 		return _loc2_ != null ? _loc2_.rotated : false;
 	}
 
 	override public function removeRegion(name:String) {
-		var _loc2_ = ASCompat.coerce(_regions[name], starling.textures.SubTexture);
+		var _loc2_ = ASCompat.coerce(ASDictionary.getString(_regions, name), starling.textures.SubTexture);
 		if (_loc2_ != null) {
 			_loc2_.dispose();
 		}

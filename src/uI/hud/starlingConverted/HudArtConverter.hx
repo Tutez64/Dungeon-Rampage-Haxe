@@ -379,7 +379,7 @@ class HudArtConverter {
 		if (cell == null) {
 			return null;
 		}
-		return ASCompat.thisOrDefault(ASCompat.dynamicAs(sGrays[cell], BakedCell), cell);
+		return ASCompat.orValue(ASCompat.dynamicAs(sGrays[cell], BakedCell), cell);
 	}
 
 	static function localBounds(bake:BakedPicture, matrix:Matrix):Rectangle {

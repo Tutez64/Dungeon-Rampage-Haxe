@@ -34,7 +34,7 @@ class KeyboardEventSpoofer {
 	function handleReleasedAction(action:String) {
 		var _loc2_ = 0;
 		if (mPressedActions.exists(action)) {
-			_loc2_ = ASCompat.toInt(mPressedActions[action]);
+			_loc2_ = ASCompat.toInt(ASDictionary.getString(mPressedActions, action));
 			mPressedActions.remove(action);
 			fireKeyboardEvent("keyUp", "UnboundActionEvent.RELEASED", action, _loc2_);
 		}

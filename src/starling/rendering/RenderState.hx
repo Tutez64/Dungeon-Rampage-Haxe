@@ -201,7 +201,7 @@ class RenderState {
 	public function setRenderTarget(target:Texture, enableDepthAndStencil:Bool = true, antiAlias:Int = 0) {
 		var _loc5_ = _renderTarget != null ? _renderTarget.base : null;
 		var _loc6_ = target != null ? target.base : null;
-		var _loc7_ = (ASCompat.floatToInt(MathUtil.min(antiAlias, 15)) | ASCompat.toInt(enableDepthAndStencil) << 4:UInt);
+		var _loc7_ = (ASCompat.floatToInt(MathUtil.min(antiAlias, 15)) | (if (enableDepthAndStencil) 1 else 0) << 4:UInt);
 		var _loc4_ = _loc7_ != (((_miscOptions : Int) & 0xFF) : UInt);
 		if (_loc5_ != _loc6_ || _loc4_) {
 			if (_onDrawRequired != null) {
@@ -294,7 +294,7 @@ class RenderState {
 			if (_onDrawRequired != null) {
 				_onDrawRequired();
 			}
-			_miscOptions = ((_miscOptions : Int) & ASCompat.floatToInt(0xFFFF0FFF) | ASCompat.toInt(value) << 12 : UInt);
+			_miscOptions = ((_miscOptions : Int) & ASCompat.floatToInt(0xFFFF0FFF) | (if (value) 1 else 0) << 12 : UInt);
 		}
 		return value;
 	}

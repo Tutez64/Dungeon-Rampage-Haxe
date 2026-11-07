@@ -164,7 +164,7 @@ class Polygon {
 			_loc8_ = _coords[_loc7_ * 2];
 			_loc10_ = _coords[_loc7_ * 2 + 1];
 			if ((_loc4_ < y && _loc10_ >= y || _loc10_ < y && _loc4_ >= y) && (_loc9_ <= x || _loc8_ <= x)) {
-				_loc5_ = ((_loc5_ ^ (ASCompat.toInt(_loc9_ + (y - _loc4_) / (_loc10_ - _loc4_) * (_loc8_ - _loc9_) < x) : UInt) : UInt) : UInt);
+				_loc5_ = ((_loc5_ ^ ((if (_loc9_ + (y - _loc4_) / (_loc10_ - _loc4_) * (_loc8_ - _loc9_) < x) 1 else 0) : UInt) : UInt) : UInt);
 			}
 			_loc7_ = _loc6_;
 			_loc6_++;

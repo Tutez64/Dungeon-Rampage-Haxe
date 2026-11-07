@@ -170,7 +170,7 @@ class HeroWithEquipPicker extends UIObject {
 		if (checkNullIteratee(__ax4_iter_494))
 			for (_tmp_ in __ax4_iter_494.keys()) {
 				_loc1_ = _tmp_;
-				_loc2_ = ASCompat.coerce(mGlyphFilePathToControllerIconData[_loc1_], uI.ControllerIconData);
+				_loc2_ = ASCompat.coerce(ASDictionary.getString(mGlyphFilePathToControllerIconData, _loc1_), uI.ControllerIconData);
 				if (!_loc2_.mIsHidden) {
 					if (_loc2_.mOwner.contains(_loc2_.mControllerGlyph)) {
 						_loc2_.mOwner.removeChild(_loc2_.mControllerGlyph);
@@ -203,7 +203,7 @@ class HeroWithEquipPicker extends UIObject {
 			equipElement.setLabelAsText();
 			return;
 		}
-		iconData = ASCompat.coerce(mGlyphFilePathToControllerIconData[glyphFilePath], uI.ControllerIconData);
+		iconData = ASCompat.coerce(ASDictionary.getString(mGlyphFilePathToControllerIconData, glyphFilePath), uI.ControllerIconData);
 		if (iconData != null) {
 			equipElement.setLabelAsControllerGlyph(iconData.mControllerGlyph);
 		} else {
