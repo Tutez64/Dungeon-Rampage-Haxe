@@ -9,6 +9,7 @@ At tag time, copy these sections into the GitHub release notes under `Changelog`
 ### Fixed
 
 - Controllers: the game no longer crashes soon after reaching the town with a controller connected and Steam Input on (#47).
+- HP bars: the bars of mobs and players no longer all show empty at times (#50).
 
 
 ### Improved
