@@ -5,7 +5,7 @@
 
 <p align="center">
 A smoother native port of Dungeon Rampage for Windows, Linux, and macOS,
-with a configurable frame rate and modding support.
+with modding support.
 </p>
 
 ## Install and play
@@ -153,6 +153,7 @@ For a debug build, append `-debug`.
 Replace `build` with `test` if you want the game to launch automatically after compiling.
 
 Since V16, as in the official game, the frame rate is set in the game's options (**Display**, **FPS**).
+Its default is the main screen's refresh rate, or 120 FPS when that is unknown.
 Earlier native builds accept `--fps auto` or `--fps <value>` instead, which
 [DRH Launcher](https://github.com/Tutez64/DRH-Launcher) sets for them.
 
