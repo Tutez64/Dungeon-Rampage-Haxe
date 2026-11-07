@@ -167,7 +167,7 @@ class SettingsCatalog {
 		var _loc2_ = section("display");
 		var _loc1_ = mDBFacade.displayTimingSettings;
 		_loc2_.setting("fps")
-			.defaultsTo(60)
+			.defaultsTo(_loc1_.defaultFrameRate())
 			.boundTo(new DisplayTimingBinding(_loc1_, true))
 			.choicesFrom(_loc1_.frameRates.choices, FrameRateOptions.coerce);
 		_loc2_.setting("vsync")
