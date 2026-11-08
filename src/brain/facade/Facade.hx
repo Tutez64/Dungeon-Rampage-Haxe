@@ -393,7 +393,9 @@ class Facade {
 		diag.LoadDiag.crumb("game render");
 		mCamera.renderInterpolated(_loc3_);
 		View.renderInterpolatedAll(_loc3_);
+		diag.LoadDiag.crumb("game render: layers");
 		mLayerRenderWorkManager.update(mRealClock);
+		diag.LoadDiag.crumb("game render: starling sync");
 		syncStarlingWorld(mRealClock);
 		diag.LoadDiag.crumb("after the game loop");
 		mRealClock.gameTime += ASCompat.floatToInt(_loc4_ * 1000);

@@ -1102,8 +1102,11 @@ class AssetLoadingComponent extends Component {
 	}
 
 	function onBundleLoaded(biomeKey:String) {
+		diag.LoadDiag.crumb("bundle publish " + biomeKey);
 		publishBundle(biomeKey);
+		diag.LoadDiag.crumb("bundle complete " + biomeKey);
 		onBiomeLoadComplete(biomeKey);
+		diag.LoadDiag.crumb("after bundle " + biomeKey);
 	}
 
 	function onBiomeLoadComplete(biomeKey:String) {

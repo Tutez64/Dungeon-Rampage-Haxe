@@ -9,7 +9,8 @@ import haxe.Timer;
 	- each file the Starling asset manager loads: time from request to bytes, size;
 	- each asset made from them that takes 5 ms or more on the main thread (texture upload, JSON parse);
 	- each synchronous Animation.json read that takes 5 ms or more;
-	- each frame of 50 ms or more, with what was done in it;
+	- each frame of 50 ms or more, with what was done in it, the steps it spent the most time in, and whether the
+	  collector freed memory in it;
 	- once per second while anything above happened: frame rate, longest frame, totals, memory.
 **/
 class LoadDiag {
@@ -24,6 +25,9 @@ class LoadDiag {
 	static var sCrumb:String = "start";
 	static var sCrumbAt = 0.0;
 	static var sStarts:Map<String, Float> = new Map();
+	// this frame: time spent in each step, from one crumb to the next
+	static var sStepMs:Map<String, Float> = new Map();
+	static var sLastUsed = 0.0;
 
 	static var sLastFrame = 0.0;
 	static var sSecondStart = 0.0;
@@ -100,10 +104,13 @@ class LoadDiag {
 		return now();
 	}
 
-	/** Names the step the main thread starts, for the watchdog. **/
-	public static inline function crumb(step:String) {
+	/** Names the step the main thread starts, for the watchdog, and adds the time of the previous one to this frame's. **/
+	public static function crumb(step:String) {
+		var t = now();
+		var previous = sStepMs.get(sCrumb);
+		sStepMs.set(sCrumb, (previous == null ? 0 : previous) + t - sCrumbAt);
 		sCrumb = step;
-		sCrumbAt = now();
+		sCrumbAt = t;
 	}
 
 	public static inline function begin(step:String):Float {
@@ -151,8 +158,12 @@ class LoadDiag {
 		if (frame >= LONG_FRAME_MS) {
 			sLongFrames++;
 			Logger.info("[LoadDiag] long frame " + Math.round(frame) + " ms: files " + sFrameFiles + ", work " + sFrameWorks + " / " + Math.round(sFrameWorkMs)
-				+ " ms, sync reads " + Math.round(sFrameSyncMs) + " ms");
+				+ " ms, sync reads " + Math.round(sFrameSyncMs) + " ms" + collected() + ", steps: " + topSteps());
 		}
+		sStepMs = new Map();
+		#if cpp
+		sLastUsed = cpp.vm.Gc.memInfo64(cpp.vm.Gc.MEM_INFO_USAGE);
+		#end
 		sFrameFiles = 0;
 		sFrameWorks = 0;
 		sFrameWorkMs = 0;
@@ -178,6 +189,23 @@ class LoadDiag {
 		}
 	}
 
+	/** The steps of this frame that took 5 ms or more, longest first. **/
+	static function topSteps():String {
+		var steps = [for (name => ms in sStepMs) if (ms >= SLOW_WORK_MS) {name: name, ms: ms}];
+		steps.sort((a, b) -> a.ms < b.ms ? 1 : (a.ms > b.ms ? -1 : 0));
+		if (steps.length > 6) steps.resize(6);
+		return steps.length == 0 ? "none of 5 ms" : [for (step in steps) shortStep(step.name) + " " + Math.round(step.ms)].join(", ");
+	}
+
+	/** Whether the memory in use dropped since the end of the last frame, which only a collection does. **/
+	static function collected():String {
+		#if cpp
+		var used = cpp.vm.Gc.memInfo64(cpp.vm.Gc.MEM_INFO_USAGE);
+		if (sLastUsed > 0 && used < sLastUsed - 1048576) return ", collected " + mb(sLastUsed - used) + " MB";
+		#end
+		return "";
+	}
+
 	static function memory():String {
 		#if cpp
 		return "used " + mb(cpp.vm.Gc.memInfo64(cpp.vm.Gc.MEM_INFO_USAGE)) + " MB, current " + mb(cpp.vm.Gc.memInfo64(cpp.vm.Gc.MEM_INFO_CURRENT))
@@ -189,6 +217,12 @@ class LoadDiag {
 
 	static function mb(bytes:Float):String {
 		return Std.string(Math.round(bytes / 104857.6) / 10);
+	}
+
+	/** A step's name with the paths in it shortened, as "asset create Art3D/…". **/
+	static function shortStep(name:String):String {
+		var i = name.indexOf("Resources/");
+		return i >= 0 ? name.substring(0, name.lastIndexOf(" ", i) + 1) + name.substr(i + 10) : name;
 	}
 
 	static function shortPath(path:String):String {

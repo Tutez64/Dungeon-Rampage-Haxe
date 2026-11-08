@@ -53,7 +53,9 @@ class DataLoader {
 		};
 		var onLoadComplete = function(param1:ASObject) {
 			diag.LoadDiag.crumb("asset file loaded " + url);
-			diag.LoadDiag.fileEnd(url, loader.bytesLoaded);
+			// bytesLoaded stays 0 for local files
+			var diagData:Dynamic = loader.data;
+			diag.LoadDiag.fileEnd(url, diagData != null && diagData.length > 0 ? diagData.length : loader.bytesLoaded);
 			cleanup();
 			if (httpStatus < 400) {
 				Execute.execute(onComplete, loader.data, mimeType);
