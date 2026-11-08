@@ -153,7 +153,7 @@ class AssetLoadingComponent extends Component {
 			_loc9_ = {};
 			_loc5_ = folder.resolvePath("Animation.json");
 			if (_loc5_.exists) {
-				var diagStart = diag.LoadDiag.stamp();
+				var diagStart = diag.LoadDiag.begin("sync read " + _loc5_.nativePath);
 				try {
 					_loc4_ = new FileStream();
 					_loc4_.open(_loc5_, flash.filesystem.FileMode.READ);

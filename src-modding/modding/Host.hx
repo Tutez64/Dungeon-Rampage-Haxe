@@ -412,6 +412,7 @@ class Host {
 		for (subscription in list.copy()) {
 			if (!subscription.active)
 				continue;
+			diag.LoadDiag.crumb("mod " + subscription.owner + " on " + event);
 			try {
 				subscription.call(payload);
 			} catch (e:Dynamic) {

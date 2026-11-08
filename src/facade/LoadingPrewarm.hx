@@ -286,7 +286,7 @@ class LoadingPrewarm {
 		var _loc7_ = 0;
 		while (mNext < mJobs.length && !pastDeadline) {
 			_loc8_ = mJobs[mNext];
-			var diagStart = diag.LoadDiag.stamp();
+			var diagStart = diag.LoadDiag.begin("prewarm " + _loc8_.name);
 			try {
 				_loc2_ = _loc8_.step(mDBFacade, mBackground);
 			} catch (error:Dynamic) {

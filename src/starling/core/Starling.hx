@@ -297,8 +297,11 @@ class Starling extends EventDispatcher {
 		if (_loc2_ < 0) {
 			_loc2_ = 1 / _nativeStage.frameRate;
 		}
+		diag.LoadDiag.crumb("starling advance");
 		advanceTime(_loc2_);
+		diag.LoadDiag.crumb("starling render");
 		render();
+		diag.LoadDiag.crumb("after starling");
 	}
 
 	public function advanceTime(passedTime:Float) {

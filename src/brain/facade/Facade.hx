@@ -337,6 +337,7 @@ class Facade {
 		mElapsedTime += _loc11_;
 		var _loc5_ = (0 : UInt);
 		mRealClock.gameTime = mRealClock.realTime;
+		diag.LoadDiag.crumb("real clock work");
 		mRealClockWorkManager.update(mRealClock);
 		var _loc7_ = false;
 		mSkippingFrame = false;
@@ -369,12 +370,16 @@ class Facade {
 			mRenderTickCounter = 0;
 		}
 		while (mElapsedTime >= mTickLength && _loc5_ < 5) {
+			diag.LoadDiag.crumb("game tick");
 			mCamera.beginTick();
 			View.beginTickAll();
 			mTickCounter = mTickCounter + 1;
 			mTickAccumulator = mTickAccumulator + 1;
+			diag.LoadDiag.crumb("game tick: logic");
 			mLogicalWorkManager.update(mGameClock);
+			diag.LoadDiag.crumb("game tick: physics");
 			mPhysicsWorkManager.update(mGameClock);
+			diag.LoadDiag.crumb("game tick: pre-render");
 			mPreRenderWorkManager.update(mGameClock);
 			flushInputs();
 			mElapsedTime -= mTickLength;
@@ -385,10 +390,12 @@ class Facade {
 		var _loc4_ = mRealClock.tickLength;
 		mRenderTickCounter = mRenderTickCounter + 1;
 		mFrameAccumulator = mFrameAccumulator + 1;
+		diag.LoadDiag.crumb("game render");
 		mCamera.renderInterpolated(_loc3_);
 		View.renderInterpolatedAll(_loc3_);
 		mLayerRenderWorkManager.update(mRealClock);
 		syncStarlingWorld(mRealClock);
+		diag.LoadDiag.crumb("after the game loop");
 		mRealClock.gameTime += ASCompat.floatToInt(_loc4_ * 1000);
 		if (_loc5_ >= 5) {
 			mElapsedTime = 0;

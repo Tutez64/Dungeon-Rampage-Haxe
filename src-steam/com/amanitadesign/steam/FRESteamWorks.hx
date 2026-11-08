@@ -166,7 +166,9 @@ class FRESteamWorks extends EventDispatcher {
 		#if air
 		return ASCompat.asBool(_ExtensionContext.call("AIRSteam_RunCallbacks"));
 		#elseif (cpp && !air)
+		diag.LoadDiag.crumb("steam callbacks");
 		Steam.onEnterFrame();
+		diag.LoadDiag.crumb("after steam callbacks");
 		return true;
 		#else
 		return false;

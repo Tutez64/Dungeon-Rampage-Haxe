@@ -415,7 +415,9 @@ class SessionTransport extends EventDispatcher implements IGameTransport {
 		}
 		markInbound();
 		mReceivedBytes += event.bytes.length;
+		diag.LoadDiag.crumb("network data");
 		dispatchEvent(GameTransportEvent.dataEvent(event.bytes));
+		diag.LoadDiag.crumb("after network data");
 		maybeSendAck(false);
 	}
 

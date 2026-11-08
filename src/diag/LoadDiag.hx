@@ -16,7 +16,13 @@ class LoadDiag {
 	static inline final LONG_FRAME_MS = 50.0;
 	static inline final SLOW_WORK_MS = 5.0;
 
+	static inline final STUCK_MS = 2000.0;
+
 	static var sInstalled = false;
+
+	// the step the main thread last started, read by the watchdog thread
+	static var sCrumb:String = "start";
+	static var sCrumbAt = 0.0;
 	static var sStarts:Map<String, Float> = new Map();
 
 	static var sLastFrame = 0.0;
@@ -51,6 +57,7 @@ class LoadDiag {
 		sInstalled = true;
 		sLastFrame = sSecondStart = now();
 		stage.addEventListener("enterFrame", onFrame);
+		startWatchdog();
 		Logger.info("[LoadDiag] installed");
 	}
 
@@ -93,7 +100,49 @@ class LoadDiag {
 		return now();
 	}
 
+	/** Names the step the main thread starts, for the watchdog. **/
+	public static inline function crumb(step:String) {
+		sCrumb = step;
+		sCrumbAt = now();
+	}
+
+	public static inline function begin(step:String):Float {
+		crumb(step);
+		return sCrumbAt;
+	}
+
+	/**
+		Every 250 ms, a thread checks that the main thread still makes frames. When it has not for 2 s, it
+		prints the step the main thread last started, then again every 5 s while it stays stuck. It prints to
+		the console, which the log captures, so as not to share the logger with the main thread.
+	**/
+	static function startWatchdog() {
+		#if cpp
+		sys.thread.Thread.create(function() {
+			var reportedAt = 0.0;
+			while (true) {
+				Sys.sleep(0.25);
+				var t = now();
+				var stuck = t - sLastFrame;
+				if (stuck < STUCK_MS) {
+					if (reportedAt > 0) {
+						Sys.println("[LoadDiag] main thread back after " + Math.round(t - sLastFrame) + " ms");
+					}
+					reportedAt = 0;
+					continue;
+				}
+				if (reportedAt == 0 || t - reportedAt >= 5000) {
+					reportedAt = t;
+					Sys.println("[LoadDiag] " + Date.now().toString() + " main thread stuck for " + Math.round(stuck) + " ms, in: " + sCrumb + " (started "
+						+ Math.round(t - sCrumbAt) + " ms ago)");
+				}
+			}
+		});
+		#end
+	}
+
 	static function onFrame(_) {
+		crumb("between frames");
 		var t = now();
 		var frame = t - sLastFrame;
 		sLastFrame = t;
