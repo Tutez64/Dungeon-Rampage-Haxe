@@ -405,7 +405,9 @@ class AssetManager extends EventDispatcher {
 			if (_loc5_ == null) {
 				starling.utils.Execute.execute(onAnyError, "Warning: no suitable factory found for \'" + reference.name + "\'");
 			} else {
+				var diagStart = diag.LoadDiag.stamp();
 				_loc5_.create(reference, helper, onComplete, onFactoryError);
+				diag.LoadDiag.work("create " + reference.extension, reference.url != null ? reference.url : reference.name, diagStart);
 			}
 		};
 		onLoadProgress = function(param1:Float) {

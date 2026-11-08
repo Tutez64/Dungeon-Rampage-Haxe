@@ -41,6 +41,7 @@ class DataLoader {
 			mimeType = getHttpHeader(ASCompat.coerce((param1 : ASAny)["responseHeaders"], Array), "Content-Type");
 		};
 		var onLoadError = function(param1:flash.events.ErrorEvent) {
+			diag.LoadDiag.fileEnd(url, 0);
 			cleanup();
 			message = param1.type + " - " + param1.text;
 			Execute.execute(onError, message);
@@ -51,6 +52,7 @@ class DataLoader {
 			}
 		};
 		var onLoadComplete = function(param1:ASObject) {
+			diag.LoadDiag.fileEnd(url, loader.bytesLoaded);
 			cleanup();
 			if (httpStatus < 400) {
 				Execute.execute(onComplete, loader.data, mimeType);
@@ -70,6 +72,7 @@ class DataLoader {
 		mimeType = null;
 		httpStatus = 0;
 		request = new URLRequest(url);
+		diag.LoadDiag.fileStart(url);
 		loader = new URLLoader();
 		loader.dataFormat = "binary";
 		loader.addEventListener("ioError", onLoadError);

@@ -132,6 +132,7 @@ class LoadingPrewarm {
 	}
 
 	public static function heroJoined(dbFacade:DBFacade, look:HeroPreloadLook) {
+		Logger.info("[LoadDiag] hero joined: " + (look != null ? look.heroType + " skin " + look.skinType : "no look"));
 		if (look == null) {
 			return;
 		}
@@ -285,6 +286,7 @@ class LoadingPrewarm {
 		var _loc7_ = 0;
 		while (mNext < mJobs.length && !pastDeadline) {
 			_loc8_ = mJobs[mNext];
+			var diagStart = diag.LoadDiag.stamp();
 			try {
 				_loc2_ = _loc8_.step(mDBFacade, mBackground);
 			} catch (error:Dynamic) {
@@ -292,6 +294,7 @@ class LoadingPrewarm {
 				_loc2_ = PrewarmJob.DONE;
 				Logger.error("LoadingPrewarm: building " + _loc8_.name + " failed: " + ASCompat.asError(error).message);
 			}
+			diag.LoadDiag.work("prewarm", _loc8_.name, diagStart);
 			if (_loc2_ == PrewarmJob.DONE) {
 				mNext = mNext + 1;
 				_loc7_ = 0;

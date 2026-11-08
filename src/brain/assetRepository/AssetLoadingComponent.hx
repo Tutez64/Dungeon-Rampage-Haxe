@@ -153,6 +153,7 @@ class AssetLoadingComponent extends Component {
 			_loc9_ = {};
 			_loc5_ = folder.resolvePath("Animation.json");
 			if (_loc5_.exists) {
+				var diagStart = diag.LoadDiag.stamp();
 				try {
 					_loc4_ = new FileStream();
 					_loc4_.open(_loc5_, flash.filesystem.FileMode.READ);
@@ -195,6 +196,7 @@ class AssetLoadingComponent extends Component {
 				} catch (e:Dynamic) {
 					Logger.error("AssetLoadingComponent.rootClipLabels: could not read " + _loc5_.nativePath + ": " + ASCompat.asError(e).message);
 				}
+				diag.LoadDiag.syncRead(_loc5_.nativePath, diagStart);
 			}
 			sRootClipLabels[_loc2_] = _loc9_;
 		}
