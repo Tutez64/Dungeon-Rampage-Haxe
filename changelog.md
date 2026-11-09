@@ -13,6 +13,7 @@ At tag time, copy these sections into the GitHub release notes under `Changelog`
 - Cursor: the game now shows its own mouse cursor, as the official game does, instead of the system one (#54).
 - HUD: its texts and outlines are no longer blurry (#55).
 - Chat bar: the grey block next to the Chat button is gone (#32).
+- Windows: loading a dungeon, and the assets that load during a run, no longer freeze the game, such as for 10-20 s when breaking an explosive barrel (#48, #49).
 
 
 ### Improved
