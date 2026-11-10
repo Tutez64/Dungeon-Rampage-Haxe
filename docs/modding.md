@@ -561,7 +561,7 @@ The compiled path is not automatic: the host must call `Compiler.compile(env)` a
 **One world, one batch (v1).** All enabled mods go into a single `Environment` and a single `Compiler.compile(env)`. That is what lets a mod import another's types *and* stay compiled: cppia resolves a class either inside the module being loaded or as a host class; a scripted class in another batch is neither. Inside one batch, every module is declared before any is emitted. Price:
 
 - **Skips cascade.** If `mods.cool_lib.Api` is refused, every module naming it is skipped too. A parse error in `cool_lib` means it declares nothing and dependents fail at import. `dependencies` makes that visible; it does not remove the coupling.
-- **Blast radius of `Module.boot()`.** A loader reject splits the batch (`narrowOnFailure`, default on) until the bad module is left interpreted. The rest still compile. Per-mod worlds would confine that and forbid compiled inter-mod use.
+- **Blast radius of `Module.boot()`.** A loader reject recompiles the batch without one module at a time, the module the reject names first, and keeps the first batch the loader takes: the bad module and the modules using it stay interpreted, the rest compiles. Only when no single module is to blame is the batch split (`narrowOnFailure`, default on), which leaves modules using a class of the other half interpreted. Per-mod worlds would confine that and forbid compiled inter-mod use.
 - **No selective unload.** Dropping the world drops all mods. v1 does not unload.
 
 Name collisions are excluded by the [package rule](#modjson), not by isolation.
