@@ -17,3 +17,4 @@ At tag time, copy these sections into the GitHub release notes under `Changelog`
 - Mods: a module the game cannot compile no longer makes other mods' modules, the API's included, run interpreted, which is slower and often does not work.
 - Linux: the game uses about 500 MB less memory in a dungeon, where memory freed after a loading stayed with the game instead of going back to the system.
 - The game uses about 200 MB less memory: the images of screens that have not been opened are no longer decoded.
+- The game uses less video memory, about 430 MB less in a dungeon: the images of a screen are released a minute after it was last shown, and loaded again when it is shown again.

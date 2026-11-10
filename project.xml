@@ -45,6 +45,9 @@
 	<haxedef name="analyzer-optimize" />
 	<haxedef name="swf_compact_animate_timelines" />
 	<haxedef name="swf_hardware_bitmap_cache" />
+	<!-- A SWF bitmap gives its texture back 60 s after it was last drawn, and is decoded again when it is
+	     drawn again: the town's art while in a dungeon. -->
+	<haxedef name="swf_hardware_bitmap_idle_time" value="60" />
 	<!-- Cache filtered text fields on the GPU so they render faster and are visually closer to AIR's. -->
 	<haxedef name="openfl_force_gl_cacheasbitmap" />
 	<define name="openfl_flash_strict" />
