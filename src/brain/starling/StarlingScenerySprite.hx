@@ -2,6 +2,7 @@ package brain.starling;
 
 import flash.geom.Matrix;
 import flash.geom.Rectangle;
+import starling.core.Starling;
 import starling.display.DisplayObject;
 import starling.display.Image;
 import starling.display.MaskRole;
@@ -14,6 +15,8 @@ class StarlingScenerySprite extends Sprite {
 	static final sBounds:Rectangle = new Rectangle();
 
 	var mBoundsValid:Bool = false;
+
+	var mBoundsFrame:UInt = 0;
 
 	var mLeft:Float = 0;
 
@@ -65,7 +68,7 @@ class StarlingScenerySprite extends Sprite {
 		if (isLead) {
 			return mRun.right >= left && mRun.left <= right && mRun.bottom >= top && mRun.top <= bottom;
 		}
-		if (!mBoundsValid || !(numChildren == 1 && Std.isOfType(getChildAt(0), StarlingSceneryImage))) {
+		if (!mBoundsValid || _lastChildChangeFrameID >= mBoundsFrame && !(numChildren == 1 && Std.isOfType(getChildAt(0), StarlingSceneryImage))) {
 			cacheBounds();
 		}
 		return mRight >= left && mLeft <= right && mBottom >= top && mTop <= bottom;
@@ -87,6 +90,7 @@ class StarlingScenerySprite extends Sprite {
 		mRight = Math.max(sBounds.right, x + _loc1_) + 256;
 		mBottom = Math.max(sBounds.bottom, y + _loc1_) + 256;
 		mBoundsValid = true;
+		mBoundsFrame = Starling.frameID;
 	}
 
 	@:allow(brain.starling) @:isVar var bakeImage(get, never):Image;
