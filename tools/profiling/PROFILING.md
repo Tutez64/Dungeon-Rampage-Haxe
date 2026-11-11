@@ -1,11 +1,14 @@
 # Diagnostic mémoire et GC
 
-Deux volets complémentaires :
+Trois volets complémentaires :
 
 - **Linux / builds GC** (sections suivantes) : chronologie, recensement et traces
   de rétention hxcpp (`tools/run_gc_session.sh`, builds `bin/gc-*`).
 - **Windows / freezes** (fin du fichier) : `StallProfiler` in-process, sampler
   Working Set, PDB + LocalDumps pour les access violations après spirale GC.
+- **Linux / FPS et mémoire par scénario** : un bot qui joue une scène et mesure
+  temps de frame, draws, tas, VRAM et graphes d'appels, dans
+  [`bench/README.md`](bench/README.md).
 
 ## Prérequis hxcpp
 

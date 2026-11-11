@@ -6,5 +6,5 @@ edits/conversion/.tmp
 /mods/data/
 __pycache__/
 /export_classes.info
-profiling
+/profiling
 .claude/worktrees

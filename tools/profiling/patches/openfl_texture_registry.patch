@@ -1,0 +1,30 @@
+diff --git a/src/openfl/display3D/textures/TextureBase.hx b/src/openfl/display3D/textures/TextureBase.hx
+index 3ecc903c5..b2b4f4092 100644
+--- a/src/openfl/display3D/textures/TextureBase.hx
++++ b/src/openfl/display3D/textures/TextureBase.hx
+@@ -58,10 +58,17 @@ class TextureBase extends EventDispatcher
+ 	@:noCompletion private var __textureTarget:Int;
+ 	@:noCompletion private var __width:Int;
+ 
++	public static var __registry:Map<Int, TextureBase> = new Map();
++	public static var __nextId:Int = 0;
++	public var __registryId:Int;
++
+ 	@:noCompletion private function new(context:Context3D)
+ 	{
+ 		super();
+ 
++		__registryId = __nextId++;
++		__registry.set(__registryId, this);
++
+ 		__context = context;
+ 		var gl = __context.gl;
+ 		// __textureTarget = target;
+@@ -85,6 +92,7 @@ class TextureBase extends EventDispatcher
+ 	public function dispose():Void
+ 	{
+ 		var gl = __context.gl;
++		__registry.remove(__registryId);
+ 
+ 		if (__alphaTexture != null)
+ 		{

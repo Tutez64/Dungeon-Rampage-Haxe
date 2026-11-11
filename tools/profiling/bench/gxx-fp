@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+# The compiler of a FP=1 build: g++ keeping frame pointers, for perf --call-graph fp.
+exec g++ -fno-omit-frame-pointer -mno-omit-leaf-frame-pointer "$@"

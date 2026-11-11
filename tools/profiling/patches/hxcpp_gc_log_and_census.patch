@@ -1,0 +1,312 @@
+diff --git a/src/hx/Class.cpp b/src/hx/Class.cpp
+index 85d13c2f..636ce358 100644
+--- a/src/hx/Class.cpp
++++ b/src/hx/Class.cpp
+@@ -412,6 +412,7 @@ const hx::StaticInfo* Class_obj::GetStaticStorage(String inName)
+ 
+ 
+ 
++extern hx::Object *gBenchStaticsOf;
+ void MarkClassStatics(hx::MarkContext *__inCtx)
+ {
+    #ifdef HXCPP_DEBUG
+@@ -433,7 +434,9 @@ void MarkClassStatics(hx::MarkContext *__inCtx)
+             hx::MarkSetMember("statics",__inCtx);
+             #endif
+ 
++            hx::gBenchStaticsOf = c;
+             c->MarkStatics(__inCtx);
++            hx::gBenchStaticsOf = 0;
+ 
+             #ifdef HXCPP_DEBUG
+             hx::MarkPopClass(__inCtx);
+diff --git a/src/hx/gc/Immix.cpp b/src/hx/gc/Immix.cpp
+index e3a42d10..c3861b94 100644
+--- a/src/hx/gc/Immix.cpp
++++ b/src/hx/gc/Immix.cpp
+@@ -9,6 +9,7 @@
+ #include "GcRegCapture.h"
+ #include <unordered_set>
+ #include <unordered_map>
++#include <map>
+ #include <mutex>
+ #include <thread>
+ #include <condition_variable>
+@@ -364,6 +365,61 @@ static std::mutex *sgCensusLock = new std::mutex();
+ static std::atomic<CensusRequest *> sgCensusRequest(nullptr);
+ // Set while a mark fills a census request; marking is then single-threaded
+ static bool sgCensus = false;
++// TEMP(bench): what holds the allocations that are not objects (array storage, strings)
++struct BenchHeld { size_t count; size_t bytes; size_t largeCount; size_t largeBytes; };
++static hx::Object *sBenchParent = 0;
++static std::map< std::pair<hx::Class_obj *,int>, BenchHeld > sBenchHeld;
++static bool sBenchLogChecked = false;
++static bool sBenchLog = false;
++static const char *sBenchWhy = 0;
++// Generic objects (anonymous objects, arrays, maps, strings) and the allocations they hold,
++//  by the nearest class above them that is not generic
++static std::unordered_map<hx::Object *, hx::Class_obj *> sBenchOwner;
++static std::map< std::pair<hx::Class_obj *,hx::Class_obj *>, BenchHeld > sBenchOwned;
++static std::unordered_map<hx::Class_obj *, int> sBenchKind;
++static int BenchKind(hx::Class_obj *inClass)
++{
++   if (!inClass) return 1;
++   std::unordered_map<hx::Class_obj *, int>::iterator it = sBenchKind.find(inClass);
++   if (it!=sBenchKind.end()) return it->second;
++   std::string name = inClass->mName.utf8_str();
++   int kind = 0;
++   if (name=="Array" || name=="Dynamic" || name=="__Anon" || name=="String" || name=="Int" || name=="Float" || name=="Bool" ||
++       name.compare(0,8,"haxe.ds.")==0 || name.compare(0,15,"openfl._Vector.")==0 || name.compare(0,12,"ASDictionary")==0 ||
++       name=="openfl.utils.Dictionary" || name=="haxe.io.Bytes" || name=="openfl.utils.ByteArrayData" ||
++       name=="lime.utils.ArrayBufferView")
++      kind = 1;
++   else if (name=="Class")
++      kind = 2;
++   else
++   {
++      // HXCPP_GC_CENSUS_TRACK=<class>,<class>: classes counted by owner as the generic ones are
++      static std::string track = std::string(",") + (getenv("HXCPP_GC_CENSUS_TRACK") ? getenv("HXCPP_GC_CENSUS_TRACK") : "") + ",";
++      if (track.find("," + name + ",")!=std::string::npos)
++         kind = 3;
++   }
++   sBenchKind[inClass] = kind;
++   return kind;
++}
++namespace hx { hx::Object *gBenchStaticsOf = 0; }
++// Which roots are being marked: 0 other, 2 script modules, 3 root set, 4 young values, 5 zombies, 6 stacks
++static size_t sBenchRootPhase = 0;
++static const char *sBenchRootNames[] = { "(roots)", "(roots)", "(script modules)", "(root set)", "(young values)", "(zombies)", "(stacks)", "(roots)" };
++static hx::Class_obj *BenchOwnerOf(hx::Object *inParent)
++{
++   if (!inParent) return hx::gBenchStaticsOf ? (hx::Class_obj *)hx::gBenchStaticsOf : (hx::Class_obj *)sBenchRootPhase;
++   hx::Class_obj *cls = inParent->__GetClass().GetPtr();
++   int kind = BenchKind(cls);
++   if (kind==0 || kind==3) return cls;
++   if (kind==2) return (hx::Class_obj *)inParent;
++   std::unordered_map<hx::Object *, hx::Class_obj *>::iterator it = sBenchOwner.find(inParent);
++   return it==sBenchOwner.end() ? 0 : it->second;
++}
++static inline bool BenchLog()
++{
++   if (!sBenchLogChecked) { sBenchLog = getenv("HXCPP_GC_LOG")!=0; sBenchLogChecked = true; }
++   return sBenchLog;
++}
+ static std::unordered_map<hx::Class_obj *,CensusEntry> *sgCensusCounts = 0;
+ static std::vector< std::pair<void *,bool> > *sgCensusDeferred = 0;
+ namespace hx
+@@ -2449,7 +2505,9 @@ public:
+                 obj->__Mark(this);
+                 mVerifyParent = 0;
+                 #else
++                if (sgCensus) sBenchParent = obj;
+                 obj->__Mark(this);
++                if (sgCensus) sBenchParent = 0;
+                 #endif
+                 #ifdef HXCPP_DEBUG
+                 mTraceCut = -1;
+@@ -2678,6 +2736,29 @@ void MarkAllocUnchecked(void *inPtr,hx::MarkContext *__inCtx)
+       ((unsigned char *)inPtr)[HX_ENDIAN_MARK_ID_BYTE] = gByteMarkID;
+    }
+ 
++   if (sgCensus)
++   {
++      bool large = !(flags & IMMIX_ALLOC_ROW_COUNT);
++      size_t size = large ? ((unsigned int *)inPtr)[-2] : (flags & IMMIX_ALLOC_SIZE_MASK) >> IMMIX_ALLOC_SIZE_SHIFT;
++      hx::Class_obj *cls = 0;
++      int tag = -1;
++      if (sBenchParent)
++      {
++         cls = sBenchParent->__GetClass().GetPtr();
++         tag = 0;
++         if (cls && cls==hx::ArrayBase::__mClass.GetPtr())
++            tag = ((hx::ArrayBase *)sBenchParent)->getElementSize() | ((flags & IMMIX_ALLOC_IS_CONTAINER) ? 0x100 : 0);
++      }
++      BenchHeld &held = sBenchHeld[ std::make_pair(cls,tag) ];
++      held.count++;
++      held.bytes += size;
++      if (large) { held.largeCount++; held.largeBytes += size; }
++      BenchHeld &owned = sBenchOwned[ std::make_pair(BenchOwnerOf(sBenchParent),(hx::Class_obj *)1) ];
++      owned.count++;
++      owned.bytes += size;
++      if (large) { owned.largeCount++; owned.largeBytes += size; }
++   }
++
+    int rows = flags & IMMIX_ALLOC_ROW_COUNT;
+    if (rows)
+    {
+@@ -2723,6 +2804,19 @@ static void CensusCount(hx::Object *inPtr, unsigned int inFlags)
+    CensusEntry &entry = (*sgCensusCounts)[ inPtr->__GetClass().GetPtr() ];
+    entry.count++;
+    entry.bytes += size;
++   {
++      hx::Class_obj *cls = inPtr->__GetClass().GetPtr();
++      int kind = BenchKind(cls);
++      if (kind==1 || kind==3)
++      {
++         hx::Class_obj *owner = BenchOwnerOf(sBenchParent);
++         if (kind==1)
++            sBenchOwner[inPtr] = owner;
++         BenchHeld &owned = sBenchOwned[ std::make_pair(owner,cls) ];
++         owned.count++;
++         owned.bytes += size;
++      }
++   }
+    if (hx::gCensusVisitor)
+       hx::gCensusVisitor(inPtr, size);
+ }
+@@ -4380,6 +4474,7 @@ public:
+          #ifdef SHOW_MEM_EVENTS
+          //GCLOG("Large alloc causing collection");
+          #endif
++         sBenchWhy = "large";
+          CollectFromThisThread(false,false);
+       }
+ 
+@@ -4545,6 +4640,7 @@ public:
+          if (inDelta>0 && (inDelta+mLargeAllocated > mLargeAllocForceRefresh) && sgInternalEnable)
+          {
+             //GCLOG("onMemoryChange alloc causing collection");
++            sBenchWhy = "native";
+             CollectFromThisThread(false,false);
+          }
+ 
+@@ -5966,8 +6062,10 @@ public:
+ 
+       hx::MarkClassStatics(&mMarker);
+       #if defined(HXCPP_SCRIPTABLE) && defined(HXCPP_GC_GENERATIONAL_RUNTIME)
++      sBenchRootPhase = 2;
+       hx::scriptMarkModules(&mMarker, inGenerational);
+       #endif
++      sBenchRootPhase = 3;
+ 
+       {
+       hx::AutoMarkPush info(&mMarker,"Roots","root");
+@@ -6003,6 +6101,7 @@ public:
+ 
+       #ifdef HXCPP_GC_GENERATIONAL_RUNTIME
+       {
++      sBenchRootPhase = 4;
+       hx::AutoMarkPush info(&mMarker,"Young array values","young");
+       // The first mark of a collection takes the log: a full one has no use
+       //  for it, and one that follows a minor mark has marked these already
+@@ -6011,6 +6110,7 @@ public:
+       #endif
+ 
+       {
++      sBenchRootPhase = 5;
+       hx::AutoMarkPush info(&mMarker,"Zombies","zombie");
+       // Mark zombies too....
+       for(int i=0;i<hx::sZombieList.size();i++)
+@@ -6023,8 +6123,10 @@ public:
+       mMarker.isGenerational = inGenerational;
+ 
+       // Mark local stacks
++      sBenchRootPhase = 6;
+       for(int i=0;i<mLocalAllocs.size();i++)
+          MarkLocalAlloc(mLocalAllocs[i] , &mMarker);
++      sBenchRootPhase = 0;
+ 
+       #ifdef PROFILE_COLLECT
+       hx::localObjects = sObjectMarks;
+@@ -6341,6 +6443,13 @@ public:
+       double incrementalStarted = hx::IncrementalNow();
+       #endif
+       PROFILE_COLLECT_SUMMARY_START;
++      double benchT0 = BenchLog() ? __hxcpp_time_stamp() : 0;
++      double benchT2 = 0;
++      bool benchGenMark = false;
++      bool benchFallback = false;
++      const char *benchMode0 = sGcMode==gcmGenerational ? "gen" : "full";
++      const char *benchWhy = sBenchWhy ? sBenchWhy : "blocks";
++      sBenchWhy = 0;
+ 
+       #ifndef HXCPP_SINGLE_THREADED_APP
+       // If we set the flag from 0 -> 0xffffffff then we are the collector
+@@ -6621,6 +6730,7 @@ public:
+       #endif
+ 
+       STAMP(t2)
++      if (benchT0) { benchT2 = __hxcpp_time_stamp(); benchGenMark = generational; }
+ 
+ 
+       // Sweep blocks
+@@ -6664,6 +6774,7 @@ public:
+             #endif
+ 
+             generational = false;
++            benchFallback = true;
+             MarkAll(generational);
+ 
+             sgTimeToNextTableUpdate--;
+@@ -7087,6 +7198,8 @@ public:
+       //  up (libhxcpp #360). Once the large and native allocations since the
+       //  last full mark add up to the heap it left, the next one is full,
+       //  which costs no more than marking the heap that often would
++      size_t benchLargeSince = mLargeSinceFull;
++      size_t benchLargeBudget = mLargeFullBudget;
+       if (!generational)
+       {
+          mLargeSinceFull = 0;
+@@ -7095,6 +7208,17 @@ public:
+       else if (mLargeSinceFull > mLargeFullBudget)
+          sGcMode = gcmFull;
+ 
++      if (benchT0)
++      {
++         double now = __hxcpp_time_stamp();
++         fprintf(stderr,"GCLOG t=%.3f why=%s major=%d compact=%d mode=%s mark=%s%s table=%d markMs=%.1f ms=%.1f rowsMB=%.0f blocksMB=%.0f largeMB=%.0f largeSinceMB=%.0f budgetMB=%.0f largeSpaceMB=%.0f est=%.2f filled=%.2f after=%.2f next=%s\n",
++            now, benchWhy, (int)inMajor, (int)inForceCompact, benchMode0, benchGenMark ? "minor" : "full", benchFallback ? "+full" : "", (int)full,
++            (benchT2-benchT0)*1000.0, (now-benchT0)*1000.0,
++            (double)(mRowsInUse<<IMMIX_LINE_BITS)/1048576.0, (double)GetWorkingMemory()/1048576.0, (double)mLargeAllocated/1048576.0,
++            (double)benchLargeSince/1048576.0, (double)benchLargeBudget/1048576.0, (double)mLargeAllocSpace.load()/1048576.0,
++            mGenerationalRetainEstimate, filled_ratio, after_gen, sGcMode==gcmFull ? "full" : "gen");
++      }
++
+       #ifdef SHOW_MEM_EVENTS
+       GCLOG("filled=%.2f%% + estimate = %.2f%% = %.2f%% -> %s\n",
+             filled_ratio*100, mGenerationalRetainEstimate*100, after_gen*100, sGcMode==gcmFull?"Full":"Generational");
+@@ -9411,6 +9535,9 @@ Dynamic __hxcpp_gc_census()
+          hx::AutoGCFreeZone wait;
+          sgCensusLock->lock();
+       }
++      sBenchHeld.clear();
++      sBenchOwner.clear();
++      sBenchOwned.clear();
+       struct Turn
+       {
+          ~Turn() { sgCensusRequest = nullptr; sgCensusLock->unlock(); }
+@@ -9434,6 +9561,34 @@ Dynamic __hxcpp_gc_census()
+       row->__SetField(HX_CSTRING("bytes"), (Float)sorted[i].second.bytes, hx::paccDynamic);
+       result->push(row);
+    }
++   for(std::map< std::pair<hx::Class_obj *,int>, BenchHeld >::iterator i=sBenchHeld.begin(); i!=sBenchHeld.end(); ++i)
++   {
++      char tag[64];
++      if (i->first.second<0) snprintf(tag,sizeof(tag),"(roots)");
++      else if (i->first.second==0) tag[0] = 0;
++      else snprintf(tag,sizeof(tag),"[%d%s]", i->first.second & 0xff, (i->first.second & 0x100) ? " ptr" : "");
++      String name = HX_CSTRING("~held by ") + (i->first.first ? i->first.first->mName : HX_CSTRING("(no class)")) + String(tag).dup();
++      hx::Anon row = hx::Anon_obj::Create();
++      row->__SetField(HX_CSTRING("name"), name, hx::paccDynamic);
++      row->__SetField(HX_CSTRING("count"), (int)i->second.count, hx::paccDynamic);
++      row->__SetField(HX_CSTRING("bytes"), (Float)i->second.bytes, hx::paccDynamic);
++      row->__SetField(HX_CSTRING("largeCount"), (int)i->second.largeCount, hx::paccDynamic);
++      row->__SetField(HX_CSTRING("largeBytes"), (Float)i->second.largeBytes, hx::paccDynamic);
++      result->push(row);
++   }
++   for(std::map< std::pair<hx::Class_obj *,hx::Class_obj *>, BenchHeld >::iterator i=sBenchOwned.begin(); i!=sBenchOwned.end(); ++i)
++   {
++      String what = i->first.second==(hx::Class_obj *)1 ? HX_CSTRING("(allocs)") : (i->first.second ? i->first.second->mName : HX_CSTRING("(no class)"));
++      String name = HX_CSTRING("^") + ((size_t)i->first.first<8 ? String(sBenchRootNames[(size_t)i->first.first]).dup() : i->first.first->mName) + HX_CSTRING(" > ") + what;
++      hx::Anon row = hx::Anon_obj::Create();
++      row->__SetField(HX_CSTRING("name"), name, hx::paccDynamic);
++      row->__SetField(HX_CSTRING("count"), (int)i->second.count, hx::paccDynamic);
++      row->__SetField(HX_CSTRING("bytes"), (Float)i->second.bytes, hx::paccDynamic);
++      row->__SetField(HX_CSTRING("largeCount"), (int)i->second.largeCount, hx::paccDynamic);
++      row->__SetField(HX_CSTRING("largeBytes"), (Float)i->second.largeBytes, hx::paccDynamic);
++      result->push(row);
++   }
++   sBenchOwner.clear();
+    return result;
+ }
+ 
