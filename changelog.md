@@ -18,3 +18,4 @@ At tag time, copy these sections into the GitHub release notes under `Changelog`
 - Linux: the game uses about 500 MB less memory in a dungeon, where memory freed after a loading stayed with the game instead of going back to the system.
 - The game uses about 200 MB less memory: the images of screens that have not been opened are no longer decoded.
 - The game uses less video memory, about 430 MB less in a dungeon: the images of a screen are released a minute after it was last shown, and loaded again when it is shown again.
+- High frame rates: moving the mouse no longer makes the game freeze for a moment (about a tenth of a second, longer on a slower processor), which happened every 5 to 10 seconds at 500 FPS in a dungeon and about every 100 seconds at 60 FPS.
