@@ -1,330 +1,326 @@
-# Diagnostic mémoire et GC
+# Memory and GC diagnostics
 
-Trois volets complémentaires :
+Three complementary parts:
 
-- **Linux / builds GC** (sections suivantes) : chronologie, recensement et traces
-  de rétention hxcpp (`tools/run_gc_session.sh`, builds `bin/gc-*`).
-- **Windows / freezes** (fin du fichier) : `StallProfiler` in-process, sampler
-  Working Set, PDB + LocalDumps pour les access violations après spirale GC.
-- **Linux / FPS et mémoire par scénario** : un bot qui joue une scène et mesure
-  temps de frame, draws, tas, VRAM et graphes d'appels, dans
+- **Linux / GC builds** (next sections): hxcpp timeline, census and retention
+  traces (`tools/run_gc_session.sh`, `bin/gc-*` builds).
+- **Windows / freezes** (end of the file): in-process `StallProfiler`, Working
+  Set sampler, PDB + LocalDumps for the access violations that follow a GC
+  spiral.
+- **Linux / FPS and memory per scenario**: a bot that plays a scene and
+  measures frame times, draws, heap, VRAM and call graphs, in
   [`bench/README.md`](bench/README.md).
 
-## Prérequis hxcpp
+## hxcpp prerequisite
 
-L’instrumentation (`HXCPP_GC_TIMELINE`, `HXCPP_GC_CENSUS`,
-`HXCPP_GC_RETENTION_TRACE` et variantes) n’est **pas** dans le tip hxcpp des
-releases. Elle vit dans un patch ponctuel :
+The instrumentation (`HXCPP_GC_TIMELINE`, `HXCPP_GC_CENSUS`,
+`HXCPP_GC_RETENTION_TRACE` and variants) is **not** in the hxcpp tip of the
+releases. It lives in a one-off patch:
 
 ```text
 tools/profiling/patches/hxcpp_gc_timeline_census_retention.patch
 ```
 
-Appliquer depuis la racine du projet, uniquement pour un build de diagnostic :
+Apply it from the project root, for a diagnostic build only:
 
 ```bash
 git -C submodules/libhxcpp apply \
   ../../tools/profiling/patches/hxcpp_gc_timeline_census_retention.patch
 ```
 
-Retirer ensuite le patch (tip release propre) :
+Then remove the patch (clean release tip):
 
 ```bash
 git -C submodules/libhxcpp apply -R \
   ../../tools/profiling/patches/hxcpp_gc_timeline_census_retention.patch
-# ou : git -C submodules/libhxcpp checkout -- .
+# or: git -C submodules/libhxcpp checkout -- .
 ```
 
-Le patch cible le commit hxcpp actuellement pointé par DRH (`c4487bf3` au
-moment de l’écriture). Après une mise à jour du submodule, vérifier
-`git -C submodules/libhxcpp apply --check …` et régénérer le patch si besoin.
+The patch targets the hxcpp commit DRH pointed to when it was written
+(`c4487bf3`). After a submodule update, check
+`git -C submodules/libhxcpp apply --check …` and regenerate the patch if
+needed.
 
-Ces defines ne doivent jamais être activés dans `project.xml` de la release.
-Sans le patch, un build qui les demande ne compilera pas ou n’émettra pas les
-lignes CSV attendues.
+These defines must never be enabled in the release's `project.xml`. Without
+the patch, a build that asks for them does not compile or does not emit the
+expected CSV lines.
 
-## Prérequis StallProfiler (jeu)
+## StallProfiler prerequisite (game)
 
-Le profiler in-process (`--profile-stalls`, marks, `alloc-spike`) n’est **pas**
-dans le code release. Il vit dans :
+The in-process profiler (`--profile-stalls`, marks, `alloc-spike`) is **not**
+in the release code. It lives in:
 
 ```text
 tools/profiling/patches/stall_profiler.patch
 ```
 
-Appliquer depuis la racine (working tree jeu) pour un build de diagnostic :
+Apply it from the root (game working tree) for a diagnostic build:
 
 ```bash
 git apply tools/profiling/patches/stall_profiler.patch
 ```
 
-Retirer :
+Remove it:
 
 ```bash
 git apply -R tools/profiling/patches/stall_profiler.patch
 ```
 
-Le patch ajoute `src/brain/utils/StallProfiler.hx`, les hooks CLI / marks
-(chat, floor, swf, input), des helpers de stats SWF dans `SwfAsset`, et
-l’instrumentation `clearBitmapCaches` / `getBitmapCacheCounts` dans
+The patch adds `src/brain/utils/StallProfiler.hx`, the CLI hooks and marks
+(chat, floor, swf, input), SWF stats helpers in `SwfAsset`, and the
+`clearBitmapCaches` / `getBitmapCacheCounts` instrumentation in
 `submodules/swf/.../AnimateLibrary.hx`.
 
-Sous Windows, si `git apply` échoue sur les fins de ligne :
+On Windows, if `git apply` fails on line endings:
 
 ```bash
 git apply --ignore-whitespace tools/profiling/patches/stall_profiler.patch
 ```
 
-## Session réaliste longue
+## Long realistic session
 
-Le build `bin/gc-diagnostics` active `HXCPP_GC_TIMELINE` et
-`HXCPP_GC_CENSUS` en plus des options de la release. Cette instrumentation
-conserve le collecteur non générationnel et son marquage parallèle. Elle écrit
-une ligne par collection avec :
+The `bin/gc-diagnostics` build enables `HXCPP_GC_TIMELINE` and
+`HXCPP_GC_CENSUS` on top of the release's options. This instrumentation keeps
+the non-generational collector and its parallel marking. It writes one line
+per collection with:
 
-- la pause et l’intervalle depuis la collection précédente ;
-- le tas vivant, courant et réservé avant/après la collection ;
-- les grosses allocations, la fragmentation et la taille de travail cible ;
-- la répartition du temps entre synchronisation, marquage, récupération,
-  grosses allocations, défragmentation et reprise des threads.
+- the pause and the interval since the previous collection;
+- the live, current and reserved heap before and after the collection;
+- the large allocations, the fragmentation and the target working size;
+- how the time splits between synchronisation, marking, reclaiming, large
+  allocations, defragmentation and resuming the threads.
 
-Lors des scans complets seulement, elle recense aussi les classes d’objets
-vivants, les buffers bruts par taille et la mémoire native déclarée au GC. Ce
-recensement est volontairement peu fréquent : il sert à identifier les familles
-qui restent vivantes sans enregistrer chaque allocation.
+On full scans only, it also counts the classes of live objects, the raw
+buffers by size and the native memory declared to the GC. This census is
+deliberately infrequent: it identifies the families that stay alive without
+recording every allocation.
 
-Ce build sert à attribuer la croissance mémoire, pas à comparer les pauses avec
-une release : les scans complets incluent le coût du recensement.
+This build is for attributing memory growth, not for comparing pauses with a
+release: the full scans include the cost of the census.
 
-Lancer la session depuis la racine du projet :
+Start the session from the project root:
 
 ```bash
 tools/run_gc_session.sh
 ```
 
-Pendant la partie, saisir des marqueurs courts dans le terminal, par exemple :
+While playing, type short markers in the terminal, for example:
 
 ```text
-town initial
+initial town
 dungeon 1 start
 floor 2
-retour town
-premières saccades GC visibles
+back in town
+first visible GC stutters
 ```
 
-Les marqueurs sont facultatifs pour les changements d’état, entrées et
-destructions de floors : l’analyseur les extrait également des logs du jeu.
+Markers are optional for state changes and for floors being entered and
+destroyed: the analyzer also extracts those from the game's logs.
 
-Fermer le jeu normalement afin que `HXCPP_GC_SUMMARY` soit également écrit. Le
-dossier `profiling/gc-AAAAMMJJ_HHMMSS` contiendra :
+Close the game normally so that `HXCPP_GC_SUMMARY` is written too. The
+`profiling/gc-YYYYMMDD_HHMMSS` folder will hold:
 
-- `game.log` : logs du jeu, chronologie détaillée des GC et résumé final ;
-- `memory.csv` : RSS/PSS, mémoire anonyme, swap, défauts de page, descripteurs,
-  CPU, VRAM/GTT du processus et du GPU ;
-- `events.csv` : marqueurs saisis pendant la partie ;
-- `game_events.csv` : transitions et floors détectés automatiquement ;
-- `gc_timeline.csv` : chronologie GC extraite ;
-- `gc_census_*.csv` : recensements des survivants lors des scans complets ;
-- `analysis.md` : résumé numérique automatique ;
-- `timeline.svg` : graphe mémoire/GC.
+- `game.log`: the game's logs, the detailed GC timeline and the final summary;
+- `memory.csv`: RSS/PSS, anonymous memory, swap, page faults, descriptors,
+  CPU, VRAM/GTT of the process and of the GPU;
+- `events.csv`: the markers typed while playing;
+- `game_events.csv`: the transitions and floors detected automatically;
+- `gc_timeline.csv`: the extracted GC timeline;
+- `gc_census_*.csv`: the censuses of survivors on full scans;
+- `analysis.md`: the automatic numeric summary;
+- `timeline.svg`: the memory/GC graph.
 
-Pour réanalyser une session :
+To analyze a session again:
 
 ```bash
-python3 tools/analyze_gc_session.py profiling/gc-AAAAMMJJ_HHMMSS
+python3 tools/analyze_gc_session.py profiling/gc-YYYYMMDD_HHMMSS
 ```
 
-## Trace de rétention ciblée
+## Targeted retention trace
 
-Le build `bin/gc-retention-raw` cherche les chaînes qui conservent les gros
-buffers bruts de 144 000 000 octets et 26 796 760 octets. Il les trace
-respectivement aux collections 16 et 31, puis reprend le comportement normal.
-Dans les sessions observées, ces collections arrivent durant les premières
-minutes de jeu.
+The `bin/gc-retention-raw` build looks for the chains that keep the large raw
+buffers of 144,000,000 bytes and 26,796,760 bytes. It traces them at
+collections 16 and 31 respectively, then goes back to the normal behaviour.
+In the sessions observed, these collections come during the first minutes of
+play.
 
-Les chemins identiques sont regroupés. Le traceur mémorise au plus 512 chemins
-distincts et imprime les 100 plus fréquents, afin d'éviter un log de plusieurs
-dizaines de milliers de lignes.
+Identical paths are grouped. The tracer remembers at most 512 distinct paths
+and prints the 100 most frequent, to avoid a log of tens of thousands of
+lines.
 
-Lancer depuis la racine du projet :
+Start from the project root:
 
 ```bash
 DRH_PROFILE_BINARY="$PWD/bin/gc-retention-raw/linux/bin/Dungeon Rampage Haxe" \
   tools/run_gc_session.sh
 ```
 
-Ces deux collections seront plus lentes que d'habitude, car le marquage
-conserve temporairement le chemin complet depuis chaque racine. Après les gels
-ponctuels, terminer la partie normalement. L'analyseur écrit les résultats dans
-`gc_retention_summary.csv`, `gc_retention_paths.csv` et la section « Trace de
-rétention » de `analysis.md`. Une session de cinq minutes suffit ; il n'est pas
-utile de refaire une longue run.
+Those two collections are slower than usual, because marking temporarily keeps
+the full path from each root. After the one-off freezes, finish the game
+normally. The analyzer writes the results to `gc_retention_summary.csv`,
+`gc_retention_paths.csv` and the `Trace de rétention` section of
+`analysis.md`. A five-minute session is enough; a long run is not needed.
 
-## Trace de rétention Animate
+## Animate retention trace
 
-Le build `bin/gc-retention-animate` trace quatre familles qui dominent le petit
-graphe vivant après la mise en cache matérielle des bitmaps :
+The `bin/gc-retention-animate` build traces four families that dominate the
+small live graph once bitmaps are hardware-cached:
 
-- collection 16 : `swf.exporters.animate.AnimateFrameObject` ;
-- collection 31 : `swf.exporters.animate.AnimateFrame` ;
-- collection 46 : `swf.exporters.animate._AnimateTimeline.FrameSymbolInstance` ;
-- collection 61 : `openfl.display.Graphics`.
+- collection 16: `swf.exporters.animate.AnimateFrameObject`;
+- collection 31: `swf.exporters.animate.AnimateFrame`;
+- collection 46: `swf.exporters.animate._AnimateTimeline.FrameSymbolInstance`;
+- collection 61: `openfl.display.Graphics`.
 
-Lancer depuis la racine du projet :
+Start from the project root:
 
 ```bash
 DRH_PROFILE_BINARY="$PWD/bin/gc-retention-animate/linux/bin/Dungeon Rampage Haxe" \
   tools/run_gc_session.sh
 ```
 
-Les quatre collections ciblées peuvent provoquer un gel de plusieurs secondes.
-Il suffit de rejoindre un dungeon et de jouer jusqu'à ce que la collection 61
-ait été enregistrée, généralement au bout de cinq à sept minutes. La session
-n'a pas besoin d'être comparable à une run précédente : elle sert à identifier
-les propriétaires des survivants, pas à mesurer les pauses.
+The four targeted collections can freeze the game for several seconds. Joining
+a dungeon and playing until collection 61 is recorded is enough, usually five
+to seven minutes. The session does not need to be comparable with an earlier
+run: it identifies who owns the survivors, it does not measure pauses.
 
-## Trace de rétention du graphe vivant
+## Live graph retention trace
 
-Le build `bin/gc-retention-graph` compare les chemins qui conservent les
-conteneurs génériques dont la population augmente pendant un dungeon :
+The `bin/gc-retention-graph` build compares the paths that keep the generic
+containers whose population grows during a dungeon:
 
-- collection 16 : `Array`, avant le dungeon ;
-- collection 31 : `Dynamic`, au début du dungeon ;
-- collection 61 : `Array`, pendant le dungeon ;
-- collection 91 : `brain.workLoop.LogicalWorkComponent`, vers la fin ;
-- collection 106 : `Array`, vers la fin ;
-- première collecte explicite après la collection 31 : `Array` et recensement
-  des survivants, normalement lors de la destruction du dungeon.
+- collection 16: `Array`, before the dungeon;
+- collection 31: `Dynamic`, at the start of the dungeon;
+- collection 61: `Array`, during the dungeon;
+- collection 91: `brain.workLoop.LogicalWorkComponent`, towards the end;
+- collection 106: `Array`, towards the end;
+- first explicit collection after collection 31: `Array` and a census of the
+  survivors, normally when the dungeon is destroyed.
 
-Lancer depuis la racine du projet :
+Start from the project root:
 
 ```bash
 DRH_PROFILE_BINARY="$PWD/bin/gc-retention-graph/linux/bin/Dungeon Rampage Haxe" \
   tools/run_gc_session.sh
 ```
 
-Faire une partie normale, revenir en town, puis attendre quelques secondes
-avant de fermer le jeu normalement. La dernière capture ne dépend pas d'un
-numéro de collection fixe : elle est déclenchée par la collecte explicite qui
-accompagne normalement la destruction du dungeon.
+Play a normal game, go back to town, then wait a few seconds before closing
+the game normally. The last capture does not depend on a fixed collection
+number: it is triggered by the explicit collection that normally comes with
+the dungeon's destruction.
 
-Les collections ciblées parcourent et enregistrent de très nombreux
-chemins. Elles peuvent donc provoquer de gros gels et fausser fortement les
-pauses GC. Cette session sert exclusivement à attribuer la croissance du graphe
-vivant ; ses temps ne doivent pas être comparés aux builds précédents.
+The targeted collections walk and record a great many paths. They can
+therefore cause long freezes and distort the GC pauses heavily. This session
+is only for attributing the growth of the live graph; its times must not be
+compared with earlier builds.
 
-## Comparaison sans cache de mesure du texte (piste écartée)
+## Comparison without the text measurement cache (lead set aside)
 
-Le build `bin/gc-text-no-cache` active le define OpenFL
-`openfl_disable_text_measurement_cache`. Il conserve la chronologie et le
-recensement GC, mais pas le traceur de rétention.
+The `bin/gc-text-no-cache` build enables the OpenFL define
+`openfl_disable_text_measurement_cache`. It keeps the GC timeline and census,
+but not the retention tracer.
 
-La session `gc-20260727_054912` confirme que le define supprime complètement
-les `ShapeCache`, sans différence visuelle. Elle ne réduit cependant pas le
-nombre de `GlyphPosition`, qui appartiennent principalement aux
-`TextLayoutGroup.positions` actifs, et n'apporte aucun gain mémoire ou GC
-mesurable. Cette optimisation ne doit donc pas être conservée.
+Session `gc-20260727_054912` confirms that the define removes the
+`ShapeCache` objects entirely, with no visual difference. It does not reduce
+the number of `GlyphPosition` objects, however, which mostly belong to the
+active `TextLayoutGroup.positions`, and brings no measurable memory or GC
+gain. This optimisation must therefore not be kept.
 
-## Copy-on-write indépendant des commandes graphiques
+## Independent copy-on-write of the graphics commands
 
-Le build `bin/gc-draw-command-cow` modifie `DrawCommandBuffer` pour détacher
-uniquement les tableaux écrits par chaque commande. Une commande simple ne
-matérialise donc plus les sept tableaux internes de chaque `Graphics`.
+The `bin/gc-draw-command-cow` build changes `DrawCommandBuffer` to detach only
+the arrays each command writes. A simple command therefore no longer
+materialises the seven internal arrays of each `Graphics`.
 
-Lancer depuis la racine du projet :
+Start from the project root:
 
 ```bash
 DRH_PROFILE_BINARY="$PWD/bin/gc-draw-command-cow/linux/bin/Dungeon Rampage Haxe" \
   tools/run_gc_session.sh
 ```
 
-Faire une partie de quelques minutes avec plusieurs floors, revenir en town,
-puis fermer normalement. Vérifier le rendu des remplissages, contours et
-gradients. Les recensements doivent surtout permettre de comparer le nombre
-d'`Array` survivants ; les temps GC seuls risquent de rester dans la variance
-naturelle.
+Play a few minutes over several floors, go back to town, then close normally.
+Check how fills, strokes and gradients render. The censuses are mostly for
+comparing the number of surviving `Array` objects; GC times alone are likely
+to stay within natural variance.
 
-La session `gc-20260727_062859` (6 floors, 210 s de jeu effectif) ne présente
-aucune régression visuelle. La meilleure référence immédiate est
-`gc-20260727_053411` : elle utilise le cache de mesure du texte normal et ne
-contient pas le COW indépendant. Son build trace cependant la rétention lors
-de certaines collections. En excluant la collection 31 volontairement ralentie
-par ce traceur, le coût GC pendant les floors passe de 7,63 à 6,52 ms/s et le
-volume récupéré de 16,63 à 15,39 Mio/s, soit respectivement environ -15 % et
--7 %. Les runs ne sont pas parfaitement contrôlées ; ces chiffres sont donc un
-signal cohérent, pas une mesure isolée à présenter comme garantie. Les tests
-unitaires et le repro dédié établissent séparément le gain structurel : seuls
-les flux effectivement écrits sont détachés.
+Session `gc-20260727_062859` (6 floors, 210 s of actual play) shows no visual
+regression. The best immediate reference is `gc-20260727_053411`: it uses the
+normal text measurement cache and does not have the independent COW. Its
+build does trace retention on some collections, though. Leaving out
+collection 31, deliberately slowed by that tracer, the GC cost during floors
+goes from 7.63 to 6.52 ms/s and the volume reclaimed from 16.63 to
+15.39 MiB/s, about -15% and -7% respectively. The runs are not perfectly
+controlled; these figures are a consistent signal, not an isolated measure to
+present as guaranteed. The unit tests and the dedicated repro establish the
+structural gain separately: only the streams actually written are detached.
 
-## Collecteur générationnel hxcpp
+## hxcpp generational collector
 
-Le build `bin/gc-generational` active `HXCPP_GC_GENERATIONAL` en plus de la
-timeline et du recensement GC. La timeline distingue les collectes
-générationnelles (`gen`) des scans complets (`std`) et enregistre la taille du
-remembered set au début de chaque collecte générationnelle. Le rapport produit
-une section `Modes de collecte` pour les comparer séparément.
+The `bin/gc-generational` build enables `HXCPP_GC_GENERATIONAL` on top of the
+GC timeline and census. The timeline tells generational collections (`gen`)
+from full scans (`std`) and records the size of the remembered set at the
+start of each generational collection. The report has a `Modes de collecte`
+section that compares them separately.
 
-Lancer depuis la racine du projet :
+Start from the project root:
 
 ```bash
 DRH_PROFILE_BINARY="$PWD/bin/gc-generational/linux/bin/Dungeon Rampage Haxe" \
   tools/run_gc_session.sh
 ```
 
-Rejouer de préférence le dungeon statique utilisé comme référence, avec un
-personnage et un équipement comparables. Vérifier le rendu à chaque floor,
-revenir en town, puis fermer le jeu normalement. Le premier objectif est de
-vérifier la stabilité et l'évolution du coût des deux modes ; une session plus
-longue ne sera utile que si ce premier test ne montre ni régression ni signal
-assez clair.
+Preferably replay the static dungeon used as the reference, with a comparable
+character and equipment. Check the rendering on each floor, go back to town,
+then close the game normally. The first goal is to check stability and how the
+cost of both modes evolves; a longer session is only useful if this first test
+shows neither a regression nor a clear enough signal.
 
-Ce build contient un contournement limité aux sources C++ générées pour un
-problème du générateur Haxe 4.3.6 avec les champs `cpp.Function` et la barrière
-d'écriture générationnelle. Une reconstruction Lime complète régénérera ces
-fichiers et échouera tant que le générateur Haxe n'est pas corrigé. Un repro
-minimal se trouve dans
+This build contains a workaround, limited to the generated C++ sources, for a
+problem of the Haxe 4.3.6 generator with `cpp.Function` fields and the
+generational write barrier. A full Lime rebuild regenerates those files and
+fails as long as the Haxe generator is not fixed. A minimal repro is in
 `../repros/hxcpp-generational-cpp-function`.
 
-## Capture CPU ciblée
+## Targeted CPU capture
 
-`perf` est préférable pour une reproduction courte autour d’une zone devenue
-lente, pas pendant toute une partie de deux heures :
+`perf` is best for a short reproduction around an area that became slow, not
+for a whole two-hour game:
 
 ```bash
 tools/profiling/profile_native_perf.sh <pid> profiling/perf-run
 tools/profiling/report_native_perf.sh profiling/perf-run/perf.data
 ```
 
-`--profile-stalls` fonctionne aussi sous Linux et sert surtout à comparer la
-pente mémoire / l’absence de longs stalls face à Windows.
+`--profile-stalls` also works on Linux, and is mostly used to compare the
+memory slope and the absence of long stalls with Windows.
 
 ---
 
-## Windows : stalls, Working Set et dumps
+## Windows: stalls, Working Set and dumps
 
-Objectif : corréler les freezes Windows (souvent plusieurs secondes à plusieurs
-dizaines de secondes, `cause=none`) avec la croissance du heap hxcpp / Working
-Set OS, puis capturer un dump natif si la session finit en `0xc0000005`.
+Goal: correlate the Windows freezes (often several seconds to several tens of
+seconds, `cause=none`) with the growth of the hxcpp heap and of the OS Working
+Set, then capture a native dump if the session ends in `0xc0000005`.
 
-Les freezes focus/chat/autre écran plus courts restent utiles comme
-révélateurs ; la cible de fond est la spirale GC, pas le crash terminal.
+The shorter freezes on focus, chat or another screen remain useful as
+indicators; the underlying target is the GC spiral, not the final crash.
 
 ### StallProfiler (in-process)
 
-Le profiler n’est actif que via CLI (coût quasi nul sinon) :
+The profiler is only active through the CLI (almost free otherwise):
 
 ```bat
 Dungeon Rampage Haxe.exe --profile-stalls --fps=auto
 ```
 
-Options :
+Options:
 
-- `--profile-stalls` : seuil 50 ms
-- `--profile-stalls=80` : seuil personnalisé en ms
-- `--profile-memory-interval=5` : sample mémoire hxcpp toutes les N secondes (défaut 5)
-- `--profile-alloc-spike=100` : loguer les sauts soudains de `gcUsage` / `gcLarge` (Mo, défaut 100)
+- `--profile-stalls`: 50 ms threshold
+- `--profile-stalls=80`: custom threshold in ms
+- `--profile-memory-interval=5`: hxcpp memory sample every N seconds (default 5)
+- `--profile-alloc-spike=100`: log sudden jumps of `gcUsage` / `gcLarge` (MB, default 100)
 
-Lignes utiles dans les logs :
+Useful lines in the logs:
 
 ```text
 [StallProfiler] enabled threshold=50ms memoryInterval=5s allocSpike=100MB
@@ -336,49 +332,51 @@ Lignes utiles dans les logs :
 [StallProfiler] stage-resize 1920x1080
 ```
 
-`cause=none` = stall sans hint récent (typiquement pause GC / gros travail hors
-leave/focus/chat). `recent=[...]` garde les derniers breadcrumbs (floor, swf-load,
-focus, chat, resize, …) même si le hint immédiat a expiré. Le temps passé en
-arrière-plan après alt-tab n’est **pas** compté comme stall.
+`cause=none` is a stall without a recent hint (typically a GC pause or heavy
+work outside leave/focus/chat). `recent=[...]` keeps the last breadcrumbs
+(floor, swf-load, focus, chat, resize, …) even if the immediate hint has
+expired. Time spent in the background after alt-tab is **not** counted as a
+stall.
 
-Les `alloc-spike` sont la piste principale pour un déclencheur mémoire : un
-+centaines de Mo / +1 Gio en une ou quelques frames, avec `recent=` pour nommer
-le chemin. Exemple résolu : codes SDL (bit `0x40000000`) fuités dans
-`KeyboardEvent.keyCode` → `Vector` Flash-style de longueur 256 qui grossissait
-à ~1 GiB. `noteLargeBitmap` reste dispo pour instrumenter manuellement un
-allocateur suspect.
+The `alloc-spike` lines are the main lead for a memory trigger: hundreds of
+MB or 1 GiB more in one or a few frames, with `recent=` to name the path. A
+solved example: SDL codes (bit `0x40000000`) leaking into
+`KeyboardEvent.keyCode`, which made a Flash-style `Vector` of length 256 grow
+to about 1 GiB. `noteLargeBitmap` is still there to instrument a suspect
+allocator by hand.
 
-### Sampler mémoire OS (Working Set / Private)
+### OS memory sampler (Working Set / Private)
 
-Dans un autre terminal PowerShell, pendant que le jeu tourne :
+In another PowerShell terminal, while the game runs:
 
 ```powershell
 $proc = Get-Process -Name "Dungeon Rampage Haxe" | Select-Object -First 1
 .\tools\profiling\profile_native_memory.ps1 -ProcessId $proc.Id -OutputCsv profiling\win1\memory.csv -IntervalSeconds 0.5
 ```
 
-CSV :
+CSV:
 
 ```text
 timestamp_sec,rss_kb,private_kb,virtual_kb
 ```
 
-Croiser l’horloge des stalls (`Logger`) avec `private_kb` / `rss_kb`. Task
-Manager peut montrer des chutes brutales du Working Set pendant un gros GC
-(parfois jusqu’à quelques dizaines de Mo puis remontée) : signal bruyant, à
-confirmer avec le sampler et `gcUsageMB` du StallProfiler.
+Cross the stalls' clock (`Logger`) with `private_kb` / `rss_kb`. Task Manager
+can show sharp drops of the Working Set during a large GC (sometimes down to a
+few tens of MB, then back up): a noisy signal, to confirm with the sampler and
+the StallProfiler's `gcUsageMB`.
 
-### Build avec PDB + LocalDumps
+### Build with PDB + LocalDumps
 
-Pour une stack native exploitable après AV :
+For a usable native stack after an access violation:
 
 ```bat
 haxelib run openfl build project.xml cpp -D HXCPP_DEBUG_LINK
 ```
 
-Copier l’exe **et** le `.pdb` côte à côte (ex. dossier `current` du launcher).
+Copy the exe **and** the `.pdb` side by side (for example into the launcher's
+`current` folder).
 
-LocalDumps (exemple actuel) :
+LocalDumps (current example):
 
 ```reg
 [HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\Windows Error Reporting\LocalDumps\Dungeon Rampage Haxe.exe]
@@ -387,21 +385,21 @@ LocalDumps (exemple actuel) :
 "DumpType"=dword:00000002
 ```
 
-`DumpType=2` = full dump : il faut assez d’espace disque (plusieurs Gio). Un
-minidump (`DumpType=1`) suffit souvent avec le PDB pour la stack.
+`DumpType=2` is a full dump: it needs enough disk space (several GiB). A
+minidump (`DumpType=1`) is often enough with the PDB for the stack.
 
-Analyser avec `cdb` / WinDbg en pointant le PDB du même build.
+Analyze with `cdb` / WinDbg, pointing to the PDB of the same build.
 
-### Scénario de session
+### Session scenario
 
-1. Lancer le build local (PDB) avec `--profile-stalls`
-2. Démarrer le sampler mémoire
-3. Enchaîner donjons / floors sans relancer le process
-4. Quand les longs stalls apparaissent, noter l’heure et les `gcLargeMB` /
-   `hwBmp` / `swfLibs`
-5. Si crash : récupérer le `.dmp` + le log `.zst` du launcher
+1. Start the local build (PDB) with `--profile-stalls`
+2. Start the memory sampler
+3. Chain dungeons and floors without restarting the process
+4. When the long stalls appear, note the time and `gcLargeMB` / `hwBmp` /
+   `swfLibs`
+5. On a crash: collect the `.dmp` and the launcher's `.zst` log
 
-Interprétation typique observée : heap/`gcLargeMB` qui montent, frames de
-5–60+ s en `cause=none`, parfois reclaim ~1 Gio puis reprise ; sans reclaim,
-dégradation puis AV. Le crash natif sous charge est une conséquence ; la cause
-à traiter est la spirale qui précède.
+Typical reading observed: the heap and `gcLargeMB` climb, frames of 5 to 60+ s
+with `cause=none`, sometimes about 1 GiB reclaimed and then recovery; without
+that reclaim, degradation and then an access violation. The native crash under
+load is a consequence; the cause to treat is the spiral before it.

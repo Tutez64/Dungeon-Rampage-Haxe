@@ -23,3 +23,7 @@ At tag time, copy these sections into the GitHub release notes under `Changelog`
 - Dungeons: frames are 5 to 7% shorter: finding the scenery that is off screen and ordering what is drawn cost less.
 - Moving the mouse costs less: in a quiet dungeon at 600 FPS, a frame is about 12% shorter while the mouse moves.
 - High frame rates: moving the mouse no longer makes the game freeze for a moment (about a tenth of a second, longer on a slower processor), which happened every 5 to 10 seconds at 500 FPS in a dungeon and about every 100 seconds at 60 FPS.
+
+### Internal
+
+- A performance bench in `tools/profiling/bench`: a bot that plays a scenario and measures frame times, draw calls, memory and call graphs.
