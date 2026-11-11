@@ -60,6 +60,8 @@ private class ChildComparator implements IComparator {
 	public function new() {}
 
 	public function compare(a:ASAny, b:ASAny):Int {
+		var a:DisplayObject = a;
+		var b:DisplayObject = b;
 		if (a.y == b.y) {
 			if (a.x == b.x) {
 				if (a.height == b.height) {
