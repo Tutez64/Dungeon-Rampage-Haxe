@@ -20,4 +20,5 @@ At tag time, copy these sections into the GitHub release notes under `Changelog`
 - The game uses less video memory, about 430 MB less in a dungeon: the images of a screen are released a minute after it was last shown, and loaded again when it is shown again.
 - The game uses about 30 MB less memory: the text describing each art library is released once it has been read.
 - Fights: memory no longer grows while visual effects play. It grew by 4 to 5 MB a minute in a dungeon, alone or with other players, which made the game's occasional short freezes come more often.
+- Moving the mouse costs less: in a quiet dungeon at 600 FPS, a frame is about 12% shorter while the mouse moves.
 - High frame rates: moving the mouse no longer makes the game freeze for a moment (about a tenth of a second, longer on a slower processor), which happened every 5 to 10 seconds at 500 FPS in a dungeon and about every 100 seconds at 60 FPS.
