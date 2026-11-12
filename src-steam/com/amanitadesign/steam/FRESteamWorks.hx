@@ -1355,7 +1355,8 @@ class FRESteamWorks extends EventDispatcher {
 		#if air
 		return ASCompat.asBool(_ExtensionContext.call("AIRSteam_RunFrame"));
 		#elseif (cpp && !air)
-		Steam.onEnterFrame();
+		// Steam Input's frame only, as the ANE: SteamWrap runs it in getConnectedControllers, which
+		// the game calls next. Steam.onEnterFrame() would run every callback and read the network.
 		return true;
 		#else
 		return false;

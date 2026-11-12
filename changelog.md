@@ -8,6 +8,7 @@ At tag time, copy these sections into the GitHub release notes under `Changelog`
 
 ### Fixed
 
+- Controllers: with a controller plugged in, the game no longer stutters (a freeze of about a tenth of a second every two or three seconds) and frames no longer take about 2.5 ms more each: a quiet dungeon ran at 240 FPS instead of 640 on the test machine (#52).
 - Mods: an untyped array stored where a mod declares a typed one, such as `Array<String>`, no longer crashes the game when read back.
 - Mods: all of OpenFL's enumerations, such as `TextFieldAutoSize` or `StageQuality`, can be used, where only four could.
 - Mods: a mod importing or declaring a class named like a standard type, such as the game's `collections.Map`, no longer makes other mods fail with `Null Function`.
@@ -23,6 +24,7 @@ At tag time, copy these sections into the GitHub release notes under `Changelog`
 - Dungeons: frames are 5 to 7% shorter: finding the scenery that is off screen and ordering what is drawn cost less.
 - Moving the mouse costs less: in a quiet dungeon at 600 FPS, a frame is about 12% shorter while the mouse moves.
 - High frame rates: moving the mouse no longer makes the game freeze for a moment (about a tenth of a second, longer on a slower processor), which happened every 5 to 10 seconds at 500 FPS in a dungeon and about every 100 seconds at 60 FPS.
+- Steam Input: with the setting on, which is the default, each frame is about 0.1 ms shorter, with or without a controller.
 
 ### Internal
 

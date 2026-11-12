@@ -26,6 +26,10 @@ class SteamInputManager {
 
 	var mLoggedGlyphOrigins:ASDictionary<ASAny, ASAny> = new ASDictionary();
 
+	var mGlyphFilePathsByOrigin:Map<String, String> = new Map();
+
+	var mActionOriginsUpdateTime:Float = -250;
+
 	var mIsInitialized:Bool = false;
 
 	var mIsSteamInputManagerEnabled:Bool = false;
@@ -127,7 +131,11 @@ class SteamInputManager {
 		reconcileControllerStateAndNotify();
 		updateControllers();
 		var _loc1_ = updateLastActiveController();
-		updateActionOrigins();
+		// Steam is asked for the origins of every action: 0.2 ms on each frame
+		if (flash.Lib.getTimer() - mActionOriginsUpdateTime >= 250) {
+			mActionOriginsUpdateTime = flash.Lib.getTimer();
+			updateActionOrigins();
+		}
 		mControllerRumble.update(mConnectedSteamControllers);
 		mKeyboardEventSpoofer.update(this);
 		if (_loc1_) {
@@ -246,6 +254,18 @@ class SteamInputManager {
 	}
 
 	public function getGlyphFilePathForOrigin(origin:String, glyphSize:UInt = (1 : UInt), glyphFlag:UInt = (2 : UInt)):String {
+		// Asked for every action on every frame. Finding the file asks Steam and compiles regular
+		// expressions, 2 ms a frame, and their memory brought a full collection every other second.
+		var _loc7_ = origin + "|" + glyphSize + "|" + glyphFlag + "|" + getControllerGlyphPreference();
+		var _loc8_ = mGlyphFilePathsByOrigin.get(_loc7_);
+		if (_loc8_ == null) {
+			_loc8_ = findGlyphFilePathForOrigin(origin, glyphSize, glyphFlag);
+			mGlyphFilePathsByOrigin.set(_loc7_, _loc8_);
+		}
+		return _loc8_;
+	}
+
+	function findGlyphFilePathForOrigin(origin:String, glyphSize:UInt, glyphFlag:UInt):String {
 		var _loc6_ = mSteamworks.getGlyphPNGForActionOrigin(origin, (glyphSize : Int), (glyphFlag : Int));
 		var _loc4_ = getControllerGlyphPreference();
 		var _loc5_ = mLocalGlyphs.getGlyphPath(_loc6_, _loc4_);
