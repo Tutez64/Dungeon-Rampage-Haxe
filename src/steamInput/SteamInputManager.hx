@@ -28,6 +28,8 @@ class SteamInputManager {
 
 	var mGlyphFilePathsByOrigin:Map<String, String> = new Map();
 
+	var mActionOriginsUpdateTime:Float = -250;
+
 	var mIsInitialized:Bool = false;
 
 	var mIsSteamInputManagerEnabled:Bool = false;
@@ -129,7 +131,11 @@ class SteamInputManager {
 		reconcileControllerStateAndNotify();
 		updateControllers();
 		var _loc1_ = updateLastActiveController();
-		updateActionOrigins();
+		// Steam is asked for the origins of every action: 0.2 ms on each frame
+		if (flash.Lib.getTimer() - mActionOriginsUpdateTime >= 250) {
+			mActionOriginsUpdateTime = flash.Lib.getTimer();
+			updateActionOrigins();
+		}
 		mControllerRumble.update(mConnectedSteamControllers);
 		mKeyboardEventSpoofer.update(this);
 		if (_loc1_) {
