@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 # run.sh <name> : plays DRH_PERF_SCRIPT (town, Proving Grounds, walk, fight by default) and prints a line per phase.
 # BIN names the executable in bin/linux/bin, MAXTIME the seconds after which the game is killed (360),
-# WRAP a command to run it under. Results go to profiling/bench/<name>.
+# WRAP a command to run it under, ARGS its arguments, PAD (still or stick) a virtual controller to
+# plug in with Steam Input on. Results go to profiling/bench/<name>.
 set -u
 . "$(dirname "${BASH_SOURCE[0]}")/env.sh"
 name="$1"
@@ -13,8 +14,15 @@ export DRH_PERF_OUT="$out" DRH_PERF_SCRIPT STEAM_APP_ID=3053950
 cd "$BIN_DIR"
 inhibit=""
 command -v kde-inhibit > /dev/null && inhibit="kde-inhibit --power --screenSaver"
+padpid=""
+if [ -n "${PAD:-}" ]; then
+  python3 -I "$BENCH/vpad.py" "$PAD" > "$out/pad.log" 2>&1 &
+  padpid=$!
+  sleep 4
+  ARGS="${ARGS:-} --experimental-use-steam-input true"
+fi
 launch() {
-  $inhibit ${WRAP:-} "./$BIN" > "$out/game.log" 2>&1 &
+  $inhibit ${WRAP:-} "./$BIN" ${ARGS:-} > "$out/game.log" 2>&1 &
   sleep 1
   pid=$(pgrep -n -f "^./Dungeon Rampage Haxe" || true)
   echo "pid=$pid" > "$out/session.txt"
@@ -38,7 +46,10 @@ while [ -n "$pid" ] && kill -0 "$pid" 2>/dev/null; do
   gpu=$(cat /proc/$pid/fdinfo/* 2>/dev/null | awk '/^drm-client-id:/{id=$2} /^drm-memory-vram:/{v[id]=$2} /^drm-memory-gtt:/{g[id]=$2} END{for(i in v){sv+=v[i]; sg+=g[i]} printf "%d,%d", sv, sg}')
   echo "$(date +%s.%N | cut -c1-14),$st,$gpu" >> "$out/mem.csv"
   if [ -f "$out/events.log" ]; then
-    if ! grep -q bot_start "$out/session.txt"; then echo "bot_start=$(stat -c %.3Y "$out/events.log" | tr , .)" >> "$out/session.txt"; fi
+    if ! grep -q bot_start "$out/session.txt"; then
+      echo "bot_start=$(stat -c %.3Y "$out/events.log" | tr , .)" >> "$out/session.txt"
+      [ -n "$padpid" ] && "$BENCH/refocus.sh" "$pid"
+    fi
     n=$(grep -c " SHOT " "$out/events.log")
     if [ "$n" -gt "$shots_done" ] && command -v spectacle > /dev/null; then
       shots_done=$n
@@ -48,6 +59,7 @@ while [ -n "$pid" ] && kill -0 "$pid" 2>/dev/null; do
   fi
   sleep 1
 done
+[ -n "$padpid" ] && kill "$padpid" 2>/dev/null
 wait
 echo "duration=$(( $(date +%s) - start ))" >> "$out/session.txt"
 python3 "$BENCH/summ.py" "$out"

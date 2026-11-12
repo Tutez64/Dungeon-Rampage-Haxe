@@ -44,7 +44,7 @@ every frame until `wiggle:off`), `keydown:<name>`, `keyup:<name>`, `phase:<name>
 `census:<name>`, `mallinfo`, `trim`, `tex`, `bmp`, `quit`.
 
 Environment: `MAXTIME` (seconds before the game is killed, 360), `WRAP` (a command to run the
-game under), `DRH_PERF_LONG=<ms>` (the frame time logged as `LONGFRAME`, 25), `DRH_PERF_IDLE=<s>`
+game under), `ARGS` (its arguments), `PAD` (below), `DRH_PERF_LONG=<ms>` (the frame time logged as `LONGFRAME`, 25), `DRH_PERF_IDLE=<s>`
 (overrides `AnimateLibrary.hardwareBitmapIdleTime`), `DRH_BENCH_RUNS` (another results folder).
 
 `seconds.csv` has, per second, the frames, the draw calls, the collector's heap, the large
@@ -52,6 +52,13 @@ allocations in MB (`large_alloc_mb`), the frames where the large heap fell (`lar
 the game's bake budget reads as GPU memory (`gpu_total_mb`, system wide and wrapped above 2 GiB)
 and the HUD converter's error count. A level only shows what the mouse costs with it moving
 (`wiggle`): Starling then hit tests the native overlay on every frame.
+
+`PAD=still` (or `stick`, which turns the left stick) plugs a virtual Xbox 360 controller in for
+the run (`vpad.py`: python3-evdev and write access to `/dev/uinput`) and turns Steam Input on.
+Steam hands a controller to a game once it has seen its window take the focus, and misses it
+when the window is focused before the game has told Steam it runs: `refocus.sh` gives the focus
+to another window and back when the bot starts (KWin only). `Glyph origin` lines in `game.log`
+show the game got the controller.
 
 `python3 smaps.py <pid>` and `python3 anonmaps.py <pid>` break a running game's memory down by
 mapping.
