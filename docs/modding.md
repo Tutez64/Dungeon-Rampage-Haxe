@@ -32,7 +32,7 @@ The game owns the runtime. The launcher owns the folder, enablement, and launch.
 | Mod page in the launcher | decided | `description` above the long description: the index entry's `longDescription`, else the shown zone of `README.md` ([Mod repository](#mod-repository)). The rest is DRH Launcher's. |
 | Mod repository and publishing | decided | Repo = mod folder from `DRH-Mods-Template`, DRH Launcher commands for every step (checks implemented once, also run by the index CI), `vX.Y.Z` tags, flat zip, PR to the index with git. [Mod repository](#mod-repository) |
 | Thunderstore / Nexus / itch as mirrors | open | Optional later; must not replace `mod.json` or the index. |
-| Mod settings | open | After DR 1.0's new settings screen, which mods should extend. A mod keeps its own in its `data` folder meanwhile. |
+| Mod settings and keys | decided | Declared through `api`, shown in the game's settings menu: keys in CONTROLS, options in ADVANCED until a MODS tab. [Mod settings and keys](#mod-settings-and-keys) |
 | Resource overlay rules | open | Until DR's Starling update, a mod's `Resources/` are its own files only, read from that folder; overriding the game's assets (precedence, SWF vs JSON, `Locale/` merge) comes after. |
 | Type blacklist | decided | None. Interpreted and compiled see the same types. [Compilation](#compilation) |
 | Host build (cppia) | decided | `-dce no`, force-include std, patch hxcpp, JIT on, verbose log, `HXCPP_CHECK_POINTER`. [Compilation](#compilation) |
@@ -250,6 +250,32 @@ The game calls the host at a few points every object or state goes through: obje
 `mods.api._internal` is the `api` mod's own plumbing: not API, not covered by its version.
 
 Load order is `enabled.json`'s, dependencies first ([Passing the list](#passing-the-list)). Outcomes land in [last-run.json](#last-run-report). `modding.Host` is not API: its hooks are private, `@:allow`ed to their game callers.
+
+### Mod settings and keys
+
+A mod's options and keys are declared through the `api` mod and shown in the game's settings menu, where the player changes them as the game's own. A mod neither draws a settings window nor binds a key code itself: index review refuses it, from the `api` version that has this on. `onKeyDown` stays for the keys of a mod's own window while it is open (Enter, Escape).
+
+**Options** (`context.settings`), declared in `init`:
+
+| Kind | Declares | Value |
+| --- | --- | --- |
+| `flag` | id, label, description, default | `Bool` |
+| `choice` | the same, and the choices, each a value and its label | the chosen value |
+| `slider` | the same, and minimum, maximum, step | `Float` |
+
+Each answers its current value, from `init` on, and calls its change handlers when it changes: set by the player, reverted when the menu is cancelled, or reset; in town or during a run.
+
+**Keys** (`context.keys`). A mod declares an action: id, label, description, a default key and default modifiers (Shift, Ctrl, Alt; none unless given). It is told when the action is pressed, and asks `api` whether it is held and for the label of what is bound ("SHIFT+R", empty when nothing is). It never reads a key code or a modifier's state. A press handler returning `true` keeps the key from the game, as `keyDown` does.
+
+- The player rebinds an action's key in the menu. Its modifiers are the declared ones for now; the player will set or remove them later, so a mod cannot count on its modifier being held.
+- A key is bound once: assigning one takes it from any other action, the game's or a mod's, compared by the key alone (R and Shift+R are the same key). A default key an action declared earlier already holds, the game's first, then the mods' in load order, starts unassigned.
+- The keys that can be bound are the game's (`KeyBindings.isBindable`).
+
+**Where.** Keys go at the end of CONTROLS, options in ADVANCED until a MODS tab exists, both grouped by mod, each label starting with the mod's name. A mod does not choose.
+
+**Kept** in `data/<id>/settings.json`, read and written by `api`. Ids are the mod's own: two mods may use the same. An entry the mod no longer declares is ignored. The menu's reset puts a mod's options and keys back to their declared defaults. A failed mod's entries leave the menu.
+
+`api` does this alone, over the game's settings classes (`settings.*`: its catalog's definitions, its rows), with no DRH release. A MODS tab, modifiers the player sets, a game `settings.json` holding no copy of the mods' values, and other kinds of rows need hooks in `src/`: they come with a DRH release and change nothing a mod declares.
 
 ## Disk layout
 
