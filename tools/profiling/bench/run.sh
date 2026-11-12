@@ -13,15 +13,26 @@ export DRH_PERF_OUT="$out" DRH_PERF_SCRIPT STEAM_APP_ID=3053950
 cd "$BIN_DIR"
 inhibit=""
 command -v kde-inhibit > /dev/null && inhibit="kde-inhibit --power --screenSaver"
-$inhibit ${WRAP:-} "./$BIN" > "$out/game.log" 2>&1 &
-sleep 1
-pid=$(pgrep -n -f "^./Dungeon Rampage Haxe" || true)
-echo "pid=$pid" > "$out/session.txt"
-start=$(date +%s)
+launch() {
+  $inhibit ${WRAP:-} "./$BIN" > "$out/game.log" 2>&1 &
+  sleep 1
+  pid=$(pgrep -n -f "^./Dungeon Rampage Haxe" || true)
+  echo "pid=$pid" > "$out/session.txt"
+  start=$(date +%s)
+}
+launch
+launches=1
 echo "epoch,rss_kb,anon_kb,file_kb,vram_kb,gtt_kb" > "$out/mem.csv"
 shots_done=0
 while [ -n "$pid" ] && kill -0 "$pid" 2>/dev/null; do
   now=$(date +%s)
+  # Steam sometimes never gives the login ticket: the bot has not started and the game says it waits
+  if [ ! -f "$out/events.log" ] && [ $((now - start)) -gt 40 ] && [ "$launches" -lt 3 ] && grep -q "Steam login ticket not received" "$out/game.log"; then
+    kill "$pid"; sleep 3; kill -9 "$pid" 2>/dev/null
+    launches=$((launches + 1))
+    launch
+    continue
+  fi
   if [ $((now - start)) -gt "${MAXTIME:-360}" ]; then echo "TIMEOUT kill" >> "$out/session.txt"; kill "$pid"; sleep 3; kill -9 "$pid" 2>/dev/null; break; fi
   st=$(awk '/^VmRSS:/{r=$2} /^RssAnon:/{a=$2} /^RssFile:/{f=$2} END{printf "%d,%d,%d", r,a,f}' /proc/$pid/status 2>/dev/null)
   gpu=$(cat /proc/$pid/fdinfo/* 2>/dev/null | awk '/^drm-client-id:/{id=$2} /^drm-memory-vram:/{v[id]=$2} /^drm-memory-gtt:/{g[id]=$2} END{for(i in v){sv+=v[i]; sg+=g[i]} printf "%d,%d", sv, sg}')
