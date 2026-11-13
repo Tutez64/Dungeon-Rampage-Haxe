@@ -8,6 +8,7 @@ import mods.api.account.OwnedHero;
 import mods.api.dungeon.Floor;
 import mods.api.dungeon.Hero;
 import mods.api.dungeon.Tile;
+import mods.api.settings.KeyAction;
 import mods.api_tour.ui.Panel;
 
 /**
@@ -39,6 +40,10 @@ class Main extends Mod {
 	var despawned:Array<Hero> = [];
 
 	var keySeen:Bool = false;
+
+	var tourKey:KeyAction;
+
+	var pressSeen:Bool = false;
 
 	override public function init(ctx:Context):Void {
 		this.ctx = ctx;
@@ -93,6 +98,8 @@ class Main extends Mod {
 			check("closure keeps its captured argument", ctx == this.ctx);
 			check("closure keeps its string literal", literal.length == 15 && literal.charAt(8) == "l");
 		});
+		checkSettings();
+
 		ctx.onFloorEnter(onFloorEnter);
 		ctx.onFloorExit(onFloorExit);
 		ctx.onHeroSpawned(onHeroSpawned);
@@ -105,6 +112,59 @@ class Main extends Mod {
 			}
 			return false;
 		});
+	}
+
+	/** Each option is left as it was found: its value is the player's, kept from one run to the next. */
+	function checkSettings():Void {
+		var flag = ctx.settings.flag("tourFlag", "Tour flag", "An option of the tour.", false);
+		var flags:Array<Bool> = [];
+		flag.onChange(function(value:Bool) flags.push(value));
+		var found = flag.value;
+		flag.value = !found;
+		check("settings: a flag set is read back and told once", flag.value == !found && flags.length == 1 && flags[0] == !found);
+		flag.value = !found;
+		check("settings: the value it has is no change", flags.length == 1);
+		flag.value = found;
+
+		var choice = ctx.settings.choice("tourChoice", "Tour choice", "A choice of the tour.", [{value: "a", label: "First"}, {value: "b", label: "Second"}], "a");
+		var chosen:Array<String> = [];
+		choice.onChange(function(value:String) chosen.push(value));
+		var other = choice.value == "a" ? "b" : "a";
+		var before = choice.value;
+		choice.value = other;
+		check("settings: a choice set is read back and told", choice.value == other && chosen.join(",") == other);
+		check("settings: a value that is no choice is refused", throws(function() choice.value = "c") && choice.value == other);
+		choice.value = before;
+
+		var slider = ctx.settings.slider("tourSlider", "Tour slider", "A number of the tour.", 0, 10, 1, 5);
+		var kept = slider.value;
+		slider.value = 99;
+		check("settings: a slider stays within its range", slider.value == 10);
+		slider.value = kept;
+		check("settings: kept in the mod's settings.json", sys.io.File.getContent(ctx.data + "/settings.json").indexOf("\"tourFlag\"") > 0);
+
+		check("settings: an id declared twice is refused", throws(function() ctx.settings.flag("tourFlag", "Again", "", false)));
+		check("settings: a default that is no choice is refused", throws(function() ctx.settings.choice("bad", "Bad", "", [{value: "a", label: "A"}], "b")));
+		check("settings: an empty range is refused", throws(function() ctx.settings.slider("bad", "Bad", "", 1, 1, 1, 1)));
+
+		tourKey = ctx.keys.action("tourKey", "Tour key", "A key action of the tour.", 113);
+		check("keys: not held", !tourKey.held);
+		check("keys: Escape cannot be bound", throws(function() ctx.keys.action("bad", "Bad", "", 27)));
+		tourKey.onPress(function() {
+			if (!pressSeen) {
+				pressSeen = true;
+				check("keys: pressed under the key its label gives", tourKey.label != "");
+			}
+		});
+	}
+
+	function throws(run:Void->Void):Bool {
+		try {
+			run();
+		} catch (e:Dynamic) {
+			return true;
+		}
+		return false;
 	}
 
 	override public function ready(ctx:Context):Void {
