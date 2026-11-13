@@ -263,15 +263,15 @@ A mod's options and keys are declared through the `api` mod and shown in the gam
 | `choice` | the same, and the choices, each a value and its label | the chosen value |
 | `slider` | the same, and minimum, maximum, step | `Float` |
 
-Each answers its current value, from `init` on, and calls its change handlers when it changes: set by the player, reverted when the menu is cancelled, or reset; in town or during a run.
+Each answers its current value, from `init` on, and calls its change handlers when it changes: set by the player in the menu, by the menu's reset, or by the mod itself; in town or during a run.
 
-**Keys** (`context.keys`). A mod declares an action: id, label, description, a default key and default modifiers (Shift, Ctrl, Alt; none unless given). It is told when the action is pressed, and asks `api` whether it is held and for the label of what is bound ("SHIFT+R", empty when nothing is). It never reads a key code or a modifier's state. A press handler returning `true` keeps the key from the game, as `keyDown` does.
+**Keys** (`context.keys`). A mod declares an action: id, label, description, a default key and default modifiers (Shift, Ctrl, Alt; none unless given). It is told when the action is pressed, and asks `api` whether it is held and for the label of what is bound ("SHIFT+R", empty when nothing is). It never reads a key code or a modifier's state. A pressed action keeps its key from the game. None is pressed while the settings menu is open, where a key pressed is one being picked.
 
 - The player rebinds an action's key in the menu. Its modifiers are the declared ones for now; the player will set or remove them later, so a mod cannot count on its modifier being held.
-- A key is bound once: assigning one takes it from any other action, the game's or a mod's, compared by the key alone (R and Shift+R are the same key). A default key an action declared earlier already holds, the game's first, then the mods' in load order, starts unassigned.
+- A key is bound once: assigning one takes it from any other action, the game's or a mod's, compared by the key alone (R and Shift+R are the same key). An action whose key another already holds when its mod loads, the game's first, then the mods' in load order, starts unassigned, and has it at a later start once it is free.
 - The keys that can be bound are the game's (`KeyBindings.isBindable`).
 
-**Where.** Keys go at the end of CONTROLS, options in ADVANCED until a MODS tab exists, both grouped by mod, each label starting with the mod's name. A mod does not choose.
+**Where.** Keys go at the end of CONTROLS, options in ADVANCED until a MODS tab exists, both grouped by mod under a header with its name. A mod does not choose.
 
 **Kept** in `data/<id>/settings.json`, read and written by `api`. Ids are the mod's own: two mods may use the same. An entry the mod no longer declares is ignored. The menu's reset puts a mod's options and keys back to their declared defaults. A failed mod's entries leave the menu.
 
