@@ -322,6 +322,7 @@ class Main extends Mod {
 		var owned = hero.local && account != null ? activeHero(account) : null;
 		if (owned != null) {
 			check("local hero: class of the active owned hero", hero.classId == owned.classId);
+			check("local hero: ascension of the active owned hero", hero.ascension == owned.ascension);
 			check("local hero: weapons of the active owned hero",
 				owned.weapons.map(weapon -> weapon.slot + ":" + weapon.id).join(",") == hero.weapons.map(weapon -> weapon.slot + ":" + weapon.id).join(","));
 		}
@@ -331,6 +332,10 @@ class Main extends Mod {
 		var portrait = player.createPortrait(32);
 		ctx.overlay.addChild(portrait);
 		ctx.overlay.removeChild(portrait);
+		var star = player.createAscensionStar(32);
+		check("ascension star: empty without an ascension", hero.ascension > 0 || star.numChildren == 0);
+		ctx.overlay.addChild(star);
+		ctx.overlay.removeChild(star);
 		if (weapons[0] != null) {
 			var icon = weapons[0].createIcon(32);
 			ctx.overlay.addChild(icon);
