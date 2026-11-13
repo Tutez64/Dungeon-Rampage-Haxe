@@ -262,6 +262,7 @@ A mod's options and keys are declared through the `api` mod and shown in the gam
 | `flag` | id, label, description, default | `Bool` |
 | `choice` | the same, and the choices, each a value and its label | the chosen value |
 | `slider` | the same, and minimum, maximum, step | `Float` |
+| `button` | id, label, the button's caption | none: it tells when it is pressed |
 
 Each answers its current value, from `init` on, and calls its change handlers when it changes: set by the player in the menu, by the menu's reset, or by the mod itself; in town or during a run.
 
@@ -271,11 +272,13 @@ Each answers its current value, from `init` on, and calls its change handlers wh
 - A key is bound once: assigning one takes it from any other action, the game's or a mod's, compared by the key alone (R and Shift+R are the same key). An action whose key another already holds when its mod loads, the game's first, then the mods' in load order, starts unassigned, and has it at a later start once it is free.
 - The keys that can be bound are the game's (`KeyBindings.isBindable`).
 
-**Where.** Keys go at the end of CONTROLS, options in ADVANCED until a MODS tab exists, both grouped by mod under a header with its name. A mod does not choose.
+**Where.** Keys go at the end of CONTROLS, options in the MODS tab, which the menu has while a mod has one, both grouped by mod under a header with its name. A mod does not choose.
 
 **Kept** in `data/<id>/settings.json`, read and written by `api`. Ids are the mod's own: two mods may use the same. An entry the mod no longer declares is ignored. The menu's reset puts a mod's options and keys back to their declared defaults. A failed mod's entries leave the menu.
 
-`api` does this alone, over the game's settings classes (`settings.*`: its catalog's definitions, its rows), with no DRH release. A MODS tab, modifiers the player sets, a game `settings.json` holding no copy of the mods' values, and other kinds of rows need hooks in `src/`: they come with a DRH release and change nothing a mod declares.
+The host opens the game's settings to the `api` (`modding.ModSettings`, not for mods): a definition added there joins the game's catalog, so its row, the menu's reset and the rule that a key is one action's are the game's own. The host does what the game has nothing for: the MODS tab, a seventh laid out with the game's six from a second copy of the popup's art; the headers; a button's row; and values kept out of the game's `settings.json`. `modding.Hooks` has the game call it at four points, with no edit of `src/`: its settings file written, a tab's rows shown, a row made, the popup's art set up. A game method that is no longer where the macro expects it fails the build.
+
+Before V18 the game has none of this: `api` then puts the definitions in the catalog itself, options in ADVANCED, draws the headers, and shows no button. Modifiers the player sets come later and change nothing a mod declares.
 
 ## Disk layout
 

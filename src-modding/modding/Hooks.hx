@@ -15,6 +15,10 @@ import haxe.macro.Type;
  * - Every generated network component (`generatedCode.*NetworkComponent`) gets a table of the fields
  *   its `recvById` dispatches, by id, as its `recv_` methods name them, so mods see a field's name and
  *   not only its number.
+ * - The game's settings call `modding.ModSettings` at four points, which is what lets mods have
+ *   settings there: its file being written, a tab's rows shown, a row made, the popup's art set up. A
+ *   method that is no longer where it is expected fails the build, so a game update cannot drop one
+ *   silently.
  */
 class Hooks {
 	/** Adds `build` to the types of `classpath`, by its top-level packages: the game's own, not the libraries'. */
@@ -35,7 +39,58 @@ class Hooks {
 			return gone(type);
 		if (type.pack.join(".") == "generatedCode" && StringTools.endsWith(type.name, "NetworkComponent"))
 			return fieldNames(type);
-		return null;
+		return switch (type.pack.concat([type.name]).join(".")) {
+			case "settings.model.LocalSettingsFile":
+				// write(blob)
+				patch("write", 1, function(f, body) return [macro modding.ModSettings.written($i{f.args[0].name})].concat(body));
+			case "settings.view.SettingsList":
+				// showCategory(category), createRow(definition, index)
+				var fields = patch("showCategory", 1, function(f, body) return body.concat([macro modding.ModSettings.listShown(this)]));
+				patch("createRow", 2, function(f, body) return [
+					macro {
+						var made = modding.ModSettings.row(mDBFacade, mSwfAsset, $i{f.args[0].name}, mModel, $i{f.args[1].name});
+						if (made != null)
+							return made;
+					}
+				].concat(body), fields);
+			case "settings.SettingsPopup":
+				// setupUI(swfAsset, ...): after `super.setupUI(...)`, which makes the popup's clip, and before the tabs.
+				patch("setupUI", 5, function(f, body) {
+					switch (body[0].expr) {
+						case ECall({expr: EField({expr: EConst(CIdent("super"))}, "setupUI", _)}, _):
+						default:
+							Context.error("modding.Hooks: SettingsPopup.setupUI no longer starts with super.setupUI(...)", body[0].pos);
+					}
+					return [body[0], macro modding.ModSettings.popupArt(mPopup, $i{f.args[0].name})].concat(body.slice(1));
+				});
+			default:
+				null;
+		}
+	}
+
+	/**
+	 * Rewrites the statements of the method `name` of the class being built, which takes `arity`
+	 * arguments. Fails the build when there is no such method.
+	 */
+	static function patch(name:String, arity:Int, rewrite:(Function, Array<Expr>) -> Array<Expr>, ?fields:Array<Field>):Array<Field> {
+		if (fields == null)
+			fields = Context.getBuildFields();
+		for (field in fields) {
+			if (field.name != name)
+				continue;
+			switch (field.kind) {
+				case FFun(f) if (f.expr != null && f.args.length == arity):
+					var body = switch (f.expr.expr) {
+						case EBlock(exprs): exprs;
+						default: [f.expr];
+					}
+					f.expr = {expr: EBlock(rewrite(f, body)), pos: f.expr.pos};
+					return fields;
+				default:
+			}
+		}
+		Context.error("modding.Hooks: " + Context.getLocalClass().toString() + " has no " + name + " taking " + arity + " argument(s)", Context.currentPos());
+		return fields;
 	}
 
 	static function gone(type:ClassType):Null<Array<Field>> {

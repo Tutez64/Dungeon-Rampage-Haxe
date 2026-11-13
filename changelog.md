@@ -4,7 +4,7 @@ At tag time, copy these sections into the GitHub release notes under `Changelog`
 
 ### Added
 
-- 
+- Mods: the settings menu has a MODS tab for the mods' own options, each mod's under its name, and a mod can put a button there, such as one that opens its window. Their keys are at the end of CONTROLS.
 
 ### Fixed
 
