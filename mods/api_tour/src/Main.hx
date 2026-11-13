@@ -147,6 +147,12 @@ class Main extends Mod {
 		check("settings: a default that is no choice is refused", throws(function() ctx.settings.choice("bad", "Bad", "", [{value: "a", label: "A"}], "b")));
 		check("settings: an empty range is refused", throws(function() ctx.settings.slider("bad", "Bad", "", 1, 1, 1, 1)));
 
+		// Shown by a game that opens its settings to mods, and pressed there by hand.
+		var button = ctx.settings.button("tourButton", "Tour button", "Press");
+		button.onPress(function() ctx.log("ok   settings: the tour's button pressed"));
+		check("settings: a button holds no value in the file", sys.io.File.getContent(ctx.data + "/settings.json").indexOf("tourButton") < 0);
+		ctx.log("settings: buttons shown by this game: " + button.shown);
+
 		tourKey = ctx.keys.action("tourKey", "Tour key", "A key action of the tour.", 113);
 		check("keys: not held", !tourKey.held);
 		check("keys: Escape cannot be bound", throws(function() ctx.keys.action("bad", "Bad", "", 27)));
