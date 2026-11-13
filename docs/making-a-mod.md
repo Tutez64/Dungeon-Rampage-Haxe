@@ -20,7 +20,7 @@ They need git. Publishing needs a GitHub account.
 
 ## Create
 
-1. `DRH-Launcher --new-mod <folder>` asks for the mod's `id` ([rules](modding.md#modjson): it is the mod's folder and package), its `name` and your `author` name, then makes the folder from [DRH-Mods-Template](https://github.com/Tutez64/DRH-Mods-Template), with its first commit.
+1. `DRH-Launcher --new-mod <folder>` asks for the mod's `name` and your `author` name, takes the `id` the name gives (`Cool Mod` gives `cool_mod`; it is the mod's folder and package, and asked for when the name gives none: [rules](modding.md#modjson)), then makes the folder from [DRH-Mods-Template](https://github.com/Tutez64/DRH-Mods-Template), with its first commit.
 2. It opens GitHub's page to create the repository: keep it public and named `DRH-Mod-<Name>` as it suggests (the index takes no other name), then push with the two lines it prints.
 3. Fill `description` in `mod.json`, and `README.md`: its first line is what GitHub visitors read first, replace it with what the repository is; its shown zone is what the launcher shows on the mod's page ([markers](modding.md#mod-repository)). `DRH-Launcher --check-mod <folder>` says what is left.
 
