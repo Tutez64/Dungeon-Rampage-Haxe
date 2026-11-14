@@ -12,6 +12,7 @@ At tag time, copy these sections into the GitHub release notes under `Changelog`
 - Mods: an untyped array stored where a mod declares a typed one, such as `Array<String>`, no longer crashes the game when read back.
 - Mods: all of OpenFL's enumerations, such as `TextFieldAutoSize` or `StageQuality`, can be used, where only four could.
 - Mods: a mod importing or declaring a class named like a standard type, such as the game's `collections.Map`, no longer makes other mods fail with `Null Function`.
+- Mods: a regular expression written with an escape, such as `~/\d+/` or `~/\.png$/`, is no longer refused with `Invalid character`, and `\\` in one stands for a backslash.
 
 ### Improved
 
