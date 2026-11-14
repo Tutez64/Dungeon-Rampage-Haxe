@@ -4,30 +4,15 @@ At tag time, copy these sections into the GitHub release notes under `Changelog`
 
 ### Added
 
-- Mods: the settings menu has a MODS tab for the mods' own options, each mod's under its name, and a mod can put a button there, such as one that opens its window. Their keys are at the end of CONTROLS.
-
+- 
 ### Fixed
 
-- Controllers: with a controller plugged in, the game no longer stutters (a freeze of about a tenth of a second every two or three seconds) and frames no longer take about 2.5 ms more each: a quiet dungeon ran at 240 FPS instead of 640 on the test machine (#52).
-- Mods: an untyped array stored where a mod declares a typed one, such as `Array<String>`, no longer crashes the game when read back.
-- Mods: all of OpenFL's enumerations, such as `TextFieldAutoSize` or `StageQuality`, can be used, where only four could.
-- Mods: a mod importing or declaring a class named like a standard type, such as the game's `collections.Map`, no longer makes other mods fail with `Null Function`.
-- Mods: a regular expression written with an escape, such as `~/\d+/` or `~/\.png$/`, is no longer refused with `Invalid character`, and `\\` in one stands for a backslash.
-- Mods: a type written through its module, such as `haxe.Constraints.IMap`, is that type in `Std.isOfType` and `is`, which answered false.
-- Mods: an entry of a map held in a `Dynamic` is read and written by a text key, as in `data["name"]`, which threw `Bad int convert` or `Bad String conversion type`.
+- 
 
 ### Improved
 
-- Mods: a module the game cannot compile no longer makes other mods' modules, the API's included, run interpreted, which is slower and often does not work.
-- Linux: the game uses about 500 MB less memory in a dungeon, where memory freed after a loading stayed with the game instead of going back to the system.
-- The game uses about 200 MB less memory: the images of screens that have not been opened are no longer decoded.
-- The game uses less video memory, about 430 MB less in a dungeon: the images of a screen are released a minute after it was last shown, and loaded again when it is shown again.
-- The game uses about 30 MB less memory: the text describing each art library is released once it has been read.
-- Fights: memory no longer grows while visual effects play. It grew by 4 to 5 MB a minute in a dungeon, alone or with other players, which made the game's occasional short freezes come more often.
-- Dungeons: frames are 5 to 7% shorter: finding the scenery that is off screen and ordering what is drawn cost less.
-- Moving the mouse costs less: in a quiet dungeon at 600 FPS, a frame is about 12% shorter while the mouse moves.
-- High frame rates: moving the mouse no longer makes the game freeze for a moment (about a tenth of a second, longer on a slower processor), which happened every 5 to 10 seconds at 500 FPS in a dungeon and about every 100 seconds at 60 FPS.
-- Steam Input: with the setting on, which is the default, each frame is about 0.1 ms shorter, with or without a controller.
+- Mods: reading or writing a field of one of the game's objects costs a mod about a third less: with nineteen mods, a frame of a fight took 3.9 ms and takes 3.7 ms on the test machine.
+- 
 
 ### Internal
 
