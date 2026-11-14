@@ -2,6 +2,7 @@ package mods.api_tour;
 
 import mods.api.Mod;
 import mods.api.Context;
+import mods.api.Dictionaries;
 import mods.api.Subscription;
 import mods.api.account.Account;
 import mods.api.account.OwnedHero;
@@ -99,6 +100,7 @@ class Main extends Mod {
 			check("closure keeps its string literal", literal.length == 15 && literal.charAt(8) == "l");
 		});
 		checkSettings();
+		checkDictionaries();
 
 		ctx.onFloorEnter(onFloorEnter);
 		ctx.onFloorExit(onFloorExit);
@@ -162,6 +164,36 @@ class Main extends Mod {
 				check("keys: pressed under the key its label gives", tourKey.label != "");
 			}
 		});
+	}
+
+	/** On a map of the mod's own, which the game's functions take as one of its dictionaries. */
+	function checkDictionaries():Void {
+		var dictionary = new haxe.ds.ObjectMap<Dynamic, Dynamic>();
+		var object:Dynamic = {};
+		Dictionaries.set(dictionary, "panel_1", "text");
+		Dictionaries.set(dictionary, 7, "number");
+		Dictionaries.set(dictionary, true, "boolean");
+		Dictionaries.set(dictionary, object, "object");
+		check("dictionaries: a value set is read back, whatever its key",
+			Dictionaries.get(dictionary, "panel_1") == "text" && Dictionaries.get(dictionary, 7) == "number"
+			&& Dictionaries.get(dictionary, true) == "boolean" && Dictionaries.get(dictionary, object) == "object");
+		Dictionaries.set(dictionary, "panel_1", "again");
+		check("dictionaries: a key set again keeps one entry",
+			Dictionaries.get(dictionary, "panel_1") == "again" && Dictionaries.keys(dictionary).length == 4);
+		check("dictionaries: a key without an entry reads null",
+			!Dictionaries.exists(dictionary, "panel_2") && Dictionaries.get(dictionary, "panel_2") == null && Dictionaries.exists(dictionary, 7));
+		var keys = Dictionaries.keys(dictionary);
+		var values = Dictionaries.values(dictionary);
+		check("dictionaries: every key and value listed",
+			keys.indexOf("panel_1") >= 0 && keys.indexOf(7) >= 0 && keys.indexOf(true) >= 0 && keys.indexOf(object) >= 0 && values.length == 4
+			&& values.indexOf("again") >= 0 && values.indexOf("object") >= 0);
+		keys.push(null);
+		check("dictionaries: keys is a copy", Dictionaries.keys(dictionary).length == keys.length - 1);
+		check("dictionaries: an entry removed is gone, twice is false",
+			Dictionaries.remove(dictionary, "panel_1") && !Dictionaries.remove(dictionary, "panel_1") && !Dictionaries.exists(dictionary, "panel_1")
+			&& Dictionaries.remove(dictionary, object) && Dictionaries.keys(dictionary).length == 2);
+		check("dictionaries: what is no dictionary is refused",
+			throws(function() Dictionaries.set(null, "a", 1)) && throws(function() Dictionaries.get([], "a")));
 	}
 
 	function throws(run:Void->Void):Bool {
