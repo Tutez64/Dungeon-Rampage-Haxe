@@ -1,5 +1,8 @@
 package mods.api_tour;
 
+import dBGlobals.DBGlobal;
+import distributedObjects.DistributedDungeonFloor;
+import distributedObjects.NPCGameObject;
 import mods.api.Mod;
 import mods.api.Context;
 import mods.api.Dictionaries;
@@ -8,6 +11,7 @@ import mods.api.account.Account;
 import mods.api.account.OwnedHero;
 import mods.api.dungeon.Floor;
 import mods.api.dungeon.Hero;
+import mods.api.dungeon.Monster;
 import mods.api.dungeon.Tile;
 import mods.api.settings.KeyAction;
 import mods.api_tour.ui.Panel;
@@ -41,6 +45,27 @@ class Main extends Mod {
 	var despawned:Array<Hero> = [];
 
 	var keySeen:Bool = false;
+
+	/** Monsters told as spawned and not as despawned since, by id. */
+	var monstersTold:Map<String, Bool> = new Map();
+
+	var monstersSpawned:Int = 0;
+
+	var monstersHurt:Int = 0;
+
+	var monstersDespawned:Int = 0;
+
+	/** Events that broke a rule on the floor in progress, the first one kept to be logged. */
+	var monsterFaults:Int = 0;
+
+	var monsterFault:String = "";
+
+	/** Times the floor's monsters were set against the game's actors and the events, and times they differed. */
+	var looks:Int = 0;
+
+	var lookFaults:Int = 0;
+
+	var watch:Null<haxe.Timer>;
 
 	var tourKey:KeyAction;
 
@@ -106,6 +131,9 @@ class Main extends Mod {
 		ctx.onFloorExit(onFloorExit);
 		ctx.onHeroSpawned(onHeroSpawned);
 		ctx.onHeroDespawned(onHeroDespawned);
+		ctx.onMonsterSpawned(onMonsterSpawned);
+		ctx.onMonsterHurt(onMonsterHurt);
+		ctx.onMonsterDespawned(onMonsterDespawned);
 		// Never keeps a key: the game's own use of it must still happen.
 		ctx.onKeyDown(function(key:UInt):Bool {
 			if (!keySeen) {
@@ -291,6 +319,10 @@ class Main extends Mod {
 			+ [for (category => count in categories) category + " " + count].join(", ") + ", one-sided exits " + oneSided(floor.tiles));
 		// Monsters come after the floor and its heroes.
 		haxe.Timer.delay(() -> checkMonsters(floor), 3000);
+		if (watch != null)
+			watch.stop();
+		watch = new haxe.Timer(1000);
+		watch.run = () -> lookAtMonsters(floor);
 	}
 
 	/** Open sides facing a tile whose own side is closed, or no tile. */
@@ -320,6 +352,7 @@ class Main extends Mod {
 		check("monsters: some, a few seconds in", monsters.length > 0);
 		check("monsters: each on a tile of its floor", Lambda.foreach(monsters, monster -> Lambda.exists(tiles, tile -> tile.contains(monster.x, monster.y))));
 		check("monsters: ids unique", Lambda.count([for (monster in monsters) Std.string(monster.id) => true]) == monsters.length);
+		check("monsters: some with hit points", Lambda.exists(monsters, monster -> monster.hp > 0 && monster.hp <= monster.maxHp));
 		var big = [for (monster in monsters) if (monster.healthBar) monster.name];
 		ctx.log("floor " + floor.id + " monsters " + monsters.length + ", with a health bar: " + big.join(", "));
 		monsters.push(null);
@@ -329,6 +362,104 @@ class Main extends Mod {
 	function onFloorExit(floor:Floor):Void {
 		check("floorExit: floor was entered", floorsEntered.exists(Std.string(floor.id)));
 		check("floorExit: state.floor moved off it", ctx.state.floor != floor);
+		if (watch != null) {
+			watch.stop();
+			watch = null;
+		}
+		check("monsters: each one spawned was despawned before its floor's exit", Lambda.count(monstersTold) == 0);
+		check("monsters: their events kept their rules" + (monsterFaults == 0 ? "" : ", first breach: " + monsterFault), monsterFaults == 0);
+		if (looks > 0)
+			check("monsters: the list was the game's actors and the events' at each of " + looks + " looks", lookFaults == 0);
+		ctx.log("monsters spawned " + monstersSpawned + ", hurt " + monstersHurt + ", despawned " + monstersDespawned);
+		monstersTold = new Map();
+		monsterFaults = 0;
+		monsterFault = "";
+		looks = 0;
+		lookFaults = 0;
+	}
+
+	function monsterBreach(what:String):Void {
+		if (monsterFaults == 0)
+			monsterFault = what;
+		monsterFaults++;
+	}
+
+	function onMonsterSpawned(monster:Monster):Void {
+		var key = Std.string(monster.id);
+		monstersSpawned++;
+		if (ctx.state.floor == null)
+			monsterBreach("spawned without a floor");
+		if (monstersTold.exists(key))
+			monsterBreach("spawned twice, " + monster.name);
+		if (monster.name == "")
+			monsterBreach("spawned without a name");
+		monstersTold.set(key, true);
+	}
+
+	function onMonsterHurt(monster:Monster):Void {
+		monstersHurt++;
+		if (!monstersTold.exists(Std.string(monster.id)))
+			monsterBreach("hurt but not spawned, or despawned already, " + monster.name);
+	}
+
+	function onMonsterDespawned(monster:Monster):Void {
+		var key = Std.string(monster.id);
+		monstersDespawned++;
+		if (!monstersTold.exists(key))
+			monsterBreach("despawned but not spawned, or twice, " + monster.name);
+		monstersTold.remove(key);
+	}
+
+	/**
+	 * Sets `floor.monsters` against the events, and against the floor's actors as the game holds them:
+	 * the list is kept from what the game reports ready and gone, which an update of the game could move.
+	 */
+	function lookAtMonsters(wrapper:Floor):Void {
+		if (ctx.state.floor != wrapper)
+			return;
+		var floor:DistributedDungeonFloor = cast Reflect.field(wrapper, "floor");
+		if (floor == null || floor.isDestroyed || floor.remoteActors == null)
+			return;
+		var listed:Map<String, Bool> = new Map();
+		var monsters:Array<Monster> = wrapper.monsters;
+		var faults:Array<String> = [];
+		for (i in 0...monsters.length) {
+			var monster:Monster = monsters[i];
+			var key = Std.string(monster.id);
+			listed.set(key, true);
+			if (!monstersTold.exists(key))
+				faults.push("listed but not told as spawned: " + monster.name);
+		}
+		for (key in monstersTold.keys())
+			if (!listed.exists(key))
+				faults.push("told as spawned but not listed: " + key);
+		var avatar = floor.activeOwnerAvatar;
+		var heroes:Int = avatar == null ? (DBGlobal.TEAM_1 : Int) : avatar.team;
+		var actors:Int = 0;
+		for (actor in floor.remoteActors.toArray()) {
+			if (!Std.isOfType(actor, NPCGameObject))
+				continue;
+			var npc:NPCGameObject = cast actor;
+			if (npc.isDestroyed || npc.isDead())
+				continue;
+			var team = npc.team;
+			if (team == heroes || team == (DBGlobal.TEAM_ENVIRONMENT : Int) || team == (DBGlobal.TEAM_3 : Int))
+				continue;
+			actors++;
+			if (!listed.exists(Std.string(npc.id)))
+				faults.push("an actor of the game not listed: " + npc.id);
+		}
+		if (actors != monsters.length)
+			faults.push(monsters.length + " listed for " + actors + " actors");
+		looks++;
+		if (faults.length > 0) {
+			lookFaults++;
+			if (lookFaults <= 3)
+				ctx.log("monsters look " + looks + ": " + faults.join("; "));
+		}
+		if (looks % 30 == 0)
+			ctx.log("monsters after " + looks + " looks: " + monsters.length + " listed, " + lookFaults + " looks that differed, spawned "
+				+ monstersSpawned + ", hurt " + monstersHurt + ", despawned " + monstersDespawned + ", " + monsterFaults + " events off their rules");
 	}
 
 	function onHeroSpawned(hero:Hero):Void {
