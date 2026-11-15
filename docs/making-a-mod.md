@@ -30,6 +30,16 @@ The entry is `src/Main.hx`, a `mods.api.Mod`. Each file under `src/` is in `mods
 
 A mod that only uses the `api` keeps working across DRH updates. Reaching the game's own classes, through `context.core`, makes it `extends`: add `"uses": ["extends"]` and `drh`, the DRH tags it was tested on, to `mod.json` ([Mod kinds](modding.md#mod-kinds)). The launcher warns its players that a DRH update may break it. Inspector shows how, and what there is to reach.
 
+## Performance
+
+What a mod runs on every frame, in an `ENTER_FRAME` handler or a timer as frequent, is added to every frame of every player who has it. That is where a mod's cost is: one that goes through every actor on each frame can cost more than all the other mods together.
+
+- A field of a game or OpenFL object, read or written from a mod, is looked up by name, tens of nanoseconds each time, where the game's own code reads memory: `npc.gmNpc.Constant` is two lookups. Read it once into a local, and keep what does not change, such as an actor's name or its table row, with the object the mod makes for it.
+- A field of one of the mod's own classes costs as much, unless the variable is declared with its class: `var entry:Entry = entries.get(id)` then reads it directly, about twenty times faster. A loop variable and what a map answers have no type until one is written.
+- React rather than look: the `api`'s events and the core's ([Game events](modding.md#game-events)) say when an object arrives, leaves or receives a field. What has to be looked at can be looked at a few times a second.
+- The `api`'s lists (`state.heroes`, `floor.monsters`, `floor.tiles`) and the game's `toArray()` are copies made at each read: take them when something changed, not on each frame.
+- Change what is shown when its value changed: a position, a text or a layout worked out again on each frame for the same result is the same cost each time.
+
 ## Test
 
 `DRH-Launcher --run-mod <folder>` installs what the mod needs from the index, the `api` included, and starts DRH with it. It prints the game's output, where `context.log` lines read `mod <id>: …`, then, once you quit, each mod's outcome ([Last-run report](modding.md#last-run-report)). The sources are read at each start: edit, quit, run again.
