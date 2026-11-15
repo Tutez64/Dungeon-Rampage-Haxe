@@ -236,6 +236,8 @@ class Main extends Mod {
 	override public function ready(ctx:Context):Void {
 		readySeen = true;
 		check("ready: tablesLoaded came first", tablesSeen);
+		check("isActive: this mod and the api run", ctx.isActive("api_tour") && ctx.isActive("api"));
+		check("isActive: a mod that is not there does not, nor a null id", !ctx.isActive("no_such_mod") && !ctx.isActive(null));
 		var account = ctx.state.account;
 		check("ready: account filled", account != null);
 		if (account != null) {
