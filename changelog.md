@@ -12,8 +12,7 @@ At tag time, copy these sections into the GitHub release notes under `Changelog`
 ### Improved
 
 - Mods: reading or writing a field of one of the game's objects costs a mod about a third less: with nineteen mods, a frame of a fight took 3.9 ms and takes 3.7 ms on the test machine.
-- 
 
 ### Internal
 
-- A performance bench in `tools/profiling/bench`: a bot that plays a scenario and measures frame times, draw calls, memory and call graphs.
+- 
