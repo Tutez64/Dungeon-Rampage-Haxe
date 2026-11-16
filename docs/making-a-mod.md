@@ -24,6 +24,12 @@ They need git. Publishing needs a GitHub account.
 2. It opens GitHub's page to create the repository: keep it public and named `DRH-Mod-<Name>` as it suggests (the index takes no other name), then push with the two lines it prints.
 3. Fill `description` in `mod.json`, and `README.md`: its first line is what GitHub visitors read first, replace it with what the repository is; its shown zone is what the launcher shows on the mod's page ([markers](modding.md#mod-repository)). `DRH-Launcher --check-mod <folder>` says what is left.
 
+Three things no command checks, which the index's reviewer does ([Mod repository](modding.md#mod-repository)):
+
+- **License.** Keep the template's GPLv3 or pick another GPL-compatible one.
+- **The game's art.** `Resources/` is for your own files. An icon or a picture that is in the game is loaded from the game when the mod runs, never copied into the mod.
+- **A mod made from another.** If yours starts from a mod of the index, its shown zone says which one, and whether yours replaces it, so that a player does not enable both.
+
 ## Write
 
 The entry is `src/Main.hx`, a `mods.api.Mod`. Each file under `src/` is in `mods.<id>` or the sub-package of its folder ([package rule](modding.md#modjson)). The [`api` reference](https://github.com/Tutez64/DRH-Mod-API/blob/master/docs/api.md) lists what the mod gets: its lifecycle, the game's events and live state, the overlay to draw on, and its folders, `Resources/` to read and `data` to write.
