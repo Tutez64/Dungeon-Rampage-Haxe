@@ -522,6 +522,15 @@ The generated file lists every entry, same shape, sorted by `id` then version:
 { "format": 1, "generated": "2026-10-10T12:00:00Z", "entries": [] }
 ```
 
+There, each entry also says what GitHub counts for its release, as of `generated`:
+
+| Field | Role |
+| --- | --- |
+| `published` | When the version's release was published, as GitHub writes it (`2026-11-16T23:26:40Z`). |
+| `downloads` | How many times its zip was downloaded: by the launcher, to install it or to update to it, and by anyone else. |
+
+The CI reads both from the releases of the entry's `source`, one request for each repository; an entry file has neither, and the index CI refuses one that does. The launcher sorts the catalog on them and shows them: a mod's downloads are those of all its versions, next to those of the version it offers; it was added when its first version was published, and last updated when the offered one was. A version GitHub says nothing of, its release deleted or GitHub not answering, has neither field: the index is deployed all the same, and the launcher shows no count for that mod and sorts it last.
+
 A launcher refuses a `format` it does not know and asks to be updated. Each version keeps its `longDescription`; if the file grows too heavy, a later format moves them to one file per mod.
 
 **Index CI.** On a pull request (`pull_request`: a read-only token, no secret; never `pull_request_target`), for each entry it adds or yanks:
@@ -532,7 +541,7 @@ A launcher refuses a `format` it does not know and asks to be updated. Each vers
 - `source` is named `DRH-Mod-<Name>`, and is the one the `id` belongs to (its highest indexed version's), or a reviewer adds the `takeover` label;
 - every dependency, `api` included, has an indexed version that satisfies it.
 
-It writes in the job summary the diff of the sources against the zip of the last indexed version, what the reviewer reads, and flags an `author` that changed since that version. After a push to the pull request, it also writes what that push changed: the sources against those of the entry the pull request held before, whose zip is checked against that entry's `size` and `sha256`. A release redone under the same version leaves nothing to compare with. Both are posted on the pull request, the first in a comment kept up to date, the second in one comment for each push. The checks on an entry are the launcher's `--check-entry <entry> <base-index> <work-dir> [--takeover]`; the rest, the pull request's shape and the summary, is the CI's script. A pull request only brings JSON; the CI downloads and inspects a zip, never runs it. Merging needs the CI and the owner's approval (`CODEOWNERS`, branch protection). On the main branch, the CI generates `index.json` (`--build-index <index> <out-file>`) and deploys it to Pages. The repository variable `DRHL_VERSION` picks the launcher release both run, a pre-release to test one; empty, the latest.
+It writes in the job summary the diff of the sources against the zip of the last indexed version, what the reviewer reads, and flags an `author` that changed since that version. After a push to the pull request, it also writes what that push changed: the sources against those of the entry the pull request held before, whose zip is checked against that entry's `size` and `sha256`. A release redone under the same version leaves nothing to compare with. Both are posted on the pull request, the first in a comment kept up to date, the second in one comment for each push. The checks on an entry are the launcher's `--check-entry <entry> <base-index> <work-dir> [--takeover]`; the rest, the pull request's shape and the summary, is the CI's script. A pull request only brings JSON; the CI downloads and inspects a zip, never runs it. Merging needs the CI and the owner's approval (`CODEOWNERS`, branch protection). On the main branch, the CI generates `index.json` (`--build-index <index> <out-file>`, with the job's token for GitHub's rate limit) and deploys it to Pages: on each push, and once a day, since the download counts change without one. The repository variable `DRHL_VERSION` picks the launcher release both run, a pre-release to test one; empty, the latest.
 
 The entries and `index.json` are under CC BY 4.0 (credit the index, and each entry's `author` for its texts), so a website or a tool may reuse them. Submitting an entry publishes it so, its texts included; a reviewer makes sure someone else than the author has their consent. The CI's code, under `.github/`, is GPLv3.
 
