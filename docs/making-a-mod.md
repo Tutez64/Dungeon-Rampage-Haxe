@@ -36,7 +36,7 @@ The entry is `src/Main.hx`, a `mods.api.Mod`. Each file under `src/` is in `mods
 
 A mod that only uses the `api` keeps working across DRH updates. Reaching the game's own classes, through `context.core`, makes it `extends`: add `"uses": ["extends"]` and `drh`, the DRH tags it was tested on, to `mod.json` ([Mod kinds](modding.md#mod-kinds)). The launcher warns its players that a DRH update may break it. Inspector shows how, and what there is to reach.
 
-An option, in the game's MODS tab, changes how the mod behaves. Turning the whole mod off is the launcher's, and showing or hiding what it draws during play is a key action, in CONTROLS: neither needs a row in the settings.
+An option, in the game's MODS tab, changes how the mod behaves. Turning the whole mod off is the launcher's, and showing or hiding what it draws during play is a key action, in CONTROLS: neither needs a row in the settings. A panel of the mod's own is not for its options: it is for what is set while seeing the result, such as a position, a size or a look, and the row or key action that opens it names what it sets.
 
 ## Performance
 
