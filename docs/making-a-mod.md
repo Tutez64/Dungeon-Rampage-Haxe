@@ -8,11 +8,11 @@ The steps to make, test and publish a mod for DRH. Each one is a DRH Launcher co
 
 ## Commands
 
-They run in a terminal, from the launcher's executable (DRH Launcher 0.4 or later). Below, `DRH-Launcher` stands for its path:
+They run in a terminal, from the launcher's executable (DRH Launcher 0.4.3 or later). Below, `DRH-Launcher` stands for its path:
 
 | System | Path |
 | --- | --- |
-| Windows | `"%LOCALAPPDATA%\DRH Launcher\DRH-Launcher"`; in PowerShell, `& "$env:LOCALAPPDATA\DRH Launcher\DRH-Launcher"` |
+| Windows | `"%LOCALAPPDATA%\DRH Launcher\bin\DRH-Launcher"`; in PowerShell, `& "$env:LOCALAPPDATA\DRH Launcher\bin\DRH-Launcher"` |
 | Linux | `~/Applications/DRH-Launcher.AppImage` |
 | macOS | `"/Applications/DRH Launcher.app/Contents/MacOS/DRH-Launcher"` |
 
