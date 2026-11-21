@@ -262,6 +262,7 @@ A mod's options and keys are declared through the `api` mod and shown in the gam
 | `flag` | id, label, description, default | `Bool` |
 | `choice` | the same, and the choices, each a value and its label | the chosen value |
 | `slider` | the same, and minimum, maximum, step | `Float` |
+| `button` | id, label, the button's caption | none: it tells when it is pressed |
 
 Each answers its current value, from `init` on, and calls its change handlers when it changes: set by the player in the menu, by the menu's reset, or by the mod itself; in town or during a run.
 
@@ -271,11 +272,13 @@ Each answers its current value, from `init` on, and calls its change handlers wh
 - A key is bound once: assigning one takes it from any other action, the game's or a mod's, compared by the key alone (R and Shift+R are the same key). An action whose key another already holds when its mod loads, the game's first, then the mods' in load order, starts unassigned, and has it at a later start once it is free.
 - The keys that can be bound are the game's (`KeyBindings.isBindable`).
 
-**Where.** Keys go at the end of CONTROLS, options in ADVANCED until a MODS tab exists, both grouped by mod under a header with its name. A mod does not choose.
+**Where.** Keys go at the end of CONTROLS, options in the MODS tab, which the menu has while a mod has one, both grouped by mod under a header with its name. A mod does not choose.
 
 **Kept** in `data/<id>/settings.json`, read and written by `api`. Ids are the mod's own: two mods may use the same. An entry the mod no longer declares is ignored. The menu's reset puts a mod's options and keys back to their declared defaults. A failed mod's entries leave the menu.
 
-`api` does this alone, over the game's settings classes (`settings.*`: its catalog's definitions, its rows), with no DRH release. A MODS tab, modifiers the player sets, a game `settings.json` holding no copy of the mods' values, and other kinds of rows need hooks in `src/`: they come with a DRH release and change nothing a mod declares.
+The host opens the game's settings to the `api` (`modding.ModSettings`, not for mods): a definition added there joins the game's catalog, so its row, the menu's reset and the rule that a key is one action's are the game's own. The host does what the game has nothing for: the MODS tab, a seventh laid out with the game's six from a second copy of the popup's art; the headers; a button's row; and values kept out of the game's `settings.json`. `modding.Hooks` has the game call it at four points, with no edit of `src/`: its settings file written, a tab's rows shown, a row made, the popup's art set up. A game method that is no longer where the macro expects it fails the build.
+
+Before V18 the game has none of this: `api` then puts the definitions in the catalog itself, options in ADVANCED, draws the headers, and shows no button. Modifiers the player sets come later and change nothing a mod declares.
 
 ## Disk layout
 
@@ -453,9 +456,11 @@ The Mods page (fetch, install, enable, order, `last-run` display) is specified i
 
 A mod's repository **is** its folder: `mod.json`, `src/`, `Resources/` (when the mod has any) at the root, plus `README.md`, `LICENSE` and `.github/`. Cloning it into a mods folder runs it as is, and DRH can pin one as a submodule (`mods/api`). It is named `DRH-Mod-<Name>`, `<Name>` free: `--pack-mod` and the index CI refuse another name, so a repository's name says it is a DRH mod, and a search on it finds them. The repositories around mods are named `DRH-Mods-*`: `DRH-Mods-Index`, `DRH-Mods-Template`, `DRH-Mods-Workflows`.
 
-`README.md` is also the long description, shown on the mod's page in the launcher. HTML comments, invisible on GitHub, pick what the launcher shows: `<!-- drh:show -->` … `<!-- /drh:show -->` keeps only those zones (several allowed, joined in order), and `<!-- drh:hide -->` … `<!-- /drh:hide -->` drops one, inside a shown zone too. Without a shown zone, the whole file is shown, minus its hidden zones. The page always shows `description` above it, so an empty shown zone (`<!-- drh:show --><!-- /drh:show -->`) leaves just that. Zones do not nest, except a hidden one inside a shown one; an unclosed or misplaced marker fails `--check-mod`. What is shown is Markdown, at most 4000 characters. It need not say it is a DRH mod: the catalog says so. What GitHub alone shows comes first, saying what the repository is.
+`README.md` is also the long description, shown on the mod's page in the launcher. HTML comments, invisible on GitHub, pick what the launcher shows: `<!-- drh:show -->` … `<!-- /drh:show -->` keeps only those zones (several allowed, joined in order), and `<!-- drh:hide -->` … `<!-- /drh:hide -->` drops one, inside a shown zone too. Without a shown zone, the whole file is shown, minus its hidden zones. The page always shows `description` above it, so an empty shown zone (`<!-- drh:show --><!-- /drh:show -->`) leaves just that. Zones do not nest, except a hidden one inside a shown one; an unclosed or misplaced marker fails `--check-mod`. What is shown is Markdown, at most 4000 characters. It need not say it is a DRH mod, nor which DRH and `api` it needs or that it is `extends`: the catalog says so, from `mod.json`. What GitHub alone shows comes first, saying what the repository is.
 
 A mod builds on `api` and runs combined with it and with DRH's own code, all GPLv3, so its license must be GPL-compatible (GPL, LGPL, MIT, BSD, Apache 2.0, MPL 2.0, …). A reviewer checks it at an `id`'s first entry and whenever `LICENSE` changes.
+
+`Resources/` holds the mod's own files. Art that is in the game is loaded from the game at runtime, not copied into the mod: it is not under the mod's license, and what the game's tables name, such as a chest's icon, then follows the game. A mod derived from an indexed one says so in what its README shows: which mod it comes from, and whether it replaces it, so that a player does not enable both. A reviewer checks both.
 
 `DRH-Mods-Template` is the skeleton: `mod.json`, `src/Main.hx` (`class Main extends mods.api.Mod`), `README.md` (a placeholder: a first line for GitHub, pointing to [Making a mod](making-a-mod.md), the modders' steps, then a shown zone to fill; `--check-mod` refuses it while the shown zone keeps the template's sentence), `LICENSE` (GPLv3, as DRH and `api`), and `.github/workflows/release.yml`, which only calls the reusable workflow of `Tutez64/DRH-Mods-Workflows`, pinned to its moving major tag (`@v1`, moved along its `v1.x.y` releases): fixes reach every mod, only a breaking change needs a new major. Nothing else is copied into a mod, so nothing there needs updating. It runs as is, as `my_mod` (its `Main` logs `loaded`): the `id` is only in `mod.json` and in the `package` line of `src/Main.hx`. `--new-mod` copies it into a fresh history; it is also a GitHub template repository, whose *Use this template* leaves both to change by hand.
 
@@ -517,6 +522,15 @@ The generated file lists every entry, same shape, sorted by `id` then version:
 { "format": 1, "generated": "2026-10-10T12:00:00Z", "entries": [] }
 ```
 
+There, each entry also says what GitHub counts for its release, as of `generated`:
+
+| Field | Role |
+| --- | --- |
+| `published` | When the version's release was published, as GitHub writes it (`2026-11-16T23:26:40Z`). |
+| `downloads` | How many times its zip was downloaded: by the launcher, to install it or to update to it, and by anyone else. |
+
+The CI reads both from the releases of the entry's `source`, one request for each repository; an entry file has neither, and the index CI refuses one that does. The launcher sorts the catalog on them and shows them: a mod's downloads are those of all its versions, next to those of the version it offers; it was added when its first version was published, and last updated when the offered one was. A version GitHub says nothing of, its release deleted or GitHub not answering, has neither field: the index is deployed all the same, and the launcher shows no count for that mod and sorts it last.
+
 A launcher refuses a `format` it does not know and asks to be updated. Each version keeps its `longDescription`; if the file grows too heavy, a later format moves them to one file per mod.
 
 **Index CI.** On a pull request (`pull_request`: a read-only token, no secret; never `pull_request_target`), for each entry it adds or yanks:
@@ -527,7 +541,7 @@ A launcher refuses a `format` it does not know and asks to be updated. Each vers
 - `source` is named `DRH-Mod-<Name>`, and is the one the `id` belongs to (its highest indexed version's), or a reviewer adds the `takeover` label;
 - every dependency, `api` included, has an indexed version that satisfies it.
 
-It writes in the job summary the diff of the sources against the zip of the last indexed version, what the reviewer reads, and flags an `author` that changed since that version, an `id` that is not the one its name gives, what `--check-mod` notes in the zip's code, a mod that code names and the index does not have, and a zip that does not hold the files its tag packs (a release made by hand), line ends aside. The checks on an entry are the launcher's `--check-entry <entry> <base-index> <work-dir> [--takeover]`; the rest, the pull request's shape and the summary, is the CI's script. A pull request only brings JSON; the CI downloads and inspects a zip, never runs it. Merging needs the CI and the owner's approval (`CODEOWNERS`, branch protection). On the main branch, the CI generates `index.json` (`--build-index <index> <out-file>`) and deploys it to Pages. It warns of a zip GitHub no longer has, or whose digest is no longer the entry's `sha256`: that version no longer installs. The repository variable `DRHL_VERSION` picks the launcher release both run, a pre-release to test one; empty, the latest.
+It writes in the job summary the diff of the sources against the zip of the last indexed version, what the reviewer reads, and flags an `author` that changed since that version, an `id` that is not the one its name gives, what `--check-mod` notes in the zip's code, a mod that code names and the index does not have, and a zip that does not hold the files its tag packs (a release made by hand), line ends aside. After a push to the pull request, it also writes what that push changed: the sources against those of the entry the pull request held before, whose zip is checked against that entry's `size` and `sha256`. A release redone under the same version leaves nothing to compare with. Both are posted on the pull request, the first in a comment kept up to date, the second in one comment for each push. The checks on an entry are the launcher's `--check-entry <entry> <base-index> <work-dir> [--takeover]`; the rest, the pull request's shape and the summary, is the CI's script. A pull request only brings JSON; the CI downloads and inspects a zip, never runs it. Merging needs the CI and the owner's approval (`CODEOWNERS`, branch protection). On the main branch, the CI generates `index.json` (`--build-index <index> <out-file>`, with the job's token for GitHub's rate limit) and deploys it to Pages: on each push, and once a day, since the download counts change without one. It warns of a zip GitHub no longer has, or whose digest is no longer the entry's `sha256`: that version no longer installs. The repository variable `DRHL_VERSION` picks the launcher release both run, a pre-release to test one; empty, the latest.
 
 The entries and `index.json` are under CC BY 4.0 (credit the index, and each entry's `author` for its texts), so a website or a tool may reuse them. Submitting an entry publishes it so, its texts included; a reviewer makes sure someone else than the author has their consent. The CI's code, under `.github/`, is GPLv3.
 

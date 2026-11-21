@@ -11,8 +11,8 @@
       <excludeFolder url="file://$MODULE_DIR$/bin" />
       <excludeFolder url="file://$MODULE_DIR$/profiling" />
     </content>
-    <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="jdk" jdkName="Haxe 4.3.7" jdkType="Haxe toolkit" />
     <orderEntry type="module-library">
       <library name="haxelib: steamwrap 1.0.0">
         <CLASSES>
@@ -43,6 +43,50 @@
         <JAVADOC />
         <SOURCES>
           <root url="file://$MODULE_DIR$/submodules/lime/src/" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="haxelib: StageWebView 1.0.1">
+        <CLASSES>
+          <root url="file://$USER_HOME$/haxelib/stagewebview/1,0,1/src/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES>
+          <root url="file://$USER_HOME$/haxelib/stagewebview/1,0,1/src/" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="haxelib: native-desktop 1.1.0">
+        <CLASSES>
+          <root url="file://$USER_HOME$/haxelib/native-desktop/1,1,0/src/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES>
+          <root url="file://$USER_HOME$/haxelib/native-desktop/1,1,0/src/" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="haxelib: native-ipc 1.0.0">
+        <CLASSES>
+          <root url="file://$USER_HOME$/haxelib/native-ipc/1,0,0/project/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES>
+          <root url="file://$USER_HOME$/haxelib/native-ipc/1,0,0/project/" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="haxelib: wsproto 1.0.0">
+        <CLASSES>
+          <root url="file://$USER_HOME$/haxelib/wsproto/1,0,0/src/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES>
+          <root url="file://$USER_HOME$/haxelib/wsproto/1,0,0/src/" />
         </SOURCES>
       </library>
     </orderEntry>

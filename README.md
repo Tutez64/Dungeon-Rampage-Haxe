@@ -112,6 +112,12 @@ haxelib dev hxscript submodules/hxscript
 
 libhxcpp is registered under its own name and as `hxcpp`, as its setup does.
 
+Lime depends on libraries of its own. Install the versions its `haxelib.json` names:
+
+```bash
+haxelib install submodules/lime/haxelib.json
+```
+
 ### Rebuild helper tools
 
 ```bash

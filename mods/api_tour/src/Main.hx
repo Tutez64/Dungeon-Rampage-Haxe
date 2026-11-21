@@ -1,12 +1,17 @@
 package mods.api_tour;
 
+import dBGlobals.DBGlobal;
+import distributedObjects.DistributedDungeonFloor;
+import distributedObjects.NPCGameObject;
 import mods.api.Mod;
 import mods.api.Context;
+import mods.api.Dictionaries;
 import mods.api.Subscription;
 import mods.api.account.Account;
 import mods.api.account.OwnedHero;
 import mods.api.dungeon.Floor;
 import mods.api.dungeon.Hero;
+import mods.api.dungeon.Monster;
 import mods.api.dungeon.Tile;
 import mods.api.settings.KeyAction;
 import mods.api_tour.ui.Panel;
@@ -40,6 +45,27 @@ class Main extends Mod {
 	var despawned:Array<Hero> = [];
 
 	var keySeen:Bool = false;
+
+	/** Monsters told as spawned and not as despawned since, by id. */
+	var monstersTold:Map<String, Bool> = new Map();
+
+	var monstersSpawned:Int = 0;
+
+	var monstersHurt:Int = 0;
+
+	var monstersDespawned:Int = 0;
+
+	/** Events that broke a rule on the floor in progress, the first one kept to be logged. */
+	var monsterFaults:Int = 0;
+
+	var monsterFault:String = "";
+
+	/** Times the floor's monsters were set against the game's actors and the events, and times they differed. */
+	var looks:Int = 0;
+
+	var lookFaults:Int = 0;
+
+	var watch:Null<haxe.Timer>;
 
 	var tourKey:KeyAction;
 
@@ -99,11 +125,15 @@ class Main extends Mod {
 			check("closure keeps its string literal", literal.length == 15 && literal.charAt(8) == "l");
 		});
 		checkSettings();
+		checkDictionaries();
 
 		ctx.onFloorEnter(onFloorEnter);
 		ctx.onFloorExit(onFloorExit);
 		ctx.onHeroSpawned(onHeroSpawned);
 		ctx.onHeroDespawned(onHeroDespawned);
+		ctx.onMonsterSpawned(onMonsterSpawned);
+		ctx.onMonsterHurt(onMonsterHurt);
+		ctx.onMonsterDespawned(onMonsterDespawned);
 		// Never keeps a key: the game's own use of it must still happen.
 		ctx.onKeyDown(function(key:UInt):Bool {
 			if (!keySeen) {
@@ -147,6 +177,12 @@ class Main extends Mod {
 		check("settings: a default that is no choice is refused", throws(function() ctx.settings.choice("bad", "Bad", "", [{value: "a", label: "A"}], "b")));
 		check("settings: an empty range is refused", throws(function() ctx.settings.slider("bad", "Bad", "", 1, 1, 1, 1)));
 
+		// Shown by a game that opens its settings to mods, and pressed there by hand.
+		var button = ctx.settings.button("tourButton", "Tour button", "Press");
+		button.onPress(function() ctx.log("ok   settings: the tour's button pressed"));
+		check("settings: a button holds no value in the file", sys.io.File.getContent(ctx.data + "/settings.json").indexOf("tourButton") < 0);
+		ctx.log("settings: buttons shown by this game: " + button.shown);
+
 		tourKey = ctx.keys.action("tourKey", "Tour key", "A key action of the tour.", 113);
 		check("keys: not held", !tourKey.held);
 		check("keys: Escape cannot be bound", throws(function() ctx.keys.action("bad", "Bad", "", 27)));
@@ -156,6 +192,36 @@ class Main extends Mod {
 				check("keys: pressed under the key its label gives", tourKey.label != "");
 			}
 		});
+	}
+
+	/** On a map of the mod's own, which the game's functions take as one of its dictionaries. */
+	function checkDictionaries():Void {
+		var dictionary = new haxe.ds.ObjectMap<Dynamic, Dynamic>();
+		var object:Dynamic = {};
+		Dictionaries.set(dictionary, "panel_1", "text");
+		Dictionaries.set(dictionary, 7, "number");
+		Dictionaries.set(dictionary, true, "boolean");
+		Dictionaries.set(dictionary, object, "object");
+		check("dictionaries: a value set is read back, whatever its key",
+			Dictionaries.get(dictionary, "panel_1") == "text" && Dictionaries.get(dictionary, 7) == "number"
+			&& Dictionaries.get(dictionary, true) == "boolean" && Dictionaries.get(dictionary, object) == "object");
+		Dictionaries.set(dictionary, "panel_1", "again");
+		check("dictionaries: a key set again keeps one entry",
+			Dictionaries.get(dictionary, "panel_1") == "again" && Dictionaries.keys(dictionary).length == 4);
+		check("dictionaries: a key without an entry reads null",
+			!Dictionaries.exists(dictionary, "panel_2") && Dictionaries.get(dictionary, "panel_2") == null && Dictionaries.exists(dictionary, 7));
+		var keys = Dictionaries.keys(dictionary);
+		var values = Dictionaries.values(dictionary);
+		check("dictionaries: every key and value listed",
+			keys.indexOf("panel_1") >= 0 && keys.indexOf(7) >= 0 && keys.indexOf(true) >= 0 && keys.indexOf(object) >= 0 && values.length == 4
+			&& values.indexOf("again") >= 0 && values.indexOf("object") >= 0);
+		keys.push(null);
+		check("dictionaries: keys is a copy", Dictionaries.keys(dictionary).length == keys.length - 1);
+		check("dictionaries: an entry removed is gone, twice is false",
+			Dictionaries.remove(dictionary, "panel_1") && !Dictionaries.remove(dictionary, "panel_1") && !Dictionaries.exists(dictionary, "panel_1")
+			&& Dictionaries.remove(dictionary, object) && Dictionaries.keys(dictionary).length == 2);
+		check("dictionaries: what is no dictionary is refused",
+			throws(function() Dictionaries.set(null, "a", 1)) && throws(function() Dictionaries.get([], "a")));
 	}
 
 	function throws(run:Void->Void):Bool {
@@ -170,6 +236,8 @@ class Main extends Mod {
 	override public function ready(ctx:Context):Void {
 		readySeen = true;
 		check("ready: tablesLoaded came first", tablesSeen);
+		check("isActive: this mod and the api run", ctx.isActive("api_tour") && ctx.isActive("api"));
+		check("isActive: a mod that is not there does not, nor a null id", !ctx.isActive("no_such_mod") && !ctx.isActive(null));
 		var account = ctx.state.account;
 		check("ready: account filled", account != null);
 		if (account != null) {
@@ -253,6 +321,10 @@ class Main extends Mod {
 			+ [for (category => count in categories) category + " " + count].join(", ") + ", one-sided exits " + oneSided(floor.tiles));
 		// Monsters come after the floor and its heroes.
 		haxe.Timer.delay(() -> checkMonsters(floor), 3000);
+		if (watch != null)
+			watch.stop();
+		watch = new haxe.Timer(1000);
+		watch.run = () -> lookAtMonsters(floor);
 	}
 
 	/** Open sides facing a tile whose own side is closed, or no tile. */
@@ -282,6 +354,7 @@ class Main extends Mod {
 		check("monsters: some, a few seconds in", monsters.length > 0);
 		check("monsters: each on a tile of its floor", Lambda.foreach(monsters, monster -> Lambda.exists(tiles, tile -> tile.contains(monster.x, monster.y))));
 		check("monsters: ids unique", Lambda.count([for (monster in monsters) Std.string(monster.id) => true]) == monsters.length);
+		check("monsters: some with hit points", Lambda.exists(monsters, monster -> monster.hp > 0 && monster.hp <= monster.maxHp));
 		var big = [for (monster in monsters) if (monster.healthBar) monster.name];
 		ctx.log("floor " + floor.id + " monsters " + monsters.length + ", with a health bar: " + big.join(", "));
 		monsters.push(null);
@@ -291,6 +364,104 @@ class Main extends Mod {
 	function onFloorExit(floor:Floor):Void {
 		check("floorExit: floor was entered", floorsEntered.exists(Std.string(floor.id)));
 		check("floorExit: state.floor moved off it", ctx.state.floor != floor);
+		if (watch != null) {
+			watch.stop();
+			watch = null;
+		}
+		check("monsters: each one spawned was despawned before its floor's exit", Lambda.count(monstersTold) == 0);
+		check("monsters: their events kept their rules" + (monsterFaults == 0 ? "" : ", first breach: " + monsterFault), monsterFaults == 0);
+		if (looks > 0)
+			check("monsters: the list was the game's actors and the events' at each of " + looks + " looks", lookFaults == 0);
+		ctx.log("monsters spawned " + monstersSpawned + ", hurt " + monstersHurt + ", despawned " + monstersDespawned);
+		monstersTold = new Map();
+		monsterFaults = 0;
+		monsterFault = "";
+		looks = 0;
+		lookFaults = 0;
+	}
+
+	function monsterBreach(what:String):Void {
+		if (monsterFaults == 0)
+			monsterFault = what;
+		monsterFaults++;
+	}
+
+	function onMonsterSpawned(monster:Monster):Void {
+		var key = Std.string(monster.id);
+		monstersSpawned++;
+		if (ctx.state.floor == null)
+			monsterBreach("spawned without a floor");
+		if (monstersTold.exists(key))
+			monsterBreach("spawned twice, " + monster.name);
+		if (monster.name == "")
+			monsterBreach("spawned without a name");
+		monstersTold.set(key, true);
+	}
+
+	function onMonsterHurt(monster:Monster):Void {
+		monstersHurt++;
+		if (!monstersTold.exists(Std.string(monster.id)))
+			monsterBreach("hurt but not spawned, or despawned already, " + monster.name);
+	}
+
+	function onMonsterDespawned(monster:Monster):Void {
+		var key = Std.string(monster.id);
+		monstersDespawned++;
+		if (!monstersTold.exists(key))
+			monsterBreach("despawned but not spawned, or twice, " + monster.name);
+		monstersTold.remove(key);
+	}
+
+	/**
+	 * Sets `floor.monsters` against the events, and against the floor's actors as the game holds them:
+	 * the list is kept from what the game reports ready and gone, which an update of the game could move.
+	 */
+	function lookAtMonsters(wrapper:Floor):Void {
+		if (ctx.state.floor != wrapper)
+			return;
+		var floor:DistributedDungeonFloor = cast Reflect.field(wrapper, "floor");
+		if (floor == null || floor.isDestroyed || floor.remoteActors == null)
+			return;
+		var listed:Map<String, Bool> = new Map();
+		var monsters:Array<Monster> = wrapper.monsters;
+		var faults:Array<String> = [];
+		for (i in 0...monsters.length) {
+			var monster:Monster = monsters[i];
+			var key = Std.string(monster.id);
+			listed.set(key, true);
+			if (!monstersTold.exists(key))
+				faults.push("listed but not told as spawned: " + monster.name);
+		}
+		for (key in monstersTold.keys())
+			if (!listed.exists(key))
+				faults.push("told as spawned but not listed: " + key);
+		var avatar = floor.activeOwnerAvatar;
+		var heroes:Int = avatar == null ? (DBGlobal.TEAM_1 : Int) : avatar.team;
+		var actors:Int = 0;
+		for (actor in floor.remoteActors.toArray()) {
+			if (!Std.isOfType(actor, NPCGameObject))
+				continue;
+			var npc:NPCGameObject = cast actor;
+			if (npc.isDestroyed || npc.isDead())
+				continue;
+			var team = npc.team;
+			if (team == heroes || team == (DBGlobal.TEAM_ENVIRONMENT : Int) || team == (DBGlobal.TEAM_3 : Int))
+				continue;
+			actors++;
+			if (!listed.exists(Std.string(npc.id)))
+				faults.push("an actor of the game not listed: " + npc.id);
+		}
+		if (actors != monsters.length)
+			faults.push(monsters.length + " listed for " + actors + " actors");
+		looks++;
+		if (faults.length > 0) {
+			lookFaults++;
+			if (lookFaults <= 3)
+				ctx.log("monsters look " + looks + ": " + faults.join("; "));
+		}
+		if (looks % 30 == 0)
+			ctx.log("monsters after " + looks + " looks: " + monsters.length + " listed, " + lookFaults + " looks that differed, spawned "
+				+ monstersSpawned + ", hurt " + monstersHurt + ", despawned " + monstersDespawned + ", " + monsterFaults + " events off their rules");
 	}
 
 	function onHeroSpawned(hero:Hero):Void {
@@ -316,6 +487,7 @@ class Main extends Mod {
 		var owned = hero.local && account != null ? activeHero(account) : null;
 		if (owned != null) {
 			check("local hero: class of the active owned hero", hero.classId == owned.classId);
+			check("local hero: ascension of the active owned hero", hero.ascension == owned.ascension);
 			check("local hero: weapons of the active owned hero",
 				owned.weapons.map(weapon -> weapon.slot + ":" + weapon.id).join(",") == hero.weapons.map(weapon -> weapon.slot + ":" + weapon.id).join(","));
 		}
@@ -325,6 +497,10 @@ class Main extends Mod {
 		var portrait = player.createPortrait(32);
 		ctx.overlay.addChild(portrait);
 		ctx.overlay.removeChild(portrait);
+		var star = player.createAscensionStar(32);
+		check("ascension star: empty without an ascension", hero.ascension > 0 || star.numChildren == 0);
+		ctx.overlay.addChild(star);
+		ctx.overlay.removeChild(star);
 		if (weapons[0] != null) {
 			var icon = weapons[0].createIcon(32);
 			ctx.overlay.addChild(icon);
