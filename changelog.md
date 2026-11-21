@@ -12,6 +12,7 @@ At tag time, copy these sections into the GitHub release notes under `Changelog`
 - Shop: the crown of a tab whose items are all bought has its colours, where parts of it were black (#35).
 - Training, shop and storage: the hero icons fit their frames, where they were drawn larger (#36).
 - Shop: the panel of a tab whose items are all bought is shaded as in DR, darker under the crown, where it was almost flat (#38).
+- Logs: an error the game did not catch is written with its name and message, as in `UncaughtError: HudFatalError: Required HUD bake failed`, where the line ended after `UncaughtError:`.
 
 ### Improved
 
