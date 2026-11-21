@@ -9,6 +9,7 @@ At tag time, copy these sections into the GitHub release notes under `Changelog`
 
 - HUD: it no longer switches at random to its slower fallback when about 2 GB of video memory is in use on the whole system, which mods made more likely.
 - Training: the stat buttons show their `+` (#56).
+- Shop: the crown of a tab whose items are all bought has its colours, where parts of it were black (#35).
 
 ### Improved
 
