@@ -28,7 +28,6 @@ jobs:
     name: ${{ inputs.package_name }}
     runs-on: ${{ inputs.runner }}
     env:
-      HXCPP_CONFIG: ${{ github.workspace }}/tools/release/hxcpp-x86-64-v2.xml
       LIME_CONFIG: ${{ github.workspace }}/tools/release/lime-ci-config.xml
 
     steps:
@@ -140,7 +139,7 @@ jobs:
             submodules/swf/run.n
             submodules/libhxcpp/hxcpp.n
             submodules/SteamWrap/ndll
-          key: native-${{ inputs.platform }}-nolto-${{ hashFiles('submodules/lime/**', 'submodules/libhxcpp/**', 'submodules/swf/**', 'submodules/SteamWrap/**', 'tools/release/hxcpp-x86-64-v2.xml', 'tools/release/lime-ci-config.xml') }}
+          key: native-${{ inputs.platform }}-nolto-v1-${{ hashFiles('submodules/lime/**', 'submodules/libhxcpp/**', 'submodules/swf/**', 'submodules/SteamWrap/**', 'tools/release/lime-ci-config.xml') }}
 
       - name: Bootstrap hxcpp
         if: steps.native-cache.outputs.cache-hit != 'true'
@@ -289,9 +288,9 @@ jobs:
         id: cpp-cache
         with:
           path: bin/${{ inputs.platform }}/obj
-          key: cpp-obj-${{ inputs.platform }}-nolto-${{ hashFiles('project.xml', 'submodules/libhxcpp/**', 'submodules/hxscript/**', 'submodules/openfl/**', 'submodules/lime/**', 'submodules/swf/**', 'submodules/SteamWrap/**') }}-${{ hashFiles('src/**', 'src-steam/**', 'src-modding/**', 'submodules/ax4/compat/**', 'generated_swf_libraries.xml') }}
+          key: cpp-obj-${{ inputs.platform }}-nolto-v1-${{ hashFiles('project.xml', 'submodules/libhxcpp/**', 'submodules/hxscript/**', 'submodules/openfl/**', 'submodules/lime/**', 'submodules/swf/**', 'submodules/SteamWrap/**') }}-${{ hashFiles('src/**', 'src-steam/**', 'src-modding/**', 'submodules/ax4/compat/**', 'generated_swf_libraries.xml') }}
           restore-keys: |
-            cpp-obj-${{ inputs.platform }}-nolto-${{ hashFiles('project.xml', 'submodules/libhxcpp/**', 'submodules/hxscript/**', 'submodules/openfl/**', 'submodules/lime/**', 'submodules/swf/**', 'submodules/SteamWrap/**') }}-
+            cpp-obj-${{ inputs.platform }}-nolto-v1-${{ hashFiles('project.xml', 'submodules/libhxcpp/**', 'submodules/hxscript/**', 'submodules/openfl/**', 'submodules/lime/**', 'submodules/swf/**', 'submodules/SteamWrap/**') }}-
 
       - name: Install cached SWF libraries
         shell: bash
