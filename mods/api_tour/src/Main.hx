@@ -272,6 +272,12 @@ class Main extends Mod {
 			for (pet in hero.pets)
 				uids.push(pet.uid);
 		check("inventory: pet uids set and unique", uids.indexOf(0) < 0 && Lambda.count([for (uid in uids) Std.string(uid) => true]) == uids.length);
+		var weaponUids = [for (weapon in stored) weapon.uid];
+		for (hero in heroes)
+			for (weapon in hero.weapons)
+				weaponUids.push(weapon.uid);
+		check("inventory: weapon uids set and unique",
+			weaponUids.indexOf(0) < 0 && Lambda.count([for (uid in weaponUids) Std.string(uid) => true]) == weaponUids.length);
 		stored.push(null);
 		check("inventory.weapons is a copy", inventory.weapons.length == stored.length - 1);
 		ctx.log("coins " + account.coins + ", gems " + account.gems + ", trophies " + account.trophies + ", " + heroes.length + " heroes, "
@@ -481,6 +487,7 @@ class Main extends Mod {
 		check("player: in state.players", ctx.state.players.indexOf(player) >= 0);
 		var weapons = hero.weapons;
 		check("heroSpawned: at least one weapon", weapons.length > 0);
+		check("heroSpawned: weapons known by their kind only, uid 0", Lambda.foreach(weapons, weapon -> weapon.uid == 0));
 		weapons.push(null);
 		check("hero.weapons is a copy", hero.weapons.length == weapons.length - 1);
 		var account = ctx.state.account;

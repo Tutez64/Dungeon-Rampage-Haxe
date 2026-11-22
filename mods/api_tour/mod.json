@@ -3,7 +3,7 @@
   "name": "API tour",
   "version": "1.0.0",
   "author": "DRH",
-  "api": "1.5",
+  "api": "1.6",
   "uses": ["extends"],
   "drh": "19",
   "entry": "Main",
