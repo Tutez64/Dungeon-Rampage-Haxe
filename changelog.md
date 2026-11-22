@@ -13,6 +13,7 @@ At tag time, copy these sections into the GitHub release notes under `Changelog`
 - Training, shop and storage: the hero icons fit their frames, where they were drawn larger (#36).
 - Shop: the panel of a tab whose items are all bought is shaded as in DR, darker under the crown, where it was almost flat (#38).
 - Logs: an error the game did not catch is written with its name and message, as in `UncaughtError: HudFatalError: Required HUD bake failed`, where the line ended after `UncaughtError:`.
+- Controllers: the HUD shows the game's own button glyphs for the controller in use, as in DR, where it showed Steam's flat ones (#53).
 
 ### Improved
 

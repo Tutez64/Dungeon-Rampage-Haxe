@@ -1493,7 +1493,9 @@ class FRESteamWorks extends EventDispatcher {
 		#if air
 		return ASCompat.asInt(_ExtensionContext.call("AIRSteam_GetInputTypeForHandle", inputHandle));
 		#elseif (cpp && !air)
-		return Steam.controllers != null ? Std.int(Steam.controllers.getInputTypeForHandle(parseHandle(inputHandle))) : 0;
+		// The handles getConnectedControllers gives are SteamWrap's controller indices; the ESteamInputType value
+		// is what AIR returns, and what SteamInputManager picks the glyph family from
+		return Steam.controllers != null ? Steam.controllers.getInputTypeValueForControllerIndex(parseHandle(inputHandle)) : 0;
 		#else
 		return 0;
 		#end
