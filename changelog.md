@@ -15,6 +15,7 @@ At tag time, copy these sections into the GitHub release notes under `Changelog`
 - Logs: an error the game did not catch is written with its name and message, as in `UncaughtError: HudFatalError: Required HUD bake failed`, where the line ended after `UncaughtError:`.
 - Controllers: the HUD shows the game's own button glyphs for the controller in use, as in DR, where it showed Steam's flat ones (#53).
 - Windows: the texts use the game's fonts when the game is installed under a path with a character such as `ł`, as in a Windows user name, where they all fell back to another font.
+- Steam: the game logs in when started while Steam is not logged on to its servers yet, as just after the computer starts, where it stayed on `WAITING FOR STEAM...` forever.
 
 ### Improved
 
