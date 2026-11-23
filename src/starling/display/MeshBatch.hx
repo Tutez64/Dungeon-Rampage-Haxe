@@ -140,6 +140,9 @@ class MeshBatch extends Mesh {
 		}
 		if (_batchable) {
 			painter.batchMesh(this);
+		} else if (painter.recording) {
+			// drawn with the context: left to the main thread
+			starling.rendering.RenderWorkers.deferObject(painter, this);
 		} else {
 			painter.finishMeshBatch();
 			painter.drawCount += 1;

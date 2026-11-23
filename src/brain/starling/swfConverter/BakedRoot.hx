@@ -7,6 +7,7 @@ class BakedRoot extends Sprite {
 	public function new() {
 		super();
 		touchable = false;
+		parallel = new starling.rendering.RenderRecording.ParallelChildren(null, true);
 	}
 
 	override public function render(painter:Painter) {
