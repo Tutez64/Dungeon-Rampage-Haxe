@@ -94,6 +94,11 @@ class StarlingSweepMesh extends Mesh {
 			return;
 		}
 		if (mDirty) {
+			if (painter.recording) {
+				// the rebuild goes through scratch objects the threads of RenderWorkers must not share
+				starling.rendering.RenderWorkers.deferObject(painter, this);
+				return;
+			}
 			rebuild();
 		}
 		if (numIndices == 0) {

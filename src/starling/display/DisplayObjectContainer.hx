@@ -324,7 +324,14 @@ import flash.errors.ArgumentError;
 		return null;
 	}
 
+	/** Set for a container whose children the threads of `RenderWorkers` render. **/
+	public var parallel:starling.rendering.RenderRecording.ParallelChildren;
+
 	override public function render(painter:Painter) {
+		if (parallel != null && !painter.recording && starling.rendering.RenderWorkers.renderChildren(this, painter)) {
+			return;
+		}
+		var _loc14_ = painter.recording;
 		var _loc5_ = 0;
 		var _loc12_:DisplayObject = null;
 		var _loc6_:BatchToken = null;
@@ -334,7 +341,7 @@ import flash.errors.ArgumentError;
 		var _loc9_:DisplayObject = null;
 		var _loc10_ = _children.length;
 		var _loc4_ = painter.frameID;
-		var _loc8_ = _loc4_ != 0;
+		var _loc8_ = _loc4_ != 0 && !_loc14_;
 		var _loc11_ = _lastParentOrSelfChangeFrameID == _loc4_;
 		var _loc3_ = false;
 		painter.pushState();
@@ -355,6 +362,8 @@ import flash.errors.ArgumentError;
 					painter.drawFromCache(_loc12_._pushToken, _loc12_._popToken);
 					painter.fillToken(_loc12_._popToken);
 					_loc12_._pushToken.copyFrom(sCacheToken);
+				} else if (_loc14_ && starling.rendering.RenderWorkers.defers(painter, _loc12_)) {
+					// left to the main thread, at its place
 				} else {
 					_loc6_ = _loc8_ ? _loc12_._pushToken : null;
 					_loc2_ = _loc8_ ? _loc12_._popToken : null;

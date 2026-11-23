@@ -99,6 +99,9 @@ import starling.utils.SystemUtil;
 
 	var _stateStackLength:Int = 0;
 
+	/** Whether this is a `RecordingPainter`, which keeps its batches for the main painter to draw. **/
+	public var recording(default, null):Bool = false;
+
 	public function new(stage3D:Stage3D) {
 		_stage3D = stage3D;
 		_stage3D.addEventListener("context3DCreate", onContextCreated, false, 40, true);
