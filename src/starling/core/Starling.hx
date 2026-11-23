@@ -335,7 +335,9 @@ class Starling extends EventDispatcher {
 			if (!_loc5_) {
 				_painter.clear(_loc3_, Color.getAlpha(_loc3_));
 			}
+			starling.rendering.RenderWorkers.prefork(_painter, _stage);
 			_stage.render(_painter);
+			starling.rendering.RenderWorkers.finishForks();
 			_painter.finishFrame();
 			_painter.frameID = ++_frameID;
 			if (!_loc5_) {

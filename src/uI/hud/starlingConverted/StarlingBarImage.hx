@@ -38,6 +38,11 @@ class StarlingBarImage extends BakedImage {
 			return;
 		}
 		if (mDirty) {
+			if (painter.recording) {
+				// the cut goes through scratch objects the threads of RenderWorkers must not share
+				starling.rendering.RenderWorkers.deferObject(painter, this);
+				return;
+			}
 			applyCut();
 		}
 		if (mEmpty) {

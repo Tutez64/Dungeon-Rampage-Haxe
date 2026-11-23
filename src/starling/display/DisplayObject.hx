@@ -101,6 +101,9 @@ import flash.errors.ArgumentError;
 
 	@:allow(starling.display) var _hasVisibleArea:Bool = false;
 
+	/** Whether a thread of `RenderWorkers` may render this object: 0 not looked up yet, 1 yes, 2 no. **/
+	public var _parallelState:Int = 0;
+
 	@:allow(starling.display) var _filter:FragmentFilter;
 
 	@:allow(starling.display) var _mask:DisplayObject;

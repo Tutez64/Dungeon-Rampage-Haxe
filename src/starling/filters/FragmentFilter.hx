@@ -95,9 +95,16 @@ import flash.errors.ArgumentError;
 		setRequiresRedraw();
 	}
 
+	/** The target as a thread of `RenderWorkers` recorded it, while the main painter runs the passes over it. **/
+	var _recorded:starling.rendering.RenderRecording;
+
 	public function render(painter:Painter) {
 		if (_target == null) {
 			throw new IllegalOperationError("Cannot render filter without target");
+		}
+		if (painter.recording) {
+			starling.rendering.RenderWorkers.recordFilter(this, painter);
+			return;
 		}
 		if (_target.is3D) {
 			_cached = _cacheRequested = false;
@@ -169,7 +176,11 @@ import flash.errors.ArgumentError;
 		painter.state.setRenderTarget(_loc5_, true, _antiAliasing);
 		painter.state.setProjectionMatrix(_loc11_.x, _loc11_.y, _loc5_.root.width, _loc5_.root.height, _loc8_.stageWidth, _loc8_.stageHeight,
 			_loc8_.cameraPosition);
-		_target.render(painter);
+		if (_recorded != null) {
+			starling.rendering.RenderWorkers.replay(painter, _recorded);
+		} else {
+			_target.render(painter);
+		}
 		painter.finishMeshBatch();
 		painter.state.setModelviewMatricesToIdentity();
 		_loc3_ = process(painter, _helper, _loc5_);

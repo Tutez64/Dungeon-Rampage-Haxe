@@ -97,6 +97,9 @@ class StarlingLayer extends Sprite {
 		super();
 		mSortIndex = inSortIndex;
 		mScreenSpace = inScreenSpace;
+		if (!inScreenSpace) {
+			parallel = new starling.rendering.RenderRecording.ParallelChildren(prepareRender);
+		}
 		blendMode = inBlendMode;
 		if (inCustomSortFunction == null) {
 			ignoreDirtyFlag = false;
@@ -246,20 +249,28 @@ class StarlingLayer extends Sprite {
 		propsCulledLastFrame += _loc2_;
 	}
 
-	override public function render(painter:Painter) {
-		if (bakeStaticImages || !mScreenSpace) {
-			painter.excludeFromCache(this);
-		}
+	// What render does before it renders the children. RenderWorkers calls it before its threads enter them,
+	// with the blend mode the painter will have.
+	function prepareRender(blendMode:String) {
 		if (bakeStaticImages) {
-			updateBake(painter);
+			updateBake(blendMode);
 		}
 		if (!mScreenSpace && stage != null) {
 			cullScenerySprites();
 		}
+	}
+
+	override public function render(painter:Painter) {
+		if (bakeStaticImages || !mScreenSpace) {
+			painter.excludeFromCache(this);
+		}
+		if (parallel == null || !parallel.takePrepared()) {
+			prepareRender(painter.state.blendMode);
+		}
 		super.render(painter);
 	}
 
-	function updateBake(painter:Painter) {
+	function updateBake(blendMode:String) {
 		var _loc2_ = 0;
 		var _loc4_:StarlingBakedRun = null;
 		var _loc5_ = 0;
@@ -281,10 +292,10 @@ class StarlingLayer extends Sprite {
 			}
 			_loc2_++;
 		}
-		if (mLayerBlend != painter.state.blendMode) {
+		if (mLayerBlend != blendMode) {
 			mFullBakeDue = true;
 		}
-		mLayerBlend = painter.state.blendMode;
+		mLayerBlend = blendMode;
 		if (!mBaked || mFullBakeDue) {
 			fullBake();
 			return;
