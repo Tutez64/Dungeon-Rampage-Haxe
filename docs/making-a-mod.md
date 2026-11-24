@@ -20,7 +20,7 @@ They need git. Publishing needs a GitHub account.
 
 ## Create
 
-1. `DRH-Launcher --new-mod <folder>` asks for the mod's `id` ([rules](modding.md#modjson): it is the mod's folder and package), its `name` and your `author` name, then makes the folder from [DRH-Mods-Template](https://github.com/Tutez64/DRH-Mods-Template), with its first commit.
+1. `DRH-Launcher --new-mod <folder>` asks for the mod's `name` and your `author` name, takes the `id` the name gives (`Cool Mod` gives `cool_mod`; it is the mod's folder and package, and asked for when the name gives none: [rules](modding.md#modjson)), then makes the folder from [DRH-Mods-Template](https://github.com/Tutez64/DRH-Mods-Template), with its first commit.
 2. It opens GitHub's page to create the repository: keep it public and named `DRH-Mod-<Name>` as it suggests (the index takes no other name), then push with the two lines it prints.
 3. Fill `description` in `mod.json`, and `README.md`: its first line is what GitHub visitors read first, replace it with what the repository is; its shown zone is what the launcher shows on the mod's page ([markers](modding.md#mod-repository)). `DRH-Launcher --check-mod <folder>` says what is left.
 
@@ -58,4 +58,4 @@ It runs the latest `api` of the major `mod.json` names. `api` is the version the
 
 1. Raise `version` in `mod.json` ([rules](modding.md#modjson)) and commit. Tag that commit `v<version>` and push the tag (`git tag v0.1.0`, `git push origin v0.1.0`): the release workflow drafts a GitHub release with the mod's zip and its index entry.
 2. Test that zip, `DRH-Launcher --run-mod <zip>`, then publish the release on GitHub.
-3. `DRH-Launcher --submit-mod <folder>` proposes it to the index. The first time, it opens the index's fork page: fork it, then run it again. It opens the pull request's page: create it. If you redo the release before it is merged, run it again: it updates the pull request. The index CI checks it, and a reviewer reads its diff against your previous version ([Index entry](modding.md#index-entry)).
+3. `DRH-Launcher --submit-mod <folder>` checks the release as the index will, then proposes it. The first time, it opens the index's fork page: fork it, then run it again. It opens the pull request's page: create it. If you redo the release or publish a new version before it is merged, run it again: it updates the pull request. When a review asked for changes, click **Re-request review** on the pull request once they are in, for the reviewer to know. The index CI checks it, and a reviewer reads its diff against your previous version ([Index entry](modding.md#index-entry)).
