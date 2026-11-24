@@ -177,7 +177,25 @@ class Effect {
 
 	@:isVar var program(get, never):Program;
 
+	// The program found last time, for the same variant: looking it up by name on each draw was 3.9% of the
+	// main thread in a fight.
+	var _programFound:Program;
+
+	var _programFoundVariant:UInt = 0;
+
+	var _programFoundBase:String;
+
 	function get_program():Program {
+		var variant = this.programVariantName;
+		if (_programFound != null && variant == _programFoundVariant && _programBaseName == _programFoundBase) {
+			return _programFound;
+		}
+		_programFoundVariant = variant;
+		_programFoundBase = _programBaseName;
+		return _programFound = lookUpProgram();
+	}
+
+	function lookUpProgram():Program {
 		var _loc2_ = this.programName;
 		var _loc1_ = Starling.painter;
 		var _loc3_ = _loc1_.getProgram(_loc2_);
