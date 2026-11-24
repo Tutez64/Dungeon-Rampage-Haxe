@@ -21,6 +21,7 @@ At tag time, copy these sections into the GitHub release notes under `Changelog`
 
 - Mods: reading or writing a field of one of the game's objects costs a mod about a third less: with nineteen mods, a frame of a fight took 3.9 ms and takes 3.7 ms on the test machine.
 - Rendering: the game uses several processor cores, where it used one: three more threads prepare the world and the HUD while the main one draws. A frame of a fight took 2.3 ms and takes 2.0 ms on the test machine (430 to 510 FPS without a limit), for about a quarter of a core more. The launch argument `--render-threads 0` turns it off, and `--render-threads <n>` sets another number of threads.
+- Filters: a glow, a blur or a drop shadow is drawn in fewer steps, for the same image: a frame of a fight had 104 draws and has 64 on the test machine, and took 1.96 ms where it takes 1.68 ms (510 to 596 FPS without a limit).
 
 ### Internal
 

@@ -45,6 +45,9 @@ class BlurFilter extends FragmentFilter {
 		var _loc7_ = input0;
 		var _loc8_ = totalBlurX;
 		var _loc10_ = totalBlurY;
+		if (FastBlur.enabled) {
+			return FastBlur.process(painter, helper, input0, _loc8_, _loc10_, _quality);
+		}
 		_loc9_.quality = _quality;
 		_loc9_.direction = "horizontal";
 		while (_loc8_ > 0) {
@@ -94,6 +97,9 @@ class BlurFilter extends FragmentFilter {
 	override public function get_numPasses():Int {
 		if (_blurX == 0 && _blurY == 0) {
 			return 1;
+		}
+		if (FastBlur.enabled) {
+			return FastBlur.numPasses(totalBlurX, totalBlurY, _quality);
 		}
 		return getNumPasses(totalBlurX) + getNumPasses(totalBlurY);
 	}
