@@ -7,7 +7,7 @@ At tag time, copy these sections into the GitHub release notes under `Changelog`
 - 
 ### Fixed
 
-- HUD: it no longer switches at random to its slower fallback when about 2 GB of video memory is in use on the whole system, which mods made more likely.
+- HUD: it is no longer missing for a whole session, when about 2 GB of video memory is in use on the whole system.
 - Training: the stat buttons show their `+` (#56).
 - Shop: the crown of a tab whose items are all bought has its colours, where parts of it were black (#35).
 - Training, shop and storage: the hero icons fit their frames, where they were drawn larger (#36).
