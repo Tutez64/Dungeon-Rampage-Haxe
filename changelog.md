@@ -16,6 +16,7 @@ At tag time, copy these sections into the GitHub release notes under `Changelog`
 - Controllers: the HUD shows the game's own button glyphs for the controller in use, as in DR, where it showed Steam's flat ones (#53).
 - Windows: the texts use the game's fonts when the game is installed under a path with a character such as `ł`, as in a Windows user name, where they all fell back to another font.
 - Steam: the game logs in when started while Steam is not logged on to its servers yet, as just after the computer starts, where it stayed on `WAITING FOR STEAM...` forever.
+- Startup: the game no longer stays on `WAITING FOR STEAM...` forever when its files take longer to load, as on the first launch after the computer starts, where it never asked Steam for the login.
 
 ### Improved
 
