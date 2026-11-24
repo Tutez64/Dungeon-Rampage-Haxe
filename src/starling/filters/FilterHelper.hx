@@ -43,6 +43,8 @@ class FilterHelper implements IFilterHelper {
 
 	var _clipRect:Rectangle;
 
+	var _tooLarge:Int = 0;
+
 	var sRegion:Rectangle = new Rectangle();
 
 	public function new(textureFormat:String = "bgra") {
@@ -128,7 +130,40 @@ class FilterHelper implements IFilterHelper {
 			_loc3_ = ASCompat.floatToInt(_loc3_ * _loc6_);
 			_loc7_ *= _loc6_;
 		}
+		if (_scale == _loc7_) {
+			if (_loc5_ <= _nativeWidth && _loc3_ <= _nativeHeight) {
+				// What is pooled is large enough, and a pass draws into a part of it: making textures of
+				// another size each time the target's bounds cross a step stalled the main thread on the
+				// driver. Kept unless it has been four times too large for a while.
+				if (_loc5_ * _loc3_ * 4 >= _nativeWidth * _nativeHeight) {
+					_tooLarge = 0;
+				} else {
+					_tooLarge++;
+				}
+				if (_tooLarge < 120) {
+					_loc5_ = _nativeWidth;
+					_loc3_ = _nativeHeight;
+				}
+			} else {
+				// growing: by half at least, so that a target that grows by a step a frame does not start over each time
+				var _loc8_ = ASCompat.floatToInt(Math.fceil(_nativeWidth * 1.5 / _sizeStep) * _sizeStep);
+				var _loc9_ = ASCompat.floatToInt(Math.fceil(_nativeHeight * 1.5 / _sizeStep) * _sizeStep);
+				if (_loc5_ > _nativeWidth && _loc5_ < _loc8_ && _loc8_ <= _loc4_) {
+					_loc5_ = _loc8_;
+				}
+				if (_loc3_ > _nativeHeight && _loc3_ < _loc9_ && _loc9_ <= _loc4_) {
+					_loc3_ = _loc9_;
+				}
+				if (_loc5_ < _nativeWidth) {
+					_loc5_ = _nativeWidth;
+				}
+				if (_loc3_ < _nativeHeight) {
+					_loc3_ = _nativeHeight;
+				}
+			}
+		}
 		if (_nativeWidth != _loc5_ || _nativeHeight != _loc3_ || _scale != _loc7_) {
+			_tooLarge = 0;
 			purge();
 			_scale = _loc7_;
 			_nativeWidth = _loc5_;
