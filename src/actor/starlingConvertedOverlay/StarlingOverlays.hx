@@ -397,6 +397,12 @@ class StarlingOverlays {
 			return;
 		}
 		if (mZoom > 0) {
+			// An attack's zoom is back to the default within seconds: bakes at its scale would be thrown away at once
+			var camera = mFacade.camera;
+			if (camera != null && camera.zoom != camera.defaultZoom && !Math.isNaN(camera.defaultZoom)) {
+				mPendingFrames = 0;
+				return;
+			}
 			if (Math.abs(_loc1_ / mZoom - 1) <= 0.001) {
 				mPendingFrames = 0;
 				return;
