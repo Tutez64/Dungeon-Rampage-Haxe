@@ -203,6 +203,8 @@ class PerfBot {
 	static var wiggleX:Float = 0;
 	static var wiggleY:Float = 0;
 	static var longMs:Float = 25;
+	static var zoomBack:Bool = false;
+	static var zoomShot:Bool = false;
 
 	static var lastHudErrors:Int = 0;
 
@@ -294,6 +296,26 @@ class PerfBot {
 			case "keyup":
 				openfl.Lib.application.window.onKeyUp.dispatch(key(step[1]), 0);
 				nextStep();
+			case "zoom":
+				// zoom:<factor>:<in>:<hold>:<out>[:<shot>] tweens the camera as an attack's zoom action does, in seconds,
+				// with a screenshot of that name during the hold
+				var camera = (cast facade : facade.DBFacade).camera;
+				var zoomIn = Std.parseFloat(step[2]);
+				var zoomHold = Std.parseFloat(step[3]);
+				var zoomOut = Std.parseFloat(step[4]);
+				if (stepFrames == 1) {
+					zoomBack = false;
+					zoomShot = false;
+					camera.tweenZoom(zoomIn, Std.parseFloat(step[1]));
+				} else if (step.length > 5 && !zoomShot && elapsed >= zoomIn + 0.3) {
+					zoomShot = true;
+					note("SHOT " + step[5]);
+				} else if (!zoomBack && elapsed >= zoomIn + zoomHold) {
+					zoomBack = true;
+					camera.tweenToDefaultZoom(zoomOut);
+				} else if (elapsed >= zoomIn + zoomHold + zoomOut) {
+					nextStep();
+				}
 			case "phase":
 				if (phaseName == null) {
 					phaseName = step[1];

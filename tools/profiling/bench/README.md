@@ -39,7 +39,9 @@ of frame times per phase.
 
 Steps, separated by `;`: `state:<name>[:timeout]`, `wait:<s>`, `click:<x>:<y>` (on a 2560x1440
 reference), `move:<x>:<y>`, `wiggle:<x>:<y>[:<n>]` (moves the mouse around that point n times on
-every frame until `wiggle:off`), `keydown:<name>`, `keyup:<name>`, `phase:<name>:<s>`,
+every frame until `wiggle:off`), `keydown:<name>`, `keyup:<name>`,
+`zoom:<factor>:<in>:<hold>:<out>[:<shot>]` (tweens the camera as an attack's zoom action does, in
+seconds, with a screenshot of that name during the hold), `phase:<name>:<s>`,
 `shot:<name>` (a screenshot by `spectacle`, cropped to `DRH_BENCH_SHOT_CROP` if set), `gc`,
 `census:<name>`, `mallinfo`, `trim`, `tex`, `bmp`, `quit`.
 
