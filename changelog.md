@@ -28,4 +28,4 @@ At tag time, copy these sections into the GitHub release notes under `Changelog`
 
 ### Internal
 
-- 
+- Loading screen: the lines that name the release are written by the code from the release's tag, where `assets.swf` was edited for each release. A build made without a tag shows `DRH dev`.
