@@ -120,6 +120,10 @@ class ColorMatrixFilterAdapter {
 
 	function set_progress(value:Float):Float {
 		var _loc2_ = 0;
+		// between its two ends, a step under a 25th of the way is not seen
+		if (mStart != null && value > 0 && value < 1 && Math.abs(value - mProgress) < 0.04) {
+			return value;
+		}
 		mProgress = value;
 		if (mStart == null) {
 			capture();
