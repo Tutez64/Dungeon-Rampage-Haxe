@@ -126,6 +126,13 @@ class ActorNametag extends Sprite {
 		return mWantVisible;
 	}
 
+	// A tag changes with its actor's health, often several times a second. Drawn as it is, it costs less than a
+	// cached bitmap that is drawn again each time, so the cache its owner asks for (ActorView, a mod) is not kept.
+	@:access(openfl.display.DisplayObject)
+	override private function get_cacheAsBitmap():Bool {
+		return __filters != null;
+	}
+
 	@:isVar public var shownOnScreen(get, never):Bool;
 
 	public function get_shownOnScreen():Bool {
