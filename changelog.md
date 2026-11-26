@@ -26,6 +26,9 @@ At tag time, copy these sections into the GitHub release notes under `Changelog`
 - Rendering: the game uses several processor cores, where it used one: three more threads prepare the world and the HUD while the main one draws. A frame of a fight took 2.3 ms and takes 2.0 ms on the test machine (430 to 510 FPS without a limit), for about a quarter of a core more. The launch argument `--render-threads 0` turns it off, and `--render-threads <n>` sets another number of threads.
 - Filters: a glow, a blur or a drop shadow is drawn in fewer steps, for the same image: a frame of a fight had 104 draws and has 64 on the test machine, and took 1.96 ms where it takes 1.68 ms (510 to 596 FPS without a limit).
 - Filters: an effect that grows or shrinks keeps its textures, where they were made again at each step of 64 pixels, the game stalling a tenth of a millisecond each time: a frame of a fight with such an effect took 1.97 ms and takes 1.77 ms on the test machine (507 to 566 FPS without a limit).
+- Rendering: the hidden objects of the interface, about 1,300 of them in a dungeon, are no longer gone through on every frame: with three other players and nineteen mods, a frame of a dungeon took 3.9 ms and takes 3.6 ms on the test machine (257 to 277 FPS without a limit).
+- Rendering: the characters and props of a dungeon are put in drawing order with less work, a buff's tint is applied when it has visibly changed, where it was on every frame, and an animation reads its frames faster: with the next line, a frame of a dungeon with three other players and nineteen mods took 4.9 ms and takes 4.7 ms on the test machine (204 to 212 FPS without a limit).
+- HUD: a text or a name tag that changes is drawn in 1.6 ms, where it took 3.6 ms. With a mod that writes a timer, a frame of 8 to 13 ms came every second.
 
 ### Internal
 
