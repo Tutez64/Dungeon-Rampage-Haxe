@@ -12,7 +12,9 @@ import sys.io.FileOutput;
 	Driven by the environment: DRH_PERF_OUT (output directory) and DRH_PERF_SCRIPT (steps
 	separated by ';'). Without DRH_PERF_OUT it does nothing.
 **/
-@:cppFileCode("#include <malloc.h>")
+@:cppFileCode("#include <malloc.h>
+#include <time.h>
+static double perfClock(clockid_t id) { struct timespec ts; clock_gettime(id, &ts); return ts.tv_sec + ts.tv_nsec * 1e-9; }")
 class PerfBot {
 	static inline final MAX_SAMPLES = 400000;
 
@@ -38,6 +40,78 @@ class PerfBot {
 	static var secMax = 0.0;
 	static var secDraws = 0.0;
 
+	// Where a frame's time goes, in wall seconds since the start. The first ones are timed around a line of the
+	// game's code by make_overlay.py's hooks; the last four split the whole frame at Lime's and OpenFL's events:
+	// update (Lime's update, the pending mouse event), events (the enterFrame broadcast: the game's loop and
+	// Starling's are in it), openfl (OpenFL's own display list), swap (buffer swap, event polling, frame limiter).
+	public static inline final B_REALWORK = 0;
+	public static inline final B_LOGICAL = 1;
+	public static inline final B_PHYSICS = 2;
+	public static inline final B_PRERENDER = 3;
+	public static inline final B_VIEWS = 4;
+	public static inline final B_LAYERS = 5;
+	public static inline final B_ADVANCE = 6;
+	public static inline final B_RENDER = 7;
+	public static inline final B_NETWORK = 8;
+	static inline final B_UPDATE = 9;
+	static inline final B_EVENTS = 10;
+	static inline final B_OPENFL = 11;
+	static inline final B_SWAP = 12;
+	static final blockNames = ["realwork", "logical", "physics", "prerender", "views", "layers", "advance", "render", "network", "update", "events", "openfl", "swap"];
+	public static var block:haxe.ds.Vector<Float> = zeros(13);
+	static var blockSec:haxe.ds.Vector<Float> = zeros(13);
+	static var blockFrame:haxe.ds.Vector<Float> = zeros(13);
+	static var lapStamp = -1.0;
+
+	/** Filter passes started (FragmentFilter.renderPasses), and filters that started some. **/
+	public static var passes = 0;
+	public static var filters = 0;
+	static var passesFrame = 0;
+	static var passesSec = 0;
+	static var filtersSec = 0;
+	static var secSlow10 = 0;
+	static var secSlow16 = 0;
+	static var mainCpu = 0.0;
+	static var procCpu = 0.0;
+
+	// DRH_PERF_RECORD: a line per frame in frames.csv, and each second the game objects by class (objects.csv),
+	// the floor, and the Starling display tree
+	static var record = false;
+	static var frames:FileOutput;
+	static var objects:FileOutput;
+	static var frameLines:StringBuf;
+	static var native:FileOutput;
+	static var world = ",,,,,,,,,,,,,,,,,";
+	static var floorKey = "";
+
+	static function zeros(n:Int):haxe.ds.Vector<Float> {
+		var v = new haxe.ds.Vector<Float>(n);
+		for (i in 0...n) v[i] = 0;
+		return v;
+	}
+
+	public static inline function begin():Float {
+		return Timer.stamp();
+	}
+
+	public static inline function end(b:Int, started:Float):Void {
+		block[b] += Timer.stamp() - started;
+	}
+
+	static function lap(b:Int):Void {
+		var now = Timer.stamp();
+		if (lapStamp >= 0) block[b] += now - lapStamp;
+		lapStamp = now;
+	}
+
+	static function threadCpu():Float {
+		return untyped __cpp__("perfClock(CLOCK_THREAD_CPUTIME_ID)");
+	}
+
+	static function processCpu():Float {
+		return untyped __cpp__("perfClock(CLOCK_PROCESS_CPUTIME_ID)");
+	}
+
 	static var probeLast = 0.0;
 	static var probeWall = 0.0;
 	static var probeGame = 0.0;
@@ -62,7 +136,44 @@ class PerfBot {
 		}
 		events = File.write(outDir + "/events.log", false);
 		seconds = File.write(outDir + "/seconds.csv", false);
-		seconds.writeString("t,phase,state,frames,max_ms,draws,gc_used_mb,gc_reserved_mb,gc_large_mb,orig_clock_ratio,large_alloc_mb,large_drops,gpu_total_mb,hud_errors\n");
+		seconds.writeString("t,phase,state,frames,max_ms,draws,gc_used_mb,gc_reserved_mb,gc_large_mb,orig_clock_ratio,large_alloc_mb,large_drops,gpu_total_mb,hud_errors,"
+			+ "passes,filters,slow10,slow16,main_cpu_ms,proc_cpu_ms,b_" + blockNames.join(",b_")
+			+ ",floor,heroes,npcs,projectiles,effects,effects_live,objects,sl_objects,sl_shown,sl_meshes,sl_filters,juggler,nat_objects,nat_shown,nat_text,nat_filters,nat_under_hidden,nat_cache_renders,alt," + [for (i in 0...PerfProbe.time.length) "p" + i + "_us,p" + i + "_calls"].join(",") + "\n");
+		var period = Sys.getEnv("DRH_PERF_ALT");
+		if (period != null && period != "") altPeriod = Std.parseInt(period);
+		var variants = Sys.getEnv("DRH_PERF_VARIANTS");
+		if (variants != null && variants != "") altVariants = Std.parseInt(variants);
+		var together = Sys.getEnv("DRH_PERF_ALL");
+		if (together != null && together != "") {
+			altAll = Std.parseInt(together);
+			altVariants = 1;
+		}
+		var forced = Sys.getEnv("DRH_PERF_ON");
+		if (forced != null && forced != "") {
+			for (part in forced.split(",")) altForced |= 1 << Std.parseInt(part);
+		}
+		applyAlt();
+		record = Sys.getEnv("DRH_PERF_RECORD") == "1";
+		if (record) {
+			frames = File.write(outDir + "/frames.csv", false);
+			frames.writeString("t,ms,draws,passes\n");
+			frameLines = new StringBuf();
+			objects = File.write(outDir + "/objects.csv", false);
+			objects.writeString("t,class,count\n");
+			native = File.write(outDir + "/native.csv", false);
+			native.writeString("t,branch,class,objects,shown,filters\n");
+			cacheFile = File.write(outDir + "/cache.csv", false);
+			cacheFile.writeString("t,branch,class,filters,objects,renders\n");
+			cacheRenders = new haxe.ds.ObjectMap();
+		}
+		mainCpu = threadCpu();
+		procCpu = processCpu();
+		// Lime calls the listeners of higher priority first, and OpenFL's stage listens at 0
+		var application = openfl.Lib.application;
+		application.onUpdate.add(function(_) lap(B_SWAP), false, 1000000);
+		application.window.onRender.add(function(_) lap(B_UPDATE), false, 1000000);
+		application.window.onRender.add(function(_) lap(B_OPENFL), false, -1000000);
+		openfl.Lib.current.stage.addEventListener(openfl.events.Event.EXIT_FRAME, function(_) lap(B_EVENTS));
 		samples = new haxe.ds.Vector<Float>(MAX_SAMPLES);
 		startStamp = Timer.stamp();
 		secStart = startStamp;
@@ -73,7 +184,9 @@ class PerfBot {
 			swf.exporters.animate.AnimateLibrary.hardwareBitmapIdleTime = Std.parseFloat(idle);
 			note("hardwareBitmapIdleTime=" + swf.exporters.animate.AnimateLibrary.hardwareBitmapIdleTime);
 		}
-		note("start steps=" + steps.length + " epoch=" + Sys.time());
+		var mono:Float = untyped __cpp__("perfClock(CLOCK_MONOTONIC)");
+		var stage = openfl.Lib.current.stage;
+		note("start steps=" + steps.length + " epoch=" + Sys.time() + " mono=" + fmt(mono, 4) + " window=" + stage.stageWidth + "x" + stage.stageHeight);
 	}
 
 	public static function note(text:String):Void {
@@ -144,13 +257,27 @@ class PerfBot {
 			secFrames++;
 			secDraws += draws;
 			if (ms > secMax) secMax = ms;
-			if (ms > longMs && stepIndex > 2) note("LONGFRAME ms=" + fmt(ms, 1) + " at=" + fmt(Sys.time(), 3));
+			if (ms > 10) secSlow10++;
+			if (ms > 16.7) secSlow16++;
+			if (ms > longMs && (record || stepIndex > 2)) note("LONGFRAME ms=" + fmt(ms, 1) + " at=" + fmt(Sys.time(), 3) + " state=" + stateName() + frameBlocks());
+			if (record) {
+				frameLines.add(fmt((now - startStamp) * 1000, 1));
+				frameLines.add(",");
+				frameLines.add(fmt(ms, 3));
+				frameLines.add(",");
+				frameLines.add(draws);
+				frameLines.add(",");
+				frameLines.add(passes - passesFrame);
+				frameLines.add("\n");
+			}
 			if (phaseName != null && sampleCount < MAX_SAMPLES) {
 				samples[sampleCount++] = ms;
 				drawSum += draws;
 			}
 		}
 		lastStamp = now;
+		passesFrame = passes;
+		for (i in 0...block.length) blockFrame[i] = block[i];
 		var largeNow = Gc.memInfo64(Gc.MEM_INFO_LARGE) / 1048576;
 		if (lastLarge >= 0) {
 			var d = largeNow - lastLarge;
@@ -168,7 +295,7 @@ class PerfBot {
 		if (now - secStart >= 1) {
 			seconds.writeString(fmt(now - startStamp, 2) + "," + (phaseName == null ? "" : phaseName) + "," + stateName() + "," + secFrames + ","
 				+ fmt(secMax, 2) + "," + fmt(secFrames > 0 ? secDraws / secFrames : 0, 1) + "," + mb(Gc.MEM_INFO_USAGE) + ","
-				+ mb(Gc.MEM_INFO_RESERVED) + "," + mb(Gc.MEM_INFO_LARGE) + "," + fmt(probeRatio, 3) + "," + fmt(secLargeAlloc, 1) + "," + secLargeDrops + "," + gpuMb() + "," + hudErrors() + "\n");
+				+ mb(Gc.MEM_INFO_RESERVED) + "," + mb(Gc.MEM_INFO_LARGE) + "," + fmt(probeRatio, 3) + "," + fmt(secLargeAlloc, 1) + "," + secLargeDrops + "," + gpuMb() + "," + hudErrors() + secondBlocks(now) + "\n");
 			secLargeAlloc = 0;
 			secLargeDrops = 0;
 			seconds.flush();
@@ -176,8 +303,283 @@ class PerfBot {
 			secFrames = 0;
 			secMax = 0;
 			secDraws = 0;
+			secSlow10 = 0;
+			secSlow16 = 0;
 		}
 		runStep(now);
+	}
+
+	// The blocks of the frame that just ended, in milliseconds, for a LONGFRAME line
+	static function frameBlocks():String {
+		var text = "";
+		for (i in 0...block.length) {
+			var ms = (block[i] - blockFrame[i]) * 1000;
+			if (ms >= 0.5) text += " " + blockNames[i] + "=" + fmt(ms, 1);
+		}
+		return text + " passes=" + (passes - passesFrame);
+	}
+
+	// The second's columns after hud_errors: filter passes and filters a frame, slow frames, CPU time of the main
+	// thread and of the process, the blocks in milliseconds, then what sampleWorld() counted
+	static function secondBlocks(now:Float):String {
+		var text = "," + fmt(secFrames > 0 ? (passes - passesSec) / secFrames : 0, 1) + "," + fmt(secFrames > 0 ? (filters - filtersSec) / secFrames : 0, 1) + ","
+			+ secSlow10 + "," + secSlow16;
+		passesSec = passes;
+		filtersSec = filters;
+		var cpu = threadCpu();
+		var all = processCpu();
+		text += "," + fmt((cpu - mainCpu) * 1000, 1) + "," + fmt((all - procCpu) * 1000, 1);
+		mainCpu = cpu;
+		procCpu = all;
+		for (i in 0...block.length) {
+			text += "," + fmt((block[i] - blockSec[i]) * 1000, 2);
+			blockSec[i] = block[i];
+		}
+		if (record) {
+			frames.writeString(frameLines.toString());
+			frames.flush();
+			frameLines = new StringBuf();
+			try {
+				sampleWorld(now);
+			} catch (e:Dynamic) {
+				world = ",,,,,,,,,,,,,,,,,";
+				note("WORLD error " + Std.string(e));
+			}
+		}
+		text += "," + world + "," + alt;
+		for (i in 0...PerfProbe.time.length) {
+			text += "," + fmt((PerfProbe.time[i] - probeSecTime[i]) * 1e6, 1) + "," + (PerfProbe.count[i] - probeSecCount[i]);
+			probeSecTime[i] = PerfProbe.time[i];
+			probeSecCount[i] = PerfProbe.count[i];
+		}
+		if (altPeriod > 0 && ++altSeconds >= altPeriod) {
+			altSeconds = 0;
+			alt = (alt + 1) % (altVariants + 1);
+			applyAlt();
+		}
+		return text;
+	}
+
+	// DRH_PERF_ALT=<seconds>: variants of some code take turns, each for that many seconds, so that one game
+	// measures them all on the same content. Variant 0 is the code as it was; variant k (1 to DRH_PERF_VARIANTS,
+	// 1 by default) turns on change k alone. The code of change k is written `if (PerfBot.on(k)) new else old`;
+	// a change in a library has a switch of its own, set in applyAlt(). DRH_PERF_ON=<k>,<k> keeps changes on in
+	// every variant. DRH_PERF_ALL=<n> has two variants instead: none, and changes 1 to n together.
+	// seconds.csv says which variant each second ran (alt).
+	static var alt = 0;
+	static var altPeriod = 0;
+	static var altSeconds = 0;
+	static var altVariants = 1;
+	static var altForced = 0;
+	static var altAll = 0;
+	public static var onMask = 0;
+	static var probeSecTime:Array<Float> = [for (i in 0...12) 0.0];
+	static var probeSecCount:Array<Int> = [for (i in 0...12) 0];
+
+	public static inline function on(change:Int):Bool {
+		return (onMask & (1 << change)) != 0;
+	}
+
+	static function applyAlt():Void {
+		onMask = altForced | (altPeriod > 0 && alt > 0 ? (altAll > 0 ? (1 << (altAll + 1)) - 2 : 1 << alt) : 0);
+		if (altPeriod > 0) PerfProbe.mode = alt;
+		// a change in a library sets its switch here, for the time of the measure
+	}
+
+	static var slObjects = 0;
+	static var slShown = 0;
+	static var slMeshes = 0;
+	static var slFilters = 0;
+
+	static function walk(object:starling.display.DisplayObject, shown:Bool):Void {
+		slObjects++;
+		shown = shown && object.visible && object.alpha != 0;
+		if (shown) {
+			slShown++;
+			if (object.filter != null) slFilters++;
+		}
+		var container = Std.downcast(object, starling.display.DisplayObjectContainer);
+		if (container != null) {
+			for (i in 0...container.numChildren) walk(container.getChildAt(i), shown);
+		} else if (shown && Std.isOfType(object, starling.display.Mesh)) {
+			slMeshes++;
+		}
+	}
+
+	// Once a second: the game objects by class, the dungeon floor, the effects in use, Starling's display tree
+	// (objects, those shown, meshes shown, filters shown) and its juggler
+	@:access(brain.gameObject.GameObjectManager)
+	@:access(distributedObjects.DistributedDungeonFloor)
+	@:access(effects.EffectManager)
+	@:access(starling.animation.Juggler)
+	static function sampleWorld(now:Float):Void {
+		var db:facade.DBFacade = cast facade;
+		var all:Array<ASAny> = db.gameObjectManager.mGameObjects.toArray();
+		var counts = new Map<String, Int>();
+		var floor:distributedObjects.DistributedDungeonFloor = null;
+		for (item in all) {
+			var object:Dynamic = item;
+			var type = Type.getClass(object);
+			if (type == null) continue;
+			var name = Type.getClassName(type);
+			counts.set(name, (counts.exists(name) ? counts.get(name) : 0) + 1);
+			if (floor == null && Std.isOfType(object, distributedObjects.DistributedDungeonFloor)) floor = cast object;
+		}
+		var heroes = 0, npcs = 0, projectiles = 0, effects = 0;
+		var t = fmt(now - startStamp, 2);
+		var lines = new StringBuf();
+		for (name => count in counts) {
+			var short = name.substr(name.lastIndexOf(".") + 1);
+			if (short == "HeroGameObject" || short == "HeroGameObjectOwner") heroes += count;
+			else if (short == "NPCGameObject") npcs += count;
+			else if (short.indexOf("Projectile") >= 0) projectiles += count;
+			else if (short.indexOf("Effect") >= 0) effects += count;
+			lines.add(t + "," + name + "," + count + "\n");
+		}
+		objects.writeString(lines.toString());
+		objects.flush();
+		var key = "";
+		var live = "";
+		if (floor != null) {
+			key = floor.mCurrentMapNodeId + "/" + floor.mCurrentFloorNum;
+			var manager = floor.mEffectManager;
+			if (manager != null) {
+				var n:Int = manager.mManagedEffects != null ? manager.mManagedEffects.size : 0;
+				if (manager.mOutstandingEffects != null) for (_ in manager.mOutstandingEffects.keys()) n++;
+				live = "" + n;
+			}
+			if (key != floorKey) {
+				note("FLOOR " + key + " tiles=" + floor.mTileLibraryPath + " heroes=" + heroes + " npcs=" + npcs + " frame_rate=" + openfl.Lib.current.stage.frameRate
+					+ " render_threads=" + starling.rendering.RenderWorkers.threads);
+			}
+		}
+		floorKey = key;
+		slObjects = slShown = slMeshes = slFilters = 0;
+		var starlingNow = starling.core.Starling.current;
+		var juggling = "";
+		if (starlingNow != null) {
+			walk(starlingNow.stage, true);
+			juggling = "" + starling.core.Starling.juggler._objects.length;
+		}
+		world = key + "," + heroes + "," + npcs + "," + projectiles + "," + effects + "," + live + "," + all.length + "," + slObjects + "," + slShown + "," + slMeshes + ","
+			+ slFilters + "," + juggling + "," + sampleNative(t);
+	}
+
+	// Cached bitmaps OpenFL drew again (an object with filters or cacheAsBitmap whose content changed), per object
+	// since the last native.csv sample
+	static var cacheFile:FileOutput;
+	static var cacheRenders:haxe.ds.ObjectMap<openfl.display.DisplayObject, Int>;
+	static var cacheRendersSec = 0;
+
+	/** Called by OpenFL's renderer (a hook of make_overlay.py) for each cached bitmap it draws again. **/
+	public static function cacheBitmapRendered(object:openfl.display.DisplayObject):Void {
+		if (cacheRenders == null) return;
+		cacheRendersSec++;
+		var count = cacheRenders.get(object);
+		cacheRenders.set(object, count == null ? 1 : count + 1);
+	}
+
+	// cache.csv: those objects by branch (four levels of names under the stage), class and filters
+	@:access(openfl.display.DisplayObject)
+	static function dumpCacheRenders(t:String):Void {
+		var rows = new Map<String, Array<Int>>();
+		for (object in cacheRenders.keys()) {
+			var labels = [];
+			var parent:openfl.display.DisplayObject = object.parent;
+			while (parent != null && parent.parent != null) {
+				labels.unshift(nativeLabel(parent));
+				parent = parent.parent;
+			}
+			var type = Type.getClass(object);
+			var filters = "";
+			if (object.__filters != null) {
+				for (filter in object.__filters) {
+					var name = Type.getClassName(Type.getClass(filter));
+					filters += (filters == "" ? "" : "+") + name.substr(name.lastIndexOf(".") + 1);
+				}
+			}
+			var key = "stage/" + labels.slice(0, 4).join("/") + "," + (type == null ? "?" : Type.getClassName(type)) + "," + filters;
+			var row = rows.get(key);
+			if (row == null) {
+				row = [0, 0];
+				rows.set(key, row);
+			}
+			row[0]++;
+			row[1] += cacheRenders.get(object);
+		}
+		var lines = new StringBuf();
+		for (key => row in rows) lines.add(t + "," + key + "," + row[0] + "," + row[1] + "\n");
+		cacheFile.writeString(lines.toString());
+		cacheFile.flush();
+		cacheRenders = new haxe.ds.ObjectMap();
+	}
+
+	static var natObjects = 0;
+	static var natShown = 0;
+	static var natText = 0;
+	static var natFilters = 0;
+	static var natUnderHidden = 0; // objects below an invisible container
+	static var natRows:Map<String, Array<Int>>;
+	static var natSamples = 0;
+
+	// A name the player or the game gave, else the class: instance names count up
+	static function nativeLabel(object:openfl.display.DisplayObject):String {
+		var name = object.name;
+		if (name != null && name != "" && !StringTools.startsWith(name, "instance")) return name;
+		var type = Type.getClass(object);
+		return type == null ? "?" : Type.getClassName(type);
+	}
+
+	@:access(openfl.display.DisplayObject)
+	static function walkNative(object:openfl.display.DisplayObject, shown:Bool, branch:String, depth:Int, underHidden:Bool = false):Void {
+		natObjects++;
+		if (underHidden) natUnderHidden++;
+		shown = shown && object.visible && object.alpha != 0;
+		var filtered = shown && object.__filters != null && object.__filters.length > 0;
+		if (shown) {
+			natShown++;
+			if (filtered) natFilters++;
+			if (Std.isOfType(object, openfl.text.TextField)) natText++;
+		}
+		if (natRows != null) {
+			var type = Type.getClass(object);
+			var key = branch + "," + (type == null ? "?" : Type.getClassName(type));
+			var row = natRows.get(key);
+			if (row == null) {
+				row = [0, 0, 0];
+				natRows.set(key, row);
+			}
+			row[0]++;
+			if (shown) row[1]++;
+			if (filtered) row[2]++;
+		}
+		var container = Std.downcast(object, openfl.display.DisplayObjectContainer);
+		if (container != null) {
+			for (i in 0...container.numChildren) {
+				var child = container.getChildAt(i);
+				if (child != null) walkNative(child, shown, depth < 3 ? branch + "/" + nativeLabel(child) : branch, depth + 1, underHidden || !object.visible);
+			}
+		}
+	}
+
+	// OpenFL's own display list: objects, those shown, text fields and filtered objects shown, objects below an
+	// invisible container; every fifth second,
+	// native.csv gets them by branch (three levels of names under the stage) and class
+	static function sampleNative(t:String):String {
+		natObjects = natShown = natText = natFilters = natUnderHidden = 0;
+		natRows = natSamples++ % 5 == 0 ? new Map() : null;
+		walkNative(openfl.Lib.current.stage, true, "stage", 0);
+		if (natRows != null) {
+			var lines = new StringBuf();
+			for (key => row in natRows) lines.add(t + "," + key + "," + row[0] + "," + row[1] + "," + row[2] + "\n");
+			native.writeString(lines.toString());
+			native.flush();
+			natRows = null;
+			dumpCacheRenders(t);
+		}
+		var renders = cacheRendersSec;
+		cacheRendersSec = 0;
+		return natObjects + "," + natShown + "," + natText + "," + natFilters + "," + natUnderHidden + "," + renders;
 	}
 
 	static var probeTime0:Array<Float> = [];
@@ -327,6 +729,10 @@ class PerfBot {
 					endPhase(elapsed);
 					nextStep();
 				}
+			case "saturate":
+				// saturate:<percent> greys the scene graph's layers as the revive state does (25 when the hero dies, 100 back)
+				(cast facade : facade.DBFacade).sceneGraphManager.saturateLayers(Std.parseFloat(step[1]), [50, 105]);
+				nextStep();
 			case "shot":
 				if (stepFrames == 1) note("SHOT " + step[1]);
 				if (elapsed >= 2.5) nextStep();
