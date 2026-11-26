@@ -54,6 +54,10 @@ class StarlingLayer extends Sprite {
 
 	static final sImageSubset:MeshSubset = new MeshSubset();
 
+	static final sHeights = new haxe.ds.ObjectMap<DisplayObject, CachedHeight>();
+
+	static var sHeightSorts:Int = 0;
+
 	var sortEveryFrame:Bool = false;
 
 	var ignoreDirtyFlag:Bool = true;
@@ -132,25 +136,56 @@ class StarlingLayer extends Sprite {
 	}
 
 	public static function compareByY(a:DisplayObject, b:DisplayObject):Int {
-		if (a.y < b.y) {
+		var _loc1_ = a.y;
+		var _loc2_ = b.y;
+		if (_loc1_ < _loc2_) {
 			return -1;
 		}
-		if (a.y > b.y) {
+		if (_loc1_ > _loc2_) {
 			return 1;
 		}
-		if (a.x > b.x) {
+		_loc1_ = a.x;
+		_loc2_ = b.x;
+		if (_loc1_ > _loc2_) {
 			return -1;
 		}
-		if (a.x < b.x) {
+		if (_loc1_ < _loc2_) {
 			return 1;
 		}
-		if (a.height > b.height) {
+		_loc1_ = heightOf(a);
+		_loc2_ = heightOf(b);
+		if (_loc1_ > _loc2_) {
 			return -1;
 		}
-		if (a.height < b.height) {
+		if (_loc1_ < _loc2_) {
 			return 1;
 		}
 		return 0;
+	}
+
+	// A container's height is the bounds of all it holds. They are kept until something in it changes or its
+	// scale, rotation or skew does: its position does not change them.
+	@:access(starling.display.DisplayObject)
+	static function heightOf(object:DisplayObject):Float {
+		if (!Std.isOfType(object, starling.display.DisplayObjectContainer)) {
+			return object.height;
+		}
+		var _loc1_ = sHeights.get(object);
+		if (_loc1_ == null) {
+			_loc1_ = new CachedHeight();
+			sHeights.set(object, _loc1_);
+		} else if (_loc1_.frame > (object._lastChildChangeFrameID : Int) && _loc1_.scaleX == object._scaleX && _loc1_.scaleY == object._scaleY
+			&& _loc1_.rotation == object._rotation && _loc1_.skewX == object._skewX && _loc1_.skewY == object._skewY) {
+			return _loc1_.height;
+		}
+		_loc1_.height = object.height;
+		_loc1_.frame = starling.core.Starling.frameID;
+		_loc1_.scaleX = object._scaleX;
+		_loc1_.scaleY = object._scaleY;
+		_loc1_.rotation = object._rotation;
+		_loc1_.skewX = object._skewX;
+		_loc1_.skewY = object._skewY;
+		return _loc1_.height;
 	}
 
 	@:isVar public var bakeStaticImages(get, set):Bool;
@@ -675,19 +710,27 @@ class StarlingLayer extends Sprite {
 	function sortLayer(compare:ASFunction) {
 		var _loc6_:DisplayObject = null;
 		var _loc4_ = 0;
+		// compareByY is called directly, the others through the function value
+		var _loc7_ = Reflect.compareMethods(compare, StarlingLayer.compareByY);
+		if (_loc7_ && ++sHeightSorts > 2000) {
+			sHeightSorts = 0;
+			sHeights.clear();
+		}
 		var _loc2_ = numChildren;
 		var _loc3_ = 1;
-		while (_loc3_ < _loc2_ && ASCompat.toNumber(compare(getChildAt(_loc3_ - 1), getChildAt(_loc3_))) <= 0) {
+		while (_loc3_ < _loc2_
+			&& (_loc7_ ? compareByY(getChildAt(_loc3_ - 1), getChildAt(_loc3_)) : ASCompat.toInt(compare(getChildAt(_loc3_ - 1), getChildAt(_loc3_)))) <= 0) {
 			_loc3_++;
 		}
 		if (_loc3_ >= _loc2_) {
 			return;
 		}
-		var _loc5_ = _loc2_ * 2;
+		// a child moved costs far less than its share of a merge sort of the whole layer
+		var _loc5_ = _loc2_ * 6;
 		while (_loc3_ < _loc2_) {
 			_loc6_ = getChildAt(_loc3_);
 			_loc4_ = _loc3_;
-			while (_loc4_ > 0 && ASCompat.toNumber(compare(getChildAt(_loc4_ - 1), _loc6_)) > 0) {
+			while (_loc4_ > 0 && (_loc7_ ? compareByY(getChildAt(_loc4_ - 1), _loc6_) : ASCompat.toInt(compare(getChildAt(_loc4_ - 1), _loc6_))) > 0) {
 				if (--_loc5_ < 0) {
 					sortChildren(compare);
 					return;
@@ -695,7 +738,7 @@ class StarlingLayer extends Sprite {
 				_loc4_--;
 			}
 			if (_loc4_ != _loc3_) {
-				_loc5_ -= _loc2_;
+				_loc5_ -= 64;
 				if (_loc5_ < 0) {
 					sortChildren(compare);
 					return;
@@ -798,4 +841,16 @@ class StarlingLayer extends Sprite {
 		clean();
 		parent.removeChild(this);
 	}
+}
+
+private class CachedHeight {
+	public var height:Float = 0;
+	public var frame:Int = -1;
+	public var scaleX:Float = 0;
+	public var scaleY:Float = 0;
+	public var rotation:Float = 0;
+	public var skewX:Float = 0;
+	public var skewY:Float = 0;
+
+	public function new() {}
 }
