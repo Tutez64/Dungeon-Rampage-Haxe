@@ -108,7 +108,8 @@ NPCs, projectiles and effects (`effects_live`: those in use, `effects`: with the
 Starling's display tree (`sl_objects`, those shown, the meshes and filters shown), its juggler,
 and OpenFL's own display list (`nat_objects`, those shown, the text fields and the filtered
 objects shown, the objects below an invisible container, the cached bitmaps drawn again in the
-second). `cache.csv` says which objects those were, by branch, class and filters, with
+second). `cache.csv` says which objects those were, by branch, class, filters and why (the
+letters are explained in `PerfBot.whyText`), with
 `native.csv`'s samples. `native.csv` has that list every fifth second, by branch (three levels of names
 under the stage, a mod's overlay being `ModOverlay/mod:<id>`) and class.
 `events.log` has a `FLOOR` line per floor and a `LONGFRAME` line, with the blocks of that frame,

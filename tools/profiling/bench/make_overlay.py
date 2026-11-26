@@ -93,7 +93,10 @@ socket.save()
 
 renderer = Source('openfl/display/DisplayObjectRenderer.hx', 'submodules/openfl/src')
 renderer.hook(r'^(\t+)(displayObject\.__cacheBitmap\.clippingLayer = displayObject\.__mask;\n\n\t+if \(needRender\)\n\t+\{\n)',
-              r'\1\2\1\tPerfBot.cacheBitmapRendered(displayObject);\n', 'the render of a cached bitmap')
+              r'\1\2\1\tPerfBot.cacheBitmapRendered(displayObject, (displayObject.__renderDirty ? 1 : 0) | (softwareDirty ? 2 : 0)'
+              r' | (hardwareDirty ? 4 : 0) | (renderType == OPENGL ? 8 : 0) | (renderer.__type == OPENGL ? 16 : 0)'
+              r' | (hasFilters ? 32 : 0) | (renderer.__type == OPENGL && (cast renderer : openfl.display.OpenGLRenderer).__defaultRenderTarget == null ? 64 : 0));\n',
+              'the render of a cached bitmap')
 renderer.save()
 
 patches = os.environ.get('DRH_BENCH_PATCHES')

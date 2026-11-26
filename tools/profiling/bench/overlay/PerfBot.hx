@@ -163,7 +163,7 @@ class PerfBot {
 			native = File.write(outDir + "/native.csv", false);
 			native.writeString("t,branch,class,objects,shown,filters\n");
 			cacheFile = File.write(outDir + "/cache.csv", false);
-			cacheFile.writeString("t,branch,class,filters,objects,renders\n");
+			cacheFile.writeString("t,branch,class,filters,why,objects,renders\n");
 			cacheRenders = new haxe.ds.ObjectMap();
 		}
 		mainCpu = threadCpu();
@@ -472,14 +472,26 @@ class PerfBot {
 	static var cacheRendersSec = 0;
 
 	/** Called by OpenFL's renderer (a hook of make_overlay.py) for each cached bitmap it draws again. **/
-	public static function cacheBitmapRendered(object:openfl.display.DisplayObject):Void {
+	public static function cacheBitmapRendered(object:openfl.display.DisplayObject, why:Int):Void {
 		if (cacheRenders == null) return;
 		cacheRendersSec++;
 		var count = cacheRenders.get(object);
 		cacheRenders.set(object, count == null ? 1 : count + 1);
+		cacheWhy.set(object, why);
 	}
 
-	// cache.csv: those objects by branch (four levels of names under the stage), class and filters
+	// The last render of each: d its content was dirty, s software dirty, h hardware dirty, then the kind of the
+	// cache (gl or sw) and of the renderer that asked (GL or SW), f with filters, and screen when the renderer
+	// draws the stage, draw when it draws into a bitmap (BitmapData.draw, another object's cache)
+	static var cacheWhy = new haxe.ds.ObjectMap<openfl.display.DisplayObject, Int>();
+
+	static function whyText(why:Int):String {
+		return ((why & 1) != 0 ? "d" : "") + ((why & 2) != 0 ? "s" : "") + ((why & 4) != 0 ? "h" : "") + ((why & 8) != 0 ? " gl" : " sw")
+			+ ((why & 16) != 0 ? " GL" : " SW") + ((why & 32) != 0 ? " f" : "") + ((why & 64) != 0 ? " screen" : " draw");
+	}
+
+	// cache.csv: those objects by branch (the names from the stage down, the middle left out when long), class,
+	// filters and the reason of the last render
 	@:access(openfl.display.DisplayObject)
 	static function dumpCacheRenders(t:String):Void {
 		var rows = new Map<String, Array<Int>>();
@@ -498,7 +510,11 @@ class PerfBot {
 					filters += (filters == "" ? "" : "+") + name.substr(name.lastIndexOf(".") + 1);
 				}
 			}
-			var key = "stage/" + labels.slice(0, 4).join("/") + "," + (type == null ? "?" : Type.getClassName(type)) + "," + filters;
+			var why = cacheWhy.get(object);
+			// the top of the path, then its end: what holds the object matters as much as where it hangs
+			var path = labels.length <= 7 ? labels.join("/") : labels.slice(0, 4).join("/") + "/../" + labels.slice(labels.length - 3).join("/");
+			var key = "stage/" + path + "," + (type == null ? "?" : Type.getClassName(type)) + "," + filters + ","
+				+ whyText(why == null ? 0 : why);
 			var row = rows.get(key);
 			if (row == null) {
 				row = [0, 0];
@@ -512,6 +528,7 @@ class PerfBot {
 		cacheFile.writeString(lines.toString());
 		cacheFile.flush();
 		cacheRenders = new haxe.ds.ObjectMap();
+		cacheWhy = new haxe.ds.ObjectMap();
 	}
 
 	static var natObjects = 0;
