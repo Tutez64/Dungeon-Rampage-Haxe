@@ -275,6 +275,10 @@ class ActorView extends FloorView {
 	public function applyStatusTint(color:UInt, amount:Float) {
 		var _loc3_:EffectView;
 		var __ax4_iter_17:Vector<EffectView>;
+		// a buff's tween calls this on every frame: a step under a 25th of the way is not seen
+		if (amount > 0 && mStatusTintAmount > 0 && color == mStatusTintColor && Math.abs(amount - mStatusTintAmount) < 0.04) {
+			return;
+		}
 		mStatusTintColor = color;
 		mStatusTintAmount = amount;
 		if (amount <= 0) {
