@@ -4,7 +4,8 @@ At tag time, copy these sections into the GitHub release notes under `Changelog`
 
 ### Added
 
-- 
+- Loading screen: a button opens the invite to the Discord server, where its address was written, and a line says how many mods are active, with the ones that failed.
+
 ### Fixed
 
 - HUD: it is no longer missing for a whole session, when about 2 GB of video memory is in use on the whole system.

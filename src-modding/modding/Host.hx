@@ -25,6 +25,7 @@ import haxe.Json;
 @:allow(brain.stateMachine.StateMachine)
 @:allow(modding.ModContext)
 @:allow(modding.ModSubscription)
+@:allow(modding.LoadingCredits)
 class Host {
 	static inline final OBJECT_READY = "objectReady";
 
@@ -136,6 +137,16 @@ class Host {
 		writeReport();
 		for (record in records)
 			note("info", summary(record));
+	}
+
+	/** How many enabled mods run. */
+	static function runningMods():Int {
+		return Lambda.count(records, function(record) return record.status == "ok");
+	}
+
+	/** The ids of the enabled mods that do not run, failed or skipped, in load order. */
+	static function stoppedMods():Array<String> {
+		return [for (record in records) if (record.status != "ok") record.id];
 	}
 
 	static function flush():Void {
