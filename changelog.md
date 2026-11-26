@@ -19,6 +19,7 @@ At tag time, copy these sections into the GitHub release notes under `Changelog`
 - Steam: the game logs in when started while Steam is not logged on to its servers yet, as just after the computer starts, where it stayed on `WAITING FOR STEAM...` forever.
 - Startup: the game no longer stays on `WAITING FOR STEAM...` forever when its files take longer to load, as on the first launch after the computer starts, where it never asked Steam for the login.
 - Attacks: an attack that zooms the camera, such as a charged attack of the long sword or the monster axe, no longer stalls the game twice for about a tenth of a second, as it did at high frame rates.
+- Death: the dungeon turns grey while your hero is dead, as in DR before its 1.0. It stayed in colour.
 
 ### Improved
 
@@ -29,6 +30,7 @@ At tag time, copy these sections into the GitHub release notes under `Changelog`
 - Rendering: the hidden objects of the interface, about 1,300 of them in a dungeon, are no longer gone through on every frame: with three other players and nineteen mods, a frame of a dungeon took 3.9 ms and takes 3.6 ms on the test machine (257 to 277 FPS without a limit).
 - Rendering: the characters and props of a dungeon are put in drawing order with less work, a buff's tint is applied when it has visibly changed, where it was on every frame, and an animation reads its frames faster: with the next line, a frame of a dungeon with three other players and nineteen mods took 4.9 ms and takes 4.7 ms on the test machine (204 to 212 FPS without a limit).
 - HUD: a text or a name tag that changes is drawn in 1.6 ms, where it took 3.6 ms. With a mod that writes a timer, a frame of 8 to 13 ms came every second.
+- Rendering: a name tag is no longer drawn again as a whole each time its character's health changes: with three other players and nineteen mods, a frame of a dungeon took 3.5 ms and takes 3.4 ms on the test machine (283 to 297 FPS without a limit).
 
 ### Internal
 
