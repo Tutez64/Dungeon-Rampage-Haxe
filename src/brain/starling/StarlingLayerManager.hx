@@ -42,6 +42,10 @@ class StarlingLayerManager {
 
 	var mStarling:Starling;
 
+	// Holds the layers of the world, under the root and before the layers in screen space, so that one filter
+	// covers the whole world and nothing of the HUD
+	var mWorld:StarlingWorld;
+
 	var mDBFacade:Facade;
 
 	var mSourceCache:StarlingSourceCache;
@@ -203,11 +207,36 @@ class StarlingLayerManager {
 	function createLayer(inSortIndex:Int, inName:String, inBlendMode:String, inSortEveryFrame:Bool = false, inCustomSortFunction:ASFunction = null,
 			inScreenSpace:Bool = false):StarlingLayer {
 		var _loc8_ = new StarlingLayer(inSortIndex, inName, inBlendMode, inSortEveryFrame, inCustomSortFunction, inScreenSpace);
-		var _loc7_ = ASCompat.reinterpretAs(mStarling.root, starling.display.Sprite);
+		var _loc7_:starling.display.Sprite = inScreenSpace ? ASCompat.reinterpretAs(mStarling.root, starling.display.Sprite) : world();
 		mLayerMap[inSortIndex] = _loc8_;
 		mLayers.push(_loc8_);
 		_loc7_.addChild(_loc8_);
 		return _loc8_;
+	}
+
+	function world():StarlingWorld {
+		if (mWorld == null) {
+			mWorld = new StarlingWorld();
+			ASCompat.reinterpretAs(mStarling.root, starling.display.Sprite).addChildAt(mWorld, 0);
+		}
+		return mWorld;
+	}
+
+	/**
+		The grey of the revive state, as SceneGraphManager.saturateLayers gave it to the native layers: `matrix` is
+		the color matrix of that filter, null for none. One filter on the world's container is one pass over the
+		screen, where a filter on each layer is one pass a layer.
+	**/
+	public function saturateWorld(matrix:Array<Float>) {
+		if (mStarling == null || mStarling.root == null) {
+			return;
+		}
+		var _loc2_ = world();
+		var _loc3_ = _loc2_.filter;
+		_loc2_.filter = matrix == null ? null : new starling.filters.ColorMatrixFilter(cast flash.Vector.ofArray(matrix));
+		if (_loc3_ != null) {
+			_loc3_.dispose();
+		}
 	}
 
 	@:isVar public var starlingOverlayLayer(get, never):StarlingLayer;
@@ -230,6 +259,13 @@ class StarlingLayerManager {
 		}
 		_loc7_ = new StarlingLayer(sortIndex, name, "normal", false, sort, screenSpace);
 		var _loc5_ = 0;
+		if (screenSpace) {
+			// after the world's container, which comes first under the root
+			world();
+			_loc5_ = 1;
+		} else {
+			_loc6_ = world();
+		}
 		while (_loc5_ < _loc6_.numChildren
 			&& Std.isOfType(_loc6_.getChildAt(_loc5_), StarlingLayer)
 			&& cast(_loc6_.getChildAt(_loc5_), StarlingLayer).sortIndex < sortIndex) {
@@ -363,6 +399,7 @@ class StarlingLayerManager {
 				_loc1_.destroy();
 			}
 		mLayers.length = 0;
+		mWorld = null;
 		ASDictionary.getString(mLayerMap, "clear")();
 	}
 }

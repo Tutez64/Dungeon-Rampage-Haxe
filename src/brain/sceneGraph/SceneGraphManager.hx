@@ -523,6 +523,14 @@ class SceneGraphManager {
 	}
 
 	public function saturateLayers(value:Float, listOfLayersToBeAvoided:Array<ASAny>) {
+		// Starling draws the world, so its layers take the grey, where the native ones took it and showed nothing
+		// of it: a native layer with a filter was also drawn through a cached bitmap on every frame. The layers
+		// in screen space (the HUD, the tweens) stay as they are, as the UI layer the callers leave out.
+		var _loc5_ = mFacade.starlingLayerManager;
+		if (_loc5_ != null && _loc5_.isReady()) {
+			_loc5_.saturateWorld(value >= 100 ? null : getGrayScaleSaturationFilter(value).matrix);
+			return;
+		}
 		var _loc3_ = mLayers.keysToArray();
 		var _loc4_:Int;
 		if (checkNullIteratee(_loc3_))
