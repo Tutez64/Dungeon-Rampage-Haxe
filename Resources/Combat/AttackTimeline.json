@@ -6897,6 +6897,198 @@
 			]
 		},
 		{
+			"attackName": "TM_KILLER_BUNNY_MURDER",
+			"choreographed": false,
+			"totalFrames": 14,
+			"frames": [
+				{
+					"frame": 0,
+					"actions": [
+						{ "type": "attackSound" },
+						{ "type": "playAnim", "animName": "charge", "startFrame": 0 },
+						{ "type": "queueAttack", "attackName": "EN_KILLER_BUNNY_MURDER_LUNGE" }
+					]
+				}
+			]
+		},
+		{
+			"attackName": "TM_KILLER_BUNNY_MURDER_BALL",
+			"choreographed": false,
+			"totalFrames": 20,
+			"frames": [
+				{
+					"frame": 0,
+					"actions": [
+						{ "type": "sound", "path": "Resources/Audio/soundEffects.swf", "name": "EvilBunnyAttack2" },
+						{ "type": "playAnim", "animName": "attack_Bite", "startFrame": 0 },
+						{ "type": "queueAttack", "attackName": "EN_KILLER_BUNNY_MURDER_END" }
+					]
+				}
+			]
+		},
+		{
+			"attackName": "TM_KILLER_BUNNY_MURDER_END",
+			"choreographed": false,
+			"totalFrames": 10,
+			"frames": [
+				{
+					"frame": 0,
+					"actions": [
+						{ "type": "sound", "path": "Resources/Audio/soundEffects.swf", "name": "EvilBunnyTransformOut2" },
+						{ "type": "playAnim", "animName": "calmDown", "startFrame": 0 }
+					]
+				}
+			]
+		},
+		{
+			"attackName": "TM_KILLER_BUNNY_MURDER_LUNGE",
+			"choreographed": false,
+			"totalFrames": 35,
+			"frames": [
+				{
+					"frame": 0,
+					"actions": [
+						{ "type": "circleCollider", "radius": 60 },
+						{ "type": "eventAttack", "attackName": "EN_KILLER_BUNNY_MURDER_BALL", "eventName": "GE_SUCCESSFUL_ATTACK" },
+						{ "type": "playAnim", "animName": "run", "startFrame": 0 },
+						{ "type": "attackautomove" }
+					]
+				},
+				{
+					"frame": 8,
+					"actions": [
+						{ "type": "circleCollider", "radius": 60 }
+					]
+				},
+				{
+					"frame": 13,
+					"actions": [
+						{ "type": "circleCollider", "radius": 60 }
+					]
+				},
+				{
+					"frame": 19,
+					"actions": [
+						{ "type": "circleCollider", "radius": 60 }
+					]
+				},
+				{
+					"frame": 25,
+					"actions": [
+						{ "type": "circleCollider", "radius": 60 }
+					]
+				},
+				{
+					"frame": 30,
+					"actions": [
+						{ "type": "circleCollider", "radius": 60 }
+					]
+				},
+				{
+					"frame": 34,
+					"actions": [
+						{ "type": "circleCollider", "radius": 60 }
+					]
+				}
+			]
+		},
+		{
+			"attackName": "TM_KILLER_BUNNY_PINK_MURDER",
+			"choreographed": false,
+			"totalFrames": 14,
+			"frames": [
+				{
+					"frame": 0,
+					"actions": [
+						{ "type": "attackSound" },
+						{ "type": "playAnim", "animName": "charge", "startFrame": 0 },
+						{ "type": "queueAttack", "attackName": "EN_KILLER_BUNNY_PINK_MURDER_LUNGE" }
+					]
+				}
+			]
+		},
+		{
+			"attackName": "TM_KILLER_BUNNY_PINK_MURDER_BALL",
+			"choreographed": false,
+			"totalFrames": 20,
+			"frames": [
+				{
+					"frame": 0,
+					"actions": [
+						{ "type": "sound", "path": "Resources/Audio/soundEffects.swf", "name": "EvilBunnyAttack2" },
+						{ "type": "playAnim", "animName": "attack_Bite", "startFrame": 0 },
+						{ "type": "queueAttack", "attackName": "EN_KILLER_BUNNY_PINK_MURDER_END" }
+					]
+				}
+			]
+		},
+		{
+			"attackName": "TM_KILLER_BUNNY_PINK_MURDER_END",
+			"choreographed": false,
+			"totalFrames": 10,
+			"frames": [
+				{
+					"frame": 0,
+					"actions": [
+						{ "type": "sound", "path": "Resources/Audio/soundEffects.swf", "name": "EvilBunnyTransformOut2" },
+						{ "type": "playAnim", "animName": "calmDown", "startFrame": 0 }
+					]
+				}
+			]
+		},
+		{
+			"attackName": "TM_KILLER_BUNNY_PINK_MURDER_LUNGE",
+			"choreographed": false,
+			"totalFrames": 35,
+			"frames": [
+				{
+					"frame": 0,
+					"actions": [
+						{ "type": "circleCollider", "radius": 60 },
+						{ "type": "eventAttack", "attackName": "EN_KILLER_BUNNY_PINK_MURDER_BALL", "eventName": "GE_SUCCESSFUL_ATTACK" },
+						{ "type": "playAnim", "animName": "run", "startFrame": 0 },
+						{ "type": "attackautomove" }
+					]
+				},
+				{
+					"frame": 8,
+					"actions": [
+						{ "type": "circleCollider", "radius": 60 }
+					]
+				},
+				{
+					"frame": 13,
+					"actions": [
+						{ "type": "circleCollider", "radius": 60 }
+					]
+				},
+				{
+					"frame": 19,
+					"actions": [
+						{ "type": "circleCollider", "radius": 60 }
+					]
+				},
+				{
+					"frame": 25,
+					"actions": [
+						{ "type": "circleCollider", "radius": 60 }
+					]
+				},
+				{
+					"frame": 30,
+					"actions": [
+						{ "type": "circleCollider", "radius": 60 }
+					]
+				},
+				{
+					"frame": 34,
+					"actions": [
+						{ "type": "circleCollider", "radius": 60 }
+					]
+				}
+			]
+		},
+		{
 			"attackName": "TM_KNIGHT_CROSSBOW_SHOT",
 			"choreographed": false,
 			"totalFrames": 10,

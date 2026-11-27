@@ -2874,6 +2874,24 @@
     "type": "LENPC"
   },
   {
+    "assetClassName": "db_rdr_killerBunny",
+    "assetPath": "Resources/Art3D/pet/killerBunny/db_pet_killerBunny.swf",
+    "combatCollisions": [{"radius": 25, "type": "circle", "x": 0, "y": -22}],
+    "constant": "KILLER_BUNNY",
+    "navCollisions": [{"radius": 25, "type": "circle", "x": 0, "y": -22}],
+    "tileTheme": null,
+    "type": "LENPC"
+  },
+  {
+    "assetClassName": "db_rdr_killerBPink",
+    "assetPath": "Resources/Art3D/pet/killerBPink/db_pet_killerBPink.swf",
+    "combatCollisions": [{"radius": 25, "type": "circle", "x": 0, "y": -22}],
+    "constant": "KILLER_BUNNY_PINK",
+    "navCollisions": [{"radius": 25, "type": "circle", "x": 0, "y": -22}],
+    "tileTheme": null,
+    "type": "LENPC"
+  },
+  {
     "assetClassName": "db_rdr_knight",
     "assetPath": "Resources/Art3D/Enemy/Knight/db_emy_knight.swf",
     "combatCollisions": [{"radius": 35, "type": "circle", "x": 0, "y": -22}],
