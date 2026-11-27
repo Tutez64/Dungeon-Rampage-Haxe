@@ -13,6 +13,7 @@ experimental-use-steam-input	--experimental-use-steam-input	true	experimental-us
 want-steam-achievements	--want-steam-achievements	true	want-steam-achievements	true
 start-windowed	--start-windowed	false	start-windowed	false
 file-logging-by-default	--file-logging-by-default	false	file-logging-by-default	false
+want-open-logs-folder-button	--want-open-logs-folder-button	false	want-open-logs-folder-button	false
 debug-outline-swf-fallback-props	--debug-outline-swf-fallback-props	false	debug-outline-swf-fallback-props	false
 debug-outline-swf-fallback	--debug-outline-swf-fallback	false	debug-outline-swf-fallback	false
 auto-size-text	--auto-size-text	true	auto-size-text	true
