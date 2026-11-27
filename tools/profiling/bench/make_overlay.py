@@ -4,8 +4,8 @@
 It holds PerfBot and PerfProbe, a copy of src/import.hx, and copies of a few of the game's files
 with hooks:
 
-- brain/facade/Facade.hx: PerfBot.frame() on each frame, the wall clock read in whole
-  milliseconds (see the README), PerfBot.cheatCount() where the game counts a suspicious second,
+- brain/facade/Facade.hx: PerfBot.frame() on each frame, the wall clock told to PerfBot (see the
+  README), PerfBot.cheatCount() where the game counts a suspicious second,
   and a timer around each work manager and the views;
 - starling/core/Starling.hx: a timer around the frame's advance and its render;
 - starling/filters/FragmentFilter.hx: the filter passes counted;
@@ -65,11 +65,8 @@ facade = Source('brain/facade/Facade.hx')
 delta = facade.name(r'^\s*var (\w+) = mGameClock\.update\(\);$', 'the game clock update')
 ratio = facade.name(r'^\s*if \((\w+) > 1\.1\) \{$', 'the speed ratio test')
 facade.hook(r'^(\tpublic function mainLoop\(event:Event\) \{\n)', r'\1\t\tPerfBot.frame(this);\n', 'mainLoop')
-facade.hook(r'^(\s*)mCurrentTime = Date\.now\(\)\.getTime\(\);$',
-            r'\1var perfRawNow = Date.now().getTime();\n'
-            r'\1PerfBot.clockProbe(perfRawNow, %s);\n'
-            r'\1// Whole milliseconds, as Date.getTime() gives on AIR\n'
-            r'\1mCurrentTime = Math.ffloor(perfRawNow);' % delta, 'the wall clock read')
+facade.hook(r'^(\s*)(mCurrentTime = ASCompat\.ASDate\.getTime\(Date\.now\(\)\);)$',
+            r'\1PerfBot.clockProbe(Date.now().getTime(), %s);\n\1\2' % delta, 'the wall clock read')
 facade.hook(r'^(\s*)(mCheatCount = mCheatCount \+ 1;)$', r'\1\2\n\1PerfBot.cheatCount(mCheatCount, %s);' % ratio, 'the cheat count')
 facade.time(r'mRealClockWorkManager\.update\(mRealClock\);', 'REALWORK')
 facade.time(r'mLogicalWorkManager\.update\(mGameClock\);', 'LOGICAL')

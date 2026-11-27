@@ -24,12 +24,13 @@ everything.
 
 ## The clock
 
-`Facade.mainLoop` compares the game clock with `Date.now().getTime()` truncated each frame. On
-hxcpp that time has a fraction, so about half a millisecond is lost per frame and above 180 FPS
-the game reports the account as a speed hacker (`LogCheater`, `testing_speed_hack_probable`). A
-bench build floors the time first, and stops the game rather than let a third suspicious second
-go by. A build without the overlay must stay under 180 FPS until `src/` is converted with ax4
-e858f06 or later; that conversion changes the line the hook looks for.
+`Facade.mainLoop` compares the game clock with the wall clock on each frame, and reports the
+account as a speed hacker (`LogCheater`, `testing_speed_hack_probable`) when the game runs ahead.
+The game reads the wall clock in whole milliseconds, as Flash gives it (`ASCompat.ASDate.getTime`,
+since the conversion with ax4 e858f06): hxcpp's time has a fraction, and truncating the difference
+of two such times lost half a millisecond per frame, which was enough above 180 FPS. A bench build
+tells `PerfBot` what that comparison would have given (`orig_clock_ratio`), and stops the game
+rather than let a third suspicious second go by.
 
 ## Run
 
