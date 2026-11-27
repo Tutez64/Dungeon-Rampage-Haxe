@@ -1270,6 +1270,11 @@ class FRESteamWorks extends EventDispatcher {
 	public function showBindingPanel(inputHandle:String):Bool {
 		#if air
 		return ASCompat.asBool(_ExtensionContext.call("AIRSteam_ShowBindingPanel", inputHandle));
+		#elseif (cpp && !air)
+		if (Steam.controllers == null) {
+			return false;
+		}
+		return Steam.controllers.showBindingPanel(parseHandle(inputHandle));
 		#else
 		return false;
 		#end
