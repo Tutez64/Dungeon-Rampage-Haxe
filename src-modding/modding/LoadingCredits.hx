@@ -10,8 +10,8 @@ import openfl.text.TextFormatAlign;
 
 /**
  * What the loading screen shows under its bar: this build's release, the mods that run and those
- * that do not, and a button to the community's Discord server. `modding.Hooks` has `DBFacade.init`
- * call `show` once the screen's clip is made.
+ * that do not, and a button to the community's Discord server. `modding.Hooks` has
+ * `DBFacade.startInitialLoading` call `show` once the screen's clip is made.
  */
 class LoadingCredits {
 	static inline final DISCORD = "discord.gg/VvWbNspZrQ";

@@ -19,8 +19,9 @@ import haxe.macro.Type;
  *   settings there: its file being written, a tab's rows shown, a row made, the popup's art set up. A
  *   method that is no longer where it is expected fails the build, so a game update cannot drop one
  *   silently.
- * - `DBFacade.init` ends by handing the loading screen to `modding.LoadingCredits`, which writes the
- *   release and the Discord invite on it. The same build failure guards it.
+ * - `DBFacade.startInitialLoading`, which makes the loading screen's clip, ends by handing it to
+ *   `modding.LoadingCredits`, which writes the release, the mods' state and the Discord invite on it.
+ *   The same build failure guards it, and so does the method no longer making the clip.
  */
 class Hooks {
 	/** Adds `build` to the types of `classpath`, by its top-level packages: the game's own, not the libraries'. */
@@ -66,8 +67,19 @@ class Hooks {
 					return [body[0], macro modding.ModSettings.popupArt(mPopup, $i{f.args[0].name})].concat(body.slice(1));
 				});
 			case "facade.DBFacade":
-				// init(stageRef): the loading screen's clip is made and on the stage by its end
-				patch("init", 1, function(f, body) return body.concat([macro modding.LoadingCredits.show(mInitialLoadingClip)]));
+				// startInitialLoading(): makes the loading screen's clip and puts it on the stage
+				patch("startInitialLoading", 0, function(f, body) {
+					var makesClip = false;
+					for (statement in body)
+						switch (statement.expr) {
+							case EBinop(OpAssign, {expr: EConst(CIdent("mInitialLoadingClip"))}, _):
+								makesClip = true;
+							default:
+						}
+					if (!makesClip)
+						Context.error("modding.Hooks: DBFacade.startInitialLoading no longer makes mInitialLoadingClip", f.expr.pos);
+					return body.concat([macro modding.LoadingCredits.show(mInitialLoadingClip)]);
+				});
 			default:
 				null;
 		}
