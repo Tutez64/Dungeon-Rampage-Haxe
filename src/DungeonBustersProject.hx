@@ -54,6 +54,9 @@ class DungeonBustersProject extends GameEntry {
 	function onUncaughtError(param1:flash.events.UncaughtErrorEvent) {
 		var _loc2_:String = null;
 		var _loc5_:Error = null;
+		if (!stage.nativeWindow.visible) {
+			stage.nativeWindow.activate();
+		}
 		param1.preventDefault();
 		var _loc4_ = false;
 		if (Std.isOfType(param1.error, Error)) {
@@ -93,6 +96,7 @@ class DungeonBustersProject extends GameEntry {
 		}
 		GameLogOutput.configure(e.arguments);
 		processArguments(e.arguments);
+		mDBFacade.prepareInitialLoading();
 	}
 
 	function onExit(e:Event) {

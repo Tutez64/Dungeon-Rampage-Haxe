@@ -275,16 +275,16 @@ class StacksWithEquipPicker extends UIObject {
 	public function hideAndUnloadControllerIcons() {
 		hideControllerIcons();
 		var _loc2_:String;
-		final __ax4_iter_486 = mGlyphFilePathToControllerIconData;
-		if (checkNullIteratee(__ax4_iter_486))
-			for (_tmp_ in __ax4_iter_486.keys()) {
+		final __ax4_iter_489 = mGlyphFilePathToControllerIconData;
+		if (checkNullIteratee(__ax4_iter_489))
+			for (_tmp_ in __ax4_iter_489.keys()) {
 				_loc2_ = _tmp_;
 				mGlyphFilePathToControllerIconData.remove(_loc2_);
 			}
 		var _loc1_:ConsumableEquipElement;
-		final __ax4_iter_487 = mEquipElements;
-		if (checkNullIteratee(__ax4_iter_487))
-			for (_tmp_ in __ax4_iter_487) {
+		final __ax4_iter_490 = mEquipElements;
+		if (checkNullIteratee(__ax4_iter_490))
+			for (_tmp_ in __ax4_iter_490) {
 				_loc1_ = _tmp_;
 				_loc1_.setLabelAsText();
 			}
@@ -293,9 +293,9 @@ class StacksWithEquipPicker extends UIObject {
 	function hideControllerIcons() {
 		var _loc2_:ControllerIconData = null;
 		var _loc1_:String;
-		final __ax4_iter_488 = mGlyphFilePathToControllerIconData;
-		if (checkNullIteratee(__ax4_iter_488))
-			for (_tmp_ in __ax4_iter_488.keys()) {
+		final __ax4_iter_491 = mGlyphFilePathToControllerIconData;
+		if (checkNullIteratee(__ax4_iter_491))
+			for (_tmp_ in __ax4_iter_491.keys()) {
 				_loc1_ = _tmp_;
 				_loc2_ = ASCompat.coerce(ASDictionary.getString(mGlyphFilePathToControllerIconData, _loc1_), uI.ControllerIconData);
 				if (!_loc2_.mIsHidden) {
@@ -546,16 +546,16 @@ class StacksWithEquipPicker extends UIObject {
 	public function resetMenuNavigation() {
 		mFirstSlotLeftNavigation = null;
 		var _loc2_:UIObject;
-		final __ax4_iter_489 = mEquipElements;
-		if (checkNullIteratee(__ax4_iter_489))
-			for (_tmp_ in __ax4_iter_489) {
+		final __ax4_iter_492 = mEquipElements;
+		if (checkNullIteratee(__ax4_iter_492))
+			for (_tmp_ in __ax4_iter_492) {
 				_loc2_ = _tmp_;
 				_loc2_.clearNavigationAndInteractions();
 			}
 		var _loc1_:UIObject;
-		final __ax4_iter_490 = mHeroSlots;
-		if (checkNullIteratee(__ax4_iter_490))
-			for (_tmp_ in __ax4_iter_490) {
+		final __ax4_iter_493 = mHeroSlots;
+		if (checkNullIteratee(__ax4_iter_493))
+			for (_tmp_ in __ax4_iter_493) {
 				_loc1_ = _tmp_;
 				_loc1_.clearNavigationAndInteractions();
 			}

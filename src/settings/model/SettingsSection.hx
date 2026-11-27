@@ -28,9 +28,9 @@ class SettingsSection {
 	public function build():Vector<SettingDefinition> {
 		var _loc2_ = new Vector<SettingDefinition>();
 		var _loc1_:SettingBuilder;
-		final __ax4_iter_469 = mBuilders;
-		if (checkNullIteratee(__ax4_iter_469))
-			for (_tmp_ in __ax4_iter_469) {
+		final __ax4_iter_472 = mBuilders;
+		if (checkNullIteratee(__ax4_iter_472))
+			for (_tmp_ in __ax4_iter_472) {
 				_loc1_ = _tmp_;
 				_loc2_.push(_loc1_.build());
 			}

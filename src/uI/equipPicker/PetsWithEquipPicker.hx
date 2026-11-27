@@ -379,16 +379,16 @@ class PetsWithEquipPicker extends UIObject {
 	public function resetMenuNavigation() {
 		mFirstSlotLeftNavigation = null;
 		var _loc2_:UIObject;
-		final __ax4_iter_484 = mEquipElements;
-		if (checkNullIteratee(__ax4_iter_484))
-			for (_tmp_ in __ax4_iter_484) {
+		final __ax4_iter_487 = mEquipElements;
+		if (checkNullIteratee(__ax4_iter_487))
+			for (_tmp_ in __ax4_iter_487) {
 				_loc2_ = _tmp_;
 				_loc2_.clearNavigationAndInteractions();
 			}
 		var _loc1_:UIObject;
-		final __ax4_iter_485 = mHeroSlots;
-		if (checkNullIteratee(__ax4_iter_485))
-			for (_tmp_ in __ax4_iter_485) {
+		final __ax4_iter_488 = mHeroSlots;
+		if (checkNullIteratee(__ax4_iter_488))
+			for (_tmp_ in __ax4_iter_488) {
 				_loc1_ = _tmp_;
 				_loc1_.clearNavigationAndInteractions();
 			}

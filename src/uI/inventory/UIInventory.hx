@@ -7,6 +7,7 @@ import account.InventoryBaseInfo;
 import account.ItemInfo;
 import account.PetInfo;
 import account.StackableInfo;
+import account.StoreServices;
 import account.StoreServicesController;
 import brain.assetRepository.AssetLoadingComponent;
 import brain.assetRepository.SwfAsset;
@@ -457,9 +458,9 @@ class UIInventory {
 		}
 		var _loc3_ = mDBFacade.dbAccountInfo.inventoryInfo;
 		var _loc2_:ChestInfo;
-		final __ax4_iter_359 = _loc3_.chests;
-		if (checkNullIteratee(__ax4_iter_359))
-			for (_tmp_ in __ax4_iter_359) {
+		final __ax4_iter_362 = _loc3_.chests;
+		if (checkNullIteratee(__ax4_iter_362))
+			for (_tmp_ in __ax4_iter_362) {
 				_loc2_ = _tmp_;
 				if (_loc2_.containsDatabaseId(chestInfo.databaseId)) {
 					return _loc2_;
@@ -576,12 +577,12 @@ class UIInventory {
 
 	function focusAfterChestReveal(itemType:UInt, keptItem:Bool) {
 		var _loc3_:UIInventoryItem;
-		var __ax4_iter_360:Vector<UIInventoryItem>;
+		var __ax4_iter_363:Vector<UIInventoryItem>;
 		var _loc4_:UIObject = null;
 		if (keptItem && itemType == 1) {
-			__ax4_iter_360 = mItems;
-			if (checkNullIteratee(__ax4_iter_360))
-				for (_tmp_ in __ax4_iter_360) {
+			__ax4_iter_363 = mItems;
+			if (checkNullIteratee(__ax4_iter_363))
+				for (_tmp_ in __ax4_iter_363) {
 					_loc3_ = _tmp_;
 					if (_loc3_.info == mSelectedItemInfo && _loc3_.canBeFocused()) {
 						_loc4_ = _loc3_;
@@ -598,6 +599,7 @@ class UIInventory {
 	}
 
 	function updateRevealLoot(chestInstanceId:UInt, details:ASAny) {
+		StoreServices.recordItemBoxOpened(mDBFacade, mLastActedChestGmId);
 		mConsumableChestCard.updateRevealLoot(details);
 		mChestCard.updateRevealLoot(details);
 		removeChestFromInventory(chestInstanceId);
@@ -708,9 +710,9 @@ class UIInventory {
 		var _loc10_:InventoryBaseInfo = null;
 		var _loc5_:IMapIterator = null;
 		mCategorizedItems = new Map();
-		final __ax4_iter_361 = CATEGORY_ARRAY;
-		if (checkNullIteratee(__ax4_iter_361))
-			for (_tmp_ in __ax4_iter_361) {
+		final __ax4_iter_364 = CATEGORY_ARRAY;
+		if (checkNullIteratee(__ax4_iter_364))
+			for (_tmp_ in __ax4_iter_364) {
 				_loc7_ = _tmp_;
 				mCategorizedItems.add(_loc7_, new Vector<InventoryBaseInfo>());
 			}
@@ -719,9 +721,9 @@ class UIInventory {
 		var _loc3_ = mDBFacade.dbAccountInfo.inventoryInfo.stackables;
 		var _loc1_ = mDBFacade.dbAccountInfo.inventoryInfo.pets;
 		var _loc4_:Map;
-		final __ax4_iter_362:Array<ASAny> = [_loc8_, _loc3_, _loc1_];
-		if (checkNullIteratee(__ax4_iter_362))
-			for (_tmp_ in __ax4_iter_362) {
+		final __ax4_iter_365:Array<ASAny> = [_loc8_, _loc3_, _loc1_];
+		if (checkNullIteratee(__ax4_iter_365))
+			for (_tmp_ in __ax4_iter_365) {
 				_loc4_ = ASCompat.coerce(_tmp_, collections.Map);
 				_loc5_ = ASCompat.reinterpretAs(_loc4_.iterator(), IMapIterator);
 				while (_loc5_.hasNext()) {
@@ -922,11 +924,11 @@ class UIInventory {
 	}
 
 	function checkIfRevealedWeaponExists():InventoryBaseInfo {
-		var __ax4_iter_363:ASAny;
+		var __ax4_iter_366:ASAny;
 		var _loc10_:Int;
 		var _loc9_:Vector<GMOfferDetail>;
 		var _loc2_:GMOfferDetail;
-		var __ax4_iter_364:ASAny;
+		var __ax4_iter_367:ASAny;
 		var _loc6_:InventoryBaseInfo = null;
 		var _loc1_:GMWeaponItem = null;
 		var _loc4_ = (0 : UInt);
@@ -939,9 +941,9 @@ class UIInventory {
 			mCurrentTab = GMInventoryBase.WEAPON_CATEGORY;
 			mRevealedItemOfferId %= (100000 : UInt);
 			_loc1_ = ASCompat.coerce(mDBFacade.gameMaster.weaponItemById.itemFor(mRevealedItemOfferId), gameMasterDictionary.GMWeaponItem);
-			__ax4_iter_363 = mCategorizedItems.itemFor(mCurrentTab);
-			if (checkNullIteratee(__ax4_iter_363))
-				for (_tmp_ in __ax4_iter_363) {
+			__ax4_iter_366 = mCategorizedItems.itemFor(mCurrentTab);
+			if (checkNullIteratee(__ax4_iter_366))
+				for (_tmp_ in __ax4_iter_366) {
 					_loc6_ = ASCompat.coerce(_tmp_, account.InventoryBaseInfo);
 					if (Std.isOfType(_loc6_, ItemInfo)) {
 						_loc4_ = ASCompat.reinterpretAs(_loc6_, ItemInfo).gmWeaponItem.Id;
@@ -962,9 +964,9 @@ class UIInventory {
 				}
 			if (_loc3_ != null) {
 				mCurrentTab = GMInventoryBase.POWERUP_CATEGORY;
-				__ax4_iter_364 = mCategorizedItems.itemFor(mCurrentTab);
-				if (checkNullIteratee(__ax4_iter_364))
-					for (_tmp_ in __ax4_iter_364) {
+				__ax4_iter_367 = mCategorizedItems.itemFor(mCurrentTab);
+				if (checkNullIteratee(__ax4_iter_367))
+					for (_tmp_ in __ax4_iter_367) {
 						_loc6_ = ASCompat.coerce(_tmp_, account.InventoryBaseInfo);
 						if (_loc6_.gmId == _loc3_.Id) {
 							mRevealedItemType = mRevealedItemOfferId = (0 : UInt);
@@ -1757,9 +1759,9 @@ class UIInventory {
 
 	function getFirstFocusableInventoryItem():UIObject {
 		var _loc1_:UIInventoryItem;
-		final __ax4_iter_365 = mItems;
-		if (checkNullIteratee(__ax4_iter_365))
-			for (_tmp_ in __ax4_iter_365) {
+		final __ax4_iter_368 = mItems;
+		if (checkNullIteratee(__ax4_iter_368))
+			for (_tmp_ in __ax4_iter_368) {
 				_loc1_ = _tmp_;
 				if (_loc1_.canBeFocused()) {
 					return _loc1_;

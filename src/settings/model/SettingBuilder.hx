@@ -9,6 +9,11 @@ class SettingBuilder {
 		mDefinition = new SettingDefinition(id, category, SettingDefinition.labelKeyFor(id), SettingDefinition.descriptionKeyFor(id), null, null);
 	}
 
+	public function action(callback:ASFunction):SettingBuilder {
+		mDefinition.action = callback;
+		return this;
+	}
+
 	public function defaultsTo(value:ASAny):SettingBuilder {
 		mDefinition.defaultValue = value;
 		return this;
@@ -72,7 +77,8 @@ class SettingBuilder {
 	}
 
 	public function build():SettingDefinition {
-		var _loc1_ = (mDefinition.choices != null ? 1 : 0) + (!Math.isNaN(mDefinition.minimum) ? 1 : 0) + (mDefinition.keyBindingAction != null ? 1 : 0);
+		var _loc1_ = (mDefinition.action != null ? 1 : 0) + (mDefinition.choices != null ? 1 : 0) + (!Math.isNaN(mDefinition.minimum) ? 1 : 0)
+			+ (mDefinition.keyBindingAction != null ? 1 : 0);
 		if (_loc1_ > 1) {
 			throw new Error("Setting " + mDefinition.id + " was given the fields of more than one kind");
 		}

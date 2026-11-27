@@ -17,6 +17,8 @@ class StarlingWorldCut {
 
 	static inline final GRID:Float = 4;
 
+	static inline final EPSILON:Float = 0.0001;
+
 	final mBounds:Rectangle = new Rectangle();
 
 	final mMatrix:Matrix = new Matrix();
@@ -55,11 +57,17 @@ class StarlingWorldCut {
 
 	var mSpans:Vector<Float> = new Vector((0 : UInt));
 
-	final mFade:HudCutFade = new HudCutFade();
-
 	final mPixels:Vector<Float> = new Vector((0 : UInt));
 
 	final mDevice:Matrix = new Matrix();
+
+	var mDesignX:Float = Math.NaN;
+
+	var mDesignY:Float = Math.NaN;
+
+	var mDesignScaleX:Float = Math.NaN;
+
+	var mDesignScaleY:Float = Math.NaN;
 
 	public function new(world:flash.display.DisplayObject, designSpace:flash.display.DisplayObjectContainer, hud:DisplayObject,
 			fadeLayer:flash.display.DisplayObject = null) {
@@ -70,6 +78,40 @@ class StarlingWorldCut {
 		mMask.visible = false;
 		designSpace.addChildAt(mMask, 0);
 		mChatOverlay = new ChatBalloonOverlay(ASCompat.reinterpretAs(world, flash.display.DisplayObjectContainer), designSpace, fadeLayer);
+	}
+
+	static function toDevicePixels(rects:Vector<Float>, count:Int, out:Vector<Float>, device:Matrix):Vector<Float> {
+		var _loc9_ = 0;
+		var _loc7_ = device.a;
+		var _loc8_ = device.d;
+		var _loc5_ = device.tx;
+		var _loc6_ = device.ty;
+		var _loc10_ = _loc7_ > 0 && _loc8_ > 0 && device.b == 0 && device.c == 0;
+		_loc9_ = 0;
+		while (_loc9_ < count) {
+			if (!_loc10_) {
+				out[_loc9_] = rects[_loc9_];
+				out[_loc9_ + 1] = rects[_loc9_ + 1];
+				out[_loc9_ + 2] = rects[_loc9_ + 2];
+				out[_loc9_ + 3] = rects[_loc9_ + 3];
+			} else {
+				out[_loc9_] = (Math.ffloor(rects[_loc9_] * _loc7_ + _loc5_ + 0.0001) - _loc5_) / _loc7_;
+				out[_loc9_ + 1] = (Math.ffloor(rects[_loc9_ + 1] * _loc8_ + _loc6_ + 0.0001) - _loc6_) / _loc8_;
+				out[_loc9_ + 2] = (Math.fceil(rects[_loc9_ + 2] * _loc7_ + _loc5_ - 0.0001) - _loc5_) / _loc7_;
+				out[_loc9_ + 3] = (Math.fceil(rects[_loc9_ + 3] * _loc8_ + _loc6_ - 0.0001) - _loc6_) / _loc8_;
+			}
+			_loc9_ += 4;
+		}
+		return out;
+	}
+
+	static function stageMatrix(node:flash.display.DisplayObject, out:Matrix):Matrix {
+		out.identity();
+		while (node != null) {
+			out.concat(node.transform.matrix);
+			node = node.parent;
+		}
+		return out;
 	}
 
 	@:isVar public var enabled(get, set):Bool;
@@ -85,8 +127,6 @@ class StarlingWorldCut {
 			mChatOverlay.update(false);
 			useMask(false);
 			mMask.graphics.clear();
-			mFade.clear();
-			mFade.hide();
 			return on;
 		}
 		update();
@@ -134,7 +174,7 @@ class StarlingWorldCut {
 		var _loc5_:DisplayObject = null;
 		var _loc3_:DisplayObject = null;
 		var _loc6_ = false;
-		var _loc2_ = mFade.designMoved(mMask);
+		var _loc2_ = designMoved();
 		if (!mDirty && !mDynamicDirty && !_loc2_) {
 			return;
 		}
@@ -159,9 +199,9 @@ class StarlingWorldCut {
 			mRects[_loc4_] = mStaticRects[_loc4_];
 			_loc4_++;
 		}
-		final __ax4_iter_187 = mDynamic;
-		if (checkNullIteratee(__ax4_iter_187))
-			for (_tmp_ in __ax4_iter_187) {
+		final __ax4_iter_188 = mDynamic;
+		if (checkNullIteratee(__ax4_iter_188))
+			for (_tmp_ in __ax4_iter_188) {
 				_loc5_ = _tmp_;
 				_loc6_ = true;
 				_loc3_ = _loc5_;
@@ -193,20 +233,11 @@ class StarlingWorldCut {
 		}
 	}
 
-	public function fade(alpha:Float, color:UInt) {
-		if (mOn && mHud != null) {
-			mFade.sync(mHud, mHud, alpha, color);
-		} else {
-			mFade.hide();
-		}
-	}
-
 	public function dispose() {
 		if (mChatOverlay != null) {
 			mChatOverlay.dispose();
 		}
 		mChatOverlay = null;
-		mFade.dispose();
 		if (mWorld != null && mWorld.mask == mMask) {
 			mWorld.mask = null;
 		}
@@ -350,13 +381,11 @@ class StarlingWorldCut {
 		var _loc3_ = Math.NaN;
 		var _loc1_ = 0;
 		var _loc7_ = Math.NaN;
-		var _loc10_ = Math.NaN;
-		mFade.remember(mMask);
+		remember();
 		var _loc5_ = mMask.graphics;
 		_loc5_.clear();
 		_loc5_.beginFill((0 : UInt));
-		mFade.clear();
-		var _loc6_ = HudCutFade.toDevicePixels(mRects, mCount, mPixels, HudCutFade.stageMatrix(mMask, mDevice));
+		var _loc6_ = toDevicePixels(mRects, mCount, mPixels, stageMatrix(mMask, mDevice));
 		var _loc9_ = 0;
 		_loc8_ = 0;
 		while (_loc8_ < mCount) {
@@ -384,29 +413,38 @@ class StarlingWorldCut {
 				}
 				sortSpans(_loc1_);
 				_loc7_ = -100000;
-				_loc10_ = -100000;
 				_loc8_ = 0;
 				while (_loc8_ < _loc1_) {
 					if (mSpans[_loc8_] > _loc7_) {
-						if (_loc10_ > -100000) {
-							mFade.add(_loc10_, _loc3_, _loc7_, _loc4_);
-						}
 						_loc5_.drawRect(_loc7_, _loc3_, mSpans[_loc8_] - _loc7_, _loc4_ - _loc3_);
-						_loc10_ = mSpans[_loc8_];
 					}
 					if (mSpans[_loc8_ + 1] > _loc7_) {
 						_loc7_ = mSpans[_loc8_ + 1];
 					}
 					_loc8_ += 2;
 				}
-				if (_loc10_ > -100000) {
-					mFade.add(_loc10_, _loc3_, _loc7_, _loc4_);
-				}
 				_loc5_.drawRect(_loc7_, _loc3_, 100000 - _loc7_, _loc4_ - _loc3_);
 			}
 			_loc2_++;
 		}
 		_loc5_.endFill();
+	}
+
+	function designMoved():Bool {
+		var _loc1_:flash.display.DisplayObject = mMask != null ? mMask.parent : null;
+		return _loc1_ != null
+			&& (_loc1_.x != mDesignX || _loc1_.y != mDesignY || _loc1_.scaleX != mDesignScaleX || _loc1_.scaleY != mDesignScaleY);
+	}
+
+	function remember() {
+		var _loc1_:flash.display.DisplayObject = mMask != null ? mMask.parent : null;
+		if (_loc1_ == null) {
+			return;
+		}
+		mDesignX = _loc1_.x;
+		mDesignY = _loc1_.y;
+		mDesignScaleX = _loc1_.scaleX;
+		mDesignScaleY = _loc1_.scaleY;
 	}
 
 	function sortYs() {

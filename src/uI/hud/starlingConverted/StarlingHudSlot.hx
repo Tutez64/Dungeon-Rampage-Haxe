@@ -131,9 +131,9 @@ class StarlingHudSlot {
 	public function reset() {
 		var _loc1_:ASFunction = null;
 		mGeneration = mGeneration + 1;
-		final __ax4_iter_164 = mRetries;
-		if (checkNullIteratee(__ax4_iter_164))
-			for (_tmp_ in __ax4_iter_164) {
+		final __ax4_iter_165 = mRetries;
+		if (checkNullIteratee(__ax4_iter_165))
+			for (_tmp_ in __ax4_iter_165) {
 				_loc1_ = _tmp_;
 				mTicker.cancelBake(_loc1_);
 			}

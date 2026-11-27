@@ -575,16 +575,16 @@ class StarlingText extends ArtDisplay {
 
 	@:allow(uI.hud.starlingConverted)
 	override function prepareTextFilters() {
-		var __ax4_iter_216:Vector<Array<ASAny>>;
+		var __ax4_iter_217:Vector<Array<ASAny>>;
 		var _loc3_:Array<ASAny> = null;
 		var _loc2_ = ASCompat.reinterpretAs(parent, ArtDisplay);
 		var _loc4_ = new Vector<ArtDisplay>((0 : UInt));
 		var _loc1_ = false;
 		while (_loc2_ != null) {
 			_loc4_.push(_loc2_);
-			__ax4_iter_216 = _loc2_.art.filterStates;
-			if (checkNullIteratee(__ax4_iter_216))
-				for (_tmp_ in __ax4_iter_216) {
+			__ax4_iter_217 = _loc2_.art.filterStates;
+			if (checkNullIteratee(__ax4_iter_217))
+				for (_tmp_ in __ax4_iter_217) {
 					_loc3_ = _tmp_;
 					if (_loc3_.length > 0) {
 						_loc1_ = true;
@@ -605,9 +605,9 @@ class StarlingText extends ArtDisplay {
 
 	function releaseFilterVariants() {
 		var _loc1_:BakedCell = null;
-		final __ax4_iter_217 = mFilterCells;
-		if (checkNullIteratee(__ax4_iter_217))
-			for (_tmp_ in __ax4_iter_217) {
+		final __ax4_iter_218 = mFilterCells;
+		if (checkNullIteratee(__ax4_iter_218))
+			for (_tmp_ in __ax4_iter_218) {
 				_loc1_ = _tmp_;
 				if (_loc1_ != null) {
 					mPages.release(_loc1_);
@@ -623,9 +623,9 @@ class StarlingText extends ArtDisplay {
 		releaseFilterVariants();
 		var _loc2_ = 1;
 		mSingleFilterVariant = false;
-		final __ax4_iter_218 = mFilterAncestors;
-		if (checkNullIteratee(__ax4_iter_218))
-			for (_tmp_ in __ax4_iter_218) {
+		final __ax4_iter_219 = mFilterAncestors;
+		if (checkNullIteratee(__ax4_iter_219))
+			for (_tmp_ in __ax4_iter_219) {
 				_loc1_ = _tmp_;
 				_loc2_ = ASCompat.floatToInt(_loc2_ * Math.max(1, _loc1_.art.filterStates.length));
 				if (_loc2_ > 16) {
@@ -668,9 +668,9 @@ class StarlingText extends ArtDisplay {
 		}
 		var _loc2_ = 0;
 		var _loc3_ = 1;
-		final __ax4_iter_219 = mFilterAncestors;
-		if (checkNullIteratee(__ax4_iter_219))
-			for (_tmp_ in __ax4_iter_219) {
+		final __ax4_iter_220 = mFilterAncestors;
+		if (checkNullIteratee(__ax4_iter_220))
+			for (_tmp_ in __ax4_iter_220) {
 				_loc1_ = _tmp_;
 				_loc2_ += _loc3_ * _loc1_.filterIndex;
 				_loc3_ *= _loc1_.art.filterStates.length;

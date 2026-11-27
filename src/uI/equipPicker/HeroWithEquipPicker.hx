@@ -148,16 +148,16 @@ class HeroWithEquipPicker extends UIObject {
 	public function hideAndUnloadControllerIcons() {
 		hideControllerIcons();
 		var _loc2_:String;
-		final __ax4_iter_492 = mGlyphFilePathToControllerIconData;
-		if (checkNullIteratee(__ax4_iter_492))
-			for (_tmp_ in __ax4_iter_492.keys()) {
+		final __ax4_iter_495 = mGlyphFilePathToControllerIconData;
+		if (checkNullIteratee(__ax4_iter_495))
+			for (_tmp_ in __ax4_iter_495.keys()) {
 				_loc2_ = _tmp_;
 				mGlyphFilePathToControllerIconData.remove(_loc2_);
 			}
 		var _loc1_:AvatarEquipElement;
-		final __ax4_iter_493 = mEquipElements;
-		if (checkNullIteratee(__ax4_iter_493))
-			for (_tmp_ in __ax4_iter_493) {
+		final __ax4_iter_496 = mEquipElements;
+		if (checkNullIteratee(__ax4_iter_496))
+			for (_tmp_ in __ax4_iter_496) {
 				_loc1_ = _tmp_;
 				_loc1_.setLabelAsText();
 			}
@@ -166,9 +166,9 @@ class HeroWithEquipPicker extends UIObject {
 	function hideControllerIcons() {
 		var _loc2_:ControllerIconData = null;
 		var _loc1_:String;
-		final __ax4_iter_494 = mGlyphFilePathToControllerIconData;
-		if (checkNullIteratee(__ax4_iter_494))
-			for (_tmp_ in __ax4_iter_494.keys()) {
+		final __ax4_iter_497 = mGlyphFilePathToControllerIconData;
+		if (checkNullIteratee(__ax4_iter_497))
+			for (_tmp_ in __ax4_iter_497.keys()) {
 				_loc1_ = _tmp_;
 				_loc2_ = ASCompat.coerce(ASDictionary.getString(mGlyphFilePathToControllerIconData, _loc1_), uI.ControllerIconData);
 				if (!_loc2_.mIsHidden) {
@@ -187,9 +187,9 @@ class HeroWithEquipPicker extends UIObject {
 		_loc1_.push("attack_weapon_3");
 		var _loc2_:Float = 0;
 		var _loc3_:AvatarEquipElement;
-		final __ax4_iter_495 = mEquipElements;
-		if (checkNullIteratee(__ax4_iter_495))
-			for (_tmp_ in __ax4_iter_495) {
+		final __ax4_iter_498 = mEquipElements;
+		if (checkNullIteratee(__ax4_iter_498))
+			for (_tmp_ in __ax4_iter_498) {
 				_loc3_ = _tmp_;
 				initControllerIcon(_loc3_, _loc1_[ASCompat.floatToInt(_loc2_)]);
 				_loc2_++;
@@ -263,9 +263,9 @@ class HeroWithEquipPicker extends UIObject {
 
 	function applyWeaponComparison() {
 		var _loc1_:HeroElement;
-		final __ax4_iter_496 = mHeroSlots;
-		if (checkNullIteratee(__ax4_iter_496))
-			for (_tmp_ in __ax4_iter_496) {
+		final __ax4_iter_499 = mHeroSlots;
+		if (checkNullIteratee(__ax4_iter_499))
+			for (_tmp_ in __ax4_iter_499) {
 				_loc1_ = _tmp_;
 				_loc1_.hideWeaponComparison();
 				if (mComparisonWeapon != null) {

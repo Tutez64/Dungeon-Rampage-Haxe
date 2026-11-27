@@ -6,6 +6,7 @@ import brain.jsonRPC.JSONRPCService;
 import collections.Map;
 import facade.DBFacade;
 import gameMasterDictionary.GMOffer;
+import uI.hud.UIHud;
 
 class StoreServices {
 	static var mLimitedOffers:Map = new Map();
@@ -75,6 +76,22 @@ class StoreServices {
 				successCallback(param1);
 			}
 		}, errorCallback);
+	}
+
+	public static function recordItemBoxOpened(dbFacade:DBFacade, gmChestId:UInt) {
+		var _loc4_ = 0;
+		if (!UIHud.isThisAConsumbleChestId((gmChestId : Int))) {
+			return;
+		}
+		var _loc3_ = dbFacade.dbAccountInfo.inventoryInfo.keys;
+		_loc4_ = 0;
+		while (_loc4_ < _loc3_.length) {
+			if (_loc3_[_loc4_].gmKey != null && _loc3_[_loc4_].gmKey.ChestId == gmChestId) {
+				recordCoinsSpent(dbFacade, _loc3_[_loc4_].gmKeyOffer);
+				return;
+			}
+			_loc4_++;
+		}
 	}
 
 	static function recordCoinsSpent(dbFacade:DBFacade, gmOffer:GMOffer) {

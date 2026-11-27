@@ -15,9 +15,13 @@ class NPCView extends ActorView {
 
 	public static var HIT_AREA_Y_OFFSET:Float = Math.NaN;
 
+	static var RAISED_TRAP_MARKERS:Array<ASAny>;
+
 	var mParentNPCObject:NPCGameObject;
 
 	var mBodyOffAnimRenderer:ActorRenderer;
+
+	var mAuthoredLayer:Int = 0;
 
 	var mActivateSoundEffect:SoundAsset;
 
@@ -110,6 +114,44 @@ class NPCView extends ActorView {
 		return mBodyOffAnimRenderer;
 	}
 
+	@:isVar var isRaisedTrap(get, never):Bool;
+
+	function get_isRaisedTrap():Bool {
+		var _loc1_ = mParentNPCObject.actorData != null ? mParentNPCObject.actorData.constant : null;
+		if (_loc1_ == null) {
+			return false;
+		}
+		var _loc2_:String;
+		final __ax4_iter_145 = RAISED_TRAP_MARKERS;
+		if (checkNullIteratee(__ax4_iter_145))
+			for (_tmp_ in __ax4_iter_145) {
+				_loc2_ = _tmp_;
+				if (_loc1_.indexOf(_loc2_) >= 0) {
+					return true;
+				}
+			}
+		return false;
+	}
+
+	@:isVar var onStateLayer(get, never):Int;
+
+	function get_onStateLayer():Int {
+		if (this.layer != mAuthoredLayer || mAuthoredLayer != 10 || mParentNPCObject.isDead() || !isRaisedTrap) {
+			return this.layer;
+		}
+		return 20;
+	}
+
+	override public function addToStage() {
+		if (mAuthoredLayer == 0) {
+			mAuthoredLayer = this.layer;
+		}
+		super.addToStage();
+		if (mParentNPCObject.triggerState && mBodyAnimRenderer != null) {
+			mBodyAnimRenderer.setLayer(onStateLayer);
+		}
+	}
+
 	@:isVar public var triggerState(never, set):Bool;
 
 	public function set_triggerState(value:Bool):Bool {
@@ -125,7 +167,7 @@ class NPCView extends ActorView {
 			}
 			if (mBodyAnimRenderer != null) {
 				if (mSceneGraphComponent.contains(root, (this.layer : UInt))) {
-					mBodyAnimRenderer.setLayer(this.layer);
+					mBodyAnimRenderer.setLayer(onStateLayer);
 				}
 				mBodyAnimRenderer.visible = true;
 				mBodyAnimRenderer.play(mAnimName, 0, _loc2_, mBodyAnimRenderer.loop);
@@ -158,5 +200,17 @@ class NPCView extends ActorView {
 			}
 		}
 		return value;
+	}
+
+	static function __init__() {
+		RAISED_TRAP_MARKERS = [
+			"TRAP_SPIKE",
+			"TRAP_SPEAR",
+			"SPIKETRAP",
+			"FLAMESPIKES",
+			"PALACE_SPIKES",
+			"PALACE_SLICER",
+			"NORDIC_CAVE_EMITTER"
+		];
 	}
 }

@@ -113,22 +113,22 @@ class BakedPages {
 
 	public static function restoreAll() {
 		var _loc3_:BakedPage;
-		var __ax4_iter_497:Vector<BakedPage>;
+		var __ax4_iter_500:Vector<BakedPage>;
 		var _loc1_ = 0;
 		_loc1_ = 0;
 		while (_loc1_ < sAll.length) {
-			__ax4_iter_497 = sAll[_loc1_].mPages__Brain_Starling_SwfConverter_BakedPages;
-			if (checkNullIteratee(__ax4_iter_497))
-				for (_tmp_ in __ax4_iter_497) {
+			__ax4_iter_500 = sAll[_loc1_].mPages__Brain_Starling_SwfConverter_BakedPages;
+			if (checkNullIteratee(__ax4_iter_500))
+				for (_tmp_ in __ax4_iter_500) {
 					_loc3_ = _tmp_;
 					restorePage(_loc3_);
 				}
 			_loc1_++;
 		}
 		var _loc2_:BakedPage;
-		final __ax4_iter_498 = sRetired;
-		if (checkNullIteratee(__ax4_iter_498))
-			for (_tmp_ in __ax4_iter_498) {
+		final __ax4_iter_501 = sRetired;
+		if (checkNullIteratee(__ax4_iter_501))
+			for (_tmp_ in __ax4_iter_501) {
 				_loc2_ = _tmp_;
 				restorePage(_loc2_);
 			}
@@ -256,9 +256,9 @@ class BakedPages {
 
 	public function uploadDirty() {
 		var _loc1_:BakedPage;
-		final __ax4_iter_499 = mPages__Brain_Starling_SwfConverter_BakedPages;
-		if (checkNullIteratee(__ax4_iter_499))
-			for (_tmp_ in __ax4_iter_499) {
+		final __ax4_iter_502 = mPages__Brain_Starling_SwfConverter_BakedPages;
+		if (checkNullIteratee(__ax4_iter_502))
+			for (_tmp_ in __ax4_iter_502) {
 				_loc1_ = _tmp_;
 				if (_loc1_.dirty) {
 					_loc1_.upload();
@@ -269,9 +269,9 @@ class BakedPages {
 	public function dispose() {
 		var _loc3_:BakedCell = null;
 		var _loc4_:String;
-		final __ax4_iter_500:ASObject = mCells__Brain_Starling_SwfConverter_BakedPages;
-		if (checkNullIteratee(__ax4_iter_500))
-			for (_tmp_ in __ax4_iter_500.___keys()) {
+		final __ax4_iter_503:ASObject = mCells__Brain_Starling_SwfConverter_BakedPages;
+		if (checkNullIteratee(__ax4_iter_503))
+			for (_tmp_ in __ax4_iter_503.___keys()) {
 				_loc4_ = _tmp_;
 				_loc3_ = ASCompat.coerce(mCells__Brain_Starling_SwfConverter_BakedPages[_loc4_], brain.starling.swfConverter.BakedCell);
 				_loc3_.mTexture__Brain_Starling_SwfConverter_BakedCell.dispose();
@@ -281,9 +281,9 @@ class BakedPages {
 			}
 		mCells__Brain_Starling_SwfConverter_BakedPages = {};
 		var _loc2_:BakedPage;
-		final __ax4_iter_501 = mPages__Brain_Starling_SwfConverter_BakedPages;
-		if (checkNullIteratee(__ax4_iter_501))
-			for (_tmp_ in __ax4_iter_501) {
+		final __ax4_iter_504 = mPages__Brain_Starling_SwfConverter_BakedPages;
+		if (checkNullIteratee(__ax4_iter_504))
+			for (_tmp_ in __ax4_iter_504) {
 				_loc2_ = _tmp_;
 				retire(_loc2_);
 			}
@@ -296,15 +296,15 @@ class BakedPages {
 
 	function placeAndWrite(cell:BakedCell, bake:BakedPicture, force:Bool):Bool {
 		var _loc4_:BakedPage;
-		var __ax4_iter_502:Vector<BakedPage>;
+		var __ax4_iter_505:Vector<BakedPage>;
 		var _loc5_ = bake.bitmap.width;
 		var _loc7_ = bake.bitmap.height;
 		var _loc6_ = 1;
 		var _loc9_:BakedPage = null;
 		if (_loc5_ + _loc6_ <= mPageWidth && _loc7_ + _loc6_ <= mPageHeight) {
-			__ax4_iter_502 = mPages__Brain_Starling_SwfConverter_BakedPages;
-			if (checkNullIteratee(__ax4_iter_502))
-				for (_tmp_ in __ax4_iter_502) {
+			__ax4_iter_505 = mPages__Brain_Starling_SwfConverter_BakedPages;
+			if (checkNullIteratee(__ax4_iter_505))
+				for (_tmp_ in __ax4_iter_505) {
 					_loc4_ = _tmp_;
 					if (!_loc4_.single && _loc4_.place(_loc5_ + _loc6_, _loc7_ + _loc6_, sPoint)) {
 						_loc9_ = _loc4_;
@@ -352,7 +352,7 @@ class BakedPages {
 
 	function freeSlot(page:BakedPage, x:Int, y:Int, slotWidth:Int) {
 		var _loc5_:BakedPage;
-		var __ax4_iter_503:Vector<BakedPage>;
+		var __ax4_iter_506:Vector<BakedPage>;
 		var _loc7_ = false;
 		page.cells--;
 		if (!page.single) {
@@ -367,9 +367,9 @@ class BakedPages {
 		}
 		if (!page.single) {
 			_loc7_ = false;
-			__ax4_iter_503 = mPages__Brain_Starling_SwfConverter_BakedPages;
-			if (checkNullIteratee(__ax4_iter_503))
-				for (_tmp_ in __ax4_iter_503) {
+			__ax4_iter_506 = mPages__Brain_Starling_SwfConverter_BakedPages;
+			if (checkNullIteratee(__ax4_iter_506))
+				for (_tmp_ in __ax4_iter_506) {
 					_loc5_ = _tmp_;
 					if (_loc5_ != page && !_loc5_.single && _loc5_.cells == 0) {
 						_loc7_ = true;

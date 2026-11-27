@@ -462,9 +462,8 @@ class UIDailyRewards extends DBUIPopup {
 
 	function getNextDay():Date {
 		var _loc1_ = GameClock.getWebServerDate();
-		ASCompat.ASDate.setTime(_loc1_, _loc1_.getTime()
-			+ 86400000
-			- (_loc1_.getSeconds() * 1000 + _loc1_.getMinutes() * 60000 + _loc1_.getHours() * 3600000));
+		ASCompat.ASDate.setTime(_loc1_,
+			ASCompat.ASDate.getTime(_loc1_) + 86400000 - (_loc1_.getSeconds() * 1000 + _loc1_.getMinutes() * 60000 + _loc1_.getHours() * 3600000));
 		return _loc1_;
 	}
 
@@ -479,7 +478,7 @@ class UIDailyRewards extends DBUIPopup {
 		ASCompat.setProperty((mDailyRewardMysteryBoxPopup : ASAny).timer_clock, "visible", true);
 		now = GameClock.getWebServerDate();
 		mTimerTargetDate = GameClock.getWebServerDate();
-		ASCompat.ASDate.setTime(mTimerTargetDate, mTimerTargetDate.getTime() + 1000 * secondsToGo);
+		ASCompat.ASDate.setTime(mTimerTargetDate, ASCompat.ASDate.getTime(mTimerTargetDate) + 1000 * secondsToGo);
 		ASCompat.setProperty((mDailyRewardMysteryBoxPopup : ASAny).label_timer, "text", "");
 		mCountdownTimer = Timers.create(1000, 0, "UIDailyRewards.mCountdownTimer");
 		EventListeners.add(mCountdownTimer, "timer", timerTick);
@@ -513,7 +512,7 @@ class UIDailyRewards extends DBUIPopup {
 		var _loc7_ = Date.now();
 		var _loc2_ = Date.now();
 		ASCompat.ASDate.setTime(_loc2_, 3600000 * 8);
-		ASCompat.ASDate.setTime(_loc7_, _loc2_.getTime() + mTimerTargetDate.getTime() - _loc6_.getTime());
+		ASCompat.ASDate.setTime(_loc7_, ASCompat.ASDate.getTime(_loc2_) + ASCompat.ASDate.getTime(mTimerTargetDate) - ASCompat.ASDate.getTime(_loc6_));
 		var _loc3_ = ASCompat.floatToInt(mTimerTargetDate.getSeconds() - _loc6_.getSeconds());
 		var _loc5_ = ASCompat.floatToInt(mTimerTargetDate.getMinutes() - _loc6_.getMinutes());
 		var _loc4_ = ASCompat.floatToInt(mTimerTargetDate.getHours() - _loc6_.getHours());
@@ -523,7 +522,7 @@ class UIDailyRewards extends DBUIPopup {
 			+ zeroPad(ASCompat.floatToInt(_loc7_.getMinutes()), 2)
 			+ ":"
 			+ zeroPad(ASCompat.floatToInt(_loc7_.getSeconds()), 2));
-		if (mTimerTargetDate.getTime() <= _loc6_.getTime()) {
+		if (ASCompat.ASDate.getTime(mTimerTargetDate) <= ASCompat.ASDate.getTime(_loc6_)) {
 			resetMysteryBox();
 			askAboutDailyReward();
 		}

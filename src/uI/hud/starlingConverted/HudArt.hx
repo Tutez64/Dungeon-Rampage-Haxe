@@ -12,7 +12,6 @@ import flash.display.DisplayObject;
 import flash.display.MovieClip;
 import flash.display.Shape;
 import flash.events.Event;
-import flash.system.Capabilities;
 import flash.text.TextField;
 import starling.core.Starling;
 
@@ -195,7 +194,6 @@ class HudArt {
 		sLeases = ASCompat.allocArray((0 : UInt));
 		sBegun = true;
 		sFacade = facade;
-		sPixelScale = Math.min(Capabilities.screenResolutionX / 1920, Capabilities.screenResolutionY / 1080);
 		var _loc2_:ASObject = new LocalSettingsFile().read();
 		sLayout = _loc2_ != null
 			&& _loc2_.hasOwnProperty("hudStyle")
@@ -416,6 +414,7 @@ class HudArt {
 		}
 		sContextWait.removeEventListener("enterFrame", waitForContext);
 		sContextWait = null;
+		sPixelScale = _loc1_._contentScaleFactor;
 		try {
 			startBake(sPixelScale);
 		} catch (error:Dynamic) {

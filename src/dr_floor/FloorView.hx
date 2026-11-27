@@ -31,9 +31,9 @@ class FloorView extends View {
 	override public function set_position(pos:Vector3D):Vector3D {
 		super.position = pos;
 		var _loc2_:NavCollider;
-		final __ax4_iter_534 = mParentFloorObject.navCollisions;
-		if (checkNullIteratee(__ax4_iter_534))
-			for (_tmp_ in __ax4_iter_534) {
+		final __ax4_iter_538 = mParentFloorObject.navCollisions;
+		if (checkNullIteratee(__ax4_iter_538))
+			for (_tmp_ in __ax4_iter_538) {
 				_loc2_ = _tmp_;
 				_loc2_.position = pos;
 			}

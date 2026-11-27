@@ -7,6 +7,7 @@ import brain.clock.GameClock;
 import brain.logger.Logger;
 import brain.render.ActorSpriteSheetRenderer;
 import brain.render.IRenderer;
+import brain.starling.StarlingLayerManager;
 import brain.workLoop.LayerWorkComponent;
 import brain.workLoop.PreRenderWorkComponent;
 import collections.IMapIterator;
@@ -693,7 +694,7 @@ class ActorRenderer extends Sprite {
 			mStarlingRenderer.showOffImage(true);
 			updateStarlingHitArea();
 			this.visible = mPendingVisible;
-			mStarlingRenderer.setLayer(mPendingLayer);
+			mStarlingRenderer.setLayer(starlingLayer);
 			if (mAnimName != null) {
 				this.play(mAnimName, 0, true, mLoop);
 			} else if (_loc28_ == null && _loc19_ == null && mStarlingRenderer.hasAnim("idle")) {
@@ -746,7 +747,7 @@ class ActorRenderer extends Sprite {
 			}
 			updateStarlingHitArea();
 			this.visible = mPendingVisible;
-			mStarlingRenderer.setLayer(mPendingLayer);
+			mStarlingRenderer.setLayer(starlingLayer);
 			if (mHighlightActive) {
 				mStarlingRenderer.setHighlightFilter(mHighlightColor, mHighlightAlpha, mHighlightBlur);
 			}
@@ -784,7 +785,7 @@ class ActorRenderer extends Sprite {
 		}
 		updateStarlingHitArea();
 		this.visible = mPendingVisible;
-		mStarlingRenderer.setLayer(mPendingLayer);
+		mStarlingRenderer.setLayer(starlingLayer);
 		if (mHighlightActive) {
 			mStarlingRenderer.setHighlightFilter(mHighlightColor, mHighlightAlpha, mHighlightBlur);
 		}
@@ -878,7 +879,7 @@ class ActorRenderer extends Sprite {
 		var _loc5_ = Math.NaN;
 		var _loc18_ = Math.NaN;
 		var _loc2_ = false;
-		var _loc26_ = false;
+		var _loc27_ = false;
 		if (mStarlingRenderer == null || mActorGameObject == null) {
 			return;
 		}
@@ -887,12 +888,16 @@ class ActorRenderer extends Sprite {
 			return;
 		}
 		var _loc24_ = _loc14_.root;
+		var _loc25_ = StarlingLayerManager.resolveLayerIndex(_loc24_);
+		if (_loc25_ != 0 && mPendingLayer != 0) {
+			mStarlingRenderer.setLayer(starlingLayerFor(_loc25_));
+		}
 		var _loc8_ = _loc24_.x;
 		var _loc10_ = _loc24_.y;
 		var _loc12_ = _loc24_.rotation;
 		var _loc6_ = _loc24_.scaleX;
 		var _loc7_ = _loc24_.scaleY;
-		var _loc25_ = _loc24_.alpha;
+		var _loc26_ = _loc24_.alpha;
 		var _loc20_ = _loc24_.visible;
 		var _loc16_ = _loc12_;
 		var _loc21_ = ASCompat.reinterpretAs(mActorGameObject, NPCGameObject);
@@ -904,9 +909,9 @@ class ActorRenderer extends Sprite {
 		var _loc4_ = _loc9_ != null ? _loc9_.scaleY : _loc7_;
 		var _loc11_ = this.x;
 		var _loc13_ = this.y;
-		if (mStarlingRenderer.transformStale || _loc25_ > 1 || _loc25_ < 0 || _loc8_ != mSyncedRootX || _loc10_ != mSyncedRootY
+		if (mStarlingRenderer.transformStale || _loc26_ > 1 || _loc26_ < 0 || _loc8_ != mSyncedRootX || _loc10_ != mSyncedRootY
 			|| _loc12_ != mSyncedRootRotation || _loc16_ != mSyncedRotation || _loc6_ != mSyncedRootScaleX || _loc7_ != mSyncedRootScaleY
-			|| _loc25_ != mSyncedRootAlpha || _loc3_ != mSyncedBodyScaleX || _loc4_ != mSyncedBodyScaleY || _loc11_ != mSyncedOffsetX
+			|| _loc26_ != mSyncedRootAlpha || _loc3_ != mSyncedBodyScaleX || _loc4_ != mSyncedBodyScaleY || _loc11_ != mSyncedOffsetX
 			|| _loc13_ != mSyncedOffsetY) {
 			_loc19_ = _loc11_ * _loc3_ * _loc6_;
 			_loc17_ = _loc13_ * _loc4_ * _loc7_;
@@ -920,14 +925,14 @@ class ActorRenderer extends Sprite {
 				_loc22_ = _loc8_ + _loc19_ * _loc5_ - _loc17_ * _loc18_;
 				_loc23_ = _loc10_ + _loc19_ * _loc18_ + _loc17_ * _loc5_;
 			}
-			mStarlingRenderer.setTransform(_loc22_, _loc23_, _loc16_ * 3.141592653589793 / 180, _loc6_ * _loc3_, _loc7_ * _loc4_, _loc25_, _loc8_, _loc10_);
+			mStarlingRenderer.setTransform(_loc22_, _loc23_, _loc16_ * 3.141592653589793 / 180, _loc6_ * _loc3_, _loc7_ * _loc4_, _loc26_, _loc8_, _loc10_);
 			mSyncedRootX = _loc8_;
 			mSyncedRootY = _loc10_;
 			mSyncedRootRotation = _loc12_;
 			mSyncedRotation = _loc16_;
 			mSyncedRootScaleX = _loc6_;
 			mSyncedRootScaleY = _loc7_;
-			mSyncedRootAlpha = _loc25_;
+			mSyncedRootAlpha = _loc26_;
 			mSyncedBodyScaleX = _loc3_;
 			mSyncedBodyScaleY = _loc4_;
 			mSyncedOffsetX = _loc11_;
@@ -942,9 +947,9 @@ class ActorRenderer extends Sprite {
 			if (mCulled && !_loc2_) {
 				mUnculledSinceLastFrame = true;
 			}
-			_loc26_ = mCulled != _loc2_;
+			_loc27_ = mCulled != _loc2_;
 			mCulled = _loc2_;
-			if (_loc26_ && _loc9_ != null && _loc14_.bodyAnimRenderer == this) {
+			if (_loc27_ && _loc9_ != null && _loc14_.bodyAnimRenderer == this) {
 				updateWeaponCulling(_loc9_);
 			}
 		}
@@ -1169,8 +1174,19 @@ class ActorRenderer extends Sprite {
 	public function setLayer(layerIndex:Int) {
 		mPendingLayer = layerIndex;
 		if (mStarlingRenderer != null) {
-			mStarlingRenderer.setLayer(layerIndex);
+			mStarlingRenderer.setLayer(starlingLayer);
 		}
+	}
+
+	function starlingLayerFor(rootLayer:Int):Int {
+		return mPendingLayer != 0 && rootLayer == 35 ? rootLayer : mPendingLayer;
+	}
+
+	@:isVar var starlingLayer(get, never):Int;
+
+	function get_starlingLayer():Int {
+		var _loc1_ = mActorGameObject != null ? mActorGameObject.actorView : null;
+		return starlingLayerFor(_loc1_ != null ? StarlingLayerManager.resolveLayerIndex(_loc1_.root) : 0);
 	}
 
 	public function setHighlightFilter(color:UInt, alpha:Float = 8, blur:Float = 2) {

@@ -172,7 +172,7 @@ class GameClock {
 
 	static public function get_date():Date {
 		var _loc1_ = Date.now();
-		var _loc2_ = _loc1_.getTime() + mServerTimeOffset;
+		var _loc2_ = ASCompat.ASDate.getTime(_loc1_) + mServerTimeOffset;
 		ASCompat.ASDate.setTime(_loc1_, _loc2_);
 		return _loc1_;
 	}
@@ -185,7 +185,7 @@ class GameClock {
 
 	public static function computeServerTimeOffset(serverDate:Date) {
 		var _loc2_ = Date.now();
-		var _loc3_ = ASCompat.floatToInt(serverDate.getTime() - _loc2_.getTime());
+		var _loc3_ = ASCompat.floatToInt(ASCompat.ASDate.getTime(serverDate) - ASCompat.ASDate.getTime(_loc2_));
 		mServerTimeOffset = _loc3_;
 	}
 
@@ -194,10 +194,10 @@ class GameClock {
 			return 0;
 		}
 		var _loc2_ = Date.now();
-		var _loc1_ = _loc2_.getTime() - mWebServerLocalStartDate.getTime();
+		var _loc1_ = ASCompat.ASDate.getTime(_loc2_) - ASCompat.ASDate.getTime(mWebServerLocalStartDate);
 		var _loc3_ = Date.now();
-		ASCompat.ASDate.setTime(_loc3_, mWebServerDate.getTime() + _loc1_);
-		return mWebServerDate.getTime() + _loc1_ + mUserTimeOffset;
+		ASCompat.ASDate.setTime(_loc3_, ASCompat.ASDate.getTime(mWebServerDate) + _loc1_);
+		return ASCompat.ASDate.getTime(mWebServerDate) + _loc1_ + mUserTimeOffset;
 	}
 
 	public static function getEpoch():Float {
@@ -232,9 +232,9 @@ class GameClock {
 			return null;
 		}
 		var _loc3_ = Date.now();
-		var _loc1_ = _loc3_.getTime() - mWebServerLocalStartDate.getTime();
+		var _loc1_ = ASCompat.ASDate.getTime(_loc3_) - ASCompat.ASDate.getTime(mWebServerLocalStartDate);
 		var _loc2_ = Date.now();
-		ASCompat.ASDate.setTime(_loc2_, mWebServerDate.getTime() + _loc1_ + mUserTimeOffset);
+		ASCompat.ASDate.setTime(_loc2_, ASCompat.ASDate.getTime(mWebServerDate) + _loc1_ + mUserTimeOffset);
 		return _loc2_;
 	}
 
@@ -247,7 +247,7 @@ class GameClock {
 
 	public static function startSetWebServerTime() {
 		var _loc1_ = Date.now();
-		mWebServerPingStartTime = _loc1_.getTime();
+		mWebServerPingStartTime = ASCompat.ASDate.getTime(_loc1_);
 	}
 
 	public static function finishSetWebServerTime(timeInfo:Array<ASAny>) {
@@ -255,9 +255,9 @@ class GameClock {
 		mEpochDuration = ASCompat.toInt(timeInfo[1]);
 		mEpochOffset = ASCompat.toInt(timeInfo[2]);
 		var _loc3_ = Date.now();
-		mWebServerPingTime = _loc3_.getTime() - mWebServerPingStartTime;
+		mWebServerPingTime = ASCompat.ASDate.getTime(_loc3_) - mWebServerPingStartTime;
 		mWebServerLocalStartDate = Date.now();
-		ASCompat.ASDate.setTime(mWebServerLocalStartDate, _loc3_.getTime() - mWebServerPingTime * 0.5);
+		ASCompat.ASDate.setTime(mWebServerLocalStartDate, ASCompat.ASDate.getTime(_loc3_) - mWebServerPingTime * 0.5);
 		mWebServerTimeString = _loc2_;
 		mWebServerDate = parseW3CDTF(_loc2_, false);
 	}

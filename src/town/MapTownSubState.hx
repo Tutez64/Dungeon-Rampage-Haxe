@@ -101,6 +101,7 @@ class MapTownSubState extends TownSubState {
 
 	override public function exitState() {
 		super.exitState();
+		mDBFacade.playerActivityCount.dropHeldAction();
 		popBattlePopupLayer();
 		mWorldMap.deinit();
 		mDBFacade.menuNavigationController.popLayer("MAP_MENU");

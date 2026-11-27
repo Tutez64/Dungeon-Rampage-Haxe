@@ -5,6 +5,7 @@ import brain.utils.MemoryTracker;
 import facade.DBFacade;
 import facade.Locale;
 import uI.popup.DBUIOneButtonPopup;
+import uI.popup.DBUIUnescapablePopup;
 
 class SocketErrorState extends State {
 	public static inline final NAME = "SocketErrorState";
@@ -43,8 +44,8 @@ class SocketErrorState extends State {
 			_loc3_ = new DBUIOneButtonPopup(mDBFacade, "SOCKET_CLOSED_DUPLICATE_LOGIN_POPUP", Locale.getString("SOCKET_CLOSE_61_HEADER"),
 				Locale.getString("SOCKET_CLOSE_61_TEXT"), Locale.getString("EXIT"), errorDialogResponse, false);
 		} else if (errorCode == 1504) {
-			_loc3_ = new DBUIOneButtonPopup(mDBFacade, "MAINTENANCE_POPUP", Locale.getString("SOCKET_CLOSE_61_HEADER"), errorText, Locale.getString("EXIT"),
-				errorDialogResponse, false);
+			_loc3_ = new DBUIUnescapablePopup(mDBFacade, "MAINTENANCE_POPUP", Locale.getString("SOCKET_CLOSE_61_HEADER"), errorText, Locale.getString("EXIT"),
+				errorDialogResponse);
 		} else {
 			_loc3_ = new DBUIOneButtonPopup(mDBFacade, "SOCKET_UNEXPECTED_CLOSE_POPUP", Locale.getString("SOCKET_UNEXPECT_CLOSE"),
 				Locale.getError((errorCode : Int)) + "\n" + errorText, Locale.getString("CENTER_BUTTON_POPUP_RELOAD_TEXT"), errorDialogResponse, false);

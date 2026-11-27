@@ -18,9 +18,9 @@ class DBConfigManager extends ConfigManager {
 		mDBFacade = dbFacade;
 		mEventComponent = new EventComponent(mDBFacade);
 		var _loc2_:String;
-		final __ax4_iter_528 = mFilePathsToOpen.concat(mDBFacade.mAdditionalConfigFilesToLoad);
-		if (checkNullIteratee(__ax4_iter_528))
-			for (_tmp_ in __ax4_iter_528) {
+		final __ax4_iter_532 = mFilePathsToOpen.concat(mDBFacade.mAdditionalConfigFilesToLoad);
+		if (checkNullIteratee(__ax4_iter_532))
+			for (_tmp_ in __ax4_iter_532) {
 				_loc2_ = _tmp_;
 				mConfigsToLoad.push(DBFacade.buildFullDownloadPath(_loc2_));
 			}
@@ -34,6 +34,9 @@ class DBConfigManager extends ConfigManager {
 	}
 
 	function handleFailure() {
+		if (!mDBFacade.stageRef.nativeWindow.visible) {
+			mDBFacade.stageRef.nativeWindow.activate();
+		}
 		Logger.fatal("Failed to load config files: " + mConfigsToLoad);
 	}
 }

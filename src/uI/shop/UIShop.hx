@@ -172,7 +172,7 @@ class UIShop {
 		this.processGMOffers();
 		this.sortOffers();
 		this.filterOffers();
-		displayCategoryPage();
+		this.displayFilteredOffers();
 	}
 
 	public function destroy() {
@@ -256,9 +256,9 @@ class UIShop {
 		var _loc4_:ASAny = null;
 		var _loc5_ = (0 : UInt);
 		mCategorizedGMOffers = new Map();
-		final __ax4_iter_440 = CATEGORIES;
-		if (checkNullIteratee(__ax4_iter_440))
-			for (_tmp_ in __ax4_iter_440) {
+		final __ax4_iter_443 = CATEGORIES;
+		if (checkNullIteratee(__ax4_iter_443))
+			for (_tmp_ in __ax4_iter_443) {
 				_loc6_ = _tmp_;
 				mCategorizedGMOffers.add(_loc6_, new Vector<GMOffer>());
 			}
@@ -631,11 +631,11 @@ class UIShop {
 		var _loc4_:String = null;
 		var _loc3_:String = null;
 		var _loc5_ = GameClock.getWebServerDate();
-		if (_loc5_.getTime() > mWeaponTabEndDate.getTime()) {
+		if (ASCompat.ASDate.getTime(_loc5_) > ASCompat.ASDate.getTime(mWeaponTabEndDate)) {
 			setCountdownText("00:00:00");
 			regenerateOffers();
 		} else {
-			_loc6_ = new TimeSpan(mWeaponTabEndDate.getTime() - _loc5_.getTime());
+			_loc6_ = new TimeSpan(ASCompat.ASDate.getTime(mWeaponTabEndDate) - ASCompat.ASDate.getTime(_loc5_));
 			_loc2_ = Std.string(_loc6_.hours);
 			if (_loc2_.length == 1) {
 				_loc2_ = "0" + _loc2_;
@@ -865,7 +865,7 @@ class UIShop {
 	}
 
 	function filterOffers() {
-		var __ax4_iter_442:ASAny;
+		var __ax4_iter_445:ASAny;
 		var _loc10_:String = null;
 		var _loc1_:Vector<GMOffer> = /*undefined*/ null;
 		var _loc2_:GMOffer = null;
@@ -878,15 +878,15 @@ class UIShop {
 		var _loc6_:GMHero = null;
 		var _loc5_ = mSelectedHero != null ? mDBFacade.dbAccountInfo.inventoryInfo.getAvatarInfoForHeroType(mSelectedHero.Id) : null;
 		mFilteredGMOffers.clear();
-		final __ax4_iter_441 = CATEGORIES;
-		if (checkNullIteratee(__ax4_iter_441))
-			for (_tmp_ in __ax4_iter_441) {
+		final __ax4_iter_444 = CATEGORIES;
+		if (checkNullIteratee(__ax4_iter_444))
+			for (_tmp_ in __ax4_iter_444) {
 				_loc10_ = _tmp_;
 				_loc1_ = new Vector<GMOffer>();
 				mFilteredGMOffers.add(_loc10_, _loc1_);
-				__ax4_iter_442 = mCategorizedGMOffers.itemFor(_loc10_);
-				if (checkNullIteratee(__ax4_iter_442))
-					for (_tmp_ in __ax4_iter_442) {
+				__ax4_iter_445 = mCategorizedGMOffers.itemFor(_loc10_);
+				if (checkNullIteratee(__ax4_iter_445))
+					for (_tmp_ in __ax4_iter_445) {
 						_loc2_ = ASCompat.coerce(_tmp_, gameMasterDictionary.GMOffer);
 						if (_loc2_.SaleTargetOffer == null) {
 							if (!_loc2_.IsCoinAltOffer) {
@@ -927,9 +927,11 @@ class UIShop {
 	function heroSelected(gmHero:GMHero, owned:Bool) {
 		mSelectedHero = gmHero;
 		this.filterOffers();
-		if (mCurrentTab == "WEAPON") {
-			this.refreshPagination(this.firstWeaponPageForActiveHero());
-		}
+		this.displayFilteredOffers();
+	}
+
+	function displayFilteredOffers() {
+		this.refreshPagination(mCurrentTab == "WEAPON" ? this.firstWeaponPageForActiveHero() : mCurrentPage);
 		this.displayCategoryPage();
 	}
 

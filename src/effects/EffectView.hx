@@ -7,6 +7,7 @@ import brain.clock.GameClock;
 import brain.logger.Logger;
 import brain.render.Layer;
 import brain.render.MovieClipRenderController;
+import brain.starling.StarlingLayerManager;
 import brain.workLoop.LayerWorkComponent;
 import facade.DBFacade;
 import dr_floor.FloorView;
@@ -482,11 +483,7 @@ class EffectView extends FloorView {
 		if (mOnStage) {
 			return this.layer;
 		}
-		var _loc1_ = mAnchor;
-		while (_loc1_ != null && !Std.isOfType(_loc1_, Layer)) {
-			_loc1_ = _loc1_.parent;
-		}
-		return Std.isOfType(_loc1_, Layer) ? cast(_loc1_, Layer).sortIndex : 0;
+		return StarlingLayerManager.resolveLayerIndex(mAnchor);
 	}
 
 	function fallbackToSwf(reason:String = null) {

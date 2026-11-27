@@ -447,7 +447,7 @@ class DcSocket {
 		var _loc2_ = new DcNetworkPacket();
 		_loc2_.writeShort((CLIENT_HEART_BEAT : Int));
 		var _loc3_ = Date.now();
-		var _loc1_ = Std.string(_loc3_.getTime());
+		var _loc1_ = Std.string(ASCompat.ASDate.getTime(_loc3_));
 		_loc2_.writeUTF(_loc1_);
 		return _loc2_;
 	}
@@ -662,7 +662,7 @@ class DcSocket {
 			_loc2_ = game_packet.readUTF();
 			_loc4_ = ASCompat.toNumber(_loc2_);
 			_loc5_ = Date.now();
-			_loc3_ = _loc5_.getTime();
+			_loc3_ = ASCompat.ASDate.getTime(_loc5_);
 			mDBFacade.dbAccountInfo.SocketPingMilsecs = ASCompat.floatToInt(_loc3_ - _loc4_);
 		}
 	}
@@ -730,9 +730,9 @@ class DcSocket {
 		}
 		var _loc4_ = new Vector<DcNetworkClass>();
 		var _loc3_:String;
-		final __ax4_iter_158:ASObject = Doid_NetInterfaces;
-		if (checkNullIteratee(__ax4_iter_158))
-			for (_tmp_ in __ax4_iter_158.___keys()) {
+		final __ax4_iter_159:ASObject = Doid_NetInterfaces;
+		if (checkNullIteratee(__ax4_iter_159))
+			for (_tmp_ in __ax4_iter_159.___keys()) {
 				_loc3_ = _tmp_;
 				_loc1_ = Doid_NetInterfaces[_loc3_];
 				if (Std.isOfType(_loc1_, DcNetworkClass)) {

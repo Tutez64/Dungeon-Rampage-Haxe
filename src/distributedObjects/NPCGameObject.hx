@@ -125,9 +125,9 @@ class NPCGameObject extends ActorGameObject implements IDistributedNPCGameObject
 		mActorStateMachine.destroy();
 		mActorStateMachine = null;
 		var _loc1_:NavCollider;
-		final __ax4_iter_308 = mOffNavCollisions;
-		if (checkNullIteratee(__ax4_iter_308))
-			for (_tmp_ in __ax4_iter_308) {
+		final __ax4_iter_310 = mOffNavCollisions;
+		if (checkNullIteratee(__ax4_iter_310))
+			for (_tmp_ in __ax4_iter_310) {
 				_loc1_ = _tmp_;
 				_loc1_.destroy();
 			}
@@ -167,9 +167,9 @@ class NPCGameObject extends ActorGameObject implements IDistributedNPCGameObject
 
 	public function removeOffNavColliders() {
 		var _loc1_:NavCollider;
-		final __ax4_iter_309 = mOffNavCollisions;
-		if (checkNullIteratee(__ax4_iter_309))
-			for (_tmp_ in __ax4_iter_309) {
+		final __ax4_iter_311 = mOffNavCollisions;
+		if (checkNullIteratee(__ax4_iter_311))
+			for (_tmp_ in __ax4_iter_311) {
 				_loc1_ = _tmp_;
 				_loc1_.destroy();
 			}
@@ -186,9 +186,9 @@ class NPCGameObject extends ActorGameObject implements IDistributedNPCGameObject
 
 	public function set_offNavCollidersActive(value:Bool):Bool {
 		var _loc2_:NavCollider;
-		final __ax4_iter_310 = mOffNavCollisions;
-		if (checkNullIteratee(__ax4_iter_310))
-			for (_tmp_ in __ax4_iter_310) {
+		final __ax4_iter_312 = mOffNavCollisions;
+		if (checkNullIteratee(__ax4_iter_312))
+			for (_tmp_ in __ax4_iter_312) {
 				_loc2_ = _tmp_;
 				_loc2_.active = value;
 			}

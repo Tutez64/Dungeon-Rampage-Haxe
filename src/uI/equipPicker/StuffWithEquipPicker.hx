@@ -160,9 +160,9 @@ class StuffWithEquipPicker extends UIObject {
 
 	public function resetMenuNavigation() {
 		var _loc1_:UIObject;
-		final __ax4_iter_491 = mHeroSlots;
-		if (checkNullIteratee(__ax4_iter_491))
-			for (_tmp_ in __ax4_iter_491) {
+		final __ax4_iter_494 = mHeroSlots;
+		if (checkNullIteratee(__ax4_iter_494))
+			for (_tmp_ in __ax4_iter_494) {
 				_loc1_ = _tmp_;
 				_loc1_.clearNavigationAndInteractions();
 			}

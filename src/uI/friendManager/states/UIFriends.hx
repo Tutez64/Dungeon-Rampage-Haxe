@@ -210,7 +210,7 @@ class UIFriends extends UIFMState {
 		var _loc5_:String = null;
 		var _loc8_:Array<ASAny> = [];
 		var _loc7_:Array<ASAny> = [];
-		var _loc6_ = Std.string(Date.now().getTime());
+		var _loc6_ = Std.string(ASCompat.ASDate.getTime(Date.now()));
 		var _loc9_:UInt;
 		if (checkNullIteratee(drFriends))
 			for (_tmp_ in drFriends) {

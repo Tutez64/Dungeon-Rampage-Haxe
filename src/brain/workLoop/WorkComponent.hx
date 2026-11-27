@@ -52,9 +52,9 @@ class WorkComponent extends Component {
 
 	public function clear() {
 		var _loc1_:ASObject;
-		final __ax4_iter_328 = mTasks;
-		if (checkNullIteratee(__ax4_iter_328))
-			for (_tmp_ in __ax4_iter_328.keys()) {
+		final __ax4_iter_330 = mTasks;
+		if (checkNullIteratee(__ax4_iter_330))
+			for (_tmp_ in __ax4_iter_330.keys()) {
 				_loc1_ = _tmp_;
 				if (Std.isOfType(_loc1_, DoLater)) {
 					mWorkLoopManager.removeDoLater(cast(_loc1_, DoLater));
@@ -68,9 +68,9 @@ class WorkComponent extends Component {
 
 	override public function destroy() {
 		var _loc1_:ASObject;
-		final __ax4_iter_329 = mTasks;
-		if (checkNullIteratee(__ax4_iter_329))
-			for (_tmp_ in __ax4_iter_329.keys()) {
+		final __ax4_iter_331 = mTasks;
+		if (checkNullIteratee(__ax4_iter_331))
+			for (_tmp_ in __ax4_iter_331.keys()) {
 				_loc1_ = _tmp_;
 				if (Std.isOfType(_loc1_, DoLater)) {
 					mWorkLoopManager.removeDoLater(cast(_loc1_, DoLater));

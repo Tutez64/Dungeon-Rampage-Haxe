@@ -228,9 +228,9 @@ class SettingsPopup extends DBUIPopup {
 			return true;
 		}
 		var _loc2_:UIRadioButton;
-		final __ax4_iter_367 = mTabs.buttons;
-		if (checkNullIteratee(__ax4_iter_367))
-			for (_tmp_ in __ax4_iter_367) {
+		final __ax4_iter_370 = mTabs.buttons;
+		if (checkNullIteratee(__ax4_iter_370))
+			for (_tmp_ in __ax4_iter_370) {
 				_loc2_ = _tmp_;
 				if (_loc2_ == uiObject) {
 					return true;

@@ -24,6 +24,8 @@ class Symbol extends DisplayObjectContainer {
 
 	static inline final QUALITY:Float = 1;
 
+	static inline final NO_LOOP_LABEL = "noloop";
+
 	static final sMatrix:Matrix = new Matrix();
 
 	static var sUnsupportedBlends:ASObject;
@@ -595,6 +597,8 @@ class Symbol extends DisplayObjectContainer {
 			_loc12_.setLoop(_loc4_.loop);
 			if (_forcePlayOnce) {
 				_loc12_.clampPlayOnce();
+			} else if (_loc12_._type == "movieclip" && _loc12_.getFrame("noloop") >= 0) {
+				_loc12_.clampPlayOnce();
 			}
 			if (_loc12_.type == "graphic") {
 				_loc9_ = ASCompat.toInt(_loc4_.firstFrame);
@@ -1068,7 +1072,7 @@ class Symbol extends DisplayObjectContainer {
 
 	function updateSymbolFilters() {
 		var _loc3_:FragmentFilter;
-		var __ax4_iter_509:Array<ASAny>;
+		var __ax4_iter_512:Array<ASAny>;
 		if (_filterChain != null) {
 			while (_filterChain.numFilters > 0) {
 				_filterChain.removeFilterAt(0, false);
@@ -1107,9 +1111,9 @@ class Symbol extends DisplayObjectContainer {
 				_filterChain.addFilter(_loc2_);
 			}
 			if (_elementFilters != null) {
-				__ax4_iter_509 = _elementFilters;
-				if (checkNullIteratee(__ax4_iter_509))
-					for (_tmp_ in __ax4_iter_509) {
+				__ax4_iter_512 = _elementFilters;
+				if (checkNullIteratee(__ax4_iter_512))
+					for (_tmp_ in __ax4_iter_512) {
 						_loc3_ = ASCompat.coerce(_tmp_, starling.filters.FragmentFilter);
 						_filterChain.addFilter(_loc3_);
 					}
@@ -1128,12 +1132,12 @@ class Symbol extends DisplayObjectContainer {
 
 	function clearFilters() {
 		var _loc1_:FragmentFilter;
-		var __ax4_iter_510:Array<ASAny>;
+		var __ax4_iter_513:Array<ASAny>;
 		this.filter = null;
 		if (_elementFilters != null) {
-			__ax4_iter_510 = _elementFilters;
-			if (checkNullIteratee(__ax4_iter_510))
-				for (_tmp_ in __ax4_iter_510) {
+			__ax4_iter_513 = _elementFilters;
+			if (checkNullIteratee(__ax4_iter_513))
+				for (_tmp_ in __ax4_iter_513) {
 					_loc1_ = ASCompat.coerce(_tmp_, starling.filters.FragmentFilter);
 					_loc1_.dispose();
 				}

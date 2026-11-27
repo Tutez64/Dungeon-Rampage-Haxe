@@ -159,7 +159,7 @@ class TimelineMasks {
 	}
 
 	function prune() {
-		var __ax4_iter_166:ASObject;
+		var __ax4_iter_167:ASObject;
 		var _loc4_:String = null;
 		var _loc1_:Vector<Array<ASAny>> = /*undefined*/ null;
 		var _loc6_:Array<ASAny> = null;
@@ -167,9 +167,9 @@ class TimelineMasks {
 		var _loc7_ = false;
 		var _loc2_:ASObject = {};
 		var _loc3_:ASObject = {};
-		final __ax4_iter_165:ASObject = mSprites;
-		if (checkNullIteratee(__ax4_iter_165))
-			for (_tmp_ in __ax4_iter_165.___keys()) {
+		final __ax4_iter_166:ASObject = mSprites;
+		if (checkNullIteratee(__ax4_iter_166))
+			for (_tmp_ in __ax4_iter_166.___keys()) {
 				_loc4_ = _tmp_;
 				_loc1_ = (mSprites[_loc4_] : Vector<Array<ASAny>>);
 				if (checkNullIteratee(_loc1_))
@@ -187,9 +187,9 @@ class TimelineMasks {
 			}
 		do {
 			_loc7_ = false;
-			__ax4_iter_166 = mSprites;
-			if (checkNullIteratee(__ax4_iter_166))
-				for (_tmp_ in __ax4_iter_166.___keys()) {
+			__ax4_iter_167 = mSprites;
+			if (checkNullIteratee(__ax4_iter_167))
+				for (_tmp_ in __ax4_iter_167.___keys()) {
 					_loc4_ = _tmp_;
 					if (!ASCompat.toBool(_loc2_[_loc4_])) {
 						_loc1_ = (mSprites[_loc4_] : Vector<Array<ASAny>>);
@@ -208,9 +208,9 @@ class TimelineMasks {
 					}
 				}
 		} while (_loc7_);
-		final __ax4_iter_167:ASObject = mSprites;
-		if (checkNullIteratee(__ax4_iter_167))
-			for (_tmp_ in __ax4_iter_167.___keys()) {
+		final __ax4_iter_168:ASObject = mSprites;
+		if (checkNullIteratee(__ax4_iter_168))
+			for (_tmp_ in __ax4_iter_168.___keys()) {
 				_loc4_ = _tmp_;
 				if (!ASCompat.toBool(_loc2_[_loc4_])) {
 					ASCompat.deleteProperty(mSprites, _loc4_);

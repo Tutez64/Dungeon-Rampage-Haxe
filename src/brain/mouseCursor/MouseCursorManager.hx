@@ -40,9 +40,9 @@ class MouseCursorManager {
 		mFacade = facade;
 		mCursors = new ASDictionary<ASAny, ASAny>();
 		var _loc2_:String;
-		final __ax4_iter_529 = BUILT_IN_CURSORS;
-		if (checkNullIteratee(__ax4_iter_529))
-			for (_tmp_ in __ax4_iter_529) {
+		final __ax4_iter_533 = BUILT_IN_CURSORS;
+		if (checkNullIteratee(__ax4_iter_533))
+			for (_tmp_ in __ax4_iter_533) {
 				_loc2_ = _tmp_;
 				mCursors[_loc2_] = _loc2_;
 			}

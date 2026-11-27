@@ -39,9 +39,9 @@ class FrameRateOptions {
 			return false;
 		}
 		var _loc2_:SettingChoice;
-		final __ax4_iter_481 = mChoices;
-		if (checkNullIteratee(__ax4_iter_481))
-			for (_tmp_ in __ax4_iter_481) {
+		final __ax4_iter_484 = mChoices;
+		if (checkNullIteratee(__ax4_iter_484))
+			for (_tmp_ in __ax4_iter_484) {
 				_loc2_ = _tmp_;
 				if (ASCompat.toNumberField(_loc2_, "value") == value) {
 					return false;
@@ -61,9 +61,9 @@ class FrameRateOptions {
 		var _loc5_ = Math.NaN;
 		var _loc3_ = Math.NaN;
 		var _loc2_:Int;
-		final __ax4_iter_482 = DIVISORS;
-		if (checkNullIteratee(__ax4_iter_482))
-			for (_tmp_ in __ax4_iter_482) {
+		final __ax4_iter_485 = DIVISORS;
+		if (checkNullIteratee(__ax4_iter_485))
+			for (_tmp_ in __ax4_iter_485) {
 				_loc2_ = ASCompat.toInt(_tmp_);
 				_loc4_ = hz / _loc2_;
 				if (!(_loc4_ < 44 || _loc4_ > 93)) {

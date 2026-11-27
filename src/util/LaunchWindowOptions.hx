@@ -4,9 +4,54 @@ import brain.logger.Logger;
 import brain.utils.FeatureFlags;
 import flash.display.NativeWindow;
 import flash.display.Stage;
+import flash.utils.Timer;
 
 class LaunchWindowOptions {
 	public function new() {}
+
+	public static function showWhenReady(stage:Stage, flags:FeatureFlags, ready:ASFunction) {
+		var cancel:ASFunction = null;
+		var poll:ASFunction = null;
+		var state:String = null;
+		var window = stage.nativeWindow;
+		var timer = new Timer(25);
+		var stable = 0;
+		var width = -1;
+		var height = -1;
+		var reset:ASFunction = function(param1:flash.events.Event) {
+			stable = 0;
+		};
+		cancel = function(param1:flash.events.Event = null) {
+			timer.stop();
+			timer.removeEventListener("timer", poll);
+			stage.removeEventListener("resize", reset);
+			stage.removeEventListener("fullScreen", reset);
+			window.removeEventListener("close", cancel);
+		};
+		poll = function(param1:flash.events.TimerEvent) {
+			if (width != stage.stageWidth || height != stage.stageHeight || state != stage.displayState) {
+				width = stage.stageWidth;
+				height = stage.stageHeight;
+				state = stage.displayState;
+				stable = 0;
+			}
+			if (width > 0 && height > 0 && ++stable >= 2) {
+				cancel();
+				ready();
+			}
+		};
+		stage.addEventListener("resize", reset);
+		stage.addEventListener("fullScreen", reset);
+		window.addEventListener("close", cancel);
+		timer.addEventListener("timer", poll);
+		try {
+			stage.displayState = flags.getFlagValue("start-windowed") ? "normal" : "fullScreenInteractive";
+		} catch (error:Dynamic) {
+			Logger.warn("Could not apply startup display mode: " + ASCompat.asError(error).message);
+		}
+		window.activate();
+		timer.start();
+	}
 
 	public static function apply(stage:Stage, flags:FeatureFlags, arguments:Array<ASAny>) {
 		var _loc5_:Array<ASAny> = null;

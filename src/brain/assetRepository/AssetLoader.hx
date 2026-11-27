@@ -108,9 +108,9 @@ class AssetLoader {
 		mBytesLoaded = (0 : UInt);
 		mBytesTotal = (0 : UInt);
 		var _loc1_:Loader;
-		final __ax4_iter_410 = mloadersets;
-		if (checkNullIteratee(__ax4_iter_410))
-			for (_tmp_ in __ax4_iter_410) {
+		final __ax4_iter_413 = mloadersets;
+		if (checkNullIteratee(__ax4_iter_413))
+			for (_tmp_ in __ax4_iter_413) {
 				_loc1_ = _tmp_;
 				mBytesLoaded += _loc1_.contentLoaderInfo.bytesLoaded;
 				mBytesTotal += _loc1_.contentLoaderInfo.bytesTotal;
@@ -150,7 +150,7 @@ class AssetLoader {
 				_loc4_.url += "?v=" + facade.fileVersion(assetPath);
 			}
 		} else {
-			_loc4_.url += "?t=" + Std.string(Date.now().getTime());
+			_loc4_.url += "?t=" + Std.string(ASCompat.ASDate.getTime(Date.now()));
 		}
 		if (mUseLoader) {
 			mLoader = new Loader();

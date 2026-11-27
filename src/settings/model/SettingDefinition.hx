@@ -17,6 +17,8 @@ class SettingDefinition {
 
 	public var defaultValue:ASAny;
 
+	public var action:ASFunction;
+
 	public var binding:ISettingBinding;
 
 	public var requiresRestart:Bool = false;
@@ -84,6 +86,12 @@ class SettingDefinition {
 		return _loc2_;
 	}
 
+	@:isVar public var isAction(get, never):Bool;
+
+	public function get_isAction():Bool {
+		return action != null;
+	}
+
 	@:isVar public var isChoice(get, never):Bool;
 
 	public function get_isChoice():Bool {
@@ -93,7 +101,7 @@ class SettingDefinition {
 	@:isVar public var isSlider(get, never):Bool;
 
 	public function get_isSlider():Bool {
-		return !isChoice && !isKeyBinding && !Math.isNaN(minimum);
+		return !isAction && !isChoice && !isKeyBinding && !Math.isNaN(minimum);
 	}
 
 	@:isVar public var isKeyBinding(get, never):Bool;
@@ -105,7 +113,7 @@ class SettingDefinition {
 	@:isVar public var isBoolean(get, never):Bool;
 
 	public function get_isBoolean():Bool {
-		return !isChoice && !isSlider && !isKeyBinding;
+		return !isAction && !isChoice && !isSlider && !isKeyBinding;
 	}
 
 	@:isVar public var isPersisted(get, never):Bool;
@@ -121,9 +129,9 @@ class SettingDefinition {
 			return false;
 		}
 		var _loc1_:SettingChoice;
-		final __ax4_iter_479 = choices;
-		if (checkNullIteratee(__ax4_iter_479))
-			for (_tmp_ in __ax4_iter_479) {
+		final __ax4_iter_482 = choices;
+		if (checkNullIteratee(__ax4_iter_482))
+			for (_tmp_ in __ax4_iter_482) {
 				_loc1_ = _tmp_;
 				if (_loc1_.memberValues != null) {
 					return true;
@@ -137,9 +145,9 @@ class SettingDefinition {
 			return null;
 		}
 		var _loc2_:SettingChoice;
-		final __ax4_iter_480 = choices;
-		if (checkNullIteratee(__ax4_iter_480))
-			for (_tmp_ in __ax4_iter_480) {
+		final __ax4_iter_483 = choices;
+		if (checkNullIteratee(__ax4_iter_483))
+			for (_tmp_ in __ax4_iter_483) {
 				_loc2_ = _tmp_;
 				if (_loc2_.value == value) {
 					return _loc2_;

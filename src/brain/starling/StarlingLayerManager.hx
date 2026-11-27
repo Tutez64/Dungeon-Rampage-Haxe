@@ -2,14 +2,17 @@ package brain.starling;
 
 import brain.facade.Facade;
 import brain.logger.Logger;
+import brain.render.Layer;
 import brain.starling.swfConverter.BakeScheduler;
 import brain.starling.swfConverter.BakedPages;
+import flash.display.DisplayObject;
 import flash.display.Sprite;
 import flash.display.Stage;
 import flash.geom.Rectangle;
 import starling.animation.Juggler;
 import starling.core.Starling;
 import starling.display.DisplayObject;
+import starling.display.Quad;
 import starling.display.Sprite;
 import starling.display.Stage;
 import starling.utils.Color;
@@ -24,6 +27,10 @@ class StarlingLayerManager {
 	static inline final LAYER_SORTED = "sorted";
 
 	static inline final LAYER_FOREGROUND = "foreground";
+
+	static inline final LAYER_FADE = "gameFade";
+
+	static inline final LAYER_FADE_EXEMPT = "fadeExempt";
 
 	static inline final LAYER_OVERFADE = "overfade";
 
@@ -51,6 +58,8 @@ class StarlingLayerManager {
 
 	var mLayers:Vector<StarlingLayer>;
 
+	var mFadeWash:Quad;
+
 	var mOnContextReady:ASFunction;
 
 	public function new(inFacade:Facade, stage:flash.display.Stage, designWidth:Float, designHeight:Float, onContextReady:ASFunction = null) {
@@ -63,6 +72,17 @@ class StarlingLayerManager {
 
 	static function keepAddOrder(a:DisplayObject, b:DisplayObject):Int {
 		return 0;
+	}
+
+	public static function resolveLayerIndex(node:flash.display.DisplayObject):Int {
+		while (node != null && !Std.isOfType(node, Layer)) {
+			node = node.parent;
+		}
+		if (!Std.isOfType(node, Layer)) {
+			return 0;
+		}
+		var _loc2_ = cast(node, Layer).sortIndex;
+		return _loc2_ == 42 || _loc2_ == 46 ? 35 : _loc2_;
 	}
 
 	@:isVar public var worldCameraOffsetX(get, never):Float;
@@ -117,7 +137,7 @@ class StarlingLayerManager {
 		if (checkNullIteratee(__ax4_iter_88))
 			for (_tmp_ in __ax4_iter_88) {
 				_loc1_ = _tmp_;
-				if (!(_loc1_.sortIndex == 36 || _loc1_.sortIndex == 64)) {
+				if (!(_loc1_.sortIndex == 36 || _loc1_.sortIndex == 64 || _loc1_.sortIndex == 34)) {
 					_loc1_.clean();
 				}
 			}
@@ -172,6 +192,8 @@ class StarlingLayerManager {
 		createLayer(10, "background", "normal", false, StarlingLayer.compareByY).bakeStaticImages = _loc3_;
 		createLayer(20, "sorted", "normal", true);
 		createLayer(30, "foreground", "normal");
+		createLayer(34, "gameFade", "normal", false, null, true);
+		createLayer(35, "fadeExempt", "normal", true);
 		createLayer(46, "overfade", "normal");
 		createLayer(50, "tween", "normal", false, null, true);
 		BakeScheduler.enabled = mDBFacade.featureFlags.getFlagValue("starling-overlays")
@@ -279,6 +301,33 @@ class StarlingLayerManager {
 			SystemUtil.supportsDepthAndStencil);
 	}
 
+	function syncFadeWash() {
+		var _loc3_ = mDBFacade != null ? mDBFacade.camera : null;
+		var _loc2_ = _loc3_ != null ? _loc3_.backgroundFadeAlpha : 0;
+		var _loc4_ = ASCompat.coerce(ASDictionary.getInt(mLayerMap, 34), brain.starling.StarlingLayer);
+		if (_loc2_ <= 0 || _loc4_ == null) {
+			if (mFadeWash != null && mFadeWash.parent != null) {
+				mFadeWash.removeFromParent();
+			}
+			return;
+		}
+		if (mFadeWash == null) {
+			mFadeWash = new Quad(mStarling.stage.stageWidth, mStarling.stage.stageHeight);
+			mFadeWash.touchable = false;
+			mFadeWash.name = "BackgroundFade";
+		}
+		var _loc1_ = _loc3_.backgroundFadeColor;
+		if (mFadeWash.color != _loc1_) {
+			mFadeWash.color = _loc1_;
+		}
+		if (mFadeWash.alpha != _loc2_) {
+			mFadeWash.alpha = _loc2_;
+		}
+		if (mFadeWash.parent != _loc4_) {
+			_loc4_.addChild(mFadeWash);
+		}
+	}
+
 	public function syncWorldTransform(worldTransformNode:flash.display.Sprite) {
 		if (!isReady()) {
 			return;
@@ -308,6 +357,7 @@ class StarlingLayerManager {
 				_loc8_.evaluateFrameLayerUpdate(_loc5_);
 			}
 		Pool.putMatrix(_loc5_);
+		syncFadeWash();
 		if (!mStarling.contextValid) {
 			return;
 		}

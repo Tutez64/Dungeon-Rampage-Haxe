@@ -413,6 +413,10 @@ class ChestInfoCard extends UIObject {
 					"category": "storage"
 				});
 				closeBuyKeysPopUp();
+				if (UIHud.isThisAConsumbleChestId((mChestInfo.gmId : Int))) {
+					boughtKey(null);
+					return;
+				}
 				mPurchasingPopUp = new DBUIPopup(mDBFacade, "", Locale.getString("PURCHASING..."));
 				MemoryTracker.track(mPurchasingPopUp, "DBUIPopup - created in ChestInfoCard.chestBuyCoinCallback()");
 				mSceneGraphComponent.addChild(mPurchasingPopUp.root, (50 : UInt));
@@ -440,6 +444,10 @@ class ChestInfoCard extends UIObject {
 					"category": "storage"
 				});
 				closeBuyKeysPopUp();
+				if (UIHud.isThisAConsumbleChestId((mChestInfo.gmId : Int))) {
+					boughtKey(null);
+					return;
+				}
 				mPurchasingPopUp = new DBUIPopup(mDBFacade, "", Locale.getString("PURCHASING..."));
 				MemoryTracker.track(mPurchasingPopUp, "DBUIPopup - created in ChestInfoCard.chestBuyGemCallback()");
 				mSceneGraphComponent.addChild(mPurchasingPopUp.root, (50 : UInt));

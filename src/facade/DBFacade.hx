@@ -59,6 +59,7 @@ import uI.popup.DBUIOneButtonPopup;
 import uI.UIHideToggle;
 import uI.UILevelUpPostController;
 import uI.UIReconnectingIndicator;
+import util.LaunchWindowOptions;
 import com.amanitadesign.steam.FRESteamWorks;
 import flash.display.DisplayObject;
 import flash.display.MovieClip;
@@ -86,6 +87,10 @@ class DBFacade extends Facade {
 	var mInitialLoadingClip:MovieClip;
 
 	var mLoadingBar:UIProgressBar;
+
+	var mInitialConfigRequested:Bool = false;
+
+	var mInitialConfig:DBConfigManager;
 
 	var mLoadingBarIntStatus:Float = 0;
 
@@ -158,6 +163,8 @@ class DBFacade extends Facade {
 	var mGameSocketPort:Int = 0;
 
 	var mGameSocketTlsOffered:Bool = false;
+
+	var mGameSocketFallbackPort:Int = 0;
 
 	var mGameSocketWssPath:String = "";
 
@@ -316,8 +323,6 @@ class DBFacade extends Facade {
 	}
 
 	function loadBackground() {
-		var countBackgroundImagesLoaded = 0;
-		var startWindowed = featureFlags.getFlagValue("start-windowed");
 		mAssetLoadingComponent.getImageAsset(DBFacade.buildFullDownloadPath("Resources/Art2D/background/left.jpg"),
 			function(param1:brain.assetRepository.ImageAsset) {
 				var _loc2_:DisplayObject = param1.image;
@@ -327,12 +332,6 @@ class DBFacade extends Facade {
 				_loc2_.x = -_loc2_.width;
 				_loc2_.y = 0;
 				addRootDisplayObject(_loc2_, 1001);
-				if (!startWindowed) {
-					countBackgroundImagesLoaded = countBackgroundImagesLoaded + 1;
-					if (countBackgroundImagesLoaded > 1) {
-						mStageRef.displayState = "fullScreenInteractive";
-					}
-				}
 			});
 		mAssetLoadingComponent.getImageAsset(DBFacade.buildFullDownloadPath("Resources/Art2D/background/right.jpg"),
 			function(param1:brain.assetRepository.ImageAsset) {
@@ -343,12 +342,6 @@ class DBFacade extends Facade {
 				_loc2_.x = viewWidth;
 				_loc2_.y = 0;
 				addRootDisplayObject(_loc2_, 1001);
-				if (!startWindowed) {
-					countBackgroundImagesLoaded = countBackgroundImagesLoaded + 1;
-					if (countBackgroundImagesLoaded > 1) {
-						mStageRef.displayState = "fullScreenInteractive";
-					}
-				}
 			});
 	}
 
@@ -501,6 +494,41 @@ class DBFacade extends Facade {
 		EventListeners.add(this.stageRef, "keyUp", releaseAltEnter);
 		EventListeners.add(this.stageRef, "deactivate", forgetPlainEnter);
 		createLetterbox();
+	}
+
+	public function prepareInitialLoading() {
+		if (mInitialConfigRequested) {
+			return;
+		}
+		mInitialConfigRequested = true;
+		mEventComponent.addListener("ConfigFileLoadedEvent", initialConfigLoaded);
+		new DBConfigManager(this).init();
+	}
+
+	function initialConfigLoaded(event:ConfigFileLoadedEvent) {
+		mEventComponent.removeListener("ConfigFileLoadedEvent");
+		mInitialConfig = event.dbConfigManager;
+		featureFlags.loadFeatureFlagValuesFromConfigs(mInitialConfig);
+		SettingsStore.applyStartupFlags(featureFlags);
+		LaunchWindowOptions.showWhenReady(stageRef, featureFlags, startInitialLoading);
+	}
+
+	public function loadInitialConfiguration() {
+		var config:DBConfigManager;
+		if (mInitialConfig == null) {
+			new DBConfigManager(this).init();
+			return;
+		}
+		config = mInitialConfig;
+		mInitialConfig = null;
+		ASCompat.setTimeout(function() {
+			if (!loadingStateLeft) {
+				mEventComponent.dispatchEvent(new ConfigFileLoadedEvent(config));
+			}
+		}, 0);
+	}
+
+	function startInitialLoading() {
 		mInitialLoadingClip = ASCompat.coerce(ASCompat.createInstance(LoadingClass, []), flash.display.MovieClip);
 		mInitialLoadingClip.addFrameScript(mInitialLoadingClip.totalFrames - 1, mInitialLoadingClip.stop);
 		mLoadingBar = new UIProgressBar(this, ASCompat.coerce((mInitialLoadingClip : ASAny).loadingBar.loadingBar, flash.display.MovieClip));
@@ -614,6 +642,7 @@ class DBFacade extends Facade {
 		mGameSocketAddress = ASCompat.asString(result.gameSocketAddress);
 		mGameSocketPort = ASCompat.asInt(result.gameSocketPort);
 		mGameSocketTlsOffered = result.gameSocketTls == true;
+		mGameSocketFallbackPort = ASCompat.toInt(result.gameSocketFallbackPort);
 		mGameSocketWssPath = result.gameSocketWssPath != null ? ASCompat.toString(result.gameSocketWssPath) : "";
 		mWebAPIRoot = mWebServicesUrl + "/api/";
 		mRPCRoot = mWebServicesUrl + "/rpc/";
@@ -840,7 +869,7 @@ class DBFacade extends Facade {
 			}
 			TransportSettings.applyOverrides(dbConfigManager);
 			_loc2_ = dbConfigManager.getConfigBoolean("EnforceServerCertificate", true);
-			_loc1_ = new GameEndpoints(mGameSocketAddress, mGameSocketPort, mGameSocketWssPath, _loc2_, mGameSocketTlsOffered);
+			_loc1_ = new GameEndpoints(mGameSocketAddress, mGameSocketPort, mGameSocketWssPath, _loc2_, mGameSocketTlsOffered, mGameSocketFallbackPort);
 			_loc3_ = featureFlags.getFlagValue("experimental-websocket-reconnects");
 			Logger.info("WorldServer endpoints: " + _loc1_ + " experimentalWebSocketReconnects=" + _loc3_);
 			mDistributedObjectManager = new DistributedObjectManager(this);

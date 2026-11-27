@@ -52,6 +52,8 @@ class ScriptTimeline {
 
 	var mIsLooping:Bool = false;
 
+	var mGotoPending:Bool = false;
+
 	var mFinishedNaturally:Bool = false;
 
 	var mTotalFrames:UInt = 0;
@@ -283,6 +285,8 @@ class ScriptTimeline {
 		mTargetActor = targetActor;
 		mIsPlaying = true;
 		mFinishedNaturally = false;
+		mIsLooping = false;
+		mGotoPending = false;
 		mLoop = loop;
 		mPlaySpeed = playSpeed;
 		if (mPlayTimelineTask != null) {
@@ -378,6 +382,7 @@ class ScriptTimeline {
 	function gotoFrame(gotoFrame:Int) {
 		mPlayHeadTime = gotoFrame;
 		mIsLooping = true;
+		mGotoPending = true;
 	}
 
 	function processTimelineFrame(timelineActionMap:Map, currentFrame:Int, gameClock:GameClock) {
@@ -411,6 +416,11 @@ class ScriptTimeline {
 		while (_loc3_ <= mPlayHeadTime) {
 			processTimelineActions(_loc3_, gameClock);
 			mLastExecutedFrame = _loc3_;
+			if (mGotoPending) {
+				mGotoPending = false;
+				mLastExecutedFrame = ASCompat.floatToInt(mPlayHeadTime) - 1;
+				break;
+			}
 			_loc3_++;
 		}
 		updatePlayHead(gameClock);

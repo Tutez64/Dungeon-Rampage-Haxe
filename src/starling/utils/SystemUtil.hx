@@ -65,9 +65,9 @@ class SystemUtil {
 	static function onActivate(event:ASObject) {
 		sApplicationActive = true;
 		var _loc2_:Array<ASAny>;
-		final __ax4_iter_381 = sWaitingCalls;
-		if (checkNullIteratee(__ax4_iter_381))
-			for (_tmp_ in __ax4_iter_381) {
+		final __ax4_iter_384 = sWaitingCalls;
+		if (checkNullIteratee(__ax4_iter_384))
+			for (_tmp_ in __ax4_iter_384) {
 				_loc2_ = ASCompat.coerce(_tmp_, Array);
 				try {
 					ASCompatMacro.applyClosure(_loc2_[0], _loc2_[1]);
@@ -147,9 +147,9 @@ class SystemUtil {
 			sEmbeddedFonts = Font.enumerateFonts(false);
 		}
 		var _loc8_:Font;
-		final __ax4_iter_382 = sEmbeddedFonts;
-		if (checkNullIteratee(__ax4_iter_382))
-			for (_tmp_ in __ax4_iter_382) {
+		final __ax4_iter_385 = sEmbeddedFonts;
+		if (checkNullIteratee(__ax4_iter_385))
+			for (_tmp_ in __ax4_iter_385) {
 				_loc8_ = ASCompat.coerce(_tmp_, flash.text.Font);
 				_loc6_ = _loc8_.fontStyle;
 				_loc7_ = _loc6_ == "bold" || _loc6_ == "boldItalic";

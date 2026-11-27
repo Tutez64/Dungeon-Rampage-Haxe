@@ -42,9 +42,9 @@ class TileGrid {
 	public function getNonFillTilePositions():Vector<Vector3D> {
 		var _loc1_ = new Vector<Vector3D>();
 		var _loc2_:Tile;
-		final __ax4_iter_451 = mTiles;
-		if (checkNullIteratee(__ax4_iter_451))
-			for (_tmp_ in __ax4_iter_451) {
+		final __ax4_iter_454 = mTiles;
+		if (checkNullIteratee(__ax4_iter_454))
+			for (_tmp_ in __ax4_iter_454) {
 				_loc2_ = _tmp_;
 				if (_loc2_ != null && !_loc2_.isFiller()) {
 					_loc1_.push(_loc2_.position.clone());
@@ -153,9 +153,9 @@ class TileGrid {
 
 	public function removeAllFromWorld() {
 		var _loc1_:Tile;
-		final __ax4_iter_452 = mTiles;
-		if (checkNullIteratee(__ax4_iter_452))
-			for (_tmp_ in __ax4_iter_452) {
+		final __ax4_iter_455 = mTiles;
+		if (checkNullIteratee(__ax4_iter_455))
+			for (_tmp_ in __ax4_iter_455) {
 				_loc1_ = _tmp_;
 				if (_loc1_ != null) {
 					_loc1_.destroy();

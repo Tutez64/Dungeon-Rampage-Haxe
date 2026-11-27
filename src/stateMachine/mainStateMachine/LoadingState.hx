@@ -9,7 +9,6 @@ import brain.clock.GameClock;
 import brain.event.EventComponent;
 import brain.logger.Logger;
 import brain.stateMachine.State;
-import config.DBConfigManager;
 import config.ServiceDiscoveryLoader;
 import config.ServiceDiscoveryReadyEvent;
 import events.DBAccountLoadedEvent;
@@ -68,8 +67,7 @@ class LoadingState extends State {
 		mEventComponent.addListener("ManagersLoadedEvent", managersLoaded);
 		mEventComponent.addListener("DB_ACCOUNT_INFO_LOADED", accountLoaded);
 		mEventComponent.addListener("MATCH_MAKER_LOADED", matchMakerReady);
-		var _loc1_ = new DBConfigManager(mDBFacade);
-		_loc1_.init();
+		mDBFacade.loadInitialConfiguration();
 		AssetLoader.stopTrackingLoads();
 	}
 

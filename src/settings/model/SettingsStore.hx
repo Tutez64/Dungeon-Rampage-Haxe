@@ -21,10 +21,11 @@ class SettingsStore {
 		if (_loc2_ == null) {
 			return;
 		}
+		GameLogFile.enabled = coerceBoolean(_loc2_["saveLogs"]);
 		var _loc4_:String;
-		final __ax4_iter_460:ASObject = SettingsCatalog.STARTUP_FLAGS;
-		if (checkNullIteratee(__ax4_iter_460))
-			for (_tmp_ in __ax4_iter_460.___keys()) {
+		final __ax4_iter_463:ASObject = SettingsCatalog.STARTUP_FLAGS;
+		if (checkNullIteratee(__ax4_iter_463))
+			for (_tmp_ in __ax4_iter_463.___keys()) {
 				_loc4_ = _tmp_;
 				_loc3_ = SettingsCatalog.STARTUP_FLAGS[_loc4_];
 				_loc5_ = storedFlagValue(_loc2_, _loc4_, featureFlags.getFlagDefaultValue(_loc3_));
@@ -36,7 +37,7 @@ class SettingsStore {
 
 	static function coerce(definition:SettingDefinition, raw:ASAny):ASAny {
 		var _loc4_:SettingChoice;
-		var __ax4_iter_461:Vector<SettingChoice>;
+		var __ax4_iter_464:Vector<SettingChoice>;
 		var _loc3_ = Math.NaN;
 		if (definition.coerceValue != null) {
 			return definition.coerceValue(raw);
@@ -45,9 +46,9 @@ class SettingsStore {
 			return KeyBindingValue.coerce(raw, definition.defaultValue);
 		}
 		if (definition.isChoice) {
-			__ax4_iter_461 = definition.choices;
-			if (checkNullIteratee(__ax4_iter_461))
-				for (_tmp_ in __ax4_iter_461) {
+			__ax4_iter_464 = definition.choices;
+			if (checkNullIteratee(__ax4_iter_464))
+				for (_tmp_ in __ax4_iter_464) {
 					_loc4_ = _tmp_;
 					if (ASCompat.toString(_loc4_.value) == ASCompat.toString(raw)) {
 						return _loc4_.value;
@@ -92,9 +93,9 @@ class SettingsStore {
 		var _loc2_:ASObject = mLocalFile.read();
 		var _loc3_:ASObject = {};
 		var _loc5_:SettingDefinition;
-		final __ax4_iter_462 = catalog.definitions;
-		if (checkNullIteratee(__ax4_iter_462))
-			for (_tmp_ in __ax4_iter_462) {
+		final __ax4_iter_465 = catalog.definitions;
+		if (checkNullIteratee(__ax4_iter_465))
+			for (_tmp_ in __ax4_iter_465) {
 				_loc5_ = _tmp_;
 				if (_loc5_.isPersisted) {
 					if (Std.isOfType(_loc5_.binding, FeatureFlagBinding)) {
@@ -116,9 +117,9 @@ class SettingsStore {
 		var _loc3_:ASObject = {};
 		_loc3_["settingsFileVersion"] = 2;
 		var _loc4_:SettingDefinition;
-		final __ax4_iter_463 = catalog.definitions;
-		if (checkNullIteratee(__ax4_iter_463))
-			for (_tmp_ in __ax4_iter_463) {
+		final __ax4_iter_466 = catalog.definitions;
+		if (checkNullIteratee(__ax4_iter_466))
+			for (_tmp_ in __ax4_iter_466) {
 				_loc4_ = _tmp_;
 				if (_loc4_.isPersisted && values.hasOwnProperty(_loc4_.id)) {
 					_loc3_[_loc4_.id] = values[_loc4_.id];

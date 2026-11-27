@@ -35,6 +35,10 @@ class SceneGraphManager {
 
 	public static inline final UI = 50;
 
+	public static inline final STARLING_FADE = 34;
+
+	public static inline final STARLING_FADE_EXEMPT = 35;
+
 	public static inline final STARLING_OVERLAY = 36;
 
 	public static inline final STARLING_HUD = 64;

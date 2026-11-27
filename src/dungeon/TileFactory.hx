@@ -127,21 +127,21 @@ class TileFactory {
 		addToGrid(_loc8_);
 		tileInitialized(_loc8_);
 		buildBackground(_loc7_.LEBackground, _loc8_, distributedDungeonFloor);
-		final __ax4_iter_453:ASAny = _loc7_.LEObjects;
-		if (checkNullIteratee(__ax4_iter_453))
-			for (_tmp_ in __ax4_iter_453) {
+		final __ax4_iter_456:ASAny = _loc7_.LEObjects;
+		if (checkNullIteratee(__ax4_iter_456))
+			for (_tmp_ in __ax4_iter_456) {
 				_loc6_ = _tmp_;
 				buildingProp(_loc6_, _loc8_, distributedDungeonFloor);
 			}
-		final __ax4_iter_454:ASAny = _loc7_.LETriggers;
-		if (checkNullIteratee(__ax4_iter_454))
-			for (_tmp_ in __ax4_iter_454) {
+		final __ax4_iter_457:ASAny = _loc7_.LETriggers;
+		if (checkNullIteratee(__ax4_iter_457))
+			for (_tmp_ in __ax4_iter_457) {
 				_loc6_ = _tmp_;
 				buildingProp(_loc6_, _loc8_, distributedDungeonFloor);
 			}
-		final __ax4_iter_455 = mLocalProximityTriggers;
-		if (checkNullIteratee(__ax4_iter_455))
-			for (_tmp_ in __ax4_iter_455) {
+		final __ax4_iter_458 = mLocalProximityTriggers;
+		if (checkNullIteratee(__ax4_iter_458))
+			for (_tmp_ in __ax4_iter_458) {
 				_loc6_ = _tmp_;
 				analyzeLocalProximityTrigger(_loc6_, _loc8_, distributedDungeonFloor);
 			}

@@ -99,6 +99,19 @@ class SteamInputManager {
 			}
 	}
 
+	public function openBindingPanel() {
+		var _loc1_ = glyphController;
+		if (_loc1_ == null || !mSteamworks.isReady) {
+			Logger.warn("Connect a controller and enable Steam Input to edit controller bindings.");
+			return;
+		}
+		try {
+			mSteamworks.showBindingPanel(_loc1_.controllerHandle);
+		} catch (error:Dynamic) {
+			Logger.warn("Could not open controller bindings: " + ASCompat.asError(error).message);
+		}
+	}
+
 	public function destroy() {
 		mControllerRumble.stopAll();
 		mControllerRumble.update(mConnectedSteamControllers);
@@ -725,6 +738,12 @@ class SteamInputManager {
 
 	public function isBigPictureMode():Bool {
 		return mSteamworks.isSteamInBigPictureMode();
+	}
+
+	@:isVar public var isSteamDeckOrBigPicture(get, never):Bool;
+
+	public function get_isSteamDeckOrBigPicture():Bool {
+		return mSteamworks.isReady && (mSteamworks.isSteamRunningOnSteamDeck() || mSteamworks.isSteamInBigPictureMode());
 	}
 
 	public function showFloatingGamepadTextInputForField(field:DisplayObject) {

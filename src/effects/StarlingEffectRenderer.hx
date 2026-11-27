@@ -25,6 +25,8 @@ class StarlingEffectRenderer {
 
 	public static inline final BACK_DRAW_ORDER_OFFSET:Float = -0.2;
 
+	static inline final NO_LOOP_LABEL = "noloop";
+
 	static var sIconTextureCache:ASDictionary<ASAny, ASAny> = new ASDictionary();
 
 	var mDBFacade:DBFacade;
@@ -156,38 +158,42 @@ class StarlingEffectRenderer {
 	}
 
 	public function play(loop:Bool, finishedCallback:ASFunction) {
-		var _loc4_:Point = null;
+		var _loc6_:Point = null;
 		if (mAnimation == null) {
 			return;
 		}
+		var _loc3_ = mAnimation.getFrame("noloop") >= 0;
+		var _loc4_ = loop && !_loc3_;
 		mFinishedCallback = finishedCallback;
 		mWantsToPlay = true;
-		mOneShot = !loop && finishedCallback != null;
+		mOneShot = !_loc4_ && finishedCallback != null;
 		mAnimation.composing = mVisible || !mOneShot || mMarkerHolder != null || mPendingMarkerContent != null;
 		if (!mVisible && !mOneShot) {
 			leaveJuggler();
 		}
 		mAnimation.removeEventListener("complete", onAnimationComplete);
 		mAnimation.resetMovieClips();
-		var _loc3_ = !loop && finishedCallback != null;
-		if (_loc3_) {
+		var _loc5_ = !_loc4_ && finishedCallback != null;
+		if (_loc5_) {
 			mAnimation.setMovieClipsPlayOnce();
 			mAnimation.addEventListener("complete", onAnimationComplete);
+		} else if (_loc3_) {
+			mAnimation.setMovieClipsPlayOnce();
 		} else {
 			mAnimation.clearMovieClipsPlayOnce();
 		}
 		if (mLabel != null && mAnimation.getFrame(mLabel) >= 0) {
-			_loc4_ = mAnimation.gotoLabel(mLabel, loop);
-			mSegmentFrames = ASCompat.floatToInt(_loc4_.x >= 0 ? ASCompat.floatToInt(_loc4_.y - _loc4_.x + 1) : 0);
-			if (_loc3_ && _loc4_.x >= 0 && _loc4_.y - _loc4_.x < 1) {
+			_loc6_ = mAnimation.gotoLabel(mLabel, _loc4_);
+			mSegmentFrames = ASCompat.floatToInt(_loc6_.x >= 0 ? ASCompat.floatToInt(_loc6_.y - _loc6_.x + 1) : 0);
+			if (_loc5_ && _loc6_.x >= 0 && _loc6_.y - _loc6_.x < 1) {
 				parkStaticPooledEffect();
 				return;
 			}
 		} else {
 			mSegmentFrames = 0;
-			mAnimation.loop = loop;
+			mAnimation.loop = _loc4_;
 			mAnimation.currentFrame = 0;
-			if (_loc3_ && mAnimation.deepestFrames <= 1) {
+			if (_loc5_ && mAnimation.deepestFrames <= 1) {
 				parkStaticPooledEffect();
 				return;
 			}

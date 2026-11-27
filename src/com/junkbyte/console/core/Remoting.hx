@@ -513,7 +513,7 @@ class Remoting extends ConsoleCore {
 	}
 
 	public function generateId():String {
-		return ConsoleLib.now().getTime() + "." + ASCompat.floatToInt(Math.ffloor(Math.random() * 100000));
+		return ASCompat.ASDate.getTime(ConsoleLib.now()) + "." + ASCompat.floatToInt(Math.ffloor(Math.random() * 100000));
 	}
 
 	public function close() {

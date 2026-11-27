@@ -440,8 +440,16 @@ class Camera {
 		return mTweenZoom;
 	}
 
-	public function fadeBackground(excludes:Array<ASAny>, duration:UInt, transitionDur:Float, color:Vector3D, alpha:Float) {
-		mBackgroundFader.doFade(excludes, duration, transitionDur, color, alpha);
+	public function fadeBackground(excludes:Array<ASAny>, duration:UInt, transitionDur:Float, color:Vector3D, alpha:Float):UInt {
+		return mBackgroundFader.doFade(excludes, duration, transitionDur, color, alpha);
+	}
+
+	public function cancelBackgroundFade(requestId:UInt) {
+		mBackgroundFader.cancelFade(requestId);
+	}
+
+	public function forceStopBackgroundFade() {
+		mBackgroundFader.forceStop();
 	}
 
 	public function doLetterboxEffect(duration:UInt, transitionDur:Float, color:Vector3D, alpha:Float) {

@@ -329,19 +329,19 @@ class UIShopOffer extends UIObject {
 		var _loc4_ = getSoldOutDate();
 		var _loc10_ = GameClock.getWebServerTime();
 		if (_loc9_ != null) {
-			_loc6_ = _loc9_.getTime();
+			_loc6_ = ASCompat.ASDate.getTime(_loc9_);
 			if (_loc6_ > _loc10_) {
 				return Locale.getString("SHOP_COMING_SOON");
 			}
 		}
 		if (_loc4_ != null) {
-			_loc2_ = _loc4_.getTime();
+			_loc2_ = ASCompat.ASDate.getTime(_loc4_);
 			if (_loc2_ < _loc10_) {
 				return Locale.getString("SHOP_SOLD_OUT");
 			}
 		}
 		if (_loc3_ != null) {
-			_loc7_ = _loc3_.getTime();
+			_loc7_ = ASCompat.ASDate.getTime(_loc3_);
 			if (_loc7_ < _loc10_) {
 				return Locale.getString("SHOP_SOLD_OUT");
 			}
@@ -511,13 +511,13 @@ class UIShopOffer extends UIObject {
 
 	function greyOffer(value:Bool) {
 		var _loc3_:DisplayObject;
-		var __ax4_iter_438:Vector<DisplayObject>;
+		var __ax4_iter_441:Vector<DisplayObject>;
 		var _loc2_:ColorMatrixFilter = null;
 		if (value) {
 			_loc2_ = SceneGraphManager.getGrayScaleSaturationFilter(5);
-			__ax4_iter_438 = this.nodesToGrey;
-			if (checkNullIteratee(__ax4_iter_438))
-				for (_tmp_ in __ax4_iter_438) {
+			__ax4_iter_441 = this.nodesToGrey;
+			if (checkNullIteratee(__ax4_iter_441))
+				for (_tmp_ in __ax4_iter_441) {
 					_loc3_ = _tmp_;
 					if (_loc3_ != null) {
 						_loc3_.filters = cast([_loc2_]);

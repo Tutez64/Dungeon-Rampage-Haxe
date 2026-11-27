@@ -256,9 +256,9 @@ class StarlingNametag {
 		}
 		mView = null;
 		var _loc1_:TagPart;
-		final __ax4_iter_443 = mParts;
-		if (checkNullIteratee(__ax4_iter_443))
-			for (_tmp_ in __ax4_iter_443) {
+		final __ax4_iter_446 = mParts;
+		if (checkNullIteratee(__ax4_iter_446))
+			for (_tmp_ in __ax4_iter_446) {
 				_loc1_ = _tmp_;
 				setCell(_loc1_, null, null, 0);
 			}
@@ -271,9 +271,9 @@ class StarlingNametag {
 		mSlowCountdown = 0;
 		mTextDirty = true;
 		var _loc1_:TagPart;
-		final __ax4_iter_444 = mParts;
-		if (checkNullIteratee(__ax4_iter_444))
-			for (_tmp_ in __ax4_iter_444) {
+		final __ax4_iter_447 = mParts;
+		if (checkNullIteratee(__ax4_iter_447))
+			for (_tmp_ in __ax4_iter_447) {
 				_loc1_ = _tmp_;
 				_loc1_.cellScale = -1;
 			}
@@ -315,7 +315,7 @@ class StarlingNametag {
 
 	function prepare(frame:Int):Bool {
 		var _loc5_:TagPart;
-		var __ax4_iter_445:Vector<TagPart>;
+		var __ax4_iter_448:Vector<TagPart>;
 		var _loc2_ = mNametag.hpBarVisible;
 		var _loc3_ = --mSlowCountdown <= 0 || mTextDirty || _loc2_ != mBarShown;
 		if (_loc3_) {
@@ -333,9 +333,9 @@ class StarlingNametag {
 			if (mOverPart != null) {
 				mOverPart.wantContent = _loc2_ ? "hpOver" : null;
 			}
-			__ax4_iter_445 = mParts;
-			if (checkNullIteratee(__ax4_iter_445))
-				for (_tmp_ in __ax4_iter_445) {
+			__ax4_iter_448 = mParts;
+			if (checkNullIteratee(__ax4_iter_448))
+				for (_tmp_ in __ax4_iter_448) {
 					_loc5_ = _tmp_;
 					if (_loc5_.wantContent != null) {
 						_loc5_.wantScale = mOverlays.bakeScale(chainScale(_loc5_.source));
@@ -343,9 +343,9 @@ class StarlingNametag {
 				}
 		}
 		var _loc4_ = true;
-		final __ax4_iter_446 = mParts;
-		if (checkNullIteratee(__ax4_iter_446))
-			for (_tmp_ in __ax4_iter_446) {
+		final __ax4_iter_449 = mParts;
+		if (checkNullIteratee(__ax4_iter_449))
+			for (_tmp_ in __ax4_iter_449) {
 				_loc5_ = _tmp_;
 				if (!_loc5_.current) {
 					prepareOne(_loc5_, frame);

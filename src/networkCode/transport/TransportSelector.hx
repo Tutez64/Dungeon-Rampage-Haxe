@@ -21,12 +21,17 @@ class TransportSelector {
 		if (endpoints == null) {
 			return;
 		}
+		var _loc4_ = endpoints.fallbackPort != endpoints.port ? endpoints.fallbackPort : 0;
 		if (!experimentalWebSocketReconnects) {
-			addTlsSocket();
-			addWebSocket();
+			addTlsSocket(endpoints.port);
+			addWebSocket(endpoints.port);
+			addTlsSocket(_loc4_);
+			addWebSocket(_loc4_);
 		} else {
-			addWebSocket();
-			addTlsSocket();
+			addWebSocket(endpoints.port);
+			addWebSocket(_loc4_);
+			addTlsSocket(endpoints.port);
+			addTlsSocket(_loc4_);
 		}
 	}
 
@@ -90,18 +95,25 @@ class TransportSelector {
 		return new SessionTransport(url, _loc3_, _loc4_, mCredentialSource);
 	}
 
-	function addWebSocket() {
-		var _loc1_ = mEndpoints.wssUrl;
-		if (_loc1_ == "") {
+	function addWebSocket(port:Int) {
+		if (!usablePort(port)) {
 			return;
 		}
-		mCandidates.push(new TransportCandidate("wss", "", 0, _loc1_));
+		var _loc2_ = mEndpoints.wssUrlForPort(port);
+		if (_loc2_ == "") {
+			return;
+		}
+		mCandidates.push(new TransportCandidate("wss", "", 0, _loc2_));
 	}
 
-	function addTlsSocket() {
-		if (!mEndpoints.tlsOffered) {
+	function addTlsSocket(port:Int) {
+		if (!mEndpoints.tlsOffered || !usablePort(port)) {
 			return;
 		}
-		mCandidates.push(new TransportCandidate("tlsSocket", mEndpoints.address, mEndpoints.port));
+		mCandidates.push(new TransportCandidate("tlsSocket", mEndpoints.address, port));
+	}
+
+	function usablePort(port:Int):Bool {
+		return port > 0 && port <= 65535;
 	}
 }

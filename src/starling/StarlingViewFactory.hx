@@ -157,16 +157,16 @@ class StarlingViewFactory {
 	public function onAssetLoaded(inMovieClip:MovieClip, inMovieClipKey:String, inX:Float, inY:Float, inScaleX:Float, inScaleY:Float, inRotation:Float,
 			inIsOnStage:Bool, inBlendMode:String = null):StarlingView {
 		var _loc13_:DisplayObject;
-		final __ax4_iter_383 = StarlingHelper.findNavCollisions(inMovieClip);
-		if (checkNullIteratee(__ax4_iter_383))
-			for (_tmp_ in __ax4_iter_383) {
+		final __ax4_iter_386 = StarlingHelper.findNavCollisions(inMovieClip);
+		if (checkNullIteratee(__ax4_iter_386))
+			for (_tmp_ in __ax4_iter_386) {
 				_loc13_ = ASCompat.coerce(_tmp_, flash.display.DisplayObject);
 				_loc13_.parent.removeChild(_loc13_);
 			}
 		var _loc12_:DisplayObject;
-		final __ax4_iter_384 = StarlingHelper.findCombatCollisions(inMovieClip);
-		if (checkNullIteratee(__ax4_iter_384))
-			for (_tmp_ in __ax4_iter_384) {
+		final __ax4_iter_387 = StarlingHelper.findCombatCollisions(inMovieClip);
+		if (checkNullIteratee(__ax4_iter_387))
+			for (_tmp_ in __ax4_iter_387) {
 				_loc12_ = ASCompat.coerce(_tmp_, flash.display.DisplayObject);
 				_loc12_.parent.removeChild(_loc12_);
 			}

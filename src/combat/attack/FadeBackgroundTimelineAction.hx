@@ -18,6 +18,8 @@ class FadeBackgroundTimelineAction extends AttackTimelineAction {
 
 	var mAlpha:Float = Math.NaN;
 
+	var mFadeId:UInt = (0 : UInt);
+
 	public function new(actorGameObject:ActorGameObject, actorView:ActorView, dbFacade:DBFacade, duration:UInt, color:Vector3D, alpha:Float,
 			transitionDur:Float) {
 		mDuration = duration;
@@ -46,12 +48,21 @@ class FadeBackgroundTimelineAction extends AttackTimelineAction {
 		if (!mDBFacade.featureFlags.getFlagValue("want-buster-background-fade")) {
 			return;
 		}
+		if (mFadeId != 0) {
+			mDBFacade.camera.cancelBackgroundFade(mFadeId);
+		}
 		var _loc2_:Array<ASAny> = [];
 		_loc2_.push(mActorView.root);
-		mDBFacade.camera.fadeBackground(_loc2_, mDuration, mTransitionDuration, mColor, mAlpha);
+		mFadeId = mDBFacade.camera.fadeBackground(_loc2_, mDuration, mTransitionDuration, mColor, mAlpha);
 	}
 
 	override public function stop() {
-		mDBFacade.camera.killBackgroundFader();
+		if (mFadeId == 0) {
+			return;
+		}
+		if (mTimeline == null || !mTimeline.finishedNaturally) {
+			mDBFacade.camera.cancelBackgroundFade(mFadeId);
+		}
+		mFadeId = (0 : UInt);
 	}
 }

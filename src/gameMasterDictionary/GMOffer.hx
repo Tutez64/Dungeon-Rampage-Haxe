@@ -126,17 +126,17 @@ class GMOffer {
 		var _loc3_ = Math.NaN;
 		var _loc1_ = GameClock.getWebServerTime();
 		if (VisibleDate != null) {
-			_loc2_ = VisibleDate.getTime();
+			_loc2_ = ASCompat.ASDate.getTime(VisibleDate);
 			if (_loc2_ > _loc1_) {
 				return false;
 			}
 			if (SoldOutDate != null) {
-				_loc3_ = SoldOutDate.getTime();
+				_loc3_ = ASCompat.ASDate.getTime(SoldOutDate);
 				if (_loc3_ < _loc1_) {
 					return false;
 				}
 			} else if (EndDate != null) {
-				_loc3_ = EndDate.getTime();
+				_loc3_ = ASCompat.ASDate.getTime(EndDate);
 				if (_loc3_ < _loc1_) {
 					return false;
 				}
@@ -144,17 +144,17 @@ class GMOffer {
 			return true;
 		}
 		if (StartDate != null) {
-			_loc2_ = StartDate.getTime();
+			_loc2_ = ASCompat.ASDate.getTime(StartDate);
 			if (_loc2_ > _loc1_) {
 				return false;
 			}
 			if (SoldOutDate != null) {
-				_loc3_ = SoldOutDate.getTime();
+				_loc3_ = ASCompat.ASDate.getTime(SoldOutDate);
 				if (_loc3_ < _loc1_) {
 					return false;
 				}
 			} else if (EndDate != null) {
-				_loc3_ = EndDate.getTime();
+				_loc3_ = ASCompat.ASDate.getTime(EndDate);
 				if (_loc3_ < _loc1_) {
 					return false;
 				}
@@ -168,13 +168,13 @@ class GMOffer {
 		var _loc2_ = Math.NaN;
 		var _loc1_ = GameClock.getWebServerTime();
 		if (StartDate != null) {
-			_loc2_ = StartDate.getTime();
+			_loc2_ = ASCompat.ASDate.getTime(StartDate);
 			if (_loc2_ > _loc1_) {
 				return false;
 			}
 		}
 		if (EndDate != null) {
-			_loc2_ = EndDate.getTime();
+			_loc2_ = ASCompat.ASDate.getTime(EndDate);
 			if (_loc2_ < _loc1_) {
 				return false;
 			}

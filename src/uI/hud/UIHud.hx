@@ -903,14 +903,14 @@ class UIHud implements IGameHud {
 			return;
 		}
 		var _loc3_:TextField;
-		final __ax4_iter_427:Array<ASAny> = [
+		final __ax4_iter_430:Array<ASAny> = [
 			(_loc4_ : ASAny)
 			.up.db_pressbutton_text,
 			(_loc4_ : ASAny)
 			.over.mc.db_pressbutton_text
 		];
-		if (checkNullIteratee(__ax4_iter_427))
-			for (_tmp_ in __ax4_iter_427) {
+		if (checkNullIteratee(__ax4_iter_430))
+			for (_tmp_ in __ax4_iter_430) {
 				_loc3_ = ASCompat.coerce(_tmp_, flash.text.TextField);
 				if (_loc3_ != null) {
 					_loc2_ = mBusterPressTextOriginals[_loc3_];
@@ -2176,18 +2176,18 @@ class UIHud implements IGameHud {
 			mPetPortrait.destroy();
 		}
 		mPetPortrait = null;
-		final __ax4_iter_428 = mWeaponButtons;
-		if (checkNullIteratee(__ax4_iter_428))
-			for (_tmp_ in __ax4_iter_428) {
+		final __ax4_iter_431 = mWeaponButtons;
+		if (checkNullIteratee(__ax4_iter_431))
+			for (_tmp_ in __ax4_iter_431) {
 				_loc1_ = _tmp_;
 				if (_loc1_ != null) {
 					_loc1_.destroy();
 				}
 				_loc1_ = null;
 			}
-		final __ax4_iter_429 = mConsumableWeaponButtons;
-		if (checkNullIteratee(__ax4_iter_429))
-			for (_tmp_ in __ax4_iter_429) {
+		final __ax4_iter_432 = mConsumableWeaponButtons;
+		if (checkNullIteratee(__ax4_iter_432))
+			for (_tmp_ in __ax4_iter_432) {
 				_loc1_ = _tmp_;
 				if (_loc1_ != null) {
 					_loc1_.destroy();
@@ -2257,9 +2257,9 @@ class UIHud implements IGameHud {
 
 	public function setWeaponHighlight(currentWeaponIndex:Int) {
 		var _loc2_:UIButton;
-		final __ax4_iter_430 = mWeaponButtons;
-		if (checkNullIteratee(__ax4_iter_430))
-			for (_tmp_ in __ax4_iter_430) {
+		final __ax4_iter_433 = mWeaponButtons;
+		if (checkNullIteratee(__ax4_iter_433))
+			for (_tmp_ in __ax4_iter_433) {
 				_loc2_ = _tmp_;
 				ASCompat.setProperty((_loc2_.root : ASAny).selectionFrame, "visible", false);
 			}
@@ -2522,6 +2522,6 @@ class UIHud implements IGameHud {
 	}
 
 	public function suppressNextExitMenuToggle() {
-		mSuppressNextExitMenuToggle = mDBFacade.inputManager.check(27) || mDBFacade.steamInputManager.pressedAction("menu_cancel");
+		mSuppressNextExitMenuToggle = mDBFacade.inputManager.check(27);
 	}
 }

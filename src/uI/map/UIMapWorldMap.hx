@@ -35,10 +35,12 @@ import town.TownStateMachine;
 import uI.infiniteIsland.II_UIMapBattlePopup;
 import uI.popup.DBUIOneButtonPopup;
 import uI.popup.DBUIUltimateRampagePopup;
+import flash.display.DisplayObject;
 import flash.display.MovieClip;
 import flash.events.Event;
 import flash.events.MouseEvent;
 import flash.events.TimerEvent;
+import flash.geom.Matrix;
 import flash.geom.Point;
 import flash.geom.Rectangle;
 import flash.text.TextField;
@@ -179,6 +181,8 @@ class UIMapWorldMap {
 
 	var mEpochCountdownTimer:Timer;
 
+	var mTrophyArt:ASDictionary<ASAny, ASAny> = new ASDictionary();
+
 	public function new(dbFacade:DBFacade, rootMovieClip:MovieClip, townSwfAsset:SwfAsset, townStateMachine:TownStateMachine) {
 		mDBFacade = dbFacade;
 		mTownStateMachine = townStateMachine;
@@ -209,6 +213,7 @@ class UIMapWorldMap {
 		mRenderWorkComponent = new LayerWorkComponent(mDBFacade, "UIMapWorldMap.render");
 		mDBFacade.mouseCursorManager.popMouseCursor(mMapCursorKey);
 		mMapCursorKey = mDBFacade.mouseCursorManager.pushMouseCursor("HAND");
+		mDBFacade.playerActivityCount.fetchPublicDungeonActivityLevel();
 		mWorkComponent.doEverySeconds(59, mDBFacade.playerActivityCount.fetchPublicDungeonActivityLevel);
 		finalLeagueBounds = ASCompat.coerce((mRootMovieClip : ASAny).worldmap.infinite_island_league.getRect((mRootMovieClip : ASAny)
 			.worldmap.infinite_island_league), flash.geom.Rectangle);
@@ -375,9 +380,9 @@ class UIMapWorldMap {
 		var _loc2_:UIButton = null;
 		var _loc3_:UIButton = null;
 		var _loc1_:Array<ASAny>;
-		final __ax4_iter_523 = LEAGUE_BOUNDARY_NODE_IDS;
-		if (checkNullIteratee(__ax4_iter_523))
-			for (_tmp_ in __ax4_iter_523) {
+		final __ax4_iter_526 = LEAGUE_BOUNDARY_NODE_IDS;
+		if (checkNullIteratee(__ax4_iter_526))
+			for (_tmp_ in __ax4_iter_526) {
 				_loc1_ = ASCompat.coerce(_tmp_, Array);
 				_loc2_ = ASCompat.coerce(mOpenNodeButtons.itemFor(_loc1_[0]), brain.uI.UIButton);
 				_loc3_ = ASCompat.coerce(mOpenNodeButtons.itemFor(_loc1_[1]), brain.uI.UIButton);
@@ -903,7 +908,7 @@ class UIMapWorldMap {
 
 	public function deinit() {
 		var _loc1_:UIButton;
-		var __ax4_iter_524:Array<ASAny>;
+		var __ax4_iter_527:Array<ASAny>;
 		mTownStateMachine = null;
 		mDidDrag = false;
 		mShowedDragMessage = false;
@@ -967,9 +972,9 @@ class UIMapWorldMap {
 			mMapDragTask = null;
 		}
 		if (mOpenNodeButtons != null) {
-			__ax4_iter_524 = mOpenNodeButtons.toArray();
-			if (checkNullIteratee(__ax4_iter_524))
-				for (_tmp_ in __ax4_iter_524) {
+			__ax4_iter_527 = mOpenNodeButtons.toArray();
+			if (checkNullIteratee(__ax4_iter_527))
+				for (_tmp_ in __ax4_iter_527) {
 					_loc1_ = ASCompat.coerce(_tmp_, brain.uI.UIButton);
 					_loc1_.enabled = false;
 					_loc1_.destroy();
@@ -1295,9 +1300,9 @@ class UIMapWorldMap {
 
 	function hasLockedNextNode(node:GMMapNode):Bool {
 		var _loc2_:GMMapNode;
-		final __ax4_iter_525 = node.ChildNodes;
-		if (checkNullIteratee(__ax4_iter_525))
-			for (_tmp_ in __ax4_iter_525) {
+		final __ax4_iter_528 = node.ChildNodes;
+		if (checkNullIteratee(__ax4_iter_528))
+			for (_tmp_ in __ax4_iter_528) {
 				_loc2_ = ASCompat.coerce(_tmp_, gameMasterDictionary.GMMapNode);
 				if (_loc2_ != null) {
 					if (mapNodeLocked(_loc2_)) {
@@ -1311,9 +1316,9 @@ class UIMapWorldMap {
 	function hasUnlockedChild(node:GMMapNode):Bool {
 		var _loc2_:GMMapNode = null;
 		var _loc3_:String;
-		final __ax4_iter_526 = node.RevealNodes;
-		if (checkNullIteratee(__ax4_iter_526))
-			for (_tmp_ in __ax4_iter_526) {
+		final __ax4_iter_529 = node.RevealNodes;
+		if (checkNullIteratee(__ax4_iter_529))
+			for (_tmp_ in __ax4_iter_529) {
 				_loc3_ = _tmp_;
 				if (ASCompat.stringAsBool(_loc3_)) {
 					_loc2_ = ASCompat.coerce(mDBFacade.gameMaster.mapNodeByConstant.itemFor(_loc3_), gameMasterDictionary.GMMapNode);
@@ -1363,9 +1368,9 @@ class UIMapWorldMap {
 		var _loc7_:Float = 0.15;
 		var _loc4_ = hasUnlockedChild(node);
 		var _loc8_:String;
-		final __ax4_iter_527 = node.RevealNodes;
-		if (checkNullIteratee(__ax4_iter_527))
-			for (_tmp_ in __ax4_iter_527) {
+		final __ax4_iter_530 = node.RevealNodes;
+		if (checkNullIteratee(__ax4_iter_530))
+			for (_tmp_ in __ax4_iter_530) {
 				_loc8_ = _tmp_;
 				if (ASCompat.stringAsBool(_loc8_)) {
 					_loc3_ = ASCompat.coerce(mDBFacade.gameMaster.mapNodeByConstant.itemFor(_loc8_), gameMasterDictionary.GMMapNode);
@@ -1680,6 +1685,7 @@ class UIMapWorldMap {
 						_loc13_ = true;
 						_loc9_ = ASCompat.coerce((_loc10_ : ASAny).locked, flash.display.MovieClip);
 					}
+					showTrophyFromMask(_loc10_, _loc3_, _loc9_);
 					if (!_loc13_) {
 						_loc2_ = true;
 						_loc7_ = (0 : UInt);
@@ -1741,6 +1747,52 @@ class UIMapWorldMap {
 		return _loc2_;
 	}
 
+	function showTrophyFromMask(node:MovieClip, gmMapNode:GMMapNode, visibleButton:MovieClip) {
+		var _loc4_:String;
+		var __ax4_iter_531:Array<ASAny>;
+		var _loc6_:Matrix = null;
+		var _loc5_:Matrix = null;
+		if (gmMapNode.NodeType != GMMapNode.BOSS_NODE_TYPE && gmMapNode.NodeType != GMMapNode.INFINITE_NODE_TYPE) {
+			return;
+		}
+		var _loc8_ = trophyArt(node);
+		if (_loc8_ == null || visibleButton == null) {
+			return;
+		}
+		var _loc7_ = mDBFacade.dbAccountInfo.activeAvatarInfo;
+		_loc8_.visible = _loc7_ != null && _loc7_.hasTrophy(gmMapNode.BitIndex);
+		if (_loc8_.visible && !node.visible) {
+			node.visible = true;
+			__ax4_iter_531 = ["reward01", "reward02", "reward03", "reward04"];
+			if (checkNullIteratee(__ax4_iter_531))
+				for (_tmp_ in __ax4_iter_531) {
+					_loc4_ = _tmp_;
+					if (ASCompat.toBool((node : ASAny)[_loc4_])) {
+						ASCompat.setProperty((node : ASAny)[_loc4_], "visible", false);
+					}
+				}
+		}
+		if (_loc8_.parent != visibleButton) {
+			_loc6_ = _loc8_.transform.matrix;
+			_loc6_.concat(_loc8_.parent.transform.matrix);
+			_loc5_ = visibleButton.transform.matrix;
+			_loc5_.invert();
+			_loc6_.concat(_loc5_);
+			visibleButton.addChild(_loc8_);
+			_loc8_.transform.matrix = _loc6_;
+		}
+	}
+
+	function trophyArt(node:MovieClip):DisplayObject {
+		var _loc2_ = ASCompat.dynamicAs(mTrophyArt[node], DisplayObject);
+		var _loc3_ = ASCompat.dynamicAs((node : ASAny).defeated, MovieClip);
+		if (_loc2_ == null && _loc3_ != null && _loc3_.numChildren > 0) {
+			_loc2_ = _loc3_.getChildAt(_loc3_.numChildren - 1);
+			mTrophyArt[node] = _loc2_;
+		}
+		return _loc2_;
+	}
+
 	function setupMapNodeButtons() {
 		mOpenNodeButtons = new Map();
 		initializeAllMapNodes();
@@ -1780,22 +1832,27 @@ class UIMapWorldMap {
 	}
 
 	public function battleButtonCallback() {
-		var _loc2_:DBUIOneButtonPopup = null;
-		var _loc1_:DBUIOneButtonPopup = null;
+		var trophy_popup:DBUIOneButtonPopup;
+		var node:GMMapNode;
+		var isPrivate:Bool;
+		var popup:DBUIOneButtonPopup;
 		if (mCurrentNode.LevelRequirement <= mDBFacade.dbAccountInfo.activeAvatarInfo.ogLevel) {
 			if (mCurrentNode.TrophyRequirement > mDBFacade.dbAccountInfo.trophies) {
 				mDBFacade.metrics.log("NotEnoughTrophiesWarning");
-				_loc2_ = new DBUIOneButtonPopup(mDBFacade, "MAP_DEBUG_POPUP", "STOP IT!", "NO! NOT ENOUGH TROPHIES!", "OK", null);
-				MemoryTracker.track(_loc2_, "DBUIOneButtonPopup - created in UIMapWorldMap.battleButtonCallback()");
+				trophy_popup = new DBUIOneButtonPopup(mDBFacade, "MAP_DEBUG_POPUP", "STOP IT!", "NO! NOT ENOUGH TROPHIES!", "OK", null);
+				MemoryTracker.track(trophy_popup, "DBUIOneButtonPopup - created in UIMapWorldMap.battleButtonCallback()");
 				return;
 			}
 			if (mapNodeOpen(mCurrentNode)) {
-				mDBFacade.mainStateMachine.enterLoadingScreenState(mCurrentNode.Id, mCurrentNode.NodeType, (0 : UInt), (0 : UInt), true,
-					mBattlePopup.IsPrivate);
+				node = mCurrentNode;
+				isPrivate = mBattlePopup.IsPrivate;
+				mDBFacade.playerActivityCount.afterMaintenanceCheck(function() {
+					mDBFacade.mainStateMachine.enterLoadingScreenState(node.Id, node.NodeType, (0 : UInt), (0 : UInt), true, isPrivate);
+				});
 			}
 		} else {
-			_loc1_ = new DBUIOneButtonPopup(mDBFacade, "MAP_DEBUG_POPUP", "STOP IT!", "NO! NOT HIGH ENOUGH LEVEL!", "OK", null);
-			MemoryTracker.track(_loc1_, "DBUIOneButtonPopup - created in UIMapWorldMap.battleButtonCallback()");
+			popup = new DBUIOneButtonPopup(mDBFacade, "MAP_DEBUG_POPUP", "STOP IT!", "NO! NOT HIGH ENOUGH LEVEL!", "OK", null);
+			MemoryTracker.track(popup, "DBUIOneButtonPopup - created in UIMapWorldMap.battleButtonCallback()");
 		}
 	}
 

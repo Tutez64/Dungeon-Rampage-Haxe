@@ -136,9 +136,9 @@ private class CompositeEffect extends FilterEffect {
 			out.resize(0);
 		}
 		var _loc2_:CompositeLayer;
-		final __ax4_iter_540 = _layers;
-		if (checkNullIteratee(__ax4_iter_540))
-			for (_tmp_ in __ax4_iter_540) {
+		final __ax4_iter_544 = _layers;
+		if (checkNullIteratee(__ax4_iter_544))
+			for (_tmp_ in __ax4_iter_544) {
 				_loc2_ = _tmp_;
 				if (_loc2_.texture != null) {
 					out[out.length] = _loc2_;

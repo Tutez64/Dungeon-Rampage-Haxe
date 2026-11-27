@@ -34,6 +34,10 @@ class SettingsModel {
 		mDirtyIds = {};
 		mForgottenIds = {};
 		loadAndApply();
+		GameLogFile.failureCallback = onLogFileFailed;
+		if (mStoredValues["saveLogs"] == true && !GameLogFile.enabled) {
+			onLogFileFailed();
+		}
 		mDBFacade.displayTimingSettings.changed = notifyChanged;
 	}
 
@@ -69,9 +73,9 @@ class SettingsModel {
 	public function get_hasPendingRestart():Bool {
 		var _loc1_:SettingDefinition = null;
 		var _loc2_:String;
-		final __ax4_iter_470:ASObject = mDirtyIds;
-		if (checkNullIteratee(__ax4_iter_470))
-			for (_tmp_ in __ax4_iter_470.___keys()) {
+		final __ax4_iter_473:ASObject = mDirtyIds;
+		if (checkNullIteratee(__ax4_iter_473))
+			for (_tmp_ in __ax4_iter_473.___keys()) {
 				_loc2_ = _tmp_;
 				_loc1_ = mCatalog.getDefinition(_loc2_);
 				if (_loc1_ != null && _loc1_.requiresRestart) {
@@ -106,6 +110,9 @@ class SettingsModel {
 			Logger.warn("Tried to set unknown setting: " + id);
 			return;
 		}
+		if (_loc3_.isAction) {
+			return;
+		}
 		if (_loc3_.isPreset) {
 			applyPreset(_loc3_, value);
 			return;
@@ -137,9 +144,9 @@ class SettingsModel {
 			return;
 		}
 		var _loc4_:SettingDefinition;
-		final __ax4_iter_471 = mCatalog.definitions;
-		if (checkNullIteratee(__ax4_iter_471))
-			for (_tmp_ in __ax4_iter_471) {
+		final __ax4_iter_474 = mCatalog.definitions;
+		if (checkNullIteratee(__ax4_iter_474))
+			for (_tmp_ in __ax4_iter_474) {
 				_loc4_ = _tmp_;
 				if (_loc4_.isKeyBinding) {
 					_loc5_ = mValues[_loc4_.id];
@@ -173,9 +180,9 @@ class SettingsModel {
 
 	public function revert() {
 		var _loc1_:String;
-		final __ax4_iter_472:ASObject = mDirtyIds;
-		if (checkNullIteratee(__ax4_iter_472))
-			for (_tmp_ in __ax4_iter_472.___keys()) {
+		final __ax4_iter_475:ASObject = mDirtyIds;
+		if (checkNullIteratee(__ax4_iter_475))
+			for (_tmp_ in __ax4_iter_475.___keys()) {
 				_loc1_ = _tmp_;
 				setValue(_loc1_, mLoadedValues[_loc1_]);
 			}
@@ -185,9 +192,9 @@ class SettingsModel {
 
 	public function resetCategory(category:String) {
 		var _loc2_:SettingDefinition;
-		final __ax4_iter_473 = mCatalog.getDefinitionsForCategory(category);
-		if (checkNullIteratee(__ax4_iter_473))
-			for (_tmp_ in __ax4_iter_473) {
+		final __ax4_iter_476 = mCatalog.getDefinitionsForCategory(category);
+		if (checkNullIteratee(__ax4_iter_476))
+			for (_tmp_ in __ax4_iter_476) {
 				_loc2_ = _tmp_;
 				if (_loc2_.isPersisted) {
 					if (Std.isOfType(_loc2_.binding, FeatureFlagBinding)) {
@@ -204,9 +211,9 @@ class SettingsModel {
 
 	public function resetAll() {
 		var _loc1_:String;
-		final __ax4_iter_474 = SettingCategory.ORDERED;
-		if (checkNullIteratee(__ax4_iter_474))
-			for (_tmp_ in __ax4_iter_474) {
+		final __ax4_iter_477 = SettingCategory.ORDERED;
+		if (checkNullIteratee(__ax4_iter_477))
+			for (_tmp_ in __ax4_iter_477) {
 				_loc1_ = _tmp_;
 				resetCategory(_loc1_);
 			}
@@ -217,9 +224,9 @@ class SettingsModel {
 			return;
 		}
 		var _loc1_:String;
-		final __ax4_iter_475:ASObject = mDirtyIds;
-		if (checkNullIteratee(__ax4_iter_475))
-			for (_tmp_ in __ax4_iter_475.___keys()) {
+		final __ax4_iter_478:ASObject = mDirtyIds;
+		if (checkNullIteratee(__ax4_iter_478))
+			for (_tmp_ in __ax4_iter_478.___keys()) {
 				_loc1_ = _tmp_;
 				if (ASCompat.toBool(mForgottenIds[_loc1_])) {
 					ASCompat.deleteProperty(mStoredValues, _loc1_);
@@ -262,7 +269,21 @@ class SettingsModel {
 		}
 	}
 
+	function onLogFileFailed() {
+		setValue("saveLogs", false);
+		mStoredValues["saveLogs"] = false;
+		mLoadedValues["saveLogs"] = false;
+		ASCompat.deleteProperty(mDirtyIds, "saveLogs");
+		ASCompat.deleteProperty(mForgottenIds, "saveLogs");
+		try {
+			mStore.writeAll(mCatalog, mStoredValues);
+		} catch (error:Dynamic) {
+			Logger.warn("Could not persist disabled game logging: " + ASCompat.asError(error).message);
+		}
+	}
+
 	public function destroy() {
+		GameLogFile.failureCallback = null;
 		apply();
 		mDBFacade.displayTimingSettings.changed = null;
 		mChangeListeners = null;
@@ -284,9 +305,9 @@ class SettingsModel {
 		mValues = {};
 		mLoadedValues = {};
 		var _loc1_:SettingDefinition;
-		final __ax4_iter_476 = mCatalog.definitions;
-		if (checkNullIteratee(__ax4_iter_476))
-			for (_tmp_ in __ax4_iter_476) {
+		final __ax4_iter_479 = mCatalog.definitions;
+		if (checkNullIteratee(__ax4_iter_479))
+			for (_tmp_ in __ax4_iter_479) {
 				_loc1_ = _tmp_;
 				if (_loc1_.isPersisted) {
 					if (mStoredValues.hasOwnProperty(_loc1_.id)) {
@@ -302,9 +323,9 @@ class SettingsModel {
 	function resolvePreset(definition:SettingDefinition):ASAny {
 		var _loc2_:SettingChoice = null;
 		var _loc3_:SettingChoice;
-		final __ax4_iter_477 = definition.choices;
-		if (checkNullIteratee(__ax4_iter_477))
-			for (_tmp_ in __ax4_iter_477) {
+		final __ax4_iter_480 = definition.choices;
+		if (checkNullIteratee(__ax4_iter_480))
+			for (_tmp_ in __ax4_iter_480) {
 				_loc3_ = _tmp_;
 				if (_loc3_.derived) {
 					_loc2_ = _loc3_;
@@ -335,9 +356,9 @@ class SettingsModel {
 			return;
 		}
 		var _loc4_:String;
-		final __ax4_iter_478:ASObject = _loc3_.memberValues;
-		if (checkNullIteratee(__ax4_iter_478))
-			for (_tmp_ in __ax4_iter_478.___keys()) {
+		final __ax4_iter_481:ASObject = _loc3_.memberValues;
+		if (checkNullIteratee(__ax4_iter_481))
+			for (_tmp_ in __ax4_iter_481.___keys()) {
 				_loc4_ = _tmp_;
 				choosePresetMember(_loc4_, _loc3_.memberValues[_loc4_]);
 			}

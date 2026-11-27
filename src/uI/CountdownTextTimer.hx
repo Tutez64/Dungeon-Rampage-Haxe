@@ -77,7 +77,7 @@ class CountdownTextTimer {
 
 	function getTimeLeft():Int {
 		var _loc1_ = ASCompat.coerce(mGetDateFunction(), Date);
-		return ASCompat.floatToInt(mDateToFinish.getTime() - _loc1_.getTime());
+		return ASCompat.floatToInt(ASCompat.ASDate.getTime(mDateToFinish) - ASCompat.ASDate.getTime(_loc1_));
 	}
 
 	function onTick(event:TimerEvent) {

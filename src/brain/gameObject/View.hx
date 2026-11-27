@@ -72,9 +72,9 @@ class View {
 
 	public static function beginTickAll() {
 		var _loc1_:View;
-		final __ax4_iter_538 = sAllViews;
-		if (checkNullIteratee(__ax4_iter_538))
-			for (_tmp_ in __ax4_iter_538) {
+		final __ax4_iter_542 = sAllViews;
+		if (checkNullIteratee(__ax4_iter_542))
+			for (_tmp_ in __ax4_iter_542) {
 				_loc1_ = _tmp_;
 				_loc1_.beginTick();
 			}
@@ -82,9 +82,9 @@ class View {
 
 	public static function renderInterpolatedAll(alpha:Float) {
 		var _loc2_:View;
-		final __ax4_iter_539 = sAllViews;
-		if (checkNullIteratee(__ax4_iter_539))
-			for (_tmp_ in __ax4_iter_539) {
+		final __ax4_iter_543 = sAllViews;
+		if (checkNullIteratee(__ax4_iter_543))
+			for (_tmp_ in __ax4_iter_543) {
 				_loc2_ = _tmp_;
 				_loc2_.renderInterpolated(alpha);
 			}

@@ -16,7 +16,7 @@ class TimeSpan {
 	}
 
 	public static function fromDates(start:Date, end:Date):TimeSpan {
-		return new TimeSpan(end.getTime() - start.getTime());
+		return new TimeSpan(ASCompat.ASDate.getTime(end) - ASCompat.ASDate.getTime(start));
 	}
 
 	public static function fromMilliseconds(milliseconds:Float):TimeSpan {
@@ -101,7 +101,7 @@ class TimeSpan {
 
 	public function getTimeBetweenTimeSpanAndNow(countdownTimer:Bool = false):String {
 		var _loc5_ = Date.now();
-		var _loc6_ = new TimeSpan(this.totalMilliseconds - _loc5_.getTime());
+		var _loc6_ = new TimeSpan(this.totalMilliseconds - ASCompat.ASDate.getTime(_loc5_));
 		var _loc2_ = Std.string(Math.abs(_loc6_.hours));
 		if (_loc2_.length == 1) {
 			_loc2_ = "0" + _loc2_;
@@ -121,7 +121,7 @@ class TimeSpan {
 	}
 
 	public function add(date:Date):Date {
-		var _loc2_ = Date.fromTime(date.getTime());
+		var _loc2_ = Date.fromTime(ASCompat.ASDate.getTime(date));
 		ASCompat.ASDate.setMilliseconds(_loc2_, ASCompat.ASDate.getMilliseconds(_loc2_) + totalMilliseconds);
 		return _loc2_;
 	}

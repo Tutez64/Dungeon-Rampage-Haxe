@@ -105,9 +105,9 @@ class StarlingInput {
 			return;
 		}
 		mAttached = true;
-		final __ax4_iter_189 = sTypes;
-		if (checkNullIteratee(__ax4_iter_189))
-			for (_tmp_ in __ax4_iter_189) {
+		final __ax4_iter_190 = sTypes;
+		if (checkNullIteratee(__ax4_iter_190))
+			for (_tmp_ in __ax4_iter_190) {
 				_loc1_ = _tmp_;
 				mFacade.stageRef.addEventListener(_loc1_, capture, true, 1000);
 				mFacade.stageRef.addEventListener(_loc1_, target, false, 1000);
@@ -139,9 +139,9 @@ class StarlingInput {
 
 	function overFlash(target:DisplayObject):Bool {
 		var _loc2_:DisplayObjectContainer = null;
-		final __ax4_iter_190 = mGroups;
-		if (checkNullIteratee(__ax4_iter_190))
-			for (_tmp_ in __ax4_iter_190) {
+		final __ax4_iter_191 = mGroups;
+		if (checkNullIteratee(__ax4_iter_191))
+			for (_tmp_ in __ax4_iter_191) {
 				_loc2_ = _tmp_;
 				if (target != null && _loc2_.contains(target)) {
 					return true;
@@ -312,9 +312,9 @@ class StarlingInput {
 		}
 		mAttached = false;
 		leave();
-		final __ax4_iter_191 = sTypes;
-		if (checkNullIteratee(__ax4_iter_191))
-			for (_tmp_ in __ax4_iter_191) {
+		final __ax4_iter_192 = sTypes;
+		if (checkNullIteratee(__ax4_iter_192))
+			for (_tmp_ in __ax4_iter_192) {
 				_loc1_ = _tmp_;
 				mFacade.stageRef.removeEventListener(_loc1_, capture, true);
 				mFacade.stageRef.removeEventListener(_loc1_, target, false);
@@ -325,9 +325,9 @@ class StarlingInput {
 	public function dispose() {
 		var _loc1_:StarlingButton = null;
 		detach();
-		final __ax4_iter_192 = mWidgets;
-		if (checkNullIteratee(__ax4_iter_192))
-			for (_tmp_ in __ax4_iter_192) {
+		final __ax4_iter_193 = mWidgets;
+		if (checkNullIteratee(__ax4_iter_193))
+			for (_tmp_ in __ax4_iter_193) {
 				_loc1_ = _tmp_;
 				try {
 					_loc1_.dispose();

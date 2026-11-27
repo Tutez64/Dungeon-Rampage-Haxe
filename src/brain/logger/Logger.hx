@@ -8,6 +8,10 @@ import flash.display.Stage;
 import flash.system.Capabilities;
 
 class Logger {
+	public static var outputCallback:ASFunction;
+
+	static var mWritingOutput:Bool = false;
+
 	static var mReentrentLock:Bool = false;
 
 	static var mWantConsole:Bool = false;
@@ -27,6 +31,29 @@ class Logger {
 	static var mListSlashCommands:Array<ASAny>;
 
 	public function new() {}
+
+	static function emit(message:String) {
+		if (outputCallback == null || mWritingOutput) {
+			return;
+		}
+		mWritingOutput = true;
+		{
+			try {
+				try {
+					outputCallback(message);
+				} catch (error:Dynamic) {};
+			} catch (__finallyError0:Dynamic) {
+				{
+					mWritingOutput = false;
+				};
+				ASCompat.rethrowKeepingStack(__finallyError0);
+				throw __finallyError0;
+			};
+			{
+				mWritingOutput = false;
+			};
+		}
+	}
 
 	public static function init(stageRef:Stage, wantConsole:Bool = false) {
 		mWantConsole = wantConsole;
@@ -117,6 +144,7 @@ class Logger {
 
 	public static function log(logString:String) {
 		logString = "" + logString;
+		emit(logString);
 		trace(logString);
 		if (mWantConsole) {
 			Cc.log(logString);
@@ -128,6 +156,7 @@ class Logger {
 			return;
 		}
 		logString = "[DEBUG] " + getDateString() + logString;
+		emit(logString);
 		trace(logString);
 		if (mWantConsole) {
 			Cc.debug(logString);
@@ -139,6 +168,7 @@ class Logger {
 			return;
 		}
 		logString = "[DEBUG] " + getDateString() + logString;
+		emit(logString);
 		trace(logString);
 		if (mWantConsole) {
 			Cc.debugch(channel, logString);
@@ -150,6 +180,7 @@ class Logger {
 			return;
 		}
 		logString = "[INFO]  " + getDateString() + logString;
+		emit(logString);
 		trace(logString);
 		if (mWantConsole) {
 			Cc.info(logString);
@@ -161,6 +192,7 @@ class Logger {
 			return;
 		}
 		logString = "[INFO] " + getDateString() + logString;
+		emit(logString);
 		trace(logString);
 		if (mWantConsole) {
 			Cc.infoch(channel, logString);
@@ -172,6 +204,7 @@ class Logger {
 			return;
 		}
 		logString = "[WARN]  " + getDateString() + logString;
+		emit(logString);
 		trace(logString);
 		if (mWantConsole) {
 			Cc.warn(logString);
@@ -183,6 +216,7 @@ class Logger {
 			return;
 		}
 		logString = "[WARN] " + getDateString() + logString;
+		emit(logString);
 		trace(logString);
 		if (mWantConsole) {
 			Cc.warnch(channel, logString);
@@ -195,6 +229,7 @@ class Logger {
 		var _loc3_ = ASCompat.stringAsBool(_loc4_) ? logString + "\n" + _loc4_ : logString;
 		tryErrorCallback(_loc3_);
 		logString = "[ERROR] " + getDateString() + _loc3_;
+		emit(logString);
 		trace(logString);
 		if (mWantConsole) {
 			Cc.error(logString);
@@ -220,6 +255,7 @@ class Logger {
 		var _loc4_ = (_loc5_ : ASAny).hasOwnProperty("getStackTrace") ? _loc5_.getStackTrace() : null;
 		logString = "[FATAL] " + getDateString() + logString;
 		var _loc3_ = logString + "\n" + _loc4_;
+		emit(_loc3_);
 		trace(_loc3_);
 		if (mWantConsole) {
 			displayConsole();
@@ -241,6 +277,7 @@ class Logger {
 			return;
 		}
 		logString = "[" + customLoggerString + "]  " + getDateString() + logString;
+		emit(logString);
 		trace(logString);
 		if (mWantConsole) {
 			Cc.warn(logString);

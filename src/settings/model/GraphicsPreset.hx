@@ -14,9 +14,9 @@ class GraphicsPreset {
 	public static function membersAt(value:Bool):ASObject {
 		var _loc2_:ASObject = {};
 		var _loc3_:String;
-		final __ax4_iter_464 = MEMBERS;
-		if (checkNullIteratee(__ax4_iter_464))
-			for (_tmp_ in __ax4_iter_464) {
+		final __ax4_iter_467 = MEMBERS;
+		if (checkNullIteratee(__ax4_iter_467))
+			for (_tmp_ in __ax4_iter_467) {
 				_loc3_ = _tmp_;
 				_loc2_[_loc3_] = value;
 			}

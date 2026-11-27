@@ -29,6 +29,8 @@ class FeatureFlags {
 
 	public static inline final FILE_LOGGING_BY_DEFAULT = "file-logging-by-default";
 
+	public static inline final WANT_OPEN_LOGS_FOLDER_BUTTON = "want-open-logs-folder-button";
+
 	public static inline final START_WINDOWED = "start-windowed";
 
 	public static inline final DEBUG_OUTLINE_SWF_FALLBACK_PROPS = "debug-outline-swf-fallback-props";
@@ -78,6 +80,7 @@ class FeatureFlags {
 		addFeatureFlag("want-steam-achievements", true);
 		addFeatureFlag("start-windowed", false);
 		addFeatureFlag("file-logging-by-default", false);
+		addFeatureFlag("want-open-logs-folder-button", false);
 		addFeatureFlag("debug-outline-swf-fallback-props", false);
 		addFeatureFlag("debug-outline-swf-fallback", false);
 		addFeatureFlag("auto-size-text", true);

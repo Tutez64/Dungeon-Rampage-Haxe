@@ -237,7 +237,7 @@ class BoosterInfoCard extends UIObject {
 		if (_loc1_ == null) {
 			return 0;
 		}
-		return _loc1_.getTime() - GameClock.getWebServerTime();
+		return ASCompat.ASDate.getTime(_loc1_) - GameClock.getWebServerTime();
 	}
 
 	function activateBooster() {

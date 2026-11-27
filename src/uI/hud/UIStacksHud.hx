@@ -81,9 +81,9 @@ class UIStacksHud {
 			new UIObject(mDBFacade, ASCompat.coerce((mUIRoot : ASAny).potion_slot_C, flash.display.MovieClip))
 		]);
 		mStackTimersUI = Vector.ofArray(([null, null, null] : Array<CountdownTextTimer>));
-		final __ax4_iter_431 = mStacksUI;
-		if (checkNullIteratee(__ax4_iter_431))
-			for (_tmp_ in __ax4_iter_431) {
+		final __ax4_iter_434 = mStacksUI;
+		if (checkNullIteratee(__ax4_iter_434))
+			for (_tmp_ in __ax4_iter_434) {
 				_loc1_ = _tmp_;
 				_loc1_.enabled = false;
 				_loc1_.dontKillMyChildren = true;
@@ -165,14 +165,14 @@ class UIStacksHud {
 	}
 
 	function removeStacks() {
-		var __ax4_iter_432:Vector<UIObject>;
-		var __ax4_iter_433:Vector<CountdownTextTimer>;
+		var __ax4_iter_435:Vector<UIObject>;
+		var __ax4_iter_436:Vector<CountdownTextTimer>;
 		var _loc2_:UIObject = null;
 		var _loc1_:CountdownTextTimer = null;
 		if (mStacksUI != null) {
-			__ax4_iter_432 = mStacksUI;
-			if (checkNullIteratee(__ax4_iter_432))
-				for (_tmp_ in __ax4_iter_432) {
+			__ax4_iter_435 = mStacksUI;
+			if (checkNullIteratee(__ax4_iter_435))
+				for (_tmp_ in __ax4_iter_435) {
 					_loc2_ = _tmp_;
 					if (ASCompat.toNumberField((_loc2_.root : ASAny).graphic, "numChildren") > 0) {
 						(_loc2_.root : ASAny).graphic.removeChildAt(0);
@@ -182,9 +182,9 @@ class UIStacksHud {
 			mStacksUI = null;
 		}
 		if (mStackTimersUI != null) {
-			__ax4_iter_433 = mStackTimersUI;
-			if (checkNullIteratee(__ax4_iter_433))
-				for (_tmp_ in __ax4_iter_433) {
+			__ax4_iter_436 = mStackTimersUI;
+			if (checkNullIteratee(__ax4_iter_436))
+				for (_tmp_ in __ax4_iter_436) {
 					_loc1_ = _tmp_;
 					if (_loc1_ != null) {
 						_loc1_.destroy();

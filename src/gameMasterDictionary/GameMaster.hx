@@ -271,19 +271,19 @@ class GameMaster {
 	public function shouldIncludeOffer(gmOffer:GMOffer, splitTests:ASAny):Bool {
 		var _loc3_:Float = 0;
 		if (gmOffer.VisibleDate != null) {
-			_loc3_ = gmOffer.VisibleDate.getTime();
+			_loc3_ = ASCompat.ASDate.getTime(gmOffer.VisibleDate);
 		} else if (gmOffer.StartDate != null) {
-			_loc3_ = gmOffer.StartDate.getTime();
+			_loc3_ = ASCompat.ASDate.getTime(gmOffer.StartDate);
 		}
 		var _loc4_:Float = 0;
 		if (gmOffer.SoldOutDate != null) {
-			_loc4_ = gmOffer.SoldOutDate.getTime();
+			_loc4_ = ASCompat.ASDate.getTime(gmOffer.SoldOutDate);
 		} else if (gmOffer.EndDate != null) {
-			_loc4_ = gmOffer.EndDate.getTime();
+			_loc4_ = ASCompat.ASDate.getTime(gmOffer.EndDate);
 		}
 		var _loc5_ = GameClock.getWebServerTime();
 		if (_loc5_ == 0) {
-			_loc5_ = GameClock.date.getTime();
+			_loc5_ = ASCompat.ASDate.getTime(GameClock.date);
 		}
 		if (_loc3_ > 0) {
 			if (_loc3_ > _loc5_) {

@@ -11,12 +11,15 @@ class GameEndpoints {
 
 	public var tlsOffered:Bool = false;
 
-	public function new(address:String, port:Int, wssPath:String = "", enforceServerCertificate:Bool = true, tlsOffered:Bool = true) {
+	public var fallbackPort:Int = 0;
+
+	public function new(address:String, port:Int, wssPath:String = "", enforceServerCertificate:Bool = true, tlsOffered:Bool = true, fallbackPort:Int = 0) {
 		this.address = address;
 		this.port = port;
 		this.wssPath = normalizePath(wssPath);
 		this.enforceServerCertificate = enforceServerCertificate;
 		this.tlsOffered = tlsOffered;
+		this.fallbackPort = fallbackPort;
 	}
 
 	static function describePath(path:String):String {
@@ -33,7 +36,12 @@ class GameEndpoints {
 	@:isVar public var wssUrl(get, never):String;
 
 	public function get_wssUrl():String {
-		return wssPath == "" ? "" : "wss://" + authority + wssPath;
+		return wssUrlForPort(port);
+	}
+
+	public function wssUrlForPort(port:Int):String {
+		var _loc2_ = port == 443 ? address : address + ":" + port;
+		return wssPath == "" ? "" : "wss://" + _loc2_ + wssPath;
 	}
 
 	@:isVar public var authority(get, never):String;
@@ -43,7 +51,7 @@ class GameEndpoints {
 	}
 
 	public function toString():String {
-		return "GameEndpoints(" + address + ":" + port + " tlsSocket=" + (tlsOffered ? "offered" : "not offered") + " wssPath=" + describePath(wssPath)
-			+ " enforceCert=" + enforceServerCertificate + ")";
+		return "GameEndpoints(" + address + ":" + port + " tlsSocket=" + (tlsOffered ? "offered" : "not offered") + " fallbackPort=" + fallbackPort
+			+ " wssPath=" + describePath(wssPath) + " enforceCert=" + enforceServerCertificate + ")";
 	}
 }

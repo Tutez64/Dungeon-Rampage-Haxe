@@ -108,7 +108,7 @@ class UIGiftMessage {
 			if (friend != null && _loc5_.indexOf(friend.excludeId) < 0) {
 				_loc6_ = [];
 				_loc4_ = [];
-				_loc3_ = Std.string(Date.now().getTime());
+				_loc3_ = Std.string(ASCompat.ASDate.getTime(Date.now()));
 				_loc1_ = Std.string(friend.id);
 				_loc2_ = "0_" + _loc3_ + "_" + _loc1_;
 				_loc4_.push(_loc2_);

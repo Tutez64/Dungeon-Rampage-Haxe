@@ -8,6 +8,7 @@ import brain.uI.UISlider;
 import facade.DBFacade;
 import settings.model.SettingDefinition;
 import settings.model.SettingsModel;
+import settings.view.rows.ActionSettingRow;
 import settings.view.rows.BooleanSettingRow;
 import settings.view.rows.ChoiceSettingRow;
 import settings.view.rows.KeyBindingSettingRow;
@@ -227,9 +228,9 @@ class SettingsList {
 			_loc1_++;
 		}
 		var _loc2_:SettingRow;
-		final __ax4_iter_411 = mRows;
-		if (checkNullIteratee(__ax4_iter_411))
-			for (_tmp_ in __ax4_iter_411) {
+		final __ax4_iter_414 = mRows;
+		if (checkNullIteratee(__ax4_iter_414))
+			for (_tmp_ in __ax4_iter_414) {
 				_loc2_ = _tmp_;
 				_loc2_.leftNavigationAdditionalInteraction = _loc2_.nudgeDown;
 				_loc2_.rightNavigationAdditionalInteraction = _loc2_.nudgeUp;
@@ -237,6 +238,9 @@ class SettingsList {
 	}
 
 	function createRow(definition:SettingDefinition, index:Int):SettingRow {
+		if (definition.isAction) {
+			return new ActionSettingRow(mDBFacade, mSwfAsset, definition, mModel, index);
+		}
 		if (definition.isKeyBinding) {
 			return new KeyBindingSettingRow(mDBFacade, mSwfAsset, definition, mModel, index);
 		}
@@ -251,9 +255,9 @@ class SettingsList {
 
 	function destroyRows() {
 		var _loc1_:SettingRow;
-		final __ax4_iter_412 = mRows;
-		if (checkNullIteratee(__ax4_iter_412))
-			for (_tmp_ in __ax4_iter_412) {
+		final __ax4_iter_415 = mRows;
+		if (checkNullIteratee(__ax4_iter_415))
+			for (_tmp_ in __ax4_iter_415) {
 				_loc1_ = _tmp_;
 				if (_loc1_.root != null && _loc1_.root.parent != null) {
 					_loc1_.root.parent.removeChild(_loc1_.root);
@@ -266,9 +270,9 @@ class SettingsList {
 
 	function onSettingChanged(id:String) {
 		var _loc2_:SettingRow;
-		final __ax4_iter_413 = mRows;
-		if (checkNullIteratee(__ax4_iter_413))
-			for (_tmp_ in __ax4_iter_413) {
+		final __ax4_iter_416 = mRows;
+		if (checkNullIteratee(__ax4_iter_416))
+			for (_tmp_ in __ax4_iter_416) {
 				_loc2_ = _tmp_;
 				_loc2_.refreshFromModel();
 			}

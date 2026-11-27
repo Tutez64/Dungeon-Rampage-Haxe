@@ -125,9 +125,9 @@ class Tile extends FloorObject {
 		var _loc10_:RectangleNavCollider = null;
 		var _loc8_:Array<ASAny> = [];
 		var _loc12_:ASObject;
-		final __ax4_iter_450:ASAny = tileJson.LEObjects;
-		if (checkNullIteratee(__ax4_iter_450))
-			for (_tmp_ in __ax4_iter_450) {
+		final __ax4_iter_453:ASAny = tileJson.LEObjects;
+		if (checkNullIteratee(__ax4_iter_453))
+			for (_tmp_ in __ax4_iter_453) {
 				_loc12_ = _tmp_;
 				if (_loc12_.constant == "JASONS_DUNGEON_EXIT") {
 					_loc13_ = ASCompat.toNumber(_loc12_.x ?? 0);

@@ -184,16 +184,18 @@ class LeaderboardFriendSlot {
 				mJoinOnlineClip.visible = true;
 				mJoinOnlineFriendButton.root.visible = true;
 				joinFriendCallback = function() {
-					var _loc1_ = false;
+					var jumpToMap:Bool;
 					if (mDBFacade.dbAccountInfo.inventoryInfo.getEquipedItemsOnAvatar(mDBFacade.dbAccountInfo.activeAvatarInfo.id).length == 0) {
 						mDBFacade.warningPopup("Warning", "Cannot enter dungeon with no weapons equipped.");
 					} else {
 						mDBFacade.metrics.log("JoinFriend", {"friendId": data.id});
-						_loc1_ = false;
+						jumpToMap = false;
 						if (mLeaderboard.currentStateName == "MapTownSubState") {
-							_loc1_ = true;
+							jumpToMap = true;
 						}
-						mDBFacade.mainStateMachine.enterLoadingScreenState((0 : UInt), "", data.id, (0 : UInt), _loc1_);
+						mDBFacade.playerActivityCount.afterMaintenanceCheck(function() {
+							mDBFacade.mainStateMachine.enterLoadingScreenState((0 : UInt), "", data.id, (0 : UInt), jumpToMap);
+						});
 					}
 				};
 				mJoinOnlineFriendButton.releaseCallback = joinFriendCallback;

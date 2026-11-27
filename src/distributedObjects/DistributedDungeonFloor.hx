@@ -598,9 +598,9 @@ class DistributedDungeonFloor extends Floor implements IDistributedDungeonFloor 
 		mEntryGeneration = _loc2_.floorGeneration;
 		var _loc1_ = ASCompat.reinterpretAs(parentArea, DistributedDungionArea);
 		var _loc3_:String;
-		final __ax4_iter_325 = TrickleCacheLoader.starlingAtlasPaths(mDBFacade, _loc1_ != null ? _loc1_.mCacheNpc : null);
-		if (checkNullIteratee(__ax4_iter_325))
-			for (_tmp_ in __ax4_iter_325) {
+		final __ax4_iter_327 = TrickleCacheLoader.starlingAtlasPaths(mDBFacade, _loc1_ != null ? _loc1_.mCacheNpc : null);
+		if (checkNullIteratee(__ax4_iter_327))
+			for (_tmp_ in __ax4_iter_327) {
 				_loc3_ = _tmp_;
 				_loc2_.queueStarlingAssetsForPath(_loc3_);
 			}
@@ -823,6 +823,7 @@ class DistributedDungeonFloor extends Floor implements IDistributedDungeonFloor 
 		LoadingPrewarm.cancelLoading();
 		mPrewarm = null;
 		mActiveOwnerAvatar = null;
+		mDBFacade.camera.forceStopBackgroundFade();
 		if (mBgMusic != null) {
 			EventListeners.remove(mBgMusic, "complete", onBgMusicLoaded);
 			EventListeners.remove(mBgMusic, "ioError", onBgMusicError);
@@ -879,9 +880,9 @@ class DistributedDungeonFloor extends Floor implements IDistributedDungeonFloor 
 		mRemoteActors.clear();
 		mRemoteActors = null;
 		var _loc11_:ASObject;
-		final __ax4_iter_326 = mDoobers;
-		if (checkNullIteratee(__ax4_iter_326))
-			for (_tmp_ in __ax4_iter_326.keys()) {
+		final __ax4_iter_328 = mDoobers;
+		if (checkNullIteratee(__ax4_iter_328))
+			for (_tmp_ in __ax4_iter_328.keys()) {
 				_loc11_ = _tmp_;
 				_loc3_ = ASCompat.dynamicAs(_loc11_, DooberGameObject);
 				if (_loc3_ != null && !_loc3_.isDestroyed) {
@@ -891,9 +892,9 @@ class DistributedDungeonFloor extends Floor implements IDistributedDungeonFloor 
 		mDoobers = null;
 		var _loc2_:Array<ASAny> = [];
 		var _loc9_:ASObject;
-		final __ax4_iter_327 = mProjectiles;
-		if (checkNullIteratee(__ax4_iter_327))
-			for (_tmp_ in __ax4_iter_327.keys()) {
+		final __ax4_iter_329 = mProjectiles;
+		if (checkNullIteratee(__ax4_iter_329))
+			for (_tmp_ in __ax4_iter_329.keys()) {
 				_loc9_ = _tmp_;
 				_loc2_.push(_loc9_);
 			}

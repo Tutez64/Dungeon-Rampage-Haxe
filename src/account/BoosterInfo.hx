@@ -42,7 +42,7 @@ class BoosterInfo extends InventoryBaseInfo {
 		if (_loc1_ == null) {
 			return Locale.getString("EXPIRED");
 		}
-		var _loc3_ = new TimeSpan(_loc1_.getTime());
+		var _loc3_ = new TimeSpan(ASCompat.ASDate.getTime(_loc1_));
 		return _loc3_.getTimeBetweenTimeSpanAndNow(true);
 	}
 
@@ -57,7 +57,7 @@ class BoosterInfo extends InventoryBaseInfo {
 		if (_loc1_ == null) {
 			return 0;
 		}
-		return _loc1_.getTime() - GameClock.getWebServerTime();
+		return ASCompat.ASDate.getTime(_loc1_) - GameClock.getWebServerTime();
 	}
 
 	override function parseJson(json:ASObject) {

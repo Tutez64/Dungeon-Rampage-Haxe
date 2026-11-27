@@ -6,6 +6,7 @@ import input.keyBindings.InputAction;
 import settings.model.bindings.DisplayTimingBinding;
 import settings.model.bindings.HudStyleBinding;
 import settings.model.bindings.KeyBindingSettingBinding;
+import settings.model.bindings.LogFileBinding;
 import settings.model.bindings.SoundVolumeBinding;
 
 class SettingsCatalog {
@@ -19,7 +20,7 @@ class SettingsCatalog {
 
 	public function new(dbFacade:DBFacade) {
 		var _loc3_:SettingDefinition;
-		var __ax4_iter_465:Vector<SettingDefinition>;
+		var __ax4_iter_468:Vector<SettingDefinition>;
 
 		mDBFacade = dbFacade;
 		mDefinitions = new Vector<SettingDefinition>();
@@ -36,9 +37,9 @@ class SettingsCatalog {
 		if (checkNullIteratee(_loc4_))
 			for (_tmp_ in _loc4_) {
 				_loc2_ = _tmp_;
-				__ax4_iter_465 = _loc2_.build();
-				if (checkNullIteratee(__ax4_iter_465))
-					for (_tmp_ in __ax4_iter_465) {
+				__ax4_iter_468 = _loc2_.build();
+				if (checkNullIteratee(__ax4_iter_468))
+					for (_tmp_ in __ax4_iter_468) {
 						_loc3_ = _tmp_;
 						mDefinitions.push(_loc3_);
 						mDefinitionsById[_loc3_.id] = _loc3_;
@@ -71,9 +72,9 @@ class SettingsCatalog {
 	public function getDefinitionsForCategory(category:String):Vector<SettingDefinition> {
 		var _loc2_ = new Vector<SettingDefinition>();
 		var _loc3_:SettingDefinition;
-		final __ax4_iter_466 = mDefinitions;
-		if (checkNullIteratee(__ax4_iter_466))
-			for (_tmp_ in __ax4_iter_466) {
+		final __ax4_iter_469 = mDefinitions;
+		if (checkNullIteratee(__ax4_iter_469))
+			for (_tmp_ in __ax4_iter_469) {
 				_loc3_ = _tmp_;
 				if (_loc3_.category == category) {
 					_loc2_.push(_loc3_);
@@ -84,9 +85,9 @@ class SettingsCatalog {
 
 	public function destroy() {
 		var _loc1_:SettingDefinition;
-		final __ax4_iter_467 = mDefinitions;
-		if (checkNullIteratee(__ax4_iter_467))
-			for (_tmp_ in __ax4_iter_467) {
+		final __ax4_iter_470 = mDefinitions;
+		if (checkNullIteratee(__ax4_iter_470))
+			for (_tmp_ in __ax4_iter_470) {
 				_loc1_ = _tmp_;
 				if (_loc1_.binding != null) {
 					_loc1_.binding.destroy();
@@ -94,6 +95,7 @@ class SettingsCatalog {
 				}
 				_loc1_.coerceValue = null;
 				_loc1_.descriptionKeyProvider = null;
+				_loc1_.action = null;
 			}
 		mDefinitions = null;
 		mDefinitionsById = null;
@@ -136,11 +138,12 @@ class SettingsCatalog {
 	function defineControls():SettingsSection {
 		var _loc1_ = section("controls");
 		startupFlag(_loc1_, "steamInput");
+		_loc1_.setting("controllerBindings").action(openControllerBindings);
 		_loc1_.flag("controllerRumble", "want-controller-rumble");
 		var _loc2_:String;
-		final __ax4_iter_468 = InputAction.ORDERED;
-		if (checkNullIteratee(__ax4_iter_468))
-			for (_tmp_ in __ax4_iter_468) {
+		final __ax4_iter_471 = InputAction.ORDERED;
+		if (checkNullIteratee(__ax4_iter_471))
+			for (_tmp_ in __ax4_iter_471) {
 				_loc2_ = _tmp_;
 				_loc1_.setting(SettingIds.keyBindingIdFor(_loc2_))
 					.keyBinding(_loc2_)
@@ -181,6 +184,14 @@ class SettingsCatalog {
 	function defineAdvanced():SettingsSection {
 		var _loc1_ = section("advanced");
 		startupFlag(_loc1_, "resumableConnection");
+		_loc1_.setting("saveLogs").defaultsTo(false).boundTo(new LogFileBinding());
+		if (mDBFacade.featureFlags.getFlagValue("want-open-logs-folder-button") && !mDBFacade.steamInputManager.isSteamDeckOrBigPicture) {
+			_loc1_.setting("openLogsFolder").action(GameLogFile.openFolder);
+		}
 		return _loc1_;
+	}
+
+	function openControllerBindings() {
+		mDBFacade.steamInputManager.openBindingPanel();
 	}
 }

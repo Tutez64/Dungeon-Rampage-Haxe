@@ -25,7 +25,7 @@ class URLSoundAssetLoader extends AssetLoader {
 		if (useCache) {
 			_loc4_.url += "?v=" + facade.fileVersion(assetPath);
 		} else {
-			_loc4_.url += "?t=" + Std.string(Date.now().getTime());
+			_loc4_.url += "?t=" + Std.string(ASCompat.ASDate.getTime(Date.now()));
 		}
 		mSound = new Sound();
 		mSound.load(_loc4_);

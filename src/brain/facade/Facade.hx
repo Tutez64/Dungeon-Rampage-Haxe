@@ -341,7 +341,7 @@ class Facade {
 		var _loc7_ = false;
 		mSkippingFrame = false;
 		var _loc2_ = mCurrentTime;
-		mCurrentTime = Date.now().getTime();
+		mCurrentTime = ASCompat.ASDate.getTime(Date.now());
 		var _loc6_ = ASCompat.floatToInt(mCurrentTime - _loc2_);
 		_loc6_ = ASCompat.floatToInt(Math.max(0, _loc6_));
 		mWallClockTimeElapsed += _loc6_;

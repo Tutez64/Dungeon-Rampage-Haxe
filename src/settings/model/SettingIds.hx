@@ -61,6 +61,12 @@ class SettingIds {
 
 	public static inline final START_WINDOWED = "startWindowed";
 
+	public static inline final CONTROLLER_BINDINGS = "controllerBindings";
+
+	public static inline final SAVE_LOGS = "saveLogs";
+
+	public static inline final OPEN_LOGS_FOLDER = "openLogsFolder";
+
 	public static inline final STARLING_RENDERER = "starlingRenderer";
 
 	public static inline final RESUMABLE_CONNECTION = "resumableConnection";

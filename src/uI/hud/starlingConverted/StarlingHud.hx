@@ -448,9 +448,9 @@ class StarlingHud implements IGameHud {
 		mStacks.root.x = 480;
 		mStacks.root.y = 55;
 		mRoot.addChild(mStacks.root);
-		final __ax4_iter_193 = Vector.ofArray(["potion_slot_A", "potion_slot_B", "potion_slot_C"]);
-		if (checkNullIteratee(__ax4_iter_193))
-			for (_tmp_ in __ax4_iter_193) {
+		final __ax4_iter_194 = Vector.ofArray(["potion_slot_A", "potion_slot_B", "potion_slot_C"]);
+		if (checkNullIteratee(__ax4_iter_194))
+			for (_tmp_ in __ax4_iter_194) {
 				_loc6_ = _tmp_;
 				_loc13_ = new StarlingButton(mStacks, _loc6_, mRoot);
 				_loc13_.enabled = false;
@@ -481,9 +481,9 @@ class StarlingHud implements IGameHud {
 			}
 			_loc3_++;
 		}
-		final __ax4_iter_194 = mBuffs;
-		if (checkNullIteratee(__ax4_iter_194))
-			for (_tmp_ in __ax4_iter_194) {
+		final __ax4_iter_195 = mBuffs;
+		if (checkNullIteratee(__ax4_iter_195))
+			for (_tmp_ in __ax4_iter_195) {
 				_loc2_ = _tmp_;
 				if (buffView(_loc2_) == null) {
 					createBuff(_loc2_);
@@ -1254,7 +1254,6 @@ class StarlingHud implements IGameHud {
 				_loc3_ = mFacade.camera != null ? mFacade.camera.backgroundFadeAlpha : 0;
 				_loc2_ = (ASCompat.toInt(mFacade.camera != null ? mFacade.camera.backgroundFadeColor : 0) : UInt);
 				mCut.syncChatOverlay(_loc3_, _loc2_);
-				mCut.fade(_loc3_, _loc2_);
 			}
 		} catch (error:Dynamic) {
 			failed(ASCompat.asError(error));
@@ -1404,10 +1403,10 @@ class StarlingHud implements IGameHud {
 	}
 
 	public function hide() {
-		var __ax4_iter_195:Vector<StarlingBuff>;
-		var __ax4_iter_196:Vector<StarlingTooltip>;
-		var __ax4_iter_197:Vector<StarlingHudSlot>;
+		var __ax4_iter_196:Vector<StarlingBuff>;
+		var __ax4_iter_197:Vector<StarlingTooltip>;
 		var __ax4_iter_198:Vector<StarlingHudSlot>;
+		var __ax4_iter_199:Vector<StarlingHudSlot>;
 		var _loc3_:StarlingBuff = null;
 		var _loc1_:StarlingTooltip = null;
 		var _loc2_:StarlingHudSlot = null;
@@ -1423,30 +1422,30 @@ class StarlingHud implements IGameHud {
 				mPetPortrait = null;
 			}
 			mPet = null;
-			__ax4_iter_195 = mBuffViews;
-			if (checkNullIteratee(__ax4_iter_195))
-				for (_tmp_ in __ax4_iter_195) {
+			__ax4_iter_196 = mBuffViews;
+			if (checkNullIteratee(__ax4_iter_196))
+				for (_tmp_ in __ax4_iter_196) {
 					_loc3_ = _tmp_;
 					_loc3_.hideTooltip();
 				}
 			if (mStacks != null) {
 				mStacks.root.visible = false;
 			}
-			__ax4_iter_196 = mTooltips;
-			if (checkNullIteratee(__ax4_iter_196))
-				for (_tmp_ in __ax4_iter_196) {
+			__ax4_iter_197 = mTooltips;
+			if (checkNullIteratee(__ax4_iter_197))
+				for (_tmp_ in __ax4_iter_197) {
 					_loc1_ = _tmp_;
 					_loc1_.hide();
 				}
-			__ax4_iter_197 = mWeapons;
-			if (checkNullIteratee(__ax4_iter_197))
-				for (_tmp_ in __ax4_iter_197) {
+			__ax4_iter_198 = mWeapons;
+			if (checkNullIteratee(__ax4_iter_198))
+				for (_tmp_ in __ax4_iter_198) {
 					_loc2_ = _tmp_;
 					_loc2_.hideTooltip();
 				}
-			__ax4_iter_198 = mConsumables;
-			if (checkNullIteratee(__ax4_iter_198))
-				for (_tmp_ in __ax4_iter_198) {
+			__ax4_iter_199 = mConsumables;
+			if (checkNullIteratee(__ax4_iter_199))
+				for (_tmp_ in __ax4_iter_199) {
 					_loc2_ = _tmp_;
 					_loc2_.hideTooltip();
 				}
@@ -1469,9 +1468,9 @@ class StarlingHud implements IGameHud {
 	}
 
 	public function detachHero() {
-		var __ax4_iter_199:Vector<StarlingBuff>;
-		var __ax4_iter_200:Vector<StarlingHudSlot>;
+		var __ax4_iter_200:Vector<StarlingBuff>;
 		var __ax4_iter_201:Vector<StarlingHudSlot>;
+		var __ax4_iter_202:Vector<StarlingHudSlot>;
 		var _loc2_:StarlingBuff = null;
 		var _loc1_:StarlingHudSlot = null;
 		try {
@@ -1480,9 +1479,9 @@ class StarlingHud implements IGameHud {
 			cleanupCall(destroyTeamLoot);
 			disposeResource(mOffScreen, "dispose");
 			mOffScreen = null;
-			__ax4_iter_199 = mBuffViews;
-			if (checkNullIteratee(__ax4_iter_199))
-				for (_tmp_ in __ax4_iter_199) {
+			__ax4_iter_200 = mBuffViews;
+			if (checkNullIteratee(__ax4_iter_200))
+				for (_tmp_ in __ax4_iter_200) {
 					_loc2_ = _tmp_;
 					disposeResource(_loc2_, "dispose");
 				}
@@ -1505,15 +1504,15 @@ class StarlingHud implements IGameHud {
 			clearCooldowns();
 			mPet = null;
 			mBuffs.length = 0;
-			__ax4_iter_200 = mWeapons;
-			if (checkNullIteratee(__ax4_iter_200))
-				for (_tmp_ in __ax4_iter_200) {
+			__ax4_iter_201 = mWeapons;
+			if (checkNullIteratee(__ax4_iter_201))
+				for (_tmp_ in __ax4_iter_201) {
 					_loc1_ = _tmp_;
 					disposeResource(_loc1_, "reset");
 				}
-			__ax4_iter_201 = mConsumables;
-			if (checkNullIteratee(__ax4_iter_201))
-				for (_tmp_ in __ax4_iter_201) {
+			__ax4_iter_202 = mConsumables;
+			if (checkNullIteratee(__ax4_iter_202))
+				for (_tmp_ in __ax4_iter_202) {
 					_loc1_ = _tmp_;
 					disposeResource(_loc1_, "reset");
 				}
@@ -1531,9 +1530,9 @@ class StarlingHud implements IGameHud {
 		var _loc1_:StarlingButton = null;
 		var _loc4_:StarlingHudSlot = null;
 		var _loc3_:StarlingTooltip = null;
-		final __ax4_iter_202 = mBuffViews;
-		if (checkNullIteratee(__ax4_iter_202))
-			for (_tmp_ in __ax4_iter_202) {
+		final __ax4_iter_203 = mBuffViews;
+		if (checkNullIteratee(__ax4_iter_203))
+			for (_tmp_ in __ax4_iter_203) {
 				_loc5_ = _tmp_;
 				disposeResource(_loc5_, "detachInput");
 			}
@@ -1550,21 +1549,21 @@ class StarlingHud implements IGameHud {
 		mBusterButton = null;
 		mBusterBanner = mBusterPulse = null;
 		mBusterPromptOffset = 0;
-		final __ax4_iter_203 = mModifierIcons;
-		if (checkNullIteratee(__ax4_iter_203))
-			for (_tmp_ in __ax4_iter_203) {
+		final __ax4_iter_204 = mModifierIcons;
+		if (checkNullIteratee(__ax4_iter_204))
+			for (_tmp_ in __ax4_iter_204) {
 				_loc2_ = _tmp_;
 				disposeResource(_loc2_);
 			}
-		final __ax4_iter_204 = mModifierButtons;
-		if (checkNullIteratee(__ax4_iter_204))
-			for (_tmp_ in __ax4_iter_204) {
+		final __ax4_iter_205 = mModifierButtons;
+		if (checkNullIteratee(__ax4_iter_205))
+			for (_tmp_ in __ax4_iter_205) {
 				_loc1_ = _tmp_;
 				disposeResource(_loc1_);
 			}
-		final __ax4_iter_205 = mStackButtons;
-		if (checkNullIteratee(__ax4_iter_205))
-			for (_tmp_ in __ax4_iter_205) {
+		final __ax4_iter_206 = mStackButtons;
+		if (checkNullIteratee(__ax4_iter_206))
+			for (_tmp_ in __ax4_iter_206) {
 				_loc1_ = _tmp_;
 				disposeResource(_loc1_);
 			}
@@ -1575,15 +1574,15 @@ class StarlingHud implements IGameHud {
 		cleanupCall(cancelPortrait);
 		mPortrait = null;
 		mProfileBulging = mXpBulging = false;
-		final __ax4_iter_206 = mWeapons;
-		if (checkNullIteratee(__ax4_iter_206))
-			for (_tmp_ in __ax4_iter_206) {
+		final __ax4_iter_207 = mWeapons;
+		if (checkNullIteratee(__ax4_iter_207))
+			for (_tmp_ in __ax4_iter_207) {
 				_loc4_ = _tmp_;
 				disposeResource(_loc4_);
 			}
-		final __ax4_iter_207 = mConsumables;
-		if (checkNullIteratee(__ax4_iter_207))
-			for (_tmp_ in __ax4_iter_207) {
+		final __ax4_iter_208 = mConsumables;
+		if (checkNullIteratee(__ax4_iter_208))
+			for (_tmp_ in __ax4_iter_208) {
 				_loc4_ = _tmp_;
 				disposeResource(_loc4_);
 			}
@@ -1592,9 +1591,9 @@ class StarlingHud implements IGameHud {
 		mInput = null;
 		disposeResource(mCut, "dispose");
 		mCut = null;
-		final __ax4_iter_208 = mTooltips;
-		if (checkNullIteratee(__ax4_iter_208))
-			for (_tmp_ in __ax4_iter_208) {
+		final __ax4_iter_209 = mTooltips;
+		if (checkNullIteratee(__ax4_iter_209))
+			for (_tmp_ in __ax4_iter_209) {
 				_loc3_ = _tmp_;
 				disposeResource(_loc3_);
 			}
@@ -1810,7 +1809,7 @@ class StarlingHud implements IGameHud {
 
 	public function suppressNextExitMenuToggle() {
 		try {
-			mSuppressNextExitMenuToggle = mFacade.inputManager.check(27) || mFacade.steamInputManager.pressedAction("menu_cancel");
+			mSuppressNextExitMenuToggle = mFacade.inputManager.check(27);
 		} catch (error:Dynamic) {
 			failed(ASCompat.asError(error));
 		}
@@ -1920,9 +1919,9 @@ class StarlingHud implements IGameHud {
 		var _loc3_:Texture = null;
 		var _loc2_:BitmapData = null;
 		mGlyphGeneration = mGlyphGeneration + 1;
-		final __ax4_iter_209 = mGlyphs;
-		if (checkNullIteratee(__ax4_iter_209))
-			for (_tmp_ in __ax4_iter_209) {
+		final __ax4_iter_210 = mGlyphs;
+		if (checkNullIteratee(__ax4_iter_210))
+			for (_tmp_ in __ax4_iter_210) {
 				_loc5_ = _tmp_;
 				if (checkNullIteratee(_loc5_))
 					for (_tmp_ in iterateDynamicValues(_loc5_)) {
@@ -1933,21 +1932,21 @@ class StarlingHud implements IGameHud {
 					}
 			}
 		mGlyphs = new ASDictionary<ASAny, ASAny>();
-		final __ax4_iter_210 = mStarlingGlyphs;
-		if (checkNullIteratee(__ax4_iter_210))
-			for (_tmp_ in __ax4_iter_210) {
+		final __ax4_iter_211 = mStarlingGlyphs;
+		if (checkNullIteratee(__ax4_iter_211))
+			for (_tmp_ in __ax4_iter_211) {
 				_loc1_ = ASCompat.coerce(_tmp_, starling.display.Image);
 				_loc1_.removeFromParent(true);
 			}
-		final __ax4_iter_211 = mGlyphTextures;
-		if (checkNullIteratee(__ax4_iter_211))
-			for (_tmp_ in __ax4_iter_211) {
+		final __ax4_iter_212 = mGlyphTextures;
+		if (checkNullIteratee(__ax4_iter_212))
+			for (_tmp_ in __ax4_iter_212) {
 				_loc3_ = ASCompat.coerce(_tmp_, starling.textures.Texture);
 				_loc3_.dispose();
 			}
-		final __ax4_iter_212 = mGrayGlyphPixels;
-		if (checkNullIteratee(__ax4_iter_212))
-			for (_tmp_ in __ax4_iter_212) {
+		final __ax4_iter_213 = mGrayGlyphPixels;
+		if (checkNullIteratee(__ax4_iter_213))
+			for (_tmp_ in __ax4_iter_213) {
 				_loc2_ = ASCompat.coerce(_tmp_, flash.display.BitmapData);
 				_loc2_.dispose();
 			}
@@ -2518,12 +2517,12 @@ class StarlingHud implements IGameHud {
 		var _loc3_:StarlingText = null;
 		var _loc2_ = mFacade.steamInputManager.hasGlyphForAction("use_dungeon_buster");
 		mBusterPromptOffset = _loc2_ ? -5 : 0;
-		final __ax4_iter_213 = Vector.ofArray([
+		final __ax4_iter_214 = Vector.ofArray([
 			"UI_buster_active.buster_activated.up.db_pressbutton_text",
 			"UI_buster_active.buster_activated.over.mc.db_pressbutton_text"
 		]);
-		if (checkNullIteratee(__ax4_iter_213))
-			for (_tmp_ in __ax4_iter_213) {
+		if (checkNullIteratee(__ax4_iter_214))
+			for (_tmp_ in __ax4_iter_214) {
 				_loc1_ = _tmp_;
 				if (Std.isOfType(node(_loc1_), ArtDisplay)) {
 					cast(node(_loc1_), ArtDisplay).setHudOffset(mBusterPromptOffset, 0);
@@ -2728,9 +2727,9 @@ class StarlingHud implements IGameHud {
 
 	function buffView(buffGO:BuffGameObject):StarlingBuff {
 		var _loc2_:StarlingBuff = null;
-		final __ax4_iter_214 = mBuffViews;
-		if (checkNullIteratee(__ax4_iter_214))
-			for (_tmp_ in __ax4_iter_214) {
+		final __ax4_iter_215 = mBuffViews;
+		if (checkNullIteratee(__ax4_iter_215))
+			for (_tmp_ in __ax4_iter_215) {
 				_loc2_ = _tmp_;
 				if (_loc2_.buff == buffGO) {
 					return _loc2_;
@@ -2813,9 +2812,9 @@ class StarlingHud implements IGameHud {
 	function setDungeonModifiers() {
 		var _loc2_ = 0;
 		var _loc1_:StarlingHudIcon = null;
-		final __ax4_iter_215 = mModifierIcons;
-		if (checkNullIteratee(__ax4_iter_215))
-			for (_tmp_ in __ax4_iter_215) {
+		final __ax4_iter_216 = mModifierIcons;
+		if (checkNullIteratee(__ax4_iter_216))
+			for (_tmp_ in __ax4_iter_216) {
 				_loc1_ = _tmp_;
 				_loc1_.dispose();
 			}

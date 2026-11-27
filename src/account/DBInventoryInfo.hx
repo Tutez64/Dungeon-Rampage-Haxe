@@ -143,7 +143,7 @@ class DBInventoryInfo {
 	public function timeTillBoosterExpire(stackId:Int):Int {
 		var _loc3_ = ASCompat.coerce(mBoostersByStackableId.itemFor(stackId), account.BoosterInfo);
 		var _loc2_ = dateBooster((_loc3_.gmId : Int));
-		return ASCompat.floatToInt(_loc2_.getTime() - GameClock.getWebServerTime());
+		return ASCompat.floatToInt(ASCompat.ASDate.getTime(_loc2_) - GameClock.getWebServerTime());
 	}
 
 	public function timeTillNextBoosterExpire():Int {
@@ -540,18 +540,18 @@ class DBInventoryInfo {
 
 	function parseChests(chestsJson:ASObject) {
 		var _loc6_:UInt;
-		var __ax4_iter_348:Vector<UInt>;
+		var __ax4_iter_351:Vector<UInt>;
 		var _loc9_ = (0 : UInt);
 		var _loc8_ = false;
 		var _loc4_:ASObject = {};
 		var _loc3_:ChestInfo;
-		final __ax4_iter_347 = mChests;
-		if (checkNullIteratee(__ax4_iter_347))
-			for (_tmp_ in __ax4_iter_347) {
+		final __ax4_iter_350 = mChests;
+		if (checkNullIteratee(__ax4_iter_350))
+			for (_tmp_ in __ax4_iter_350) {
 				_loc3_ = _tmp_;
-				__ax4_iter_348 = _loc3_.databaseIds;
-				if (checkNullIteratee(__ax4_iter_348))
-					for (_tmp_ in __ax4_iter_348) {
+				__ax4_iter_351 = _loc3_.databaseIds;
+				if (checkNullIteratee(__ax4_iter_351))
+					for (_tmp_ in __ax4_iter_351) {
 						_loc6_ = _tmp_;
 						_loc4_[Std.string(_loc6_)] = true;
 					}
@@ -580,9 +580,9 @@ class DBInventoryInfo {
 
 	public function getChestStack(gmChestId:UInt):ChestInfo {
 		var _loc2_:ChestInfo;
-		final __ax4_iter_349 = mChests;
-		if (checkNullIteratee(__ax4_iter_349))
-			for (_tmp_ in __ax4_iter_349) {
+		final __ax4_iter_352 = mChests;
+		if (checkNullIteratee(__ax4_iter_352))
+			for (_tmp_ in __ax4_iter_352) {
 				_loc2_ = _tmp_;
 				if (_loc2_.gmId == gmChestId) {
 					return _loc2_;
@@ -608,9 +608,9 @@ class DBInventoryInfo {
 	public function chestCountOfType(gmChestId:UInt):UInt {
 		var _loc2_ = (0 : UInt);
 		var _loc3_:ChestInfo;
-		final __ax4_iter_350 = mChests;
-		if (checkNullIteratee(__ax4_iter_350))
-			for (_tmp_ in __ax4_iter_350) {
+		final __ax4_iter_353 = mChests;
+		if (checkNullIteratee(__ax4_iter_353))
+			for (_tmp_ in __ax4_iter_353) {
 				_loc3_ = _tmp_;
 				if (_loc3_.gmId == gmChestId) {
 					_loc2_ += _loc3_.count;
@@ -625,9 +625,9 @@ class DBInventoryInfo {
 
 	public function hasRoomForChest(gmChestId:UInt):Bool {
 		var _loc2_:ChestInfo;
-		final __ax4_iter_351 = mChests;
-		if (checkNullIteratee(__ax4_iter_351))
-			for (_tmp_ in __ax4_iter_351) {
+		final __ax4_iter_354 = mChests;
+		if (checkNullIteratee(__ax4_iter_354))
+			for (_tmp_ in __ax4_iter_354) {
 				_loc2_ = _tmp_;
 				if (_loc2_.gmId == gmChestId && !_loc2_.isFull) {
 					return true;
@@ -1000,9 +1000,9 @@ class DBInventoryInfo {
 			}
 		}
 		var _loc2_:ChestInfo;
-		final __ax4_iter_352 = mChests;
-		if (checkNullIteratee(__ax4_iter_352))
-			for (_tmp_ in __ax4_iter_352) {
+		final __ax4_iter_355 = mChests;
+		if (checkNullIteratee(__ax4_iter_355))
+			for (_tmp_ in __ax4_iter_355) {
 				_loc2_ = _tmp_;
 				if (_loc2_.isNew) {
 					return true;
@@ -1032,9 +1032,9 @@ class DBInventoryInfo {
 			_loc1_.isNew = false;
 		}
 		var _loc2_:ChestInfo;
-		final __ax4_iter_353 = mChests;
-		if (checkNullIteratee(__ax4_iter_353))
-			for (_tmp_ in __ax4_iter_353) {
+		final __ax4_iter_356 = mChests;
+		if (checkNullIteratee(__ax4_iter_356))
+			for (_tmp_ in __ax4_iter_356) {
 				_loc2_ = _tmp_;
 				_loc2_.isNew = false;
 			}
@@ -1044,9 +1044,9 @@ class DBInventoryInfo {
 		var skin:GMSkin;
 		var offer:GMOffer;
 		var result = new Vector<GMSkin>();
-		final __ax4_iter_354 = mDBFacade.gameMaster.Skins;
-		if (checkNullIteratee(__ax4_iter_354))
-			for (_tmp_ in __ax4_iter_354) {
+		final __ax4_iter_357 = mDBFacade.gameMaster.Skins;
+		if (checkNullIteratee(__ax4_iter_357))
+			for (_tmp_ in __ax4_iter_357) {
 				skin = _tmp_;
 				if (skin.ForHero == gmHero.Constant) {
 					offer = ASCompat.coerce(offerBySkinId.itemFor(skin.Id), gameMasterDictionary.GMOffer);
@@ -1062,7 +1062,7 @@ class DBInventoryInfo {
 	}
 
 	public function isSkinExpired(skin:GMSkin, offer:GMOffer):Bool {
-		var _loc7_ = GameClock.date.getTime();
+		var _loc7_ = ASCompat.ASDate.getTime(GameClock.date);
 		var _loc4_ = false;
 		var _loc3_:Float = 0;
 		var _loc6_ = false;
@@ -1070,11 +1070,11 @@ class DBInventoryInfo {
 		if (offer != null) {
 			_loc4_ = offer.VisibleDate != null || offer.StartDate != null;
 			if (_loc4_) {
-				_loc3_ = offer.VisibleDate != null ? offer.VisibleDate.getTime() : offer.StartDate.getTime();
+				_loc3_ = offer.VisibleDate != null ? ASCompat.ASDate.getTime(offer.VisibleDate) : ASCompat.ASDate.getTime(offer.StartDate);
 			}
 			_loc6_ = offer.EndDate != null || offer.SoldOutDate != null;
 			if (_loc6_) {
-				_loc5_ = offer.SoldOutDate != null ? offer.SoldOutDate.getTime() : offer.EndDate.getTime();
+				_loc5_ = offer.SoldOutDate != null ? ASCompat.ASDate.getTime(offer.SoldOutDate) : ASCompat.ASDate.getTime(offer.EndDate);
 			}
 		}
 		if (doesPlayerOwnSkin(skin.Id) || (offer != null && !_loc4_ || _loc3_ <= _loc7_ && (!_loc6_ || _loc5_ > _loc7_))) {
