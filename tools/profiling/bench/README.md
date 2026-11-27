@@ -120,8 +120,10 @@ and its path from the stage.
 
 It then prints (`python3 record_summ.py profiling/bench/<name>` prints it again): the time and
 FPS per state and per floor, the dungeon seconds grouped by FPS with a frame's blocks and the
-scene's counts in each group, the correlation of the frame time with each count, and the worst
-frames. The groups show what grows when the game is slow.
+scene's counts in each group, the correlation of the frame time with each count, and the long
+frames of the dungeons by what was going on: a floor change (1 s before its `FLOOR` line to 3 s
+after), a menu or a popup up (the layers `game.log` says the game pushed and popped), or playing,
+those last ones listed with their largest part. The groups show what grows when the game is slow.
 
 `DRH_PERF_ALT=<seconds>` compares variants of some code inside one game: they take turns, each
 for that many seconds, so all meet the same content, which two games never do. Variant 0 is the

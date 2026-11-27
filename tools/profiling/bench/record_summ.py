@@ -3,8 +3,9 @@
 
 Per state and per dungeon floor: the time spent, FPS, draws, actors. Then the seconds in a dungeon
 grouped by FPS, with where a frame's time goes in each group and what the scene held, the
-correlation of the frame time with each count, the long frames, and the censuses if any."""
-import bisect, collections, csv, glob, json, math, os, re, sys
+correlation of the frame time with each count, the long frames by what was going on (floor
+change, menu up, playing), and the censuses if any."""
+import bisect, collections, csv, datetime, glob, json, math, os, re, sys
 
 BANDS = [(0, 100), (100, 150), (150, 200), (200, 300), (300, 1e9)]
 DUNGEON = 'RunState'
@@ -227,19 +228,82 @@ def main(run):
     pairs = [(correlation([number(row, name) for row in kept], frame_ms), name) for name in COUNTS]
     print('  ' + '  '.join('%s %.2f' % (name, r) for r, name in sorted(pairs, reverse=True)))
 
-    longs = collections.Counter()
-    worst = []
-    for text in events:
-        match = re.match(r'(\S+) LONGFRAME ms=([\d.]+) at=\S+(?: state=(\S*))?(.*)', text)
-        if match:
-            longs[match.group(3) or '?'] += 1
-            if match.group(3) == DUNGEON:
-                worst.append((float(match.group(2)), float(match.group(1)), match.group(4).strip()))
-    if longs:
-        print('\nlong frames by state: ' + '  '.join('%s %d' % item for item in longs.most_common()))
-        for ms, t, rest in sorted(worst, reverse=True)[:12]:
-            print('  %7.1f ms at %6.0f s  %s' % (ms, t, rest))
+    long_frames(run, events)
     census(run, events)
+
+
+def long_frames(run, events):
+    """The long frames of a dungeon by what the player was doing: a menu or a popup on screen (the
+    game logs the layers it pushes and pops), a floor change (1 s before its FLOOR line to 3 s
+    after, the popup of the floor's end still up or not), or playing. The ones met while playing are listed, they are the ones a player feels."""
+    longs = collections.Counter()
+    frames = []
+    floors = []
+    shift = None
+    for text in events:
+        match = re.match(r'(\S+) FLOOR ', text)
+        if match:
+            floors.append(float(match.group(1)))
+        match = re.match(r'(\S+) LONGFRAME ms=([\d.]+) at=(\S+)(?: state=(\S*))?(.*)', text)
+        if match:
+            longs[match.group(4) or '?'] += 1
+            if shift is None:
+                shift = float(match.group(3)) - float(match.group(1))
+            if match.group(4) == DUNGEON:
+                frames.append((float(match.group(1)), float(match.group(2)), match.group(5).strip()))
+    if not longs:
+        return
+    print('\nlong frames by state: ' + '  '.join('%s %d' % item for item in longs.most_common()))
+    if not frames:
+        return
+    # the layers the game pushed and popped, in the recording's seconds
+    menus, opened = [], {}
+    path = os.path.join(run, 'game.log')
+    if os.path.exists(path):
+        for text in open(path, errors='replace'):
+            match = re.search(r'\[(\d{4}-\d\d-\d\d \d\d:\d\d:\d\d\.\d+)\] (Pushing|Popping) layer: (\w+)', text)
+            if match:
+                at = datetime.datetime.strptime(match.group(1), '%Y-%m-%d %H:%M:%S.%f').timestamp() - shift
+                if match.group(2) == 'Pushing':
+                    opened[match.group(3)] = at
+                elif match.group(3) in opened:
+                    menus.append((opened.pop(match.group(3)), at, match.group(3)))
+        menus += [(at, 1e12, name) for name, at in opened.items()]
+
+    def cause(rest):
+        values = {key: float(value) for key, value in re.findall(r'(\w+)=([+-]?[\d.]+)', rest)}
+        if values.get('collected_mb', 0) >= 50:
+            return 'collection'
+        if values.get('objects', 0) >= 20:
+            return 'objects made'
+        blocks = {key: value for key, value in values.items() if key in ('update', 'network', 'openfl', 'swap') + tuple(IN_EVENTS)}
+        return max(blocks, key=blocks.get) if blocks else '?'
+
+    count, total = collections.Counter(), collections.Counter()
+    playing = []
+    for t, ms, rest in frames:
+        menu = [name for start, end, name in menus if start - 0.3 <= t <= end + 0.3]
+        if any(-1 <= t - floor <= 3 for floor in floors):
+            context = 'floor change'
+        elif menu:
+            context = 'menu up: ' + menu[0]
+        else:
+            context = 'playing'
+            playing.append((t, ms, rest))
+        count[context] += 1
+        total[context] += ms
+    print('long dungeon frames by what was going on:')
+    for context, ms in total.most_common():
+        print('  %-44s %4d frames %7.2f s  %4.0f ms each' % (context, count[context], ms / 1000, ms / count[context]))
+    causes, cause_ms = collections.Counter(), collections.Counter()
+    for t, ms, rest in playing:
+        causes[cause(rest)] += 1
+        cause_ms[cause(rest)] += ms
+    if playing:
+        print('while playing, by the largest part: ' + '  '.join('%s %d (%.0f ms each)' % (name, causes[name], ms / causes[name])
+                                                                for name, ms in cause_ms.most_common()))
+        for ms, t, rest in sorted(((ms, t, rest) for t, ms, rest in playing), reverse=True)[:20]:
+            print('  %7.1f ms at %6.0f s  %s' % (ms, t, rest))
 
 
 def alternated(rows):
