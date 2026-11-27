@@ -11,7 +11,9 @@ with hooks:
 - starling/filters/FragmentFilter.hx: the filter passes counted;
 - networkCode/DcSocket.hx: a timer around the handling of received data;
 - OpenFL's openfl/display/DisplayObjectRenderer.hx (from submodules/openfl): each cached bitmap that is
-  drawn again is told to PerfBot.
+  drawn again is told to PerfBot;
+- OpenFL's openfl/display/_internal/CairoGraphics.hx: a graphics drawn in software, as one with a gradient
+  is, is timed.
 
 DRH_BENCH_PATCHES names a folder of patches (git diff of files under src/) applied over all that:
 changes under test, each written `if (PerfBot.on(k)) new else old`, so that src/ stays as it is.
@@ -115,6 +117,13 @@ if patches:
         if done.returncode != 0:
             sys.exit('make_overlay.py: %s does not apply:\n%s%s' % (patch, done.stdout, done.stderr))
         print('patched: ' + os.path.basename(patch))
+
+cairo = Source('openfl/display/_internal/CairoGraphics.hx', 'submodules/openfl/src')
+cairo.hook(r'^(\tpublic static function render\(graphics:Graphics, renderer:CairoRenderer, allowRenderSizeReuse:Bool = false\):Void\n\t\{\n\t\t#if lime_cairo\n)',
+           r'\1\t\tvar perfT = PerfBot.begin();\n', "the software render of a graphics")
+cairo.hook(r'^(\t\t)(graphics\.__softwareDirty = false;\n\t\tgraphics\.__dirty = false;)$', r'\1PerfBot.softwareGraphics(graphics, perfT);\n\1\2',
+           "the end of the software render of a graphics")
+cairo.save()
 
 shutil.copy(os.path.join(root, 'src/import.hx'), out)
 for file in os.listdir(os.path.join(bench, 'overlay')):

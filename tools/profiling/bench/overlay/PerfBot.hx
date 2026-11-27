@@ -521,6 +521,27 @@ class PerfBot {
 			+ ((why & 16) != 0 ? " GL" : " SW") + ((why & 32) != 0 ? " f" : "") + ((why & 64) != 0 ? " screen" : " draw");
 	}
 
+	/**
+		Called by OpenFL's CairoGraphics (a hook of make_overlay.py) after it drew a graphics in software. A
+		recording notes the ones of 2 ms or more: the timer has a tick of 1 ms.
+	**/
+	@:access(openfl.display.Graphics)
+	public static function softwareGraphics(graphics:openfl.display.Graphics, started:Float):Void {
+		if (!record) return;
+		var ms = (Timer.stamp() - started) * 1000;
+		if (ms < 2) return;
+		var owner = graphics.__owner;
+		var labels = [];
+		var parent:openfl.display.DisplayObject = owner;
+		while (parent != null && parent.parent != null) {
+			labels.unshift(nativeLabel(parent));
+			parent = parent.parent;
+		}
+		var path = labels.length <= 8 ? labels.join("/") : labels.slice(0, 4).join("/") + "/../" + labels.slice(labels.length - 4).join("/");
+		var size = graphics.__bitmap != null ? graphics.__bitmap.width + "x" + graphics.__bitmap.height : "?";
+		note("SOFTWARE ms=" + fmt(ms, 0) + " size=" + size + " state=" + stateName() + " path=stage/" + path);
+	}
+
 	// cache.csv: those objects by branch (the names from the stage down, the middle left out when long), class,
 	// filters and the reason of the last render
 	@:access(openfl.display.DisplayObject)

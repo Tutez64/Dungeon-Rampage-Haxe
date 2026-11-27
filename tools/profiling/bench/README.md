@@ -114,7 +114,9 @@ letters are explained in `PerfBot.whyText`), with
 under the stage, a mod's overlay being `ModOverlay/mod:<id>`) and class.
 `events.log` has a `FLOOR` line per floor and a `LONGFRAME` line for each frame over
 `DRH_PERF_LONG`, with the blocks of that frame, the game objects made or gone during it
-(`objects=`) and what the collector's heap lost when a collection ran (`collected_mb=`).
+(`objects=`) and what the collector's heap lost when a collection ran (`collected_mb=`), and a
+`SOFTWARE` line for each native graphics OpenFL drew in software in 2 ms or more, with its size
+and its path from the stage.
 
 It then prints (`python3 record_summ.py profiling/bench/<name>` prints it again): the time and
 FPS per state and per floor, the dungeon seconds grouped by FPS with a frame's blocks and the
