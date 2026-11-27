@@ -1,24 +1,14 @@
 <xml>
 
-	<section id="vars">
-		<set name="MSVC_ARCH" value="SSE4.2" if="windows HXCPP_M64" />
-	</section>
-
+	<!--
+		The Intel half of the macOS build asks for x86-64-v2: every Mac that runs the macOS the
+		build targets has it. Windows and Linux stay at the compilers' default, x86-64-v1: a
+		processor without SSE4.1, SSE4.2 or POPCNT stops on the first such instruction.
+	-->
 	<section id="exes">
-		<compiler id="linux" if="linux HXCPP_M64">
-			<flag value="-march=x86-64-v2" />
-		</compiler>
 		<compiler id="darwin" if="macos HXCPP_M64" unless="HXCPP_ARM64">
 			<flag value="-march=x86-64-v2" />
 		</compiler>
-
-		<linker id="dll" if="linux HXCPP_M64">
-			<flag value="-march=x86-64-v2" />
-		</linker>
-
-		<linker id="exe" if="linux HXCPP_M64">
-			<flag value="-march=x86-64-v2" />
-		</linker>
 
 		<linker id="dll" if="macos HXCPP_M64" unless="HXCPP_ARM64">
 			<flag value="-march=x86-64-v2" />
