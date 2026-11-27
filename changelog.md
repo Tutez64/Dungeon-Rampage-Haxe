@@ -20,6 +20,7 @@ At tag time, copy these sections into the GitHub release notes under `Changelog`
 - Startup: the game no longer stays on `WAITING FOR STEAM...` forever when its files take longer to load, as on the first launch after the computer starts, where it never asked Steam for the login.
 - Attacks: an attack that zooms the camera, such as a charged attack of the long sword or the monster axe, no longer stalls the game twice for about a tenth of a second, as it did at high frame rates.
 - Death: the dungeon turns grey while your hero is dead, as in DR before its 1.0. It stayed in colour.
+- Windows: the mouse and the keys act at once when the game runs below its frame rate, where the aim followed the mouse seconds late (#58).
 
 ### Improved
 
