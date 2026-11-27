@@ -112,8 +112,9 @@ second). `cache.csv` says which objects those were, by branch, class, filters an
 letters are explained in `PerfBot.whyText`), with
 `native.csv`'s samples. `native.csv` has that list every fifth second, by branch (three levels of names
 under the stage, a mod's overlay being `ModOverlay/mod:<id>`) and class.
-`events.log` has a `FLOOR` line per floor and a `LONGFRAME` line, with the blocks of that frame,
-for each frame over `DRH_PERF_LONG`.
+`events.log` has a `FLOOR` line per floor and a `LONGFRAME` line for each frame over
+`DRH_PERF_LONG`, with the blocks of that frame, the game objects made or gone during it
+(`objects=`) and what the collector's heap lost when a collection ran (`collected_mb=`).
 
 It then prints (`python3 record_summ.py profiling/bench/<name>` prints it again): the time and
 FPS per state and per floor, the dungeon seconds grouped by FPS with a frame's blocks and the
@@ -142,7 +143,9 @@ times.
 second, about 0.3 GB of `perf.data` per half hour). `record_stacks.py` then sorts the main
 thread's samples into the same FPS groups and prints, per function, the milliseconds a frame
 spends in it in each group, sorted by what the slowest group adds (`stacks_bands.txt`). It also
-writes `stacks_<group>.txt` for `callers.py`, `callees.py` and `under.py`.
+writes `stacks_<group>.txt` for `callers.py`, `callees.py` and `under.py`, and
+`stacks_long.txt`, the stacks sampled inside the frames of 25 ms or more, with a table of where the
+time of those frames went (collections, new actors, assets loaded, bakes, sound decoding).
 
 ## Call graphs
 

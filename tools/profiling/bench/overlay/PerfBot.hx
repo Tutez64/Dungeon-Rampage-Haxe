@@ -259,7 +259,9 @@ class PerfBot {
 			if (ms > secMax) secMax = ms;
 			if (ms > 10) secSlow10++;
 			if (ms > 16.7) secSlow16++;
-			if (ms > longMs && (record || stepIndex > 2)) note("LONGFRAME ms=" + fmt(ms, 1) + " at=" + fmt(Sys.time(), 3) + " state=" + stateName() + frameBlocks());
+			if (ms > longMs && (record || stepIndex > 2)) {
+				note("LONGFRAME ms=" + fmt(ms, 1) + " at=" + fmt(Sys.time(), 3) + " state=" + stateName() + frameBlocks() + frameWorld());
+			}
 			if (record) {
 				frameLines.add(fmt((now - startStamp) * 1000, 1));
 				frameLines.add(",");
@@ -276,6 +278,10 @@ class PerfBot {
 			}
 		}
 		lastStamp = now;
+		if (record) {
+			lastObjects = objectCount();
+			lastUsage = Gc.memInfo64(Gc.MEM_INFO_USAGE) / 1048576;
+		}
 		passesFrame = passes;
 		for (i in 0...block.length) blockFrame[i] = block[i];
 		var largeNow = Gc.memInfo64(Gc.MEM_INFO_LARGE) / 1048576;
@@ -317,6 +323,31 @@ class PerfBot {
 			if (ms >= 0.5) text += " " + blockNames[i] + "=" + fmt(ms, 1);
 		}
 		return text + " passes=" + (passes - passesFrame);
+	}
+
+	static var lastObjects = 0;
+	static var lastUsage = 0.0;
+
+	@:access(brain.gameObject.GameObjectManager)
+	static function objectCount():Int {
+		try {
+			var db:facade.DBFacade = cast facade;
+			return db.gameObjectManager.mGameObjects.size;
+		} catch (e:Dynamic) {
+			return 0;
+		}
+	}
+
+	// For a LONGFRAME line of a recording: the game objects made or gone during the frame, and the megabytes
+	// the collector's heap lost, which says a collection ran
+	static function frameWorld():String {
+		if (!record) return "";
+		var text = "";
+		var made = objectCount() - lastObjects;
+		if (made != 0) text += " objects=" + (made > 0 ? "+" : "") + made;
+		var freed = lastUsage - Gc.memInfo64(Gc.MEM_INFO_USAGE) / 1048576;
+		if (freed > 8) text += " collected_mb=" + fmt(freed, 0);
+		return text;
 	}
 
 	// The second's columns after hud_errors: filter passes and filters a frame, slow frames, CPU time of the main
