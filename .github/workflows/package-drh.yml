@@ -28,8 +28,12 @@ jobs:
     name: ${{ inputs.package_name }}
     runs-on: ${{ inputs.runner }}
     env:
-      HXCPP_CONFIG: ${{ github.workspace }}/tools/release/hxcpp-macos-x86-64-v2.xml
+      HXCPP_CONFIG: ${{ github.workspace }}/tools/release/hxcpp-ci.xml
       LIME_CONFIG: ${{ github.workspace }}/tools/release/lime-ci-config.xml
+      # hxcpp keeps the game's objects here, each named after a hash of its source, headers,
+      # options and compiler: see the cpp-cache step. 0 leaves the pruning to that step's script.
+      HXCPP_COMPILE_CACHE: ${{ github.workspace }}/.ci-cache/hxcpp
+      HXCPP_CACHE_MB: "0"
 
     steps:
       - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
@@ -140,7 +144,7 @@ jobs:
             submodules/swf/run.n
             submodules/libhxcpp/hxcpp.n
             submodules/SteamWrap/ndll
-          key: native-${{ inputs.platform }}-nolto-${{ hashFiles('submodules/lime/**', 'submodules/libhxcpp/**', 'submodules/swf/**', 'submodules/SteamWrap/**', 'tools/release/hxcpp-macos-x86-64-v2.xml', 'tools/release/lime-ci-config.xml') }}
+          key: native-${{ inputs.platform }}-nolto-${{ hashFiles('submodules/lime/**', 'submodules/libhxcpp/**', 'submodules/swf/**', 'submodules/SteamWrap/**', 'tools/release/hxcpp-ci.xml', 'tools/release/lime-ci-config.xml') }}
 
       - name: Bootstrap hxcpp
         if: steps.native-cache.outputs.cache-hit != 'true'
@@ -282,16 +286,17 @@ jobs:
           restore-keys: |
             swf-libs-${{ hashFiles('submodules/swf/**', 'submodules/lime/src/lime/tools/AssetHelper.hx', 'tools/release/swf_cache.py') }}-
 
-      # Same split: a compiler or library change does not reuse old objects.
-      # A game-source change restores this platform's previous tree, and hxcpp
-      # recompiles only the .cpp files that are newer than their .o.
+      # hxcpp's compile cache: an object is found again by what it was compiled from, not by
+      # dates, which a fresh checkout makes newer than any restored object. Each run restores
+      # the latest cache of its platform and saves its own, so a change recompiles the files it
+      # touches, and a library or compiler change those whose headers or options it changes.
       - uses: actions/cache@0400d5f644dc74513175e3cd8d07132dd4860809 # v4.2.4
         id: cpp-cache
         with:
-          path: bin/${{ inputs.platform }}/obj
-          key: cpp-obj-${{ inputs.platform }}-nolto-${{ hashFiles('project.xml', 'tools/release/hxcpp-macos-x86-64-v2.xml', 'submodules/libhxcpp/**', 'submodules/hxscript/**', 'submodules/openfl/**', 'submodules/lime/**', 'submodules/swf/**', 'submodules/SteamWrap/**') }}-${{ hashFiles('src/**', 'src-steam/**', 'src-modding/**', 'submodules/ax4/compat/**', 'generated_swf_libraries.xml') }}
+          path: .ci-cache/hxcpp
+          key: hxcpp-objects-v1-${{ inputs.platform }}-${{ github.run_id }}-${{ github.run_attempt }}
           restore-keys: |
-            cpp-obj-${{ inputs.platform }}-nolto-${{ hashFiles('project.xml', 'tools/release/hxcpp-macos-x86-64-v2.xml', 'submodules/libhxcpp/**', 'submodules/hxscript/**', 'submodules/openfl/**', 'submodules/lime/**', 'submodules/swf/**', 'submodules/SteamWrap/**') }}-
+            hxcpp-objects-v1-${{ inputs.platform }}-
 
       - name: Install cached SWF libraries
         shell: bash
@@ -380,6 +385,11 @@ jobs:
           test -f "$macos_app/Contents/MacOS/libsteam_api.dylib"
           test -f "$macos_app/Contents/MacOS/steam_appid.txt"
           test -n "$(find "$macos_app/Contents/Resources/Resources/ffdec_fonts" -name '*.ttf' | head -n 1)"
+
+      # The objects this build did not link go, or the cache would keep every build's.
+      - name: Prune the compile cache
+        shell: bash
+        run: python tools/release/prune_hxcpp_cache.py .ci-cache/hxcpp "bin/${{ inputs.platform }}/obj" --lists ${{ inputs.platform == 'macos' && '2' || '1' }}
 
       - name: Stage SWF libraries for cache
         shell: bash

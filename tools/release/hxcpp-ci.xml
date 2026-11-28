@@ -1,0 +1,34 @@
+<xml>
+
+	<!--
+		What the CI builds add to hxcpp's toolchains, on macOS only.
+
+		The Intel half asks for x86-64-v2: every Mac that runs the macOS the build targets has it.
+		Windows and Linux stay at the compilers' default, x86-64-v1: a processor without SSE4.1,
+		SSE4.2 or POPCNT stops on the first such instruction.
+
+		clang writes the dates of a precompiled header's files in it, and refuses the header once
+		one of them has another date, as every file has after a checkout. Without the dates it
+		takes the header the compile cache restores (HXCPP_COMPILE_CACHE, see package-drh.yml);
+		gcc and MSVC do not look at them.
+	-->
+	<section id="exes">
+		<compiler id="darwin" if="macos">
+			<flag value="-Xclang" />
+			<flag value="-fno-pch-timestamp" />
+		</compiler>
+
+		<compiler id="darwin" if="macos HXCPP_M64" unless="HXCPP_ARM64">
+			<flag value="-march=x86-64-v2" />
+		</compiler>
+
+		<linker id="dll" if="macos HXCPP_M64" unless="HXCPP_ARM64">
+			<flag value="-march=x86-64-v2" />
+		</linker>
+
+		<linker id="exe" if="macos HXCPP_M64" unless="HXCPP_ARM64">
+			<flag value="-march=x86-64-v2" />
+		</linker>
+	</section>
+
+</xml>
