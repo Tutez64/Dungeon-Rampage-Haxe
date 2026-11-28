@@ -310,6 +310,24 @@ jobs:
           tag="${tag#V}"
           haxelib run openfl build project.xml cpp -Ddrh_tag="$tag"
 
+      # The symbol tables, the functions' names, leave the binaries for files of their own,
+      # kept beside the package: gdb and perf read one put next to its binary.
+      - name: Split the Linux symbols
+        if: inputs.platform == 'linux'
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          symbols="bin/linux/Dungeon Rampage Haxe symbols"
+          mkdir -p "$symbols" dist
+          for name in "Dungeon Rampage Haxe" lime.ndll steamwrap.ndll; do
+            binary="bin/linux/bin/$name"
+            objcopy --only-keep-debug "$binary" "$symbols/$name.debug"
+            strip --strip-unneeded "$binary"
+            objcopy --add-gnu-debuglink="$symbols/$name.debug" "$binary"
+          done
+          tar -C "bin/linux" -cJf "dist/Dungeon.Rampage.Haxe.${{ inputs.version }}.Linux.symbols.tar.xz" "Dungeon Rampage Haxe symbols"
+
       - name: Package Linux
         if: inputs.platform == 'linux'
         shell: bash
@@ -338,7 +356,10 @@ jobs:
         run: |
           $tag = "${{ inputs.version }}"
           if ($tag.StartsWith("V")) { $tag = $tag.Substring(1) }
-          haxelib run openfl build project.xml cpp "-Ddrh_tag=$tag"
+          # The functions' names go to a PDB kept beside the package: the executable has none
+          $symbols = "$env:GITHUB_WORKSPACE/bin/windows/symbols" -replace '\\', '/'
+          New-Item -ItemType Directory -Force -Path $symbols | Out-Null
+          haxelib run openfl build project.xml cpp "-Ddrh_tag=$tag" "-DHXCPP_PDB_FILE=$symbols/DungeonRampageHaxe.pdb"
 
       - name: Package Windows
         if: inputs.platform == 'windows'
@@ -362,6 +383,10 @@ jobs:
           if ($fonts.Count -lt 1) { throw "Missing exported SWF fonts" }
 
           Compress-Archive -Path $packageDir -DestinationPath $archive -Force
+
+          $pdb = "bin/windows/symbols/DungeonRampageHaxe.pdb"
+          if (!(Test-Path $pdb)) { throw "Missing $pdb" }
+          Compress-Archive -Path $pdb -DestinationPath "dist/Dungeon.Rampage.Haxe.${{ inputs.version }}.Windows.symbols.zip" -Force
 
       - name: Build and package macOS
         if: inputs.platform == 'macos'
