@@ -398,11 +398,31 @@ jobs:
           output_zip="dist/Dungeon.Rampage.Haxe.${{ inputs.version }}.macOS.zip"
           tag="${{ inputs.version }}"
           tag="${tag#V}"
+          # HXCPP_DEBUG_LINK_AND_STRIP has hxcpp keep each architecture's executable as it was
+          # linked, in its objects folder, before it strips the one of the app. On macOS it
+          # changes nothing else: the objects are compiled as before.
           tools/macos/release_macos_all.sh \
             --output-zip "$output_zip" \
-            -- -Ddrh_tag="$tag"
+            -- -Ddrh_tag="$tag" -DHXCPP_DEBUG_LINK_AND_STRIP
 
           macos_app="bin/macos/bin/Dungeon Rampage Haxe.app"
+
+          # The functions' names, kept beside the package: a dSYM per architecture, which lldb and
+          # atos match to the app's executable by its UUID, and the same names as text.
+          symbols="bin/macos/Dungeon Rampage Haxe symbols"
+          mkdir -p "$symbols"
+          for pair in x86_64:darwin64 arm64:darwinarm64; do
+            arch="${pair%%:*}"
+            unstripped="bin/macos/obj/obj/${pair##*:}/ApplicationMain"
+            test -f "$unstripped"
+            dsymutil "$unstripped" -o "$symbols/Dungeon Rampage Haxe-$arch.dSYM"
+            nm -n "$unstripped" > "$symbols/Dungeon Rampage Haxe-$arch.symbols.txt"
+            echo "$arch: $(wc -l < "$symbols/Dungeon Rampage Haxe-$arch.symbols.txt") symbols linked, $(nm -arch "$arch" "$macos_app/Contents/MacOS/Dungeon Rampage Haxe" | wc -l) left in the app"
+            dwarfdump --uuid "$symbols/Dungeon Rampage Haxe-$arch.dSYM"
+          done
+          dwarfdump --uuid "$macos_app/Contents/MacOS/Dungeon Rampage Haxe"
+          du -sh "$symbols"/*
+          tar -C "bin/macos" -cJf "dist/Dungeon.Rampage.Haxe.${{ inputs.version }}.macOS.symbols.tar.xz" "Dungeon Rampage Haxe symbols"
 
           test -d "$macos_app"
           test -f "$macos_app/Contents/MacOS/lime.ndll"
