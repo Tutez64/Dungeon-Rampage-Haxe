@@ -408,20 +408,20 @@ jobs:
           macos_app="bin/macos/bin/Dungeon Rampage Haxe.app"
 
           # The functions' names, kept beside the package: a dSYM per architecture, which lldb and
-          # atos match to the app's executable by its UUID, and the same names as text.
+          # atos match to the app's executable by its UUID.
           symbols="bin/macos/Dungeon Rampage Haxe symbols"
           mkdir -p "$symbols"
+          app_uuids="$(dwarfdump --uuid "$macos_app/Contents/MacOS/Dungeon Rampage Haxe")"
           for pair in x86_64:darwin64 arm64:darwinarm64; do
             arch="${pair%%:*}"
-            unstripped="bin/macos/obj/obj/${pair##*:}/ApplicationMain"
-            test -f "$unstripped"
-            dsymutil "$unstripped" -o "$symbols/Dungeon Rampage Haxe-$arch.dSYM"
-            nm -n "$unstripped" > "$symbols/Dungeon Rampage Haxe-$arch.symbols.txt"
-            echo "$arch: $(wc -l < "$symbols/Dungeon Rampage Haxe-$arch.symbols.txt") symbols linked, $(nm -arch "$arch" "$macos_app/Contents/MacOS/Dungeon Rampage Haxe" | wc -l) left in the app"
-            dwarfdump --uuid "$symbols/Dungeon Rampage Haxe-$arch.dSYM"
+            dsym="$symbols/Dungeon Rampage Haxe-$arch.dSYM"
+            dsymutil "bin/macos/obj/obj/${pair##*:}/ApplicationMain" -o "$dsym"
+            uuid="$(dwarfdump --uuid "$dsym" | awk '{print $2}')"
+            if [[ -z "$uuid" ]] || ! grep -q "$uuid" <<< "$app_uuids"; then
+              echo "The $arch dSYM ($uuid) does not match the app's executable" >&2
+              exit 1
+            fi
           done
-          dwarfdump --uuid "$macos_app/Contents/MacOS/Dungeon Rampage Haxe"
-          du -sh "$symbols"/*
           tar -C "bin/macos" -cJf "dist/Dungeon.Rampage.Haxe.${{ inputs.version }}.macOS.symbols.tar.xz" "Dungeon Rampage Haxe symbols"
 
           test -d "$macos_app"
